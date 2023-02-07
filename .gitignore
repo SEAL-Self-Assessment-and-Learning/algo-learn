@@ -1,0 +1,11 @@
+node_modules
+.parcel-cache
+dist
+.npm-packages
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

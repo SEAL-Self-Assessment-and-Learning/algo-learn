@@ -1,0 +1,25 @@
+{
+  "i18n-ally.localesPaths": [
+    "src/locales"
+  ],
+  "i18n-ally.sourceLanguage": "en",
+  "i18n-ally.keepFulfilled": true,
+  "i18n-ally.keystyle": "flat",
+  "i18n-ally.sortKeys": true,
+  "i18n-ally.dirStructure": "auto",
+  "i18n-ally.extract.ignoredByFiles": {
+    "src/utils/colorscheme.ts": [
+      "(prefers-color-scheme: dark)",
+      "(prefers-color-scheme: dark)",
+      "(prefers-color-scheme: light)"
+    ]
+  },
+  "search.exclude": {
+    "**/.yarn": true,
+    "**/.pnp.*": true
+  },
+  "eslint.nodePath": ".yarn/sdks",
+  "prettier.prettierPath": ".yarn/sdks/prettier/index.js",
+  "typescript.tsdk": ".yarn/sdks/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  main a {
+    @apply cursor-pointer text-goethe-700 underline hover:bg-black/10 dark:text-goethe-50 dark:hover:bg-goethe-900;
+  } 
+
+  h1 {
+    @apply text-2xl font-bold;
+  }
+
+  h2 {
+    @apply text-xl font-bold;
+  }
+
+  h3 {
+    @apply text-lg font-bold;
+  }
+
+  body {
+    font-family: "Noto Sans", sans-serif;
+  }
+}
