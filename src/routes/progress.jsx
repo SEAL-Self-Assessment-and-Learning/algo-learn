@@ -38,28 +38,24 @@ export function LearningProgress() {
   }
   return (
     <div className="mx-auto max-w-lg">
-      <h1 className="my-5">{t("your-learning-progress")}</h1>
-      <h2 className="my-5">Possible activities:</h2>
+      <h1 className="my-5">{t("Training")}</h1>
 
       <div className="flex flex-col place-items-center">
         <div className="mt-2">
-          <b>1. Practice:</b> This mode will adapt to your skill level over time
-          and preferentially practice your weakest skills first. Your skill
-          strength weakens over time, so keep coming back!
+          <b>1. {t("Practice")}:</b> {t("Practice.desc")}
         </div>
         <Button to="/practice" color="green" className="m-5">
-          Practice now
+          {t("Practice")}
         </Button>
         <div className="mt-6">
-          <b>2. Examine:</b> This mode will skip the practice and allow you to
-          test yourself on the highest skill level.
+          <b>2. {t("Examine")}:</b> {t("Examine.desc")}
         </div>
         <Button to="/examine" color="cyan" className="m-5">
-          Examine
+          {t("Examine")}
         </Button>
       </div>
       <h2 className="mb-5 mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10">
-        {t("simple-learning-overview")}
+        {t("your-learning-progress")}
       </h2>
       <table>
         <tbody>
@@ -79,7 +75,7 @@ export function LearningProgress() {
       <h2 className="mb-5 mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10">
         {t("detailed-learning-progress")}
       </h2>
-      <p className="my-5">Probably more details than you want to know.</p>
+      <p className="my-5">{t("detailed-learning-progress-text")}</p>
       <table>
         <tbody>
           <ProgressLine isHead showVariant />
@@ -91,7 +87,8 @@ export function LearningProgress() {
               onMouseOut={() => setSelectedLog(log)}
               question={question}
               variant={variant}
-              strength={strengthMap[path]}
+              strength={strengthMap[path].p}
+              halflife={strengthMap[path].h}
             />
           ))}
         </tbody>
@@ -99,7 +96,7 @@ export function LearningProgress() {
       <h2 className="mb-5 mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10">
         {t("History")}
       </h2>
-      <p className="my-5">Definitely way too many details.</p>
+      <p className="my-5">{t("history-text")}</p>
       <table className="w-full">
         <tbody>
           <HistoryLines t={t} isHead />
@@ -126,6 +123,7 @@ function ProgressLine({
   variant,
   path,
   strength,
+  halflife,
   isHead = false,
   showVariant = false,
   // onMouseOver,
@@ -148,7 +146,11 @@ function ProgressLine({
   }
 
   const percentage = Math.round(strength * 100)
-  const strengthTooltip = `Strength: ${percentage}%. Decays over time, so practice regularly!`
+  const strengthTooltip = `Estimated strength: ${percentage}%. Decays over time, so practice regularly!${
+    halflife
+      ? ` (Estimated halflife: ~${Math.round(halflife * 10) / 10} days.)`
+      : ""
+  }`
   return (
     <tr
       className={`[&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10`}
@@ -165,7 +167,7 @@ function ProgressLine({
         <button
           aria-label={strengthTooltip}
           data-microtip-position="right"
-          data-microtip-size="medium"
+          data-microtip-size="large"
           role="tooltip"
           className="grid cursor-default place-items-center"
         >
@@ -181,6 +183,7 @@ ProgressLine.propTypes = {
   path: PropTypes.string,
   log: PropTypes.array,
   strength: PropTypes.number,
+  halflife: PropTypes.number,
   showVariant: PropTypes.bool,
   isHead: PropTypes.bool,
   // onMouseOver: PropTypes.func,

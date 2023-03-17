@@ -1,7 +1,13 @@
 import random from "random"
 import { useMemo } from "react"
 import useLocalStorageState from "use-local-storage-state"
-import { SimplifySum, SortTerms } from "./routes/asymptotics"
+import {
+  LandauNotation,
+  Between,
+  SimplifySum,
+  SortTerms,
+} from "./routes/asymptotics"
+import { computeStrength, SkillFeatures } from "./utils/memory-model"
 
 function min<T>(a: T, b: T) {
   return a < b ? a : b
@@ -9,8 +15,7 @@ function min<T>(a: T, b: T) {
 /**
  * List of all questions
  */
-export const questions = [SimplifySum, SortTerms]
-// RelateToSum
+export const questions = [SortTerms, LandauNotation, SimplifySum, Between]
 
 /**
  * List of all valid (question,variant) pairs
@@ -51,43 +56,43 @@ function PathOfEntry(entry: LogEntry, omitSeed: boolean = false): string {
   )
 }
 
-const initialLogExample = [
-  {
-    question: "asymptotics/sort",
-    variant: "pure",
-    seed: "skkpjd93",
-    result: "pass",
-    timestamp: Date.now() - 24 * 3600 * 1000,
-  },
-  {
-    question: "asymptotics/sort",
-    variant: "start",
-    seed: "jd930jz",
-    result: "fail",
-    timestamp: Date.now() - 400000,
-  },
-  {
-    question: "asymptotics/sort",
-    variant: "start",
-    seed: "skm93js",
-    result: "pass",
-    timestamp: Date.now() - 200000,
-  },
-  {
-    question: "asymptotics/sort",
-    variant: "start",
-    seed: "82sjh9w",
-    result: "pass",
-    timestamp: Date.now() - 100,
-  },
-  {
-    question: "asymptotics/sort",
-    variant: "start",
-    seed: "skkpjd93",
-    result: "pass",
-    timestamp: Date.now() - 29,
-  },
-]
+// const initialLogExample = [
+//   {
+//     question: "asymptotics/sort",
+//     variant: "pure",
+//     seed: "skkpjd93",
+//     result: "pass",
+//     timestamp: Date.now() - 24 * 3600 * 1000,
+//   },
+//   {
+//     question: "asymptotics/sort",
+//     variant: "start",
+//     seed: "jd930jz",
+//     result: "fail",
+//     timestamp: Date.now() - 400000,
+//   },
+//   {
+//     question: "asymptotics/sort",
+//     variant: "start",
+//     seed: "skm93js",
+//     result: "pass",
+//     timestamp: Date.now() - 200000,
+//   },
+//   {
+//     question: "asymptotics/sort",
+//     variant: "start",
+//     seed: "82sjh9w",
+//     result: "pass",
+//     timestamp: Date.now() - 100,
+//   },
+//   {
+//     question: "asymptotics/sort",
+//     variant: "start",
+//     seed: "skkpjd93",
+//     result: "pass",
+//     timestamp: Date.now() - 29,
+//   },
+// ]
 
 /**
  * Return the progress of the user
@@ -139,8 +144,6 @@ export function useSkills() {
   }
 }
 
-type SkillFeatures = { numPassed: number; numFailed: number; lag: number }
-
 /**
  * Computes the feature vector for all question variants
  * @param {Object} props
@@ -178,31 +181,6 @@ function computeFeatureMap({ log }: { log: Array<LogEntry> }): {
   return featureMap
 }
 
-/**
- * Given the features of a user/skill pair and the time since the last
- * interaction in minutes, determine the strength of the skill using Leitner's algorithm
- * @param {Object} features the features from which we compute the strength
- * @param {number} features.numPassed the number of times the user passed the question
- * @param {number} features.numFailed the number of times the user failed the question
- * @param {number} features.lag the time since the last interaction in days
- * @returns {number} the strength as determined by Leitner's algorithm
- * See https://blog.duolingo.com/how-we-learn-how-you-learn/
- */
-export function computeStrength({
-  numPassed,
-  numFailed,
-  lag,
-}: SkillFeatures): number {
-  // Leitner's algorithm assumes that the skill decays in this many days to 50%:
-  const halfLife = 2 ** ((numPassed - numFailed - 3) / 2)
-  // (In general, the exponent can be any linear function of the features.)
-
-  // This is the probability of remembering the skill after lag many days:
-  const p = 2 ** (-lag / halfLife)
-
-  return p
-}
-
 function computeStrengthMap({
   featureMap,
 }: {
@@ -210,10 +188,10 @@ function computeStrengthMap({
     [path: string]: SkillFeatures
   }
 }): {
-  [path: string]: number
+  [path: string]: { p: number; h: number }
 } {
   const strengthMap: {
-    [path: string]: number
+    [path: string]: { p: number; h: number }
   } = {}
   for (const [path, feature] of Object.entries(featureMap)) {
     strengthMap[path] = computeStrength(feature)
@@ -226,7 +204,7 @@ export function averageStrength({
   path,
 }: {
   strengthMap: {
-    [path: string]: number
+    [path: string]: { p: number; h: number }
   }
   path: string
 }) {
@@ -235,7 +213,7 @@ export function averageStrength({
 
   let avg = 0
   for (const v of q.variants || []) {
-    avg += strengthMap[path + "/" + v]
+    avg += strengthMap[path + "/" + v].p
   }
   avg /= q.variants.length
   return avg
@@ -252,7 +230,7 @@ export function weakestSkill({
   noise = 0,
 }: {
   strengthMap: {
-    [path: string]: number
+    [path: string]: { p: number; h: number }
   }
   skills: Array<string>
   noise: number
@@ -260,10 +238,10 @@ export function weakestSkill({
   let minPath: string | undefined
   let min = 1
   for (const path of skills) {
-    if (!minPath || strengthMap[path] < min) minPath = path
-    min = strengthMap[path]
+    if (!minPath || strengthMap[path].p < min) minPath = path
+    min = strengthMap[path].p
   }
-  const selection = skills.filter((path) => strengthMap[path] <= min + noise)
+  const selection = skills.filter((path) => strengthMap[path].p <= min + noise)
   if (selection.length == 0) throw Error("Cannot find weakest skill")
   return random.choice(selection) ?? "unreachable"
 }
@@ -290,7 +268,7 @@ export function computeUnlockedSkills({
   thresholdStrength = 0.75,
 }: {
   strengthMap: {
-    [path: string]: number
+    [path: string]: { p: number; h: number }
   }
   thresholdStrength?: number
 }) {
@@ -300,7 +278,7 @@ export function computeUnlockedSkills({
     for (const v of q.variants) {
       const qv = q.path + "/" + v
       unlockedPaths.push(qv)
-      if (strengthMap[qv] < thresholdStrength) break
+      if (strengthMap[qv].p < thresholdStrength) break
     }
   }
   return unlockedPaths

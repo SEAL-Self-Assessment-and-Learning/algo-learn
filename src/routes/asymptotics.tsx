@@ -1,19 +1,13 @@
 // Learning goal:
 // I can simplify expressions in asymptotic notation
 import { TFunction } from "i18next"
-import { all, create, log2, MathNode } from "mathjs"
 import random, { RNGFactory } from "random"
 import { FunctionComponent, ReactElement, ReactNode, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLoaderData, useNavigate } from "react-router-dom"
 
-const math = create(all)
-
-import nerdamer from "nerdamer"
-
-import "nerdamer/Algebra.js"
-import "nerdamer/Calculus.js"
-// import "nerdamer/Solve.js"
+import { MathNode } from "mathjs"
+import math from "../utils/math"
 
 import {
   ExerciseMultipleChoice,
@@ -25,11 +19,13 @@ import {
 import TeX from "../components/TeX"
 import {
   AsymptoticTerm,
+  mathNodeToAsymptoticTerm,
   sampleTermSet,
   TermSetVariants,
   TermVariants,
+  TooComplex,
 } from "../utils/AsymptoticTerm"
-import { playPassSound } from "../utils/audio"
+import { playFailSound, playPassSound } from "../utils/audio"
 import shuffleArray from "../utils/shuffle"
 
 /**
@@ -91,6 +87,10 @@ SimplifySum.title = "asymptotics.sum.title"
 
 /**
  * Generate and render a question about sorting terms
+ *
+ * This exercise trains students on the competency of understanding and applying asymptotic notation in the context of analyzing algorithmic time complexity. Specifically, the exercise focuses on the skill of sorting terms in order of their growth rate, which is a key step in analyzing the time complexity of an algorithm.
+ *
+ * By practicing this skill, students will become more familiar with the different types of asymptotic notation (e.g., big-O, big-omega, big-theta), and they will learn how to identify the dominant term in an expression and compare its growth rate with other terms. This is a foundational skill for analyzing the time complexity of algorithms and designing efficient algorithms.
  * @returns {ReactElement} output
  */
 export function SortTerms({
@@ -181,24 +181,6 @@ export function RouteToQuestion({
   )
 }
 
-// const customFunctions = {
-//   log: function (a) {
-//     return log2(a)
-//   },
-// }
-// customFunctions.log.toTex = "\\mathrm{${name}}\\left(${args}\\right)" //template string
-math.log = log2
-math.log.toTex = "\\mathrm{${name}}\\left(${args}\\right)" //template string
-// math.import(customFunctions)
-delete math.Unit // remove units
-console.log(math)
-
-function customLaTeX(node, options) {
-  // if (node.type === "FunctionNode" && node.name === "log") {
-  //   return "\\log({" + node.args[0].toTex(options) + "})"
-  // }
-}
-
 /**
  * Return all variables in a given mathjs expression
  * @param {MathNode} node
@@ -221,24 +203,24 @@ function getVars(node: MathNode): Array<string> {
   }
 }
 
-function parseAsAsymptoticTerm(node: MathNode): AsymptoticTerm {
-  const simpleNode = math.simplify(node)
-  if (node instanceof math.OperatorNode && node.args instanceof Array) {
-    const args = node.args.map(parseAsAsymptoticTerm)
-  } else if (node instanceof math.SymbolNode) {
-    return [node.name]
-  } else if (node instanceof math.ParenthesisNode) {
-    return getVars(node.content as MathNode)
-  } else {
-    return []
-  }
-}
+// function parseAsAsymptoticTerm(node: MathNode): AsymptoticTerm {
+//   const simpleNode = math.simplify(node)
+//   if (node instanceof math.OperatorNode && node.args instanceof Array) {
+//     const args = node.args.map(parseAsAsymptoticTerm)
+//   } else if (node instanceof math.SymbolNode) {
+//     return [node.name]
+//   } else if (node instanceof math.ParenthesisNode) {
+//     return getVars(node.content as MathNode)
+//   } else {
+//     return []
+//   }
+// }
 
 /**
  * Generate and render a question about O/Omega/o/omega
  * @returns {ReactElement} output
  */
-export function RelateToSum({
+export function Between({
   seed,
   variant,
   t,
@@ -259,7 +241,7 @@ export function RelateToSum({
 
   const functionName = random.choice("fghFGHT".split("")) as string
   const variable = random.choice("nmNMxyztk".split("")) as string
-  const [a, b] = sampleTermSet({ variable, numTerms: 2, variant: "polylog" })
+  const [a, b] = sampleTermSet({ variable, numTerms: 2, variant })
   let aLandau, bLandau
   if (a.compare(b) < 0) {
     aLandau = "\\omega"
@@ -269,48 +251,17 @@ export function RelateToSum({
     bLandau = "\\omega"
   }
 
-  const landaus = shuffleArray(["\\omega", "\\Theta", "o"])
-  // const correctLandau = c == sorted[0] || c == sorted[1] ? "\\omega" : "o"
-  const answers = landaus.map((landau) => ({
-    key: landau,
-    element: (
-      <TeX>
-        {landau}\big({a.toLatex(true)}\big)
-      </TeX>
-    ),
-    correct: true,
-  }))
-
   const functionDeclaration = `${functionName}\\colon\\mathbb N\\to\\mathbb R`
   const aTeX = `${aLandau}(${a.toLatex()})`
   const bTeX = `${bLandau}(${b.toLatex()})`
 
-  let testOutput
+  let parsed: AsymptoticTerm
   let textFeedback: ReactNode = "please enter an expression"
   let feedbackType: "ok" | "error" = "error"
   if (text) {
     try {
       const expr = math.parse(text)
-      console.log(math.simplify(expr))
-      // testTex = math.simplify(math.derivative(expr, "x")).toTex({
-      //   parenthesis: "auto",
-      //   handler: customLaTeX,
-      //   implicit: "show",
-      // })
-      // const expr = nerdamer(text)
-      console.log("Your expression:", expr)
-      // const unknownVar = expr.variables().find((v) => v !== variable)
-      const unknownVarsss = expr
-        .filter(
-          (node) =>
-            node.isSymbolNode &&
-            !node.isFunctionNode &&
-            node.name !== variable &&
-            node.name !== "log"
-        )
-        .map((node) => node.name as string)
       const unknownVars = getVars(expr).filter((v) => v !== variable)
-      console.log(unknownVars)
       const unknownVar: string | null =
         unknownVars.length > 0 ? unknownVars[0] : null
       if (unknownVar) {
@@ -322,56 +273,28 @@ export function RelateToSum({
           </>
         )
       } else {
-        // math.js:
+        feedbackType = "ok"
         textFeedback = (
           <TeX>
             {expr.toTex({
               parenthesis: "auto",
-              handler: customLaTeX,
               implicit: "show",
             })}
           </TeX>
         )
-        // Nerdamer:
-        // textFeedback = <TeX>{expr.toTeX()}</TeX>
-        feedbackType = "ok"
+        try {
+          parsed = mathNodeToAsymptoticTerm(expr, variable)
+        } catch (e) {
+          if (e instanceof TooComplex) {
+            textFeedback = <>&apos;{e.node.toString()}&apos; is too complex!</>
+            feedbackType = "error"
+          } else {
+            throw e
+          }
+        }
       }
-    } catch {
+    } catch (e) {
       textFeedback = "unable to parse your expression"
-    }
-
-    try {
-      if (feedbackType === "ok") {
-        testOutput = (
-          <>
-            <TeX>a={nerdamer(a.toString()).toTeX()}</TeX>
-            <br />
-            <TeX>b={nerdamer(b.toString()).toTeX()}</TeX>
-          </>
-        )
-        // testOutput = (
-        //   <div>
-        //     {testOutput}
-        //     <br />
-        //     text/a=
-        //     <TeX>
-        //       {nerdamer(
-        //         `limit((${text})/(${a.toString()}),${variable},Infinity)`
-        //       ).toTeX()}
-        //     </TeX>
-        //     <br />
-        //     text/b=
-        //     <TeX>
-        //       {nerdamer(
-        //         `limit((${text})/(${b.toString()}),${variable},Infinity)`
-        //       ).toTeX()}
-        //     </TeX>
-        //   </div>
-        // )
-      }
-    } catch {
-      textFeedback = "your expression is too complicated, please simplify it"
-      feedbackType = "error"
     }
   }
   const msgColor =
@@ -379,7 +302,7 @@ export function RelateToSum({
       ? "text-red-600 dark:text-red-400"
       : "text-green-600 dark:text-green-400"
 
-  const title = t(RelateToSum.title)
+  const title = t(Between.title)
   const mode =
     feedbackType === "error"
       ? "disabled"
@@ -400,32 +323,40 @@ export function RelateToSum({
     if (mode === "disabled") {
       setMode("verify")
     } else if (mode === "verify") {
-      if (textFeedback === null) return
-      playPassSound()
-      setMode("correct")
+      if (textFeedback === null || feedbackType === "error") return
+      if (parsed.compare(a) * parsed.compare(b) < 0) {
+        playPassSound()
+        setMode("correct")
+      } else {
+        playFailSound()
+        setMode("incorrect")
+      }
     } else if (mode === "correct" || mode === "incorrect") {
       onResult(mode)
     }
   }
+  const condA = `${functionName}(${variable}) \\in ${aTeX}`
+  const condB = `${functionName}(${variable}) \\in ${bTeX}`
   return (
     <QuestionContainer>
       <QuestionHeader title={title} regeneratable={regeneratable} />
-      <Trans t={t} i18nKey="asymptotics.RelateToSum.text">
+      <Trans t={t} i18nKey="asymptotics.between.text">
         Enter a function <TeX>{{ functionDeclaration } as any}</TeX> that
-        satisfies{" "}
-        <TeX block>
-          {functionName}({variable}) \in {{ aTeX } as any}
-        </TeX>{" "}
-        and{" "}
-        <TeX block>
-          {functionName}({variable}) \in {{ bTeX } as any}\,.
+        satisfies <TeX block>{{ condA } as any}</TeX> and{" "}
+        <TeX block>{{ condB } as any}</TeX>
+      </Trans>
+      <br />
+      <br />
+      <div className="flex place-items-center gap-2 pl-3">
+        <TeX>
+          {functionName}({variable})=
         </TeX>
-        <br />
-        <br />
-        <div className="flex place-items-center gap-2 pl-3">
-          <TeX>
-            {functionName}({variable})=
-          </TeX>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleClick()
+          }}
+        >
           <input
             type="text"
             onChange={(e) => {
@@ -433,72 +364,100 @@ export function RelateToSum({
             }}
             value={text}
             className="rounded-md bg-gray-300 p-2 dark:bg-gray-900"
+            disabled={mode === "correct" || mode === "incorrect"}
           />
-          <div className={msgColor}>{textFeedback}</div>
-        </div>
-        <div>{testOutput}</div>
-        <div className="p-5 text-slate-600 dark:text-slate-400">
+        </form>
+        <div className={msgColor}>{textFeedback}</div>
+      </div>
+      <div className="p-5 text-slate-600 dark:text-slate-400">
+        <Trans t={t} i18nKey="asymptotics.between.note">
           Note: This text field accepts <i>simple</i> mathematical expressions,
-          such as &ldquo;<span className="font-mono">96n^3</span>&rdquo;,{" "}
-          &ldquo;<span className="font-mono">n log(n)</span>&rdquo;, &ldquo;
-          <span className="font-mono">n^(2/3)</span>&rdquo;, or &ldquo;
-          <span className="font-mono">n^2 / log(log(n))</span>&rdquo;.
-        </div>
-      </Trans>
+          such as
+        </Trans>{" "}
+        &ldquo;<span className="font-mono">96n^3</span>&rdquo;, &ldquo;
+        <span className="font-mono">n log(n)</span>&rdquo;, {t("or")} &ldquo;
+        <span className="font-mono">n^(2/3)</span>&rdquo;.
+      </div>
       <QuestionFooter mode={mode} message={message} buttonClick={handleClick} />
     </QuestionContainer>
   )
 }
-RelateToSum.variants = ["default"]
-RelateToSum.path = "asymptotics/relate"
-RelateToSum.title = "asymptotics.relate.title"
-
-// function MathNodeToAsymptoticTerm(node: MathNode): AsymptoticTerm {
-//   const term = new AsymptoticTerm({})
-//   if (node.isOperatorNode) {
-//     if (node.op === "^") {
-//       const base = node.args[0]
-//       if (base.isSymbolNode) {
-//       } else if (base.isConstantNode) {
-//       } else {
-//         return null
-//       }
-//       const exponent = node.args[1]
-//     }
-//   }
-// }
+Between.variants = ["start", "polylog"]
+Between.path = "asymptotics/between"
+Between.title = "asymptotics.between.title"
 
 /**
- * The following function can parse simple mathematical expressions, such as
- * "n^3", "log n", "n^3 * log n", "n^3 * log log n", "n/ log log n".
- *
- * NOTE: We are now using math.parse() from mathjs instead.
+ * Generate and render a question about asymptotic notation
+ * @param {Object} props
+ * @param {string} props.seed - seed for random number generator
+ * @param {TFunction} props.t - translation function
+ * @param {(result: "correct" | "incorrect" | "abort") => void} props.onResult - callback function
+ * @param {boolean} props.regeneratable - whether the question can be regenerated
+ * @returns {ReactElement} output
  */
-// function parseSimpleMath(str: string) {
-//   // first, we identify the tokens:
-//   // sequences of letters and numbers are tokens, such as "log" everything else is a separator
-//   str = str
-//     .split(/([A-Za-z]+)/)
-//     .filter((e) => e.trim().length > 0)
-//     .join(" ")
-//   const tokens = str
-//     .split(/([0-9]+)/)
-//     .filter((e) => e.trim().length > 0)
-//     .join(" ")
+export function LandauNotation({
+  seed,
+  t,
+  onResult,
+  regeneratable = false,
+}: {
+  seed: string
+  t: TFunction
+  onResult: (result: "correct" | "incorrect" | "abort") => void
+  regeneratable?: boolean
+}): ReactElement {
+  random.use(RNGFactory(seed))
 
-//   // Now we construct the parse tree:
-//   const stack = []
-//   for (const token of tokens) {
-//     if (token === "*") {
-//       const a = stack.pop()
-//       const b = stack.pop()
-//       stack.push(`${b} \\cdot ${a}`)
-//     } else if (token === "/") {
-//       const a = stack.pop()
-//       const b = stack.pop()
-//       stack.push(`\\frac{${b}}{${a}}`)
-//     } else {
-//       stack.push(token)
-//     }
-//   }
-// }
+  const functionTypes = ["\\log n", "n", "n^2", "2^n"]
+  const notationTypes = ["o", "O", "\\omega", "\\Theta", "\\Omega"]
+
+  const NUM_QUESTIONS = 8
+
+  // Choose a function and an asymptotic notation type
+  const answers = []
+  while (answers.length < NUM_QUESTIONS) {
+    const variable = random.choice("nmNMxyztk".split("")) as string
+    const functionLeft = random.choice(functionTypes) as string
+    const functionRight = random.choice(functionTypes) as string
+    const notation = random.choice(notationTypes) as string
+    const correct =
+      functionLeft === functionRight
+        ? notation === "\\Theta" || notation === "O" || notation === "\\Omega"
+        : functionTypes.findIndex((e) => e === functionLeft) <
+          functionTypes.findIndex((e) => e === functionRight)
+        ? notation == "o" || notation == "O"
+        : notation == "\\omega" || notation == "\\Omega"
+    const key = `${functionLeft.replaceAll(
+      "n",
+      variable
+    )} = ${notation}(${functionRight.replaceAll("n", variable)})`
+    const element = <TeX>{key}</TeX>
+
+    const isDuplicate = answers.findIndex((e) => e.key === key) >= 0
+    const allIncorrect =
+      answers.length == NUM_QUESTIONS - 1 &&
+      answers.findIndex((e) => e.correct) == -1 &&
+      !correct
+    if (!isDuplicate && !allIncorrect) {
+      answers.push({ key, correct, element })
+    }
+  }
+
+  shuffleArray(answers)
+
+  return (
+    <ExerciseMultipleChoice
+      title={t("asymptotics.landau.long-title")}
+      answers={answers}
+      onResult={onResult}
+      key={window.location.pathname}
+      regeneratable={regeneratable}
+      allowMultiple
+    >
+      {t("asymptotics.landau.text")}
+    </ExerciseMultipleChoice>
+  )
+}
+LandauNotation.path = "asymptotics/landau"
+LandauNotation.title = "asymptotics.landau.title"
+LandauNotation.variants = ["default"]

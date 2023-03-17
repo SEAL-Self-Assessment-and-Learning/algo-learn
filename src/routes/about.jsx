@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { AiFillGithub } from "react-icons/ai"
+import { SiDuolingo, SiReact } from "react-icons/si"
 import { Link } from "react-router-dom"
 
 export function About() {
@@ -16,9 +17,7 @@ export function About() {
       <p>
         The site uses an artificial intelligence algorithm to learn which
         problems you tend to struggle with, and present them to you more often.
-        Over time, the algorithm will adapt to your demonstrated skill strength,
-        and you will be able to focus on the problems that you are struggling
-        with. (No, it&apos;s not as good as tik-tok yet.)
+        Over time, the algorithm will adapt to your demonstrated skill strength.
       </p>
       <h2 className="mt-5">Spaced repetition</h2>
       <p>
@@ -53,8 +52,12 @@ export function About() {
       </p>
       <h2 className="mt-5">Source Code</h2>
       <p>
-        This site is built in <Link to="https://reactjs.org/">React</Link> and
-        is available as open source software on{" "}
+        This site is built in{" "}
+        <Link to="https://reactjs.org/">
+          <SiReact className="inline" />
+          React
+        </Link>{" "}
+        and is available as open source software on{" "}
         <a href="https://github.com/holgerdell/algo-learn/">
           <AiFillGithub className="inline" />
           github
@@ -64,8 +67,11 @@ export function About() {
       <h2 className="mt-5">Inspiration</h2>
       <p>
         This site is heavily inspired by the popular language learning tool{" "}
-        <Link to="https://duolingo.com/">duolingo</Link> and its research
-        division{" "}
+        <Link to="https://duolingo.com/">
+          <SiDuolingo className="inline" />
+          duolingo
+        </Link>{" "}
+        and its research division{" "}
         <Link to="https://research.duolingo.com/">duolingo research</Link>.
       </p>
     </div>

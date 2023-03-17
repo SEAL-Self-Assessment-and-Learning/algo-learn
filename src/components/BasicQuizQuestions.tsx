@@ -7,7 +7,7 @@
 // - Drag-and-drop sorting questions
 
 import "microtip/microtip.css"
-import { ChangeEvent, Fragment, ReactNode, useState } from "react"
+import { ChangeEvent, ReactNode, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { BiLink, BiRefresh } from "react-icons/bi"
 import { GiPlayButton } from "react-icons/gi"
@@ -222,7 +222,9 @@ export function ExerciseMultipleChoice({
   }
   allowMultiple ??= correctAnswers.length !== 1
   const [mode, setMode] = useState(
-    "disabled" as "disabled" | "verify" | "correct" | "incorrect"
+    allowMultiple
+      ? "verify"
+      : ("disabled" as "disabled" | "verify" | "correct" | "incorrect")
   )
   const [checked, setChecked] = useState([] as Array<string>)
 
@@ -249,7 +251,7 @@ export function ExerciseMultipleChoice({
         </b>
         <br />
         {correctAnswers.map((item) => (
-          <Fragment key="item.key">{item.element}</Fragment>
+          <div key="item.key">{item.element}</div>
         ))}
       </>
     ) : null

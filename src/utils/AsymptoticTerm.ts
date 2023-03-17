@@ -2,6 +2,16 @@ import Fraction from "fraction.js"
 import random from "random"
 import shuffleArray from "./shuffle"
 
+import { MathNode } from "mathjs"
+import math from "../utils/math"
+
+export function max(a: Fraction, b: Fraction) {
+  return a.compare(b) > 0 ? a : b
+}
+export function min(a: Fraction, b: Fraction) {
+  return a.compare(b) < 0 ? a : b
+}
+
 /**
  * A class representing a product term.
  * @class
@@ -33,14 +43,14 @@ export class AsymptoticTerm {
     logbasis = 2,
     expBase = 1,
     polyexponent = 0,
-    variable = "n",
+    variable,
   }: {
     coefficient?: number | Fraction
     logexponent?: number | Fraction
     logbasis?: number | Fraction
     expBase?: number | Fraction
     polyexponent?: number | Fraction
-    variable?: string
+    variable: string
   }) {
     this.coefficient = new Fraction(coefficient)
     this.polyexponent = new Fraction(polyexponent)
@@ -157,17 +167,55 @@ export class AsymptoticTerm {
   }
 
   compare(t: AsymptoticTerm): number {
+    if (t.coefficient.equals(0)) {
+      if (this.coefficient.equals(0)) return 0
+      else if (this.coefficient.compare(0) > 0) return 1
+      else return -1
+    }
+    if (this.coefficient.equals(0)) {
+      if (t.coefficient.compare(0) > 0) return -1
+      else return 1
+    }
+
+    if (this.coefficient.compare(0) < 0 && t.coefficient.compare(0) > 0) {
+      return -1
+    } else if (
+      this.coefficient.compare(0) > 0 &&
+      t.coefficient.compare(0) < 0
+    ) {
+      return 1
+    }
+
+    const sign = this.coefficient.compare(0) > 0 ? 1 : -1
+
     let cmp = this.expBase.compare(t.expBase)
-    if (cmp != 0) {
-      return cmp
-    }
+    if (cmp === 0) cmp = this.polyexponent.compare(t.polyexponent)
+    if (cmp === 0) cmp = this.logexponent.compare(t.logexponent)
+    return cmp * sign
+  }
 
-    cmp = this.polyexponent.compare(t.polyexponent)
-    if (cmp != 0) {
-      return cmp
-    }
+  isConstant(): boolean {
+    return (
+      this.polyexponent.equals(0) &&
+      this.logexponent.equals(0) &&
+      this.expBase.equals(1)
+    )
+  }
 
-    return this.logexponent.compare(t.logexponent)
+  isLinear(): boolean {
+    return (
+      this.polyexponent.equals(1) &&
+      this.logexponent.equals(0) &&
+      this.expBase.equals(1)
+    )
+  }
+
+  isLogarithmic(): boolean {
+    return (
+      this.polyexponent.equals(0) &&
+      this.logexponent.equals(1) &&
+      this.expBase.equals(1)
+    )
   }
 }
 
@@ -259,6 +307,7 @@ export function sampleTerm(
   switch (variant) {
     case "log": {
       return new AsymptoticTerm({
+        variable,
         coefficient: sampleFraction({
           fractionProbability: 1 / 3,
         }),
@@ -272,6 +321,7 @@ export function sampleTerm(
     }
     case "poly": {
       return new AsymptoticTerm({
+        variable,
         coefficient: sampleFraction({
           fractionProbability: 1 / 3,
         }),
@@ -282,6 +332,7 @@ export function sampleTerm(
     }
     case "exp": {
       return new AsymptoticTerm({
+        variable,
         coefficient: sampleFraction({
           fractionProbability: 1 / 3,
         }),
@@ -291,36 +342,6 @@ export function sampleTerm(
         }),
       })
     }
-    // case "pureSimple": {
-    //   const C = sampleFraction({
-    //     oneProbability: 2 / 3,
-    //     fractionProbability: 0,
-    //   })
-    //   if (random.int(1, 3) == 1) {
-    //     return new AsymptoticTerm({
-    //       coefficient: C,
-    //       logexponent: sampleFraction({
-    //         fractionProbability: 0,
-    //         maxInt: 3,
-    //       }),
-    //       logbasis: sampleFraction({
-    //         fractionProbability: 0,
-    //         minInt: 2,
-    //         maxInt: 7,
-    //       }),
-    //       variable,
-    //     })
-    //   } else {
-    //     return new AsymptoticTerm({
-    //       coefficient: C,
-    //       polyexponent: sampleFraction({
-    //         fractionProbability: 0,
-    //         maxInt: 17,
-    //       }),
-    //       variable,
-    //     })
-    //   }
-    // }
     case "pure": {
       const C = sampleFraction({
         fractionProbability: 1 / 3,
@@ -405,6 +426,7 @@ export function sampleTerm(
 export type TermSetVariants =
   | "start" // log, poly, exp, at least one of each
   | TermVariants
+
 /**
  * Generate a random set of asymptotically distinct terms
  * @param {Object} options
@@ -448,4 +470,165 @@ export function sampleTermSet({
     set.push(t)
   }
   return shuffleArray(set)
+}
+
+// Define an Error "TooComplex" that is thrown when an expression is too
+// complex to be parsed.
+export class TooComplex extends Error {
+  node: math.MathNode
+  constructor(node: math.MathNode) {
+    super("This expression is too complex to be parsed.")
+    this.node = node
+    this.name = "TooComplex"
+  }
+}
+
+/**
+ * A function that converts a math.MathNode to an AsymptoticTerm.
+ * @function
+ * @param {math.MathNode} node - The math.MathNode to convert.
+ * @param {string} variable - The variable of the AsymptoticTerm.
+ * @returns {AsymptoticTerm} - The AsymptoticTerm equivalent of the math.MathNode.
+ */
+export function mathNodeToAsymptoticTerm(
+  node: MathNode,
+  variable: string
+): AsymptoticTerm {
+  node = math.simplify(node)
+  if (node.type === "ConstantNode") {
+    const n = node as math.ConstantNode
+    return new AsymptoticTerm({
+      coefficient: n.value,
+      variable,
+    })
+  }
+
+  if (node.type === "SymbolNode") {
+    const n = node as math.SymbolNode
+    if (n.name === variable) {
+      return new AsymptoticTerm({
+        polyexponent: 1,
+        variable,
+      })
+    } else {
+      throw Error("unknown symbol '" + n.name + "'")
+    }
+  }
+
+  if (node.type === "OperatorNode") {
+    const n = node as math.OperatorNode
+    if (!(n.args instanceof Array))
+      throw Error("expected args to be an array of arguments")
+
+    if (n.op === "*") {
+      const factors = n.args.map((arg) =>
+        mathNodeToAsymptoticTerm(arg, variable)
+      )
+      return factors.reduce((result, factor) => {
+        result.coefficient = result.coefficient.mul(factor.coefficient)
+        result.polyexponent = result.polyexponent.add(factor.polyexponent)
+        result.logexponent = result.logexponent.add(factor.logexponent)
+        result.logbasis = max(result.logbasis, factor.logbasis)
+        result.expBase = result.expBase.mul(factor.expBase)
+        return result
+      }, new AsymptoticTerm({ variable }))
+    }
+
+    if (n.op === "/") {
+      if (n.args.length !== 2)
+        throw Error("expected 2 arguments at node '" + n.toString() + "'")
+      const [a, b] = n.args.map((arg) =>
+        mathNodeToAsymptoticTerm(arg, variable)
+      )
+      return new AsymptoticTerm({
+        coefficient: a.coefficient.div(b.coefficient),
+        polyexponent: a.polyexponent.sub(b.polyexponent),
+        logexponent: a.logexponent.sub(b.logexponent),
+        logbasis: max(a.logbasis, b.logbasis),
+        expBase: a.expBase.div(b.expBase),
+        variable,
+      })
+    }
+
+    if (n.op === "^" && n.args.length === 2) {
+      const base = mathNodeToAsymptoticTerm(n.args[0], variable)
+      const exponent = mathNodeToAsymptoticTerm(n.args[1], variable)
+      if (exponent.isConstant()) {
+        base.coefficient = base.coefficient.pow(exponent.coefficient)
+        base.logexponent = base.logexponent.mul(exponent.coefficient)
+        base.polyexponent = base.polyexponent.mul(exponent.coefficient)
+        base.expBase = base.expBase.pow(exponent.coefficient)
+        return base
+      } else if (base.isConstant() && exponent.isLinear()) {
+        const result = new AsymptoticTerm({ variable, coefficient: 1 })
+        result.expBase = base.coefficient.pow(exponent.coefficient)
+        return result
+      } else if (base.isConstant() && exponent.isLogarithmic()) {
+        const result = new AsymptoticTerm({ variable, coefficient: 1 })
+        result.polyexponent = new Fraction(
+          math.log(base.coefficient.valueOf(), exponent.logbasis.valueOf())
+        ).mul(exponent.coefficient)
+        return result
+      }
+    }
+  }
+
+  function baseOfLog(name: string): number | undefined {
+    if (name.startsWith("log")) {
+      const [, base] = name.split("_")
+      if (base) {
+        return parseInt(base)
+      } else {
+        return 2
+      }
+    }
+    if (name === "lg") {
+      return 10
+    }
+    if (name === "ln") {
+      return math.e
+    }
+  }
+  function logOf(t: AsymptoticTerm, base = 2): AsymptoticTerm | undefined {
+    // logarithm of an expression <= 0 is undefined
+    if (t.coefficient.compare(0) <= 0) return
+
+    // Moreover, we currently do not support log(log(n)) to be the leading term after the logOf operation
+    if (
+      t.logexponent.compare(0) > 0 &&
+      t.polyexponent.compare(0) <= 0 &&
+      t.expBase.compare(0) <= 1
+    )
+      return
+
+    const logCoeff = new AsymptoticTerm({
+      coefficient: math.log(t.coefficient.valueOf(), base),
+      variable: t.variable,
+    })
+    const logPoly = new AsymptoticTerm({
+      logbasis: base,
+      logexponent: 1,
+      coefficient: t.polyexponent,
+      variable: t.variable,
+    })
+    const logExp = new AsymptoticTerm({
+      polyexponent: 1,
+      coefficient: math.log(t.expBase.valueOf(), base),
+      variable: t.variable,
+    })
+    return [logCoeff, logPoly, logExp].sort((a, b) => a.compare(b)).pop()
+  }
+
+  if (node.type === "FunctionNode") {
+    const n = node as math.FunctionNode
+    const base = baseOfLog(n.fn.name)
+    const arg = mathNodeToAsymptoticTerm(n.args[0], variable)
+    if (base) {
+      const l = logOf(arg, base)
+      if (l !== undefined) {
+        return l
+      }
+    }
+  }
+  throw new TooComplex(node)
 }
