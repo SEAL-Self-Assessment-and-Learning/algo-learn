@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "module": "ES2022",
+    "module": "ES6",
     "jsx": "react-jsx",
     "checkJs": true
   },
-  "exclude": [".yarn", "node_modules", "**/node_modules/*"]
+  "include": ["src/**/*"]
 }

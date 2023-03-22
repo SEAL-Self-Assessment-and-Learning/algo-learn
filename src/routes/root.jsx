@@ -26,47 +26,19 @@ export default function Root() {
     document.body.className = theme
   }, [theme])
 
-  // const skillData = useSkills()
-
-  // const [sidebar, setSidebar] = useLocalStorageState("sidebar", {
-  //   defaultValue: true,
-  // })
-  //
-  // const { t } = useTranslation()
-  //
-  // const sidebarNode = !sidebar ? null : (
-  //   <Sidebar>
-  //     <SidebarItem text={t("Help")} icon={<FiHelpCircle />}>
-  //       {t("helpButtonText")}
-  //     </SidebarItem>
-  //     <SidebarItem text={t("sidebar sum")}>
-  //       <Link to="/asymptotics/sum">Link</Link>
-  //     </SidebarItem>
-  //     <SidebarItem text={t("sidebar sort")}>
-  //       <Link to="/asymptotics/sort">Link</Link>
-  //     </SidebarItem>
-  //   </Sidebar>
-  // )
-
   return (
-    <div className="max-w-screen min-h-screen overflow-x-hidden bg-slate-200 text-black dark:bg-slate-800 dark:text-white">
-      <div className="flex h-screen flex-col">
+    <div className="max-w-screen overflow-x-hidden dark:bg-black dark:text-white">
+      <div className="flex min-h-screen flex-col">
         <GlobalHeader
           theme={theme}
           userTheme={userTheme}
           toggleTheme={toggleTheme}
           setUserTheme={setUserTheme}
         />
-        {/* <AppHeader
-          sidebar={sidebar}
-          toggleSidebar={() => setSidebar(!sidebar)}
-        /> */}
         <div className="relative flex flex-1">
-          {/* {sidebarNode} */}
           <main className="flex-1 p-3">
             <Outlet />
           </main>
-          {/* <Footer /> */}
         </div>
       </div>
     </div>
@@ -222,12 +194,3 @@ SidebarItem.propTypes = {
 function TopbarItem(props) {
   return <SidebarItem {...props} topbar />
 }
-
-// function Footer() {
-//   const { t } = useTranslation()
-//   return (
-//     <div className="fixed right-2 bottom-2 text-right text-xs">
-//       {/* <Link to="/legal">{t("imprint-and-privacy")}</Link> */}
-//     </div>
-//   )
-// }

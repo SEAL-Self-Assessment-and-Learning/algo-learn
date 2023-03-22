@@ -2,8 +2,8 @@ import random from "random"
 import { useMemo } from "react"
 import useLocalStorageState from "use-local-storage-state"
 import {
-  LandauNotation,
   Between,
+  LandauNotation,
   SimplifySum,
   SortTerms,
 } from "./routes/asymptotics"
@@ -18,6 +18,17 @@ function min<T>(a: T, b: T) {
 export const questions = [SortTerms, LandauNotation, SimplifySum, Between]
 
 /**
+ * Return the question corresponding to a path
+ */
+export function questionByPath(
+  path: string
+): typeof SimplifySum | typeof SortTerms | undefined {
+  for (const e of questions) {
+    if (path.startsWith(e.path)) return e
+  }
+}
+
+/**
  * List of all valid (question,variant) pairs
  */
 export const questionVariants = questions.flatMap((q) =>
@@ -28,12 +39,11 @@ export const questionVariants = questions.flatMap((q) =>
   }))
 )
 
-export function questionByPath(
-  path: string
-): typeof SimplifySum | typeof SortTerms | undefined {
-  for (const e of questions) {
-    if (path.startsWith(e.path)) return e
-  }
+/**
+ * Return the question variant corresponding to a path
+ */
+export function questionVariantByPath(path: string) {
+  return questionVariants.find((q) => q.path === path)
 }
 
 type LogEntry = {
@@ -98,10 +108,14 @@ function PathOfEntry(entry: LogEntry, omitSeed: boolean = false): string {
  * Return the progress of the user
  */
 export function useSkills() {
-  const [log, setLog] = useLocalStorageState("log", {
+  const [storedlog, setLog] = useLocalStorageState("log", {
     defaultValue: [] as Array<LogEntry>,
     storageSync: true,
   })
+  const log = storedlog.filter(
+    (e) => questionVariantByPath(e.question + "/" + e.variant) !== undefined
+  )
+
   // const [log, setLog] = useState(initialLogExample as Array<LogEntry>)
   for (let i = 0; i < log.length - 1; i++) {
     console.assert(

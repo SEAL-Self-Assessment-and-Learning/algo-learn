@@ -1,6 +1,15 @@
 {
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.mjs",
+    "src/**/*.cjs"
+  ],
   "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
     "jsx": "react-jsx",
     "isolatedModules": true,
     "strict": true,
@@ -8,6 +17,5 @@
     "module": "ES2022",
     "moduleResolution": "node",
     "esModuleInterop": true
-  },
-  "exclude": ["node_modules", "**/node_modules/*"]
+  }
 }

@@ -15,7 +15,7 @@
   "about": "about",
   "asymptotics.between.note": "Note: This text field accepts <1>simple</1> mathematical expressions, such as",
   "asymptotics.between.text": "Enter a function <1>{{functionDeclaration}}</1> that satisfies <3>{{condA}}</3> and <6>{{condB}}.</6>",
-  "asymptotics.between.title": "Between terms",
+  "asymptotics.between.title": "Between",
   "asymptotics.landau.long-title": "Landau Notation",
   "asymptotics.landau.text": "Which of these statements are true? Select all that apply.",
   "asymptotics.landau.title": "Landau",

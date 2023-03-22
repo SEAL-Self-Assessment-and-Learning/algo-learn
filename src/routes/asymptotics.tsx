@@ -6,7 +6,6 @@ import { FunctionComponent, ReactElement, ReactNode, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLoaderData, useNavigate } from "react-router-dom"
 
-import { MathNode } from "mathjs"
 import math from "../utils/math"
 
 import {
@@ -18,19 +17,21 @@ import {
 } from "../components/BasicQuizQuestions"
 import TeX from "../components/TeX"
 import {
-  AsymptoticTerm,
-  mathNodeToAsymptoticTerm,
+  SimpleAsymptoticTerm,
+  mathNodeToSumProductTerm,
   sampleTermSet,
   TermSetVariants,
   TermVariants,
   TooComplex,
+  SumProductTerm,
 } from "../utils/AsymptoticTerm"
 import { playFailSound, playPassSound } from "../utils/audio"
 import shuffleArray from "../utils/shuffle"
 
 /**
  * Generate and render a question about simplifying sums
- * @returns {ReactElement} output
+ *
+ * @returns {ReactElement} Output
  */
 export function SimplifySum({
   seed,
@@ -55,8 +56,8 @@ export function SimplifySum({
     .sort((t1, t2) => t1.compare(t2))
     .at(-1)
   const answers = sum.map((term) => ({
-    key: term.toLatex(true),
-    element: <TeX>\Theta\big({term.toLatex(true)}\big)</TeX>,
+    key: term.toLatex(variable, true),
+    element: <TeX>\Theta\big({term.toLatex(variable, true)}\big)</TeX>,
     correct: term === correctTerm,
   }))
 
@@ -88,10 +89,20 @@ SimplifySum.title = "asymptotics.sum.title"
 /**
  * Generate and render a question about sorting terms
  *
- * This exercise trains students on the competency of understanding and applying asymptotic notation in the context of analyzing algorithmic time complexity. Specifically, the exercise focuses on the skill of sorting terms in order of their growth rate, which is a key step in analyzing the time complexity of an algorithm.
+ * This exercise trains students on the competency of understanding and applying
+ * asymptotic notation in the context of analyzing algorithmic time complexity.
+ * Specifically, the exercise focuses on the skill of sorting terms in order of
+ * their growth rate, which is a key step in analyzing the time complexity of an
+ * algorithm.
  *
- * By practicing this skill, students will become more familiar with the different types of asymptotic notation (e.g., big-O, big-omega, big-theta), and they will learn how to identify the dominant term in an expression and compare its growth rate with other terms. This is a foundational skill for analyzing the time complexity of algorithms and designing efficient algorithms.
- * @returns {ReactElement} output
+ * By practicing this skill, students will become more familiar with the
+ * different types of asymptotic notation (e.g., big-O, big-omega, big-theta),
+ * and they will learn how to identify the dominant term in an expression and
+ * compare its growth rate with other terms. This is a foundational skill for
+ * analyzing the time complexity of algorithms and designing efficient
+ * algorithms.
+ *
+ * @returns {ReactElement} Output
  */
 export function SortTerms({
   seed,
@@ -110,7 +121,7 @@ export function SortTerms({
 
   const variable = random.choice("nmNMxyztk".split(""))
 
-  interface AsymptoticTermWithIndex extends AsymptoticTerm {
+  interface AsymptoticTermWithIndex extends SimpleAsymptoticTerm {
     index: number
     correctIndex: number
   }
@@ -129,9 +140,9 @@ export function SortTerms({
   }
 
   const answers = set.map((term) => ({
-    key: term.toLatex(true),
+    key: term.toLatex(variable, true),
     index: term.index,
-    element: <TeX>{term.toLatex(true)}</TeX>,
+    element: <TeX>{term.toLatex(variable, true)}</TeX>,
     correctIndex: term.correctIndex,
   }))
 
@@ -183,10 +194,11 @@ export function RouteToQuestion({
 
 /**
  * Return all variables in a given mathjs expression
- * @param {MathNode} node
- * @returns {Array<string>} variables
+ *
+ * @param {math.MathNode} node
+ * @returns {string[]} Variables
  */
-function getVars(node: MathNode): Array<string> {
+function getVars(node: math.MathNode): Array<string> {
   if (
     (node instanceof math.OperatorNode || node instanceof math.FunctionNode) &&
     node.args instanceof Array
@@ -195,7 +207,7 @@ function getVars(node: MathNode): Array<string> {
   } else if (node instanceof math.SymbolNode) {
     return [node.name]
   } else if (node instanceof math.ParenthesisNode) {
-    return getVars(node.content as MathNode)
+    return getVars(node.content as math.MathNode)
   } else if (node instanceof math.ConstantNode) {
     return []
   } else {
@@ -203,22 +215,10 @@ function getVars(node: MathNode): Array<string> {
   }
 }
 
-// function parseAsAsymptoticTerm(node: MathNode): AsymptoticTerm {
-//   const simpleNode = math.simplify(node)
-//   if (node instanceof math.OperatorNode && node.args instanceof Array) {
-//     const args = node.args.map(parseAsAsymptoticTerm)
-//   } else if (node instanceof math.SymbolNode) {
-//     return [node.name]
-//   } else if (node instanceof math.ParenthesisNode) {
-//     return getVars(node.content as MathNode)
-//   } else {
-//     return []
-//   }
-// }
-
 /**
  * Generate and render a question about O/Omega/o/omega
- * @returns {ReactElement} output
+ *
+ * @returns {ReactElement} Output
  */
 export function Between({
   seed,
@@ -255,7 +255,7 @@ export function Between({
   const aTeX = `${aLandau}(${a.toLatex()})`
   const bTeX = `${bLandau}(${b.toLatex()})`
 
-  let parsed: AsymptoticTerm
+  let parsed: SumProductTerm
   let textFeedback: ReactNode = "please enter an expression"
   let feedbackType: "ok" | "error" = "error"
   if (text) {
@@ -283,10 +283,10 @@ export function Between({
           </TeX>
         )
         try {
-          parsed = mathNodeToAsymptoticTerm(expr, variable)
+          parsed = mathNodeToSumProductTerm(expr)
         } catch (e) {
           if (e instanceof TooComplex) {
-            textFeedback = <>&apos;{e.node.toString()}&apos; is too complex!</>
+            textFeedback = <>Your expression is too complex, try a simpler one!</>
             feedbackType = "error"
           } else {
             throw e
@@ -295,6 +295,7 @@ export function Between({
       }
     } catch (e) {
       textFeedback = "unable to parse your expression"
+      feedbackType = "error"
     }
   }
   const msgColor =
@@ -324,7 +325,7 @@ export function Between({
       setMode("verify")
     } else if (mode === "verify") {
       if (textFeedback === null || feedbackType === "error") return
-      if (parsed.compare(a) * parsed.compare(b) < 0) {
+      if (parsed.compare(a.toSumProductTerm()) * parsed.compare(b.toSumProductTerm()) < 0) {
         playPassSound()
         setMode("correct")
       } else {
@@ -388,12 +389,16 @@ Between.title = "asymptotics.between.title"
 
 /**
  * Generate and render a question about asymptotic notation
+ *
  * @param {Object} props
- * @param {string} props.seed - seed for random number generator
- * @param {TFunction} props.t - translation function
- * @param {(result: "correct" | "incorrect" | "abort") => void} props.onResult - callback function
- * @param {boolean} props.regeneratable - whether the question can be regenerated
- * @returns {ReactElement} output
+ * @param {string} props.seed - Seed for random number generator
+ * @param {TFunction} props.t - Translation function
+ * @param {(result: "correct" | "incorrect" | "abort") => void} props.onResult
+ *   - Callback function
+ *
+ * @param {boolean} props.regeneratable - Whether the question can be
+ *   regenerated
+ * @returns {ReactElement} Output
  */
 export function LandauNotation({
   seed,

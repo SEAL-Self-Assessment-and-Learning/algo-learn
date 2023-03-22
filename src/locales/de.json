@@ -15,7 +15,7 @@
   "about": "Über",
   "asymptotics.between.note": "Hinweis: Dieses Feld erwartet <1>einfache</1> mathematische Ausdrücke, wie etwa",
   "asymptotics.between.text": "Gib eine Funktion <1>{{functionDeclaration}}</1> an, die <3>{{condA}}</3> und <6>{{condB}}</6> erfüllt.",
-  "asymptotics.between.title": "Zwischen Ausdrücken",
+  "asymptotics.between.title": "Dazwischen",
   "asymptotics.landau.long-title": "Landau Notation",
   "asymptotics.landau.text": "Welche dieser Aussagen sind wahr? Wähle alle aus.",
   "asymptotics.landau.title": "Landau",
