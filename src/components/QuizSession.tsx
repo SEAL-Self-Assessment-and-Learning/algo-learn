@@ -35,13 +35,17 @@ export function QuizSession({
   targetNum: number
   practiceMode: boolean
 }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [{ numCorrect, numIncorrect, aborted }, setState] = useState({
     numCorrect: 0,
     numIncorrect: 0,
     aborted: false,
   })
   const { strengthMap, unlockedSkills, appendLogEntry } = useSkills()
+  
+  // TODO: does not work as expected as the seed is regenerated on every render, so even if we just switch the language
+  const seed = genSeed()
+
   if (aborted) {
     return (
       <CenterScreen>
@@ -66,8 +70,6 @@ export function QuizSession({
     const Q = questionByPath(nextPath)
     const [skillGroup, question, variant] = nextPath.split("/")
     if (!Q) throw Error(`Question with path '${nextPath}' not found!`)
-
-    const seed = genSeed()
 
     const handleResult = (result: "correct" | "incorrect" | "abort") => {
       if (result === "correct") {
@@ -103,14 +105,87 @@ export function QuizSession({
       />
     )
   } else {
-    const great = ["Great job!", "Well done!", "Perfect!"]
-    const good = ["Not bad, keep going!", "Practice makes perfect!"]
-    const meh = [
-      "You'll do better next time!",
-      "Keep it up!",
-      "You must try again to succeed!",
-      "The universe does not play dice!",
+    const greatEN = [
+      "Perfect!",
+      "Outstanding work!",
+      "Fantastic job!",
+      "You're a quiz whiz!",
+      "Excellent performance!",
+      "Impressive results!",
+      "Great work!",
+      "Amazing job!",
+      "Incredible performance!",
+      "Brilliant work!",
+      "Superb job!",
     ]
+    const goodEN = [
+      "Nice job, keep it up!",
+      "You're on the right track!",
+      "Solid effort, keep practicing!",
+      "You're improving with each try!",
+      "Well done, but there's always room for improvement!",
+      "Good job!",
+      "Great effort!",
+      "Well played!",
+      "Impressive improvement!",
+      "You're getting there!",
+    ]
+    const mehEN = [
+      "You'll do better next time!",
+      "Not bad, keep working at it!",
+      "You're making progress, keep going!",
+      "Keep practicing, you'll get there!",
+      "Don't give up, you're improving!",
+      "A little more effort and you'll see better results!",
+      "You must try again to succeed!",
+      "Keep it up!",
+      "Stay focused!",
+      "Keep pushing!",
+      "You're improving!",
+      "You're getting better!",
+    ]
+    const greatDE = [
+      "Perfekt!",
+      "Hervorragende Arbeit!",
+      "Fantastische Arbeit!",
+      "Du bist ein Quiz-Genie!",
+      "Ausgezeichnete Leistung!",
+      "Beeindruckende Ergebnisse!",
+      "Großartige Arbeit!",
+      "Erstaunliche Arbeit!",
+      "Unglaubliche Leistung!",
+      "Brillante Arbeit!",
+      "Hervorragende Arbeit!",
+    ]
+    const goodDE = [
+      "Gute Arbeit, weiter so!",
+      "Du bist auf dem richtigen Weg!",
+      "Solide Anstrengung, weiter üben!",
+      "Du verbesserst dich mit jedem Versuch!",
+      "Gut gemacht, aber es gibt immer Raum für Verbesserungen!",
+      "Gute Arbeit!",
+      "Große Anstrengung!",
+      "Gut gespielt!",
+      "Beeindruckende Verbesserung!",
+      "Du kommst näher!",
+    ]
+    const mehDE = [
+      "Beim nächsten Mal wirst du es besser machen!",
+      "Nicht schlecht, weiter so!",
+      "Du machst Fortschritte, bleib dran!",
+      "Übe weiter, du wirst es schaffen!",
+      "Gib nicht auf, du verbesserst dich!",
+      "Ein wenig mehr Anstrengung und du wirst bessere Ergebnisse sehen!",
+      "Du musst es erneut versuchen, um erfolgreich zu sein!",
+      "Weiter so!",
+      "Bleib fokussiert!",
+      "Bleib dran!",
+      "Du verbesserst dich!",
+      "Du wirst besser!",
+    ]
+    const great = i18n.language === "de" ? greatDE : greatEN
+    const good = i18n.language === "de" ? goodDE : goodEN
+    const meh = i18n.language === "de" ? mehDE : mehEN
     const msg =
       numIncorrect == 0
         ? random.choice(great)
