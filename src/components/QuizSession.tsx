@@ -1,4 +1,4 @@
-import random from "random"
+import random, { RNGFactory } from "random"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import {
@@ -13,38 +13,30 @@ import { Button } from "./Button"
 import { CenterScreen } from "./CenterScreen"
 
 /**
- * QuizQuestion: Display a quiz question.
- * @param {onResult} function Call this function once the question was answered.
+ * Component that renders a quiz session, consisting of a sequence of targetNum
+ * questions. In practice mode, the questions are chosen among the unlocked
+ * skills that our memory model determines to be the weakest for this user. In
+ * exam mode, the memory model is ignored and the session selects the most
+ * difficult questions for each question type (simulating part of an exam)
+ *
+ * @param {object} param
+ * @param {string} param.mode Determines the mode of the session.
  */
-// type QuizQuestion = (
-//   onResult: (result: "correct" | "incorrect" | "abort") => void
-// ) => ReactElement
-
-// export function QuizSession({
-//   questions,
-//   onFinished,
-// }: {
-//   questions: Array<QuizQuestion>
-//   onFinished: () => void
-// }) {
-
-export function QuizSession({
-  targetNum = 3,
-  practiceMode = true,
-}: {
-  targetNum: number
-  practiceMode: boolean
-}) {
+export function QuizSession({ mode }: { mode: "practice" | "exam" }) {
   const { t, i18n } = useTranslation()
+  const [{ seed, targetNum }] = useState({
+    seed: genSeed(),
+    targetNum: 3,
+  })
   const [{ numCorrect, numIncorrect, aborted }, setState] = useState({
     numCorrect: 0,
     numIncorrect: 0,
     aborted: false,
   })
   const { strengthMap, unlockedSkills, appendLogEntry } = useSkills()
-  
-  // TODO: does not work as expected as the seed is regenerated on every render, so even if we just switch the language
-  const seed = genSeed()
+
+  const rng = random.clone(RNGFactory(seed))
+  const questionSeed = genSeed({ seed: `${seed}${numCorrect + numIncorrect}` })
 
   if (aborted) {
     return (
@@ -59,13 +51,15 @@ export function QuizSession({
   const num = numCorrect + numIncorrect
 
   if (num < targetNum) {
-    const nextPath = practiceMode
-      ? weakestSkill({
-          strengthMap,
-          skills: unlockedSkills,
-          noise: 0.2,
-        })
-      : randomHighestSkill()
+    const nextPath =
+      mode === "practice"
+        ? weakestSkill({
+            rng,
+            strengthMap,
+            skills: unlockedSkills,
+            noise: 0.2,
+          })
+        : randomHighestSkill({ rng })
 
     const Q = questionByPath(nextPath)
     const [skillGroup, question, variant] = nextPath.split("/")
@@ -96,8 +90,8 @@ export function QuizSession({
 
     return (
       <Q
-        key={seed}
-        seed={seed}
+        key={questionSeed}
+        seed={questionSeed}
         variant={variant as TermSetVariants}
         onResult={handleResult}
         t={t}

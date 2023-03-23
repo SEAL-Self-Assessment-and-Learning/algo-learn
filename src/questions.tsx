@@ -1,36 +1,46 @@
-import random from "random"
-import { useMemo } from "react"
+import { Random } from "random"
+import { FunctionComponent, useMemo } from "react"
 import useLocalStorageState from "use-local-storage-state"
-import {
-  Between,
-  LandauNotation,
-  SimplifySum,
-  SortTerms,
-} from "./routes/asymptotics"
+import LandauNotation from "./routes/asymptotics/LandauNotation"
+import Between from "./routes/asymptotics/Between"
+import SortTerms from "./routes/asymptotics/SortTerms"
+import SimplifySum from "./routes/asymptotics/SimplifySum"
 import { computeStrength, SkillFeatures } from "./utils/memory-model"
+import { TFunction } from "i18next"
 
 function min<T>(a: T, b: T) {
   return a < b ? a : b
 }
-/**
- * List of all questions
- */
-export const questions = [SortTerms, LandauNotation, SimplifySum, Between]
 
-/**
- * Return the question corresponding to a path
- */
-export function questionByPath(
+export interface QuestionType
+  extends FunctionComponent<{
+    variant: string
+    seed: string
+    t: TFunction
+    onResult: (result: "correct" | "incorrect") => void
+    regeneratable?: boolean
+  }> {
+  variants: string[]
+  title: string
   path: string
-): typeof SimplifySum | typeof SortTerms | undefined {
+}
+
+/** List of all questions */
+export const questions: QuestionType[] = [
+  SortTerms as QuestionType,
+  LandauNotation as QuestionType,
+  SimplifySum as QuestionType,
+  Between as QuestionType,
+]
+
+/** Return the question corresponding to a path */
+export function questionByPath(path: string): QuestionType | undefined {
   for (const e of questions) {
     if (path.startsWith(e.path)) return e
   }
 }
 
-/**
- * List of all valid (question,variant) pairs
- */
+/** List of all valid (question,variant) pairs */
 export const questionVariants = questions.flatMap((q) =>
   q.variants.map((v) => ({
     question: q,
@@ -39,9 +49,7 @@ export const questionVariants = questions.flatMap((q) =>
   }))
 )
 
-/**
- * Return the question variant corresponding to a path
- */
+/** Return the question variant corresponding to a path */
 export function questionVariantByPath(path: string) {
   return questionVariants.find((q) => q.path === path)
 }
@@ -56,9 +64,10 @@ type LogEntry = {
 
 /**
  * Return a string that uniquely identifies a question
- * @param {LogEntry} entry the log entry whose path we want
- * @param {boolean} omitSeed whether to omit the seed
- * @returns {string} path
+ *
+ * @param {LogEntry} entry The log entry whose path we want
+ * @param {boolean} omitSeed Whether to omit the seed
+ * @returns {string} Path
  */
 function PathOfEntry(entry: LogEntry, omitSeed: boolean = false): string {
   return (
@@ -104,9 +113,7 @@ function PathOfEntry(entry: LogEntry, omitSeed: boolean = false): string {
 //   },
 // ]
 
-/**
- * Return the progress of the user
- */
+/** Return the progress of the user */
 export function useSkills() {
   const [storedlog, setLog] = useLocalStorageState("log", {
     defaultValue: [] as Array<LogEntry>,
@@ -160,9 +167,10 @@ export function useSkills() {
 
 /**
  * Computes the feature vector for all question variants
- * @param {Object} props
- * @param {Array<LogEntry>} props.log a user's full history
- * @returns {Object} the feature vector
+ *
+ * @param {object} props
+ * @param {LogEntry[]} props.log A user's full history
+ * @returns {object} The feature vector
  */
 function computeFeatureMap({ log }: { log: Array<LogEntry> }): {
   [path: string]: SkillFeatures
@@ -233,16 +241,20 @@ export function averageStrength({
   return avg
 }
 
-/** Return the weakest skill.
+/**
+ * Return the weakest skill.
+ *
  * @param strengthMap
- * @param skills if provided, only select among these skills
- * @param noise if provided, make the selection noisy using randomness
+ * @param skills If provided, only select among these skills
+ * @param noise If provided, make the selection noisy using randomness
  */
 export function weakestSkill({
+  rng,
   strengthMap,
   skills = questionVariants.map(({ path }) => path),
   noise = 0,
 }: {
+  rng: Random
   strengthMap: {
     [path: string]: { p: number; h: number }
   }
@@ -257,15 +269,13 @@ export function weakestSkill({
   }
   const selection = skills.filter((path) => strengthMap[path].p <= min + noise)
   if (selection.length == 0) throw Error("Cannot find weakest skill")
-  return random.choice(selection) ?? "unreachable"
+  return rng.choice(selection) ?? "unreachable"
 }
 
-/**
- * Returns a random skill of the highest skill levels ("exam-level")
- */
-export function randomHighestSkill() {
+/** Returns a random skill of the highest skill levels ("exam-level") */
+export function randomHighestSkill({ rng }: { rng: Random }) {
   return (
-    random.choice([
+    rng.choice([
       "asymptotics/sum/polylog",
       "asymptotics/sum/polylogexp",
       "asymptotics/sort/polylog",
@@ -275,7 +285,8 @@ export function randomHighestSkill() {
 }
 
 /**
- * returns all skills that are already unlocked. A skill unlocks only once all dependencies are above thresholdStrength
+ * Returns all skills that are already unlocked. A skill unlocks only once all
+ * dependencies are above thresholdStrength
  */
 export function computeUnlockedSkills({
   strengthMap,

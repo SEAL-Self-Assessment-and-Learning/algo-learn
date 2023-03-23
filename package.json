@@ -36,6 +36,7 @@
     "@parcel/core": "^2.8.3",
     "@parcel/transformer-js": "^2.8.3",
     "@parcel/transformer-react-refresh-wrap": "^2.8.3",
+    "@types/jest": "^29.5.0",
     "@types/katex": "^0.16.0",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",

@@ -208,6 +208,7 @@ export class ProductTerm {
    */
   isUnbounded(): boolean {
     if (this.exponentialBase.compare(1) > 0) return true
+    if (this.exponentialBase.compare(1) < 0) return false
     for (const [, e] of this.logarithmExponents) {
       if (e.compare(0) > 0) {
         return true
@@ -232,6 +233,7 @@ export class ProductTerm {
 
   /**
    * Compute the absolute value of a product term.
+   *
    * @returns {ProductTerm} The absolute value of the product term.
    */
   abs(): ProductTerm {
@@ -274,7 +276,9 @@ export class ProductTerm {
   }
 
   /**
-   * Add two product terms. (Note that this only preserves the asymptotic behaviour.)
+   * Add two product terms. (Note that this only preserves the asymptotic
+   * behaviour.)
+   *
    * @param {ProductTerm} t - The second product term.
    * @returns {ProductTerm} The sum of the two product terms.
    */
@@ -316,7 +320,9 @@ export class ProductTerm {
   }
 
   /**
-   * Subtract another product term from this one. (Note that this only preserves the asymptotic behaviour.)
+   * Subtract another product term from this one. (Note that this only preserves
+   * the asymptotic behaviour.)
+   *
    * @param {ProductTerm} t - The second product term.
    * @returns {ProductTerm} The difference of the two product terms.
    */
@@ -345,6 +351,7 @@ export class ProductTerm {
 
   /**
    * Divide this product term by another one.
+   *
    * @param {ProductTerm} t - The second product term.
    * @returns {ProductTerm} The quotient of the two product terms.
    */
@@ -380,44 +387,32 @@ export class ProductTerm {
     else return 0
   }
 
-  /**
-   * Landau-Oh
-   */
+  /** Landau-Oh */
   Oh(t: ProductTerm): boolean {
     return this.compare(t) <= 0
   }
 
-  /**
-   * Landau-oh
-   */
+  /** Landau-oh */
   oh(t: ProductTerm): boolean {
     return this.compare(t) < 0
   }
 
-  /**
-   * Landau-Omega
-   */
+  /** Landau-Omega */
   Omega(t: ProductTerm): boolean {
     return this.compare(t) >= 0
   }
 
-  /**
-   * Landau-omega
-   */
+  /** Landau-omega */
   omega(t: ProductTerm): boolean {
     return this.compare(t) > 0
   }
 
-  /**
-   * Landau-Theta
-   */
+  /** Landau-Theta */
   Theta(t: ProductTerm): boolean {
     return this.compare(t) === 0
   }
 
-  /**
-   * tilde notation (Sedgewick-Wayne)
-   */
+  /** Tilde notation (Sedgewick-Wayne) */
   tilde(t: ProductTerm): boolean {
     return this.compare(t, true) === 0
   }
@@ -453,6 +448,7 @@ export class ProductTerm {
 
   /**
    * Return the power of a given ProductTerm.
+   *
    * @param exponent The exponent
    * @returns The power of t to the exponent
    */
@@ -488,8 +484,8 @@ export class ProductTerm {
   }
 
   /**
-   * Compute the logarithm of a given ProductTerm.
-   * Note that the logarithm of a product term is a SumProductTerm.
+   * Compute the logarithm of a given ProductTerm. Note that the logarithm of a
+   * product term is a SumProductTerm.
    *
    * @param base The base of the logarithm
    * @returns The logarithm of t in base base, or undefined if t <= 0
@@ -575,9 +571,10 @@ export class SumProductTerm {
   }
 
   /**
-   * Normalize the sum of product terms.
-   * To do so, we sort the terms in descending order, and then collect all terms that are asymptotically equal.
+   * Normalize the sum of product terms. To do so, we sort the terms in
+   * descending order, and then collect all terms that are asymptotically equal.
    * This is done in-place.
+   *
    * @returns {SumProductTerm} A reference to the same sum of product terms.
    */
   private normalize(): SumProductTerm {
@@ -599,6 +596,7 @@ export class SumProductTerm {
 
   /**
    * Return a copy of the terms in the sum of product terms.
+   *
    * @returns {ProductTerm[]} The terms
    */
   getTerms(): ProductTerm[] {
@@ -607,6 +605,7 @@ export class SumProductTerm {
 
   /**
    * Return the dominant term of the sum of product terms.
+   *
    * @returns {ProductTerm} The dominant term.
    */
   dominantTerm(): ProductTerm {
@@ -619,6 +618,7 @@ export class SumProductTerm {
 
   /**
    * Add this term to another term. Does not modify the original terms.
+   *
    * @param x The term to add.
    * @returns {SumProductTerm} The sum of the two terms.
    */
@@ -634,6 +634,7 @@ export class SumProductTerm {
 
   /**
    * Negate the sum. Does not modify the original terms.
+   *
    * @returns {SumProductTerm} The negated sum.
    */
   neg(): SumProductTerm {
@@ -646,6 +647,7 @@ export class SumProductTerm {
 
   /**
    * Multiply this term with another term.
+   *
    * @param x The term to multiply with.
    * @returns {SumProductTerm} The product of the two terms.
    */
@@ -664,6 +666,7 @@ export class SumProductTerm {
 
   /**
    * Divide this term by a product term.
+   *
    * @param x The term to divide by.
    * @returns {SumProductTerm} The quotient of the two terms.
    */
@@ -683,6 +686,7 @@ export class SumProductTerm {
 
   /**
    * Raise this term to a power.
+   *
    * @param e The exponent.
    * @returns {SumProductTerm} The power of the term.
    */
@@ -711,9 +715,7 @@ export class SumProductTerm {
     )
   }
 
-  /**
-   * Return the logarithm of a given SumProductTerm.
-   */
+  /** Return the logarithm of a given SumProductTerm. */
   log(base: number = 2): SumProductTerm {
     if (this.terms.length === 0) {
       throw new Error("Cannot take the logarithm of 0")
@@ -737,6 +739,7 @@ export class SumProductTerm {
 
   /**
    * Compute the limit of this SumProductTerm.
+   *
    * @returns {Fraction | Unbounded} The limit.
    */
   limit(): Fraction | Unbounded {
@@ -749,6 +752,7 @@ export class SumProductTerm {
 
   /**
    * Return the only term in the sum of product terms.
+   *
    * @returns {ProductTerm} The term.
    * @throws {Error} If there are multiple terms in the sum.
    */

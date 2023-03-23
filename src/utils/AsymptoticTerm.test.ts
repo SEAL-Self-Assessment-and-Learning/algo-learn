@@ -57,7 +57,7 @@ test("ProductTerms: x * 7x^3 equals 7x^3", () => {
 })
 
 test("ProductTerms: lim c = c", () => {
-  for (let c of [-3, -2, -1, 0, 1, 2, 3]) {
+  for (const c of [-3, -2, -1, 0, 1, 2, 3]) {
     const t = createProductTerm({
       coefficient: c,
     })
@@ -140,7 +140,7 @@ test("ProductTerms: lim +/- log(x)^{+/- 1/2}", () => {
 })
 
 test("ProductTerms: lim +/- c * x^0", () => {
-  for (let d of [-99, -2, -1, 0, 1, 2, 99]) {
+  for (const d of [-99, -2, -1, 0, 1, 2, 99]) {
     expect(
       createProductTerm({
         coefficient: d,
@@ -170,7 +170,7 @@ test("ProductTerms: lim +/- c * x^0", () => {
 })
 
 test("ProductTerms: lim +/- x^{+/- c} log(x)^{+/- d}", () => {
-  for (let d of [-99, -2, -1, 0, 1, 2, 99]) {
+  for (const d of [-99, -2, -1, 0, 1, 2, 99]) {
     expect(
       createProductTerm({
         coefficient: 7,
@@ -186,7 +186,7 @@ test("ProductTerms: lim +/- x^{+/- c} log(x)^{+/- d}", () => {
       }).limit()
     ).toBe("-infty")
   }
-  for (let d of [-99, -2, -1, 0, 1, 2, 99]) {
+  for (const d of [-99, -2, -1, 0, 1, 2, 99]) {
     expect(
       createProductTerm({
         coefficient: 7,
@@ -212,7 +212,7 @@ test("ProductTerms.compare: -f(x) << constant << f(x)", () => {
   const c = createProductTerm({
     coefficient: 100,
   })
-  for (let d of [1, 2, 99, 100, 101]) {
+  for (const d of [1, 2, 99, 100, 101]) {
     expect(
       c
         .compare(
@@ -232,7 +232,7 @@ test("ProductTerms.compare: -f(x) << constant << f(x)", () => {
       )
       .valueOf()
   ).toBe(0)
-  for (let d of [1, 2, 99, 100, 101]) {
+  for (const d of [1, 2, 99, 100, 101]) {
     expect(
       c
         .compare(
@@ -243,7 +243,7 @@ test("ProductTerms.compare: -f(x) << constant << f(x)", () => {
         .valueOf()
     ).toBe(1)
   }
-  for (let d of [1, 2, 99, 100, 101]) {
+  for (const d of [1, 2, 99, 100, 101]) {
     expect(
       c
         .compare(
@@ -254,7 +254,7 @@ test("ProductTerms.compare: -f(x) << constant << f(x)", () => {
         .valueOf()
     ).toBe(-1)
   }
-  for (let d of [1, 2, 99, 100, 101]) {
+  for (const d of [1, 2, 99, 100, 101]) {
     expect(
       c
         .compare(
@@ -268,8 +268,8 @@ test("ProductTerms.compare: -f(x) << constant << f(x)", () => {
 })
 
 test("ProductTerms.compare: strict", () => {
-  for (let c of [-3, 0, 3]) {
-    for (let d of [-3, 0, 3]) {
+  for (const c of [-3, 0, 3]) {
+    for (const d of [-3, 0, 3]) {
       let tc, td
       tc = createProductTerm({
         coefficient: c,
@@ -321,7 +321,7 @@ test("ProductTerms.compare: strict", () => {
 })
 
 test("ProductTerms.compare: mathNodeToProductTerm compare", () => {
-  const n = (str) => {
+  const n = (str: string) => {
     const t = mathNodeToSumProductTerm(math.parse(str))
     expect(t).toBeDefined()
     return t
@@ -372,12 +372,17 @@ test("ProductTerms.compare: mathNodeToProductTerm compare", () => {
   expect(n(`3 x^2 - x^3`).Theta(n(`x^2`))).toBeFalsy()
   expect(n(`3 x^2 - 2 x^2`).Theta(n(`x^2`))).toBeTruthy()
   expect(n(`3 x^2 - 3 x^2`).Theta(n(`x^2`))).toBeFalsy()
+  expect(n(`x^7`).Oh(n(`2^x`))).toBeTruthy()
+  expect(n(`x^7`).oh(n(`2^x`))).toBeTruthy()
+  expect(n(`x^2`).oh(n(`2^x`))).toBeTruthy()
+  expect(n(`4^x`).omega(n(`x^77`))).toBeTruthy()
+  expect(n(`92^x`).omega(n(`7^x`))).toBeTruthy()
 
   // This currently fails, we do not support proper subtraction yet:
   // expect(n(`(3 x^2 + log(x)) - 3 x^2`).tilde(n(`log(x)`))).toBeTruthy()
 
-  for (let c of [-3, 0, 3]) {
-    for (let d of [-3, 0, 3]) {
+  for (const c of [-3, 0, 3]) {
+    for (const d of [-3, 0, 3]) {
       expect(n(`7 x^(${c})`).getTerms()[0].coefficient.valueOf()).toBe(7)
       expect(n(`x^(${c})`).compare(n(`x^(${d})`))).toBe(
         c > d ? 1 : c < d ? -1 : 0

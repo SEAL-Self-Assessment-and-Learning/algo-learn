@@ -13,33 +13,35 @@ import Root from "./routes/root"
 import { QuizSession } from "./components/QuizSession"
 import "./i18n"
 import { About } from "./routes/about"
-import { RouteToQuestion } from "./routes/asymptotics"
+import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
 import { Legal } from "./routes/legal"
 import "./tailwind.css"
 import { genSeed } from "./utils/genseed"
 
 let routes = []
-for (const q of questions) {
-  const { path, variants } = q
+for (const Question of questions) {
+  const { path, variants } = Question
   console.assert(
     variants.length > 0,
     "Every question requires at least one variant."
   )
-  routes.push(
-    {
-      path: `${path}`,
-      loader: () => redirect(variants[0]),
-    },
-    {
-      path: `${path}/:variant`,
-      loader: () => redirect(genSeed(7)),
-    },
-    {
-      path: `${path}/:variant/:seed`,
-      loader: ({ params }) => ({ ...params, path }),
-      element: <RouteToQuestion Question={q} />,
-    }
-  )
+  routes.push({
+    path: `${path}`,
+    loader: () => redirect(variants[0]),
+  })
+  for (const variant of variants) {
+    routes.push(
+      {
+        path: `${path}/${variant}`,
+        loader: () => redirect(genSeed()),
+      },
+      {
+        path: `${path}/${variant}/:seed`,
+        loader: ({ params }) => ({ ...params, path }),
+        element: <ViewSingleQuestion Question={Question} variant={variant} />,
+      }
+    )
+  }
 }
 
 const router = createBrowserRouter(
@@ -52,8 +54,8 @@ const router = createBrowserRouter(
         { index: true, element: <LearningProgress /> },
         { path: "legal", element: <Legal /> },
         { path: "about", element: <About /> },
-        { path: "practice", element: <QuizSession /> },
-        { path: "examine", element: <QuizSession practiceMode={false} /> },
+        { path: "practice", element: <QuizSession mode="practice" /> },
+        { path: "examine", element: <QuizSession mode="examine" /> },
         ...routes,
       ],
     },

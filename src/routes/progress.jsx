@@ -15,8 +15,8 @@ import {
 } from "../questions"
 
 /**
-/**
- * LearningProgress component
+ * /** LearningProgress component
+ *
  * @returns {ReactNode}
  */
 export function LearningProgress() {
@@ -192,6 +192,7 @@ ProgressLine.propTypes = {
 
 /**
  * Display a strength meter / progress bar
+ *
  * @param {Object} props
  * @param {number} strength A number between 0 and 1
  */

@@ -12,14 +12,14 @@ export default function TeX({
   children: ReactNode
   props?: Object
 }): ReactElement {
+  const latex = (
+    <ReactTeX {...props} block={false}>
+      {renderToStaticMarkup(<>{children}</>)}
+    </ReactTeX>
+  )
   if (block) {
-    return (
-      <div className="m-3">
-        <ReactTeX {...props} block={false}>
-          {renderToStaticMarkup(<>{children}</>)}
-        </ReactTeX>
-      </div>
-    )
+    return <div className="m-3">{latex}</div>
+  } else {
+    return latex
   }
-  return <ReactTeX {...props}>{renderToStaticMarkup(<>{children}</>)}</ReactTeX>
 }

@@ -13,6 +13,7 @@ import { BiLink, BiRefresh } from "react-icons/bi"
 import { GiPlayButton } from "react-icons/gi"
 import { SiCheckmarx, SiIfixit } from "react-icons/si"
 import { Link } from "react-router-dom"
+import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { playFailSound, playPassSound } from "../utils/audio"
 import { AnswerBox } from "./AnswerBox"
 import { Button } from "./Button"
@@ -21,32 +22,31 @@ import { SortableList } from "./SortableList"
 /**
  * A container for questions.
  *
+ * @example
+ *   ;<ExerciseContainer>
+ *     <ExerciseTitle title="Exercise 1" />
+ *     <p>Question text</p>
+ *     <ExerciseMultipleChoice>
+ *       <AnswerRadio id="a1">Answer 1</AnswerRadio>
+ *       <AnswerRadio id="a2">Answer 2</AnswerRadio>
+ *       <AnswerRadio id="a3">Answer 3</AnswerRadio>
+ *     </ExerciseMultipleChoice>
+ *   </ExerciseContainer>
+ *
  * @param {Object} props
  * @param {React.ReactNode} props.children
  * @param {string} props.className
  * @returns {React.ReactElement}
- * @example
- * <ExerciseContainer>
- *   <ExerciseTitle title="Exercise 1" />
- *   <p>Question text</p>
- *   <ExerciseMultipleChoice>
- *     <AnswerRadio id="a1">Answer 1</AnswerRadio>
- *     <AnswerRadio id="a2">Answer 2</AnswerRadio>
- *     <AnswerRadio id="a3">Answer 3</AnswerRadio>
- *   </ExerciseMultipleChoice>
- * </ExerciseContainer>
  */
-export function QuestionContainer({
-  children,
-  className = "",
-  ...props
-}: {
-  children: React.ReactNode
-  className?: string
-}) {
+export function QuestionContainer(
+  props: React.HTMLAttributes<HTMLDivElement>
+): React.ReactElement {
   return (
-    <div {...props} className={`mx-auto mt-5 block max-w-xl ${className}`}>
-      {children}
+    <div
+      {...props}
+      className={`mx-auto mt-5 block max-w-xl ${props.className ?? ""}`}
+    >
+      {props.children}
     </div>
   )
 }
@@ -241,6 +241,15 @@ export function ExerciseMultipleChoice({
       onResult(mode)
     }
   }
+  useGlobalDOMEvents({
+    keydown(e: Event) {
+      const key = (e as KeyboardEvent).key
+      if (key === "Enter") {
+        e.preventDefault()
+        handleClick()
+      }
+    },
+  })
   const message =
     mode === "correct" ? (
       <b className="text-2xl">Correct!</b>
@@ -328,6 +337,15 @@ export function ExerciseSort({
       onResult(mode)
     }
   }
+  useGlobalDOMEvents({
+    keydown(e: Event) {
+      const key = (e as KeyboardEvent).key
+      if (key === "Enter") {
+        e.preventDefault()
+        handleClick()
+      }
+    },
+  })
   const message =
     mode === "correct" ? (
       <b className="text-2xl">Correct!</b>
