@@ -34,5 +34,5 @@ export function useTheme() {
       setUserTheme(LIGHT)
     }
   }
-  return [theme, userTheme, toggleTheme, setUserTheme]
+  return {theme, userTheme, toggleTheme, setUserTheme}
 }

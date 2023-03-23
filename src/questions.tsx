@@ -54,7 +54,7 @@ export function questionVariantByPath(path: string) {
   return questionVariants.find((q) => q.path === path)
 }
 
-type LogEntry = {
+export type LogEntry = {
   question: string
   variant: string
   seed: string
@@ -269,19 +269,20 @@ export function weakestSkill({
   }
   const selection = skills.filter((path) => strengthMap[path].p <= min + noise)
   if (selection.length == 0) throw Error("Cannot find weakest skill")
-  return rng.choice(selection) ?? "unreachable"
+  return rng.choice(selection) ?? selection[0]
 }
 
+const HIGHEST_SKILLS = [
+  "asymptotics/sum/polylog",
+  "asymptotics/sum/polylogexp",
+  "asymptotics/sort/polylog",
+  "asymptotics/sort/polylogexp",
+  "asymptotics/between/polylog",
+  "asymptotics/landau/default",
+]
 /** Returns a random skill of the highest skill levels ("exam-level") */
-export function randomHighestSkill({ rng }: { rng: Random }) {
-  return (
-    rng.choice([
-      "asymptotics/sum/polylog",
-      "asymptotics/sum/polylogexp",
-      "asymptotics/sort/polylog",
-      "asymptotics/sort/polylogexp",
-    ]) ?? "unreachable"
-  )
+export function randomHighestSkill({ rng }: { rng: Random }):string {
+  return rng.choice(HIGHEST_SKILLS) ?? HIGHEST_SKILLS[0]
 }
 
 /**

@@ -8,7 +8,7 @@ import {
   weakestSkill,
 } from "../questions"
 import { TermSetVariants } from "../utils/AsymptoticTerm"
-import { genSeed } from "../utils/genseed"
+import { genSeed } from "../utils/genSeed"
 import { Button } from "./Button"
 import { CenterScreen } from "./CenterScreen"
 
@@ -22,7 +22,7 @@ import { CenterScreen } from "./CenterScreen"
  * @param {object} param
  * @param {string} param.mode Determines the mode of the session.
  */
-export function QuizSession({ mode }: { mode: "practice" | "exam" }) {
+export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
   const { t, i18n } = useTranslation()
   const [{ seed, targetNum }] = useState({
     seed: genSeed(),
@@ -60,7 +60,6 @@ export function QuizSession({ mode }: { mode: "practice" | "exam" }) {
             noise: 0.2,
           })
         : randomHighestSkill({ rng })
-
     const Q = questionByPath(nextPath)
     const [skillGroup, question, variant] = nextPath.split("/")
     if (!Q) throw Error(`Question with path '${nextPath}' not found!`)
@@ -142,7 +141,7 @@ export function QuizSession({ mode }: { mode: "practice" | "exam" }) {
       "Perfekt!",
       "Hervorragende Arbeit!",
       "Fantastische Arbeit!",
-      "Du bist ein Quiz-Genie!",
+      "Du bist ein Quiz-Meister!",
       "Ausgezeichnete Leistung!",
       "Beeindruckende Ergebnisse!",
       "Großartige Arbeit!",

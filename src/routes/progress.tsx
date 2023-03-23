@@ -1,33 +1,30 @@
+import { TFunction } from "i18next"
 import moment from "moment/moment"
-import PropTypes from "prop-types"
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { BiLink } from "react-icons/bi"
 import { BsFillCheckSquareFill, BsFillXSquareFill } from "react-icons/bs"
 import { Link } from "react-router-dom"
 import { Button } from "../components/Button"
 import {
   averageStrength,
+  LogEntry,
   questionByPath,
   questions,
+  QuestionType,
   questionVariants,
   useSkills,
 } from "../questions"
 
-/**
- * /** LearningProgress component
- *
- * @returns {ReactNode}
- */
+/** LearningProgress component */
 export function LearningProgress() {
   const { t } = useTranslation()
   const { strengthMap, log } = useSkills()
   const [selectedLogRev, setSelectedLog] = useState(log)
-  const selectedLog = selectedLogRev.slice()
+  const selectedLog: LogEntry[] = selectedLogRev.slice()
   selectedLog.reverse()
 
-  function selectQuestion(q) {
-    let selection = []
+  function selectQuestion(q: QuestionType) {
+    const selection = []
     for (const e of log) {
       if (e.question === q.path) {
         selection.push(e)
@@ -63,7 +60,6 @@ export function LearningProgress() {
           {questions.map((q) => (
             <ProgressLine
               key={q.path}
-              path={q.path}
               // onMouseOver={() => selectQuestion(q)}
               // onMouseOut={() => setSelectedLog(log)}
               question={q}
@@ -82,7 +78,6 @@ export function LearningProgress() {
           {questionVariants.map(({ question, variant, path }) => (
             <ProgressLine
               key={path}
-              path={path}
               onMouseOver={() => selectQuestion(question)}
               onMouseOut={() => setSelectedLog(log)}
               question={question}
@@ -106,28 +101,38 @@ export function LearningProgress() {
     </div>
   )
 }
-LearningProgress.propTypes = {}
 
-function Thd({ children, className = "", isHead = false }) {
+function Thd({
+  children,
+  className = "",
+  isHead = false,
+}: {
+  children: ReactNode
+  className?: string
+  isHead?: boolean
+}) {
   const Tag = isHead ? "th" : "td"
   return <Tag className={`px-2 py-3 ${className}`}>{children}</Tag>
-}
-Thd.propTypes = {
-  children: PropTypes.node.isRequired,
-  isHead: PropTypes.bool,
-  className: PropTypes.string,
 }
 
 function ProgressLine({
   question,
   variant,
-  path,
   strength,
   halflife,
   isHead = false,
   showVariant = false,
-  // onMouseOver,
-  // onMouseOut,
+  onMouseOver,
+  onMouseOut,
+}: {
+  question?: QuestionType
+  variant?: string
+  strength?: number
+  halflife?: number
+  isHead?: boolean
+  showVariant?: boolean
+  onMouseOver?: () => void
+  onMouseOut?: () => void
 }) {
   const { t } = useTranslation()
   if (isHead) {
@@ -145,6 +150,9 @@ function ProgressLine({
     )
   }
 
+  if (strength === undefined || question === undefined) {
+    return null
+  }
   const percentage = Math.round(strength * 100)
   const strengthTooltip = `Estimated strength: ${percentage}%. Decays over time, so practice regularly!${
     halflife
@@ -154,11 +162,11 @@ function ProgressLine({
   return (
     <tr
       className={`[&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10`}
-      // onMouseOver={onMouseOver}
-      // onMouseOut={onMouseOut}
+      onMouseOver={onMouseOver}
+      onMouseOut={onMouseOut}
     >
       <Thd>
-        <Link to={path}>
+        <Link to={question.path}>
           {t(question.title)}
           {variant ? ` (${variant})` : ""}
         </Link>
@@ -177,18 +185,6 @@ function ProgressLine({
     </tr>
   )
 }
-ProgressLine.propTypes = {
-  question: PropTypes.any,
-  variant: PropTypes.string,
-  path: PropTypes.string,
-  log: PropTypes.array,
-  strength: PropTypes.number,
-  halflife: PropTypes.number,
-  showVariant: PropTypes.bool,
-  isHead: PropTypes.bool,
-  // onMouseOver: PropTypes.func,
-  // onMouseOut: PropTypes.func,
-}
 
 /**
  * Display a strength meter / progress bar
@@ -196,7 +192,7 @@ ProgressLine.propTypes = {
  * @param {Object} props
  * @param {number} strength A number between 0 and 1
  */
-function StrengthMeter({ strength }) {
+function StrengthMeter({ strength }: { strength: number }) {
   const strengthBasic = Math.ceil(strength * 4)
   const present = <div className={`inline-block h-4 w-4 bg-green-500`}></div>
   const absent = <div className={`inline-block h-4 w-4 bg-slate-500`}></div>
@@ -212,17 +208,20 @@ function StrengthMeter({ strength }) {
   return <div className="flex h-4 gap-2 text-left">{bar}</div>
 }
 
-StrengthMeter.propTypes = {
-  strength: PropTypes.number,
-}
-function PassFailButton({ className = "", result }) {
+function PassFailButton({
+  className = "",
+  result,
+}: {
+  className?: string
+  result: string
+}) {
   const { t } = useTranslation()
   return (
     <button
-      aria-label={t(`result-${result}`)}
+      aria-label={t(`result-${result}`) || undefined}
       data-microtip-position="left"
       role="tooltip"
-      className={`cursor-default`}
+      className="cursor-default"
     >
       {result === "pass" ? (
         <BsFillCheckSquareFill
@@ -236,31 +235,32 @@ function PassFailButton({ className = "", result }) {
     </button>
   )
 }
-PassFailButton.propTypes = {
-  className: PropTypes.string,
-  result: PropTypes.string,
-}
 
-function LinkToQuestion({ to }) {
-  const { t } = useTranslation()
-  return (
-    <button
-      aria-label={t("Look at this question again")}
-      data-microtip-position="left"
-      role="tooltip"
-      className="grid place-items-center"
-    >
-      <Link to={to} className="h-full w-full">
-        <BiLink className="inline text-lg" />
-      </Link>
-    </button>
-  )
-}
-LinkToQuestion.propTypes = {
-  to: PropTypes.string,
-}
+// function LinkToQuestion({ to }: { to: string }) {
+//   const { t } = useTranslation()
+//   return (
+//     <button
+//       aria-label={t("Look at this question again")}
+//       data-microtip-position="left"
+//       role="tooltip"
+//       className="grid place-items-center"
+//     >
+//       <Link to={to} className="h-full w-full">
+//         <BiLink className="inline text-lg" />
+//       </Link>
+//     </button>
+//   )
+// }
 
-function HistoryLines({ t, progress, isHead = false }) {
+function HistoryLines({
+  t,
+  progress,
+  isHead = false,
+}: {
+  t: TFunction
+  progress?: Array<LogEntry>
+  isHead?: boolean
+}) {
   if (isHead) {
     return (
       <tr
@@ -276,35 +276,37 @@ function HistoryLines({ t, progress, isHead = false }) {
     )
   }
 
+  if (progress === undefined) {
+    return null
+  }
+
   let history = <></>
   for (const event of progress) {
-    history = (
-      <>
-        {history}
-        <tr
-          className={`[&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10`}
-        >
-          <Thd>
-            <Link to={`${event.question}/${event.variant}/${event.seed}`}>
-              {moment(event.timestamp).fromNow()}
-            </Link>
-          </Thd>
-          <Thd>
-            {t(questionByPath(event.question).title)} ({event.variant}{" "}
-            <PassFailButton
-              className="inline opacity-50"
-              result={event.result}
-            />
-            )
-          </Thd>
-        </tr>
-      </>
-    )
+    const question = questionByPath(event.question)
+    if (question !== undefined) {
+      history = (
+        <>
+          {history}
+          <tr
+            className={`[&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10`}
+          >
+            <Thd>
+              <Link to={`${event.question}/${event.variant}/${event.seed}`}>
+                {moment(event.timestamp).fromNow()}
+              </Link>
+            </Thd>
+            <Thd>
+              {t(question.title)} ({event.variant}{" "}
+              <PassFailButton
+                className="inline opacity-50"
+                result={event.result}
+              />
+              )
+            </Thd>
+          </tr>
+        </>
+      )
+    }
   }
   return history
-}
-HistoryLines.propTypes = {
-  t: PropTypes.func.isRequired,
-  progress: PropTypes.array,
-  isHead: PropTypes.bool,
 }

@@ -1,40 +1,33 @@
-import PropTypes from "prop-types"
-import { useEffect } from "react"
+import { ReactNode, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { FiSun } from "react-icons/fi"
-import { GiHamburgerMenu } from "react-icons/gi"
 import { MdDarkMode } from "react-icons/md"
 import { Link, Outlet, useNavigate } from "react-router-dom"
-import { availableThemes, LIGHT, useTheme } from "../utils/colorscheme"
+import { availableThemes, LIGHT, useTheme } from "../hooks/useTheme"
 
-function TextRadio({ children, isSelected, selectWith }) {
-  return isSelected ? (
-    <b>{children}</b>
-  ) : (
-    <Link onClick={selectWith}>{children}</Link>
-  )
-}
-TextRadio.propTypes = {
-  children: PropTypes.node.isRequired,
-  isSelected: PropTypes.bool.isRequired,
-  selectWith: PropTypes.func.isRequired,
-}
+// function TextRadio({
+//   children,
+//   isSelected,
+//   selectWith,
+// }: {
+//   children: ReactNode
+//   isSelected: boolean
+//   selectWith: () => void
+// }) {
+//   return isSelected ? (
+//     <b>{children}</b>
+//   ) : (
+//     <Link to="" onClick={selectWith}>
+//       {children}
+//     </Link>
+//   )
+// }
 
 export default function Root() {
-  const [theme, userTheme, toggleTheme, setUserTheme] = useTheme()
-  useEffect(() => {
-    document.body.className = theme
-  }, [theme])
-
   return (
     <div className="max-w-screen overflow-x-hidden dark:bg-black dark:text-white">
       <div className="flex min-h-screen flex-col">
-        <GlobalHeader
-          theme={theme}
-          userTheme={userTheme}
-          toggleTheme={toggleTheme}
-          setUserTheme={setUserTheme}
-        />
+        <GlobalHeader />
         <div className="relative flex flex-1">
           <main className="flex-1 p-3">
             <Outlet />
@@ -45,20 +38,24 @@ export default function Root() {
   )
 }
 
-function GlobalHeader({ theme, userTheme, toggleTheme, setUserTheme }) {
+function GlobalHeader() {
   const { t, i18n } = useTranslation()
-  const lngs = {
-    en: { nativeName: "English" },
-    de: { nativeName: "Deutsch" },
+  const lngs = ["en", "de"]
+  const nativeName: Record<string, string> = {
+    en: "English",
+    de: "Deutsch",
   }
   function nextLanguage() {
-    const lngsArray = Object.keys(lngs)
-    const currentLngIndex = Object.keys(lngs).indexOf(i18n.resolvedLanguage)
-    const nextLngIndex = (currentLngIndex + 1) % lngsArray.length
-    const nextLng = lngsArray[nextLngIndex]
-    i18n.changeLanguage(nextLng)
+    const currentLngIndex = lngs.indexOf(i18n.resolvedLanguage)
+    const nextLngIndex = (currentLngIndex + 1) % lngs.length
+    const nextLng = lngs[nextLngIndex]
+    void i18n.changeLanguage(nextLng)
   }
   const navigate = useNavigate()
+  const { theme, userTheme, toggleTheme, setUserTheme } = useTheme()
+  useEffect(() => {
+    document.body.className = theme
+  }, [theme])
 
   return (
     <header className="dark flex flex-none place-items-center  justify-between bg-goethe-500 p-2 text-white dark:bg-goethe-700">
@@ -94,16 +91,16 @@ function GlobalHeader({ theme, userTheme, toggleTheme, setUserTheme }) {
         onClick={nextLanguage}
       >
         <div className="w-28">
-          {Object.keys(lngs).map((lng) => (
+          {lngs.map((lng) => (
             <button
               key={lng}
               className={`block w-full p-2 dark:hover:bg-goethe-500/50 ${
                 i18n.resolvedLanguage === lng ? "font-bold" : ""
               }`}
               type="button"
-              onClick={() => i18n.changeLanguage(lng)}
+              onClick={() => void i18n.changeLanguage(lng)}
             >
-              {lngs[lng].nativeName}
+              {nativeName[lng] ?? "error"}
             </button>
           ))}
         </div>
@@ -121,46 +118,58 @@ function GlobalHeader({ theme, userTheme, toggleTheme, setUserTheme }) {
     </header>
   )
 }
-GlobalHeader.propTypes = {
-  theme: PropTypes.string.isRequired,
-  userTheme: PropTypes.string.isRequired,
-  toggleTheme: PropTypes.func.isRequired,
-  setUserTheme: PropTypes.func.isRequired,
-}
 
-function AppHeader({ toggleSidebar }) {
-  return (
-    <header className="flex flex-none flex-row place-items-center bg-slate-100 p-0 dark:bg-slate-900">
-      <a
-        className="select-none p-3 hover:bg-amber-200 dark:hover:bg-amber-800"
-        onClick={toggleSidebar}
-      >
-        <GiHamburgerMenu />
-      </a>
-      <div className="pl-2">
-        <h2 className="font-bold">My activity</h2>
-      </div>
-    </header>
-  )
-}
-AppHeader.propTypes = {
-  toggleSidebar: PropTypes.func.isRequired,
-}
+// function AppHeader({ toggleSidebar }: { toggleSidebar: () => void }) {
+//   return (
+//     <header className="flex flex-none flex-row place-items-center bg-slate-100 p-0 dark:bg-slate-900">
+//       <a
+//         className="select-none p-3 hover:bg-amber-200 dark:hover:bg-amber-800"
+//         onClick={toggleSidebar}
+//       >
+//         <GiHamburgerMenu />
+//       </a>
+//       <div className="pl-2">
+//         <h2 className="font-bold">My activity</h2>
+//       </div>
+//     </header>
+//   )
+// }
 
-function Sidebar(props) {
-  return <nav className="flex-none sm:static">{props.children}</nav>
-}
-Sidebar.propTypes = {
-  children: PropTypes.node,
-}
+// function Sidebar(props: PropsWithChildren) {
+//   return <nav className="flex-none sm:static" {...props} />
+// }
 
-function SidebarItem({ onClick, icon, text, children, topbar = false }) {
-  const hoverColor = topbar
-    ? "hover:bg-goethe-900"
-    : "hover:bg-amber-200 dark:hover:bg-amber-800"
+/**
+ * A topbar item is a clickable element that can be used to navigate to a page
+ * or to trigger an action.
+ *
+ * @param onClick The function to be called when the item is clicked.
+ * @param icon The icon to be displayed.
+ * @param text The text to be displayed.
+ * @param children The children to be displayed when the item is expanded.
+ * @param topbar Whether the item is displayed in the topbar or in the sidebar.
+ * @returns A topbar item.
+ */
+function TopbarItem({
+  onClick,
+  icon,
+  text,
+  children,
+  topbar = true,
+}: {
+  onClick: () => void
+  icon: ReactNode
+  text?: ReactNode
+  children?: ReactNode
+  topbar?: boolean
+}) {
   return (
     <div
-      className={`group relative flex flex-col place-content-stretch ${hoverColor}`}
+      className={`group relative flex flex-col place-content-stretch ${
+        topbar
+          ? "hover:bg-goethe-900"
+          : "hover:bg-amber-200 dark:hover:bg-amber-800"
+      }`}
     >
       <button
         onClick={onClick}
@@ -182,15 +191,4 @@ function SidebarItem({ onClick, icon, text, children, topbar = false }) {
       </div>
     </div>
   )
-}
-SidebarItem.propTypes = {
-  onClick: PropTypes.func,
-  icon: PropTypes.node,
-  text: PropTypes.string,
-  children: PropTypes.node,
-  topbar: PropTypes.bool,
-}
-
-function TopbarItem(props) {
-  return <SidebarItem {...props} topbar />
 }

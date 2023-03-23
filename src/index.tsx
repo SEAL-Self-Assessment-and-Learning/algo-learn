@@ -5,7 +5,7 @@ import "@fontsource/noto-sans/700.css"
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import { createBrowserRouter, redirect, RouterProvider } from "react-router-dom"
-import ErrorPage from "./error-page"
+import ErrorPage from "./components/ErrorPage"
 import { questions } from "./questions"
 import { LearningProgress } from "./routes/progress"
 import Root from "./routes/root"
@@ -16,9 +16,9 @@ import { About } from "./routes/about"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
 import { Legal } from "./routes/legal"
 import "./tailwind.css"
-import { genSeed } from "./utils/genseed"
+import { genSeed } from "./utils/genSeed"
 
-let routes = []
+const routes = []
 for (const Question of questions) {
   const { path, variants } = Question
   console.assert(
@@ -37,12 +37,16 @@ for (const Question of questions) {
       },
       {
         path: `${path}/${variant}/:seed`,
-        loader: ({ params }) => ({ ...params, path }),
+        loader: ({ params }: { params: object }) => ({ ...params, path }),
         element: <ViewSingleQuestion Question={Question} variant={variant} />,
       }
     )
   }
 }
+
+export const basename =
+  window.location.hostname === "tcs.uni-frankfurt.de" ? "/algo-learn" : ""
+export const prefixURL = window.location.host + basename
 
 const router = createBrowserRouter(
   [
@@ -61,12 +65,11 @@ const router = createBrowserRouter(
     },
   ],
   {
-    basename:
-      window.location.hostname === "tcs.uni-frankfurt.de" ? "/algo-learn" : "",
+    basename: basename,
   }
 )
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>

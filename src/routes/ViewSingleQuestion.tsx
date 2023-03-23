@@ -15,8 +15,14 @@ export function ViewSingleQuestion({
   }
   const navigate = useNavigate()
 
-  if (!(Question.variants.find((v) => v === variant))) {
-    throw new Error(`'${t(Question.title)}' does not have variant '${variant}'. Valid variants are: ${Question.variants.join(", ")}.`)
+  if (!Question.variants.find((v) => v === variant)) {
+    throw new Error(
+      `'${t(
+        Question.title
+      )}' does not have variant '${variant}'. Valid variants are: ${Question.variants.join(
+        ", "
+      )}.`
+    )
   }
 
   console.assert(seed !== null, "useSeed is null")

@@ -1,13 +1,13 @@
 import Fraction from "fraction.js"
 import random from "random"
-import shuffleArray from "./shuffle"
+import shuffleArray from "./shuffleArray"
 
 import math, {
   baseOfLog,
   exponentToLatex,
   exponentToText,
   log2Fraction,
-} from "../utils/math"
+} from "./math"
 
 /**
  * Represents an iterated logarithm term, such as (log(log(n)))^3. It is

@@ -14,11 +14,11 @@ import { GiPlayButton } from "react-icons/gi"
 import { SiCheckmarx, SiIfixit } from "react-icons/si"
 import { Link } from "react-router-dom"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
-import { playFailSound, playPassSound } from "../utils/audio"
+import playSound from "../effects/playSound"
 import { AnswerBox } from "./AnswerBox"
 import { Button } from "./Button"
 import { SortableList } from "./SortableList"
-
+import {prefixURL} from "../index"
 /**
  * A container for questions.
  *
@@ -54,36 +54,40 @@ export function QuestionContainer(
 export function QuestionHeader({
   title,
   regeneratable = false,
+  permalink,
 }: {
   title?: string
   regeneratable?: boolean
+  permalink?: string
 }) {
   const { t } = useTranslation()
   const [recentlyCopied, setRecentlyCopied] = useState(false)
   return (
     <h1>
       {title != undefined && title + " "}
-      <button
-        aria-label={
-          (recentlyCopied ? t("copyLinkCopied") : t("copyLinkTooltip")) || ""
-        }
-        data-microtip-position="right"
-        role="tooltip"
-      >
-        <Link
-          to={""}
-          onClick={() => {
-            void navigator.clipboard
-              .writeText(window.location.href)
-              .then(() => setRecentlyCopied(true))
-          }}
-          onMouseLeave={() => {
-            setTimeout(() => setRecentlyCopied(false), 200)
-          }}
+      {permalink && (
+        <button
+          aria-label={
+            (recentlyCopied ? t("copyLinkCopied") : t("copyLinkTooltip")) || ""
+          }
+          data-microtip-position="right"
+          role="tooltip"
         >
-          <BiLink className="inline" />
-        </Link>
-      </button>
+          <Link
+            to={""}
+            onClick={() => {
+              void navigator.clipboard
+                .writeText(prefixURL + "/" + permalink)
+                .then(() => setRecentlyCopied(true))
+            }}
+            onMouseLeave={() => {
+              setTimeout(() => setRecentlyCopied(false), 200)
+            }}
+          >
+            <BiLink className="inline" />
+          </Link>
+        </button>
+      )}
       {regeneratable && (
         <button
           aria-label={t("generate-new-exercise-of-same-type") || ""}
@@ -110,13 +114,7 @@ export function AnswerRadio({
 }) {
   return (
     <div className="flex place-items-center">
-      <input
-        type="radio"
-        name={window.location.pathname}
-        id={id}
-        className="peer hidden"
-        onChange={onChange}
-      />
+      <input type="radio" id={id} className="peer hidden" onChange={onChange} />
       <AnswerBox TagName="label" htmlFor={id} includePeerCheckedStyle>
         {children}
       </AnswerBox>
@@ -206,6 +204,7 @@ export function ExerciseMultipleChoice({
   regeneratable = false,
   onResult = () => {},
   allowMultiple,
+  permalink
 }: {
   children: ReactNode
   title: string
@@ -213,6 +212,7 @@ export function ExerciseMultipleChoice({
   regeneratable?: boolean
   onResult?: (result: "correct" | "incorrect" | "abort") => void
   allowMultiple?: boolean
+  permalink?: string
 }) {
   const correctAnswers = answers.filter((x) => x.correct).sort()
   if (correctAnswers.length === 0) {
@@ -236,7 +236,7 @@ export function ExerciseMultipleChoice({
         checked.length === correctAnswers.length &&
         correctAnswers.every((item) => checked.includes(item.key))
       setMode(isCorrect ? "correct" : "incorrect")
-      isCorrect ? playPassSound() : playFailSound()
+      isCorrect ? playSound("pass") : playSound("fail")
     } else if (mode === "correct" || mode === "incorrect") {
       onResult(mode)
     }
@@ -266,7 +266,7 @@ export function ExerciseMultipleChoice({
     ) : null
   return (
     <QuestionContainer>
-      <QuestionHeader title={title} regeneratable={regeneratable} />
+      <QuestionHeader permalink={permalink} title={title} regeneratable={regeneratable} />
       {children}
       <div className="mx-auto flex max-w-max flex-wrap gap-5 p-5">
         {answers.map(({ key, element }) => {
@@ -274,7 +274,6 @@ export function ExerciseMultipleChoice({
             <div key={key} className="flex place-items-center">
               <input
                 type={allowMultiple ? "checkbox" : "radio"}
-                name={window.location.pathname}
                 id={key}
                 className="peer hidden"
                 onChange={(e) => {
@@ -312,12 +311,14 @@ export function ExerciseSort({
   answers,
   regeneratable = false,
   onResult = () => {},
+  permalink
 }: {
   children: ReactNode
   title: string
   answers: { key: string; element: ReactNode; correctIndex: number }[]
   regeneratable?: boolean
   onResult?: (result: "correct" | "incorrect" | "abort") => void
+  permalink?: string
 }) {
   const [mode, setMode] = useState(
     "verify" as "verify" | "correct" | "incorrect"
@@ -331,7 +332,7 @@ export function ExerciseSort({
         isCorrect &&= items[i].correctIndex === i
       }
       setMode(isCorrect ? "correct" : "incorrect")
-      isCorrect ? playPassSound() : playFailSound()
+      isCorrect ? playSound("pass") : playSound("fail")
     } else {
       console.assert(mode === "correct" || mode === "incorrect")
       onResult(mode)
@@ -359,7 +360,7 @@ export function ExerciseSort({
 
   return (
     <QuestionContainer>
-      <QuestionHeader title={title} regeneratable={regeneratable} />
+      <QuestionHeader permalink={permalink} title={title} regeneratable={regeneratable} />
       {children}
       <SortableList
         items={items}

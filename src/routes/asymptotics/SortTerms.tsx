@@ -41,6 +41,7 @@ export default function SortTerms({
   onResult: (result: "correct" | "incorrect" | "abort") => void
   regeneratable?: boolean
 }): ReactElement {
+  const permalink = SortTerms.path + "/" + variant + "/" + seed
   random.use(RNGFactory(seed))
 
   const variable = random.choice("nmNMxyztk".split(""))
@@ -74,9 +75,9 @@ export default function SortTerms({
     <ExerciseSort
       title={t(SortTerms.title)}
       answers={answers}
-      key={window.location.pathname}
       onResult={onResult}
       regeneratable={regeneratable}
+      permalink={permalink}
     >
       {t("asymptotics.sortTerms.text")}
     </ExerciseSort>

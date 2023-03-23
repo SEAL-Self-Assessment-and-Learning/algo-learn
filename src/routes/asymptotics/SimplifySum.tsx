@@ -25,11 +25,16 @@ export default function SimplifySum({
   onResult: (result: "correct" | "incorrect" | "abort") => void
   regeneratable?: boolean
 }): ReactElement {
+  const permalink = SimplifySum.path + "/" + variant + "/" + seed
   random.use(RNGFactory(seed))
 
   const functionName = random.choice("fghFGHT".split("")) as string
   const variable = random.choice("nmNMxyztk".split("")) as string
-  const sum = sampleTermSet({ variable, numTerms: 4, variant: variant as TermSetVariants })
+  const sum = sampleTermSet({
+    variable,
+    numTerms: 4,
+    variant: variant as TermSetVariants,
+  })
   const correctTerm = sum
     .slice()
     .sort((t1, t2) => t1.compare(t2))
@@ -51,8 +56,8 @@ export default function SimplifySum({
       answers={answers}
       regeneratable={regeneratable}
       allowMultiple={false}
-      key={window.location.pathname}
       onResult={onResult}
+      permalink={permalink}
     >
       <Trans t={t} i18nKey="asymptotics.simplifySum.text">
         F <TeX>{{ functionDeclaration } as any}</TeX> F{" "}

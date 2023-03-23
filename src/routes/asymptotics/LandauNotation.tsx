@@ -3,7 +3,7 @@ import random, { RNGFactory } from "random"
 import { ReactElement } from "react"
 import { ExerciseMultipleChoice } from "../../components/BasicQuizQuestions"
 import TeX from "../../components/TeX"
-import shuffleArray from "../../utils/shuffle"
+import shuffleArray from "../../utils/shuffleArray"
 
 /**
  * Generate and render a question about asymptotic notation
@@ -20,16 +20,19 @@ import shuffleArray from "../../utils/shuffle"
  */
 
 export default function LandauNotation({
+  variant = "default",
   seed,
   t,
   onResult,
   regeneratable = false,
 }: {
+  variant?: string
   seed: string
   t: TFunction
   onResult: (result: "correct" | "incorrect" | "abort") => void
   regeneratable?: boolean
 }): ReactElement {
+  const permalink = LandauNotation.path + variant + "/" + seed
   random.use(RNGFactory(seed))
 
   const functionTypes = ["\\log n", "n", "n^2", "2^n"]
@@ -74,8 +77,8 @@ export default function LandauNotation({
       title={t("asymptotics.landau.long-title")}
       answers={answers}
       onResult={onResult}
-      key={window.location.pathname}
       regeneratable={regeneratable}
+      permalink={permalink}
       allowMultiple
     >
       {t("asymptotics.landau.text")}

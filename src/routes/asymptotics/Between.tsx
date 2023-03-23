@@ -16,7 +16,7 @@ import {
   TermSetVariants,
   TooComplex,
 } from "../../utils/AsymptoticTerm"
-import { playFailSound, playPassSound } from "../../utils/audio"
+import playSound from "../../effects/playSound"
 
 /**
  * Generate and render a question about O/Omega/o/omega
@@ -37,6 +37,7 @@ export default function Between({
   onResult: (result: "correct" | "incorrect" | "abort") => void
   regeneratable?: boolean
 }): ReactElement {
+  const permalink = Between.path + "/" + variant + "/" + seed
   random.use(RNGFactory(seed))
   const [text, setText] = useState("")
   const [savedMode, setMode] = useState(
@@ -45,7 +46,11 @@ export default function Between({
 
   const functionName = random.choice("fghFGHT".split("")) as string
   const variable = random.choice("nmNMxyztk".split("")) as string
-  const [a, b] = sampleTermSet({ variable, numTerms: 2, variant: variant as TermSetVariants})
+  const [a, b] = sampleTermSet({
+    variable,
+    numTerms: 2,
+    variant: variant as TermSetVariants,
+  })
   let aLandau, bLandau
   if (a.compare(b) < 0) {
     aLandau = "\\omega"
@@ -136,10 +141,10 @@ export default function Between({
           parsed.compare(b.toSumProductTerm()) <
         0
       ) {
-        playPassSound()
+        playSound("pass")
         setMode("correct")
       } else {
-        playFailSound()
+        playSound("fail")
         setMode("incorrect")
       }
     } else if (mode === "correct" || mode === "incorrect") {
@@ -150,7 +155,11 @@ export default function Between({
   const condB = `${functionName}(${variable}) \\in ${bTeX}`
   return (
     <QuestionContainer>
-      <QuestionHeader title={title} regeneratable={regeneratable} />
+      <QuestionHeader
+        title={title}
+        regeneratable={regeneratable}
+        permalink={permalink}
+      />
       <Trans t={t} i18nKey="asymptotics.between.text">
         Enter a function <TeX>{{ functionDeclaration } as any}</TeX> that
         satisfies <TeX block>{{ condA } as any}</TeX> and{" "}
