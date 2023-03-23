@@ -342,7 +342,6 @@ test("ProductTerms.compare: mathNodeToProductTerm compare", () => {
   expect(n(`x^(-1/3)`).toString()).toBe("x^(-1/3)")
   expect(n(`(2x) * (5x)`).toString()).toBe("10 * x^2")
   expect(n(`3 x^2 + 7 x^2`).toString()).toBe("10 * x^2")
-  // expect(n(`y`).toString()).toBe("y")
   expect(n(`x + 1`).compare(n(`1`))).toBe(1)
   expect(n(`x`).Oh(n(`x`))).toBeTruthy()
   expect(n(`x`).Oh(n(`x^2`))).toBeTruthy()
@@ -363,6 +362,7 @@ test("ProductTerms.compare: mathNodeToProductTerm compare", () => {
   expect(n(`3 x^7`).compare(n(`-x^2`)).valueOf()).toBe(1)
   expect(n(`3 x`).compare(n(`-x^2`)).valueOf()).toBe(1)
   expect(n(`x`).tilde(n(`x^2`))).toBeFalsy()
+  expect(n(`x`).tilde(n(`2x`))).toBeFalsy()
   expect(n(`6 x^2`).tilde(n(`x^2`))).toBeFalsy()
   expect(n(`6 x^2`).tilde(n(`6 x^2 + log(x)`))).toBeTruthy()
   expect(n(`3 x^2 + 7 x^2`).tilde(n(`(2 x) * (5 x)`))).toBeTruthy()
@@ -377,16 +377,15 @@ test("ProductTerms.compare: mathNodeToProductTerm compare", () => {
   expect(n(`x^2`).oh(n(`2^x`))).toBeTruthy()
   expect(n(`4^x`).omega(n(`x^77`))).toBeTruthy()
   expect(n(`92^x`).omega(n(`7^x`))).toBeTruthy()
-
-  // This currently fails, we do not support proper subtraction yet:
-  // expect(n(`(3 x^2 + log(x)) - 3 x^2`).tilde(n(`log(x)`))).toBeTruthy()
-
-  for (const c of [-3, 0, 3]) {
-    for (const d of [-3, 0, 3]) {
-      expect(n(`7 x^(${c})`).getTerms()[0].coefficient.valueOf()).toBe(7)
-      expect(n(`x^(${c})`).compare(n(`x^(${d})`))).toBe(
-        c > d ? 1 : c < d ? -1 : 0
-      )
-    }
-  }
+  expect(n(`(3 x^2 + 9 log(x)) - 3 x^2`).tilde(n(`9 * log(x)`))).toBeTruthy()
+  expect(n(`3 x^2 + 9 log(x) - 3 x^2`).tilde(n(`9 * log(x)`))).toBeTruthy()
+  expect(n(`9 x^2 + 9 log(x) - 3 x^2`).tilde(n(`6 x^2`))).toBeTruthy()
+  expect(n(`(2x+3)(5x+7)`).tilde(n(`10 x^2`))).toBeTruthy()
+  expect(n(`(2x+3)(5x+7)-10x^2`).tilde(n(`29x`))).toBeTruthy()
+  expect(n(`2^(log(x))`).tilde(n(`x`))).toBeTruthy()
+  expect(n(`3^(log_3(x))`).Theta(n(`x`))).toBeTruthy()
+  expect(n(`3^(log_3(x))`).tilde(n(`x`))).toBeTruthy()
+  expect(n(`2^(log_3(x))`).tilde(n(`x`))).toBeFalsy()
+  expect(n(`y^7`).toString("y")).toBe("y^7")
+  expect(n(`3^n`).toString("n")).toBe("3^n")
 })

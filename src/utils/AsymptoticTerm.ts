@@ -503,11 +503,11 @@ export class ProductTerm {
     )
 
     // logarithm of each iterated-log factor
-    // (Note that log((log^(i)(n))^e) = e * log^(i+1)(n) holds)
+    // (Note that log_b((log2^(i)(n))^e) = e * log2^(i+1)(n) / log2(b) holds)
     for (const [i, e] of this.logarithmExponents) {
       newTerms.push(
         new ProductTerm({
-          coefficient: e,
+          coefficient: e.div(log2Fraction(base)),
           logarithmExponents: new IteratedLogarithms([
             [i + 1, new Fraction(1)],
           ]),
