@@ -5,7 +5,7 @@
 @layer base {
   main a {
     @apply cursor-pointer text-goethe-700 underline hover:bg-black/10 dark:text-goethe-50 dark:hover:bg-goethe-900;
-  } 
+  }
 
   h1 {
     @apply text-2xl font-bold;
@@ -33,5 +33,13 @@
 
   .btn-blue:hover {
     @apply bg-blue-700;
+  }
+
+  table.tbl > tbody > tr {
+    @apply [&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10;
+  }
+ 
+   table.tbl td, table.tbl th {
+    @apply px-2 py-3;
   }
 }

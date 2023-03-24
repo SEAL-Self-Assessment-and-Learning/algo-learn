@@ -3569,6 +3569,7 @@ __metadata:
     stream-browserify: ^3.0.0
     stylelint: ^15.1.0
     stylelint-config-standard: ^30.0.1
+    stylelint-prettier: ^3.0.0
     tailwindcss: ^3.2.4
     ts-jest: ^29.0.5
     typescript: ^4.9.5
@@ -12452,6 +12453,18 @@ __metadata:
   peerDependencies:
     stylelint: ^15.0.0
   checksum: db0cce181b654df4960d0c03129f3904c775628cb29a7aadfcb995034c234797b10db50640c85085bf0f2e5fbffc654b20a8c2be38c26ef670691fe7e8c86e86
+  languageName: node
+  linkType: hard
+
+"stylelint-prettier@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "stylelint-prettier@npm:3.0.0"
+  dependencies:
+    prettier-linter-helpers: ^1.0.0
+  peerDependencies:
+    prettier: ">=2.0.0"
+    stylelint: ">=14.0.0"
+  checksum: 094f53ef5dbe3806524db7f580b9312ceca444651803fc08c8baa48cd9a270985c709fa4f083681a685310dc347b8e55aa93d462554ba7d4ae6258a3bdf6a278
   languageName: node
   linkType: hard
 

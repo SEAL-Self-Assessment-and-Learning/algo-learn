@@ -1,6 +1,5 @@
 import { TFunction } from "i18next"
 import moment from "moment/moment"
-import { ReactNode, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { BsFillCheckSquareFill, BsFillXSquareFill } from "react-icons/bs"
 import { Link } from "react-router-dom"
@@ -14,25 +13,13 @@ import {
   questionVariants,
   useSkills,
 } from "../hooks/useSkills"
+import { StrengthMeter } from "../components/StrengthMeter"
+import { TiLockClosed, TiLockOpen } from "react-icons/ti"
 
 /** LearningProgress component */
 export function LearningProgress() {
   const { t } = useTranslation()
   const { strengthMap, featureMap, unlockedSkills, log } = useSkills()
-  const [selectedLogRev, setSelectedLog] = useState(log)
-  const selectedLog: LogEntry[] = selectedLogRev.slice()
-  selectedLog.reverse()
-
-  function selectQuestion(q: QuizQuestion) {
-    const selection = []
-    for (const e of log) {
-      if (e.question === q.path) {
-        selection.push(e)
-      }
-      if (selection.length == 10) break
-    }
-    setSelectedLog(selection)
-  }
   return (
     <div className="mx-auto max-w-lg">
       <h1 className="my-5">{t("Training")}</h1>
@@ -54,15 +41,16 @@ export function LearningProgress() {
       <h2 className="mb-5 mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10">
         {t("your-learning-progress")}
       </h2>
-      <table>
+      <table className="tbl">
         <tbody>
-          <ProgressLine isHead />
+          <SkillTableHead t={t} />
           {questions.map((q) => (
-            <ProgressLine
+            <SkillTableRow
+              t={t}
               key={q.path}
-              // onMouseOver={() => selectQuestion(q)}
-              // onMouseOut={() => setSelectedLog(log)}
               question={q}
+              unlocked
+              qualified
               strength={averageStrength({ strengthMap, path: q.path })}
             />
           ))}
@@ -72,146 +60,83 @@ export function LearningProgress() {
         {t("detailed-learning-progress")}
       </h2>
       <p className="my-5">{t("detailed-learning-progress-text")}</p>
-      <table>
+      <table className="tbl">
         <tbody>
-          <ProgressLine isHead showVariant />
+          <SkillTableHead t={t} showVariant />
           {questionVariants.map(({ question, variant, path }) => (
-            <ProgressLine
+            <SkillTableRow
+              t={t}
               key={path}
-              onMouseOver={() => selectQuestion(question)}
-              onMouseOut={() => setSelectedLog(log)}
               question={question}
               variant={variant}
               qualified={featureMap[path].qualified}
-              unlocked={path in unlockedSkills}
+              unlocked={unlockedSkills.find((s) => s === path) !== undefined}
               strength={strengthMap[path].p}
               halflife={strengthMap[path].h}
             />
           ))}
         </tbody>
       </table>
-      <h2 className="mb-5 mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10">
-        {t("History")}
-      </h2>
+      <LogTable
+        t={t}
+        log={log}
+        className="mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10"
+      />
+    </div>
+  )
+}
+
+function LogTable({
+  t,
+  log,
+  className = "",
+}: {
+  t: TFunction
+  log: LogEntry[]
+  className?: string
+}) {
+  return (
+    <div className={className}>
+      <h2>{t("History")}</h2>
       <p className="my-5">{t("history-text")}</p>
-      <table className="w-full">
+      <table className="tbl">
         <tbody>
-          <HistoryLines t={t} isHead />
-          <HistoryLines t={t} progress={selectedLog} />
+          <tr>
+            <th>{t("time")}</th>
+            <th>
+              {t("question")} ({t("question-variant")})
+            </th>
+          </tr>
+          {log.map((entry) => (
+            <LogTableRow key={entry.timestamp} t={t} entry={entry} />
+          ))}
         </tbody>
       </table>
     </div>
   )
 }
 
-function Thd({
-  children,
-  className = "",
-  isHead = false,
-}: {
-  children: ReactNode
-  className?: string
-  isHead?: boolean
-}) {
-  const Tag = isHead ? "th" : "td"
-  return <Tag className={`px-2 py-3 ${className}`}>{children}</Tag>
-}
-
-function ProgressLine({
-  question,
-  variant,
-  strength,
-  halflife,
-  unlocked,
-  qualified,
-  isHead = false,
-  showVariant = false,
-  onMouseOver,
-  onMouseOut,
-}: {
-  question?: QuizQuestion
-  variant?: string
-  strength?: number
-  halflife?: number
-  unlocked?: boolean
-  qualified?: boolean
-  isHead?: boolean
-  showVariant?: boolean
-  onMouseOver?: () => void
-  onMouseOut?: () => void
-}) {
-  const { t } = useTranslation()
-  if (isHead) {
-    return (
-      <tr
-        className={
-          "font-bold [&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10"
-        }
-      >
-        <Thd isHead>
-          {t("Skill")} {showVariant ? `(${t("question-variant")})` : ""}
-        </Thd>
-        <Thd isHead>{t("Strength")}</Thd>
-      </tr>
-    )
-  }
-
-  if (strength === undefined || question === undefined) {
-    return null
-  }
-  const percentage = Math.round(strength * 100)
-  const strengthTooltip = `Estimated strength: ${percentage}%. Decays over time, so practice regularly!${
-    halflife
-      ? ` (Estimated halflife: ~${Math.round(halflife * 10) / 10} days.)`
-      : ""
-  }`
+function LogTableRow({ t, entry }: { t: TFunction; entry: LogEntry }) {
+  const title = questionByPath(entry.question)?.title
+  if (title === undefined) return null
   return (
-    <tr
-      className={`[&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10`}
-      onMouseOver={onMouseOver}
-      onMouseOut={onMouseOut}
-    >
-      <Thd>
-        <Link to={question.path}>
-          {t(question.title)}
-          {variant ? ` (${variant})` : ""}
+    <tr className="[&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10">
+      <td>
+        <PassFailButton
+          className="mr-2 inline opacity-50"
+          result={entry.result}
+        />
+        {moment(entry.timestamp).fromNow()}
+      </td>
+      <td>
+        {t(title)} ({entry.variant}) [
+        <Link to={`${entry.question}/${entry.variant}/${entry.seed}`}>
+          view
         </Link>
-      </Thd>
-      <Thd>
-        <button
-          aria-label={strengthTooltip}
-          data-microtip-position="right"
-          data-microtip-size="large"
-          role="tooltip"
-          className="grid cursor-default place-items-center"
-        >
-          <StrengthMeter strength={strength} />
-        </button>
-      </Thd>
+        ]
+      </td>
     </tr>
   )
-}
-
-/**
- * Display a strength meter / progress bar
- *
- * @param {Object} props
- * @param {number} strength A number between 0 and 1
- */
-function StrengthMeter({ strength }: { strength: number }) {
-  const strengthBasic = (strength < 0.5 ? Math.round : Math.ceil)(strength * 4)
-  const present = <div className={`inline-block h-4 w-4 bg-green-500`}></div>
-  const absent = <div className={`inline-block h-4 w-4 bg-slate-500`}></div>
-  let bar = <></>
-  for (let i = 0; i <= 3; i++) {
-    bar = (
-      <>
-        {bar}
-        {i < strengthBasic ? present : absent}
-      </>
-    )
-  }
-  return <div className="flex h-4 gap-2 text-left">{bar}</div>
 }
 
 function PassFailButton({
@@ -219,100 +144,84 @@ function PassFailButton({
   result,
 }: {
   className?: string
-  result: string
+  result: "pass" | "fail"
 }) {
-  const { t } = useTranslation()
-  return (
-    <button
-      aria-label={t(`result-${result}`) || undefined}
-      data-microtip-position="left"
-      role="tooltip"
-      className="cursor-default"
-    >
-      {result === "pass" ? (
-        <BsFillCheckSquareFill
-          className={`text-lg text-green-700 dark:text-green-500 ${className}`}
-        />
-      ) : (
-        <BsFillXSquareFill
-          className={`text-lg text-red-700 dark:text-red-500 ${className}`}
-        />
-      )}
-    </button>
+  return result === "pass" ? (
+    <BsFillCheckSquareFill
+      className={`mb-[0.2ex] inline w-[0.75em] text-lg text-green-700 dark:text-green-500 ${className}`}
+    />
+  ) : (
+    <BsFillXSquareFill
+      className={`mb-[0.2ex] inline w-[0.75em] text-lg text-red-700 dark:text-red-500 ${className}`}
+    />
   )
 }
 
-// function LinkToQuestion({ to }: { to: string }) {
-//   const { t } = useTranslation()
-//   return (
-//     <button
-//       aria-label={t("Look at this question again")}
-//       data-microtip-position="left"
-//       role="tooltip"
-//       className="grid place-items-center"
-//     >
-//       <Link to={to} className="h-full w-full">
-//         <BiLink className="inline text-lg" />
-//       </Link>
-//     </button>
-//   )
-// }
-
-function HistoryLines({
+function SkillTableHead({
   t,
-  progress,
-  isHead = false,
+  showVariant = false,
 }: {
   t: TFunction
-  progress?: Array<LogEntry>
-  isHead?: boolean
+  showVariant?: boolean
 }) {
-  if (isHead) {
-    return (
-      <tr
-        className={`font-bold [&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10`}
-      >
-        <Thd className="w-1/2" isHead>
-          {t("time")}
-        </Thd>
-        <Thd className="w-1/2" isHead>
-          {t("question")} ({t("question-variant")})
-        </Thd>
-      </tr>
-    )
-  }
+  return (
+    <tr>
+      <th>
+        {t("Skill")} {showVariant ? `(${t("question-variant")})` : ""}
+      </th>
+      <th>{t("Strength")}</th>
+    </tr>
+  )
+}
 
-  if (progress === undefined) {
-    return null
-  }
-
-  let history = <></>
-  for (const event of progress) {
-    const question = questionByPath(event.question)
-    if (question !== undefined) {
-      history = (
-        <>
-          {history}
-          <tr
-            className={`[&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10`}
-          >
-            <Thd>
-              <Link to={`${event.question}/${event.variant}/${event.seed}`}>
-                {moment(event.timestamp).fromNow()}
-              </Link>
-            </Thd>
-            <Thd>
-              {t(question.title)} ({event.variant}{" "}
-              <PassFailButton
-                className="inline opacity-50"
-                result={event.result}
-              />
-              )
-            </Thd>
-          </tr>
-        </>
-      )
-    }
-  }
-  return history
+function SkillTableRow({
+  t,
+  question,
+  variant,
+  strength,
+  halflife,
+  qualified,
+  unlocked,
+  onMouseOver,
+  onMouseOut,
+}: {
+  t: TFunction
+  question: QuizQuestion
+  variant?: string
+  strength: number
+  halflife?: number
+  qualified?: boolean
+  unlocked?: boolean
+  onMouseOver?: () => void
+  onMouseOut?: () => void
+}) {
+  const percentage = Math.round(strength * 100)
+  const strengthTooltip = `Estimated strength: ${percentage}%. Decays over time, so practice regularly!${
+    halflife
+      ? ` (Estimated halflife: ~${Math.round(halflife * 10) / 10} days.)`
+      : ""
+  }`
+  return (
+    <tr onMouseOver={onMouseOver} onMouseOut={onMouseOut}>
+      <td>
+        <Link to={question.path}>
+          {t(question.title)}
+          {variant ? ` (${variant})` : ""}
+        </Link>
+      </td>
+      <td>
+        {!unlocked && !qualified ? (
+          <span className="text-yellow-800 dark:text-yellow-200">
+            <TiLockClosed className="mb-[0.3ex] inline" /> (locked)
+          </span>
+        ) : unlocked && !qualified ? (
+          <span className="text-green-800 dark:text-green-200">
+            <TiLockOpen className="mb-[0.3ex] inline" /> (practicing...)
+          </span>
+        ) : (
+          <StrengthMeter strength={strength} tooltip={strengthTooltip} />
+        )}
+      </td>
+    </tr>
+  )
 }

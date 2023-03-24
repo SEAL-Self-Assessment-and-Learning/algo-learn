@@ -106,14 +106,15 @@ export function useSkills() {
     defaultValue: [] as Array<LogEntry>,
     storageSync: true,
   })
-  const log = storedlog.filter(
-    (e) => questionVariantByPath(e.question + "/" + e.variant) !== undefined
-  )
-
+  const log = storedlog
+    .filter(
+      (e) => questionVariantByPath(e.question + "/" + e.variant) !== undefined
+    )
+    .sort((a, b) => b.timestamp - a.timestamp)
   for (let i = 0; i < log.length - 1; i++) {
     console.assert(
-      log[i + 1].timestamp > log[i].timestamp,
-      "Invariant failed: The log must be sorted, and each timestamp must be unique!"
+      log[i + 1].timestamp < log[i].timestamp,
+      "Invariant failed: The log must be sorted in descending order, and each timestamp must be unique!"
     )
   }
 
@@ -128,8 +129,8 @@ export function useSkills() {
 
   /* Compute  */
   const unlockedSkills = useMemo(
-    () => computeUnlockedSkills({ strengthMap }),
-    [strengthMap]
+    () => computeUnlockedSkills({ featureMap, strengthMap }),
+    [featureMap, strengthMap]
   )
 
   function appendLogEntry(entry: LogEntry) {
@@ -179,9 +180,12 @@ function computeFeatureMap({ log }: { log: Array<LogEntry> }): {
   const minQualifyingPasses = 3
 
   const now = Date.now()
-  for (const e of log.reverse()) {
+  for (const e of log.slice().reverse()) {
     const path = e.question + "/" + e.variant
-
+    featureMap[path].lag = min(
+      featureMap[path].lag,
+      (now - e.timestamp) / 3600 / 24 / 1000
+    )
     if (featureMap[path].qualified) {
       if (e.result === "pass") {
         featureMap[path].numPassed += 1
@@ -189,18 +193,19 @@ function computeFeatureMap({ log }: { log: Array<LogEntry> }): {
         console.assert(e.result === "fail")
         featureMap[path].numFailed += 1
       }
-      featureMap[path].lag = min(
-        featureMap[path].lag,
-        (now - e.timestamp) / 3600 / 24 / 1000
-      )
     } else if (qualifyingPasses[path] < minQualifyingPasses) {
       if (e.result === "pass") {
         qualifyingPasses[path] += 1
       } else {
         qualifyingPasses[path] = 0
       }
-    } else {
+    }
+    if (qualifyingPasses[path] === minQualifyingPasses) {
       featureMap[path].qualified = true
+      // featureMap[path].numPassed = Math.max(
+      //   featureMap[path].numPassed,
+      //   minQualifyingPasses
+      // )
     }
   }
   return featureMap
@@ -234,10 +239,10 @@ export function averageStrength({
   path: string
 }) {
   const q = questionByPath(path)
-  if (q === undefined) return 0
+  if (q === undefined || q.variants.length === 0) return 0
 
   let avg = 0
-  for (const v of q.variants || []) {
+  for (const v of q.variants) {
     avg += strengthMap[path + "/" + v].p
   }
   avg /= q.variants.length
@@ -255,7 +260,7 @@ export function weakestSkill({
   rng,
   strengthMap,
   skills = questionVariants.map(({ path }) => path),
-  noise = 0,
+  noise = 0.1,
 }: {
   rng: Random
   strengthMap: {
@@ -265,14 +270,16 @@ export function weakestSkill({
   noise: number
 }): string {
   let minPath: string | undefined
-  let min = 1
+  let min = 2
   for (const path of skills) {
-    if (!minPath || strengthMap[path].p < min) minPath = path
+    if (!minPath || strengthMap[path].p < min) {
+      minPath = path
+    }
     min = strengthMap[path].p
   }
   const selection = skills.filter((path) => strengthMap[path].p <= min + noise)
   if (selection.length == 0) throw Error("Cannot find weakest skill")
-  return rng.choice(selection) ?? selection[0]
+  return rng.choice(selection)!
 }
 
 const HIGHEST_SKILLS = [
@@ -299,9 +306,13 @@ export function randomHighestSkill({ rng }: { rng: Random }): string {
  * @returns {string[]} The list of unlocked skills
  */
 export function computeUnlockedSkills({
+  featureMap,
   strengthMap,
   thresholdStrength = 0.75,
 }: {
+  featureMap: {
+    [path: string]: SkillFeatures
+  }
   strengthMap: {
     [path: string]: { p: number; h: number }
   }
@@ -313,7 +324,7 @@ export function computeUnlockedSkills({
     for (const v of q.variants) {
       const qv = q.path + "/" + v
       unlockedPaths.push(qv)
-      if (strengthMap[qv].p < thresholdStrength) break
+      if (strengthMap[qv].p < thresholdStrength || !featureMap[qv].qualified) break
     }
   }
   return unlockedPaths
