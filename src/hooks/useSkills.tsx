@@ -1,23 +1,22 @@
 import { Random } from "random"
 import { FunctionComponent, useMemo } from "react"
 import useLocalStorageState from "use-local-storage-state"
-import LandauNotation from "./routes/asymptotics/LandauNotation"
-import Between from "./routes/asymptotics/Between"
-import SortTerms from "./routes/asymptotics/SortTerms"
-import SimplifySum from "./routes/asymptotics/SimplifySum"
-import { computeStrength, SkillFeatures } from "./utils/memory-model"
 import { TFunction } from "i18next"
 
-function min<T>(a: T, b: T) {
-  return a < b ? a : b
-}
+import { computeStrength, SkillFeatures } from "../utils/memory-model"
+import { min } from "../utils/math"
 
-export interface QuestionType
+import LandauNotation from "../routes/asymptotics/LandauNotation"
+import Between from "../routes/asymptotics/Between"
+import SortTerms from "../routes/asymptotics/SortTerms"
+import SimplifySum from "../routes/asymptotics/SimplifySum"
+
+export interface QuizQuestion
   extends FunctionComponent<{
     variant: string
     seed: string
     t: TFunction
-    onResult: (result: "correct" | "incorrect") => void
+    onResult: (result: "correct" | "incorrect" | "abort") => void
     regeneratable?: boolean
   }> {
   variants: string[]
@@ -26,15 +25,15 @@ export interface QuestionType
 }
 
 /** List of all questions */
-export const questions: QuestionType[] = [
-  SortTerms as QuestionType,
-  LandauNotation as QuestionType,
-  SimplifySum as QuestionType,
-  Between as QuestionType,
+export const questions: QuizQuestion[] = [
+  SortTerms,
+  LandauNotation,
+  SimplifySum,
+  Between,
 ]
 
 /** Return the question corresponding to a path */
-export function questionByPath(path: string): QuestionType | undefined {
+export function questionByPath(path: string): QuizQuestion | undefined {
   for (const e of questions) {
     if (path.startsWith(e.path)) return e
   }
@@ -60,19 +59,6 @@ export type LogEntry = {
   seed: string
   result: "pass" | "fail"
   timestamp: number
-}
-
-/**
- * Return a string that uniquely identifies a question
- *
- * @param {LogEntry} entry The log entry whose path we want
- * @param {boolean} omitSeed Whether to omit the seed
- * @returns {string} Path
- */
-function PathOfEntry(entry: LogEntry, omitSeed: boolean = false): string {
-  return (
-    entry.question + "/" + entry.variant + (omitSeed ? "" : "/" + entry.seed)
-  )
 }
 
 // const initialLogExample = [
@@ -115,6 +101,7 @@ function PathOfEntry(entry: LogEntry, omitSeed: boolean = false): string {
 
 /** Return the progress of the user */
 export function useSkills() {
+  // const [storedlog, setLog] = useState(initialLogExample as Array<LogEntry>)
   const [storedlog, setLog] = useLocalStorageState("log", {
     defaultValue: [] as Array<LogEntry>,
     storageSync: true,
@@ -123,7 +110,6 @@ export function useSkills() {
     (e) => questionVariantByPath(e.question + "/" + e.variant) !== undefined
   )
 
-  // const [log, setLog] = useState(initialLogExample as Array<LogEntry>)
   for (let i = 0; i < log.length - 1; i++) {
     console.assert(
       log[i + 1].timestamp > log[i].timestamp,
@@ -140,6 +126,7 @@ export function useSkills() {
     [featureMap]
   )
 
+  /* Compute  */
   const unlockedSkills = useMemo(
     () => computeUnlockedSkills({ strengthMap }),
     [strengthMap]
@@ -175,30 +162,46 @@ export function useSkills() {
 function computeFeatureMap({ log }: { log: Array<LogEntry> }): {
   [path: string]: SkillFeatures
 } {
-  const featureMap: {
-    [path: string]: SkillFeatures
-  } = {}
+  const qualifyingPasses: { [path: string]: number } = {}
+  const featureMap: { [path: string]: SkillFeatures } = {}
   for (const { path } of questionVariants) {
+    qualifyingPasses[path] = 0
     featureMap[path] = {
+      qualified: false,
       numPassed: 0,
       numFailed: 0,
       lag: Infinity,
     }
   }
 
-  for (const e of log) {
-    const path = PathOfEntry(e, true)
+  // We need at least 3 successive passes to unlock a skill;
+  // only after this time will the featureMap be computed.
+  const minQualifyingPasses = 3
 
-    if (e.result === "pass") {
-      featureMap[path].numPassed += 1
+  const now = Date.now()
+  for (const e of log.reverse()) {
+    const path = e.question + "/" + e.variant
+
+    if (featureMap[path].qualified) {
+      if (e.result === "pass") {
+        featureMap[path].numPassed += 1
+      } else {
+        console.assert(e.result === "fail")
+        featureMap[path].numFailed += 1
+      }
+      featureMap[path].lag = min(
+        featureMap[path].lag,
+        (now - e.timestamp) / 3600 / 24 / 1000
+      )
+    } else if (qualifyingPasses[path] < minQualifyingPasses) {
+      if (e.result === "pass") {
+        qualifyingPasses[path] += 1
+      } else {
+        qualifyingPasses[path] = 0
+      }
     } else {
-      console.assert(e.result === "fail")
-      featureMap[path].numFailed += 1
+      featureMap[path].qualified = true
     }
-    featureMap[path].lag = min(
-      featureMap[path].lag,
-      (Date.now() - e.timestamp) / 3600 / 24 / 1000
-    )
   }
   return featureMap
 }
@@ -281,13 +284,19 @@ const HIGHEST_SKILLS = [
   "asymptotics/landau/default",
 ]
 /** Returns a random skill of the highest skill levels ("exam-level") */
-export function randomHighestSkill({ rng }: { rng: Random }):string {
+export function randomHighestSkill({ rng }: { rng: Random }): string {
   return rng.choice(HIGHEST_SKILLS) ?? HIGHEST_SKILLS[0]
 }
 
 /**
  * Returns all skills that are already unlocked. A skill unlocks only once all
  * dependencies are above thresholdStrength
+ *
+ * @param {object} props
+ * @param {object} props.strengthMap A map from skill path to its strength
+ * @param {number} props.thresholdStrength The threshold for a skill to be
+ *   considered unlocked
+ * @returns {string[]} The list of unlocked skills
  */
 export function computeUnlockedSkills({
   strengthMap,
@@ -297,7 +306,7 @@ export function computeUnlockedSkills({
     [path: string]: { p: number; h: number }
   }
   thresholdStrength?: number
-}) {
+}): string[] {
   // for now, we assume all questions are independent and all variants strictly build on each other.
   const unlockedPaths = []
   for (const q of questions) {

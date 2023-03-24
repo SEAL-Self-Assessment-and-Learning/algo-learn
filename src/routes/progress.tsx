@@ -10,20 +10,20 @@ import {
   LogEntry,
   questionByPath,
   questions,
-  QuestionType,
+  QuizQuestion,
   questionVariants,
   useSkills,
-} from "../questions"
+} from "../hooks/useSkills"
 
 /** LearningProgress component */
 export function LearningProgress() {
   const { t } = useTranslation()
-  const { strengthMap, log } = useSkills()
+  const { strengthMap, featureMap, unlockedSkills, log } = useSkills()
   const [selectedLogRev, setSelectedLog] = useState(log)
   const selectedLog: LogEntry[] = selectedLogRev.slice()
   selectedLog.reverse()
 
-  function selectQuestion(q: QuestionType) {
+  function selectQuestion(q: QuizQuestion) {
     const selection = []
     for (const e of log) {
       if (e.question === q.path) {
@@ -82,6 +82,8 @@ export function LearningProgress() {
               onMouseOut={() => setSelectedLog(log)}
               question={question}
               variant={variant}
+              qualified={featureMap[path].qualified}
+              unlocked={path in unlockedSkills}
               strength={strengthMap[path].p}
               halflife={strengthMap[path].h}
             />
@@ -120,15 +122,19 @@ function ProgressLine({
   variant,
   strength,
   halflife,
+  unlocked,
+  qualified,
   isHead = false,
   showVariant = false,
   onMouseOver,
   onMouseOut,
 }: {
-  question?: QuestionType
+  question?: QuizQuestion
   variant?: string
   strength?: number
   halflife?: number
+  unlocked?: boolean
+  qualified?: boolean
   isHead?: boolean
   showVariant?: boolean
   onMouseOver?: () => void
@@ -193,7 +199,7 @@ function ProgressLine({
  * @param {number} strength A number between 0 and 1
  */
 function StrengthMeter({ strength }: { strength: number }) {
-  const strengthBasic = Math.ceil(strength * 4)
+  const strengthBasic = (strength < 0.5 ? Math.round : Math.ceil)(strength * 4)
   const present = <div className={`inline-block h-4 w-4 bg-green-500`}></div>
   const absent = <div className={`inline-block h-4 w-4 bg-slate-500`}></div>
   let bar = <></>

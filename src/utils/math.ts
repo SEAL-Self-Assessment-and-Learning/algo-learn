@@ -65,14 +65,19 @@ export function max(a: Fraction, b: Fraction): Fraction {
 }
 
 /**
- * Return the minimum of two fractions
+ * Return the minimum of two numbers. Other than Math.min, this function works
+ * with Fractions and with Infinity.
  *
- * @param {Fraction} a
- * @param {Fraction} b
- * @returns The minimum of a and b
+ * @param {T} a
+ * @param {T} b
+ * @returns {T} The minimum of a and b
  */
-export function min(a: Fraction, b: Fraction): Fraction {
-  return a.compare(b) < 0 ? a : b
+export function min<T>(a: T, b: T): T {
+  if (a instanceof Fraction && b instanceof Fraction) {
+    return a.compare(b) < 0 ? a : b
+  } else {
+    return a < b ? a : b
+  }
 }
 
 /**

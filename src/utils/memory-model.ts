@@ -13,6 +13,7 @@
  */
 
 export type SkillFeatures = {
+  qualified: boolean // whether the qualification phase for this skill was successful
   numPassed: number // number of times the user passed the question
   numFailed: number // number of times the user failed the question
   lag: number // time since the last interaction in days
@@ -34,9 +35,9 @@ export function pclip(p: number): number {
 }
 
 // These weights are set, such that 3 correct answers and
-// 0 wrong answers give a half-life of 7 days
-const RIGHT = 0.598785
-const WRONG = -0.4
+// 0 wrong answers give a half-life of 14 days
+const RIGHT = 0.932118
+const WRONG = -0.8
 const BIAS = 1.011
 
 /**
@@ -76,12 +77,5 @@ export function computeStrength({
 }: SkillFeatures): { h: number; p: number } {
   const h = halflife(numPassed, numFailed, n0)
   const p = pclip(2 ** (-lag / h))
-
-  // if the user has not interacted with this skill often enough,
-  // we return a probability of 0
-  if (numPassed + numFailed < 3) {
-    return { h, p: 0 }
-  } else {
-    return { h, p }
-  }
+  return { h, p }
 }

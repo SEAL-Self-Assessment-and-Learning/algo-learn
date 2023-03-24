@@ -6,7 +6,7 @@ import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import { createBrowserRouter, redirect, RouterProvider } from "react-router-dom"
 import ErrorPage from "./components/ErrorPage"
-import { questions } from "./questions"
+import { questions } from "./hooks/useSkills"
 import { LearningProgress } from "./routes/progress"
 import Root from "./routes/root"
 

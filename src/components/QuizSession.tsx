@@ -6,7 +6,7 @@ import {
   randomHighestSkill,
   useSkills,
   weakestSkill,
-} from "../questions"
+} from "../hooks/useSkills"
 import { TermSetVariants } from "../utils/AsymptoticTerm"
 import { genSeed } from "../utils/genSeed"
 import { Button } from "./Button"

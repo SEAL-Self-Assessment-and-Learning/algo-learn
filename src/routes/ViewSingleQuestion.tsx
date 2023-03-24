@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next"
 import { useLoaderData, useNavigate } from "react-router-dom"
-import { QuestionType } from "../questions"
+import { QuizQuestion } from "../hooks/useSkills"
 
 export function ViewSingleQuestion({
   Question,
   variant,
 }: {
-  Question: QuestionType
+  Question: QuizQuestion
   variant: string
 }) {
   const { t } = useTranslation()
