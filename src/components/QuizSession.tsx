@@ -70,7 +70,7 @@ export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
         appendLogEntry({
           question: `${skillGroup}/${question}`,
           variant,
-          seed,
+          seed: questionSeed,
           result: "pass",
           timestamp: Date.now(),
         })
@@ -79,7 +79,7 @@ export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
         appendLogEntry({
           question: `${skillGroup}/${question}`,
           variant,
-          seed,
+          seed: questionSeed,
           result: "fail",
           timestamp: Date.now(),
         })
