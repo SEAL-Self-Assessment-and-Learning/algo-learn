@@ -12,13 +12,13 @@ import { useTranslation } from "react-i18next"
 import { BiLink, BiRefresh } from "react-icons/bi"
 import { GiPlayButton } from "react-icons/gi"
 import { SiCheckmarx, SiIfixit } from "react-icons/si"
-import { Link } from "react-router-dom"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import playSound from "../effects/playSound"
 import { AnswerBox } from "./AnswerBox"
 import { Button } from "./Button"
 import { SortableList } from "./SortableList"
-import {prefixURL} from "../index"
+import { prefixURL } from "../index"
+
 /**
  * A container for questions.
  *
@@ -53,11 +53,11 @@ export function QuestionContainer(
 
 export function QuestionHeader({
   title,
-  regeneratable = false,
+  regenerate,
   permalink,
 }: {
   title?: string
-  regeneratable?: boolean
+  regenerate?: () => void
   permalink?: string
 }) {
   const { t } = useTranslation()
@@ -73,8 +73,8 @@ export function QuestionHeader({
           data-microtip-position="right"
           role="tooltip"
         >
-          <Link
-            to={""}
+          <BiLink
+            className="inline"
             onClick={() => {
               void navigator.clipboard
                 .writeText(prefixURL + "/" + permalink)
@@ -83,20 +83,16 @@ export function QuestionHeader({
             onMouseLeave={() => {
               setTimeout(() => setRecentlyCopied(false), 200)
             }}
-          >
-            <BiLink className="inline" />
-          </Link>
+          />
         </button>
       )}
-      {regeneratable && (
+      {regenerate && (
         <button
           aria-label={t("generate-new-exercise-of-same-type") || ""}
           data-microtip-position="right"
           role="tooltip"
         >
-          <Link to={".."} relative="path">
-            <BiRefresh className="inline" />
-          </Link>
+          <BiRefresh className="inline" onClick={regenerate} />
         </button>
       )}
     </h1>
@@ -201,15 +197,15 @@ export function ExerciseMultipleChoice({
   children,
   title,
   answers,
-  regeneratable = false,
+  regenerate,
   onResult = () => {},
   allowMultiple,
-  permalink
+  permalink,
 }: {
   children: ReactNode
   title: string
   answers: { key: string; correct: boolean; element: ReactNode }[]
-  regeneratable?: boolean
+  regenerate?: () => void
   onResult?: (result: "correct" | "incorrect" | "abort") => void
   allowMultiple?: boolean
   permalink?: string
@@ -266,7 +262,11 @@ export function ExerciseMultipleChoice({
     ) : null
   return (
     <QuestionContainer>
-      <QuestionHeader permalink={permalink} title={title} regeneratable={regeneratable} />
+      <QuestionHeader
+        permalink={permalink}
+        title={title}
+        regenerate={regenerate}
+      />
       {children}
       <div className="mx-auto flex max-w-max flex-wrap gap-5 p-5">
         {answers.map(({ key, element }) => {
@@ -309,14 +309,14 @@ export function ExerciseSort({
   children,
   title,
   answers,
-  regeneratable = false,
+  regenerate,
   onResult = () => {},
-  permalink
+  permalink,
 }: {
   children: ReactNode
   title: string
   answers: { key: string; element: ReactNode; correctIndex: number }[]
-  regeneratable?: boolean
+  regenerate?: () => void
   onResult?: (result: "correct" | "incorrect" | "abort") => void
   permalink?: string
 }) {
@@ -360,7 +360,11 @@ export function ExerciseSort({
 
   return (
     <QuestionContainer>
-      <QuestionHeader permalink={permalink} title={title} regeneratable={regeneratable} />
+      <QuestionHeader
+        permalink={permalink}
+        title={title}
+        regenerate={regenerate}
+      />
       {children}
       <SortableList
         items={items}

@@ -33,7 +33,7 @@ export function ViewSingleQuestion({
       variant={variant}
       t={t}
       onResult={() => navigate("/")}
-      regeneratable={true}
+      regenerate={() => navigate("/" + Question.path + "/" + variant)}
     />
   )
 }

@@ -24,13 +24,13 @@ export default function LandauNotation({
   seed,
   t,
   onResult,
-  regeneratable = false,
+  regenerate,
 }: {
   variant?: string
   seed: string
   t: TFunction
   onResult: (result: "correct" | "incorrect" | "abort") => void
-  regeneratable?: boolean
+  regenerate?: () => void
 }): ReactElement {
   const permalink = LandauNotation.path + variant + "/" + seed
   random.use(RNGFactory(seed))
@@ -77,7 +77,7 @@ export default function LandauNotation({
       title={t("asymptotics.landau.long-title")}
       answers={answers}
       onResult={onResult}
-      regeneratable={regeneratable}
+      regenerate={regenerate}
       permalink={permalink}
       allowMultiple
     >

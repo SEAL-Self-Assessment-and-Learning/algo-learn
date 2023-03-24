@@ -94,7 +94,6 @@ export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
         variant={variant as TermSetVariants}
         onResult={handleResult}
         t={t}
-        regeneratable={false}
       />
     )
   } else {

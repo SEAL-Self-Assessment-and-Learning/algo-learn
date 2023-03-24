@@ -17,7 +17,7 @@ export interface QuizQuestion
     seed: string
     t: TFunction
     onResult: (result: "correct" | "incorrect" | "abort") => void
-    regeneratable?: boolean
+    regenerate?: () => void
   }> {
   variants: string[]
   title: string

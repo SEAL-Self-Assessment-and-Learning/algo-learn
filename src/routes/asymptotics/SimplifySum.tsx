@@ -17,13 +17,13 @@ export default function SimplifySum({
   variant,
   t,
   onResult,
-  regeneratable = false,
+  regenerate,
 }: {
   seed: string
   variant: string
   t: TFunction
   onResult: (result: "correct" | "incorrect" | "abort") => void
-  regeneratable?: boolean
+  regenerate?: () => void
 }): ReactElement {
   const permalink = SimplifySum.path + "/" + variant + "/" + seed
   random.use(RNGFactory(seed))
@@ -54,7 +54,7 @@ export default function SimplifySum({
     <ExerciseMultipleChoice
       title={t(SimplifySum.title)}
       answers={answers}
-      regeneratable={regeneratable}
+      regenerate={regenerate}
       allowMultiple={false}
       onResult={onResult}
       permalink={permalink}

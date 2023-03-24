@@ -29,13 +29,13 @@ export default function Between({
   variant,
   t,
   onResult,
-  regeneratable = false,
+  regenerate,
 }: {
   seed: string
   variant: string
   t: TFunction
   onResult: (result: "correct" | "incorrect" | "abort") => void
-  regeneratable?: boolean
+  regenerate?: () => void
 }): ReactElement {
   const permalink = Between.path + "/" + variant + "/" + seed
   random.use(RNGFactory(seed))
@@ -157,7 +157,7 @@ export default function Between({
     <QuestionContainer>
       <QuestionHeader
         title={title}
-        regeneratable={regeneratable}
+        regenerate={regenerate}
         permalink={permalink}
       />
       <Trans t={t} i18nKey="asymptotics.between.text">
