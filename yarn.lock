@@ -3560,6 +3560,7 @@ __metadata:
     prop-types: ^15.8.1
     random: ^4.1.0
     react: ^18.2.0
+    react-circular-progressbar: ^2.1.0
     react-codemod: ^5.4.3
     react-dom: ^18.2.0
     react-i18next: ^12.1.5
@@ -11142,6 +11143,15 @@ __metadata:
   dependencies:
     seedrandom: ^3.0.5
   checksum: ecbcf1bfadbdc67b240754725e553135c7575cc61869d30f187f2b506696ef482dd4ddff0da48090717aca1c08dc19a372800c99087fc32d972b13eac1cbefc4
+  languageName: node
+  linkType: hard
+
+"react-circular-progressbar@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "react-circular-progressbar@npm:2.1.0"
+  peerDependencies:
+    react: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: dc118010a8f94733daafac586c969f7e889ad0736d96a0fda79406ee62e9410848abfd3dee4887bb0ff46b99e1f8c86ee1afabc88dfbf4dcb95107b22de1d6d7
   languageName: node
   linkType: hard
 
