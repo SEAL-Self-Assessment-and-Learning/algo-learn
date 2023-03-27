@@ -1,4 +1,4 @@
-import { Random } from "random"
+import Random from "../utils/random"
 import { FunctionComponent, useMemo } from "react"
 import useLocalStorageState from "use-local-storage-state"
 import { TFunction } from "i18next"
@@ -6,22 +6,25 @@ import { TFunction } from "i18next"
 import { computeStrength, SkillFeatures } from "../utils/memory-model"
 import { min } from "../utils/math"
 
-import LandauNotation from "../routes/asymptotics/LandauNotation"
-import Between from "../routes/asymptotics/Between"
-import SortTerms from "../routes/asymptotics/SortTerms"
-import SimplifySum from "../routes/asymptotics/SimplifySum"
+import { LandauNotation } from "../routes/asymptotics/LandauNotation"
+import { Between } from "../routes/asymptotics/Between"
+import { SortTerms } from "../routes/asymptotics/SortTerms"
+import { SimplifySum } from "../routes/asymptotics/SimplifySum"
 
-export interface QuizQuestion
-  extends FunctionComponent<{
-    variant: string
-    seed: string
-    t: TFunction
-    onResult: (result: "correct" | "incorrect" | "abort") => void
-    regenerate?: () => void
-  }> {
+export type QuestionProps = {
+  variant: string
+  seed: string
+  t: TFunction
+  onResult: (result: "correct" | "incorrect" | "abort") => void
+  regenerate?: () => void
+}
+
+export interface QuizQuestion {
+  path: string
   variants: string[]
   title: string
-  path: string
+  description?: string
+  Component: FunctionComponent<QuestionProps>
 }
 
 /** List of all questions */
@@ -257,12 +260,12 @@ export function averageStrength({
  * @param noise If provided, make the selection noisy using randomness
  */
 export function weakestSkill({
-  rng,
+  random,
   strengthMap,
   skills = questionVariants.map(({ path }) => path),
   noise = 0.1,
 }: {
-  rng: Random
+  random: Random
   strengthMap: {
     [path: string]: { p: number; h: number }
   }
@@ -279,7 +282,7 @@ export function weakestSkill({
   }
   const selection = skills.filter((path) => strengthMap[path].p <= min + noise)
   if (selection.length == 0) throw Error("Cannot find weakest skill")
-  return rng.choice(selection)!
+  return random.choice(selection)
 }
 
 const HIGHEST_SKILLS = [
@@ -291,8 +294,8 @@ const HIGHEST_SKILLS = [
   "asymptotics/landau/default",
 ]
 /** Returns a random skill of the highest skill levels ("exam-level") */
-export function randomHighestSkill({ rng }: { rng: Random }): string {
-  return rng.choice(HIGHEST_SKILLS) ?? HIGHEST_SKILLS[0]
+export function randomHighestSkill({ random }: { random: Random }): string {
+  return random.choice(HIGHEST_SKILLS)
 }
 
 /**
@@ -324,7 +327,8 @@ export function computeUnlockedSkills({
     for (const v of q.variants) {
       const qv = q.path + "/" + v
       unlockedPaths.push(qv)
-      if (strengthMap[qv].p < thresholdStrength || !featureMap[qv].qualified) break
+      if (strengthMap[qv].p < thresholdStrength || !featureMap[qv].qualified)
+        break
     }
   }
   return unlockedPaths

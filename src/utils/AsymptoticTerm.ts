@@ -1,6 +1,4 @@
 import Fraction from "fraction.js"
-import random from "random"
-import shuffleArray from "./shuffleArray"
 
 import math, {
   baseOfLog,
@@ -8,6 +6,7 @@ import math, {
   exponentToText,
   log2Fraction,
 } from "./math"
+import Random from "./random"
 
 /**
  * Represents an iterated logarithm term, such as (log(log(n)))^3. It is
@@ -913,28 +912,36 @@ function logToLatex(
  * @returns {Fraction} A random fraction
  */
 export function sampleFraction({
-  oneProbability,
+  oneProbability = 0,
   fractionProbability = 0.3,
   minInt = 1,
   maxInt = 99,
   maxDenominator = 9,
+  random,
 }: {
   oneProbability?: number
   fractionProbability?: number
   minInt?: number
   maxInt?: number
   maxDenominator?: number
+  random: Random
 }): Fraction {
-  const uniform = random.uniform(0, 1)
-  if (oneProbability && uniform() <= oneProbability) {
-    return new Fraction(1)
+  const type: "one" | "frac" | "int" = random.weightedChoice([
+    ["one", oneProbability],
+    ["frac", fractionProbability],
+    ["int", 1 - oneProbability - fractionProbability],
+  ])
+  switch (type) {
+    case "one":
+      return new Fraction(1)
+    case "frac": {
+      const denominator = random.int(2, maxDenominator)
+      const numerator = random.int(1, denominator - 1)
+      return new Fraction(numerator, denominator)
+    }
+    case "int":
+      return new Fraction(random.int(minInt, maxInt))
   }
-  if (fractionProbability && uniform() <= fractionProbability) {
-    const denominator = random.int(2, maxDenominator)
-    const numerator = random.int(1, denominator - 1)
-    return new Fraction(numerator, denominator)
-  }
-  return new Fraction(random.int(minInt, maxInt))
 }
 
 export type TermVariants =
@@ -955,7 +962,8 @@ export type TermVariants =
  */
 export function sampleTerm(
   variable: string = "n",
-  variant: TermVariants = "pure"
+  variant: TermVariants = "pure",
+  random: Random
 ): SimpleAsymptoticTerm {
   switch (variant) {
     case "log": {
@@ -963,12 +971,15 @@ export function sampleTerm(
         variable,
         coefficient: sampleFraction({
           fractionProbability: 1 / 3,
+          random,
         }),
         logexponent: sampleFraction({
           fractionProbability: 0,
+          random,
         }),
         logbasis: sampleFraction({
           fractionProbability: 0,
+          random,
         }),
       })
     }
@@ -977,9 +988,11 @@ export function sampleTerm(
         variable,
         coefficient: sampleFraction({
           fractionProbability: 1 / 3,
+          random,
         }),
         polyexponent: sampleFraction({
           fractionProbability: 0,
+          random,
         }),
       })
     }
@@ -988,16 +1001,19 @@ export function sampleTerm(
         variable,
         coefficient: sampleFraction({
           fractionProbability: 1 / 3,
+          random,
         }),
         exponentialBase: sampleFraction({
           fractionProbability: 0,
           minInt: 2,
+          random,
         }),
       })
     }
     case "pure": {
       const C = sampleFraction({
         fractionProbability: 1 / 3,
+        random,
       })
       if (random.int(1, 3) == 1) {
         return new SimpleAsymptoticTerm({
@@ -1005,11 +1021,13 @@ export function sampleTerm(
           logexponent: sampleFraction({
             fractionProbability: 0,
             maxInt: 3,
+            random,
           }),
           logbasis: sampleFraction({
             fractionProbability: 0,
             minInt: 2,
             maxInt: 7,
+            random,
           }),
           variable,
         })
@@ -1020,6 +1038,7 @@ export function sampleTerm(
             fractionProbability: 1 / 3,
             maxInt: 3,
             maxDenominator: 3,
+            random,
           }),
           variable,
         })
@@ -1029,21 +1048,25 @@ export function sampleTerm(
       return new SimpleAsymptoticTerm({
         coefficient: sampleFraction({
           fractionProbability: 1 / 3,
+          random,
         }),
         polyexponent: sampleFraction({
           fractionProbability: 1 / 3,
           maxInt: 3,
           maxDenominator: 3,
+          random,
         }),
         logexponent: sampleFraction({
           fractionProbability: 0,
           minInt: -17,
           maxInt: 17,
+          random,
         }),
         logbasis: sampleFraction({
           fractionProbability: 0,
           minInt: 2,
           maxInt: 7,
+          random,
         }),
         variable,
       })
@@ -1051,25 +1074,30 @@ export function sampleTerm(
       return new SimpleAsymptoticTerm({
         coefficient: sampleFraction({
           fractionProbability: 1 / 3,
+          random,
         }),
         exponentialBase: sampleFraction({
           fractionProbability: 0,
           maxInt: 10,
+          random,
         }),
         polyexponent: sampleFraction({
           fractionProbability: 1 / 3,
           maxInt: 3,
           maxDenominator: 3,
+          random,
         }),
         logexponent: sampleFraction({
           fractionProbability: 0,
           minInt: -17,
           maxInt: 17,
+          random,
         }),
         logbasis: sampleFraction({
           fractionProbability: 0,
           minInt: 2,
           maxInt: 7,
+          random,
         }),
         variable,
       })
@@ -1093,25 +1121,28 @@ export function sampleTermSet({
   variable = "n",
   numTerms = 4,
   variant = "start",
+  random,
 }: {
   variable?: string
   numTerms?: number
   variant?: TermSetVariants
+  random: Random
 }): Array<SimpleAsymptoticTerm> {
   const set = [] as Array<SimpleAsymptoticTerm>
   if (variant === "start") {
-    set.push(sampleTerm(variable, "log"))
-    set.push(sampleTerm(variable, "poly"))
-    set.push(sampleTerm(variable, "exp"))
+    set.push(sampleTerm(variable, "log", random))
+    set.push(sampleTerm(variable, "poly", random))
+    set.push(sampleTerm(variable, "exp", random))
   }
   const sample =
     variant === "start"
       ? () =>
           sampleTerm(
             variable,
-            random.choice<TermVariants>(["log", "poly", "exp"])
+            random.choice<TermVariants>(["log", "poly", "exp"]),
+            random
           )
-      : () => sampleTerm(variable, variant)
+      : () => sampleTerm(variable, variant, random)
   let trials = 0
   while (set.length < numTerms) {
     let t = sample()
@@ -1123,7 +1154,7 @@ export function sampleTermSet({
     }
     set.push(t)
   }
-  return shuffleArray(set)
+  return random.shuffle(set)
 }
 
 interface GeneratedAsymptoticTerm {

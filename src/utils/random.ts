@@ -1,0 +1,165 @@
+/** Class for generating random numbers from a given seed. */
+export default class Random {
+  /**
+   * Creates a new Random object.
+   *
+   * @param seed A string or number to use as a seed.
+   * @returns A new Random object.
+   */
+  constructor(seed: string | number) {
+    if (typeof seed === "number") {
+      seed = seed.toString()
+    }
+    const nextSeed = xmur3(seed)
+    this.uniform = sfc32(nextSeed(), nextSeed(), nextSeed(), nextSeed())
+  }
+
+  /** Returns a random number between 0 (inclusive) and 1 (exclusive). */
+  uniform: () => number
+
+  /**
+   * Returns a random number.
+   *
+   * @param min The minimum number.
+   * @param max The maximum number.
+   * @returns A random number between min (inclusive) and max (exclusive).
+   */
+  float(min: number, max: number): number {
+    return this.uniform() * (max - min) + min
+  }
+
+  /**
+   * Returns a random integer.
+   *
+   * @param min The minimum number.
+   * @param max The maximum number.
+   * @returns A random integer between min (inclusive) and max (inclusive).
+   */
+  int(min: number, max: number): number {
+    return Math.floor(this.float(min, max + 1))
+  }
+
+  /**
+   * Chooses a uniformly random element from an array.
+   *
+   * @param array An array of elements.
+   * @returns A random element from the array.
+   */
+  choice<T>(array: Array<T>): T {
+    return array[this.int(0, array.length - 1)]
+  }
+
+  /**
+   * Chooses a random index from an array of weights.
+   *
+   * @param weights An array of weights.
+   * @param rng A random number generator. (If not provided, randomWeightedIndex
+   *   will use global randomness, and so will not be a pure function.)
+   * @returns A random index from the array.
+   */
+  weightedIndex(weights: number[]): number {
+    const sumOfWeights = weights.reduce((acc, weight) => acc + weight, 0)
+    const randomValue = this.float(0, sumOfWeights)
+    let accumulatedWeight = 0
+    for (let i = 0; i < weights.length; i++) {
+      accumulatedWeight += weights[i]
+      if (randomValue < accumulatedWeight) {
+        return i
+      }
+    }
+
+    // This should never be reached, but return the first index as a fallback
+    return 0
+  }
+
+  /**
+   * Chooses a random element from an array of weighted elements.
+   *
+   * @param array An array of tuples of the form [element, weight]
+   * @returns A random element from the array.
+   */
+  weightedChoice<T>(array: Array<[element: T, weight: number]>): T {
+    const elements = array.map((w) => w[0])
+    const weigths = array.map((w) => w[1])
+    return elements[this.weightedIndex(weigths)]
+  }
+
+  /**
+   * Shuffles array in place using Durstenfeld's shuffle algorithm.
+   *
+   * @param {Array} array An array containing the items.
+   * @returns {Array} A reference to the same array, now shuffled.
+   */
+  shuffle<T>(array: Array<T>): Array<T> {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = this.int(0, i)
+      ;[array[i], array[j]] = [array[j], array[i]]
+    }
+    return array
+  }
+
+  /**
+   * Generates a random base36 string of a given length.
+   *
+   * @property {number} length The length of the string to generate.
+   * @returns {string} A random base36 string of the given length.
+   */
+  base36string(length: number): string {
+    const str = []
+    for (let i = 0; i < length; i++) {
+      str.push(this.int(0, 35).toString(36))
+    }
+    return str.join("")
+  }
+}
+
+/**
+ * Hashes a string into a sequence of 32-bit integers.
+ *
+ * @param {string} str The string to hash
+ * @returns {function} Each call to this function returns the next 32-bit hash
+ * @see https://github.com/bryc/code/blob/master/jshash/PRNGs.md#addendum-a-seed-generating-functions
+ */
+export function xmur3(str: string): () => number {
+  let h = 1779033703 ^ str.length
+  for (let i = 0; i < str.length; i++) {
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353)
+    h = (h << 13) | (h >>> 19)
+  }
+  return function () {
+    h = Math.imul(h ^ (h >>> 16), 2246822507)
+    h = Math.imul(h ^ (h >>> 13), 3266489909)
+    return (h ^= h >>> 16) >>> 0
+  }
+}
+
+/**
+ * Pseudorandom number generator using the SFC32 algorithm.
+ *
+ * @param {number} a The first 32-bit seed
+ * @param {number} b The second 32-bit seed
+ * @param {number} c The third 32-bit seed
+ * @param {number} d The fourth 32-bit seed
+ * @returns {function} Each call to this function returns the next random number
+ * @see https://github.com/bryc/code/blob/master/jshash/PRNGs.md#sfc32
+ */
+export function sfc32(
+  a: number,
+  b: number,
+  c: number,
+  d: number
+): () => number {
+  a |= 0
+  b |= 0
+  c |= 0
+  d |= 0
+  return function () {
+    const t = (((a + b) | 0) + d) | 0
+    d = (d + 1) | 0
+    a = b ^ (b >>> 9)
+    b = (c + (c << 3)) | 0
+    c = (c << 21) | (c >>> 11)
+    c = (c + t) | 0
+    return (t >>> 0) / 4294967296
+  }
+}

@@ -27,7 +27,7 @@ export function ViewSingleQuestion({
 
   console.assert(seed !== null, "useSeed is null")
   return (
-    <Question
+    <Question.Component
       key={seed}
       seed={seed}
       variant={variant}

@@ -1,9 +1,7 @@
-import { TFunction } from "i18next"
-import random, { RNGFactory } from "random"
-import { ReactElement } from "react"
 import { ExerciseMultipleChoice } from "../../components/BasicQuizQuestions"
 import TeX from "../../components/TeX"
-import shuffleArray from "../../utils/shuffleArray"
+import { QuizQuestion, QuestionProps } from "../../hooks/useSkills"
+import Random from "../../utils/random"
 
 /**
  * Generate and render a question about asymptotic notation
@@ -19,72 +17,62 @@ import shuffleArray from "../../utils/shuffleArray"
  * @returns {ReactElement} Output
  */
 
-export default function LandauNotation({
-  variant = "default",
-  seed,
-  t,
-  onResult,
-  regenerate,
-}: {
-  variant?: string
-  seed: string
-  t: TFunction
-  onResult: (result: "correct" | "incorrect" | "abort") => void
-  regenerate?: () => void
-}): ReactElement {
-  const permalink = LandauNotation.path + variant + "/" + seed
-  random.use(RNGFactory(seed))
+export const LandauNotation: QuizQuestion = {
+  path: "asymptotics/landau",
+  title: "asymptotics.landau.title",
+  variants: ["default"],
+  Component: ({ seed, variant, t, onResult, regenerate }: QuestionProps) => {
+    const permalink = LandauNotation.path + "/" + variant + "/" + seed
+    const random = new Random(seed)
 
-  const functionTypes = ["\\log n", "n", "n^2", "2^n"]
-  const notationTypes = ["o", "O", "\\omega", "\\Theta", "\\Omega"]
+    const functionTypes = ["\\log n", "n", "n^2", "2^n"]
+    const notationTypes = ["o", "O", "\\omega", "\\Theta", "\\Omega"]
 
-  const NUM_QUESTIONS = 8
+    const NUM_QUESTIONS = 8
 
-  // Choose a function and an asymptotic notation type
-  const answers = []
-  while (answers.length < NUM_QUESTIONS) {
-    const variable = random.choice("nmNMxyztk".split("")) as string
-    const functionLeft = random.choice(functionTypes) as string
-    const functionRight = random.choice(functionTypes) as string
-    const notation = random.choice(notationTypes) as string
-    const correct =
-      functionLeft === functionRight
-        ? notation === "\\Theta" || notation === "O" || notation === "\\Omega"
-        : functionTypes.findIndex((e) => e === functionLeft) <
-          functionTypes.findIndex((e) => e === functionRight)
-        ? notation == "o" || notation == "O"
-        : notation == "\\omega" || notation == "\\Omega"
-    const key = `${functionLeft.replaceAll(
-      "n",
-      variable
-    )} = ${notation}(${functionRight.replaceAll("n", variable)})`
-    const element = <TeX>{key}</TeX>
+    // Choose a function and an asymptotic notation type
+    const answers = []
+    while (answers.length < NUM_QUESTIONS) {
+      const variable = random.choice("nmNMxyztk".split(""))
+      const functionLeft = random.choice(functionTypes)
+      const functionRight = random.choice(functionTypes)
+      const notation = random.choice(notationTypes)
+      const correct =
+        functionLeft === functionRight
+          ? notation === "\\Theta" || notation === "O" || notation === "\\Omega"
+          : functionTypes.findIndex((e) => e === functionLeft) <
+            functionTypes.findIndex((e) => e === functionRight)
+          ? notation == "o" || notation == "O"
+          : notation == "\\omega" || notation == "\\Omega"
+      const key = `${functionLeft.replaceAll(
+        "n",
+        variable
+      )} = ${notation}(${functionRight.replaceAll("n", variable)})`
+      const element = <TeX>{key}</TeX>
 
-    const isDuplicate = answers.findIndex((e) => e.key === key) >= 0
-    const allIncorrect =
-      answers.length == NUM_QUESTIONS - 1 &&
-      answers.findIndex((e) => e.correct) == -1 &&
-      !correct
-    if (!isDuplicate && !allIncorrect) {
-      answers.push({ key, correct, element })
+      const isDuplicate = answers.findIndex((e) => e.key === key) >= 0
+      const allIncorrect =
+        answers.length == NUM_QUESTIONS - 1 &&
+        answers.findIndex((e) => e.correct) == -1 &&
+        !correct
+      if (!isDuplicate && !allIncorrect) {
+        answers.push({ key, correct, element })
+      }
     }
-  }
 
-  shuffleArray(answers)
+    random.shuffle(answers)
 
-  return (
-    <ExerciseMultipleChoice
-      title={t("asymptotics.landau.long-title")}
-      answers={answers}
-      onResult={onResult}
-      regenerate={regenerate}
-      permalink={permalink}
-      allowMultiple
-    >
-      {t("asymptotics.landau.text")}
-    </ExerciseMultipleChoice>
-  )
+    return (
+      <ExerciseMultipleChoice
+        title={t("asymptotics.landau.long-title")}
+        answers={answers}
+        onResult={onResult}
+        regenerate={regenerate}
+        permalink={permalink}
+        allowMultiple
+      >
+        {t("asymptotics.landau.text")}
+      </ExerciseMultipleChoice>
+    )
+  },
 }
-LandauNotation.path = "asymptotics/landau"
-LandauNotation.title = "asymptotics.landau.title"
-LandauNotation.variants = ["default"]

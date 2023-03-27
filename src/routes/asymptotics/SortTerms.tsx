@@ -1,13 +1,12 @@
-import { TFunction } from "i18next"
-import random, { RNGFactory } from "random"
-import { ReactElement } from "react"
 import { ExerciseSort } from "../../components/BasicQuizQuestions"
 import TeX from "../../components/TeX"
+import { QuizQuestion, QuestionProps } from "../../hooks/useSkills"
 import {
   sampleTermSet,
   SimpleAsymptoticTerm,
   TermSetVariants,
 } from "../../utils/AsymptoticTerm"
+import Random from "../../utils/random"
 
 /**
  * Generate and render a question about sorting terms
@@ -27,62 +26,52 @@ import {
  *
  * @returns {ReactElement} Output
  */
+export const SortTerms: QuizQuestion = {
+  path: "asymptotics/sort",
+  title: "asymptotics.sort.title",
+  variants: ["start", "pure", "polylog", "polylogexp"],
+  Component: ({ seed, variant, t, onResult, regenerate }: QuestionProps) => {
+    const permalink = SortTerms.path + "/" + variant + "/" + seed
+    const random = new Random(seed)
 
-export default function SortTerms({
-  seed,
-  variant,
-  t,
-  onResult,
-  regenerate,
-}: {
-  seed: string
-  variant: string
-  t: TFunction
-  onResult: (result: "correct" | "incorrect" | "abort") => void
-  regenerate?: () => void
-}): ReactElement {
-  const permalink = SortTerms.path + "/" + variant + "/" + seed
-  random.use(RNGFactory(seed))
+    const variable = random.choice("nmNMxyztk".split(""))
 
-  const variable = random.choice("nmNMxyztk".split(""))
+    interface AsymptoticTermWithIndex extends SimpleAsymptoticTerm {
+      index: number
+      correctIndex: number
+    }
 
-  interface AsymptoticTermWithIndex extends SimpleAsymptoticTerm {
-    index: number
-    correctIndex: number
-  }
+    const set = sampleTermSet({
+      variable,
+      numTerms: 5,
+      variant: variant as TermSetVariants,
+      random,
+    }) as Array<AsymptoticTermWithIndex>
+    for (const [i, t] of set.entries()) {
+      t.index = i
+    }
+    const sorted = set.slice().sort((t1, t2) => t1.compare(t2))
+    for (const [i, t] of sorted.entries()) {
+      t.correctIndex = i
+    }
 
-  const set = sampleTermSet({
-    variable,
-    numTerms: 5,
-    variant: variant as TermSetVariants,
-  }) as Array<AsymptoticTermWithIndex>
-  for (const [i, t] of set.entries()) {
-    t.index = i
-  }
-  const sorted = set.slice().sort((t1, t2) => t1.compare(t2))
-  for (const [i, t] of sorted.entries()) {
-    t.correctIndex = i
-  }
+    const answers = set.map((t) => ({
+      key: t.toLatex(variable, true),
+      index: t.index,
+      element: <TeX>{t.toLatex(variable, true)}</TeX>,
+      correctIndex: t.correctIndex,
+    }))
 
-  const answers = set.map((t) => ({
-    key: t.toLatex(variable, true),
-    index: t.index,
-    element: <TeX>{t.toLatex(variable, true)}</TeX>,
-    correctIndex: t.correctIndex,
-  }))
-
-  return (
-    <ExerciseSort
-      title={t(SortTerms.title)}
-      answers={answers}
-      onResult={onResult}
-      regenerate={regenerate}
-      permalink={permalink}
-    >
-      {t("asymptotics.sortTerms.text")}
-    </ExerciseSort>
-  )
+    return (
+      <ExerciseSort
+        title={t(SortTerms.title)}
+        answers={answers}
+        onResult={onResult}
+        regenerate={regenerate}
+        permalink={permalink}
+      >
+        {t("asymptotics.sortTerms.text")}
+      </ExerciseSort>
+    )
+  },
 }
-SortTerms.variants = ["start", "pure", "polylog", "polylogexp"]
-SortTerms.path = "asymptotics/sort"
-SortTerms.title = "asymptotics.sort.title"

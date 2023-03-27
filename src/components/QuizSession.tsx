@@ -1,4 +1,3 @@
-import random, { RNGFactory } from "random"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import {
@@ -8,7 +7,7 @@ import {
   weakestSkill,
 } from "../hooks/useSkills"
 import { TermSetVariants } from "../utils/AsymptoticTerm"
-import { genSeed } from "../utils/genSeed"
+import Random from "../utils/random"
 import { Button } from "./Button"
 import { CenterScreen } from "./CenterScreen"
 
@@ -110,7 +109,7 @@ const meh = {
 export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
   const { t, i18n } = useTranslation()
   const [{ seed, targetNum }] = useState({
-    seed: genSeed(),
+    seed: new Random(Math.random()).base36string(7),
     targetNum: 3,
   })
   const [{ numCorrect, numIncorrect, aborted }, setState] = useState({
@@ -120,8 +119,8 @@ export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
   })
   const { strengthMap, unlockedSkills, appendLogEntry } = useSkills()
 
-  const rng = random.clone(RNGFactory(seed))
-  const questionSeed = genSeed({ seed: `${seed}${numCorrect + numIncorrect}` })
+  const random = new Random(`${seed}${numCorrect + numIncorrect}`)
+  const questionSeed = random.base36string(7)
 
   if (aborted) {
     return (
@@ -139,12 +138,12 @@ export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
     const nextPath =
       mode === "practice"
         ? weakestSkill({
-            rng,
+            random,
             strengthMap,
             skills: unlockedSkills,
             noise: 0.2,
           })
-        : randomHighestSkill({ rng })
+        : randomHighestSkill({ random })
     const Q = questionByPath(nextPath)
     const [skillGroup, question, variant] = nextPath.split("/")
     if (!Q) throw Error(`Question with path '${nextPath}' not found!`)
@@ -173,7 +172,7 @@ export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
     }
 
     return (
-      <Q
+      <Q.Component
         key={questionSeed}
         seed={questionSeed}
         variant={variant as TermSetVariants}

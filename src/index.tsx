@@ -16,7 +16,7 @@ import { About } from "./routes/about"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
 import { Legal } from "./routes/legal"
 import "./tailwind.css"
-import { genSeed } from "./utils/genSeed"
+import Random from "./utils/random"
 
 const routes = []
 for (const Question of questions) {
@@ -33,7 +33,7 @@ for (const Question of questions) {
     routes.push(
       {
         path: `${path}/${variant}`,
-        loader: () => redirect(genSeed()),
+        loader: () => redirect(new Random(Math.random()).base36string(7)),
       },
       {
         path: `${path}/${variant}/:seed`,
