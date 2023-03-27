@@ -293,30 +293,6 @@ export class ProductTerm {
       logarithmExponents: this.logarithmExponents,
       exponentialBase: this.exponentialBase,
     })
-    // let cmp
-    // if (this.coefficient.compare(0) > 0 && t.coefficient.compare(0) < 0) {
-    //   cmp = this.compare(t.neg())
-    // } else if (
-    //   this.coefficient.compare(0) < 0 &&
-    //   t.coefficient.compare(0) > 0
-    // ) {
-    //   cmp = -this.compare(t.neg())
-    // } else if (this.coefficient.compare(0) > 0) {
-    //   cmp = this.compare(t)
-    // } else {
-    //   cmp = -this.compare(t)
-    // }
-    // if (cmp === 0) {
-    //   return new ProductTerm({
-    //     coefficient: this.coefficient.add(t.coefficient),
-    //     logarithmExponents: this.logarithmExponents,
-    //     exponentialBase: this.exponentialBase,
-    //   })
-    // } else if (cmp > 0) {
-    //   return this
-    // } else {
-    //   return t
-    // }
   }
 
   /**

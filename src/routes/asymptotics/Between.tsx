@@ -17,6 +17,7 @@ import {
   TooComplex,
 } from "../../utils/AsymptoticTerm"
 import playSound from "../../effects/playSound"
+import { randomWeightedChoice } from "../../utils/randomWeighted"
 
 /**
  * Generate and render a question about O/Omega/o/omega
@@ -205,3 +206,123 @@ export default function Between({
 Between.variants = ["start", "polylog"]
 Between.path = "asymptotics/between"
 Between.title = "asymptotics.between.title"
+
+const BASE_FUNCTION_TYPES = [
+  "constant",
+  "logarithmic",
+  "linear",
+  "linearithmic",
+  "quadratic",
+  "cubic",
+  "polynomial",
+  "exponential",
+]
+
+function generateCloseFunctions(variable = "n", rng = random) {
+  const baseFunctionType = randomWeightedChoice([
+    ["logarithmic", 1],
+    ["linear", 1],
+    ["polynomial", 1],
+    ["exponential", 1],
+  ])
+
+  const lowerOrderModifications: Array<[element: string, weight: number]> = []
+  /*eslint no-fallthrough: ["error", { "commentPattern": "break[\\s\\w]*omitted" }]*/
+  switch (baseFunctionType) {
+    case "exponential":
+      lowerOrderModifications.push(["polynomial", 1])
+      lowerOrderModifications.push(["quadratic", 1])
+      lowerOrderModifications.push(["cubic", 1])
+      lowerOrderModifications.push(["linear", 1])
+    // break omitted
+    case "polynomial":
+    // break omitted
+    case "linear":
+      lowerOrderModifications.push(["logarithmic", 1])
+    // break omitted
+    case "locarithmic":
+      lowerOrderModifications.push(["loglog", 1])
+  }
+  const modificationFunctionType = randomWeightedChoice(lowerOrderModifications)
+
+  const modificationAction = randomWeightedChoice([
+    ["multiply", 1],
+    ["divide", 1],
+  ])
+
+  let function1, function2
+  switch (modificationAction) {
+    case "multiply":
+      function1 = generateBaseFunction(baseFunctionType, variable, rng)
+      function2 =
+        generateBaseFunction(baseFunctionType, variable, rng) +
+        " * " +
+        generateBaseFunction(modificationFunctionType, variable, rng, true)
+      break
+    case "divide":
+      function1 =
+        generateBaseFunction(baseFunctionType, variable, rng) +
+        " / " +
+        generateBaseFunction(modificationFunctionType, variable, rng, true)
+      function2 = generateBaseFunction(baseFunctionType, variable, rng)
+      break
+  }
+  return [function1, function2]
+}
+
+function generateBaseFunction(
+  functionType: string,
+  variable = "n",
+  rng = random,
+  omitCoefficient = false
+) {
+  switch (functionType) {
+    case "constant": {
+      const constant = rng.int(2, 10)
+      return `${constant}`
+    }
+    case "loglog": {
+      const logBase1 = rng.int(2, 5)
+      const logBase2 = rng.int(2, 5)
+      return `log_${logBase1}(log_${logBase2}(${variable}))`
+    }
+    case "logarithmic": {
+      const logBase = rng.int(2, 5)
+      return `log_${logBase}(${variable})`
+    }
+    case "linear": {
+      if (omitCoefficient) {
+        return variable
+      }
+      const linearCoefficient = rng.int(2, 10)
+      return `${linearCoefficient}*${variable}`
+    }
+    case "quadratic": {
+      if (omitCoefficient) {
+        return `${variable}^2`
+      }
+      const quadraticCoefficient = rng.int(2, 5)
+      return `${quadraticCoefficient}*${variable}^2`
+    }
+    case "cubic": {
+      if (omitCoefficient) {
+        return `${variable}^3`
+      }
+      const cubicCoefficient = rng.int(2, 5)
+      return `${cubicCoefficient}*${variable}^3`
+    }
+    case "polynomial": {
+      const polyCoefficient = rng.int(2, 5)
+      const polyExponent = rng.int(2, 6)
+      if (omitCoefficient) {
+        return `${polyExponent}^2`
+      }
+      return `${polyCoefficient}*${variable}^${polyExponent}`
+    }
+    case "exponential": {
+      const expBase = rng.int(2, 5)
+      return `${expBase}^${variable}`
+    }
+  }
+  return "1"
+}
