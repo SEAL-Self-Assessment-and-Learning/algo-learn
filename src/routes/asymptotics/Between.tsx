@@ -17,6 +17,7 @@ import {
 import playSound from "../../effects/playSound"
 import { QuizQuestion, QuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
+import useGlobalDOMEvents from "../../hooks/useGlobalDOMEvents"
 
 /**
  * Generate and render a question about O/Omega/o/omega
@@ -144,6 +145,15 @@ export const Between: QuizQuestion = {
         onResult(mode)
       }
     }
+    useGlobalDOMEvents({
+      keydown(e: Event) {
+        const key = (e as KeyboardEvent).key
+        if (key === "Enter") {
+          e.preventDefault()
+          handleClick()
+        }
+      },
+    })
     const condA = `${functionName}(${variable}) \\in ${aTeX}`
     const condB = `${functionName}(${variable}) \\in ${bTeX}`
     return (
@@ -164,22 +174,16 @@ export const Between: QuizQuestion = {
           <TeX>
             {functionName}({variable})=
           </TeX>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              handleClick()
+          <input
+            autoFocus
+            type="text"
+            onChange={(e) => {
+              setText(e.target.value)
             }}
-          >
-            <input
-              type="text"
-              onChange={(e) => {
-                setText(e.target.value)
-              }}
-              value={text}
-              className="rounded-md bg-gray-300 p-2 dark:bg-gray-900"
-              disabled={mode === "correct" || mode === "incorrect"}
-            />
-          </form>
+            value={text}
+            className="rounded-md bg-gray-300 p-2 dark:bg-gray-900"
+            disabled={mode === "correct" || mode === "incorrect"}
+          />
           <div className={msgColor}>{textFeedback}</div>
         </div>
         <div className="p-5 text-slate-600 dark:text-slate-400">

@@ -141,12 +141,6 @@ export function QuestionFooter({
   message?: ReactNode
   buttonClick: () => void
 }) {
-  console.assert(
-    mode === "disabled" ||
-      mode === "verify" ||
-      mode === "correct" ||
-      mode === "incorrect"
-  )
   const icon =
     mode === "correct" ? (
       <SiCheckmarx className="mr-5 inline-block text-7xl" />
@@ -173,18 +167,17 @@ export function QuestionFooter({
       : "disabled"
   return (
     <div className={`absolute bottom-0 left-0 right-0 ${backgroundColor}`}>
-      <div className={`m-auto h-48 max-w-xl p-5 sm:flex sm:place-items-center`}>
-        <div className={`flex place-items-center text-left ${textColor}`}>
-          <div className="flex place-items-center">
-            {icon}
-            <div className="inline-block">{message}</div>
-          </div>
+      <div className="m-auto flex h-48 max-w-xl flex-col justify-between gap-4 p-5 sm:flex-row">
+        <div
+          className={`flex place-items-center self-center text-left ${textColor}`}
+        >
+          {icon}
+          <div>{message}</div>
         </div>
-        <div className="grow"></div>
         <Button
           color={buttonColor}
           onClick={buttonClick}
-          className="mt-5 ml-auto sm:m-0 sm:ml-10"
+          className="self-end sm:self-center"
         >
           <FooterButtonText mode={mode} />
         </Button>
@@ -217,12 +210,24 @@ export function ExerciseMultipleChoice({
     )
   }
   allowMultiple ??= correctAnswers.length !== 1
-  const [mode, setMode] = useState(
-    allowMultiple
-      ? "verify"
-      : ("disabled" as "disabled" | "verify" | "correct" | "incorrect")
-  )
+
   const [checked, setChecked] = useState([] as Array<string>)
+  function setCheckedEntry(key: string, value: boolean) {
+    const newChecked = allowMultiple ? checked.filter((x) => x !== key) : []
+    if (value) {
+      newChecked.push(key)
+    }
+    setChecked(newChecked)
+  }
+
+  const [mode, setMode] = useState(
+    "disabled" as "disabled" | "verify" | "correct" | "incorrect"
+  )
+  if (checked.length > 0 && mode == "disabled") {
+    setMode("verify")
+  } else if (checked.length === 0 && mode === "verify") {
+    setMode("disabled")
+  }
 
   function handleClick() {
     if (mode === "disabled") {
@@ -243,6 +248,17 @@ export function ExerciseMultipleChoice({
       if (key === "Enter") {
         e.preventDefault()
         handleClick()
+        return
+      }
+      if (mode === "correct" || mode === "incorrect") {
+        return
+      }
+      const num = parseInt(key)
+      if (!Number.isNaN(num) && num >= 1 && num <= answers.length) {
+        e.preventDefault()
+        const id = answers[num - 1].key
+        setCheckedEntry(id, !checked.includes(id))
+        return
       }
     },
   })
@@ -256,7 +272,7 @@ export function ExerciseMultipleChoice({
         </b>
         <br />
         {correctAnswers.map((item) => (
-          <div key="item.key">{item.element}</div>
+          <div key={item.key}>{item.element}</div>
         ))}
       </>
     ) : null
@@ -276,15 +292,9 @@ export function ExerciseMultipleChoice({
                 type={allowMultiple ? "checkbox" : "radio"}
                 id={key}
                 className="peer hidden"
+                checked={checked.includes(key)}
                 onChange={(e) => {
-                  setMode("verify")
-                  const newChecked = allowMultiple
-                    ? checked.slice().filter((x) => x !== e.target.id)
-                    : []
-                  if (e.target.checked) {
-                    newChecked.push(e.target.id)
-                  }
-                  setChecked(newChecked)
+                  setCheckedEntry(e.target.id, e.target.checked)
                 }}
                 disabled={mode === "correct" || mode === "incorrect"}
               />

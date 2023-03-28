@@ -1,5 +1,7 @@
-import { useState } from "react"
+import { ReactElement, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
+import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import {
   questionByPath,
   randomHighestSkill,
@@ -106,23 +108,38 @@ const meh = {
  * @param {object} param
  * @param {string} param.mode Determines the mode of the session.
  */
-export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
+export function QuizSession({
+  mode,
+}: {
+  mode: "practice" | "examine"
+}): ReactElement {
   const { t, i18n } = useTranslation()
   const [{ seed, targetNum }] = useState({
     seed: new Random(Math.random()).base36string(7),
     targetNum: 3,
   })
-  const [{ numCorrect, numIncorrect, aborted }, setState] = useState({
+  const [{ numCorrect, numIncorrect, status }, setState] = useState({
     numCorrect: 0,
     numIncorrect: 0,
-    aborted: false,
+    status: "running" as "running" | "finished" | "aborted",
   })
   const { strengthMap, unlockedSkills, appendLogEntry } = useSkills()
-
+  const num = numCorrect + numIncorrect
   const random = new Random(`${seed}${numCorrect + numIncorrect}`)
   const questionSeed = random.base36string(7)
 
-  if (aborted) {
+  const navigate = useNavigate()
+  useGlobalDOMEvents({
+    keydown(e: Event) {
+      const key = (e as KeyboardEvent).key
+      if (key === "Enter" && status !== "running") {
+        e.preventDefault()
+        navigate("/")
+      }
+    },
+  })
+
+  if (status === "aborted") {
     return (
       <CenterScreen>
         Your session was aborted.
@@ -131,10 +148,10 @@ export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
         </Button>
       </CenterScreen>
     )
-  }
-  const num = numCorrect + numIncorrect
-
-  if (num < targetNum) {
+  } else if (status === "running") {
+    if (num === targetNum) {
+      setState({ numCorrect, numIncorrect, status: "finished" })
+    }
     const nextPath =
       mode === "practice"
         ? weakestSkill({
@@ -150,7 +167,7 @@ export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
 
     const handleResult = (result: "correct" | "incorrect" | "abort") => {
       if (result === "correct") {
-        setState({ numCorrect: numCorrect + 1, numIncorrect, aborted })
+        setState({ numCorrect: numCorrect + 1, numIncorrect, status })
         appendLogEntry({
           question: `${skillGroup}/${question}`,
           variant,
@@ -159,7 +176,7 @@ export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
           timestamp: Date.now(),
         })
       } else if (result === "incorrect") {
-        setState({ numCorrect, numIncorrect: numIncorrect + 1, aborted })
+        setState({ numCorrect, numIncorrect: numIncorrect + 1, status })
         appendLogEntry({
           question: `${skillGroup}/${question}`,
           variant,
@@ -168,7 +185,7 @@ export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
           timestamp: Date.now(),
         })
       } else if (result === "abort")
-        setState({ numCorrect, numIncorrect, aborted })
+        setState({ numCorrect, numIncorrect, status })
     }
 
     return (
@@ -180,23 +197,28 @@ export function QuizSession({ mode }: { mode: "practice" | "examine" }) {
         t={t}
       />
     )
-  } else {
-    const msgList =
-      numIncorrect == 0
-        ? great
-        : numCorrect / (numCorrect + numIncorrect) >= 0.75
-        ? good
-        : meh
-    const msg = random.choice(msgList[i18n.language === "de" ? "de" : "en"])
-    return (
-      <CenterScreen>
-        <div className="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
-          <div className="font-serif italic">{msg}</div>
-          <Button to={"/"} color="green" className="mt-12 ml-auto">
-            Continue
-          </Button>
-        </div>
-      </CenterScreen>
-    )
   }
+
+  // now we have status === "finished"
+  const msgList =
+    numIncorrect == 0
+      ? great
+      : numCorrect / (numCorrect + numIncorrect) >= 0.75
+      ? good
+      : meh
+  const msg = random.choice(msgList[i18n.language === "de" ? "de" : "en"])
+  return (
+    <CenterScreen>
+      <div className="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
+        <div className="font-serif italic">{msg}</div>
+        <Button
+          to={"/"}
+          color="green"
+          className="mt-12 ml-auto block max-w-max"
+        >
+          Continue
+        </Button>
+      </div>
+    </CenterScreen>
+  )
 }

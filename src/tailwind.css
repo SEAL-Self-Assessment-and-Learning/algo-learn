@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  main a {
+  main a:not(.btn) {
     @apply cursor-pointer text-goethe-700 underline hover:bg-black/10 dark:text-goethe-50 dark:hover:bg-goethe-900;
   }
 
@@ -24,7 +24,7 @@
   }
 
   .btn {
-    @apply font-bold py-2 px-4 rounded;
+    @apply inline-block font-bold py-2 px-4 rounded-lg shadow-lg;
   }
 
   .btn-blue {
