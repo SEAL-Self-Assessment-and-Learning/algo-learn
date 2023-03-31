@@ -18,6 +18,7 @@ import { AnswerBox } from "./AnswerBox"
 import { Button } from "./Button"
 import { SortableList } from "./SortableList"
 import { prefixURL } from "../index"
+import { t } from "i18next"
 
 /**
  * A container for questions.
@@ -125,10 +126,10 @@ export function FooterButtonText({
 }) {
   return mode === "correct" || mode === "incorrect" ? (
     <>
-      Continue <GiPlayButton className="inline" />
+      {t("FooterButtonText.Continue")} <GiPlayButton className="inline" />
     </>
   ) : (
-    <>Check</>
+    <>{t("FooterButtonText.Check")}</>
   )
 }
 
@@ -167,7 +168,7 @@ export function QuestionFooter({
       : "disabled"
   return (
     <div className={`absolute bottom-0 left-0 right-0 ${backgroundColor}`}>
-      <div className="m-auto flex h-48 max-w-xl flex-col justify-between gap-4 p-5 sm:flex-row">
+      <div className="m-auto flex justify-end sm:h-48 max-w-xl flex-col sm:justify-between gap-4 p-5 sm:flex-row">
         <div
           className={`flex place-items-center self-center text-left ${textColor}`}
         >
@@ -359,12 +360,12 @@ export function ExerciseSort({
   })
   const message =
     mode === "correct" ? (
-      <b className="text-2xl">Correct!</b>
+      <b className="text-2xl">{t("feedback.correct")}</b>
     ) : mode === "incorrect" ? (
       <>
-        <b className="text-lg">That&apos;s okay!</b>
+        <b className="text-lg">{t("feedback.thats-ok")}</b>
         <br />
-        You&apos;ll get better over time.
+        {t("feedback.correct-order")}
       </>
     ) : null
 
