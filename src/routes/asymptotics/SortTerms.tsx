@@ -1,4 +1,4 @@
-import { ExerciseSort } from "../../components/BasicQuizQuestions"
+import { ExerciseSort } from "../../components/ExerciseSort"
 import TeX from "../../components/TeX"
 import { QuizQuestion, QuestionProps } from "../../hooks/useSkills"
 import {
@@ -30,6 +30,7 @@ export const SortTerms: QuizQuestion = {
   path: "asymptotics/sort",
   title: "asymptotics.sort.title",
   variants: ["start", "pure", "polylog", "polylogexp"],
+  examVariants: ["polylogexp"],
   Component: ({ seed, variant, t, onResult, regenerate }: QuestionProps) => {
     const permalink = SortTerms.path + "/" + variant + "/" + seed
     const random = new Random(seed)

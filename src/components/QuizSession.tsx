@@ -11,7 +11,7 @@ import {
 import { TermSetVariants } from "../utils/AsymptoticTerm"
 import Random from "../utils/random"
 import { Button } from "./Button"
-import { CenterScreen } from "./CenterScreen"
+import { ScreenCenteredDiv } from "./CenteredDivs"
 
 const great = {
   en: [
@@ -113,21 +113,8 @@ export function QuizSession({
 }: {
   mode: "practice" | "examine"
 }): ReactElement {
+  // Hooks
   const { t, i18n } = useTranslation()
-  const [{ seed, targetNum }] = useState({
-    seed: new Random(Math.random()).base36string(7),
-    targetNum: 3,
-  })
-  const [{ numCorrect, numIncorrect, status }, setState] = useState({
-    numCorrect: 0,
-    numIncorrect: 0,
-    status: "running" as "running" | "finished" | "aborted",
-  })
-  const { strengthMap, unlockedSkills, appendLogEntry } = useSkills()
-  const num = numCorrect + numIncorrect
-  const random = new Random(`${seed}${numCorrect + numIncorrect}`)
-  const questionSeed = random.base36string(7)
-
   const navigate = useNavigate()
   useGlobalDOMEvents({
     keydown(e: Event) {
@@ -138,15 +125,29 @@ export function QuizSession({
       }
     },
   })
+  const [{ sessionSeed, targetNum }] = useState({
+    sessionSeed: new Random(Math.random()).base36string(7),
+    targetNum: 3,
+  })
+  const { featureMap, unlockedSkills, appendLogEntry } = useSkills()
+  const [{ numCorrect, numIncorrect, status }, setState] = useState({
+    numCorrect: 0,
+    numIncorrect: 0,
+    status: "running" as "running" | "finished" | "aborted",
+  })
+
+  const num = numCorrect + numIncorrect
+  const random = new Random(`${sessionSeed}${numCorrect + numIncorrect}`)
+  const questionSeed = random.base36string(7)
 
   if (status === "aborted") {
     return (
-      <CenterScreen>
+      <ScreenCenteredDiv>
         Your session was aborted.
         <Button to={"/"} color="green">
           Continue
         </Button>
-      </CenterScreen>
+      </ScreenCenteredDiv>
     )
   } else if (status === "running") {
     if (num === targetNum) {
@@ -156,7 +157,7 @@ export function QuizSession({
       mode === "practice"
         ? weakestSkill({
             random,
-            strengthMap,
+            strengthMap: featureMap,
             skills: unlockedSkills,
             noise: 0.2,
           })
@@ -208,17 +209,17 @@ export function QuizSession({
       : meh
   const msg = random.choice(msgList[i18n.language === "de" ? "de" : "en"])
   return (
-    <CenterScreen>
+    <ScreenCenteredDiv>
       <div className="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
         <div className="font-serif italic">{msg}</div>
         <Button
           to={"/"}
           color="green"
-          className="mt-12 ml-auto block max-w-max"
+          className="ml-auto mt-12 block max-w-max"
         >
           Continue
         </Button>
       </div>
-    </CenterScreen>
+    </ScreenCenteredDiv>
   )
 }

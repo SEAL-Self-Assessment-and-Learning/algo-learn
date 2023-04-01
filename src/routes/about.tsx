@@ -6,7 +6,7 @@ import { Link } from "react-router-dom"
 export function About() {
   const { t } = useTranslation()
   return (
-    <div className="mx-auto max-w-lg p-3 mb-16">
+    <div className="mx-auto mb-16 max-w-lg p-3">
       <h1>{t("About")}</h1>
       <p>
         This website is a learning tool that aims to help you practice some of
@@ -43,12 +43,17 @@ export function About() {
         This site is under heavy development, utterly incomplete, and things
         might break without notice! Our plan for this site is to provide
         exam-level questions for all intended learning outcomes at levels
-        SOLO1/SOLO2 according to <Link to="https://en.wikipedia.org/wiki/Bloom's_taxonomy">Bloom&apos;s taxonomy</Link>. We are also looking into
-        making the algorithm better, and integrating the site with Moodle.
+        SOLO1/SOLO2 according to{" "}
+        <Link to="https://en.wikipedia.org/wiki/Bloom's_taxonomy">
+          Bloom&apos;s taxonomy
+        </Link>
+        . We are also looking into making the algorithm better, and integrating
+        the site with Moodle.
       </p>
       <h2 className="mt-5">Authors</h2>
       <p>
-        Created by <a href="https://holgerdell.com">Holger Dell</a> (2023) with some help by GPT-4 and GitHub Copilot.
+        Created by <a href="https://holgerdell.com">Holger Dell</a> (2023) with
+        some help by GPT-4 and GitHub Copilot.
       </p>
       <h2 className="mt-5">Source Code</h2>
       <p>

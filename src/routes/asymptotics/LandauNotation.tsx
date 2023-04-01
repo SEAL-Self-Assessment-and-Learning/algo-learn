@@ -1,4 +1,4 @@
-import { ExerciseMultipleChoice } from "../../components/BasicQuizQuestions"
+import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
 import TeX from "../../components/TeX"
 import { QuizQuestion, QuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
@@ -21,6 +21,7 @@ export const LandauNotation: QuizQuestion = {
   path: "asymptotics/landau",
   title: "asymptotics.landau.title",
   variants: ["default"],
+  examVariants: ["default"],
   Component: ({ seed, variant, t, onResult, regenerate }: QuestionProps) => {
     const permalink = LandauNotation.path + "/" + variant + "/" + seed
     const random = new Random(seed)

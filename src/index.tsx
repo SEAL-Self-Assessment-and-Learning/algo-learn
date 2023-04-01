@@ -17,6 +17,7 @@ import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
 import { Legal } from "./routes/legal"
 import "./tailwind.css"
 import Random from "./utils/random"
+import { basename } from "./config"
 
 const routes = []
 for (const Question of questions) {
@@ -44,10 +45,6 @@ for (const Question of questions) {
   }
 }
 
-export const basename =
-  window.location.hostname === "tcs.uni-frankfurt.de" ? "/algo-learn" : ""
-export const prefixURL = window.location.host + basename
-
 const router = createBrowserRouter(
   [
     {
@@ -65,7 +62,7 @@ const router = createBrowserRouter(
     },
   ],
   {
-    basename: basename,
+    basename,
   }
 )
 

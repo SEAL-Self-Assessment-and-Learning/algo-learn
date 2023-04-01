@@ -3,7 +3,12 @@ import { FunctionComponent, useMemo } from "react"
 import useLocalStorageState from "use-local-storage-state"
 import { TFunction } from "i18next"
 
-import { computeStrength, SkillFeatures } from "../utils/memory-model"
+import {
+  computeStrength,
+  SkillFeatures as BasicSkillFeatures,
+  SkillFeaturesAndPredictions as SkillFeatures,
+  SkillFeaturesAndPredictions,
+} from "../utils/memory-model"
 import { min } from "../utils/math"
 
 import { LandauNotation } from "../routes/asymptotics/LandauNotation"
@@ -22,9 +27,15 @@ export type QuestionProps = {
 export interface QuizQuestion {
   path: string
   variants: string[]
+  examVariants: string[]
   title: string
   description?: string
   Component: FunctionComponent<QuestionProps>
+}
+
+export interface QuizQuestionVariant {
+  question: QuizQuestion
+  variant: string
 }
 
 /** List of all questions */
@@ -43,17 +54,32 @@ export function questionByPath(path: string): QuizQuestion | undefined {
 }
 
 /** List of all valid (question,variant) pairs */
-export const questionVariants = questions.flatMap((q) =>
+export const questionVariants: QuizQuestionVariant[] = questions.flatMap((q) =>
   q.variants.map((v) => ({
     question: q,
     variant: v,
-    path: q.path + "/" + v,
+    // path: q.path + "/" + v,
   }))
 )
 
+const HIGHEST_SKILLS: QuizQuestionVariant[] = questions.flatMap((q) =>
+  q.examVariants.map((v) => ({
+    question: q,
+    variant: v,
+    // path: q.path + "/" + v,
+  }))
+)
+
+/** Return the path corresponding to a question variant */
+export function pathOfQuestionVariant(qv: QuizQuestionVariant): string {
+  return qv.question.path + "/" + qv.variant
+}
+
 /** Return the question variant corresponding to a path */
 export function questionVariantByPath(path: string) {
-  return questionVariants.find((q) => q.path === path)
+  return questionVariants.find((qv) =>
+    path.startsWith(pathOfQuestionVariant(qv))
+  )
 }
 
 export type LogEntry = {
@@ -121,19 +147,19 @@ export function useSkills() {
     )
   }
 
-  /* Compute the features of each skill (e.g., how often pass/fail?) */
-  const featureMap = useMemo(() => computeFeatureMap({ log }), [log])
+  /* Compute the basic features of each skill (e.g., how often pass/fail?) */
+  const basicFeatureMap = computeBasicFeatureMap({ log })
 
   /* Compute the strength of each skill (number between 0 and 1) */
-  const strengthMap = useMemo(
-    () => computeStrengthMap({ featureMap }),
-    [featureMap]
+  const featureMap = useMemo(
+    () => computeFeatureMap({ basicFeatureMap }),
+    [basicFeatureMap]
   )
 
   /* Compute  */
   const unlockedSkills = useMemo(
-    () => computeUnlockedSkills({ featureMap, strengthMap }),
-    [featureMap, strengthMap]
+    () => computeUnlockedSkills({ featureMap }),
+    [featureMap]
   )
 
   function appendLogEntry(entry: LogEntry) {
@@ -147,9 +173,8 @@ export function useSkills() {
   }
 
   return {
-    strengthMap,
+    featureMap: featureMap,
     unlockedSkills,
-    featureMap,
     log,
     appendLogEntry,
     clearLog,
@@ -163,12 +188,13 @@ export function useSkills() {
  * @param {LogEntry[]} props.log A user's full history
  * @returns {object} The feature vector
  */
-function computeFeatureMap({ log }: { log: Array<LogEntry> }): {
-  [path: string]: SkillFeatures
+function computeBasicFeatureMap({ log }: { log: Array<LogEntry> }): {
+  [path: string]: BasicSkillFeatures
 } {
   const qualifyingPasses: { [path: string]: number } = {}
-  const featureMap: { [path: string]: SkillFeatures } = {}
-  for (const { path } of questionVariants) {
+  const featureMap: { [path: string]: BasicSkillFeatures } = {}
+  for (const qv of questionVariants) {
+    const path = pathOfQuestionVariant(qv)
     qualifyingPasses[path] = 0
     featureMap[path] = {
       qualified: false,
@@ -214,24 +240,40 @@ function computeFeatureMap({ log }: { log: Array<LogEntry> }): {
   return featureMap
 }
 
-function computeStrengthMap({
-  featureMap,
+/**
+ * Computes the strength of each skill
+ *
+ * @param {object} props
+ * @param {object} props.featureMap The feature vector
+ * @returns {object} The strength of each skill
+ */
+function computeFeatureMap({
+  basicFeatureMap,
 }: {
-  featureMap: {
-    [path: string]: SkillFeatures
+  basicFeatureMap: {
+    [path: string]: BasicSkillFeatures
   }
 }): {
-  [path: string]: { p: number; h: number }
+  [path: string]: SkillFeatures
 } {
-  const strengthMap: {
-    [path: string]: { p: number; h: number }
+  const featureMap: {
+    [path: string]: SkillFeatures
   } = {}
-  for (const [path, feature] of Object.entries(featureMap)) {
-    strengthMap[path] = computeStrength(feature)
+  for (const [path, feature] of Object.entries(basicFeatureMap)) {
+    featureMap[path] = computeStrength(feature)
   }
-  return strengthMap
+  return featureMap
 }
 
+/**
+ * Given a strengthMap and a path, compute the average strength of all question
+ * variants that exist within that path.
+ *
+ * @param {object} props
+ * @param {object} props.strengthMap The strength of each skill
+ * @param {string} props.path The path to the skill
+ * @returns {number} The average strength of all variants of the skill
+ */
 export function averageStrength({
   strengthMap,
   path,
@@ -240,7 +282,7 @@ export function averageStrength({
     [path: string]: { p: number; h: number }
   }
   path: string
-}) {
+}): number {
   const q = questionByPath(path)
   if (q === undefined || q.variants.length === 0) return 0
 
@@ -262,7 +304,7 @@ export function averageStrength({
 export function weakestSkill({
   random,
   strengthMap,
-  skills = questionVariants.map(({ path }) => path),
+  skills = questionVariants.map((qv) => pathOfQuestionVariant(qv)),
   noise = 0.1,
 }: {
   random: Random
@@ -285,17 +327,13 @@ export function weakestSkill({
   return random.choice(selection)
 }
 
-const HIGHEST_SKILLS = [
-  "asymptotics/sum/polylog",
-  "asymptotics/sum/polylogexp",
-  "asymptotics/sort/polylog",
-  "asymptotics/sort/polylogexp",
-  "asymptotics/between/polylog",
-  "asymptotics/landau/default",
-]
 /** Returns a random skill of the highest skill levels ("exam-level") */
-export function randomHighestSkill({ random }: { random: Random }): string {
-  return random.choice(HIGHEST_SKILLS)
+export function randomHighestSkill({
+  random,
+}: {
+  random: Random
+}): string {
+  return pathOfQuestionVariant(random.choice(HIGHEST_SKILLS))
 }
 
 /**
@@ -303,21 +341,17 @@ export function randomHighestSkill({ random }: { random: Random }): string {
  * dependencies are above thresholdStrength
  *
  * @param {object} props
- * @param {object} props.strengthMap A map from skill path to its strength
+ * @param {object} props.featureMap The feature vector
  * @param {number} props.thresholdStrength The threshold for a skill to be
  *   considered unlocked
  * @returns {string[]} The list of unlocked skills
  */
 export function computeUnlockedSkills({
   featureMap,
-  strengthMap,
   thresholdStrength = 0.75,
 }: {
   featureMap: {
-    [path: string]: SkillFeatures
-  }
-  strengthMap: {
-    [path: string]: { p: number; h: number }
+    [path: string]: SkillFeaturesAndPredictions
   }
   thresholdStrength?: number
 }): string[] {
@@ -327,7 +361,7 @@ export function computeUnlockedSkills({
     for (const v of q.variants) {
       const qv = q.path + "/" + v
       unlockedPaths.push(qv)
-      if (strengthMap[qv].p < thresholdStrength || !featureMap[qv].qualified)
+      if (featureMap[qv].p < thresholdStrength || !featureMap[qv].qualified)
         break
     }
   }

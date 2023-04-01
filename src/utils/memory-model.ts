@@ -20,6 +20,11 @@ export type SkillFeatures = {
   n0?: number // inherent difficulty of the question
 }
 
+export interface SkillFeaturesAndPredictions extends SkillFeatures {
+  h: number // half-life of the skill in days
+  p: number // probability of remembering the skill
+}
+
 // various constraints on parameters and outputs
 const MIN_HALF_LIFE = 1.0 / (24 * 60) // 1 minutes (in days)
 const MAX_HALF_LIFE = 90 // 3 months  (in days)
@@ -63,19 +68,11 @@ export function halflife(
  * Given the features of a user/skill pair and the time since the last
  * interaction in minutes, determine the strength of the skill using HLR
  *
- * @param {object} features The features from which we compute the strength
- * @param {number} features.numPassed The number of correct answers
- * @param {number} features.numFailed The number of wrong answers
- * @param {number} features.lag The time since the last interaction in days
- * @returns {number} The strength as determined by Leitner's algorithm
+ * @param {SkillFeatures} f The features from which we compute the strength
+ * @returns {SkillFeaturesAndPredictions} The features and the strength
  */
-export function computeStrength({
-  numPassed,
-  numFailed,
-  lag,
-  n0,
-}: SkillFeatures): { h: number; p: number } {
-  const h = halflife(numPassed, numFailed, n0)
-  const p = pclip(2 ** (-lag / h))
-  return { h, p }
+export function computeStrength(f: SkillFeatures): SkillFeaturesAndPredictions {
+  const h = halflife(f.numPassed, f.numFailed, f.n0)
+  const p = pclip(2 ** (-f.lag / h))
+  return { h, p, ...f }
 }

@@ -1,11 +1,6 @@
 import { ReactNode, useState } from "react"
 import { Trans } from "react-i18next"
 import math, { getVars } from "../../utils/math"
-import {
-  QuestionContainer,
-  QuestionFooter,
-  QuestionHeader,
-} from "../../components/BasicQuizQuestions"
 import TeX from "../../components/TeX"
 import {
   mathNodeToSumProductTerm,
@@ -18,6 +13,9 @@ import playSound from "../../effects/playSound"
 import { QuizQuestion, QuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
 import useGlobalDOMEvents from "../../hooks/useGlobalDOMEvents"
+import { QuestionFooter } from "../../components/QuestionFooter"
+import { QuestionHeader } from "../../components/QuestionHeader"
+import { HorizontallyCenteredDiv } from "../../components/CenteredDivs"
 
 /**
  * Generate and render a question about O/Omega/o/omega
@@ -29,6 +27,7 @@ export const Between: QuizQuestion = {
   title: "asymptotics.between.title",
   description: "asymptotics.between.description",
   variants: ["start", "polylog"],
+  examVariants: ["polylog"],
   Component: ({ seed, variant, t, onResult, regenerate }: QuestionProps) => {
     const permalink = Between.path + "/" + variant + "/" + seed
     const random = new Random(seed)
@@ -59,7 +58,7 @@ export const Between: QuizQuestion = {
     const bTeX = `${bLandau}(${b.toLatex()})`
 
     let parsed: SumProductTerm
-    let textFeedback: ReactNode = "please enter an expression"
+    let textFeedback: ReactNode = t("feedback.enter-an-expression")
     let feedbackType: "ok" | "error" = "error"
     if (text) {
       try {
@@ -71,8 +70,8 @@ export const Between: QuizQuestion = {
           feedbackType = "error"
           textFeedback = (
             <>
-              Unknown variable: <TeX>{unknownVar}</TeX>. Expected:{" "}
-              <TeX>{variable}</TeX>.
+              {t("feedback.unknown-variable")}: <TeX>{unknownVar}</TeX>.<br />
+              {t("feedback.expected")}: <TeX>{variable}</TeX>.
             </>
           )
         } else {
@@ -89,9 +88,7 @@ export const Between: QuizQuestion = {
             parsed = mathNodeToSumProductTerm(expr)
           } catch (e) {
             if (e instanceof TooComplex) {
-              textFeedback = (
-                <>Your expression is too complex, try a simpler one!</>
-              )
+              textFeedback = t("feedback.too-complex")
               feedbackType = "error"
             } else {
               throw e
@@ -99,7 +96,7 @@ export const Between: QuizQuestion = {
           }
         }
       } catch (e) {
-        textFeedback = "unable to parse your expression"
+        textFeedback = t("feedback.invalid-expression")
         feedbackType = "error"
       }
     }
@@ -117,10 +114,10 @@ export const Between: QuizQuestion = {
         : savedMode
     const message =
       mode === "correct" ? (
-        <b className="text-2xl">Correct!</b>
+        <b className="text-2xl">{t("feedback.correct")}</b>
       ) : mode === "incorrect" ? (
         <>
-          <b className="text-xl">Possible correct solution:</b>
+          <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
           <br />
           TODO
         </>
@@ -157,7 +154,7 @@ export const Between: QuizQuestion = {
     const condA = `${functionName}(${variable}) \\in ${aTeX}`
     const condB = `${functionName}(${variable}) \\in ${bTeX}`
     return (
-      <QuestionContainer>
+      <HorizontallyCenteredDiv>
         <QuestionHeader
           title={title}
           regenerate={regenerate}
@@ -184,7 +181,9 @@ export const Between: QuizQuestion = {
             className="rounded-md bg-gray-300 p-2 dark:bg-gray-900"
             disabled={mode === "correct" || mode === "incorrect"}
           />
-          <div className={msgColor}>{textFeedback}</div>
+          <div className={`flex h-12 items-center ${msgColor}`}>
+            <div>{textFeedback}</div>
+          </div>
         </div>
         <div className="p-5 text-slate-600 dark:text-slate-400">
           <Trans t={t} i18nKey="asymptotics.between.note">
@@ -199,130 +198,131 @@ export const Between: QuizQuestion = {
           mode={mode}
           message={message}
           buttonClick={handleClick}
+          t={t}
         />
-      </QuestionContainer>
+      </HorizontallyCenteredDiv>
     )
   },
 }
 
-const BASE_FUNCTION_TYPES = [
-  "constant",
-  "logarithmic",
-  "linear",
-  "linearithmic",
-  "quadratic",
-  "cubic",
-  "polynomial",
-  "exponential",
-]
+// const BASE_FUNCTION_TYPES = [
+//   "constant",
+//   "logarithmic",
+//   "linear",
+//   "linearithmic",
+//   "quadratic",
+//   "cubic",
+//   "polynomial",
+//   "exponential",
+// ]
 
-function generateCloseFunctions(variable = "n", random: Random) {
-  const baseFunctionType = random.weightedChoice([
-    ["logarithmic", 1],
-    ["linear", 1],
-    ["polynomial", 1],
-    ["exponential", 1],
-  ])
+// function generateCloseFunctions(variable = "n", random: Random) {
+//   const baseFunctionType = random.weightedChoice([
+//     ["logarithmic", 1],
+//     ["linear", 1],
+//     ["polynomial", 1],
+//     ["exponential", 1],
+//   ])
 
-  const lowerOrderModifications: Array<[element: string, weight: number]> = []
-  /*eslint no-fallthrough: ["error", { "commentPattern": "break[\\s\\w]*omitted" }]*/
-  switch (baseFunctionType) {
-    case "exponential":
-      lowerOrderModifications.push(["polynomial", 1])
-      lowerOrderModifications.push(["quadratic", 1])
-      lowerOrderModifications.push(["cubic", 1])
-      lowerOrderModifications.push(["linear", 1])
-    // break omitted
-    case "polynomial":
-    // break omitted
-    case "linear":
-      lowerOrderModifications.push(["logarithmic", 1])
-    // break omitted
-    case "locarithmic":
-      lowerOrderModifications.push(["loglog", 1])
-  }
-  const modificationFunctionType = random.weightedChoice(
-    lowerOrderModifications
-  )
+//   const lowerOrderModifications: Array<[element: string, weight: number]> = []
+//   /*eslint no-fallthrough: ["error", { "commentPattern": "break[\\s\\w]*omitted" }]*/
+//   switch (baseFunctionType) {
+//     case "exponential":
+//       lowerOrderModifications.push(["polynomial", 1])
+//       lowerOrderModifications.push(["quadratic", 1])
+//       lowerOrderModifications.push(["cubic", 1])
+//       lowerOrderModifications.push(["linear", 1])
+//     // break omitted
+//     case "polynomial":
+//     // break omitted
+//     case "linear":
+//       lowerOrderModifications.push(["logarithmic", 1])
+//     // break omitted
+//     case "locarithmic":
+//       lowerOrderModifications.push(["loglog", 1])
+//   }
+//   const modificationFunctionType = random.weightedChoice(
+//     lowerOrderModifications
+//   )
 
-  const modificationAction = random.weightedChoice([
-    ["multiply", 1],
-    ["divide", 1],
-  ])
+//   const modificationAction = random.weightedChoice([
+//     ["multiply", 1],
+//     ["divide", 1],
+//   ])
 
-  let function1, function2
-  switch (modificationAction) {
-    case "multiply":
-      function1 = generateBaseFunction(baseFunctionType, variable, random)
-      function2 =
-        generateBaseFunction(baseFunctionType, variable, random) +
-        " * " +
-        generateBaseFunction(modificationFunctionType, variable, random, true)
-      break
-    case "divide":
-      function1 =
-        generateBaseFunction(baseFunctionType, variable, random) +
-        " / " +
-        generateBaseFunction(modificationFunctionType, variable, random, true)
-      function2 = generateBaseFunction(baseFunctionType, variable, random)
-      break
-  }
-  return [function1, function2]
-}
+//   let function1, function2
+//   switch (modificationAction) {
+//     case "multiply":
+//       function1 = generateBaseFunction(baseFunctionType, variable, random)
+//       function2 =
+//         generateBaseFunction(baseFunctionType, variable, random) +
+//         " * " +
+//         generateBaseFunction(modificationFunctionType, variable, random, true)
+//       break
+//     case "divide":
+//       function1 =
+//         generateBaseFunction(baseFunctionType, variable, random) +
+//         " / " +
+//         generateBaseFunction(modificationFunctionType, variable, random, true)
+//       function2 = generateBaseFunction(baseFunctionType, variable, random)
+//       break
+//   }
+//   return [function1, function2]
+// }
 
-function generateBaseFunction(
-  functionType: string,
-  variable = "n",
-  random: Random,
-  omitCoefficient = false
-) {
-  switch (functionType) {
-    case "constant": {
-      const constant = random.int(2, 10)
-      return `${constant}`
-    }
-    case "loglog": {
-      const logBase1 = random.int(2, 5)
-      const logBase2 = random.int(2, 5)
-      return `log_${logBase1}(log_${logBase2}(${variable}))`
-    }
-    case "logarithmic": {
-      const logBase = random.int(2, 5)
-      return `log_${logBase}(${variable})`
-    }
-    case "linear": {
-      if (omitCoefficient) {
-        return variable
-      }
-      const linearCoefficient = random.int(2, 10)
-      return `${linearCoefficient}*${variable}`
-    }
-    case "quadratic": {
-      if (omitCoefficient) {
-        return `${variable}^2`
-      }
-      const quadraticCoefficient = random.int(2, 5)
-      return `${quadraticCoefficient}*${variable}^2`
-    }
-    case "cubic": {
-      if (omitCoefficient) {
-        return `${variable}^3`
-      }
-      const cubicCoefficient = random.int(2, 5)
-      return `${cubicCoefficient}*${variable}^3`
-    }
-    case "polynomial": {
-      const polyCoefficient = random.int(2, 5)
-      const polyExponent = random.int(2, 6)
-      if (omitCoefficient) {
-        return `${polyExponent}^2`
-      }
-      return `${polyCoefficient}*${variable}^${polyExponent}`
-    }
-    case "exponential": {
-      const expBase = random.int(2, 5)
-      return `${expBase}^${variable}`
-    }
-  }
-  return "1"
-}
+// function generateBaseFunction(
+//   functionType: string,
+//   variable = "n",
+//   random: Random,
+//   omitCoefficient = false
+// ) {
+//   switch (functionType) {
+//     case "constant": {
+//       const constant = random.int(2, 10)
+//       return `${constant}`
+//     }
+//     case "loglog": {
+//       const logBase1 = random.int(2, 5)
+//       const logBase2 = random.int(2, 5)
+//       return `log_${logBase1}(log_${logBase2}(${variable}))`
+//     }
+//     case "logarithmic": {
+//       const logBase = random.int(2, 5)
+//       return `log_${logBase}(${variable})`
+//     }
+//     case "linear": {
+//       if (omitCoefficient) {
+//         return variable
+//       }
+//       const linearCoefficient = random.int(2, 10)
+//       return `${linearCoefficient}*${variable}`
+//     }
+//     case "quadratic": {
+//       if (omitCoefficient) {
+//         return `${variable}^2`
+//       }
+//       const quadraticCoefficient = random.int(2, 5)
+//       return `${quadraticCoefficient}*${variable}^2`
+//     }
+//     case "cubic": {
+//       if (omitCoefficient) {
+//         return `${variable}^3`
+//       }
+//       const cubicCoefficient = random.int(2, 5)
+//       return `${cubicCoefficient}*${variable}^3`
+//     }
+//     case "polynomial": {
+//       const polyCoefficient = random.int(2, 5)
+//       const polyExponent = random.int(2, 6)
+//       if (omitCoefficient) {
+//         return `${polyExponent}^2`
+//       }
+//       return `${polyCoefficient}*${variable}^${polyExponent}`
+//     }
+//     case "exponential": {
+//       const expBase = random.int(2, 5)
+//       return `${expBase}^${variable}`
+//     }
+//   }
+//   return "1"
+// }

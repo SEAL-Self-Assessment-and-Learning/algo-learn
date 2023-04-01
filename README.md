@@ -41,25 +41,36 @@ In principle, you're now in position to start development. However, we strongly 
 - [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 - [Auto Rename Tag](https://marketplace.visualstudio.com/items?itemName=formulahendry.auto-rename-tag)
 - [i18n Ally](https://marketplace.visualstudio.com/items?itemName=Lokalise.i18n-ally)
+- [ZipFS - a zip file system](https://marketplace.visualstudio.com/items?itemName=arcanis.vscode-zipfs)
 - optional: [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
 - optional: [Atom One Dark Theme](https://marketplace.visualstudio.com/items?itemName=akamud.vscode-theme-onedark)
 
+Then follow [these instructions](https://yarnpkg.com/getting-started/editor-sdks#vscode) to allow VS Code to use the project's PnP SDK.
+
 ### Run tests
+
+Unit tests:
 
 ```bash
 yarn test
+```
+
+Lint all files:
+
+```bash
+yarn lint
+```
+
+Type-check all files:
+
+```bash
+yarn check
 ```
 
 ### Build for production
 
 ```bash
 yarn build
-```
-
-### Lint
-
-```bash
-yarn lint
 ```
 
 ### Major libraries used

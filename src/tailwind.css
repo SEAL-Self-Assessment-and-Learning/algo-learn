@@ -24,7 +24,7 @@
   }
 
   .btn {
-    @apply inline-block font-bold py-2 px-4 rounded-lg shadow-lg;
+    @apply inline-block rounded-lg px-4 py-2 font-bold shadow-lg;
   }
 
   .btn-blue {
@@ -38,8 +38,9 @@
   table.tbl > tbody > tr {
     @apply [&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10;
   }
- 
-   table.tbl td, table.tbl th {
+
+  table.tbl td,
+  table.tbl th {
     @apply px-2 py-3;
   }
 }

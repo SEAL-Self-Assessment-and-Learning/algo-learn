@@ -1,5 +1,5 @@
 import { Trans } from "react-i18next"
-import { ExerciseMultipleChoice } from "../../components/BasicQuizQuestions"
+import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
 import TeX from "../../components/TeX"
 import { QuizQuestion, QuestionProps } from "../../hooks/useSkills"
 import { sampleTermSet, TermSetVariants } from "../../utils/AsymptoticTerm"
@@ -14,6 +14,7 @@ export const SimplifySum: QuizQuestion = {
   path: "asymptotics/sum",
   title: "asymptotics.sum.title",
   variants: ["pure", "polylog", "polylogexp"],
+  examVariants: ["polylogexp"],
   Component: ({ seed, variant, t, onResult, regenerate }: QuestionProps) => {
     const permalink = SimplifySum.path + "/" + variant + "/" + seed
     const random = new Random(seed)

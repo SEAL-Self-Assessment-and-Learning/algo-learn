@@ -4,13 +4,15 @@
   "packageManager": "yarn@3.5.0",
   "license": "MIT",
   "author": "Holger Dell (https://holgerdell.com)",
+  "type": "module",
+  "source": "src/index.html",
   "scripts": {
-    "start": "parcel src/index.html",
-    "build": "parcel build src/index.html",
+    "start": "parcel",
+    "build": "parcel build",
     "test": "jest",
     "lint": "eslint src/**/*.[t|j]s src/**/*.[t|j]sx",
-    "check": "tsc --noEmit",
-    "ci": "yarn build && yarn test && yarn lint && yarn check",
+    "check": "tsc",
+    "ci": "yarn run prettier src/ --check && yarn lint && yarn build && yarn test && yarn check",
     "clean": "rm -rf build/ .parcel-cache/ .yarn/cache/"
   },
   "browserslist": [
@@ -43,7 +45,7 @@
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
     "babel-jest": "^29.5.0",
-    "eslint": "^8.34.0",
+    "eslint": "^8.37.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
@@ -52,19 +54,19 @@
     "jest": "^29.5.0",
     "parcel": "^2.8.3",
     "postcss": "^8.4.21",
-    "prettier": "^2.8.3",
+    "prettier": "^2.8.7",
     "prettier-config-standard": "^5.0.0",
     "prettier-plugin-css-order": "^1.3.0",
     "prettier-plugin-jsdoc": "^0.4.2",
     "prettier-plugin-organize-imports": "^3.2.2",
-    "prettier-plugin-tailwindcss": "^0.2.2",
+    "prettier-plugin-tailwindcss": "^0.2.6",
     "prettier-standard": "^16.4.1",
     "react-circular-progressbar": "^2.1.0",
-    "stylelint": "^15.1.0",
-    "stylelint-config-standard": "^30.0.1",
+    "stylelint": "^15.4.0",
+    "stylelint-config-standard": "^32.0.0",
     "stylelint-prettier": "^3.0.0",
-    "tailwindcss": "^3.2.4",
-    "typescript": "^4.9.5"
+    "tailwindcss": "^3.3.1",
+    "typescript": "^5.0.3"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.0.7",
@@ -76,14 +78,14 @@
     "i18next": "^22.4.13",
     "i18next-browser-languagedetector": "^7.0.1",
     "katex": "^0.16.4",
-    "mathjs": "^11.6.0",
+    "mathjs": "^11.7.0",
     "microtip": "^0.2.2",
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^12.2.0",
-    "react-icons": "^4.7.1",
-    "react-router-dom": "^6.8.1",
-    "use-local-storage-state": "^18.1.2"
+    "react-icons": "^4.8.0",
+    "react-router-dom": "^6.10.0",
+    "use-local-storage-state": "^18.2.1"
   }
 }

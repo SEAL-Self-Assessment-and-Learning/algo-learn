@@ -1,5 +1,6 @@
 import { CircularProgressbarWithChildren } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
+import "microtip/microtip.css"
 
 /**
  * Display a strength meter / progress bar
@@ -8,48 +9,14 @@ import "react-circular-progressbar/dist/styles.css"
  * @param {number} props.strength A number between 0 and 1
  * @param {string} props.tooltip A tooltip to display on hover
  */
-export function StrengthMeterCircular({
-  strength,
-  tooltip,
-}: {
-  strength: number
-  tooltip?: string
-}) {
-  const strengthRounded = strength < 0.01 ? 0 : Math.ceil(strength * 4)
-  const present = <div className={`inline-block h-4 w-4 bg-green-500`}></div>
-  const absent = <div className={`inline-block h-4 w-4 bg-slate-500`}></div>
+export function StrengthMeterCircular({ strength }: { strength: number }) {
   return (
     <CircularProgressbarWithChildren value={strength} maxValue={1}>
-      Sort<br />
+      Sort
+      <br />
       {`${Math.round(strength * 100)}%`}
     </CircularProgressbarWithChildren>
   )
-
-  let bar = <></>
-  for (let i = 0; i <= 3; i++) {
-    bar = (
-      <>
-        {bar}
-        {i < strengthRounded ? present : absent}
-      </>
-    )
-  }
-  bar = <div className="flex h-4 gap-2 text-left">{bar}</div>
-  if (tooltip) {
-    bar = (
-      <button
-        aria-label={tooltip}
-        data-microtip-position="right"
-        data-microtip-size="large"
-        role="tooltip"
-        className="cursor-default"
-        type="button"
-      >
-        {bar}
-      </button>
-    )
-  }
-  return bar
 }
 
 /**
@@ -61,26 +28,17 @@ export function StrengthMeterCircular({
  */
 export function StrengthMeter({
   strength,
+  steps = 4,
   tooltip,
 }: {
   strength: number
+  steps?: number
   tooltip?: string
 }) {
-  const strengthRounded = strength < 0.01 ? 0 : Math.ceil(strength * 4)
-  const present = <div className={`inline-block h-4 w-4 bg-green-500`}></div>
-  const absent = <div className={`inline-block h-4 w-4 bg-slate-500`}></div>
-  let bar = <></>
-  for (let i = 0; i <= 3; i++) {
-    bar = (
-      <>
-        {bar}
-        {i < strengthRounded ? present : absent}
-      </>
-    )
-  }
-  bar = <div className="flex h-4 gap-2 text-left">{bar}</div>
+  const strengthRounded = strength < 0.01 ? 0 : Math.ceil(strength * steps)
+  const bar = <ProgressBar done={strengthRounded} total={steps} />
   if (tooltip) {
-    bar = (
+    return (
       <button
         aria-label={tooltip}
         data-microtip-position="right"
@@ -92,6 +50,32 @@ export function StrengthMeter({
         {bar}
       </button>
     )
+  } else {
+    return bar
   }
-  return bar
+}
+
+function ProgressBar({
+  done = 0,
+  doing = 0,
+  total,
+}: {
+  done?: number
+  doing?: number
+  total?: number
+}) {
+  total ??= done + doing
+  const doneDiv = <div className={`inline-block h-4 w-4 bg-green-500`}></div>
+  const doingDiv = <div className={`inline-block h-4 w-4 bg-orange-500`}></div>
+  const restDiv = <div className={`inline-block h-4 w-4 bg-slate-500`}></div>
+  let bar = <></>
+  for (let i = 0; i < total; i++) {
+    bar = (
+      <>
+        {bar}
+        {i < done ? doneDiv : i < done + doing ? doingDiv : restDiv}
+      </>
+    )
+  }
+  return <div className="flex h-4 gap-2 text-left">{bar}</div>
 }

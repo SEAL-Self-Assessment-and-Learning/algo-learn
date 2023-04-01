@@ -5,24 +5,6 @@ import { MdDarkMode } from "react-icons/md"
 import { Link, Outlet, useNavigate } from "react-router-dom"
 import { availableThemes, LIGHT, useTheme } from "../hooks/useTheme"
 
-// function TextRadio({
-//   children,
-//   isSelected,
-//   selectWith,
-// }: {
-//   children: ReactNode
-//   isSelected: boolean
-//   selectWith: () => void
-// }) {
-//   return isSelected ? (
-//     <b>{children}</b>
-//   ) : (
-//     <Link to="" onClick={selectWith}>
-//       {children}
-//     </Link>
-//   )
-// }
-
 export default function Root() {
   return (
     <div className="max-w-screen overflow-x-hidden dark:bg-black dark:text-white">
@@ -184,7 +166,7 @@ function TopbarItem({
       </button>
       <div
         className={`absolute ${
-          topbar ? "top-full right-0 text-center" : "top-0 left-full"
+          topbar ? "right-0 top-full text-center" : "left-full top-0"
         } z-50 hidden min-h-full w-max flex-col place-items-center bg-inherit p-2 focus:outline-none group-hover:flex`}
       >
         {children}

@@ -12,16 +12,18 @@ import {
   QuizQuestion,
   questionVariants,
   useSkills,
+  pathOfQuestionVariant,
 } from "../hooks/useSkills"
 import { StrengthMeter } from "../components/StrengthMeter"
 import { TiLockClosed, TiLockOpen } from "react-icons/ti"
+import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 
 /** LearningProgress component */
 export function LearningProgress() {
   const { t } = useTranslation()
-  const { strengthMap, featureMap, unlockedSkills, log } = useSkills()
+  const { featureMap, unlockedSkills, log } = useSkills()
   return (
-    <div className="mx-auto max-w-lg">
+    <HorizontallyCenteredDiv>
       <h1 className="my-5">{t("Training")}</h1>
 
       <div className="flex flex-col place-items-center">
@@ -51,7 +53,10 @@ export function LearningProgress() {
               question={q}
               unlocked
               qualified
-              strength={averageStrength({ strengthMap, path: q.path })}
+              strength={averageStrength({
+                strengthMap: featureMap,
+                path: q.path,
+              })}
             />
           ))}
         </tbody>
@@ -63,18 +68,21 @@ export function LearningProgress() {
       <table className="tbl">
         <tbody>
           <SkillTableHead t={t} showVariant />
-          {questionVariants.map(({ question, variant, path }) => (
-            <SkillTableRow
-              t={t}
-              key={path}
-              question={question}
-              variant={variant}
-              qualified={featureMap[path].qualified}
-              unlocked={unlockedSkills.find((s) => s === path) !== undefined}
-              strength={strengthMap[path].p}
-              halflife={strengthMap[path].h}
-            />
-          ))}
+          {questionVariants.map((qv) => {
+            const path = pathOfQuestionVariant(qv)
+            return (
+              <SkillTableRow
+                t={t}
+                key={path}
+                question={qv.question}
+                variant={qv.variant}
+                qualified={featureMap[path].qualified}
+                unlocked={unlockedSkills.find((s) => s === path) !== undefined}
+                strength={featureMap[path].p}
+                halflife={featureMap[path].h}
+              />
+            )
+          })}
         </tbody>
       </table>
       <LogTable
@@ -82,7 +90,7 @@ export function LearningProgress() {
         log={log}
         className="mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10"
       />
-    </div>
+    </HorizontallyCenteredDiv>
   )
 }
 
