@@ -14,6 +14,7 @@ export function ExerciseSort({
   regenerate,
   onResult = () => {},
   permalink,
+  viewOnly = false,
 }: {
   children: ReactNode
   title: string
@@ -21,10 +22,15 @@ export function ExerciseSort({
   regenerate?: () => void
   onResult?: (result: "correct" | "incorrect" | "abort") => void
   permalink?: string
+  viewOnly?: boolean
 }) {
   const { t } = useTranslation()
   const [mode, setMode] = useState(
-    "verify" as "verify" | "correct" | "incorrect"
+    (viewOnly ? "disabled" : "verify") as
+      | "verify"
+      | "correct"
+      | "incorrect"
+      | "disabled"
   )
   const [items, setItems] = useState(answers)
 
@@ -36,8 +42,7 @@ export function ExerciseSort({
       }
       setMode(isCorrect ? "correct" : "incorrect")
       isCorrect ? playSound("pass") : playSound("fail")
-    } else {
-      console.assert(mode === "correct" || mode === "incorrect")
+    } else if (mode === "correct" || mode === "incorrect") {
       onResult(mode)
     }
   }
@@ -73,7 +78,7 @@ export function ExerciseSort({
         items={items}
         onChange={setItems}
         className="p-5"
-        disabled={mode === "correct" || mode === "incorrect"}
+        disabled={mode !== "verify"}
       />
       <QuestionFooter
         mode={mode}

@@ -15,6 +15,7 @@ export function ExerciseMultipleChoice({
   onResult = () => {},
   allowMultiple,
   permalink,
+  viewOnly = false,
 }: {
   children: ReactNode
   title: string
@@ -23,6 +24,7 @@ export function ExerciseMultipleChoice({
   onResult?: (result: "correct" | "incorrect" | "abort") => void
   allowMultiple?: boolean
   permalink?: string
+  viewOnly?: boolean
 }) {
   const { t } = useTranslation()
   const correctAnswers = answers.filter((x) => x.correct).sort()
@@ -46,7 +48,7 @@ export function ExerciseMultipleChoice({
     "disabled" as "disabled" | "verify" | "correct" | "incorrect"
   )
   if (checked.length > 0 && mode == "disabled") {
-    setMode("verify")
+    if (!viewOnly) setMode("verify")
   } else if (checked.length === 0 && mode === "verify") {
     setMode("disabled")
   }

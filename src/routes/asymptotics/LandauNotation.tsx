@@ -1,6 +1,6 @@
 import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
 import TeX from "../../components/TeX"
-import { QuizQuestion, QuestionProps } from "../../hooks/useSkills"
+import { Question, QuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
 
 /**
@@ -17,13 +17,20 @@ import Random from "../../utils/random"
  * @returns {ReactElement} Output
  */
 
-export const LandauNotation: QuizQuestion = {
-  path: "asymptotics/landau",
+export const LandauNotation: Question = {
+  name: "asymptotics/landau",
   title: "asymptotics.landau.title",
   variants: ["default"],
   examVariants: ["default"],
-  Component: ({ seed, variant, t, onResult, regenerate }: QuestionProps) => {
-    const permalink = LandauNotation.path + "/" + variant + "/" + seed
+  Component: ({
+    seed,
+    variant,
+    t,
+    onResult,
+    regenerate,
+    viewOnly,
+  }: QuestionProps) => {
+    const permalink = LandauNotation.name + "/" + variant + "/" + seed
     const random = new Random(seed)
 
     const functionTypes = ["\\log n", "n", "n^2", "2^n"]
@@ -71,6 +78,7 @@ export const LandauNotation: QuizQuestion = {
         regenerate={regenerate}
         permalink={permalink}
         allowMultiple
+        viewOnly={viewOnly}
       >
         {t("asymptotics.landau.text")}
       </ExerciseMultipleChoice>

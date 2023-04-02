@@ -1,6 +1,6 @@
 import { ExerciseSort } from "../../components/ExerciseSort"
 import TeX from "../../components/TeX"
-import { QuizQuestion, QuestionProps } from "../../hooks/useSkills"
+import { Question, QuestionProps } from "../../hooks/useSkills"
 import {
   sampleTermSet,
   SimpleAsymptoticTerm,
@@ -26,13 +26,20 @@ import Random from "../../utils/random"
  *
  * @returns {ReactElement} Output
  */
-export const SortTerms: QuizQuestion = {
-  path: "asymptotics/sort",
+export const SortTerms: Question = {
+  name: "asymptotics/sort", // Name of the skill, used in the URL
   title: "asymptotics.sort.title",
   variants: ["start", "pure", "polylog", "polylogexp"],
   examVariants: ["polylogexp"],
-  Component: ({ seed, variant, t, onResult, regenerate }: QuestionProps) => {
-    const permalink = SortTerms.path + "/" + variant + "/" + seed
+  Component: ({
+    seed,
+    variant,
+    t,
+    onResult,
+    regenerate,
+    viewOnly,
+  }: QuestionProps) => {
+    const permalink = SortTerms.name + "/" + variant + "/" + seed
     const random = new Random(seed)
 
     const variable = random.choice("nmNMxyztk".split(""))
@@ -70,6 +77,7 @@ export const SortTerms: QuizQuestion = {
         onResult={onResult}
         regenerate={regenerate}
         permalink={permalink}
+        viewOnly={viewOnly}
       >
         {t("asymptotics.sortTerms.text")}
       </ExerciseSort>

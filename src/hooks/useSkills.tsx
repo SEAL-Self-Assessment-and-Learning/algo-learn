@@ -22,10 +22,11 @@ export type QuestionProps = {
   t: TFunction
   onResult: (result: "correct" | "incorrect" | "abort") => void
   regenerate?: () => void
+  viewOnly?: boolean
 }
 
-export interface QuizQuestion {
-  path: string
+export interface Question {
+  name: string
   variants: string[]
   examVariants: string[]
   title: string
@@ -33,28 +34,35 @@ export interface QuizQuestion {
   Component: FunctionComponent<QuestionProps>
 }
 
-export interface QuizQuestionVariant {
-  question: QuizQuestion
+export interface QuestionVariant {
+  question: Question
   variant: string
 }
 
 /** List of all questions */
-export const questions: QuizQuestion[] = [
+export const questions: Question[] = [
   SortTerms,
   LandauNotation,
   SimplifySum,
   Between,
 ]
 
+/** List of all skill groups. Will be the first part of the questions' routes. */
+export const skillGroups: string[] = []
+for (const q of questions) {
+  const [group] = q.name.split("/")
+  if (!skillGroups.includes(group)) skillGroups.push(group)
+}
+
 /** Return the question corresponding to a path */
-export function questionByPath(path: string): QuizQuestion | undefined {
+export function questionByPath(path: string): Question | undefined {
   for (const e of questions) {
-    if (path.startsWith(e.path)) return e
+    if (path.startsWith(e.name)) return e
   }
 }
 
 /** List of all valid (question,variant) pairs */
-export const questionVariants: QuizQuestionVariant[] = questions.flatMap((q) =>
+export const ALL_SKILLS: QuestionVariant[] = questions.flatMap((q) =>
   q.variants.map((v) => ({
     question: q,
     variant: v,
@@ -62,24 +70,38 @@ export const questionVariants: QuizQuestionVariant[] = questions.flatMap((q) =>
   }))
 )
 
-const HIGHEST_SKILLS: QuizQuestionVariant[] = questions.flatMap((q) =>
+export const EXAM_SKILLS: QuestionVariant[] = questions.flatMap((q) =>
   q.examVariants.map((v) => ({
     question: q,
     variant: v,
-    // path: q.path + "/" + v,
   }))
 )
 
 /** Return the path corresponding to a question variant */
-export function pathOfQuestionVariant(qv: QuizQuestionVariant): string {
-  return qv.question.path + "/" + qv.variant
+export function pathOfQuestionVariant(qv: QuestionVariant): string {
+  return qv.question.name + "/" + qv.variant
 }
 
-/** Return the question variant corresponding to a path */
-export function questionVariantByPath(path: string) {
-  return questionVariants.find((qv) =>
-    path.startsWith(pathOfQuestionVariant(qv))
-  )
+/**
+ * Return all question variants below the given path
+ *
+ * @param path Partial path to the question variant(s)
+ * @param mode If "practice", return all variants. If "exam", return only the
+ *   exam-level variants
+ * @returns List of question variants below the given path
+ */
+export function questionSetByPath(
+  path: string,
+  mode: "practice" | "exam" = "practice"
+): QuestionVariant[] {
+  const QV = mode === "practice" ? ALL_SKILLS : EXAM_SKILLS
+  return QV.filter((qv) => pathOfQuestionVariant(qv).startsWith(path))
+}
+
+export function questionVariantByPath(
+  path: string
+): QuestionVariant | undefined {
+  return questionSetByPath(path)[0]
 }
 
 export type LogEntry = {
@@ -173,7 +195,7 @@ export function useSkills() {
   }
 
   return {
-    featureMap: featureMap,
+    featureMap,
     unlockedSkills,
     log,
     appendLogEntry,
@@ -193,11 +215,11 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntry> }): {
 } {
   const qualifyingPasses: { [path: string]: number } = {}
   const featureMap: { [path: string]: BasicSkillFeatures } = {}
-  for (const qv of questionVariants) {
+  for (const qv of ALL_SKILLS) {
     const path = pathOfQuestionVariant(qv)
     qualifyingPasses[path] = 0
     featureMap[path] = {
-      qualified: false,
+      mastered: false,
       numPassed: 0,
       numFailed: 0,
       lag: Infinity,
@@ -215,7 +237,7 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntry> }): {
       featureMap[path].lag,
       (now - e.timestamp) / 3600 / 24 / 1000
     )
-    if (featureMap[path].qualified) {
+    if (featureMap[path].mastered) {
       if (e.result === "pass") {
         featureMap[path].numPassed += 1
       } else {
@@ -230,7 +252,7 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntry> }): {
       }
     }
     if (qualifyingPasses[path] === minQualifyingPasses) {
-      featureMap[path].qualified = true
+      featureMap[path].mastered = true
       // featureMap[path].numPassed = Math.max(
       //   featureMap[path].numPassed,
       //   minQualifyingPasses
@@ -297,43 +319,36 @@ export function averageStrength({
 /**
  * Return the weakest skill.
  *
- * @param strengthMap
- * @param skills If provided, only select among these skills
+ * @param featureMap The feature map
+ * @param fromSkills If provided, only select among these skills
  * @param noise If provided, make the selection noisy using randomness
  */
 export function weakestSkill({
   random,
-  strengthMap,
-  skills = questionVariants.map((qv) => pathOfQuestionVariant(qv)),
+  featureMap,
+  fromSkills = ALL_SKILLS.map((qv) => pathOfQuestionVariant(qv)),
   noise = 0.1,
 }: {
   random: Random
-  strengthMap: {
+  featureMap: {
     [path: string]: { p: number; h: number }
   }
-  skills: Array<string>
+  fromSkills?: Array<string>
   noise: number
 }): string {
   let minPath: string | undefined
   let min = 2
-  for (const path of skills) {
-    if (!minPath || strengthMap[path].p < min) {
+  for (const path of fromSkills) {
+    if (!minPath || featureMap[path].p < min) {
       minPath = path
+      min = featureMap[path].p
     }
-    min = strengthMap[path].p
   }
-  const selection = skills.filter((path) => strengthMap[path].p <= min + noise)
+  const selection = fromSkills.filter(
+    (path) => featureMap[path].p <= min + noise
+  )
   if (selection.length == 0) throw Error("Cannot find weakest skill")
   return random.choice(selection)
-}
-
-/** Returns a random skill of the highest skill levels ("exam-level") */
-export function randomHighestSkill({
-  random,
-}: {
-  random: Random
-}): string {
-  return pathOfQuestionVariant(random.choice(HIGHEST_SKILLS))
 }
 
 /**
@@ -359,9 +374,9 @@ export function computeUnlockedSkills({
   const unlockedPaths = []
   for (const q of questions) {
     for (const v of q.variants) {
-      const qv = q.path + "/" + v
+      const qv = q.name + "/" + v
       unlockedPaths.push(qv)
-      if (featureMap[qv].p < thresholdStrength || !featureMap[qv].qualified)
+      if (featureMap[qv].p < thresholdStrength || !featureMap[qv].mastered)
         break
     }
   }

@@ -1,10 +1,11 @@
 import { ReactElement, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import {
+  EXAM_SKILLS,
+  pathOfQuestionVariant,
   questionByPath,
-  randomHighestSkill,
   useSkills,
   weakestSkill,
 } from "../hooks/useSkills"
@@ -111,8 +112,11 @@ const meh = {
 export function QuizSession({
   mode,
 }: {
-  mode: "practice" | "examine"
+  mode: "practice" | "exam"
 }): ReactElement {
+  const params = useParams()
+  const partialPath = params["*"] ?? ""
+
   // Hooks
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
@@ -153,15 +157,20 @@ export function QuizSession({
     if (num === targetNum) {
       setState({ numCorrect, numIncorrect, status: "finished" })
     }
+    const fromSkills = (
+      mode === "practice"
+        ? unlockedSkills
+        : EXAM_SKILLS.map(pathOfQuestionVariant)
+    ).filter((s) => s.startsWith(partialPath))
     const nextPath =
       mode === "practice"
         ? weakestSkill({
             random,
-            strengthMap: featureMap,
-            skills: unlockedSkills,
+            featureMap,
+            fromSkills,
             noise: 0.2,
           })
-        : randomHighestSkill({ random })
+        : random.choice(fromSkills)
     const Q = questionByPath(nextPath)
     const [skillGroup, question, variant] = nextPath.split("/")
     if (!Q) throw Error(`Question with path '${nextPath}' not found!`)

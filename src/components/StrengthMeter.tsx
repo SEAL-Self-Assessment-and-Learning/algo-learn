@@ -55,7 +55,7 @@ export function StrengthMeter({
   }
 }
 
-function ProgressBar({
+export function ProgressBar({
   done = 0,
   doing = 0,
   total,

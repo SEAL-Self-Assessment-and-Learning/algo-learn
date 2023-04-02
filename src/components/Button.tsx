@@ -23,15 +23,17 @@ export function Button({
   to = "",
   onClick,
   className = "",
+  disabled = false,
 }: {
   children?: ReactNode
   color?: keyof typeof colorClassMap
   to?: To
   onClick?: () => void
   className?: string
+  disabled?: boolean
 }) {
   className = `btn text-white dark:text-black ${colorClassMap[color]} ${className}`
-  if (color === "disabled") {
+  if (disabled || color === "disabled") {
     return (
       <button type="button" disabled className={className}>
         {children}

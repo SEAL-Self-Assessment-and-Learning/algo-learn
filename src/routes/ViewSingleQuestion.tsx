@@ -1,39 +1,32 @@
 import { useTranslation } from "react-i18next"
-import { useLoaderData, useNavigate } from "react-router-dom"
-import { QuizQuestion } from "../hooks/useSkills"
+import { useNavigate, useParams } from "react-router-dom"
+import { QuestionVariant, pathOfQuestionVariant } from "../hooks/useSkills"
 
-export function ViewSingleQuestion({
-  Question,
-  variant,
-}: {
-  Question: QuizQuestion
-  variant: string
-}) {
+export function ViewSingleQuestion({ qv }: { qv: QuestionVariant }) {
   const { t } = useTranslation()
-  const { seed } = useLoaderData() as {
+  const navigate = useNavigate()
+  const { seed } = useParams() as {
     seed: string
   }
-  const navigate = useNavigate()
 
-  if (!Question.variants.find((v) => v === variant)) {
+  if (!qv.question.variants.find((v) => v === qv.variant)) {
     throw new Error(
-      `'${t(
-        Question.title
-      )}' does not have variant '${variant}'. Valid variants are: ${Question.variants.join(
-        ", "
-      )}.`
+      `'${t(qv.question.title)}' does not have variant '${
+        qv.variant
+      }'. Valid variants are: ${qv.question.variants.join(", ")}.`
     )
   }
 
   console.assert(seed !== null, "useSeed is null")
   return (
-    <Question.Component
+    <qv.question.Component
       key={seed}
       seed={seed}
-      variant={variant}
+      variant={qv.variant}
       t={t}
       onResult={() => navigate("/")}
-      regenerate={() => navigate("/" + Question.path + "/" + variant)}
+      regenerate={() => navigate(pathOfQuestionVariant(qv))}
+      viewOnly
     />
   )
 }

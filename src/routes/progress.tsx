@@ -9,14 +9,18 @@ import {
   LogEntry,
   questionByPath,
   questions,
-  QuizQuestion,
-  questionVariants,
+  Question,
+  ALL_SKILLS,
   useSkills,
   pathOfQuestionVariant,
+  skillGroups,
+  questionSetByPath,
 } from "../hooks/useSkills"
 import { StrengthMeter } from "../components/StrengthMeter"
 import { TiLockClosed, TiLockOpen } from "react-icons/ti"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
+import { SkillFeaturesAndPredictions } from "../utils/memory-model"
+import { CircularProgressbarWithChildren } from "react-circular-progressbar"
 
 /** LearningProgress component */
 export function LearningProgress() {
@@ -25,37 +29,46 @@ export function LearningProgress() {
   return (
     <HorizontallyCenteredDiv>
       <h1 className="my-5">{t("Training")}</h1>
+      {t("Training.desc")}
+      <ol className="my-5 ml-8 list-decimal">
+        <li>
+          <b>{t("Practice")}.</b> {t("Practice.desc")}
+        </li>
+        <li>
+          <b>{t("Examine")}.</b> {t("Examine.desc")}
+        </li>
+      </ol>
 
-      <div className="flex flex-col place-items-center">
-        <div className="mt-2">
-          <b>1. {t("Practice")}:</b> {t("Practice.desc")}
-        </div>
-        <Button to="/practice" color="green" className="m-5">
-          {t("Practice")}
-        </Button>
-        <div className="mt-6">
-          <b>2. {t("Examine")}:</b> {t("Examine.desc")}
-        </div>
-        <Button to="/examine" color="cyan" className="m-5">
-          {t("Examine")}
-        </Button>
+      <h2 className="mb-5 mt-5 border-black/10 pt-2 dark:border-white/10">
+        {t("home.skill-groups")}
+      </h2>
+      <div>{t("train.skills.desc")}</div>
+      <div className="my-3">
+        {skillGroups.map((g) => (
+          <SkillGroupCircle
+            t={t}
+            key={g}
+            partialPath={g}
+            featureMap={featureMap}
+          />
+        ))}
       </div>
       <h2 className="mb-5 mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10">
         {t("your-learning-progress")}
       </h2>
       <table className="tbl">
         <tbody>
-          <SkillTableHead t={t} />
+          <QuestionTableHead t={t} />
           {questions.map((q) => (
-            <SkillTableRow
+            <QuestionTableRow
               t={t}
-              key={q.path}
+              key={q.name}
               question={q}
               unlocked
               qualified
               strength={averageStrength({
                 strengthMap: featureMap,
-                path: q.path,
+                path: q.name,
               })}
             />
           ))}
@@ -67,16 +80,16 @@ export function LearningProgress() {
       <p className="my-5">{t("detailed-learning-progress-text")}</p>
       <table className="tbl">
         <tbody>
-          <SkillTableHead t={t} showVariant />
-          {questionVariants.map((qv) => {
+          <QuestionTableHead t={t} showVariant />
+          {ALL_SKILLS.map((qv) => {
             const path = pathOfQuestionVariant(qv)
             return (
-              <SkillTableRow
+              <QuestionTableRow
                 t={t}
                 key={path}
                 question={qv.question}
                 variant={qv.variant}
-                qualified={featureMap[path].qualified}
+                qualified={featureMap[path].mastered}
                 unlocked={unlockedSkills.find((s) => s === path) !== undefined}
                 strength={featureMap[path].p}
                 halflife={featureMap[path].h}
@@ -128,7 +141,7 @@ function LogTableRow({ t, entry }: { t: TFunction; entry: LogEntry }) {
   const title = questionByPath(entry.question)?.title
   if (title === undefined) return null
   return (
-    <tr className="[&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10">
+    <tr>
       <td>
         <PassFailButton
           className="mr-2 inline opacity-50"
@@ -165,7 +178,50 @@ function PassFailButton({
   )
 }
 
-function SkillTableHead({
+function SkillGroupCircle({
+  t,
+  partialPath,
+  featureMap,
+}: {
+  t: TFunction
+  partialPath: string
+  featureMap: { [path: string]: SkillFeaturesAndPredictions }
+}) {
+  const QVs = questionSetByPath(partialPath)
+  const qualified = QVs.filter(
+    (qv) => featureMap[pathOfQuestionVariant(qv)].mastered
+  )
+  const done = qualified.length
+  const total = QVs.length
+  const skillName =
+    partialPath === "asymptotics" ? t("skill.asymptotics") : partialPath
+  return (
+    <div className="bg-shading m-5 flex max-w-max flex-col items-center gap-3 rounded-lg p-5">
+      <div className="w-max text-center font-bold">{skillName}</div>
+      <div className="w-32 text-center text-xl">
+        <CircularProgressbarWithChildren
+          value={done}
+          maxValue={total}
+          strokeWidth={16}
+        >
+          <div className="text-slate-500">
+            <span className="font-bold text-black">{done}</span>/{total}
+            <br />
+            XP
+          </div>
+        </CircularProgressbarWithChildren>
+      </div>
+      <Button to={"/practice/" + partialPath} color="green">
+        {t("Practice")}
+      </Button>
+      <Button to={"/exam/" + partialPath} color="cyan">
+        {t("Examine")}
+      </Button>
+    </div>
+  )
+}
+
+function QuestionTableHead({
   t,
   showVariant = false,
 }: {
@@ -182,7 +238,7 @@ function SkillTableHead({
   )
 }
 
-function SkillTableRow({
+function QuestionTableRow({
   t,
   question,
   variant,
@@ -194,7 +250,7 @@ function SkillTableRow({
   onMouseOut,
 }: {
   t: TFunction
-  question: QuizQuestion
+  question: Question
   variant?: string
   strength: number
   halflife?: number
@@ -212,7 +268,7 @@ function SkillTableRow({
   return (
     <tr onMouseOver={onMouseOver} onMouseOut={onMouseOut}>
       <td>
-        <Link to={question.path}>
+        <Link to={"practice/" + question.name + (variant ? "/" + variant : "")}>
           {t(question.title)}
           {variant ? ` (${variant})` : ""}
         </Link>

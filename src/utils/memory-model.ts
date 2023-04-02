@@ -13,7 +13,7 @@
  */
 
 export type SkillFeatures = {
-  qualified: boolean // whether the qualification phase for this skill was successful
+  mastered: boolean // whether we think this skill has been mastered at least once
   numPassed: number // number of times the user passed the question
   numFailed: number // number of times the user failed the question
   lag: number // time since the last interaction in days

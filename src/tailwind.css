@@ -35,8 +35,12 @@
     @apply bg-blue-700;
   }
 
+  .bg-shading {
+    @apply bg-black/10 dark:bg-white/10;
+  }
+
   table.tbl > tbody > tr {
-    @apply [&:nth-child(odd)]:bg-black/10 dark:[&:nth-child(odd)]:bg-white/10;
+    @apply [&:nth-child(odd)]:bg-shading;
   }
 
   table.tbl td,

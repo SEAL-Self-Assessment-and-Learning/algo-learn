@@ -10,7 +10,7 @@ import {
   TooComplex,
 } from "../../utils/AsymptoticTerm"
 import playSound from "../../effects/playSound"
-import { QuizQuestion, QuestionProps } from "../../hooks/useSkills"
+import { Question, QuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
 import useGlobalDOMEvents from "../../hooks/useGlobalDOMEvents"
 import { QuestionFooter } from "../../components/QuestionFooter"
@@ -22,14 +22,21 @@ import { HorizontallyCenteredDiv } from "../../components/CenteredDivs"
  *
  * @returns {ReactElement} Output
  */
-export const Between: QuizQuestion = {
-  path: "asymptotics/between",
+export const Between: Question = {
+  name: "asymptotics/between",
   title: "asymptotics.between.title",
   description: "asymptotics.between.description",
   variants: ["start", "polylog"],
   examVariants: ["polylog"],
-  Component: ({ seed, variant, t, onResult, regenerate }: QuestionProps) => {
-    const permalink = Between.path + "/" + variant + "/" + seed
+  Component: ({
+    seed,
+    variant,
+    t,
+    onResult,
+    regenerate,
+    viewOnly,
+  }: QuestionProps) => {
+    const permalink = Between.name + "/" + variant + "/" + seed
     const random = new Random(seed)
     const [text, setText] = useState("")
     const [savedMode, setMode] = useState(
@@ -124,7 +131,7 @@ export const Between: QuizQuestion = {
       ) : null
     function handleClick() {
       if (mode === "disabled") {
-        setMode("verify")
+        if (!viewOnly) setMode("verify")
       } else if (mode === "verify") {
         if (textFeedback === null || feedbackType === "error") return
         if (
