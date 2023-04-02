@@ -1,9 +1,10 @@
 import { ReactNode, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { FiSun } from "react-icons/fi"
+import { FiFileText, FiHome, FiInfo, FiSun } from "react-icons/fi"
 import { MdDarkMode } from "react-icons/md"
-import { Link, Outlet, useNavigate } from "react-router-dom"
+import { Link, Outlet, useLocation } from "react-router-dom"
 import { availableThemes, LIGHT, useTheme } from "../hooks/useTheme"
+import { GiHamburgerMenu } from "react-icons/gi"
 
 export default function Root() {
   return (
@@ -22,6 +23,7 @@ export default function Root() {
 
 function GlobalHeader() {
   const { t, i18n } = useTranslation()
+  const location = useLocation()
   const lngs = ["en", "de"]
   const nativeName: Record<string, string> = {
     en: "English",
@@ -33,11 +35,28 @@ function GlobalHeader() {
     const nextLng = lngs[nextLngIndex]
     void i18n.changeLanguage(nextLng)
   }
-  const navigate = useNavigate()
   const { theme, userTheme, toggleTheme, setUserTheme } = useTheme()
   useEffect(() => {
     document.body.className = theme
   }, [theme])
+
+  const mainMenuItems = [
+    {
+      label: t("menu.home"),
+      to: "/",
+      icon: <FiHome />,
+    },
+    {
+      label: t("menu.about"),
+      to: "/about",
+      icon: <FiInfo />,
+    },
+    {
+      label: t("menu.legal"),
+      to: "/legal",
+      icon: <FiFileText />,
+    },
+  ]
 
   return (
     <header className="dark flex flex-none place-items-center  justify-between bg-goethe-500 p-2 text-white dark:bg-goethe-700">
@@ -87,15 +106,18 @@ function GlobalHeader() {
           ))}
         </div>
       </TopbarItem>
-      <TopbarItem icon="?" onClick={() => navigate("/about")}>
-        <Link to="/about" className="w-full no-underline">
-          <div className="block p-2 hover:bg-goethe-500/50">{t("about")}</div>
-        </Link>
-        <Link to="/legal" className="no-underline">
-          <div className="block p-2 hover:bg-goethe-500/50">
-            {t("imprint-and-privacy")}
-          </div>
-        </Link>
+      <TopbarItem icon={<GiHamburgerMenu />}>
+        {mainMenuItems.map(({ label, to, icon }) => (
+          <Link key={to} to={to} className="w-full no-underline">
+            <div
+              className={`flex items-center justify-center gap-2 p-2 hover:bg-goethe-500/50 ${
+                location.pathname === to ? "font-bold" : ""
+              }`}
+            >
+              {icon} {label}
+            </div>
+          </Link>
+        ))}
       </TopbarItem>
     </header>
   )
@@ -139,7 +161,7 @@ function TopbarItem({
   children,
   topbar = true,
 }: {
-  onClick: () => void
+  onClick?: () => void
   icon: ReactNode
   text?: ReactNode
   children?: ReactNode
