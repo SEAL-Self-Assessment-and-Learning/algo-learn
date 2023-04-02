@@ -47,25 +47,27 @@ export function ExerciseMultipleChoice({
   const [mode, setMode] = useState(
     "disabled" as "disabled" | "verify" | "correct" | "incorrect"
   )
-  if (checked.length > 0 && mode == "disabled") {
+  if (mode == "disabled" && checked.length > 0) {
     if (!viewOnly) setMode("verify")
-  } else if (checked.length === 0 && mode === "verify") {
+  } else if (mode === "verify" && checked.length === 0) {
     setMode("disabled")
   }
 
   function handleClick() {
+    console.log("handleClick", mode)
     if (mode === "disabled") {
       return
     } else if (mode === "verify") {
       const isCorrect =
         checked.length === correctAnswers.length &&
         correctAnswers.every((item) => checked.includes(item.key))
-      setMode(isCorrect ? "correct" : "incorrect")
       isCorrect ? playSound("pass") : playSound("fail")
+      setMode(isCorrect ? "correct" : "incorrect")
     } else if (mode === "correct" || mode === "incorrect") {
       onResult(mode)
     }
   }
+
   useGlobalDOMEvents({
     keydown(e: Event) {
       const key = (e as KeyboardEvent).key

@@ -20,7 +20,10 @@ import { StrengthMeter } from "../components/StrengthMeter"
 import { TiLockClosed, TiLockOpen } from "react-icons/ti"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { SkillFeaturesAndPredictions } from "../utils/memory-model"
-import { CircularProgressbarWithChildren } from "react-circular-progressbar"
+import {
+  CircularProgressbarWithChildren,
+  buildStyles,
+} from "react-circular-progressbar"
 
 /** LearningProgress component */
 export function LearningProgress() {
@@ -43,9 +46,9 @@ export function LearningProgress() {
         {t("home.skill-groups")}
       </h2>
       <div>{t("train.skills.desc")}</div>
-      <div className="my-3">
+      <div className="m-6 flex flex-wrap gap-6">
         {skillGroups.map((g) => (
-          <SkillGroupCircle
+          <SkillGroupCard
             t={t}
             key={g}
             partialPath={g}
@@ -178,7 +181,7 @@ function PassFailButton({
   )
 }
 
-function SkillGroupCircle({
+function SkillGroupCard({
   t,
   partialPath,
   featureMap,
@@ -193,16 +196,20 @@ function SkillGroupCircle({
   )
   const done = qualified.length
   const total = QVs.length
-  const skillName =
-    partialPath === "asymptotics" ? t("skill.asymptotics") : partialPath
+  const skillName = t("skill." + partialPath)
   return (
-    <div className="bg-shading m-5 flex max-w-max flex-col items-center gap-3 rounded-lg p-5">
-      <div className="w-max text-center font-bold">{skillName}</div>
+    <div className="bg-shading flex w-[30%] flex-col items-center gap-3 rounded-lg p-5">
+      <div className="w-min text-center font-bold">{skillName}</div>
       <div className="w-32 text-center text-xl">
         <CircularProgressbarWithChildren
           value={done}
           maxValue={total}
-          strokeWidth={16}
+          strokeWidth={18}
+          background
+          styles={buildStyles({
+            pathColor: "green",
+            trailColor: "gray",
+          })}
         >
           <div className="text-slate-500">
             <span className="font-bold text-black">{done}</span>/{total}

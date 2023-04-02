@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import { useNavigate, useParams } from "react-router-dom"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import {
+  ALL_SKILLS,
   EXAM_SKILLS,
   pathOfQuestionVariant,
   questionByPath,
@@ -117,8 +118,17 @@ export function QuizSession({
   const params = useParams()
   const partialPath = params["*"] ?? ""
 
-  // Hooks
   const { t, i18n } = useTranslation()
+  const [{ sessionSeed, targetNum }] = useState({
+    sessionSeed: new Random(Math.random()).base36string(7),
+    targetNum: 3,
+  })
+  const { featureMap, appendLogEntry } = useSkills()
+  const [{ numCorrect, numIncorrect, status }, setState] = useState({
+    numCorrect: 0,
+    numIncorrect: 0,
+    status: "running" as "running" | "finished" | "aborted",
+  })
   const navigate = useNavigate()
   useGlobalDOMEvents({
     keydown(e: Event) {
@@ -128,16 +138,6 @@ export function QuizSession({
         navigate("/")
       }
     },
-  })
-  const [{ sessionSeed, targetNum }] = useState({
-    sessionSeed: new Random(Math.random()).base36string(7),
-    targetNum: 3,
-  })
-  const { featureMap, unlockedSkills, appendLogEntry } = useSkills()
-  const [{ numCorrect, numIncorrect, status }, setState] = useState({
-    numCorrect: 0,
-    numIncorrect: 0,
-    status: "running" as "running" | "finished" | "aborted",
   })
 
   const num = numCorrect + numIncorrect
@@ -157,9 +157,13 @@ export function QuizSession({
     if (num === targetNum) {
       setState({ numCorrect, numIncorrect, status: "finished" })
     }
+    console.log(mode)
+    console.log(ALL_SKILLS)
+    console.log(EXAM_SKILLS)
+    console.log(partialPath)
     const fromSkills = (
       mode === "practice"
-        ? unlockedSkills
+        ? ALL_SKILLS.map(pathOfQuestionVariant)
         : EXAM_SKILLS.map(pathOfQuestionVariant)
     ).filter((s) => s.startsWith(partialPath))
     const nextPath =
@@ -177,7 +181,6 @@ export function QuizSession({
 
     const handleResult = (result: "correct" | "incorrect" | "abort") => {
       if (result === "correct") {
-        setState({ numCorrect: numCorrect + 1, numIncorrect, status })
         appendLogEntry({
           question: `${skillGroup}/${question}`,
           variant,
@@ -185,8 +188,8 @@ export function QuizSession({
           result: "pass",
           timestamp: Date.now(),
         })
+        setState({ numCorrect: numCorrect + 1, numIncorrect, status })
       } else if (result === "incorrect") {
-        setState({ numCorrect, numIncorrect: numIncorrect + 1, status })
         appendLogEntry({
           question: `${skillGroup}/${question}`,
           variant,
@@ -194,6 +197,7 @@ export function QuizSession({
           result: "fail",
           timestamp: Date.now(),
         })
+        setState({ numCorrect, numIncorrect: numIncorrect + 1, status })
       } else if (result === "abort")
         setState({ numCorrect, numIncorrect, status })
     }

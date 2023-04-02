@@ -9,9 +9,9 @@ export function About() {
     <div className="mx-auto mb-16 max-w-lg p-3">
       <h1>{t("About")}</h1>
       <p>
-        This application helps you practice some of
-        the skills that are relevant for the exam of a typical algorithms and
-        data structures course. The site is supposed to be both useful and fun!
+        This application helps you practice some of the skills that are relevant
+        for the exam of a typical algorithms and data structures course. The
+        site is supposed to be both useful and fun!
       </p>
       <h2 className="mt-5">Active learning</h2>
       <p>

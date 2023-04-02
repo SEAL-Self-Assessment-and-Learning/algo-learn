@@ -20,7 +20,7 @@ const colorClassMap = {
 export function Button({
   children,
   color = "disabled",
-  to = "",
+  to,
   onClick,
   className = "",
   disabled = false,
@@ -33,17 +33,22 @@ export function Button({
   disabled?: boolean
 }) {
   className = `btn text-white dark:text-black ${colorClassMap[color]} ${className}`
-  if (disabled || color === "disabled") {
+  if (disabled || color === "disabled" || (!to && !onClick)) {
     return (
       <button type="button" disabled className={className}>
         {children}
       </button>
     )
-  } else {
+  } else if (to) {
     return (
       <Link to={to} onClick={onClick} className={className}>
         {children}
       </Link>
     )
   }
+  return (
+    <button type="button" onClick={onClick} className={className}>
+      {children}
+    </button>
+  )
 }

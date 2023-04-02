@@ -12,6 +12,7 @@ module.exports = {
     },
   },
   extends: [
+    "plugin:prettier/recommended",
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:react/jsx-runtime",
@@ -46,6 +47,7 @@ module.exports = {
         "plugin:react-hooks/recommended",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "prettier",
       ],
       parserOptions: {
         project: ["./tsconfig.json"],

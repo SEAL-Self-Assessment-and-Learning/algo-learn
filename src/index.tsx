@@ -46,7 +46,10 @@ for (const qv of ALL_SKILLS) {
 
 const partialPaths = new Set<string>()
 for (const qv of ALL_SKILLS) {
-  const partialPath = pathOfQuestionVariant(qv).split("/").slice(0, -1).join("/")
+  const partialPath = pathOfQuestionVariant(qv)
+    .split("/")
+    .slice(0, -1)
+    .join("/")
   partialPaths.add(partialPath)
 }
 
