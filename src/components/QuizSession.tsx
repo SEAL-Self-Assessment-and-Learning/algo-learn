@@ -147,9 +147,9 @@ export function QuizSession({
   if (status === "aborted") {
     return (
       <ScreenCenteredDiv>
-        Your session was aborted.
+        {t("quiz-session-aborted")}
         <Button to={"/"} color="green">
-          Continue
+          {t("Continue")}
         </Button>
       </ScreenCenteredDiv>
     )
@@ -230,7 +230,7 @@ export function QuizSession({
           color="green"
           className="ml-auto mt-12 block max-w-max"
         >
-          Continue
+          {t("Continue")}
         </Button>
       </div>
     </ScreenCenteredDiv>

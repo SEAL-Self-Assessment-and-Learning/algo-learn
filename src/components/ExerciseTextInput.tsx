@@ -16,6 +16,7 @@ export function ExerciseTextInput({
   onResult = () => {},
   permalink,
   viewOnly = false,
+  possibleCorrectSolution,
 }: {
   title: string
   children?: ReactNode
@@ -31,6 +32,7 @@ export function ExerciseTextInput({
   allowMultiple?: boolean
   permalink?: string
   viewOnly?: boolean
+  possibleCorrectSolution?: ReactNode
 }) {
   const { t } = useTranslation()
   const [text, setText] = useState("")
@@ -51,11 +53,15 @@ export function ExerciseTextInput({
     mode === "correct" ? (
       <b className="text-2xl">{t("feedback.correct")}</b>
     ) : mode === "incorrect" ? (
-      <>
-        <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
-        <br />
-        TODO
-      </>
+      possibleCorrectSolution ? (
+        <>
+          <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
+          <br />
+          {possibleCorrectSolution}
+        </>
+      ) : (
+        <b className="text-2xl">{t("feedback.incorrect")}</b>
+      )
     ) : null
   function handleClick() {
     if (mode === "disabled") {

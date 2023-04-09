@@ -14,6 +14,7 @@ import {
   solarizedDark,
   solarizedLight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs"
+import { Trans } from "react-i18next"
 
 /**
  * Generate and render a question about asymptotic notation
@@ -54,9 +55,11 @@ export const RecursionFormula: Question = {
 
     const desc = (
       <>
-        Consider the following recursive procedure{" "}
-        <span className="font-mono">{functionName}</span> with integer input{" "}
-        <span className="font-mono">{n}</span>:
+        <Trans t={t} i18nKey="recursion.formula.description">
+          Consider the following recursive procedure{" "}
+          <span className="font-mono">{{ functionName } as any}</span> with
+          integer input <span className="font-mono">{{ n } as any}</span>:
+        </Trans>
         {/* <pre className="bg-shading m-2 max-w-max rounded-lg p-5"> */}
         <div className="my-5">
           <SyntaxHighlighter
@@ -67,30 +70,32 @@ export const RecursionFormula: Question = {
           </SyntaxHighlighter>
         </div>
         {/* </pre> */}
-        Let{" "}
-        <TeX>
-          {T}({n})
-        </TeX>{" "}
-        is the number of stars (<span className="font-mono">*</span>) that the
-        procedure prints.
+        <Trans t={t} i18nKey="recursion.formula.description2">
+          Let{" "}
+          <TeX>
+            {T}({n})
+          </TeX>{" "}
+          be the number of stars (<span className="font-mono">*</span>) that the
+          procedure prints.
+        </Trans>
         {variant !== "choice" && (
           <>
             {" "}
-            The base case is{" "}
+            {t("recursion.formula.basecase")}{" "}
             <TeX>
               {T}(1)={d}
             </TeX>
             .
           </>
         )}{" "}
-        What is the recurrence relation of{" "}
+        {t("recursion.formula.question")}{" "}
         <TeX>
           {T}({n})
         </TeX>
         {variant !== "choice" && (
           <>
             {" "}
-            for <TeX>{n} \geq 2</TeX>
+            {t("for")} <TeX>{n} \geq 2</TeX>
           </>
         )}
         ?
@@ -157,6 +162,11 @@ export const RecursionFormula: Question = {
           permalink={permalink}
           viewOnly={viewOnly}
           prompt={prompt}
+          possibleCorrectSolution={
+            <TeX>
+              {a} {T}({n}/{b}) + {c}
+            </TeX>
+          }
         >
           {desc}
         </ExerciseTextInput>
