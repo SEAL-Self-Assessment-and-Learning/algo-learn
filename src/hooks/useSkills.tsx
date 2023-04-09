@@ -16,6 +16,7 @@ import { Between } from "../routes/asymptotics/Between"
 import { SortTerms } from "../routes/asymptotics/SortTerms"
 import { SimplifySum } from "../routes/asymptotics/SimplifySum"
 import { RecursionFormula } from "../routes/recursion/RecursionFormula"
+import { Loops } from "../routes/time/Loops"
 
 export type QuestionProps = {
   variant: string
@@ -47,6 +48,7 @@ export const questions: Question[] = [
   SimplifySum,
   Between,
   RecursionFormula,
+  Loops,
 ]
 
 /** List of all skill groups. Will be the first part of the questions' routes. */

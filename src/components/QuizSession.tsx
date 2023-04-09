@@ -157,10 +157,6 @@ export function QuizSession({
     if (num === targetNum) {
       setState({ numCorrect, numIncorrect, status: "finished" })
     }
-    console.log(mode)
-    console.log(ALL_SKILLS)
-    console.log(EXAM_SKILLS)
-    console.log(partialPath)
     const fromSkills = (
       mode === "practice"
         ? ALL_SKILLS.map(pathOfQuestionVariant)

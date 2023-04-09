@@ -1,17 +1,45 @@
 import { ReactElement } from "react"
 import Random from "../../utils/random"
 import TeX from "../../components/TeX"
+import { printStars } from "../recursion/recursiveFormulaUtils"
 
-/**
- * Produce a string of the form " print(***)"
- *
- * @param {number} stars - Number of stars
- * @param {number} indent - Number of spaces to indent
- * @returns {string} - The string
- */
-export function printStars(stars: number, indent: number): string {
-  if (stars == 0) return ""
-  else return `${" ".repeat(indent)}print("${"*".repeat(stars)}")\n`
+// function sampleAtomicExpression({
+//   random,
+//   indent = 4,
+// }: {
+//   random: Random
+//   indent?: number
+// }) {
+//   const numStars = random.int(1, 4)
+//   const code = printStars(numStars, indent)
+//   return { code, numStars }
+// }
+
+export function sampleExactIfEven({
+  random,
+  availableVarNames = "nmNMxyztk".split(""),
+  indent = 0,
+}: {
+  random: Random
+  availableVarNames?: string[]
+  indent?: number
+}) {
+  const _ = " ".repeat(indent)
+  const innerVar = random.choice(availableVarNames)
+  const low = random.int(0, 3)
+  const high = random.int(6, 9)
+  let code = ""
+  code += `${_}for ${innerVar} from ${low} to ${high}:\n`
+  const cond = random.choice(["even", "odd"])
+  code += `${_}  if ${innerVar} is ${cond}:\n`
+  const numPrint = random.int(1, 4)
+  code += printStars(numPrint, indent + 4)
+  let numStars = 0
+  for (let i = low; i <= high; i++) {
+    if (cond === "odd" && (i & 1) === 1) numStars += numPrint
+    else if (cond === "even" && (i & 1) === 0) numStars += numPrint
+  }
+  return { code, numStars }
 }
 
 /**
@@ -23,7 +51,7 @@ export function printStars(stars: number, indent: number): string {
  *   case and in the recursive case, as well as the number of recursive callsand
  *   the number to divide by.
  */
-export function sampleRecursiveFunction(random: Random) {
+export function sampleLoop(random: Random) {
   const functionName = random.choice("fghPp".split(""))
   const variable = random.choice("nmNMxyztk".split(""))
   const preStars = random.int(0, 3)
@@ -33,19 +61,13 @@ export function sampleRecursiveFunction(random: Random) {
   const numRecCalls = random.int(1, 3)
   const divideBy = random.int(2, 7)
 
-  let functionText = ""
-  functionText += `def ${functionName}(${variable}):\n`
-  functionText += printStars(preStars, 2)
-  functionText += `  if (${variable} <= 1):\n`
-  functionText += printStars(baseStars, 4)
-  functionText += `  else:\n`
-  functionText += printStars(recStars, 4)
-  for (let i = 0; i < numRecCalls; i++) {
-    functionText += `    ${functionName}(${variable}/${divideBy})\n`
-  }
-  functionText += printStars(postStars, 2)
+  const availableVarNames = "nmNMxyztk".split("").filter((c) => c !== variable)
+  const { code } = sampleExactIfEven({
+    random,
+    availableVarNames,
+  })
   return {
-    functionText,
+    functionText: code,
     functionName,
     n: variable,
     b: divideBy,
