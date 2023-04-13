@@ -354,7 +354,7 @@ export class ProductTerm {
     }
     // Now both a.coefficient and b.coefficient are non-zero and have the same sign.
     const sign = this.coefficient.compare(0) > 0 ? 1 : -1
-    const lim = this.mul(t.inv()).limit()
+    const lim = this.div(t).limit()
     if (lim === "infty") return sign
     else if (lim === "-infty") return -sign
     if (strict) return sign * lim.compare(1)
