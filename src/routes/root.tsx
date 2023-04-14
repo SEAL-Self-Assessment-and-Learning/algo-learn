@@ -1,10 +1,12 @@
 import { ReactNode, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { FiFileText, FiHome, FiInfo, FiSun } from "react-icons/fi"
+import { TbGitCommit } from "react-icons/tb"
 import { MdDarkMode } from "react-icons/md"
 import { Link, Outlet, useLocation } from "react-router-dom"
 import { availableThemes, LIGHT, useTheme } from "../hooks/useTheme"
 import { GiHamburgerMenu } from "react-icons/gi"
+import { version } from "../version"
 
 export default function Root() {
   return (
@@ -55,6 +57,13 @@ function GlobalHeader() {
       label: t("menu.legal"),
       to: "/legal",
       icon: <FiFileText />,
+    },
+    {
+      label: `${t("menu.version")}: ${version ?? "local build"}`,
+      to: version
+        ? `https://github.com/holgerdell/algo-learn/commit/${version}`
+        : undefined,
+      icon: <TbGitCommit />,
     },
   ]
 
@@ -108,7 +117,7 @@ function GlobalHeader() {
       </TopbarItem>
       <TopbarItem icon={<GiHamburgerMenu />}>
         {mainMenuItems.map(({ label, to, icon }) => (
-          <Link key={to} to={to} className="w-full no-underline">
+          <Link key={to} to={to ?? ""} className="w-full no-underline">
             <div
               className={`flex items-center justify-center gap-2 p-2 hover:bg-goethe-500/50 ${
                 location.pathname === to ? "font-bold" : ""

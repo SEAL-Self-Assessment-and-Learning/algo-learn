@@ -46,6 +46,9 @@ jobs:
       - name: Yarn install 🔧
         uses: ./.github/actions/yarn-nm-install
 
+      - name: Write version number
+        run: echo "export const version = \"$(git rev-parse --short $GITHUB_SHA)\"" > src/version.ts
+
       - name: Yarn Build 🔧
         run: yarn build --public-url /algo-learn
 
