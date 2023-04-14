@@ -114,7 +114,9 @@ export function ExerciseTextInput({
           <div>{FeedbackText}</div>
         </div>
       </div>
-      <div className="p-5 text-slate-600 dark:text-slate-400">{bottomNote}</div>
+      <div className="py-5 text-slate-600 dark:text-slate-400">
+        {bottomNote}
+      </div>
       <QuestionFooter
         mode={mode}
         message={message}

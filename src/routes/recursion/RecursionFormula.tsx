@@ -71,12 +71,8 @@ export const RecursionFormula: Question = {
         </div>
         {/* </pre> */}
         <Trans t={t} i18nKey="recursion.formula.description2">
-          Let{" "}
-          <TeX>
-            {T}({n})
-          </TeX>{" "}
-          be the number of stars (<span className="font-mono">*</span>) that the
-          procedure prints.
+          Let <TeX>{`${T}(${n})`}</TeX> be the number of stars (
+          <span className="font-mono">*</span>) that the procedure prints.
         </Trans>
         {variant !== "choice" && (
           <>
@@ -88,10 +84,7 @@ export const RecursionFormula: Question = {
             .
           </>
         )}{" "}
-        {t("recursion.formula.question")}{" "}
-        <TeX>
-          {T}({n})
-        </TeX>
+        {t("recursion.formula.question")} <TeX>{`${T}(${n})`}</TeX>
         {variant !== "choice" && (
           <>
             {" "}
@@ -120,6 +113,13 @@ export const RecursionFormula: Question = {
           {T}({n}) ={" "}
         </TeX>
       )
+      const bottomNote = (
+        <Trans i18nKey="recursion.choice.bottomnote">
+          Note: This field expects a string of the form &ldquo;
+          <span className="font-mono">{`a ${T}(${n}/b) + c`}</span>&rdquo; as
+          input.
+        </Trans>
+      )
       const feedback = (input: string) => {
         if (input === "")
           return {
@@ -133,17 +133,7 @@ export const RecursionFormula: Question = {
             isValid: true,
             isCorrect:
               p.a === a && p.b === b && p.c === c && p.T === T && p.n === n,
-            FeedbackText: (
-              <>
-                {/* press &ldquo;Check&rdquo; and see
-                <br />
-                if your answer is correct. */}
-                {/* Interpreted as{" "}
-                <TeX>
-                  {p.T}({p.n}) = {p.a} \cdot {p.T}({p.b} \cdot {p.n}) + {p.c}
-                </TeX> */}
-              </>
-            ),
+            FeedbackText: <></>,
           }
         } catch (e) {
           return {
@@ -162,6 +152,7 @@ export const RecursionFormula: Question = {
           permalink={permalink}
           viewOnly={viewOnly}
           prompt={prompt}
+          bottomNote={bottomNote}
           possibleCorrectSolution={
             <TeX>
               {a} {T}({n}/{b}) + {c}
