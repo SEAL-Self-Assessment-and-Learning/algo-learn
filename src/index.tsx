@@ -17,7 +17,7 @@ import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
 import { Legal } from "./routes/legal"
 import "./tailwind.css"
 import Random from "./utils/random"
-import { basename } from "./config"
+import { BASENAME } from "./config"
 
 const routes = []
 for (const question of questions) {
@@ -70,7 +70,7 @@ const router = createBrowserRouter(
     },
   ],
   {
-    basename,
+    basename: BASENAME,
   }
 )
 

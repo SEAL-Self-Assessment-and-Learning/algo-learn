@@ -1,0 +1,88 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build and deploy to production when pushed to stable branch
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events but only for the main branch
+  push:
+    branches: [stable]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "19"
+          cache: "yarn"
+
+      - name: Yarn install 🔧
+        uses: ./.github/actions/yarn-nm-install
+
+      - name: Write basename and version number to src/config.ts
+        run: |
+          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn\"/g" src/config.ts
+          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short $GITHUB_SHA)\"/g" src/config.ts
+
+      - name: Run typescript check
+        run: yarn check
+
+      - name: Run test suite
+        run: yarn test
+
+      - name: Run linter
+        run: yarn lint
+
+      - name: Yarn Build 🔧
+        run: yarn build --base /algo-learn/
+
+      - name: Deploy to server 🚀
+        id: deploy
+        uses: Pendect/action-rsyncer@v2.0.0
+        env:
+          DEPLOY_KEY: ${{secrets.DEPLOY_KEY}}
+        with:
+          options: ""
+          ssh_options: ""
+          src: "dist/"
+          dest: "dell-from-github@tcs.uni-frankfurt.de:/var/www/html/algo-learn/"
+
+      - name: Display status from deploy
+        run: echo "${{ steps.deploy.outputs.status }}"
+
+      # - name: Deploy to gh-pages branch 🚀
+      #   uses: JamesIves/github-pages-deploy-action@v4
+      #   with:
+      #     folder: dist # The folder the action should deploy.
+      # - name: Setup Pages
+      #   uses: actions/configure-pages@v3
+      # - name: Upload artifact
+      #   uses: actions/upload-pages-artifact@v1
+      #   with:
+      #     # Upload entire dist/ directory
+      #     path: 'dist'
+      # - name: Deploy to GitHub Pages
+      #   id: deployment
+      #   uses: actions/deploy-pages@v1

@@ -1,47 +1,24 @@
 {
   "name": "algo-tools.tcs-uni-frankfurt.de",
-  "version": "0",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "packageManager": "yarn@3.5.0",
   "license": "MIT",
   "author": "Holger Dell (https://holgerdell.com)",
-  "type": "module",
-  "source": "src/index.html",
   "scripts": {
-    "start": "parcel",
-    "build": "parcel build",
-    "test": "jest",
+    "start": "$npm_execpath run dev",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint src/**/*.[t|j]s src/**/*.[t|j]sx",
     "check": "tsc",
-    "ci": "yarn run prettier src/ --check && yarn lint && yarn build && yarn test && yarn check",
-    "clean": "rm -rf build/ .parcel-cache/ .yarn/cache/"
-  },
-  "browserslist": [
-    "defaults"
-  ],
-  "alias": {
-    "process": {
-      "global": "{}"
-    }
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "\\.(css|sass)$": "identity-obj-proxy"
-    },
-    "transform": {
-      "^.+\\.[j|t]sx?$": "babel-jest"
-    }
+    "ci": "$npm_execpath run prettier src/ --check && $npm_execpath lint && $npm_execpath build && $npm_execpath test && $npm_execpath check",
+    "clean": "rm -rf dist/ .yarn/cache/ node_modules/"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.3",
-    "@babel/plugin-transform-modules-commonjs": "^7.21.2",
-    "@babel/preset-env": "^7.20.2",
-    "@babel/preset-react": "^7.18.6",
-    "@babel/preset-typescript": "^7.21.0",
-    "@parcel/config-default": "^2.8.3",
-    "@parcel/core": "^2.8.3",
-    "@parcel/transformer-js": "^2.8.3",
-    "@parcel/transformer-react-refresh-wrap": "^2.8.3",
-    "@types/jest": "^29.5.0",
     "@types/katex": "^0.16.0",
     "@types/node": "^18.15.11",
     "@types/react": "^18.0.28",
@@ -49,7 +26,7 @@
     "@types/react-syntax-highlighter": "^15.5.6",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
-    "babel-jest": "^29.5.0",
+    "@vitejs/plugin-react": "^3.1.0",
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.27.5",
@@ -58,8 +35,6 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-prettier": "^0.0.0-empty",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^29.5.0",
-    "parcel": "^2.8.3",
     "postcss": "^8.4.21",
     "prettier": "^2.8.7",
     "prettier-config-standard": "^5.0.0",
@@ -73,7 +48,9 @@
     "stylelint-config-standard": "^32.0.0",
     "stylelint-prettier": "^3.0.0",
     "tailwindcss": "^3.3.1",
-    "typescript": "^5.0.3"
+    "typescript": "^5.0.4",
+    "vite": "^4.2.1",
+    "vitest": "^0.30.1"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.0.7",

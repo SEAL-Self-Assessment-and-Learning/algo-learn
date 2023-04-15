@@ -6,7 +6,7 @@ import { MdDarkMode } from "react-icons/md"
 import { Link, Outlet, useLocation } from "react-router-dom"
 import { availableThemes, LIGHT, useTheme } from "../hooks/useTheme"
 import { GiHamburgerMenu } from "react-icons/gi"
-import { version } from "../version"
+import { VERSION } from "../config"
 
 export default function Root() {
   return (
@@ -59,9 +59,9 @@ function GlobalHeader() {
       icon: <FiFileText />,
     },
     {
-      label: `${t("menu.version")}: ${version ?? "local build"}`,
-      to: version
-        ? `https://github.com/holgerdell/algo-learn/commit/${version}`
+      label: `${t("menu.version")}: ${VERSION}`,
+      to: VERSION
+        ? `https://github.com/holgerdell/algo-learn/commit/${VERSION}`
         : undefined,
       icon: <TbGitCommit />,
     },

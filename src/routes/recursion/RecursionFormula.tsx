@@ -8,8 +8,8 @@ import {
   sampleRecurrenceAnswers,
   sampleRecursiveFunction,
 } from "./recursiveFormulaUtils"
-import SyntaxHighlighter from "react-syntax-highlighter"
 import { useTheme } from "../../hooks/useTheme"
+import SyntaxHighlighter from "react-syntax-highlighter"
 import {
   solarizedDark,
   solarizedLight,

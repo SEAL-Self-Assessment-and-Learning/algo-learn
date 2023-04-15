@@ -1,3 +1,4 @@
+import { expect, test } from "vitest"
 import Fraction from "fraction.js"
 import {
   createProductTerm,
