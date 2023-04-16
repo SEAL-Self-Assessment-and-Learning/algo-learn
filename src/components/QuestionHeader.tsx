@@ -2,7 +2,8 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { BiLink, BiRefresh } from "react-icons/bi"
 import { prefixURL } from "../config"
-import "microtip/microtip.css"
+import { Tooltip } from "react-tooltip"
+import "react-tooltip/dist/react-tooltip.css"
 
 export function QuestionHeader({
   title,
@@ -14,20 +15,16 @@ export function QuestionHeader({
   permalink?: string
 }) {
   const { t } = useTranslation()
+  const idString = permalink ? permalink.replaceAll("/", "-") : ""
   const [recentlyCopied, setRecentlyCopied] = useState(false)
   return (
     <h1>
       {title != undefined && title + " "}
       {permalink && (
-        <button
-          aria-label={
-            (recentlyCopied ? t("copyLinkCopied") : t("copyLinkTooltip")) || ""
-          }
-          data-microtip-position="right"
-          role="tooltip"
-        >
-          <BiLink
-            className="inline"
+        <>
+          <button
+            type="button"
+            id={`copy-link-${idString}`}
             onClick={() => {
               void navigator.clipboard
                 .writeText(prefixURL + "/" + permalink)
@@ -36,17 +33,36 @@ export function QuestionHeader({
             onMouseLeave={() => {
               setTimeout(() => setRecentlyCopied(false), 200)
             }}
-          />
-        </button>
+          >
+            <BiLink className="inline" />
+          </button>
+          <Tooltip
+            anchorSelect={`#copy-link-${idString}`}
+            place="right"
+            className="text-sm font-normal"
+          >
+            {(recentlyCopied ? t("copyLinkCopied") : t("copyLinkTooltip")) ||
+              ""}
+          </Tooltip>
+        </>
       )}
       {regenerate && (
-        <button
-          aria-label={t("generate-new-exercise-of-same-type") || ""}
-          data-microtip-position="right"
-          role="tooltip"
-        >
-          <BiRefresh className="inline" onClick={regenerate} />
-        </button>
+        <>
+          <button
+            type="button"
+            id={`regenerate-${idString}`}
+            onClick={regenerate}
+          >
+            <BiRefresh className="inline" />
+          </button>
+          <Tooltip
+            anchorSelect={`#regenerate-${idString}`}
+            place="right"
+            className="text-sm font-normal"
+          >
+            {t("generate-new-exercise-of-same-type")}
+          </Tooltip>
+        </>
       )}
     </h1>
   )

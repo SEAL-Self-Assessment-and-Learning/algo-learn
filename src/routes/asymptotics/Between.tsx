@@ -168,9 +168,12 @@ export const Between: Question = {
           permalink={permalink}
         />
         <Trans t={t} i18nKey="asymptotics.between.text">
-          Enter a function <TeX>{{ functionDeclaration } as any}</TeX> that
-          satisfies <TeX block>{{ condA } as any}</TeX> and{" "}
-          <TeX block>{{ condB } as any}</TeX>
+          {"Enter a function"}
+          <TeX>{functionDeclaration}</TeX>
+          {" that satisfies "}
+          <TeX block>{condA}</TeX>
+          {" and "}
+          <TeX block>{condB}</TeX>
         </Trans>
         <br />
         <br />

@@ -56,9 +56,9 @@ export const RecursionFormula: Question = {
     const desc = (
       <>
         <Trans t={t} i18nKey="recursion.formula.description">
-          Consider the following recursive procedure{" "}
-          <span className="font-mono">{{ functionName } as any}</span> with
-          integer input <span className="font-mono">{{ n } as any}</span>:
+          Consider the following recursive procedure
+          <span className="font-mono">{functionName}</span> with integer input{" "}
+          <span className="font-mono">{n}</span>:
         </Trans>
         {/* <pre className="bg-shading m-2 max-w-max rounded-lg p-5"> */}
         <div className="my-5">

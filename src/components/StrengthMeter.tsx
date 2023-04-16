@@ -1,6 +1,7 @@
 import { CircularProgressbarWithChildren } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
-import "microtip/microtip.css"
+import { Tooltip } from "react-tooltip"
+import "react-tooltip/dist/react-tooltip.css"
 
 /**
  * Display a strength meter / progress bar
@@ -23,14 +24,17 @@ export function StrengthMeterCircular({ strength }: { strength: number }) {
  * Display a strength meter / progress bar
  *
  * @param {Object} props
+ * @param {string} props.id A unique ID for the meter
  * @param {number} props.strength A number between 0 and 1
  * @param {string} props.tooltip A tooltip to display on hover
  */
 export function StrengthMeter({
+  id,
   strength,
   steps = 4,
   tooltip,
 }: {
+  id: string
   strength: number
   steps?: number
   tooltip?: string
@@ -39,16 +43,12 @@ export function StrengthMeter({
   const bar = <ProgressBar done={strengthRounded} total={steps} />
   if (tooltip) {
     return (
-      <button
-        aria-label={tooltip}
-        data-microtip-position="right"
-        data-microtip-size="large"
-        role="tooltip"
-        className="cursor-default"
-        type="button"
-      >
-        {bar}
-      </button>
+      <>
+        <div id={`strength-meter-${id}`}>{bar}</div>
+        <Tooltip anchorSelect={`#strength-meter-${id}`} place="right">
+          {tooltip}
+        </Tooltip>
+      </>
     )
   } else {
     return bar

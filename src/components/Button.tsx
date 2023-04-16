@@ -33,7 +33,7 @@ export function Button({
   disabled?: boolean
 }) {
   className = `btn text-white dark:text-black ${colorClassMap[color]} ${className}`
-  if (disabled || color === "disabled" || (!to && !onClick)) {
+  if (disabled || (!to && !onClick)) {
     return (
       <button type="button" disabled className={className}>
         {children}

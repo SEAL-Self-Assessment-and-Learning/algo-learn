@@ -60,8 +60,8 @@ export const SimplifySum: Question = {
         viewOnly={viewOnly}
       >
         <Trans t={t} i18nKey="asymptotics.simplifySum.text">
-          F <TeX>{{ functionDeclaration } as any}</TeX> F{" "}
-          <TeX block>{{ functionDefinition } as any}</TeX> F
+          Let <TeX>{functionDeclaration}</TeX> be defined as
+          <TeX block>{functionDefinition}</TeX>
         </Trans>
       </ExerciseMultipleChoice>
     )

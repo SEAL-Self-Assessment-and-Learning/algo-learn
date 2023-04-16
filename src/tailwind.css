@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  main a:not(.btn) {
+  main a:not(.btn, .unstyled) {
     @apply cursor-pointer text-goethe-700 underline hover:bg-black/10 dark:text-goethe-50 dark:hover:bg-goethe-900;
   }
 

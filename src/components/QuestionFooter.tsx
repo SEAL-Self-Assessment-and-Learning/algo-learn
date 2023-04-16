@@ -60,6 +60,7 @@ export function QuestionFooter({
           color={buttonColor}
           onClick={buttonClick}
           className="self-end sm:self-center"
+          disabled={mode === "disabled"}
         >
           {footerButtonText}
         </Button>

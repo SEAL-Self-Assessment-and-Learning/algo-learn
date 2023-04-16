@@ -57,8 +57,8 @@ export const Loops: Question = {
       <>
         <Trans t={t} i18nKey="time.loops.description">
           Consider the following procedure{" "}
-          <span className="font-mono">{{ functionName } as any}</span> with
-          integer input <span className="font-mono">{{ n } as any}</span>:
+          <span className="font-mono">{functionName}</span> with integer input{" "}
+          <span className="font-mono">{n}</span>:
         </Trans>
         <div className="my-5">
           <SyntaxHighlighter

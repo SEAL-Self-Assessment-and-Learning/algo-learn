@@ -123,7 +123,9 @@ function GlobalHeader() {
                 location.pathname === to ? "font-bold" : ""
               }`}
             >
-              {icon} {label}
+              {icon}
+              {icon && label ? " " : ""}
+              {label}
             </div>
           </Link>
         ))}
@@ -159,7 +161,7 @@ function GlobalHeader() {
  * @param onClick The function to be called when the item is clicked.
  * @param icon The icon to be displayed.
  * @param text The text to be displayed.
- * @param children The children to be displayed when the item is expanded.
+ * @param children The children to be displayed in the item's dropdown menu.
  * @param topbar Whether the item is displayed in the topbar or in the sidebar.
  * @returns A topbar item.
  */
