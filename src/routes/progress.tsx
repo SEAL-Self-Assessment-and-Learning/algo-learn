@@ -229,7 +229,7 @@ function SkillGroupCard({
       </div> */}
       </Link>
       <Tooltip anchorSelect={`#skill-group-card-${partialPath}`} place="bottom">
-        Click to practice!
+        {t("Click to practice")}
       </Tooltip>
     </>
   )
