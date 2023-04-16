@@ -1,11 +1,11 @@
 import { ReactNode, useState } from "react"
 import { useTranslation } from "react-i18next"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
-import playSound from "../effects/playSound"
 import { AnswerBox } from "./AnswerBox"
 import { HorizontallyCenteredDiv } from "./CenteredDivs"
 import { QuestionFooter } from "./QuestionFooter"
 import { QuestionHeader } from "./QuestionHeader"
+import { useSound } from "../hooks/useSound"
 
 export function ExerciseMultipleChoice({
   children,
@@ -27,6 +27,7 @@ export function ExerciseMultipleChoice({
   viewOnly?: boolean
 }) {
   const { t } = useTranslation()
+  const { playSound } = useSound()
   const correctAnswers = answers.filter((x) => x.correct).sort()
   if (correctAnswers.length === 0) {
     throw new Error(

@@ -1,11 +1,11 @@
 import { ReactNode, useState } from "react"
 import { useTranslation } from "react-i18next"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
-import playSound from "../effects/playSound"
 import { SortableList } from "./SortableList"
 import { HorizontallyCenteredDiv } from "./CenteredDivs"
 import { QuestionFooter } from "./QuestionFooter"
 import { QuestionHeader } from "./QuestionHeader"
+import { useSound } from "../hooks/useSound"
 
 export function ExerciseSort({
   children,
@@ -25,6 +25,7 @@ export function ExerciseSort({
   viewOnly?: boolean
 }) {
   const { t } = useTranslation()
+  const { playSound } = useSound()
   const [mode, setMode] = useState(
     (viewOnly ? "disabled" : "verify") as
       | "verify"

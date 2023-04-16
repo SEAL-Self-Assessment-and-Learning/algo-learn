@@ -3,10 +3,12 @@ import { useTranslation } from "react-i18next"
 import { FiFileText, FiHome, FiInfo, FiSun } from "react-icons/fi"
 import { TbGitCommit } from "react-icons/tb"
 import { MdDarkMode } from "react-icons/md"
+import { FaVolumeMute, FaVolumeUp } from "react-icons/fa"
 import { Link, Outlet, useLocation } from "react-router-dom"
 import { availableThemes, LIGHT, useTheme } from "../hooks/useTheme"
 import { GiHamburgerMenu } from "react-icons/gi"
 import { VERSION } from "../config"
+import { useSound } from "../hooks/useSound"
 
 export default function Root() {
   return (
@@ -26,6 +28,7 @@ export default function Root() {
 function GlobalHeader() {
   const { t, i18n } = useTranslation()
   const location = useLocation()
+  const { muted, toggleMuted } = useSound()
   const lngs = ["en", "de"]
   const nativeName: Record<string, string> = {
     en: "English",
@@ -75,6 +78,10 @@ function GlobalHeader() {
           <span className="font-mono text-sm text-yellow-300">alpha</span>
         </Link>
       </div>
+      <TopbarItem
+        icon={muted ? <FaVolumeMute /> : <FaVolumeUp />}
+        onClick={toggleMuted}
+      />
       <TopbarItem
         icon={theme === LIGHT ? <FiSun /> : <MdDarkMode />}
         onClick={toggleTheme}
@@ -187,8 +194,9 @@ function TopbarItem({
       }`}
     >
       <button
+        type="button"
         onClick={onClick}
-        className="flex h-10 cursor-pointer place-content-center place-items-center"
+        className={`flex h-10 ${onClick ? "cursor-pointer" : ""} items-center`}
       >
         <div className="px-3">{icon}</div>
         {text != undefined && (
@@ -197,13 +205,15 @@ function TopbarItem({
           </div>
         )}
       </button>
-      <div
-        className={`absolute ${
-          topbar ? "right-0 top-full text-center" : "left-full top-0"
-        } z-50 hidden min-h-full w-max flex-col place-items-center bg-inherit p-2 focus:outline-none group-hover:flex`}
-      >
-        {children}
-      </div>
+      {children != undefined && (
+        <div
+          className={`absolute ${
+            topbar ? "right-0 top-full text-center" : "left-full top-0"
+          } z-50 hidden min-h-full w-max flex-col place-items-center bg-inherit p-2 focus:outline-none group-hover:flex`}
+        >
+          {children}
+        </div>
+      )}
     </div>
   )
 }

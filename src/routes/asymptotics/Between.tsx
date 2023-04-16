@@ -9,13 +9,13 @@ import {
   TermSetVariants,
   TooComplex,
 } from "../../utils/AsymptoticTerm"
-import playSound from "../../effects/playSound"
 import { Question, QuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
 import useGlobalDOMEvents from "../../hooks/useGlobalDOMEvents"
 import { QuestionFooter } from "../../components/QuestionFooter"
 import { QuestionHeader } from "../../components/QuestionHeader"
 import { HorizontallyCenteredDiv } from "../../components/CenteredDivs"
+import { useSound } from "../../hooks/useSound"
 
 /**
  * Generate and render a question about O/Omega/o/omega
@@ -36,6 +36,7 @@ export const Between: Question = {
     regenerate,
     viewOnly,
   }: QuestionProps) => {
+    const { playSound } = useSound()
     const permalink = Between.name + "/" + variant + "/" + seed
     const random = new Random(seed)
     const [text, setText] = useState("")
