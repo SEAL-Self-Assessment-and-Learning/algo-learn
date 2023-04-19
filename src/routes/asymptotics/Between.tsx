@@ -1,4 +1,3 @@
-import { ReactNode, useState } from "react"
 import { Trans } from "react-i18next"
 import math, { getVars } from "../../utils/math"
 import TeX from "../../components/TeX"
@@ -7,15 +6,10 @@ import {
   sampleTermSet,
   SumProductTerm,
   TermSetVariants,
-  TooComplex,
 } from "../../utils/AsymptoticTerm"
 import { Question, QuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
-import useGlobalDOMEvents from "../../hooks/useGlobalDOMEvents"
-import { QuestionFooter } from "../../components/QuestionFooter"
-import { QuestionHeader } from "../../components/QuestionHeader"
-import { HorizontallyCenteredDiv } from "../../components/CenteredDivs"
-import { useSound } from "../../hooks/useSound"
+import { ExerciseTextInput } from "../../components/ExerciseTextInput"
 
 /**
  * Generate and render a question about O/Omega/o/omega
@@ -36,13 +30,8 @@ export const Between: Question = {
     regenerate,
     viewOnly,
   }: QuestionProps) => {
-    const { playSound } = useSound()
     const permalink = Between.name + "/" + variant + "/" + seed
     const random = new Random(seed)
-    const [text, setText] = useState("")
-    const [savedMode, setMode] = useState(
-      "disabled" as "disabled" | "verify" | "correct" | "incorrect"
-    )
 
     const functionName = random.choice("fghFGHT".split(""))
     const variable = random.choice("nmNMxyztk".split(""))
@@ -64,110 +53,13 @@ export const Between: Question = {
     const functionDeclaration = `${functionName}\\colon\\mathbb N\\to\\mathbb R`
     const aTeX = `${aLandau}(${a.toLatex()})`
     const bTeX = `${bLandau}(${b.toLatex()})`
-
     let parsed: SumProductTerm
-    let textFeedback: ReactNode = t("feedback.enter-an-expression")
-    let feedbackType: "ok" | "error" = "error"
-    if (text) {
-      try {
-        const expr = math.parse(text)
-        const unknownVars = getVars(expr).filter((v) => v !== variable)
-        const unknownVar: string | null =
-          unknownVars.length > 0 ? unknownVars[0] : null
-        if (unknownVar) {
-          feedbackType = "error"
-          textFeedback = (
-            <>
-              {t("feedback.unknown-variable")}: <TeX>{unknownVar}</TeX>.<br />
-              {t("feedback.expected")}: <TeX>{variable}</TeX>.
-            </>
-          )
-        } else {
-          feedbackType = "ok"
-          textFeedback = (
-            <TeX>
-              {expr.toTex({
-                parenthesis: "auto",
-                implicit: "show",
-              })}
-            </TeX>
-          )
-          try {
-            parsed = mathNodeToSumProductTerm(expr)
-          } catch (e) {
-            if (e instanceof TooComplex) {
-              textFeedback = t("feedback.too-complex")
-              feedbackType = "error"
-            } else {
-              throw e
-            }
-          }
-        }
-      } catch (e) {
-        textFeedback = t("feedback.invalid-expression")
-        feedbackType = "error"
-      }
-    }
-    const msgColor =
-      feedbackType === "error"
-        ? "text-red-600 dark:text-red-400"
-        : "text-green-600 dark:text-green-400"
-
     const title = t(Between.title)
-    const mode =
-      feedbackType === "error"
-        ? "disabled"
-        : savedMode === "disabled"
-        ? "verify"
-        : savedMode
-    const message =
-      mode === "correct" ? (
-        <b className="text-2xl">{t("feedback.correct")}</b>
-      ) : mode === "incorrect" ? (
-        <>
-          <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
-          <br />
-          TODO
-        </>
-      ) : null
-    function handleClick() {
-      if (mode === "disabled") {
-        if (!viewOnly) setMode("verify")
-      } else if (mode === "verify") {
-        if (textFeedback === null || feedbackType === "error") return
-        if (
-          parsed.compare(a.toSumProductTerm()) *
-            parsed.compare(b.toSumProductTerm()) <
-          0
-        ) {
-          playSound("pass")
-          setMode("correct")
-        } else {
-          playSound("fail")
-          setMode("incorrect")
-        }
-      } else if (mode === "correct" || mode === "incorrect") {
-        onResult(mode)
-      }
-    }
-    useGlobalDOMEvents({
-      keydown(e: Event) {
-        const key = (e as KeyboardEvent).key
-        if (key === "Enter") {
-          e.preventDefault()
-          handleClick()
-        }
-      },
-    })
     const condA = `${functionName}(${variable}) \\in ${aTeX}`
     const condB = `${functionName}(${variable}) \\in ${bTeX}`
-    return (
-      <HorizontallyCenteredDiv>
-        <QuestionHeader
-          title={title}
-          regenerate={regenerate}
-          permalink={permalink}
-        />
+
+    const desc = (
+      <>
         <Trans t={t} i18nKey="asymptotics.between.text">
           {"Enter a function"}
           <TeX>{functionDeclaration}</TeX>
@@ -176,42 +68,96 @@ export const Between: Question = {
           {" and "}
           <TeX block>{condB}</TeX>
         </Trans>
-        <br />
-        <br />
-        <div className="flex place-items-center gap-2 pl-3">
-          <TeX>
-            {functionName}({variable})=
-          </TeX>
-          <input
-            autoFocus
-            type="text"
-            onChange={(e) => {
-              setText(e.target.value)
-            }}
-            value={text}
-            className="rounded-md bg-gray-300 p-2 dark:bg-gray-900"
-            disabled={mode === "correct" || mode === "incorrect"}
-          />
-          <div className={`flex h-12 items-center ${msgColor}`}>
-            <div>{textFeedback}</div>
-          </div>
-        </div>
-        <div className="p-5 text-slate-600 dark:text-slate-400">
-          <Trans t={t} i18nKey="asymptotics.between.note">
-            Note: This text field accepts <i>simple</i> mathematical
-            expressions, such as
-          </Trans>{" "}
-          &ldquo;<span className="font-mono">96n^3</span>&rdquo;, &ldquo;
-          <span className="font-mono">n log(n)</span>&rdquo;, {t("or")} &ldquo;
-          <span className="font-mono">n^(2/3)</span>&rdquo;.
-        </div>
-        <QuestionFooter
-          mode={mode}
-          message={message}
-          buttonClick={handleClick}
-          t={t}
-        />
-      </HorizontallyCenteredDiv>
+        <div className="flex place-items-center gap-2 pl-3"></div>
+      </>
+    )
+
+    const prompt = (
+      <TeX>
+        {functionName}({variable}) ={" "}
+      </TeX>
+    )
+
+    const bottomNote = (
+      <>
+        <Trans t={t} i18nKey="asymptotics.between.note">
+          Note: This text field accepts <i>simple</i> mathematical expressions,
+          such as
+        </Trans>{" "}
+        &ldquo;<span className="font-mono">96n^3</span>&rdquo;, &ldquo;
+        <span className="font-mono">n log(n)</span>&rdquo;, {t("or")} &ldquo;
+        <span className="font-mono">n^(2/3)</span>&rdquo;.
+      </>
+    )
+    const feedback = (input: string) => {
+      if (input === "")
+        return {
+          isValid: false,
+          isCorrect: false,
+          FeedbackText: null,
+        }
+      try {
+        const expr = math.parse(input)
+        const unknownVars = getVars(expr).filter((v) => v !== variable)
+        const unknownVar: string | null =
+          unknownVars.length > 0 ? unknownVars[0] : null
+        if (unknownVar) {
+          return {
+            isValid: false,
+            isCorrect: false,
+            FeedbackText: (
+              <>
+                {t("feedback.unknown-variable")}: <TeX>{unknownVar}</TeX>.<br />
+                {t("feedback.expected")}: <TeX>{variable}</TeX>.
+              </>
+            ),
+          }
+        }
+        try {
+          parsed = mathNodeToSumProductTerm(math.parse(input))
+          return {
+            isValid: true,
+            isCorrect:
+              parsed.compare(a.toSumProductTerm()) *
+                parsed.compare(b.toSumProductTerm()) <
+              0,
+            FeedbackText: (
+              <TeX>
+                {expr.toTex({
+                  parenthesis: "auto",
+                  implicit: "show",
+                })}
+              </TeX>
+            ),
+          }
+        } catch (e) {
+          return {
+            isValid: false,
+            isCorrect: false,
+            FeedbackText: <>Incomplete or too complex</>,
+          }
+        }
+      } catch (e) {
+        return {
+          isValid: false,
+          isCorrect: false,
+          FeedbackText: t("feedback.invalid-expression"),
+        }
+      }
+    }
+    return (
+      <ExerciseTextInput
+        title={title}
+        feedback={feedback}
+        onResult={onResult}
+        regenerate={regenerate}
+        permalink={permalink}
+        viewOnly={viewOnly}
+        prompt={prompt}
+        bottomNote={bottomNote}
+      >
+        {desc}
+      </ExerciseTextInput>
     )
   },
 }
