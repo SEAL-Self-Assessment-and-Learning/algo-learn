@@ -1,9 +1,12 @@
 {
-  "name": "algo-tools.tcs-uni-frankfurt.de",
+  "name": "algo-learn",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "packageManager": "yarn@3.5.0",
+  "engines": {
+    "node": ">=18.0.0 <20.0.0"
+  },
   "license": "MIT",
   "author": "Holger Dell (https://holgerdell.com)",
   "scripts": {

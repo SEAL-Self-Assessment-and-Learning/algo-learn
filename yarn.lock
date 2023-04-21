@@ -1160,9 +1160,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"algo-tools.tcs-uni-frankfurt.de@workspace:.":
+"algo-learn@workspace:.":
   version: 0.0.0-use.local
-  resolution: "algo-tools.tcs-uni-frankfurt.de@workspace:."
+  resolution: "algo-learn@workspace:."
   dependencies:
     "@dnd-kit/core": ^6.0.7
     "@dnd-kit/sortable": ^7.0.2
