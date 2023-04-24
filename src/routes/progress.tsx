@@ -33,7 +33,7 @@ export function LearningProgress() {
   const { featureMap, unlockedSkills, log } = useSkills()
   return (
     <HorizontallyCenteredDiv>
-      <h1 className="my-5">{t("Practice")}</h1>
+      <h1>{t("Practice")}</h1>
       <div>
         {t("Practice.desc")} {t("train.skills.desc")}
       </div>

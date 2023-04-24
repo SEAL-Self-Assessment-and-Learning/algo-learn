@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
+import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 
 export function Legal() {
   const { t } = useTranslation()
   return (
-    <div className="mx-auto max-w-lg p-3">
+    <HorizontallyCenteredDiv>
       <h1>{t("Imprint-and-Privacy")}</h1>
       <p className="my-5">{t("note-data-never-leaves-your-browser")}</p>
       <p className="my-5">
@@ -22,6 +23,6 @@ export function Legal() {
         source code is available on{" "}
         <a href="https://github.com/holgerdell/algo-learn/">github</a>.
       </p>
-    </div>
+    </HorizontallyCenteredDiv>
   )
 }

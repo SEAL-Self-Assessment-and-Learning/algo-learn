@@ -67,7 +67,7 @@ function GlobalHeader() {
   return (
     <header className="dark flex flex-none flex-wrap place-items-center justify-between bg-goethe-500 p-2 text-white dark:bg-goethe-700">
       <div className="flex-grow text-2xl">
-        <Link to="/" className="no-underline">
+        <Link to="/" className="unstyled no-underline">
           algo learn{" "}
           <span className="font-mono text-sm text-yellow-300">alpha</span>
         </Link>
@@ -119,7 +119,11 @@ function GlobalHeader() {
         </TopbarItem>
         <TopbarItem icon={<GiHamburgerMenu />}>
           {mainMenuItems.map(({ label, to, icon }) => (
-            <Link key={to} to={to ?? ""} className="w-full no-underline">
+            <Link
+              key={to}
+              to={to ?? ""}
+              className="unstyled w-full no-underline"
+            >
               <div
                 className={`flex items-center justify-center gap-2 p-2 hover:bg-goethe-500/50 ${
                   location.pathname === to ? "font-bold" : ""

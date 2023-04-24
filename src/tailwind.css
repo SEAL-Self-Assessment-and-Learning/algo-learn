@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 @layer base {
-  main a:not(.btn, .unstyled) {
+  a:not(.btn, .unstyled) {
     @apply cursor-pointer text-goethe-700 underline hover:bg-black/10 dark:text-goethe-50 dark:hover:bg-goethe-900;
   }
 
   h1 {
-    @apply text-2xl font-bold;
+    @apply my-5 text-2xl font-bold;
   }
 
   h2 {

@@ -2,11 +2,12 @@ import { useTranslation } from "react-i18next"
 import { AiFillGithub } from "react-icons/ai"
 import { SiDuolingo, SiReact } from "react-icons/si"
 import { Link } from "react-router-dom"
+import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 
 export function About() {
   const { t } = useTranslation()
   return (
-    <div className="mx-auto mb-16 max-w-lg p-3">
+    <HorizontallyCenteredDiv>
       <h1>{t("About")}</h1>
       <p>
         This application helps you practice some of the skills that are relevant
@@ -84,6 +85,6 @@ export function About() {
       <p>
         Created by <a href="https://holgerdell.com">Holger Dell</a> (2023).
       </p>
-    </div>
+    </HorizontallyCenteredDiv>
   )
 }
