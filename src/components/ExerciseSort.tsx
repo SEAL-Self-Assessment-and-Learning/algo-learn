@@ -2,10 +2,8 @@ import { ReactNode, useState } from "react"
 import { useTranslation } from "react-i18next"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { SortableList } from "./SortableList"
-import { HorizontallyCenteredDiv } from "./CenteredDivs"
-import { QuestionFooter } from "./QuestionFooter"
-import { QuestionHeader } from "./QuestionHeader"
 import { useSound } from "../hooks/useSound"
+import { Question } from "./Question"
 
 export function ExerciseSort({
   children,
@@ -68,12 +66,14 @@ export function ExerciseSort({
     ) : null
 
   return (
-    <HorizontallyCenteredDiv>
-      <QuestionHeader
-        permalink={permalink}
-        title={title}
-        regenerate={regenerate}
-      />
+    <Question
+      permalink={permalink}
+      title={title}
+      regenerate={regenerate}
+      footerMode={mode}
+      footerMessage={message}
+      handleFooterClick={handleClick}
+    >
       {children}
       <SortableList
         items={items}
@@ -81,12 +81,6 @@ export function ExerciseSort({
         className="p-5"
         disabled={mode !== "verify"}
       />
-      <QuestionFooter
-        mode={mode}
-        message={message}
-        buttonClick={handleClick}
-        t={t}
-      />
-    </HorizontallyCenteredDiv>
+    </Question>
   )
 }

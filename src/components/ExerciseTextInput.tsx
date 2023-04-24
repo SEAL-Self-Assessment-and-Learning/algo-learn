@@ -1,10 +1,8 @@
 import { ReactNode, useState } from "react"
 import { useTranslation } from "react-i18next"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
-import { HorizontallyCenteredDiv } from "./CenteredDivs"
-import { QuestionFooter } from "./QuestionFooter"
-import { QuestionHeader } from "./QuestionHeader"
 import { useSound } from "../hooks/useSound"
+import { Question } from "./Question"
 
 export function ExerciseTextInput({
   title,
@@ -90,12 +88,14 @@ export function ExerciseTextInput({
     },
   })
   return (
-    <HorizontallyCenteredDiv>
-      <QuestionHeader
-        title={title}
-        regenerate={regenerate}
-        permalink={permalink}
-      />
+    <Question
+      permalink={permalink}
+      title={title}
+      regenerate={regenerate}
+      footerMode={mode}
+      footerMessage={message}
+      handleFooterClick={handleClick}
+    >
       {children}
       <br />
       <br />
@@ -118,12 +118,6 @@ export function ExerciseTextInput({
       <div className="py-5 text-slate-600 dark:text-slate-400">
         {bottomNote}
       </div>
-      <QuestionFooter
-        mode={mode}
-        message={message}
-        buttonClick={handleClick}
-        t={t}
-      />
-    </HorizontallyCenteredDiv>
+    </Question>
   )
 }

@@ -11,7 +11,7 @@ export function HorizontallyCenteredDiv(
   return (
     <div
       {...props}
-      className={`mx-auto mt-5 block max-w-xl ${props.className ?? ""}`}
+      className={`mx-auto block max-w-xl p-3 ${props.className ?? ""}`}
     />
   )
 }

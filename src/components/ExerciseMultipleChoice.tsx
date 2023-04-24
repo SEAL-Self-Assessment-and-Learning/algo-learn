@@ -1,11 +1,8 @@
 import { ReactNode, useState } from "react"
-import { useTranslation } from "react-i18next"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { AnswerBox } from "./AnswerBox"
-import { HorizontallyCenteredDiv } from "./CenteredDivs"
-import { QuestionFooter } from "./QuestionFooter"
-import { QuestionHeader } from "./QuestionHeader"
 import { useSound } from "../hooks/useSound"
+import { Question } from "./Question"
 
 export function ExerciseMultipleChoice({
   children,
@@ -26,7 +23,6 @@ export function ExerciseMultipleChoice({
   permalink?: string
   viewOnly?: boolean
 }) {
-  const { t } = useTranslation()
   const { playSound } = useSound()
   const correctAnswers = answers.filter((x) => x.correct).sort()
   if (correctAnswers.length === 0) {
@@ -104,12 +100,14 @@ export function ExerciseMultipleChoice({
       </>
     ) : null
   return (
-    <HorizontallyCenteredDiv>
-      <QuestionHeader
-        permalink={permalink}
-        title={title}
-        regenerate={regenerate}
-      />
+    <Question
+      permalink={permalink}
+      title={title}
+      regenerate={regenerate}
+      footerMode={mode}
+      footerMessage={message}
+      handleFooterClick={handleClick}
+    >
       {children}
       <div className="mx-auto flex max-w-max flex-wrap gap-5 p-5">
         {answers.map(({ key, element }) => {
@@ -137,12 +135,6 @@ export function ExerciseMultipleChoice({
           )
         })}
       </div>
-      <QuestionFooter
-        mode={mode}
-        message={message}
-        buttonClick={handleClick}
-        t={t}
-      />
-    </HorizontallyCenteredDiv>
+    </Question>
   )
 }

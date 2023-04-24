@@ -12,15 +12,9 @@ import { useSound } from "../hooks/useSound"
 
 export default function Root() {
   return (
-    <div className="max-w-screen overflow-x-hidden dark:bg-black dark:text-white">
-      <div className="flex min-h-screen flex-col">
-        <GlobalHeader />
-        <div className="relative flex flex-1">
-          <main className="flex-1 p-3">
-            <Outlet />
-          </main>
-        </div>
-      </div>
+    <div className="flex h-screen flex-col overflow-x-scroll dark:bg-black dark:text-white">
+      <GlobalHeader />
+      <Outlet />
     </div>
   )
 }
@@ -71,72 +65,74 @@ function GlobalHeader() {
   ]
 
   return (
-    <header className="dark flex flex-none place-items-center  justify-between bg-goethe-500 p-2 text-white dark:bg-goethe-700">
+    <header className="dark flex flex-none flex-wrap place-items-center justify-between bg-goethe-500 p-2 text-white dark:bg-goethe-700">
       <div className="flex-grow text-2xl">
         <Link to="/" className="no-underline">
           algo learn{" "}
           <span className="font-mono text-sm text-yellow-300">alpha</span>
         </Link>
       </div>
-      <TopbarItem
-        icon={muted ? <FaVolumeMute /> : <FaVolumeUp />}
-        onClick={toggleMuted}
-      />
-      <TopbarItem
-        icon={theme === LIGHT ? <FiSun /> : <MdDarkMode />}
-        onClick={toggleTheme}
-      >
-        <div className="w-28">
-          {availableThemes.map((thm) => (
-            <button
-              key={thm}
-              className={`block w-full p-2 dark:hover:bg-goethe-500/50 ${
-                userTheme == thm ? "font-bold" : ""
-              }`}
-              type="button"
-              onClick={() => setUserTheme(thm)}
-            >
-              {t("theme." + thm)}
-            </button>
+      <div className="flex">
+        <TopbarItem
+          icon={muted ? <FaVolumeMute /> : <FaVolumeUp />}
+          onClick={toggleMuted}
+        />
+        <TopbarItem
+          icon={theme === LIGHT ? <FiSun /> : <MdDarkMode />}
+          onClick={toggleTheme}
+        >
+          <div className="w-28">
+            {availableThemes.map((thm) => (
+              <button
+                key={thm}
+                className={`block w-full p-2 dark:hover:bg-goethe-500/50 ${
+                  userTheme == thm ? "font-bold" : ""
+                }`}
+                type="button"
+                onClick={() => setUserTheme(thm)}
+              >
+                {t("theme." + thm)}
+              </button>
+            ))}
+          </div>
+        </TopbarItem>
+        <TopbarItem
+          icon={
+            <span className="font-mono text-sm">{i18n.resolvedLanguage}</span>
+          }
+          onClick={nextLanguage}
+        >
+          <div className="w-28">
+            {lngs.map((lng) => (
+              <button
+                key={lng}
+                className={`block w-full p-2 dark:hover:bg-goethe-500/50 ${
+                  i18n.resolvedLanguage === lng ? "font-bold" : ""
+                }`}
+                type="button"
+                onClick={() => void i18n.changeLanguage(lng)}
+              >
+                {nativeName[lng] ?? "error"}
+              </button>
+            ))}
+          </div>
+        </TopbarItem>
+        <TopbarItem icon={<GiHamburgerMenu />}>
+          {mainMenuItems.map(({ label, to, icon }) => (
+            <Link key={to} to={to ?? ""} className="w-full no-underline">
+              <div
+                className={`flex items-center justify-center gap-2 p-2 hover:bg-goethe-500/50 ${
+                  location.pathname === to ? "font-bold" : ""
+                }`}
+              >
+                {icon}
+                {icon && label ? " " : ""}
+                {label}
+              </div>
+            </Link>
           ))}
-        </div>
-      </TopbarItem>
-      <TopbarItem
-        icon={
-          <span className="font-mono text-sm">{i18n.resolvedLanguage}</span>
-        }
-        onClick={nextLanguage}
-      >
-        <div className="w-28">
-          {lngs.map((lng) => (
-            <button
-              key={lng}
-              className={`block w-full p-2 dark:hover:bg-goethe-500/50 ${
-                i18n.resolvedLanguage === lng ? "font-bold" : ""
-              }`}
-              type="button"
-              onClick={() => void i18n.changeLanguage(lng)}
-            >
-              {nativeName[lng] ?? "error"}
-            </button>
-          ))}
-        </div>
-      </TopbarItem>
-      <TopbarItem icon={<GiHamburgerMenu />}>
-        {mainMenuItems.map(({ label, to, icon }) => (
-          <Link key={to} to={to ?? ""} className="w-full no-underline">
-            <div
-              className={`flex items-center justify-center gap-2 p-2 hover:bg-goethe-500/50 ${
-                location.pathname === to ? "font-bold" : ""
-              }`}
-            >
-              {icon}
-              {icon && label ? " " : ""}
-              {label}
-            </div>
-          </Link>
-        ))}
-      </TopbarItem>
+        </TopbarItem>
+      </div>
     </header>
   )
 }
