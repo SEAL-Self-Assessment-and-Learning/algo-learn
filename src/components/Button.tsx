@@ -17,6 +17,20 @@ const colorClassMap = {
     "text-orange-50 bg-orange-900 dark:text-orange-900 dark:bg-orange-200 hover:dark:bg-organge-100",
 }
 
+/**
+ * Button is a button that can be used to navigate to a different page or to
+ * perform an action.
+ *
+ * @param props
+ * @param props.children The content of the button.
+ * @param props.color The color of the button. Defaults to "disabled".
+ * @param props.to The URL to navigate to when the button is clicked. If this is
+ *   set, the button will be rendered as a link.
+ * @param props.onClick The function to call when the button is clicked. If this
+ *   is set, the button will be rendered as a button.
+ * @param props.className Additional classes to apply to the button.
+ * @param props.disabled Whether the button should be disabled.
+ */
 export function Button({
   children,
   color = "disabled",

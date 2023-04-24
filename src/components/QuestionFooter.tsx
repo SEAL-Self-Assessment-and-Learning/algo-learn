@@ -4,6 +4,15 @@ import { SiCheckmarx, SiIfixit } from "react-icons/si"
 import { Button } from "./Button"
 import { useTranslation } from "react-i18next"
 
+/**
+ * QuestionFooter is the footer of a question. It contains a message and a
+ * button.
+ *
+ * @param props
+ * @param props.mode Mode of the footer.
+ * @param props.message Message to show.
+ * @param props.buttonClick Function to call when the button is clicked.
+ */
 export function QuestionFooter({
   mode = "disabled",
   message,

@@ -4,6 +4,22 @@ import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { Question } from "./Question"
 
+/**
+ * ExerciseTextInput is an exercise that requires the user to type in text.
+ *
+ * @param props
+ * @param props.permalink Permalink to the question.
+ * @param props.title Title of the question.
+ * @param props.regenerate Function to regenerate the question.
+ * @param props.children Main section of the question.
+ * @param props.onResult Function to call when the user submits an answer.
+ * @param props.viewOnly Whether to disable answering.
+ * @param props.possibleCorrectSolution Possible correct solution to show when
+ *   the user gets the answer wrong.
+ * @param props.feedback Function to generate feedback for the given text.
+ * @param props.bottomNote Note to show at the bottom of the question.
+ * @param props.prompt Prompt to show at the top of the question.
+ */
 export function ExerciseTextInput({
   title,
   children,

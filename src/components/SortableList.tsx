@@ -29,6 +29,17 @@ interface Props<T extends BaseItem> {
   disabled?: boolean
 }
 
+/**
+ * SortableList is a wrapper for a sortable list.
+ *
+ * @param props
+ * @param props.item A list of items to be sorted.
+ * @param props.onChange A callback to be called when the order of the items
+ *   changes.
+ * @param props.className A class name to be applied to the list.
+ * @param props.disabled Whether the list is disabled.
+ * @param props.children Children of the list.
+ */
 export function SortableList<T extends BaseItem>({
   items,
   onChange,

@@ -3,6 +3,13 @@ import "katex/dist/katex.min.css"
 import { ReactElement, ReactNode } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 
+/**
+ * TeX is a component that renders TeX.
+ *
+ * @param props
+ * @param props.block Whether to render as a block.
+ * @param props.children The TeX to render.
+ */
 export default function TeX({
   block = false,
   children,

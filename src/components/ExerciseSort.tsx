@@ -5,6 +5,18 @@ import { SortableList } from "./SortableList"
 import { useSound } from "../hooks/useSound"
 import { Question } from "./Question"
 
+/**
+ * ExerciseSort is a reordering exercise.
+ *
+ * @param props
+ * @param props.answers List of answers.
+ * @param props.permalink Permalink to the question.
+ * @param props.title Title of the question.
+ * @param props.regenerate Function to regenerate the question.
+ * @param props.children Main section of the question.
+ * @param props.onResult Function to call when the user submits an answer.
+ * @param props.viewOnly Whether to disable answering.
+ */
 export function ExerciseSort({
   children,
   title,

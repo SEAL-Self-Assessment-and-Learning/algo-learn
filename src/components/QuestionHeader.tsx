@@ -5,6 +5,14 @@ import { prefixURL } from "../config"
 import { Tooltip } from "react-tooltip"
 import "react-tooltip/dist/react-tooltip.css"
 
+/**
+ * QuestionHeader is a header for a question.
+ *
+ * @param props
+ * @param props.title Title of the question.
+ * @param props.regenerate Function to regenerate the question.
+ * @param props.permalink Permalink to the question.
+ */
 export function QuestionHeader({
   title,
   regenerate,

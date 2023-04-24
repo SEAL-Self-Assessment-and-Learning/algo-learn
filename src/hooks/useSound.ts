@@ -17,6 +17,12 @@ for (const [name, url] of Object.entries(sounds)) {
   Audios[name] = new Audio(url.href)
 }
 
+/**
+ * A hook for playing sounds.
+ *
+ * @returns An object containing the current mute state, functions to set and
+ *   toggle the mute state, and a function to play a sound.
+ */
 export function useSound() {
   const [muted, setMuted] = useLocalStorageState("muted", {
     defaultValue: false,

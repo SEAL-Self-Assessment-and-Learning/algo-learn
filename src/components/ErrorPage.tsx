@@ -1,5 +1,6 @@
 import { isRouteErrorResponse, useRouteError } from "react-router-dom"
 
+/** ErrorPage is a page that is displayed when an unexpected error occurs. */
 export default function ErrorPage() {
   const error = useRouteError()
   return (

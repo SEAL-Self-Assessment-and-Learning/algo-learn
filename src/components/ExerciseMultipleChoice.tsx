@@ -4,6 +4,19 @@ import { AnswerBox } from "./AnswerBox"
 import { useSound } from "../hooks/useSound"
 import { Question } from "./Question"
 
+/**
+ * ExerciseMultipleChoice is a multiple choice exercise.
+ *
+ * @param props
+ * @param props.answers List of answers.
+ * @param props.permalink Permalink to the question.
+ * @param props.title Title of the question.
+ * @param props.regenerate Function to regenerate the question.
+ * @param props.children Main section of the question.
+ * @param props.onResult Function to call when the user submits an answer.
+ * @param props.allowMultiple Whether to allow multiple answers.
+ * @param props.viewOnly Whether to disable answering.
+ */
 export function ExerciseMultipleChoice({
   children,
   title,

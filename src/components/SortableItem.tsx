@@ -24,6 +24,14 @@ const SortableItemContext = createContext<Context>({
   ref() {},
 })
 
+/**
+ * SortableItem is a wrapper for a sortable item.
+ *
+ * @param props
+ * @param props.children Children of the sortable item.
+ * @param props.id A unique id for the item.
+ * @param props.disabled Whether the item is disabled.
+ */
 export function SortableItem({
   children,
   id,
