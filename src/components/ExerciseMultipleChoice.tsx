@@ -90,7 +90,7 @@ export function ExerciseMultipleChoice({
         return
       }
       const num = parseInt(key)
-      if (!Number.isNaN(num) && num >= 1 && num <= answers.length && (e as KeyboardEvent).ctrlKey) {
+      if (!Number.isNaN(num) && num >= 1 && num <= answers.length && !(e as KeyboardEvent).ctrlKey) {
         e.preventDefault()
         const id = answers[num - 1].key
         setCheckedEntry(id, !checked.includes(id))
