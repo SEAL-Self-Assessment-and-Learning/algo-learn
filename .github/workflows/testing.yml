@@ -35,6 +35,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      # See https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables for a definition of GITHUB_REF.
+      # The GITHUB_REF is in the form of refs/heads/<branch_name> or refs/pull/<pull_request_number>/merge. We replace the slashes with underscores.
+      - name: Get a clean name of the current branch or pull request
+        run: echo "CLEAN_REF=$(echo "$GITHUB_REF" | sed -e 's/\//_/g')" >> $GITHUB_ENV
+        shell: bash
+
       - uses: actions/setup-node@v3
         with:
           node-version: "19"
@@ -45,8 +51,8 @@ jobs:
 
       - name: Write basename and version number to src/config.ts
         run: |
-          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$GITHUB_SHA\"/g" src/config.ts
-          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short $GITHUB_SHA)\"/g" src/config.ts
+          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$CLEAN_REF\"/g" src/config.ts
+          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" src/config.ts
 
       - name: Run typescript check
         run: yarn check
@@ -58,7 +64,7 @@ jobs:
         run: yarn lint
 
       - name: Yarn Build 🔧
-        run: yarn build --base /algo-learn-testing/$GITHUB_SHA/
+        run: yarn build --base /algo-learn-testing/$CLEAN_REF/
 
       - name: Deploy to server 🚀
         id: deploy
@@ -69,22 +75,7 @@ jobs:
           options: ""
           ssh_options: ""
           src: "dist/"
-          dest: "dell-from-github@tcs.uni-frankfurt.de:/var/www/html/algo-learn-testing/$GITHUB_SHA/"
+          dest: "dell-from-github@tcs.uni-frankfurt.de:/var/www/html/algo-learn-testing/$CLEAN_REF/"
 
       - name: Display status from deploy
         run: echo "${{ steps.deploy.outputs.status }}"
-
-      # - name: Deploy to gh-pages branch 🚀
-      #   uses: JamesIves/github-pages-deploy-action@v4
-      #   with:
-      #     folder: dist # The folder the action should deploy.
-      # - name: Setup Pages
-      #   uses: actions/configure-pages@v3
-      # - name: Upload artifact
-      #   uses: actions/upload-pages-artifact@v1
-      #   with:
-      #     # Upload entire dist/ directory
-      #     path: 'dist'
-      # - name: Deploy to GitHub Pages
-      #   id: deployment
-      #   uses: actions/deploy-pages@v1
