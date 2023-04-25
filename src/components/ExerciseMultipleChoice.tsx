@@ -80,9 +80,9 @@ export function ExerciseMultipleChoice({
 
   useGlobalDOMEvents({
     keydown(e: Event) {
-      const kbEvent = e as KeyboardEvent;
+      const kbEvent = e as KeyboardEvent
       if (kbEvent.ctrlKey || kbEvent.metaKey || kbEvent.altKey) {
-        return;
+        return
       }
 
       if (kbEvent.key === "Enter") {
