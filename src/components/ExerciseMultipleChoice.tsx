@@ -80,8 +80,12 @@ export function ExerciseMultipleChoice({
 
   useGlobalDOMEvents({
     keydown(e: Event) {
-      const key = (e as KeyboardEvent).key
-      if (key === "Enter") {
+      const kbEvent = e as KeyboardEvent;
+      if (kbEvent.ctrlKey || kbEvent.metaKey || kbEvent.altKey) {
+        return;
+      }
+
+      if (kbEvent.key === "Enter") {
         e.preventDefault()
         handleClick()
         return
@@ -89,8 +93,8 @@ export function ExerciseMultipleChoice({
       if (mode === "correct" || mode === "incorrect") {
         return
       }
-      const num = parseInt(key)
-      if (!Number.isNaN(num) && num >= 1 && num <= answers.length && !(e as KeyboardEvent).ctrlKey) {
+      const num = parseInt(kbEvent.key)
+      if (!Number.isNaN(num) && num >= 1 && num <= answers.length) {
         e.preventDefault()
         const id = answers[num - 1].key
         setCheckedEntry(id, !checked.includes(id))
