@@ -79,9 +79,12 @@ yarn build
 - [Tailwind CSS](https://tailwindcss.com/)
 - [i18next](https://www.i18next.com/)
 
-### Deploy to GitHub Pages
+### Staging and Deployment
 
-Simply push to the `main` branch. The GitHub Action will automatically deploy the latest version to GitHub Pages.
+Continuous integration is provided by GitHub Actions, see [`.github/workflows`](.github/workflows). In short:
+
+- Push events to the `main` branch and pull requests trigger the staging build, the result is deployed in the staging area at <https://tcs.uni-frankfurt.de/algo-learn-testing/>.
+- Push events to the `stable` branch trigger the production build, the result is deployed at <https://tcs.uni-frankfurt.de/algo-learn/>.
 
 ## License
 
