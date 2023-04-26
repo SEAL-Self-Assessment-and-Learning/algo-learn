@@ -56,8 +56,7 @@ export const RecursionFormula: Question = {
     const desc = (
       <>
         <Trans t={t} i18nKey="recursion.formula.description">
-          Consider the following recursive procedure
-          <span className="font-mono">{functionName}</span> with integer input{" "}
+          <span className="font-mono">{functionName}</span>
           <span className="font-mono">{n}</span>:
         </Trans>
         {/* <pre className="bg-shading m-2 max-w-max rounded-lg p-5"> */}
@@ -71,8 +70,8 @@ export const RecursionFormula: Question = {
         </div>
         {/* </pre> */}
         <Trans t={t} i18nKey="recursion.formula.description2">
-          Let <TeX>{`${T}(${n})`}</TeX> be the number of stars (
-          <span className="font-mono">*</span>) that the procedure prints.
+          <TeX>{`${T}(${n})`}</TeX>
+          <span className="font-mono">*</span>
         </Trans>
         {variant !== "choice" && (
           <>
@@ -115,9 +114,7 @@ export const RecursionFormula: Question = {
       )
       const bottomNote = (
         <Trans i18nKey="recursion.choice.bottomnote">
-          Note: This field expects a string of the form &ldquo;
-          <span className="font-mono">{`a ${T}(${n}/b) + c`}</span>&rdquo; as
-          input.
+          <span className="font-mono">{`a ${T}(${n}/b) + c`}</span>
         </Trans>
       )
       const feedback = (input: string) => {
