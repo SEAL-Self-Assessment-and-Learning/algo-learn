@@ -1,27 +1,30 @@
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
+import { Trans } from "react-i18next"
 
 export function Legal() {
   const { t } = useTranslation()
   return (
     <HorizontallyCenteredDiv>
-      <h1>{t("Imprint-and-Privacy")}</h1>
-      <p className="my-5">{t("note-data-never-leaves-your-browser")}</p>
+      <h1>{t("Legal.label")}</h1>
+      <p className="my-5">{t("Legal.text")}</p>
       <p className="my-5">
-        {t("for-detailed-imprint-and-privacy-information-see-this-page")}
-        <Link
-          to="https://tcs.uni-frankfurt.de/legal"
-          className="block max-w-max"
-        >
-          https://tcs.uni-frankfurt.de/legal
-        </Link>
+        <Trans t={t} i18nKey="Legal.detailed.text">
+          <Link
+            to="https://tcs.uni-frankfurt.de/legal"
+            className="block max-w-max"
+          >
+            https://tcs.uni-frankfurt.de/legal
+          </Link>
+        </Trans>
       </p>
-      <h2>Authors</h2>
+      <h2>{t("Legal.authors.label")}</h2>
       <p>
-        Written by <a href="https://holgerdell.com">Holger Dell</a> (2023), the
-        source code is available on{" "}
-        <a href="https://github.com/holgerdell/algo-learn/">github</a>.
+        <Trans t={t} i18nKey="Legal.authors.text">
+          <a href="https://holgerdell.com/"></a>
+          <a href="https://github.com/holgerdell/algo-learn/"></a>
+        </Trans>
       </p>
     </HorizontallyCenteredDiv>
   )

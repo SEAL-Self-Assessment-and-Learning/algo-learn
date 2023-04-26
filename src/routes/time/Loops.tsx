@@ -133,7 +133,7 @@ export const Loops: Question = {
           return {
             isValid: false,
             isCorrect: false,
-            FeedbackText: <>not a number</>,
+            FeedbackText: t("feedback.nan"),
           }
         } else {
           return {
@@ -195,7 +195,7 @@ export const Loops: Question = {
           return {
             isValid: false,
             isCorrect: false,
-            FeedbackText: <>Incomplete or too complex</>,
+            FeedbackText: t("feedback.incomplete"),
           }
         }
       }

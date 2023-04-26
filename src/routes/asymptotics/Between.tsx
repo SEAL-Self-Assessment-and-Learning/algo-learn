@@ -134,7 +134,7 @@ export const Between: Question = {
           return {
             isValid: false,
             isCorrect: false,
-            FeedbackText: <>Incomplete or too complex</>,
+            FeedbackText: t("feedback.incomplete"),
           }
         }
       } catch (e) {

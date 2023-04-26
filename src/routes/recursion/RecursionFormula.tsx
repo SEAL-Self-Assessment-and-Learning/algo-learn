@@ -139,7 +139,7 @@ export const RecursionFormula: Question = {
           return {
             isValid: false,
             isCorrect: false,
-            FeedbackText: <>Incomplete or too complex</>,
+            FeedbackText: t("feedback.incomplete"),
           }
         }
       }

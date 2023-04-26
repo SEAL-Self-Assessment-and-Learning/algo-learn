@@ -41,22 +41,22 @@ function GlobalHeader() {
 
   const mainMenuItems = [
     {
-      label: t("menu.home"),
+      label: t("Home"),
       to: "/",
       icon: <FiHome />,
     },
     {
-      label: t("menu.about"),
+      label: t("About.label"),
       to: "/about",
       icon: <FiInfo />,
     },
     {
-      label: t("menu.legal"),
+      label: t("Legal.label"),
       to: "/legal",
       icon: <FiFileText />,
     },
     {
-      label: `${t("menu.version")}: ${VERSION}`,
+      label: `${t("Version")}: ${VERSION}`,
       to: VERSION
         ? `https://github.com/holgerdell/algo-learn/commit/${VERSION}`
         : undefined,

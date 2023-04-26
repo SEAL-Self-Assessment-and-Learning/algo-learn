@@ -1,7 +1,10 @@
 import { isRouteErrorResponse, useRouteError } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 /** ErrorPage is a page that is displayed when an unexpected error occurs. */
 export default function ErrorPage() {
+  const { t } = useTranslation()
+
   const error = useRouteError()
   return (
     <div
@@ -9,8 +12,8 @@ export default function ErrorPage() {
       className="mx-auto grid h-screen max-w-md place-items-center text-center"
     >
       <div className="flex flex-col gap-5">
-        <h1 className="text-7xl font-bold">Oops!</h1>
-        <p>Sorry, an unexpected error has occurred.</p>
+        <h1 className="text-7xl font-bold">{t("Errors.oops")}</h1>
+        <p>{t("Errors.sorry")}</p>
         <p className="text-gray-500">
           <i>
             {isRouteErrorResponse(error) ? (
