@@ -21,7 +21,8 @@
     "format": "prettier src/ --write",
     "pre-commit": "$npm_execpath run format && $npm_execpath run check && $npm_execpath run test && $npm_execpath run lint",
     "clean": "rm -rf dist/ .yarn/cache/ node_modules/",
-    "postinstall": "husky install"
+    "postinstall": "husky install",
+    "visualize": "$npm_execpath run vite-bundle-visualizer -o vite-bundle-visualizer.html"
   },
   "devDependencies": {
     "@types/katex": "^0.16.0",
