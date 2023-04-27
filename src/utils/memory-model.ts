@@ -49,9 +49,9 @@ const BIAS = 1.011
  * Given the number of times the user passed and failed the question, determine
  * the half-life of the skill in days
  *
- * @param numPassed The number of times the user passed the question
- * @param numFailed The number of times the user failed the question
- * @param n0 The inherent difficulty of the question
+ * @param numPassed - The number of times the user passed the question
+ * @param numFailed - The number of times the user failed the question
+ * @param n0 - The inherent difficulty of the question
  * @returns The half-life of the skill in days
  */
 export function halflife(
@@ -68,8 +68,8 @@ export function halflife(
  * Given the features of a user/skill pair and the time since the last
  * interaction in minutes, determine the strength of the skill using HLR
  *
- * @param {SkillFeatures} f The features from which we compute the strength
- * @returns {SkillFeaturesAndPredictions} The features and the strength
+ * @param f - The features from which we compute the strength
+ * @returns The features and the strength
  */
 export function computeStrength(f: SkillFeatures): SkillFeaturesAndPredictions {
   const h = halflife(f.numPassed, f.numFailed, f.n0)

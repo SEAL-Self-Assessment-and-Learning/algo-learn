@@ -209,9 +209,9 @@ export function useSkills() {
 /**
  * Computes the feature vector for all question variants
  *
- * @param {object} props
- * @param {LogEntry[]} props.log A user's full history
- * @returns {object} The feature vector
+ * @param props
+ * @param props.log A user's full history
+ * @returns The feature vector
  */
 function computeBasicFeatureMap({ log }: { log: Array<LogEntry> }): {
   [path: string]: BasicSkillFeatures
@@ -268,9 +268,9 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntry> }): {
 /**
  * Computes the strength of each skill
  *
- * @param {object} props
- * @param {object} props.featureMap The feature vector
- * @returns {object} The strength of each skill
+ * @param props
+ * @param props.featureMap The feature vector
+ * @returns The strength of each skill
  */
 function computeFeatureMap({
   basicFeatureMap,
@@ -294,10 +294,10 @@ function computeFeatureMap({
  * Given a strengthMap and a path, compute the average strength of all question
  * variants that exist within that path.
  *
- * @param {object} props
- * @param {object} props.strengthMap The strength of each skill
- * @param {string} props.path The path to the skill
- * @returns {number} The average strength of all variants of the skill
+ * @param props
+ * @param props.strengthMap The strength of each skill
+ * @param props.path The path to the skill
+ * @returns The average strength of all variants of the skill
  */
 export function averageStrength({
   strengthMap,
@@ -358,11 +358,11 @@ export function weakestSkill({
  * Returns all skills that are already unlocked. A skill unlocks only once all
  * dependencies are above thresholdStrength
  *
- * @param {object} props
- * @param {object} props.featureMap The feature vector
- * @param {number} props.thresholdStrength The threshold for a skill to be
- *   considered unlocked
- * @returns {string[]} The list of unlocked skills
+ * @param props
+ * @param props.featureMap The feature vector
+ * @param props.thresholdStrength The threshold for a skill to be considered
+ *   unlocked
+ * @returns The list of unlocked skills
  */
 export function computeUnlockedSkills({
   featureMap,

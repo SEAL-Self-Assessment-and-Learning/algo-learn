@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 
-type Props = {
+export type Props = {
   [key in keyof WindowEventMap]?: EventListenerOrEventListenerObject
 }
 

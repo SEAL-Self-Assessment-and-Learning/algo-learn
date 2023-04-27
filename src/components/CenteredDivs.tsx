@@ -2,8 +2,8 @@
  * A container for horizontally centered content. Intended to be used as a
  * direct child of <main>.
  *
- * @param {Object} props The props to pass to the div.
- * @returns {React.ReactElement}
+ * @param props The props to pass to the div.
+ * @returns
  */
 export function HorizontallyCenteredDiv(
   props: React.HTMLAttributes<HTMLDivElement>
@@ -20,8 +20,8 @@ export function HorizontallyCenteredDiv(
  * A container for horizontally and vertically centered content. Intended to be
  * used as a direct child of <main>.
  *
- * @param {Object} props The props to pass to the div.
- * @returns {React.ReactElement}
+ * @param props The props to pass to the div.
+ * @returns
  */
 export function ScreenCenteredDiv(
   props: React.HTMLAttributes<HTMLDivElement>

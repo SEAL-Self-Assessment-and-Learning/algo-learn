@@ -1,18 +1,3 @@
 module.exports = {
-  extends: ["stylelint-config-standard"],
-  rules: {
-    "at-rule-no-unknown": [
-      true,
-      {
-        ignoreAtRules: [
-          "tailwind",
-          "apply",
-          "variants",
-          "responsive",
-          "screen",
-        ],
-      },
-    ],
-    "no-descending-specificity": null,
-  },
+  extends: ["stylelint-config-recommended", "stylelint-config-tailwindcss"],
 }

@@ -17,12 +17,12 @@ import { AnswerBox } from "./AnswerBox"
 
 import { DragHandle, SortableItem } from "./SortableItem"
 
-interface BaseItem {
+export interface BaseItem {
   key: UniqueIdentifier
   element: ReactNode
 }
 
-interface Props<T extends BaseItem> {
+export interface Props<T extends BaseItem> {
   items: T[]
   onChange: (array: T[]) => void
   className?: string

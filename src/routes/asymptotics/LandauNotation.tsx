@@ -6,15 +6,12 @@ import Random from "../../utils/random"
 /**
  * Generate and render a question about asymptotic notation
  *
- * @param {Object} props
- * @param {string} props.seed - Seed for random number generator
- * @param {TFunction} props.t - Translation function
- * @param {(result: "correct" | "incorrect" | "abort") => void} props.onResult
- *   - Callback function
- *
- * @param {boolean} props.regeneratable - Whether the question can be
- *   regenerated
- * @returns {ReactElement} Output
+ * @param props
+ * @param props.seed - Seed for random number generator
+ * @param props.t - Translation function
+ * @param props.onResult - Callback function
+ * @param props.regeneratable - Whether the question can be regenerated
+ * @returns Output
  */
 
 export const LandauNotation: Question = {

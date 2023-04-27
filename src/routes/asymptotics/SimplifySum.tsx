@@ -8,7 +8,7 @@ import Random from "../../utils/random"
 /**
  * Generate and render a question about simplifying sums
  *
- * @returns {ReactElement} Output
+ * @returns Output
  */
 export const SimplifySum: Question = {
   name: "asymptotics/sum",

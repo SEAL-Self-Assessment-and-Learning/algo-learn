@@ -5,9 +5,9 @@ import TeX from "../../components/TeX"
 /**
  * Produce a string of the form " print(***)"
  *
- * @param {number} stars - Number of stars
- * @param {number} indent - Number of spaces to indent
- * @returns {string} - The string
+ * @param stars - Number of stars
+ * @param indent - Number of spaces to indent
+ * @returns - The string
  */
 export function printStars(stars: number, indent: number): string {
   if (stars == 0) return ""
@@ -17,11 +17,11 @@ export function printStars(stars: number, indent: number): string {
 /**
  * Sample the source code of a simple recursive procedure that prints stars
  *
- * @param {Random} random - Random number generator
- * @returns {Object} - Object containing the source code, the name of the
- *   function, the name of the variable, the number of stars printed in the base
- *   case and in the recursive case, as well as the number of recursive callsand
- *   the number to divide by.
+ * @param random - Random number generator
+ * @returns - Object containing the source code, the name of the function, the
+ *   name of the variable, the number of stars printed in the base case and in
+ *   the recursive case, as well as the number of recursive callsand the number
+ *   to divide by.
  */
 export function sampleRecursiveFunction(random: Random) {
   const functionName = random.choice("fghPp".split(""))
@@ -59,7 +59,7 @@ export function sampleRecursiveFunction(random: Random) {
  * Prints a recurrence relation for a recursive function of the form T(n) = a
  * T(n/b) + c; T(1) = d
  *
- * @returns {ReactElement} Output
+ * @returns Output
  */
 export function Recurrence({
   T,
@@ -93,16 +93,16 @@ export function Recurrence({
  * Sample a set of recurrence relations for a recursive function of the form
  * T(n) = a T(n/b) + c; T(1) = d
  *
- * @param {Object} props
- * @param {Random} props.random - Random number generator
- * @param {string} props.T - The correct name of the function
- * @param {string} props.n - The correct name of the variable
- * @param {number} props.a - The correct coefficient of the recursive call
- * @param {number} props.b - The correct divisor in the recursive call
- * @param {number} props.c - The correct constant term
- * @param {number} props.d - The correct value of the function in the base case
- * @returns {Array} Array of objects containing the key, whether it is correct,
- *   and the element to render
+ * @param props
+ * @param props.random - Random number generator
+ * @param props.T - The correct name of the function
+ * @param props.n - The correct name of the variable
+ * @param props.a - The correct coefficient of the recursive call
+ * @param props.b - The correct divisor in the recursive call
+ * @param props.c - The correct constant term
+ * @param props.d - The correct value of the function in the base case
+ * @returns Array of objects containing the key, whether it is correct, and the
+ *   element to render
  */
 export function sampleRecurrenceAnswers({
   random,
@@ -161,8 +161,8 @@ export function sampleRecurrenceAnswers({
 /**
  * Parse a recursive function of the form "a T(n/b) + c"
  *
- * @param {string} input - The input string
- * @returns {Object} Object containing the parsed values
+ * @param input - The input string
+ * @returns Object containing the parsed values
  * @throws {Error} If the input is invalid
  */
 export function parseRecursiveFunction(input: string): {

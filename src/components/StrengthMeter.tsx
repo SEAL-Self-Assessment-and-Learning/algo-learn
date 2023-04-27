@@ -7,9 +7,9 @@ import { useTranslation } from "react-i18next"
 /**
  * Display a strength meter / progress bar
  *
- * @param {Object} props
- * @param {number} props.strength A number between 0 and 1
- * @param {string} props.tooltip A tooltip to display on hover
+ * @param props
+ * @param props.strength A number between 0 and 1
+ * @param props.tooltip A tooltip to display on hover
  */
 export function StrengthMeterCircular({ strength }: { strength: number }) {
   const { t } = useTranslation()
@@ -26,10 +26,10 @@ export function StrengthMeterCircular({ strength }: { strength: number }) {
 /**
  * Display a strength meter / progress bar
  *
- * @param {Object} props
- * @param {string} props.id A unique ID for the meter
- * @param {number} props.strength A number between 0 and 1
- * @param {string} props.tooltip A tooltip to display on hover
+ * @param props
+ * @param props.id A unique ID for the meter
+ * @param props.strength A number between 0 and 1
+ * @param props.tooltip A tooltip to display on hover
  */
 export function StrengthMeter({
   id,

@@ -1,9 +1,8 @@
-import { useTranslation } from "react-i18next"
+import { useTranslation, Trans } from "react-i18next"
 import { AiFillGithub } from "react-icons/ai"
 import { SiDuolingo, SiReact } from "react-icons/si"
 import { Link } from "react-router-dom"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
-import { Trans } from "react-i18next"
 
 export function About() {
   const { t, i18n } = useTranslation()

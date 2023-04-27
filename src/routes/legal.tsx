@@ -1,7 +1,6 @@
-import { useTranslation } from "react-i18next"
+import { useTranslation, Trans } from "react-i18next"
 import { Link } from "react-router-dom"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
-import { Trans } from "react-i18next"
 
 export function Legal() {
   const { t } = useTranslation()

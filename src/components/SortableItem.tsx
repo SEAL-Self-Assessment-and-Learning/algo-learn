@@ -7,7 +7,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { createContext, PropsWithChildren, useContext, useMemo } from "react"
 import { RxDragHandleHorizontal } from "react-icons/rx"
 
-interface Props {
+export interface Props {
   id: UniqueIdentifier
   disabled?: boolean
 }

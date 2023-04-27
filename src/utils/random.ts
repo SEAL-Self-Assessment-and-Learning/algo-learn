@@ -3,7 +3,7 @@ export default class Random {
   /**
    * Creates a new Random object.
    *
-   * @param seed A string or number to use as a seed.
+   * @param seed - A string or number to use as a seed.
    * @returns A new Random object.
    */
   constructor(seed: string | number) {
@@ -20,8 +20,8 @@ export default class Random {
   /**
    * Returns a random number.
    *
-   * @param min The minimum number.
-   * @param max The maximum number.
+   * @param min - The minimum number.
+   * @param max - The maximum number.
    * @returns A random number between min (inclusive) and max (exclusive).
    */
   float(min: number, max: number): number {
@@ -31,8 +31,8 @@ export default class Random {
   /**
    * Returns a random integer.
    *
-   * @param min The minimum number.
-   * @param max The maximum number.
+   * @param min - The minimum number.
+   * @param max - The maximum number.
    * @returns A random integer between min (inclusive) and max (inclusive).
    */
   int(min: number, max: number): number {
@@ -42,7 +42,7 @@ export default class Random {
   /**
    * Chooses a uniformly random element from an array.
    *
-   * @param array An array of elements.
+   * @param array - An array of elements.
    * @returns A random element from the array.
    */
   choice<T>(array: Array<T>): T {
@@ -50,11 +50,10 @@ export default class Random {
   }
 
   /**
-   * Chooses a random index from an array of weights.
+   * Chooses a random index from an array of weights that is interpreted as a
+   * probability distribution.
    *
-   * @param weights An array of weights.
-   * @param rng A random number generator. (If not provided, randomWeightedIndex
-   *   will use global randomness, and so will not be a pure function.)
+   * @param weights - An array of weights.
    * @returns A random index from the array.
    */
   weightedIndex(weights: number[]): number {
@@ -75,7 +74,7 @@ export default class Random {
   /**
    * Chooses a random element from an array of weighted elements.
    *
-   * @param array An array of tuples of the form [element, weight]
+   * @param array - An array of tuples of the form [element, weight]
    * @returns A random element from the array.
    */
   weightedChoice<T>(array: Array<[element: T, weight: number]>): T {
@@ -87,8 +86,8 @@ export default class Random {
   /**
    * Shuffles array in place using Durstenfeld's shuffle algorithm.
    *
-   * @param {Array} array An array containing the items.
-   * @returns {Array} A reference to the same array, now shuffled.
+   * @param array - An array containing the items.
+   * @returns A reference to the same array, now shuffled.
    */
   shuffle<T>(array: Array<T>): Array<T> {
     for (let i = array.length - 1; i > 0; i--) {
@@ -101,8 +100,8 @@ export default class Random {
   /**
    * Generates a random base36 string of a given length.
    *
-   * @property {number} length The length of the string to generate.
-   * @returns {string} A random base36 string of the given length.
+   * @param length - The length of the string to generate.
+   * @returns A random base36 string of the given length.
    */
   base36string(length: number): string {
     const str = []
@@ -116,8 +115,8 @@ export default class Random {
 /**
  * Hashes a string into a sequence of 32-bit integers.
  *
- * @param {string} str The string to hash
- * @returns {function} Each call to this function returns the next 32-bit hash
+ * @param str - The string to hash
+ * @returns Each call to this function returns the next 32-bit hash
  * @see https://github.com/bryc/code/blob/master/jshash/PRNGs.md#addendum-a-seed-generating-functions
  */
 export function xmur3(str: string): () => number {
@@ -136,11 +135,11 @@ export function xmur3(str: string): () => number {
 /**
  * Pseudorandom number generator using the SFC32 algorithm.
  *
- * @param {number} a The first 32-bit seed
- * @param {number} b The second 32-bit seed
- * @param {number} c The third 32-bit seed
- * @param {number} d The fourth 32-bit seed
- * @returns {function} Each call to this function returns the next random number
+ * @param a - The first 32-bit seed
+ * @param b - The second 32-bit seed
+ * @param c - The third 32-bit seed
+ * @param d - The fourth 32-bit seed
+ * @returns Each call to this function returns the next random number
  * @see https://github.com/bryc/code/blob/master/jshash/PRNGs.md#sfc32
  */
 export function sfc32(

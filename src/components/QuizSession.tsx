@@ -107,8 +107,8 @@ const meh = {
  * exam mode, the memory model is ignored and the session selects the most
  * difficult questions for each question type (simulating part of an exam)
  *
- * @param {object} param
- * @param {string} param.mode Determines the mode of the session.
+ * @param param
+ * @param param.mode Determines the mode of the session.
  */
 export function QuizSession({
   mode,

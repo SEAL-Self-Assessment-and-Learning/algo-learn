@@ -28,26 +28,26 @@ export type Unbounded = "infty" | "-infty"
  * term is a multiplication of several factors, where each factor is a term that
  * can be a coefficient, a polynomial, an iterated logarithm, or an
  * exponential.
- *
- * @typedef {Object} ProductTerm
- * @property {Fraction} coefficient - The coefficient of the term.
- * @property {Map<number, Fraction>} logarithmExponents - A map from the number
- *   of times the logarithm function is iterated to the exponent of the term.
- *   For example, if the term is c * n^2 * log(n)^3 * log(log(n))^4 * 5^n, then
- *   the map would be {0: 2, 1: 3, 2: 4}.
- * @property {Fraction} exponentialBase - The base of the exponential term. For
- *   example, if the term is c * n^2 * log(n)^3 * log(log(n))^4 * 5^n, then the
- *   base would be 5.
  */
 export class ProductTerm {
+  /** The coefficient of the term. */
   coefficient: Fraction
+  /**
+   * A map from the number of times the logarithm function is iterated to the
+   * exponent of the term. For example, if the term is c * n^2 * log(n)^3 *
+   * log(log(n))^4 * 5^n, then the map would be {0: 2, 1: 3, 2: 4}.
+   */
   logarithmExponents: IteratedLogarithms
+  /**
+   * The base of the exponential term. For example, if the term is c * n^2 *
+   * log(n)^3 * log(log(n))^4 * 5^n, then the base would be 5.
+   */
   exponentialBase: Fraction
 
   /**
    * Create a ProductTerm.
    *
-   * @param props
+   * @param props - The properties of the term
    * @param props.coefficient - The coefficient of the term
    * @param props.logarithmExponents - The logarithm exponents
    * @param props.logexponent - The exponent of the logarithm
@@ -73,7 +73,7 @@ export class ProductTerm {
    * math.js)
    *
    * @param variable - The variable to use in the string representation
-   * @returns {string} String representation of the term, slightly simplified.
+   * @returns String representation of the term, slightly simplified.
    */
   toString(variable: string = "x"): string {
     const vartex = variable.length === 1 ? variable : `(${variable})`
@@ -115,8 +115,8 @@ export class ProductTerm {
   /**
    * Returns the math.js representation of the term.
    *
-   * @param {string} variable - The variable to use.
-   * @returns {string} The latex representation of the term.
+   * @param variable - The variable to use.
+   * @returns The latex representation of the term.
    */
   toMathNode(variable: string): math.MathNode {
     return math.parse(this.toString(variable))
@@ -125,8 +125,8 @@ export class ProductTerm {
   /**
    * Returns the latex representation of the term.
    *
-   * @param {string} variable - The variable to use.
-   * @returns {string} The latex representation of the term.
+   * @param variable - The variable to use.
+   * @returns The latex representation of the term.
    */
   toLatex(variable: string): string {
     // const vartex = variable.length === 1 ? variable : `{${variable}}`
@@ -188,7 +188,7 @@ export class ProductTerm {
   /**
    * Check if the product term is a constant.
    *
-   * @returns {boolean} - If not null, the constant represented by the term.
+   * @returns - If not null, the constant represented by the term.
    */
   isConstant(): boolean {
     if (this.coefficient.equals(0)) return true
@@ -202,8 +202,7 @@ export class ProductTerm {
   /**
    * Check if the product term is unbounded.
    *
-   * @returns {boolean} - True if the product term is unbounded, false
-   *   otherwise.
+   * @returns - True if the product term is unbounded, false otherwise.
    */
   isUnbounded(): boolean {
     if (this.exponentialBase.compare(1) > 0) return true
@@ -221,7 +220,7 @@ export class ProductTerm {
   /**
    * Compute the limit of a as the variable approaches infinity.
    *
-   * @returns {Fraction} The limit of the product term.
+   * @returns The limit of the product term.
    */
   limit(): Fraction | Unbounded {
     if (this.isConstant()) return this.coefficient
@@ -233,7 +232,7 @@ export class ProductTerm {
   /**
    * Compute the absolute value of a product term.
    *
-   * @returns {ProductTerm} The absolute value of the product term.
+   * @returns The absolute value of the product term.
    */
   abs(): ProductTerm {
     return new ProductTerm({
@@ -246,7 +245,7 @@ export class ProductTerm {
   /**
    * Compute the negation of a product term.
    *
-   * @returns {ProductTerm} The negation of the product term.
+   * @returns The negation of the product term.
    */
   neg(): ProductTerm {
     return new ProductTerm({
@@ -259,7 +258,7 @@ export class ProductTerm {
   /**
    * Compute the multiplicative inverse of a product term.
    *
-   * @returns {ProductTerm} The multiplicative inverse of the product term.
+   * @returns The multiplicative inverse of the product term.
    */
   inv(): ProductTerm {
     return new ProductTerm({
@@ -278,8 +277,8 @@ export class ProductTerm {
    * Add two product terms. (Note that this only preserves the asymptotic
    * behaviour.)
    *
-   * @param {ProductTerm} t - The second product term.
-   * @returns {ProductTerm} The sum of the two product terms.
+   * @param t - The second product term.
+   * @returns The sum of the two product terms.
    */
   add(t: ProductTerm): ProductTerm {
     if (!this.abs().Theta(t.abs())) {
@@ -298,8 +297,8 @@ export class ProductTerm {
    * Subtract another product term from this one. (Note that this only preserves
    * the asymptotic behaviour.)
    *
-   * @param {ProductTerm} t - The second product term.
-   * @returns {ProductTerm} The difference of the two product terms.
+   * @param t - The second product term.
+   * @returns The difference of the two product terms.
    */
   sub(t: ProductTerm): ProductTerm {
     return this.add(t.neg())
@@ -308,8 +307,8 @@ export class ProductTerm {
   /**
    * Multiply this product term with another one.
    *
-   * @param {ProductTerm} t - The second product term.
-   * @returns {ProductTerm} The product of the two product terms.
+   * @param t - The second product term.
+   * @returns The product of the two product terms.
    */
   mul(t: ProductTerm): ProductTerm {
     return new ProductTerm({
@@ -327,8 +326,8 @@ export class ProductTerm {
   /**
    * Divide this product term by another one.
    *
-   * @param {ProductTerm} t - The second product term.
-   * @returns {ProductTerm} The quotient of the two product terms.
+   * @param t - The second product term.
+   * @returns The quotient of the two product terms.
    */
   div(t: ProductTerm): ProductTerm {
     return this.mul(t.inv())
@@ -338,9 +337,9 @@ export class ProductTerm {
    * Compare two product terms by computing the product term a/b and then the
    * limit of this ratio.
    *
-   * @param {ProductTerm} t - The second product term.
-   * @param {boolean} strict - If true, equality holds only if the limit is 1.
-   * @returns {number} Negative if a << b, 0 if a ~~ b, and positive if a >> b.
+   * @param t - The second product term.
+   * @param strict - If true, equality holds only if the limit is 1.
+   * @returns Negative if a << b, 0 if a ~~ b, and positive if a >> b.
    */
   compare(t: ProductTerm, strict: boolean = false): number {
     if (
@@ -395,8 +394,7 @@ export class ProductTerm {
   /**
    * Return true if the product term is of the form c * log(x).
    *
-   * @returns {boolean} True if the given product term is of the form c *
-   *   log(x).
+   * @returns True if the given product term is of the form c * log(x).
    */
   isLogarithmic(): boolean {
     if (this.coefficient.equals(0)) return true
@@ -410,7 +408,7 @@ export class ProductTerm {
   /**
    * Return true if the product term is of the form c * x.
    *
-   * @returns {boolean} True if the given product term is of the form c * x.
+   * @returns True if the given product term is of the form c * x.
    */
   isLinear(): boolean {
     if (this.coefficient.equals(0)) return true
@@ -550,7 +548,7 @@ export class SumProductTerm {
    * descending order, and then collect all terms that are asymptotically equal.
    * This is done in-place.
    *
-   * @returns {SumProductTerm} A reference to the same sum of product terms.
+   * @returns A reference to the same sum of product terms.
    */
   private normalize(): SumProductTerm {
     this.terms.sort((a, b) => -a.abs().compare(b.abs()))
@@ -572,7 +570,7 @@ export class SumProductTerm {
   /**
    * Return a copy of the terms in the sum of product terms.
    *
-   * @returns {ProductTerm[]} The terms
+   * @returns The terms
    */
   getTerms(): ProductTerm[] {
     return this.terms.slice()
@@ -581,7 +579,7 @@ export class SumProductTerm {
   /**
    * Return the dominant term of the sum of product terms.
    *
-   * @returns {ProductTerm} The dominant term.
+   * @returns The dominant term.
    */
   dominantTerm(): ProductTerm {
     if (this.terms.length === 0) {
@@ -595,7 +593,7 @@ export class SumProductTerm {
    * Add this term to another term. Does not modify the original terms.
    *
    * @param x The term to add.
-   * @returns {SumProductTerm} The sum of the two terms.
+   * @returns The sum of the two terms.
    */
   add(x: ProductTerm | SumProductTerm): SumProductTerm {
     const newTerms = this.terms.slice()
@@ -610,7 +608,7 @@ export class SumProductTerm {
   /**
    * Negate the sum. Does not modify the original terms.
    *
-   * @returns {SumProductTerm} The negated sum.
+   * @returns The negated sum.
    */
   neg(): SumProductTerm {
     return new SumProductTerm(this.terms.map((t) => t.neg()))
@@ -624,7 +622,7 @@ export class SumProductTerm {
    * Multiply this term with another term.
    *
    * @param x The term to multiply with.
-   * @returns {SumProductTerm} The product of the two terms.
+   * @returns The product of the two terms.
    */
   mul(x: ProductTerm | SumProductTerm): SumProductTerm {
     if (x instanceof ProductTerm) {
@@ -643,7 +641,7 @@ export class SumProductTerm {
    * Divide this term by a product term.
    *
    * @param x The term to divide by.
-   * @returns {SumProductTerm} The quotient of the two terms.
+   * @returns The quotient of the two terms.
    */
   div(x: ProductTerm | SumProductTerm): SumProductTerm {
     if (x instanceof SumProductTerm) {
@@ -663,7 +661,7 @@ export class SumProductTerm {
    * Raise this term to a power.
    *
    * @param e The exponent.
-   * @returns {SumProductTerm} The power of the term.
+   * @returns The power of the term.
    */
   pow(e: SumProductTerm): SumProductTerm {
     if (e.isIdenticallyZero()) {
@@ -715,7 +713,7 @@ export class SumProductTerm {
   /**
    * Compute the limit of this SumProductTerm.
    *
-   * @returns {Fraction | Unbounded} The limit.
+   * @returns The limit.
    */
   limit(): Fraction | Unbounded {
     if (this.terms.length === 0) {
@@ -728,7 +726,7 @@ export class SumProductTerm {
   /**
    * Return the only term in the sum of product terms.
    *
-   * @returns {ProductTerm} The term.
+   * @returns The term.
    * @throws {Error} If there are multiple terms in the sum.
    */
   getOnlyTerm(): ProductTerm {
@@ -782,8 +780,8 @@ export class SumProductTerm {
  * Returns all logarithm iteration numbers that are used in the given product
  * terms.
  *
- * @param {ProductTerm[]} terms - The product terms.
- * @returns {number[]} The used logarithm iteration numbers.
+ * @param terms - The product terms.
+ * @returns The used logarithm iteration numbers.
  */
 export function usedIterationNumbers(
   terms: ProductTerm | ProductTerm[]
@@ -797,8 +795,8 @@ export function usedIterationNumbers(
 /**
  * Like the function mathNodeToAsymptoticTerm below, but for ProductTerms.
  *
- * @param {math.MathNode} node - The MathNode to convert.
- * @returns {SumProductTerm} The product term.
+ * @param node - The MathNode to convert.
+ * @returns The product term.
  */
 export function mathNodeToSumProductTerm(node: math.MathNode): SumProductTerm {
   if (node.type === "ConstantNode") {
@@ -862,13 +860,13 @@ export function mathNodeToSumProductTerm(node: math.MathNode): SumProductTerm {
 /**
  * Output a logarithm as a LaTeX string.
  *
- * @param {string} vartex - The LaTeX string for the variable.
- * @param {Fraction} logexponent - The exponent of the logarithm.
- * @param {Fraction} logbasis - The base of the logarithm.
- * @param {boolean} omitLogBasis - If true, the log basis is omitted.
- * @param {boolean} verboseStyle - If true, the log is wrapped in parentheses
- *   and the exponent is written as a superscript.
- * @returns {string} The LaTeX string.
+ * @param vartex - The LaTeX string for the variable.
+ * @param logexponent - The exponent of the logarithm.
+ * @param logbasis - The base of the logarithm.
+ * @param omitLogBasis - If true, the log basis is omitted.
+ * @param verboseStyle - If true, the log is wrapped in parentheses and the
+ *   exponent is written as a superscript.
+ * @returns The LaTeX string.
  */
 function logToLatex(
   vartex: string,
@@ -901,15 +899,13 @@ function logToLatex(
 /**
  * Generate a random fraction
  *
- * @param {Object} options
- * @param {number} options.oneProbability Approximate probability of generating
- *   1
- * @param {number} options.fractionProbability Probability of generating a
- *   fraction
- * @param {number} options.minInt Minimum integer to generate
- * @param {number} options.maxInt Maximum integer to generate
- * @param {number} options.maxDenominator Maximum denominator to generate
- * @returns {Fraction} A random fraction
+ * @param options
+ * @param options.oneProbability Approximate probability of generating 1
+ * @param options.fractionProbability Probability of generating a fraction
+ * @param options.minInt Minimum integer to generate
+ * @param options.maxInt Maximum integer to generate
+ * @param options.maxDenominator Maximum denominator to generate
+ * @returns A random fraction
  */
 export function sampleFraction({
   oneProbability = 0,
@@ -956,9 +952,9 @@ export type TermVariants =
 /**
  * Generate a term (no sums)
  *
- * @param {string | ReactNode} variable Variable name to use
- * @param {number} variant What kind of terms to generate
- * @returns {SimpleAsymptoticTerm} Term
+ * @param variable Variable name to use
+ * @param variant What kind of terms to generate
+ * @returns Term
  */
 export function sampleTerm(
   variable: string = "n",
@@ -1111,11 +1107,11 @@ export type TermSetVariants =
 /**
  * Generate a random set of asymptotically distinct terms
  *
- * @param {Object} options
- * @param {number} options.numTerms Number of terms to generate
- * @param {string | node} options.variable Variable name to use
- * @param {number} options.difficulty Difficulty level
- * @returns {Array} Of asymptotically distinct terms
+ * @param options
+ * @param options.numTerms Number of terms to generate
+ * @param options.variable Variable name to use
+ * @param options.difficulty Difficulty level
+ * @returns Of asymptotically distinct terms
  */
 export function sampleTermSet({
   variable = "n",
@@ -1157,22 +1153,26 @@ export function sampleTermSet({
   return random.shuffle(set)
 }
 
-interface GeneratedAsymptoticTerm {
+/**
+ * An interface for asymptotic terms that can be generated using different
+ * methods.
+ */
+export interface GeneratedAsymptoticTerm {
+  /** Print the term as a LaTeX string */
   toLatex(
     variable?: string,
     omitCoefficient?: boolean,
     omitLogBasis?: boolean
   ): string
+  /** Print the term as a math string */
   toString(variable: string): string
+  /** Convert the term to MathNode */
   toMathNode(variable: string): math.MathNode
+  /**
+   * Convert the term to a SumProductTerm. This is the normal form that will be
+   * used to compare different asymptotic terms to each other.
+   */
   toSumProductTerm(variable: string): SumProductTerm
-  // compare(other: AsymptoticTerm): number
-  // Oh(other: AsymptoticTerm): boolean
-  // oh(other: AsymptoticTerm): boolean
-  // Omega(other: AsymptoticTerm): boolean
-  // omega(other: AsymptoticTerm): boolean
-  // Theta(other: AsymptoticTerm): boolean
-  // tilde(other: AsymptoticTerm): boolean
 }
 
 /**
@@ -1186,13 +1186,12 @@ interface GeneratedAsymptoticTerm {
  *     expexponent: 4,
  *   })
  *
- * @class
- * @param {number} coefficient - The coefficient of the term.
- * @param {number} polyexponent - The exponent of the polynomial term.
- * @param {number} logexponent - The exponent of the logarithm term.
- * @param {number} logbasis - The basis of the logarithm term.
- * @param {number} expexponent - The exponent of the exponential term.
- * @param {string} variable - The variable of the term.
+ * @param coefficient - The coefficient of the term.
+ * @param polyexponent - The exponent of the polynomial term.
+ * @param logexponent - The exponent of the logarithm term.
+ * @param logbasis - The basis of the logarithm term.
+ * @param expexponent - The exponent of the exponential term.
+ * @param variable - The variable of the term.
  */
 export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
   coefficient: Fraction
@@ -1240,8 +1239,8 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
   /**
    * Returns the math.js representation of the term.
    *
-   * @param {string} variable - The variable to use.
-   * @returns {string} The latex representation of the term.
+   * @param variable - The variable to use.
+   * @returns The latex representation of the term.
    */
   toMathNode(variable: string): math.MathNode {
     return math.parse(this.toString(variable))
@@ -1250,9 +1249,9 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
   /**
    * Returns the latex representation of the term.
    *
-   * @param {boolean} omitCoefficient - Whether to omit the coefficient.
-   * @param {boolean} omitLogBasis - Whether to omit the basis of the log.
-   * @returns {string} The latex representation of the term.
+   * @param omitCoefficient - Whether to omit the coefficient.
+   * @param omitLogBasis - Whether to omit the basis of the log.
+   * @returns The latex representation of the term.
    */
   toLatex(
     variable?: string,
@@ -1320,9 +1319,8 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
    * Returns the representation of the term as a string (compatible with
    * nerdamer).
    *
-   * @param {string} variable - The variable to use.
-   * @returns {string} String representation of the term, not simplified in any
-   *   way.
+   * @param variable - The variable to use.
+   * @returns String representation of the term, not simplified in any way.
    */
   toString(variable: string = "x"): string {
     variable = variable.length === 1 ? variable : `(${variable})`
@@ -1337,11 +1335,6 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
 /**
  * Define an Error "TooComplex" that is thrown when an expression is too complex
  * to be parsed.
- *
- * @class
- * @extends Error
- * @param {string} message - The error message.
- * @returns {TooComplex} - The TooComplex error.
  */
 export class TooComplex extends Error {
   node: math.MathNode | SumProductTerm | ProductTerm

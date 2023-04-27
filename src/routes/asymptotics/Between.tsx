@@ -14,7 +14,7 @@ import { ExerciseTextInput } from "../../components/ExerciseTextInput"
 /**
  * Generate and render a question about O/Omega/o/omega
  *
- * @returns {ReactElement} Output
+ * @returns Output
  */
 export const Between: Question = {
   name: "asymptotics/between",

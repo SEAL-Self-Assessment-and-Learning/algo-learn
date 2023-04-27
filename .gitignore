@@ -1,6 +1,8 @@
 node_modules
 .parcel-cache
 dist
+docs
+vite-bundle-visualizer.html
 .npm-packages
 .pnp.*
 .yarn/*

@@ -56,8 +56,8 @@ export default math
 /**
  * Return the maximum of two fractions
  *
- * @param {Fraction} a
- * @param {Fraction} b
+ * @param a - The first fraction
+ * @param b - The second fraction
  * @returns The maximum of a and b
  */
 export function max(a: Fraction, b: Fraction): Fraction {
@@ -68,9 +68,9 @@ export function max(a: Fraction, b: Fraction): Fraction {
  * Return the minimum of two numbers. Other than Math.min, this function works
  * with Fractions and with Infinity.
  *
- * @param {T} a
- * @param {T} b
- * @returns {T} The minimum of a and b
+ * @param a - The first number
+ * @param b - The second number
+ * @returns The minimum of a and b
  */
 export function min<T>(a: T, b: T): T {
   if (a instanceof Fraction && b instanceof Fraction) {
@@ -83,7 +83,7 @@ export function min<T>(a: T, b: T): T {
 /**
  * Return the base-2 logarithm of a Fraction.
  *
- * @param {Fraction} x The number to take the logarithm of
+ * @param x - The number to take the logarithm of
  * @returns The number log_2(x) as a Fraction
  */
 export function log2Fraction(x: Fraction | number): Fraction {
@@ -93,8 +93,8 @@ export function log2Fraction(x: Fraction | number): Fraction {
 /**
  * Return the logarithm of a Fraction.
  *
- * @param {Fraction} x The number to take the logarithm of
- * @param {number} b The base of the logarithm
+ * @param x - The number to take the logarithm of
+ * @param b - The base of the logarithm
  * @returns The number log_b(x) as a Fraction
  */
 export function logFraction(x: Fraction | number, b: number): Fraction {
@@ -105,8 +105,8 @@ export function logFraction(x: Fraction | number, b: number): Fraction {
  * Prints x as an exponent if x is not 1. Moreover, if the fraction n/d is
  * non-trivial (that is, has d != 1), then print it as "(n/d)".
  *
- * @param {Fraction} x
- * @returns {string} The exponent as text
+ * @param x - The exponent
+ * @returns The exponent as text
  */
 export function exponentToText(x: Fraction) {
   if (x.equals(1)) {
@@ -122,8 +122,8 @@ export function exponentToText(x: Fraction) {
  * Prints x as an exponent if x is not 1. Moreover, if the fraction n/d is
  * non-trivial (that is, has d != 1), then print it as "^{n/d}".
  *
- * @param {Fraction} x
- * @returns {string} The exponent as a LaTeX string
+ * @param x - The exponent
+ * @returns The exponent as a LaTeX string
  */
 export function exponentToLatex(x: Fraction) {
   return x.equals(1) ? "" : `^{${x.toFraction()}}`
@@ -132,8 +132,8 @@ export function exponentToLatex(x: Fraction) {
 /**
  * Return all variables in a given mathjs expression
  *
- * @param {math.MathNode} node The mathjs expression
- * @returns {string[]} List of variables
+ * @param node - The mathjs expression
+ * @returns List of variables
  */
 export function getVars(node: math.MathNode): Array<string> {
   if (
@@ -156,7 +156,7 @@ export function getVars(node: math.MathNode): Array<string> {
  * Takes the name of a FunctionNode function, assumes it is a logarithm, and
  * returns the base of the logarithm.
  *
- * @param name The name of the function
+ * @param name - The name of the function
  * @returns The base of the logarithm, or undefined if the function is not a
  */
 export function baseOfLog(name: string): number | undefined {

@@ -24,7 +24,7 @@ import Random from "../../utils/random"
  * analyzing the time complexity of algorithms and designing efficient
  * algorithms.
  *
- * @returns {ReactElement} Output
+ * @returns Output
  */
 export const SortTerms: Question = {
   name: "asymptotics/sort", // Name of the skill, used in the URL
