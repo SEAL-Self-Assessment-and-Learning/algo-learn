@@ -11,12 +11,7 @@ export function Legal() {
       <p className="my-5">{t("Legal.text")}</p>
       <p className="my-5">
         <Trans t={t} i18nKey="Legal.detailed.text">
-          <Link
-            to="https://tcs.uni-frankfurt.de/legal"
-            className="block max-w-max"
-          >
-            https://tcs.uni-frankfurt.de/legal
-          </Link>
+          <Link to="https://tcs.uni-frankfurt.de/legal" />
         </Trans>
       </p>
       <h2>{t("Legal.authors.label")}</h2>
