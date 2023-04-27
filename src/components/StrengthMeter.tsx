@@ -2,6 +2,7 @@ import { CircularProgressbarWithChildren } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
 import { Tooltip } from "react-tooltip"
 import "react-tooltip/dist/react-tooltip.css"
+import { useTranslation } from "react-i18next"
 
 /**
  * Display a strength meter / progress bar
@@ -11,9 +12,11 @@ import "react-tooltip/dist/react-tooltip.css"
  * @param {string} props.tooltip A tooltip to display on hover
  */
 export function StrengthMeterCircular({ strength }: { strength: number }) {
+  const { t } = useTranslation()
+
   return (
     <CircularProgressbarWithChildren value={strength} maxValue={1}>
-      Sort
+      {t("StrengthMeter.sort")}
       <br />
       {`${Math.round(strength * 100)}%`}
     </CircularProgressbarWithChildren>

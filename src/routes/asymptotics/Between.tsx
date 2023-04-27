@@ -61,11 +61,8 @@ export const Between: Question = {
     const desc = (
       <>
         <Trans t={t} i18nKey="asymptotics.between.text">
-          {"Enter a function"}
           <TeX>{functionDeclaration}</TeX>
-          {" that satisfies "}
           <TeX block>{condA}</TeX>
-          {" and "}
           <TeX block>{condB}</TeX>
         </Trans>
         <div className="flex place-items-center gap-2 pl-3"></div>
@@ -134,7 +131,7 @@ export const Between: Question = {
           return {
             isValid: false,
             isCorrect: false,
-            FeedbackText: <>Incomplete or too complex</>,
+            FeedbackText: t("feedback.incomplete"),
           }
         }
       } catch (e) {

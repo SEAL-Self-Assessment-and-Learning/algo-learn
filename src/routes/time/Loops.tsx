@@ -56,9 +56,8 @@ export const Loops: Question = {
     const desc = (
       <>
         <Trans t={t} i18nKey="time.loops.description">
-          Consider the following procedure{" "}
-          <span className="font-mono">{functionName}</span> with integer input{" "}
-          <span className="font-mono">{n}</span>:
+          <span className="font-mono">{functionName}</span>
+          <span className="font-mono">{n}</span>
         </Trans>
         <div className="my-5">
           <SyntaxHighlighter
@@ -70,12 +69,8 @@ export const Loops: Question = {
         </div>
         {/* </pre> */}
         <Trans t={t} i18nKey="recursion.formula.description2">
-          Let{" "}
-          <TeX>
-            {T}({n})
-          </TeX>{" "}
-          be the number of stars (<span className="font-mono">*</span>) that the
-          procedure prints.
+          <TeX>{`${T}(${n})`}</TeX>
+          <span className="font-mono">*</span>
         </Trans>
         {variant !== "choice" && (
           <>
@@ -104,9 +99,7 @@ export const Loops: Question = {
       const { code, numStars } = sampleExactIfEven({ random })
       const desc = (
         <>
-          <Trans t={t} i18nKey="time.loops.simpleExact.description">
-            Consider the following piece of code:
-          </Trans>
+          {t("time.loops.simpleExact.description")}
           <div className="my-5">
             <SyntaxHighlighter
               language="python3"
@@ -133,7 +126,7 @@ export const Loops: Question = {
           return {
             isValid: false,
             isCorrect: false,
-            FeedbackText: <>not a number</>,
+            FeedbackText: t("feedback.nan"),
           }
         } else {
           return {
@@ -195,7 +188,7 @@ export const Loops: Question = {
           return {
             isValid: false,
             isCorrect: false,
-            FeedbackText: <>Incomplete or too complex</>,
+            FeedbackText: t("feedback.incomplete"),
           }
         }
       }
