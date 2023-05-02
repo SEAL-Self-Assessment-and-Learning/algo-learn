@@ -161,7 +161,21 @@ export function QuizSession({
       mode === "practice"
         ? ALL_SKILLS.map(pathOfQuestionVariant)
         : EXAM_SKILLS.map(pathOfQuestionVariant)
-    ).filter((s) => s.startsWith(partialPath))
+    ).filter((s) => {
+      const skill = s.split("/")
+      const splittedPath = partialPath.split("/")
+      /** Select all questions, when no path is selected */
+      if (splittedPath[0] === "") {
+        return true
+      }
+      for (let i = 0; i < splittedPath.length; i++) {
+        if (splittedPath[i] !== skill[i]) {
+          return false
+        }
+      }
+      return true
+    })
+
     const nextPath =
       mode === "practice"
         ? weakestSkill({

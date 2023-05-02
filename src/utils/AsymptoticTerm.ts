@@ -961,6 +961,14 @@ export function sampleTerm(
   variant: TermVariants = "pure",
   random: Random
 ): SimpleAsymptoticTerm {
+  const terms = ["poly", "log", "exp"]
+  const term: {
+    coefficient?: Fraction
+    polyexponent?: Fraction
+    logexponent?: Fraction
+    logbasis?: Fraction
+    exponentialBase?: Fraction
+  } = {}
   switch (variant) {
     case "log": {
       return new SimpleAsymptoticTerm({
@@ -1067,34 +1075,46 @@ export function sampleTerm(
         variable,
       })
     case "polylogexp":
-      return new SimpleAsymptoticTerm({
-        coefficient: sampleFraction({
+      /** Remove one random term from the array */
+      terms.splice(terms.indexOf(random.choice(terms)), 1)
+      /** Add the terms if they weren't removed */
+      if (terms.includes("poly")) {
+        term.coefficient = sampleFraction({
           fractionProbability: 1 / 3,
           random,
-        }),
-        exponentialBase: sampleFraction({
-          fractionProbability: 0,
-          maxInt: 10,
-          random,
-        }),
-        polyexponent: sampleFraction({
+        })
+        term.polyexponent = sampleFraction({
           fractionProbability: 1 / 3,
           maxInt: 3,
           maxDenominator: 3,
           random,
-        }),
-        logexponent: sampleFraction({
+        })
+      }
+
+      if (terms.includes("log")) {
+        term.logexponent = sampleFraction({
           fractionProbability: 0,
           minInt: -17,
           maxInt: 17,
           random,
-        }),
-        logbasis: sampleFraction({
+        })
+        term.logbasis = sampleFraction({
           fractionProbability: 0,
           minInt: 2,
           maxInt: 7,
           random,
-        }),
+        })
+      }
+
+      if (terms.includes("exp")) {
+        term.exponentialBase = sampleFraction({
+          fractionProbability: 0,
+          maxInt: 10,
+          random,
+        })
+      }
+      return new SimpleAsymptoticTerm({
+        ...term,
         variable,
       })
   }
