@@ -4,9 +4,8 @@ name: Build and deploy to testing when pushed to main branch
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push events but only for the main branch
-  push:
-    branches: [main]
+  # Triggers the workflow on pull request events
+  pull_request:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -63,17 +62,3 @@ jobs:
 
       - name: Yarn Build 🔧
         run: yarn build --base /algo-learn-testing/$CLEAN_REF/
-
-      - name: Deploy to server 🚀
-        id: deploy
-        uses: Pendect/action-rsyncer@v2.0.0
-        env:
-          DEPLOY_KEY: ${{secrets.DEPLOY_KEY}}
-        with:
-          options: ""
-          ssh_options: ""
-          src: "dist/"
-          dest: "dell-from-github@tcs.uni-frankfurt.de:/var/www/html/algo-learn-testing/$CLEAN_REF/"
-
-      - name: Display status from deploy
-        run: echo "${{ steps.deploy.outputs.status }}"
