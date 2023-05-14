@@ -36,7 +36,7 @@ export function Question({
 }) {
   return (
     <>
-      <HorizontallyCenteredDiv className="flex-grow overflow-y-scroll">
+      <HorizontallyCenteredDiv className="w-full flex-grow overflow-y-scroll">
         <QuestionHeader
           permalink={permalink}
           title={title}
