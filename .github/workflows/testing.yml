@@ -4,9 +4,11 @@ name: Build and deploy to testing when pushed to main branch
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push events but only for the main branch
+  # Triggers the workflow on push events to main and feat* branches
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'feat*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
