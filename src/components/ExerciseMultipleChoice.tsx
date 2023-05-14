@@ -26,6 +26,7 @@ export function ExerciseMultipleChoice({
   allowMultiple,
   permalink,
   viewOnly = false,
+  source = false,
 }: {
   children: ReactNode
   title: string
@@ -35,6 +36,7 @@ export function ExerciseMultipleChoice({
   allowMultiple?: boolean
   permalink?: string
   viewOnly?: boolean
+  source?: boolean
 }) {
   const { playSound } = useSound()
   const correctAnswers = answers.filter((x) => x.correct).sort()
@@ -116,6 +118,32 @@ export function ExerciseMultipleChoice({
         ))}
       </>
     ) : null
+
+  if (source) {
+    return (
+      <Question
+        permalink={permalink}
+        title={title}
+        regenerate={regenerate}
+        footerMode={mode}
+        footerMessage={message}
+        handleFooterClick={handleClick}
+        source={source}
+      >
+        {children}
+        {"\n"}
+        {"\\begin{itemize}\n"}
+        {answers.map(({ element }) => (
+          <>
+            {"  \\item "}
+            {element}
+            {"\n"}
+          </>
+        ))}
+        {"\\end{itemize}\n"}
+      </Question>
+    )
+  }
   return (
     <Question
       permalink={permalink}
@@ -124,6 +152,7 @@ export function ExerciseMultipleChoice({
       footerMode={mode}
       footerMessage={message}
       handleFooterClick={handleClick}
+      source={source}
     >
       {children}
       <div className="mx-auto flex max-w-max flex-wrap gap-5 p-5">

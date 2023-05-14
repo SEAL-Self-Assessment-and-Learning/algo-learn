@@ -18,6 +18,7 @@ import { Legal } from "./routes/legal"
 import "./tailwind.css"
 import Random from "./utils/random"
 import { BASENAME } from "./config"
+import { TestSimpleMC } from "./routes/test/SimpleMCTest"
 
 const routes = []
 for (const question of questions) {
@@ -63,6 +64,7 @@ const router = createBrowserRouter(
         { index: true, element: <LearningProgress /> },
         { path: "legal", element: <Legal /> },
         { path: "about", element: <About /> },
+        { path: "test", element: <TestSimpleMC /> },
         { path: "practice/*", element: <QuizSession mode="practice" /> },
         { path: "exam/*", element: <QuizSession mode="exam" /> },
         ...routes,
