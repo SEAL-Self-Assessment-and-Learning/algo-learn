@@ -26,12 +26,12 @@ const translations: Translations = {
   en_US: {
     title: "Compute a sum",
     description: "Compute the sum of two integers",
-    text: "Let <0></0> and <1></1> be two natural numbers. What is the sum <2></2>?",
+    text: "Let {{0}} and {{1}} be two natural numbers. What is the <3>sum</3> {{2}}?",
   },
   de_DE: {
     title: "Summe berechnen",
     description: "Berechne die Summe zweier Zahlen",
-    text: "Seien <0></0> und <1></1> zwei natürliche Zahlen. Was ist die Summe <2></2>?",
+    text: "Seien {{0}} und {{1}} zwei natürliche Zahlen. Was ist die <3>Summe</3> {{2}}?",
   },
 }
 
@@ -110,6 +110,7 @@ ${answers.map(({ element }) => `    \\item $${element}$`).join("\n")}
             <TeX>
               {a} + {b}
             </TeX>
+            <b></b>
           </Trans>
         </ExerciseMultipleChoice>
       )
