@@ -1,4 +1,10 @@
-import { cloneElement, FunctionComponent, ReactElement, ReactNode } from "react"
+import {
+  cloneElement,
+  Fragment,
+  FunctionComponent,
+  ReactElement,
+  ReactNode,
+} from "react"
 
 export type Translations = {
   [lang in Language]: {
@@ -108,19 +114,19 @@ export function tFunctions(translations: Translations, lang: Language) {
     } else {
       return (
         <>
-          {tree.map((c) => {
+          {tree.map((c, index) => {
             if (typeof c === "string") {
-              return <>{c}</>
+              return <Fragment key={index}>{c}</Fragment>
             }
             if (!children || !Array.isArray(children) || !children[c.tagNumber])
               throw new Error(`No child with index ${c.tagNumber} found.`)
             if (c.child.length === 0) {
               // This match is a tag without nested text; in this case, we return the child as is
-              return <>{children[c.tagNumber]}</>
+              return <Fragment key={index}>{children[c.tagNumber]}</Fragment>
             } else {
               // This match is a tag with nested text; in this case, we recursively translate the child.
               return (
-                <>
+                <Fragment key={index}>
                   {cloneElement(children[c.tagNumber] as ReactElement, {
                     children: (
                       <TransTree tree={c.child}>
@@ -128,7 +134,7 @@ export function tFunctions(translations: Translations, lang: Language) {
                       </TransTree>
                     ),
                   })}
-                </>
+                </Fragment>
               )
             }
           })}
