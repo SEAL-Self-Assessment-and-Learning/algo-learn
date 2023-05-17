@@ -44,6 +44,7 @@
   "Your learning progress": "Your learning progress",
   "asymptotics.between.note": "Note: This text field accepts <1>simple</1> mathematical formulas, such as",
   "asymptotics.between.text": "Enter a function <0><0></0></0> that satisfies <1><0></0></1> and <2><0></0></2>.",
+  "asymptotics.between.Theta.text": "Enter a function <0><0></0></0> that satisfies <1><0></0></1>.",
   "asymptotics.between.title": "Between",
   "asymptotics.landau.long-title": "Landau Notation",
   "asymptotics.landau.text": "Which of these statements are true? Select all that apply.",

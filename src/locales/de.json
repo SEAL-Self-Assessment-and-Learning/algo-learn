@@ -44,6 +44,7 @@
   "Your learning progress": "Dein Lernfortschritt",
   "asymptotics.between.note": "Hinweis: Dieses Feld erwartet <1>einfache</1> mathematische Formeln, wie etwa",
   "asymptotics.between.text": "Gib eine Funktion <0><0></0></0> an, die <1><0></0></1> und <2><0></0></2> erfüllt.",
+  "asymptotics.between.Theta.text": "Gib eine Funktion <0><0></0></0> an, die <1><0></0></1> erfüllt.",
   "asymptotics.between.title": "Dazwischen",
   "asymptotics.landau.long-title": "Landau Notation",
   "asymptotics.landau.text": "Welche dieser Aussagen sind wahr? Wähle alle aus.",

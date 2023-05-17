@@ -133,7 +133,7 @@ export class ProductTerm {
     const numerator = []
     const denominator = []
     if (this.coefficient.compare(1) !== 0) {
-      numerator.push(this.coefficient.toFraction())
+      numerator.push(this.coefficient.toLatex())
     }
     for (const i of Array.from(this.logarithmExponents.keys()).sort()) {
       const e = this.logarithmExponents.get(i)
@@ -143,17 +143,17 @@ export class ProductTerm {
       }
       let out = ""
       for (let j = 0; j < i; j++) {
-        out += "log("
+        out += "\\log("
       }
       out += `{${variable}}`
       for (let j = 0; j < i; j++) {
         out += ")"
       }
       if (e.compare(0) > 0) {
-        out += exponentToText(e)
+        out += exponentToLatex(e)
         numerator.push(out)
       } else {
-        out += exponentToText(e.neg())
+        out += exponentToLatex(e.neg())
         denominator.push(out)
       }
     }
