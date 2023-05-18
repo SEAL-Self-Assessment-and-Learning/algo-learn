@@ -18,7 +18,7 @@ import { Legal } from "./routes/legal"
 import "./tailwind.css"
 import Random from "./utils/random"
 import { BASENAME } from "./config"
-import { TestSimpleMC } from "./routes/test/SimpleMCTest"
+import { TestSimpleMC } from "./routes/test/TestSimpleMC"
 
 const routes = []
 for (const question of questions) {
