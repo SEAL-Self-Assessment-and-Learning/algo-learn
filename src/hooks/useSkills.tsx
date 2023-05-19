@@ -17,6 +17,7 @@ import { SortTerms } from "../routes/asymptotics/SortTerms"
 import { SimplifySum } from "../routes/asymptotics/SimplifySum"
 import { RecursionFormula } from "../routes/recursion/RecursionFormula"
 import { Loops } from "../routes/time/Loops"
+import { AsymptoticsPreciseLanguage } from "../routes/asymptotics/PreciseLanguage"
 
 export type QuestionProps = {
   variant: string
@@ -34,6 +35,7 @@ export interface Question {
   title: string
   description?: string
   Component: FunctionComponent<QuestionProps>
+  masteryThreshold?: number
 }
 
 export interface QuestionVariant {
@@ -43,6 +45,7 @@ export interface QuestionVariant {
 
 /** List of all questions */
 export const questions: Question[] = [
+  AsymptoticsPreciseLanguage,
   SortTerms,
   LandauNotation,
   SimplifySum,
@@ -229,10 +232,6 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntry> }): {
     }
   }
 
-  // We need at least 3 successive passes to unlock a skill;
-  // only after this time will the featureMap be computed.
-  const minQualifyingPasses = 3
-
   const now = Date.now()
   for (const e of log.slice().reverse()) {
     const path = e.question + "/" + e.variant
@@ -240,6 +239,14 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntry> }): {
       featureMap[path].lag,
       (now - e.timestamp) / 3600 / 24 / 1000
     )
+
+    /**
+     * The mastery threshold is defined on each Question, or a default value of
+     * 3 is used. We need at least 3 successive correct answers to "master" a
+     * skill, which causes the successors of these skills to be unlocked.
+     */
+    const minQualifyingPasses = questionByPath(path)?.masteryThreshold ?? 3
+
     if (featureMap[path].mastered) {
       if (e.result === "pass") {
         featureMap[path].numPassed += 1

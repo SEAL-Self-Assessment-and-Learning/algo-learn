@@ -22,24 +22,26 @@ import { renderToStaticMarkup } from "react-dom/server"
  *   ```
  *
  * @param props
+ * @param props.tex The TeX code to render.
  * @param props.block Whether to render as a block.
  * @param props.source Whether to print the LaTeX source or render it in react.
- * @param props.children The TeX code to render.
  * @returns The rendered TeX code. If `source` is `true`, the TeX source code is
  *   returned as a ReactElement.
  */
 export default function TeX({
+  tex,
   block = false,
   source = false,
   children,
   ...props
 }: {
+  tex?: string
   block?: boolean
   source?: boolean
-  children: ReactNode
+  children?: ReactNode
   props?: Object
 }): ReactElement {
-  const pureText = renderToStaticMarkup(<>{children}</>)
+  const pureText = tex ?? renderToStaticMarkup(<>{children}</>) ?? ""
   if (source) {
     if (block) {
       return <>\[{pureText}\]</>

@@ -1,4 +1,6 @@
 {
+  "asymptotics.precise-language.title": "Präzises Formulieren: Oh-Notation",
+  "math.precise-language.title": "Präzises mathematisches Formulieren",
   "About.activeLearning.label": "Aktives Lernen",
   "About.activeLearning.text": "Diese Seite soll Vorlesungen, Videos und Lehrbücher ergänzen, indem sie eine Reihe von interaktiven Übungen zur Verfügung stellt, mit denen du die dort gezeigten Fähigkeiten üben kannst. Du erhältst direkt Feedback und kannst so oft üben, wie du möchtest.",
   "About.authors.label": "Autoren",
@@ -58,6 +60,7 @@
   "detailed-learning-progress": "Detaillierte Lernfortschritte",
   "detailed-learning-progress-text": "Wahrscheinlich mehr Details, als Du wissen willst.",
   "even": "gerade",
+  "math.formal-language.title": "Formale mathematische Ausdrucksweise",
   "feedback.correct": "Richtig!",
   "feedback.correct-order": "Du wirst mit der Zeit besser.",
   "feedback.enter-an-expression": "Gib eine Formel ein",
@@ -99,6 +102,7 @@
   "skill.level": "Level",
   "skill.recursion": "Rekursion",
   "skill.time": "Laufzeit",
+  "skill.math": "Formulierung",
   "start exam": "Prüfung starten",
   "theme.OS default": "Standard",
   "theme.dark": "dunkel",
