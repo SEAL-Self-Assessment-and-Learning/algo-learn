@@ -107,6 +107,7 @@ export const PreciseLanguageMeta: (
           }
           replacement = replacement.filter((c) => !usedValues.includes(c))
           p[pattern] = random.choice(replacement)
+          usedValues.push(p[pattern])
         })
       }
 
