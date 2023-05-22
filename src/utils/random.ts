@@ -50,6 +50,22 @@ export default class Random {
   }
 
   /**
+   * Chooses a uniformly random fixed-size subset from an array.
+   *
+   * @param array - An array of elements.
+   * @param size - The size of the subset.
+   * @returns A list of size distinct elements from the array.
+   */
+  subset<T>(array: Array<T>, size: number): Array<T> {
+    if (size > array.length) {
+      throw new Error("Subset size cannot be larger than the array size")
+    }
+    const copy = array.slice()
+    this.shuffle(copy)
+    return copy.slice(0, size)
+  }
+
+  /**
    * Chooses a random index from an array of weights that is interpreted as a
    * probability distribution.
    *

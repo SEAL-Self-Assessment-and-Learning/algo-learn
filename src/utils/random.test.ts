@@ -71,3 +71,17 @@ test("Check that random.choice returns all values eventually.", () => {
   }
   expect(S.size).toBe(9)
 })
+
+test("Check that random.subset returns a subset of the correct size.", () => {
+  const random = new Random("some fixed seed")
+  const L = [2, 3, 4, 5, 6, 7, 8, 9, 10]
+  for (let i = 0; i <= L.length; i++) {
+    const test = random.subset(L, i)
+    expect(test.length).toBe(i)
+    for (const x of test) {
+      expect(L).toContain(x)
+    }
+    const S = new Set(test)
+    expect(S.size).toBe(i)
+  }
+})
