@@ -74,6 +74,7 @@ export const PreciseLanguageMeta: (
     name: path,
     title: title,
     variants: variants,
+    independentVariants: true,
     examVariants: [],
     masteryThreshold: 1,
     Component: ({

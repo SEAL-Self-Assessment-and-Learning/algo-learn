@@ -1,22 +1,20 @@
 import { ReactElement, useState } from "react"
-import { useTranslation } from "react-i18next"
 import { useNavigate, useParams } from "react-router-dom"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import {
-  ALL_SKILLS,
-  EXAM_SKILLS,
-  pathOfQuestionVariant,
   questionByPath,
   useSkills,
-  weakestSkill,
+  sortByStrength,
+  allQuestionVariantsInPath,
 } from "../hooks/useSkills"
 import { TermSetVariants } from "../utils/AsymptoticTerm"
-import Random from "../utils/random"
 import { Button } from "./Button"
 import { ScreenCenteredDiv } from "./CenteredDivs"
+import { useTranslation } from "../hooks/useTranslation"
+import Random from "../utils/random"
 
 const great = {
-  en: [
+  en_US: [
     "Perfect!",
     "Outstanding work!",
     "Fantastic job!",
@@ -29,7 +27,7 @@ const great = {
     "Brilliant work!",
     "Superb job!",
   ],
-  de: [
+  de_DE: [
     "Perfekt!",
     "Hervorragende Arbeit!",
     "Fantastische Arbeit!",
@@ -44,7 +42,7 @@ const great = {
   ],
 }
 const good = {
-  en: [
+  en_US: [
     "Nice job, keep it up!",
     "You're on the right track!",
     "Solid effort, keep practicing!",
@@ -56,7 +54,7 @@ const good = {
     "Impressive improvement!",
     "You're getting there!",
   ],
-  de: [
+  de_DE: [
     "Gute Arbeit, weiter so!",
     "Du bist auf dem richtigen Weg!",
     "Solide Anstrengung, weiter üben!",
@@ -70,7 +68,7 @@ const good = {
   ],
 }
 const meh = {
-  en: [
+  en_US: [
     "You'll do better next time!",
     "Not bad, keep working at it!",
     "You're making progress, keep going!",
@@ -84,7 +82,7 @@ const meh = {
     "You're improving!",
     "You're getting better!",
   ],
-  de: [
+  de_DE: [
     "Beim nächsten Mal wirst du es besser machen!",
     "Nicht schlecht, weiter so!",
     "Du machst Fortschritte, bleib dran!",
@@ -108,27 +106,35 @@ const meh = {
  * difficult questions for each question type (simulating part of an exam)
  *
  * @param param
+ * @param param.targetNum The number of questions in the session. (default: 10)
  * @param param.mode Determines the mode of the session.
  */
 export function QuizSession({
+  targetNum = 10,
   mode,
 }: {
+  targetNum?: number
   mode: "practice" | "exam"
 }): ReactElement {
   const params = useParams()
   const partialPath = params["*"] ?? ""
 
-  const { t, i18n } = useTranslation()
-  const [{ sessionSeed, targetNum }] = useState({
-    sessionSeed: new Random(Math.random()).base36string(7),
-    targetNum: 3,
-  })
+  const { t, lang } = useTranslation()
   const { featureMap, appendLogEntry } = useSkills()
-  const [{ numCorrect, numIncorrect, status }, setState] = useState({
+  const [{ sessionSeed }] = useState({
+    sessionSeed: new Random(Math.random()).base36string(7),
+  })
+  const [state, setState] = useState({
+    questionVariants: [] as string[],
     numCorrect: 0,
     numIncorrect: 0,
-    status: "running" as "running" | "finished" | "aborted",
+    status: "initializing" as
+      | "initializing"
+      | "running"
+      | "finished"
+      | "aborted",
   })
+  const { questionVariants, numCorrect, numIncorrect, status } = state
   const navigate = useNavigate()
   useGlobalDOMEvents({
     keydown(e: Event) {
@@ -139,6 +145,24 @@ export function QuizSession({
       }
     },
   })
+
+  if (status === "initializing") {
+    let newQuestionVariants = allQuestionVariantsInPath({
+      path: partialPath,
+      mode,
+    })
+    newQuestionVariants = sortByStrength({
+      random: new Random(sessionSeed),
+      featureMap,
+      questionVariants: newQuestionVariants,
+    })
+    newQuestionVariants = newQuestionVariants.slice(0, targetNum)
+    setState({
+      ...state,
+      questionVariants: newQuestionVariants,
+      status: "running",
+    })
+  }
 
   const num = numCorrect + numIncorrect
   const random = new Random(`${sessionSeed}${numCorrect + numIncorrect}`)
@@ -155,36 +179,16 @@ export function QuizSession({
     )
   } else if (status === "running") {
     if (num === targetNum) {
-      setState({ numCorrect, numIncorrect, status: "finished" })
+      setState({ ...state, status: "finished" })
     }
-    const fromSkills = (
-      mode === "practice"
-        ? ALL_SKILLS.map(pathOfQuestionVariant)
-        : EXAM_SKILLS.map(pathOfQuestionVariant)
-    ).filter((s) => {
-      const skill = s.split("/")
-      const splittedPath = partialPath.split("/")
-      /** Select all questions, when no path is selected */
-      if (splittedPath[0] === "") {
-        return true
-      }
-      for (let i = 0; i < splittedPath.length; i++) {
-        if (splittedPath[i] !== skill[i]) {
-          return false
-        }
-      }
-      return true
-    })
-
     const nextPath =
       mode === "practice"
-        ? weakestSkill({
+        ? sortByStrength({
             random,
             featureMap,
-            fromSkills,
-            noise: 0.2,
-          })
-        : random.choice(fromSkills)
+            questionVariants,
+          })[0]
+        : random.choice(questionVariants)
     const Q = questionByPath(nextPath)
     const [skillGroup, question, variant] = nextPath.split("/")
     if (!Q) throw Error(`Question with path '${nextPath}' not found!`)
@@ -198,7 +202,7 @@ export function QuizSession({
           result: "pass",
           timestamp: Date.now(),
         })
-        setState({ numCorrect: numCorrect + 1, numIncorrect, status })
+        setState({ ...state, numCorrect: numCorrect + 1 })
       } else if (result === "incorrect") {
         appendLogEntry({
           question: `${skillGroup}/${question}`,
@@ -207,9 +211,10 @@ export function QuizSession({
           result: "fail",
           timestamp: Date.now(),
         })
-        setState({ numCorrect, numIncorrect: numIncorrect + 1, status })
-      } else if (result === "abort")
-        setState({ numCorrect, numIncorrect, status })
+        setState({ ...state, numIncorrect: numIncorrect + 1 })
+      } else if (result === "abort") {
+        setState({ ...state, status: "aborted" })
+      }
     }
 
     return (
@@ -230,7 +235,7 @@ export function QuizSession({
       : numCorrect / (numCorrect + numIncorrect) >= 0.75
       ? good
       : meh
-  const msg = random.choice(msgList[i18n.language === "de" ? "de" : "en"])
+  const msg = random.choice(msgList[lang])
   return (
     <ScreenCenteredDiv>
       <div className="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">

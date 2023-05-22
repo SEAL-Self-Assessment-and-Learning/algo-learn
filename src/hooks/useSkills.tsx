@@ -32,10 +32,11 @@ export interface Question {
   name: string
   variants: string[]
   examVariants: string[]
+  independentVariants?: boolean // variants don't depend on each other
   title: string
   description?: string
   Component: FunctionComponent<QuestionProps>
-  masteryThreshold?: number
+  masteryThreshold?: number // number of subsequent correct answers required to "master"
 }
 
 export interface QuestionVariant {
@@ -327,38 +328,68 @@ export function averageStrength({
 }
 
 /**
- * Return the weakest skill.
+ * Function that returns all question variants in or below a given path.
  *
- * @param featureMap The feature map
- * @param fromSkills If provided, only select among these skills
- * @param noise If provided, make the selection noisy using randomness
+ * @param param
+ * @param param.path The (partial) path of the skill tree that should be trained
+ *   (or examined) in the session. For example, "asymptotics/sum" would train
+ *   all variants of the question "sum", whereas "asymptotics/sum/pure" would
+ *   only train a single question variant.
+ * @param param.mode Determines the mode of the session.
+ * @returns A list of question variants that should be trained (or examined) in
+ *   the session.
  */
-export function weakestSkill({
+export function allQuestionVariantsInPath({
+  path,
+  mode = "practice",
+}: {
+  path: string
+  mode: "practice" | "exam"
+}): string[] {
+  const allQuestionVariants =
+    mode === "practice"
+      ? ALL_SKILLS.map(pathOfQuestionVariant)
+      : EXAM_SKILLS.map(pathOfQuestionVariant)
+  return allQuestionVariants.filter((s) => {
+    const skill = s.split("/")
+    const splittedPath = path.split("/")
+    /** Select all questions, when no path is selected */
+    if (splittedPath[0] === "") {
+      return true
+    }
+    for (let i = 0; i < splittedPath.length; i++) {
+      if (splittedPath[i] !== skill[i]) {
+        return false
+      }
+    }
+    return true
+  })
+}
+
+/**
+ * Return a list of question variants sorted by strength from lowest to highest
+ *
+ * @param props
+ * @param props.random The random number generator
+ * @param props.featureMap The feature map
+ * @param props.questionVariants The list of question variants that should be
+ *   sorted. Note that this list will be sorted in-place.
+ * @returns The questionVariants list
+ */
+export function sortByStrength({
   random,
   featureMap,
-  fromSkills = ALL_SKILLS.map((qv) => pathOfQuestionVariant(qv)),
-  noise = 0.1,
+  questionVariants,
 }: {
-  random: Random
+  random?: Random
   featureMap: {
     [path: string]: { p: number; h: number }
   }
-  fromSkills?: Array<string>
-  noise: number
-}): string {
-  let minPath: string | undefined
-  let min = 2
-  for (const path of fromSkills) {
-    if (!minPath || featureMap[path].p < min) {
-      minPath = path
-      min = featureMap[path].p
-    }
-  }
-  const selection = fromSkills.filter(
-    (path) => featureMap[path].p <= min + noise
-  )
-  if (selection.length == 0) throw Error("Cannot find weakest skill")
-  return random.choice(selection)
+  questionVariants: Array<string>
+}): string[] {
+  random?.shuffle(questionVariants) // If random was provided, shuffle to break ties
+  questionVariants.sort((a, b) => featureMap[a].p - featureMap[b].p)
+  return questionVariants
 }
 
 /**
