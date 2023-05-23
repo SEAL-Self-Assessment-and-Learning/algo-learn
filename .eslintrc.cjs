@@ -58,6 +58,7 @@ module.exports = {
       },
       rules: {
         "no-unused-vars": "off",
+        "no-extra-semi": "off",
         "@typescript-eslint/no-unused-vars": "warn",
       },
     },

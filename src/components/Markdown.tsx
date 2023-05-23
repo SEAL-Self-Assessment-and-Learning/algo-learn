@@ -1,39 +1,13 @@
 import { Fragment, FunctionComponent } from "react"
 import TeX from "./TeX"
-
-const codeRegex = /`([^`]+)`/g
-const squareBracketRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-const dollarRegex = /\$([^$]+)\$/g
-const boldRegex = /\*\*([^*]+)\*\*/g
-const italicRegex = /\*([^*]+)\*/g
-const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-
-/**
- * Function to render a given markdown-like string in LaTeX
- *
- * @param text The markdown-like string to render
- * @returns The LaTeX string
- */
-export function markdownToLatex(text: string): string {
-  // TODO: this is a hacky implementation; replace with a proper markdown parser
-
-  // find all markdown code text and replace it with \texttt LaTeX commands
-  text = text.replace(codeRegex, (_, text: string) => `\\texttt{${text}}`)
-
-  // find all markdown links and replace them with \href LaTeX commands
-  text = text.replace(
-    linkRegex,
-    (_, text: string, url: string) => `\\href{${url}}{${text}}`
-  )
-
-  // find all markdown bold text and replace it with \textbf LaTeX commands
-  text = text.replace(boldRegex, (_, text: string) => `\\textbf{${text}}`)
-
-  // find all markdown italic text and replace it with \textit LaTeX commands
-  text = text.replace(italicRegex, (_, text: string) => `\\textit{${text}}`)
-
-  return text
-}
+import { Link } from "react-router-dom"
+import { parseMarkdown, ParseTree, ParseTreeNode } from "../utils/parseMarkdown"
+import SyntaxHighlighter from "react-syntax-highlighter"
+import {
+  solarizedLight,
+  solarizedDark,
+} from "react-syntax-highlighter/dist/esm/styles/hljs"
+import { useTheme } from "../hooks/useTheme"
 
 /**
  * Function to render a given markdown-like string as a React component
@@ -43,7 +17,7 @@ export function markdownToLatex(text: string): string {
  * @returns The React component
  */
 export const Markdown: FunctionComponent<{ md: string }> = ({ md }) => {
-  return <MarkdownTree parseTree={parseMarkdownText(md)} />
+  return <MarkdownTree parseTree={parseMarkdown(md)} />
 }
 
 /**
@@ -78,6 +52,7 @@ export const MarkdownTree: FunctionComponent<{
 export const MarkdownTreeNode: FunctionComponent<{
   parseTreeNode: ParseTreeNode
 }> = ({ parseTreeNode }) => {
+  const { theme } = useTheme()
   if (typeof parseTreeNode === "string") {
     return <>{parseTreeNode}</>
   }
@@ -101,82 +76,36 @@ export const MarkdownTreeNode: FunctionComponent<{
       </i>
     )
   }
-  // TODO: Implement this function
+  if (parseTreeNode.kind === "`") {
+    return <pre>{parseTreeNode.child}</pre>
+  }
+  if (parseTreeNode.kind === "```") {
+    return (
+      <div className="my-5">
+        <SyntaxHighlighter
+          language={parseTreeNode.language}
+          style={theme === "light" ? solarizedLight : solarizedDark}
+        >
+          {parseTreeNode.child}
+        </SyntaxHighlighter>
+      </div>
+    )
+  }
+  if (parseTreeNode.kind === "a") {
+    return (
+      <Link to={parseTreeNode.url}>
+        <MarkdownTree parseTree={parseTreeNode.child} />
+      </Link>
+    )
+  }
+  if (parseTreeNode.kind === ">") {
+    return (
+      <blockquote className="my-4 border-l-4 pl-2">
+        <MarkdownTree parseTree={parseTreeNode.child} />
+      </blockquote>
+    )
+  }
+
+  // will never be reached:
   return <></>
-}
-
-/**
- * We first parse the markdown-like text into a parse tree. To this end, we
- * define the following types:
- */
-type ParseTree = ParseTreeNode[]
-type ParseTreeNode =
-  | string
-  | { kind: "`" | "$$" | "$"; child: string }
-  | { kind: "**" | "*" | ">"; child: ParseTree }
-
-/**
- * The parseMarkdownText function parses markdown-like text into a parse tree.
- *
- * @param text The markdown-like text to parse
- * @returns The parse tree
- */
-function parseMarkdownText(text: string): ParseTree {
-  if (text === "") return []
-
-  // const regexes = [
-  //   codeRegex,
-  //   squareBracketRegex,
-  //   dollarRegex,
-  //   squareBracketRegex,
-  //   boldRegex,
-  //   italicRegex,
-  // ]
-
-  let match = dollarRegex.exec(text)
-  if (match) {
-    const index = match.index
-    const matchText = match[1]
-    const matchStart = index
-    const matchEnd = index + match[0].length
-    const before = text.slice(0, matchStart)
-    const after = text.slice(matchEnd)
-    const node = {
-      kind: "$",
-      child: matchText,
-    } as ParseTreeNode
-    return [...parseMarkdownText(before), node, ...parseMarkdownText(after)]
-  }
-
-  match = squareBracketRegex.exec(text)
-  if (match) {
-    const index = match.index
-    const matchText = match[1]
-    const matchStart = index
-    const matchEnd = index + match[0].length
-    const before = text.slice(0, matchStart)
-    const after = text.slice(matchEnd)
-    const node = {
-      kind: "$$",
-      child: matchText,
-    } as ParseTreeNode
-    return [...parseMarkdownText(before), node, ...parseMarkdownText(after)]
-  }
-
-  match = boldRegex.exec(text)
-  if (match) {
-    const index = match.index
-    const matchText = match[1]
-    const matchStart = index
-    const matchEnd = index + match[0].length
-    const before = text.slice(0, matchStart)
-    const after = text.slice(matchEnd)
-    const node = {
-      kind: "**",
-      child: parseMarkdownText(matchText),
-    } as ParseTreeNode
-    return [...parseMarkdownText(before), node, ...parseMarkdownText(after)]
-  }
-
-  return [text]
 }
