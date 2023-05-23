@@ -8,7 +8,7 @@ import {
   MultipleChoiceFeedback,
   MultipleChoiceQuestion,
 } from "./QuestionGenerator"
-import { Markdown } from "./Markdown"
+import { Markdown } from "../../components/Markdown"
 
 /**
  * ExerciseMultipleChoice is a multiple choice exercise.
@@ -118,7 +118,7 @@ export function ExerciseMultipleChoice({
         <br />
         {feedbackOject &&
           feedbackOject.correctAnswers.map((item, index) => (
-            <div key={index}>{<Markdown text={question.answers[item]} />}</div>
+            <div key={index}>{<Markdown md={question.answers[item]} />}</div>
           ))}
       </>
     ) : null
@@ -133,7 +133,7 @@ export function ExerciseMultipleChoice({
       handleFooterClick={handleClick}
       source={source}
     >
-      <Markdown text={question.text} />
+      <Markdown md={question.text} />
       <div className="mx-auto flex max-w-max flex-wrap gap-5 p-5">
         {question.answers.map((answer, index) => {
           const id = `${index}`
@@ -155,7 +155,7 @@ export function ExerciseMultipleChoice({
                 htmlFor={id}
                 includePeerCheckedStyle
               >
-                <Markdown text={answer} />
+                <Markdown md={answer} />
               </AnswerBox>
             </div>
           )

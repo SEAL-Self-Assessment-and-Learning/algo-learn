@@ -10,7 +10,8 @@ import {
 } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { useTheme } from "../../hooks/useTheme"
 import { TestQuestion } from "./TestQuestion"
-import { MultipleChoiceAnswer, toJSON, toTex } from "./QuestionGenerator"
+import { MultipleChoiceAnswer, toJSON } from "./QuestionGenerator"
+import { questionToLatex } from "./questionToTex"
 
 /** Component for testing the question generator */
 
@@ -65,7 +66,7 @@ export function TestSimpleMC() {
             wrapLongLines
             style={theme === "dark" ? solarizedDark : solarizedLight}
           >
-            {format === "latex" ? toTex(question) : toJSON(question)}
+            {format === "latex" ? questionToLatex(question) : toJSON(question)}
           </SyntaxHighlighter>
         </HorizontallyCenteredDiv>
       )}
