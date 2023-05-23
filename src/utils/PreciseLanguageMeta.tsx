@@ -130,6 +130,14 @@ export const PreciseLanguageMeta: (
 
       random.shuffle(answers)
 
+      const markdown = `
+${translations[lang]["consider"]}
+
+> ${format(ownt["text"], p)}
+
+${translations[lang]["what"]}
+`
+      console.log(markdown)
       return (
         <ExerciseMultipleChoice
           title={t(title)}
@@ -140,11 +148,7 @@ export const PreciseLanguageMeta: (
           viewOnly={viewOnly}
           allowMultiple
         >
-          {translations[lang]["consider"]}
-          <blockquote className="my-4 border-l-4 pl-2">
-            <Markdown md={format(ownt["text"], p)} />
-          </blockquote>
-          {translations[lang]["what"]}
+          <Markdown md={markdown} />
         </ExerciseMultipleChoice>
       )
     },
