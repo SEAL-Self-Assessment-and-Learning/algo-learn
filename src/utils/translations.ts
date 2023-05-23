@@ -41,22 +41,22 @@ function t(
   lang: Language,
   key: TKey,
   parameters?: TFunctionParameters
-): string | undefined
+): string
 function t(
   translations: Translations,
   lang: Language,
   key: TKey,
   parameters?: TFunctionParameters
-): string | string[] | undefined
+): string | string[]
 function t(
   translations: Translations,
   lang: Language,
   key: TKey,
   parameters?: TFunctionParameters
-): string | string[] | undefined {
+): string | string[] {
   const text = translations[lang][key]
   if (text === undefined) {
-    return undefined
+    return key
   }
   return format(text, parameters)
 }
@@ -81,7 +81,18 @@ export function tFunctional(translations: FlatTranslations, key: string) {
  * @param lang The language to translate to
  * @returns A function that maps a key to a translation
  */
-export function tFunction(translations: Translations, lang: Language) {
+export function tFunction(
+  translations: FlatTranslations,
+  lang: Language
+): { t: (key: TKey, parameters: TFunctionParameters) => string }
+export function tFunction(
+  translations: Translations,
+  lang: Language
+): { t: (key: TKey, parameters: TFunctionParameters) => string | string[] }
+export function tFunction(
+  translations: FlatTranslations | Translations,
+  lang: Language
+) {
   return {
     t: (key: TKey, parameters: TFunctionParameters) =>
       t(translations, lang, key, parameters),
