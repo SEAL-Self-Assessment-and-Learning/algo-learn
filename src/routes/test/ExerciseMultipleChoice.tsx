@@ -33,7 +33,7 @@ export function ExerciseMultipleChoice({
   source = false,
 }: {
   question: MultipleChoiceQuestion
-  feedback: (answer: MultipleChoiceAnswer) => MultipleChoiceFeedback
+  feedback?: (answer: MultipleChoiceAnswer) => MultipleChoiceFeedback
   regenerate?: () => void
   onResult?: (result: "correct" | "incorrect" | "abort") => void
   permalink?: string
@@ -45,7 +45,7 @@ export function ExerciseMultipleChoice({
   // check is the array of indices of the currently checked answers
   const [checked, setChecked] = useState([] as Array<number>)
   function setCheckedEntry(key: number, value: boolean) {
-    const newChecked = question.allowMultipleAnswers
+    const newChecked = question.allowMultiple
       ? checked.filter((x) => x !== key)
       : []
     if (value) {
@@ -73,10 +73,12 @@ export function ExerciseMultipleChoice({
     if (mode === "disabled") {
       return
     } else if (mode === "verify") {
-      const feedbackObject = feedback({ checked })
-      feedbackObject.correct ? playSound("pass") : playSound("fail")
-      setMode(feedbackObject.correct ? "correct" : "incorrect")
-      setFeedbackObject(feedbackObject)
+      if (feedback !== undefined) {
+        const feedbackObject = feedback({ choice: checked })
+        feedbackObject.correct ? playSound("pass") : playSound("fail")
+        setMode(feedbackObject.correct ? "correct" : "incorrect")
+        setFeedbackObject(feedbackObject)
+      }
     } else if (mode === "correct" || mode === "incorrect") {
       onResult(mode)
     }
@@ -106,23 +108,26 @@ export function ExerciseMultipleChoice({
       }
     },
   })
-  const message =
-    mode === "correct" ? (
-      <b className="text-2xl">Correct!</b>
-    ) : mode === "incorrect" ? (
+
+  let message = null
+  if (mode === "correct") {
+    message = <b className="text-2xl">Correct!</b>
+  } else if (mode === "incorrect") {
+    message = feedbackOject?.correctChoice ? (
       <>
         <b className="text-xl">
           Correct solution
-          {feedbackOject && feedbackOject.correctAnswers.length > 1 ? "s" : ""}:
+          {feedbackOject.correctChoice.length > 1 ? "s" : ""}:
         </b>
         <br />
-        {feedbackOject &&
-          feedbackOject.correctAnswers.map((item, index) => (
-            <div key={index}>{<Markdown md={question.answers[item]} />}</div>
-          ))}
+        {feedbackOject.correctChoice.map((item, index) => (
+          <div key={index}>{<Markdown md={question.answers[item]} />}</div>
+        ))}
       </>
-    ) : null
-
+    ) : (
+      <>Incorrect</>
+    )
+  }
   return (
     <Question
       permalink={permalink}
@@ -140,7 +145,7 @@ export function ExerciseMultipleChoice({
           return (
             <div key={index} className="flex place-items-center">
               <input
-                type={question.allowMultipleAnswers ? "checkbox" : "radio"}
+                type={question.allowMultiple ? "checkbox" : "radio"}
                 id={id}
                 className="peer hidden"
                 checked={checked.includes(index)}

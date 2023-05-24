@@ -26,14 +26,8 @@ const translations: FlatTranslations = {
   },
 }
 
-interface TestQuestion extends MultipleChoiceQuestion {
-  a: number
-  b: number
-  correctAnswerIndex: number
-}
-
 /** This question generator generates a simple multiple choice question. */
-export const TestQuestion: QuestionGenerator<TestQuestion> = {
+export const TestQuestion: QuestionGenerator = {
   path: "asymptotics/sum",
   name: tFunctional(translations, "title"),
   description: tFunctional(translations, "description"),
@@ -58,7 +52,7 @@ export const TestQuestion: QuestionGenerator<TestQuestion> = {
    * @param lang The language of the question
    * @returns A new SimpleMCTest question
    */
-  generate: ({ seed }, lang = "en_US"): TestQuestion => {
+  generate: ({ seed }, lang = "en_US") => {
     const random = new Random(seed)
 
     const a = random.int(2, 10)
@@ -83,48 +77,36 @@ export const TestQuestion: QuestionGenerator<TestQuestion> = {
 
     const { t } = tFunction(translations, lang)
 
-    return {
+    const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
-      lang,
       name: TestQuestion.name(lang),
       path: TestQuestion.path,
-      parameters: { seed, lang },
       text: t("text", [`$${a}$`, `$${b}$`, `$${a}+${b}$`]),
-      a,
-      b,
       answers,
-      correctAnswerIndex: correctAnswerIndex,
-      allowMultipleAnswers: false,
     }
-  },
-  /**
-   * The user has answered this question. This function checks the answer and
-   * returns feedback, including the correct solution.
-   *
-   * @param answer The answer(s) of the user
-   * @returns Feedback for the user
-   */
-  feedback: (
-    question: TestQuestion,
-    answer: MultipleChoiceAnswer
-  ): MultipleChoiceFeedback => {
-    // TODO: Use question.lang and fill in the translations
-    if (
-      answer.checked.length === 1 &&
-      answer.checked[0] === question.correctAnswerIndex
-    ) {
+
+    /**
+     * We define the feedback function as a closure. The function checks the
+     * answer and returns feedback, including the correct solution.
+     *
+     * @param answer The answer(s) of the user
+     * @returns Feedback for the user
+     */
+    function feedback(answer: MultipleChoiceAnswer): MultipleChoiceFeedback {
       return {
-        correct: true,
-        correctAnswers: [question.correctAnswerIndex],
-        feedbackText: "Correct!",
+        correct:
+          answer.choice.length === 1 && answer.choice[0] === correctAnswerIndex,
+        correctChoice: [correctAnswerIndex],
       }
     }
+
     return {
-      correct: false,
-      correctAnswers: [question.correctAnswerIndex],
-      feedbackText: `The correct answer is $${
-        question.answers[question.correctAnswerIndex]
-      }$.`,
+      question,
+      feedback,
+      a, // only added for possible unit tests
+      b, // only added for possible unit tests
+      correctAnswer, // only added for possible unit tests
+      correctAnswerIndex, // only added for possible unit tests
     }
   },
 }

@@ -1,32 +1,37 @@
 import { FunctionComponent } from "react"
 import { ExerciseMultipleChoice } from "./ExerciseMultipleChoice"
-import {
-  MultipleChoiceAnswer,
-  MultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-  Question,
-} from "./QuestionGenerator"
+import { FeedbackFunction, Question } from "./QuestionGenerator"
 
 /** Function to render the question as a React component */
-export const QuestionComponent: FunctionComponent<
-  QuestionComponentProps<MultipleChoiceQuestion>
-> = ({ question, feedback, permalink, onResult, regenerate, viewOnly }) => {
-  return (
-    <ExerciseMultipleChoice
-      question={question}
-      feedback={feedback}
-      regenerate={regenerate}
-      onResult={onResult}
-      permalink={permalink}
-      viewOnly={viewOnly}
-    />
-  )
+export const QuestionComponent: FunctionComponent<QuestionComponentProps> = ({
+  question,
+  feedback,
+  permalink,
+  onResult,
+  regenerate,
+  viewOnly,
+}) => {
+  if (question.type === "MultipleChoiceQuestion" && !question.sorting) {
+    return (
+      <ExerciseMultipleChoice
+        question={question}
+        feedback={feedback}
+        regenerate={regenerate}
+        onResult={onResult}
+        permalink={permalink}
+        viewOnly={viewOnly}
+      />
+    )
+  } else if (question.type === "MultipleChoiceQuestion" && question.sorting) {
+    // return <ExerciseSorting...
+  }
+  return <></>
 }
 
 /** Props for the React Component */
-export interface QuestionComponentProps<TQuestion extends Question> {
-  question: TQuestion // The question object
-  feedback: (answer: MultipleChoiceAnswer) => MultipleChoiceFeedback // Function to generate feedback
+export interface QuestionComponentProps {
+  question: Question // The question object
+  feedback?: FeedbackFunction // Function to generate feedback
   permalink?: string // Permalink to the question
   onResult?: (result: Result) => void // Callback for when a result is produced
   viewOnly?: boolean // Determines whether the component should displayed interactively or non-interactively
