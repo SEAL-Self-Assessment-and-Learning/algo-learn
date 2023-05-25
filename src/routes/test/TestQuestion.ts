@@ -5,10 +5,9 @@ import {
   FlatTranslations,
 } from "../../utils/translations"
 import {
-  QuestionGenerator,
   MultipleChoiceQuestion,
-  MultipleChoiceAnswer,
-  MultipleChoiceFeedback,
+  QuestionGenerator,
+  minimalMultipleChoiceFeedback,
 } from "./QuestionGenerator"
 
 const translations: FlatTranslations = {
@@ -83,26 +82,11 @@ export const TestQuestion: QuestionGenerator = {
       path: TestQuestion.path,
       text: t("text", [`$${a}$`, `$${b}$`, `$${a}+${b}$`]),
       answers,
-    }
-
-    /**
-     * We define the feedback function as a closure. The function checks the
-     * answer and returns feedback, including the correct solution.
-     *
-     * @param answer The answer(s) of the user
-     * @returns Feedback for the user
-     */
-    function feedback(answer: MultipleChoiceAnswer): MultipleChoiceFeedback {
-      return {
-        correct:
-          answer.choice.length === 1 && answer.choice[0] === correctAnswerIndex,
-        correctChoice: [correctAnswerIndex],
-      }
+      feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
     }
 
     return {
       question,
-      feedback,
       a, // only added for possible unit tests
       b, // only added for possible unit tests
       correctAnswer, // only added for possible unit tests

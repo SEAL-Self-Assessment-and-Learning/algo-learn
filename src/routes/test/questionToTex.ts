@@ -6,7 +6,7 @@ export function questionToLatex(question: Question): string {
   if (question.type === "MultipleChoiceQuestion") {
     const q: MultipleChoiceQuestion = question
     return `\\begin{exercise}[${markdownToLatex(q.name)}]
-${markdownToLatex(q.text)}
+${markdownToLatex(q.text ?? "")}
 \\begin{itemize}
 ${q.answers.map((answer) => `    \\item ${markdownToLatex(answer)}`).join("\n")}
 \\end{itemize}

@@ -1,3 +1,4 @@
+import { Question } from "../../components/Question"
 import { Language } from "../../utils/translations"
 
 /**
@@ -7,7 +8,7 @@ import { Language } from "../../utils/translations"
  * optional properties. If this is not possible, a new question type should be
  * added.
  */
-export type Question = MultipleChoiceQuestion // | FreeTextQuestion
+export type Question = MultipleChoiceQuestion | FreeTextQuestion
 
 /**
  * Base type for all question types; they must contain the already-translated
@@ -15,9 +16,27 @@ export type Question = MultipleChoiceQuestion // | FreeTextQuestion
  * must have at least these properties.
  */
 export interface QuestionBase {
-  type: string // The type of the question
-  path: string // Unique path to this question; for example, "/en/topic/questiongenerator1/variant1/VeryRandomSeed". The path must contain all parameters necessary to re-generate the question.
-  name: string // The name of the question
+  /** The type of the question */
+  type: string
+
+  /**
+   * Unique path to this question; for example,
+   * "/en/topic/questiongenerator1/variant1/VeryRandomSeed". The path must
+   * contain _all_ parameters necessary to re-generate the question.
+   */
+  path: string
+
+  /** The name of the question */
+  name: string
+
+  /** The markdown text of the question (optional) */
+  text?: string
+
+  /**
+   * If true, the client may request feedback on preliminary answers, before the
+   * user has clicked "check" (optional)
+   */
+  allowPreliminaryAnswers?: boolean
 }
 
 /**
@@ -26,30 +45,69 @@ export interface QuestionBase {
  */
 export interface MultipleChoiceQuestion extends QuestionBase {
   type: "MultipleChoiceQuestion"
-  text: string // The text of the question
-  answers: string[] // List of possible answers to the question
-  allowMultiple?: boolean // Whether multiple answers can be selected; defaults to false
-  sorting?: boolean // Whether the question is a sorting question; defaults to false
+
+  /** List of possible answers to the question */
+  answers: string[]
+
+  /** Whether multiple answers can be selected; defaults to false */
+  allowMultiple?: boolean
+
+  /** Whether the question is a sorting question; defaults to false */
+  sorting?: boolean
+
+  /** The feedback function for this question; defaults to undefined */
+  feedback?: MultipleChoiceFeedbackFunction
+}
+
+/** The AnswerBase interface is the base type for all answer types. */
+export interface AnswerBase {
+  /**
+   * If true, the answer is only a preliminary answer; the user has not yet
+   * submitted the answer. (optional)
+   */
+  preliminary?: boolean
 }
 
 /**
  * After the user selects answer(s), these answeres are stored as a
  * MultipleChoiceAnswer object.
  */
-export interface MultipleChoiceAnswer {
-  choice: number[] // The indices of all answers selected by the user; the order is relevant only if sortingQuestion is true
+export interface MultipleChoiceAnswer extends AnswerBase {
+  /**
+   * The indices of all answers selected by the user; the order is relevant only
+   * if sortingQuestion is true
+   */
+  choice: number[]
 }
 
 /**
  * The QuestionGenerator provides a feedback function that is given the question
- * and the answer given by the user and returns feedback on the answer. This
- * feedback is a MultipleChoiceFeedback object, which is then shown to the
- * user.
+ * and the answer given by the user and returns feedback on the answer. The type
+ * of the feedback function depends on the question type, but every feedback
+ * must/may contain the fields in the following FeedbackBase interface.
  */
-export interface MultipleChoiceFeedback {
-  correct: boolean // Whether the choice is exactly correct.
-  correctChoice?: number[] // The correct choice; the order is relevant only if sortingQuestion is true. (optional)
-  feedbackText?: string // The feedback text to show to the user. (optional)
+export interface FeedbackBase {
+  /**
+   * Whether the choice is exactly correct. This field may be withheld, for
+   * example, if the correctness is unknown or if the answer was only
+   * preliminary and not final.
+   */
+  correct?: boolean
+
+  /** The feedback text to show to the user. (optional) */
+  feedbackText?: string
+}
+
+/**
+ * The feedback object returned by the feedback function for multiple-choice
+ * questions.
+ */
+export interface MultipleChoiceFeedback extends FeedbackBase {
+  /**
+   * The correct choice; the order is relevant only if sortingQuestion is true.
+   * (optional)
+   */
+  correctChoice?: number[]
 }
 
 /** The signature of the feedback function for multiple-choice questions */
@@ -57,8 +115,83 @@ export type MultipleChoiceFeedbackFunction = (
   answer: MultipleChoiceAnswer
 ) => MultipleChoiceFeedback
 
-/** In general, we can add new types of feedback functions for new question types */
-export type FeedbackFunction = MultipleChoiceFeedbackFunction // | FreeTextFeedbackFunction
+/**
+ * This function returns a feedback function for multiple-choice questions that
+ * checks whether the selected answer or answers are correct. The correct answer
+ * is given as a list of indices of the correct answers.
+ *
+ * @param correctAnswerIndex The index or indices of the correct answer(s)
+ * @param sorting Whether the order of the answers is relevant; defaults to
+ *   false, in which case the order of the answers is ignored by sorting them
+ * @returns
+ */
+export function minimalMultipleChoiceFeedback({
+  correctAnswerIndex,
+  sorting = false,
+}: {
+  correctAnswerIndex: number | number[]
+  sorting?: boolean
+}): MultipleChoiceFeedbackFunction {
+  const correctChoice =
+    typeof correctAnswerIndex === "number"
+      ? [correctAnswerIndex]
+      : correctAnswerIndex.slice()
+  if (!sorting) correctChoice.sort()
+  const feedback: MultipleChoiceFeedbackFunction = ({ choice }) => {
+    const sameLength = choice.length === correctChoice.length
+    if (!sorting) choice = choice.slice().sort()
+    let sameAnswer = true
+    choice.forEach((c, i) => {
+      if (c !== correctChoice[i]) sameAnswer = false
+    })
+    const correct = sameLength && sameAnswer
+    return { correct, correctChoice }
+  }
+  return feedback
+}
+
+/**
+ * FreeTextQuestion stores the generated data of free text questions. Free text
+ * questions are questions where the user can enter any text as an answer.
+ */
+export interface FreeTextQuestion extends QuestionBase {
+  type: "FreeTextQuestion"
+
+  /** The prompt to show to the user next to the input field (optional) */
+  prompt?: string
+
+  /** The placeholder text to show in the input field (optional) */
+  placeholder?: string
+
+  /**
+   * The format of the answer; for example, "number", "email", "python3", ...
+   * (optional)
+   */
+  format?: string
+
+  /** The number of lines in the input field (defaults to 1) */
+  lines?: number
+
+  /** The feedback function for this question; defaults to undefined */
+  feedback?: FreeTextFeedbackFunction
+}
+
+/**
+ * After the user enters an answer, this answer is stored as a FreeTextAnswer
+ * object.
+ */
+export interface FreeTextAnswer extends AnswerBase {
+  /** The text entered by the user */
+  text: string
+}
+
+/** For feedback on free-text questions, the base feedback type is sufficient. */
+export type FreeTextFeedback = FeedbackBase
+
+/** The signature of the feedback function for free-text questions */
+export type FreeTextFeedbackFunction = (
+  answer: FreeTextAnswer
+) => FreeTextFeedback
 
 /**
  * Each QuestionGenerator may support multiple variants and parameters with
@@ -129,17 +262,11 @@ export interface QuestionGenerator {
    *
    * @param parameters The parameters to use when generating the question
    * @param lang The language to use when generating the question
-   * @returns The question as well as the feedback function for the question as
-   *   a closure. Additional properties may be added to the output object to
+   * @returns The question object including its corresponding feedback function
+   *   as a closure. Additional properties may be added to the output object to
    *   provide unit tests.
    */
-  generate: (
-    parameters: Parameters,
-    lang?: Language
-  ) => {
-    question: Question
-    feedback?: FeedbackFunction
-  }
+  generate: (parameters: Parameters, lang?: Language) => { question: Question }
 }
 
 /**
@@ -148,6 +275,16 @@ export interface QuestionGenerator {
  * @param question The question to export
  * @returns The question in JSON format
  */
-export function toJSON(question: Question): string {
+export function questionToJSON(question: Question): string {
   return JSON.stringify(question, null, 2).replace("\\\\", "\\")
+}
+
+/**
+ * Function to import the question from JSON format
+ *
+ * @param json The question to import in JSON format
+ * @returns The question object
+ */
+export function questionFromJSON(json: string): Question {
+  return JSON.parse(json) as Question
 }

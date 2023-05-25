@@ -1,11 +1,10 @@
 import { FunctionComponent } from "react"
 import { ExerciseMultipleChoice } from "./ExerciseMultipleChoice"
-import { FeedbackFunction, Question } from "./QuestionGenerator"
+import { Question } from "./QuestionGenerator"
 
 /** Function to render the question as a React component */
 export const QuestionComponent: FunctionComponent<QuestionComponentProps> = ({
   question,
-  feedback,
   permalink,
   onResult,
   regenerate,
@@ -15,7 +14,7 @@ export const QuestionComponent: FunctionComponent<QuestionComponentProps> = ({
     return (
       <ExerciseMultipleChoice
         question={question}
-        feedback={feedback}
+        feedback={question.feedback}
         regenerate={regenerate}
         onResult={onResult}
         permalink={permalink}
@@ -31,7 +30,6 @@ export const QuestionComponent: FunctionComponent<QuestionComponentProps> = ({
 /** Props for the React Component */
 export interface QuestionComponentProps {
   question: Question // The question object
-  feedback?: FeedbackFunction // Function to generate feedback
   permalink?: string // Permalink to the question
   onResult?: (result: Result) => void // Callback for when a result is produced
   viewOnly?: boolean // Determines whether the component should displayed interactively or non-interactively

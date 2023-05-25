@@ -10,7 +10,7 @@ import {
 } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { useTheme } from "../../hooks/useTheme"
 import { TestQuestion } from "./TestQuestion"
-import { toJSON } from "./QuestionGenerator"
+import { questionToJSON } from "./QuestionGenerator"
 import { questionToLatex } from "./questionToTex"
 
 /** Component for testing the question generator */
@@ -21,7 +21,7 @@ export function TestSimpleMC() {
   const [seed] = useState(new Random(Math.random()).base36string(7))
   const [format, setFormat] = useState("react" as "react" | "latex" | "json")
   const lang = i18n.language === "de" ? "de_DE" : "en_US"
-  const { question, feedback } = TestQuestion.generate({ seed, lang })
+  const { question } = TestQuestion.generate({ seed, lang })
   return (
     <>
       <HorizontallyCenteredDiv className="select-none">
@@ -53,7 +53,6 @@ export function TestSimpleMC() {
       {format === "react" ? (
         <QuestionComponent
           question={question}
-          feedback={feedback}
           key={seed}
           onResult={() => undefined}
         />
@@ -64,7 +63,9 @@ export function TestSimpleMC() {
             wrapLongLines
             style={theme === "dark" ? solarizedDark : solarizedLight}
           >
-            {format === "latex" ? questionToLatex(question) : toJSON(question)}
+            {format === "latex"
+              ? questionToLatex(question)
+              : questionToJSON(question)}
           </SyntaxHighlighter>
         </HorizontallyCenteredDiv>
       )}

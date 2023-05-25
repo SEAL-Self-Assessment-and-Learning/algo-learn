@@ -138,7 +138,7 @@ export function ExerciseMultipleChoice({
       handleFooterClick={handleClick}
       source={source}
     >
-      <Markdown md={question.text} />
+      <Markdown md={question.text ?? ""} />
       <div className="mx-auto flex max-w-max flex-wrap gap-5 p-5">
         {question.answers.map((answer, index) => {
           const id = `${index}`
