@@ -1,8 +1,10 @@
-import { useTranslation, Trans } from "react-i18next"
+import { Trans, useTranslation } from "../hooks/useTranslation"
 import { AiFillGithub } from "react-icons/ai"
 import { SiDuolingo, SiReact } from "react-icons/si"
 import { Link } from "react-router-dom"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
+import { format } from "../utils/format"
+import { Markdown } from "../components/Markdown"
 
 export function About() {
   const { t, i18n } = useTranslation()
@@ -15,11 +17,11 @@ export function About() {
       <p>{t("About.activeLearning.text")}</p>
       <h2 className="mt-5">{t("About.spacedRepetition.label")}</h2>
       <p>
-        <Trans t={t} i18nKey="About.spacedRepetition.text">
-          <Link
-            to={`https://${i18n.language}.wikipedia.org/wiki/Spaced_repetition`}
-          ></Link>
-        </Trans>
+        <Markdown
+          md={format(t("About.spacedRepetition.text"), [
+            `https://${i18n.language}.wikipedia.org/wiki/Spaced_repetition`,
+          ])}
+        />
       </p>
       <h2 className="mt-5">{t("About.individuallyAdaptive.label")}</h2>
       <p>

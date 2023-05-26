@@ -5,7 +5,7 @@ import {
   sampleTermSet,
   SimpleAsymptoticTerm,
   TermSetVariants,
-} from "../../utils/AsymptoticTerm"
+} from "./asymptoticsUtils"
 import Random from "../../utils/random"
 
 /**

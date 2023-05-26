@@ -5,8 +5,8 @@ import math, {
   exponentToLatex,
   exponentToText,
   log2Fraction,
-} from "./math"
-import Random from "./random"
+} from "../../utils/math"
+import Random from "../../utils/random"
 
 /**
  * Represents an iterated logarithm term, such as (log(log(n)))^3. It is

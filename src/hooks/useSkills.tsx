@@ -11,14 +11,14 @@ import {
 } from "../utils/memory-model"
 import { min } from "../utils/math"
 
-import { LandauNotation } from "../routes/asymptotics/LandauNotation"
-import { Between } from "../routes/asymptotics/Between"
-import { SortTerms } from "../routes/asymptotics/SortTerms"
-import { SimplifySum } from "../routes/asymptotics/SimplifySum"
-import { RecursionFormula } from "../routes/recursion/RecursionFormula"
-import { Loops } from "../routes/time/Loops"
-import { AsymptoticsPreciseLanguage } from "../routes/asymptotics/PreciseLanguage"
-import { Result } from "../routes/test/QuestionComponent"
+import { LandauNotation } from "../question-generators/asymptotics/LandauNotation"
+import { Between } from "../question-generators/asymptotics/Between"
+import { SortTerms } from "../question-generators/asymptotics/SortTerms"
+import { SimplifySum } from "../question-generators/asymptotics/SimplifySum"
+import { RecursionFormula } from "../question-generators/recursion/RecursionFormula"
+import { Loops } from "../question-generators/time/Loops"
+import { AsymptoticsPreciseLanguage } from "../question-generators/asymptotics/PreciseLanguage"
+import { Result } from "../components/QuestionComponent"
 
 export type QuestionProps = {
   variant: string

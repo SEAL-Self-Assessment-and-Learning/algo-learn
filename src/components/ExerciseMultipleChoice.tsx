@@ -6,9 +6,9 @@ import { useSound } from "../hooks/useSound"
 import {
   MultipleChoiceFeedback,
   MultipleChoiceQuestion,
-} from "../routes/test/QuestionGenerator"
+} from "../api/QuestionGenerator"
 import { Markdown } from "./Markdown"
-import { Result } from "../routes/test/QuestionComponent"
+import { Result } from "./QuestionComponent"
 
 /** The current display mode */
 export type MODE =

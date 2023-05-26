@@ -5,8 +5,8 @@ import {
   mathNodeToSumProductTerm,
   ProductTerm,
   usedIterationNumbers,
-} from "./AsymptoticTerm"
-import math from "./math"
+} from "./asymptoticsUtils"
+import math from "../../utils/math"
 
 test("ProductTerms: 2 * 7 equals 14", () => {
   const a = new ProductTerm({ coefficient: 2 })

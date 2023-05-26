@@ -1,7 +1,7 @@
 import { Fragment, FunctionComponent } from "react"
 import TeX from "./TeX"
 import { Link } from "react-router-dom"
-import { parseMarkdown, ParseTree, ParseTreeNode } from "../utils/parseMarkdown"
+import { parseMarkdown, ParseTree, ParseTreeNode } from "../utils/markdown"
 import SyntaxHighlighter from "react-syntax-highlighter"
 import {
   solarizedLight,

@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "../hooks/useTranslation"
 import { useNavigate, useParams } from "react-router-dom"
 import { QuestionVariant, pathOfQuestionVariant } from "../hooks/useSkills"
 

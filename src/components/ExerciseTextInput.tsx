@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react"
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "../hooks/useTranslation"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { Question } from "./Question"

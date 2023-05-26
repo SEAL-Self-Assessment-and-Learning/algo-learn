@@ -11,14 +11,13 @@ import { LearningProgress } from "./routes/progress"
 import Root from "./routes/root"
 
 import { QuizSession } from "./components/QuizSession"
-import "./i18n"
 import { About } from "./routes/about"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
 import { Legal } from "./routes/legal"
 import "./tailwind.css"
 import Random from "./utils/random"
 import { BASENAME } from "./config"
-import { TestSimpleMC } from "./routes/test/TestSimpleMC"
+import { TestSimpleMC } from "./routes/test"
 
 const routes = []
 for (const question of questions) {

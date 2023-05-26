@@ -1,20 +1,18 @@
+import { Language } from "../api/QuestionGenerator"
 import { format } from "./format"
-
-/** Type for supported languages */
-export type Language = "de_DE" | "en_US"
 
 /** Type for keys in translations objects */
 export type TKey = string
 
-/** FlatTranslation objects are not nested */
-export type FlatTranslations = {
+/** Translation objects are not nested */
+export type Translations = {
   [lang in Language]: {
     [key: TKey]: string
   }
 }
 
-/** Translation objects may contain strings of lists of strings */
-export type Translations = {
+/** DeepTranslation objects may contain strings or lists of strings */
+export type DeepTranslations = {
   [lang in Language]: {
     [key: TKey]: string | string[]
   }
@@ -37,19 +35,19 @@ export type TFunctionParameters = string[] | Record<string, string>
  * @returns The translated text
  */
 function t(
-  translations: FlatTranslations,
+  translations: Translations,
   lang: Language,
   key: TKey,
   parameters?: TFunctionParameters
 ): string
 function t(
-  translations: Translations,
+  translations: DeepTranslations,
   lang: Language,
   key: TKey,
   parameters?: TFunctionParameters
 ): string | string[]
 function t(
-  translations: Translations,
+  translations: DeepTranslations,
   lang: Language,
   key: TKey,
   parameters?: TFunctionParameters
@@ -69,7 +67,7 @@ function t(
  * @param key The key to translate
  * @returns A function that maps a language to a translation
  */
-export function tFunctional(translations: FlatTranslations, key: string) {
+export function tFunctional(translations: Translations, key: string) {
   return (lang: Language) => t(translations, lang, key)
 }
 
@@ -82,15 +80,15 @@ export function tFunctional(translations: FlatTranslations, key: string) {
  * @returns A function that maps a key to a translation
  */
 export function tFunction(
-  translations: FlatTranslations,
+  translations: Translations,
   lang: Language
 ): { t: (key: TKey, parameters: TFunctionParameters) => string }
 export function tFunction(
-  translations: Translations,
+  translations: DeepTranslations,
   lang: Language
 ): { t: (key: TKey, parameters: TFunctionParameters) => string | string[] }
 export function tFunction(
-  translations: FlatTranslations | Translations,
+  translations: Translations | DeepTranslations,
   lang: Language
 ) {
   return {

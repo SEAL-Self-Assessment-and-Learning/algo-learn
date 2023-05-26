@@ -1,17 +1,17 @@
-import Random from "../../utils/random"
+import Random from "../utils/random"
 import { useState } from "react"
-import { QuestionComponent } from "./QuestionComponent"
-import { HorizontallyCenteredDiv } from "../../components/CenteredDivs"
+import { QuestionComponent } from "../components/QuestionComponent"
+import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import SyntaxHighlighter from "react-syntax-highlighter"
 import {
   solarizedDark,
   solarizedLight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs"
-import { useTheme } from "../../hooks/useTheme"
-import { TestQuestion } from "./TestQuestion"
-import { Question, questionToJSON } from "./QuestionGenerator"
-import { questionToLatex } from "./questionToTex"
-import { useTranslation } from "../../hooks/useTranslation"
+import { useTheme } from "../hooks/useTheme"
+import { TestQuestion } from "../question-generators/test/TestQuestion"
+import { Question, questionToJSON } from "../api/QuestionGenerator"
+import { questionToLatex } from "../utils/questionToTex"
+import { useTranslation } from "../hooks/useTranslation"
 
 /** Component for testing the question generator */
 export function TestSimpleMC() {

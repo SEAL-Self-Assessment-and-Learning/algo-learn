@@ -1,14 +1,14 @@
-import { Trans } from "react-i18next"
+import { Trans } from "../../hooks/useTranslation"
 import math, { getVars } from "../../utils/math"
 import TeX from "../../components/TeX"
 import {
+  SumProductTerm,
   mathNodeToSumProductTerm,
   ProductTerm,
   createProductTerm,
-  SumProductTerm,
   sampleFraction,
   IteratedLogarithms,
-} from "../../utils/AsymptoticTerm"
+} from "./asymptoticsUtils"
 import { Question, QuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
 import { ExerciseTextInput } from "../../components/ExerciseTextInput"

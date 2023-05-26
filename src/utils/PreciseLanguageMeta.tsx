@@ -1,14 +1,15 @@
 import { ExerciseMultipleChoice } from "../components/ExerciseMultipleChoice"
 import { Question, QuestionProps } from "../hooks/useSkills"
 import Random from "./random"
-import { RecursionFormula } from "../routes/recursion/RecursionFormula"
-import { FlatTranslations, Language, Translations } from "./translations"
+import { RecursionFormula } from "../question-generators/recursion/RecursionFormula"
+import { Translations, DeepTranslations } from "./translations"
 import { format } from "./format"
 import { useTranslation } from "../hooks/useTranslation"
 import {
+  Language,
   MultipleChoiceQuestion,
   minimalMultipleChoiceFeedback,
-} from "../routes/test/QuestionGenerator"
+} from "../api/QuestionGenerator"
 
 /**
  * Interface for "basic" Multiple-Choice Questions. These are fairly static,
@@ -39,7 +40,7 @@ export interface BasicMCQuestion {
    * Provides translations for the question text as well as for the correct and
    * wrong answers.
    */
-  translations: Translations &
+  translations: DeepTranslations &
     Partial<
       Record<
         Language,
@@ -48,7 +49,7 @@ export interface BasicMCQuestion {
     >
 }
 
-const translations: FlatTranslations = {
+const translations: Translations = {
   en_US: {
     consider: "Consider the following sentence:",
     what: "What do we know now?",

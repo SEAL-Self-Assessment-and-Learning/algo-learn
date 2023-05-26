@@ -1,5 +1,5 @@
 import moment from "moment/moment"
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "../hooks/useTranslation"
 import { BsFillCheckSquareFill, BsFillXSquareFill } from "react-icons/bs"
 import { Link } from "react-router-dom"
 import { Button } from "../components/Button"

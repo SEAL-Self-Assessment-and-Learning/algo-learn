@@ -5,7 +5,7 @@ import Random from "../../utils/random"
 import {
   MultipleChoiceQuestion,
   minimalMultipleChoiceFeedback,
-} from "../test/QuestionGenerator"
+} from "../../api/QuestionGenerator"
 
 /**
  * Generate and render a question about asymptotic notation

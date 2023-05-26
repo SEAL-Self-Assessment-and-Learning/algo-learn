@@ -1,5 +1,5 @@
 import { isRouteErrorResponse, useRouteError } from "react-router-dom"
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "../hooks/useTranslation"
 
 /** ErrorPage is a page that is displayed when an unexpected error occurs. */
 export default function ErrorPage() {

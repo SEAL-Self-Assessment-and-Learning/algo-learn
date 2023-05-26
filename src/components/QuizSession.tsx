@@ -7,12 +7,12 @@ import {
   sortByStrength,
   allQuestionVariantsInPath,
 } from "../hooks/useSkills"
-import { TermSetVariants } from "../utils/AsymptoticTerm"
+import { TermSetVariants } from "../question-generators/asymptotics/asymptoticsUtils"
 import { Button } from "./Button"
 import { ScreenCenteredDiv } from "./CenteredDivs"
 import { useTranslation } from "../hooks/useTranslation"
 import Random from "../utils/random"
-import { Result } from "../routes/test/QuestionComponent"
+import { Result } from "./QuestionComponent"
 
 const great = {
   en_US: [

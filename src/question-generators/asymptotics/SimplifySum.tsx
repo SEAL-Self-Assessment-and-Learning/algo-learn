@@ -1,11 +1,11 @@
 import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
 import { Question, QuestionProps } from "../../hooks/useSkills"
-import { sampleTermSet, TermSetVariants } from "../../utils/AsymptoticTerm"
+import { sampleTermSet, TermSetVariants } from "./asymptoticsUtils"
 import Random from "../../utils/random"
 import {
   MultipleChoiceQuestion,
   minimalMultipleChoiceFeedback,
-} from "../test/QuestionGenerator"
+} from "../../api/QuestionGenerator"
 import { format } from "../../utils/format"
 
 /**

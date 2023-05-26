@@ -16,7 +16,7 @@ import {
 import {
   MultipleChoiceQuestion,
   minimalMultipleChoiceFeedback,
-} from "../test/QuestionGenerator"
+} from "../../api/QuestionGenerator"
 import { format } from "../../utils/format"
 import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
 import { ExerciseTextInput } from "../../components/ExerciseTextInput"

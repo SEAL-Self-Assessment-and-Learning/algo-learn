@@ -1,16 +1,12 @@
 import Random from "../../utils/random"
-import {
-  tFunctional,
-  tFunction,
-  FlatTranslations,
-} from "../../utils/translations"
+import { tFunctional, tFunction, Translations } from "../../utils/translations"
 import {
   MultipleChoiceQuestion,
   QuestionGenerator,
   minimalMultipleChoiceFeedback,
-} from "./QuestionGenerator"
+} from "../../api/QuestionGenerator"
 
-const translations: FlatTranslations = {
+const translations: Translations = {
   en_US: {
     title: "Compute a sum",
     description: "Compute the sum of two integers",

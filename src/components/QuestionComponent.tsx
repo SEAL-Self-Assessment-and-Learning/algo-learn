@@ -1,6 +1,6 @@
 import { FunctionComponent } from "react"
-import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
-import { Question } from "./QuestionGenerator"
+import { ExerciseMultipleChoice } from "./ExerciseMultipleChoice"
+import { Question } from "../api/QuestionGenerator"
 
 /** Function to render the question as a React component */
 export const QuestionComponent: FunctionComponent<QuestionComponentProps> = ({

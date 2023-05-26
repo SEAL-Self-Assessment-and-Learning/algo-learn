@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react"
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "../hooks/useTranslation"
 import { FiFileText, FiHome, FiInfo, FiSun } from "react-icons/fi"
 import { TbGitCommit } from "react-icons/tb"
 import { MdDarkMode } from "react-icons/md"

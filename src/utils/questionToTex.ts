@@ -1,5 +1,5 @@
-import { markdownToLatex } from "../../utils/markdownToLatex"
-import { Question, MultipleChoiceQuestion } from "./QuestionGenerator"
+import { markdownToLatex } from "./markdown"
+import { Question, MultipleChoiceQuestion } from "../api/QuestionGenerator"
 
 /** Function to render the question in LaTeX */
 export function questionToLatex(question: Question): string {

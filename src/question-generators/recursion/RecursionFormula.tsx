@@ -12,7 +12,7 @@ import { Trans } from "react-i18next"
 import {
   MultipleChoiceQuestion,
   minimalMultipleChoiceFeedback,
-} from "../test/QuestionGenerator"
+} from "../../api/QuestionGenerator"
 import { format } from "../../utils/format"
 import { Markdown } from "../../components/Markdown"
 

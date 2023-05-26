@@ -2,7 +2,7 @@ import { ReactNode } from "react"
 import { GiPlayButton } from "react-icons/gi"
 import { SiCheckmarx, SiIfixit } from "react-icons/si"
 import { Button } from "./Button"
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "../hooks/useTranslation"
 
 /**
  * QuestionFooter is the footer of a question. It contains a message and a
