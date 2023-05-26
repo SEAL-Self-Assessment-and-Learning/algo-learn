@@ -25,15 +25,19 @@ export function About() {
       </p>
       <h2 className="mt-5">{t("About.individuallyAdaptive.label")}</h2>
       <p>
-        <Trans t={t} i18nKey="About.individuallyAdaptive.text">
-          <Link to="https://doi.org/10.18653/v1/p16-1174"></Link>
-        </Trans>
+        <Markdown
+          md={format(t("About.individuallyAdaptive.text"), [
+            "https://doi.org/10.18653/v1/p16-1174",
+          ])}
+        />
       </p>
       <h2 className="mt-5">{t("About.development.label")}</h2>
       <p>
-        <Trans t={t} i18nKey="About.development.text">
-          <Link to="https://cft.vanderbilt.edu/guides-sub-pages/blooms-taxonomy/"></Link>
-        </Trans>
+        <Markdown
+          md={format(t("About.development.text"), [
+            "https://cft.vanderbilt.edu/guides-sub-pages/blooms-taxonomy/",
+          ])}
+        />
       </p>
       <h2 className="mt-5">{t("About.sourceCode.label")}</h2>
       <p>
@@ -41,9 +45,9 @@ export function About() {
           <Link to="https://reactjs.org/">
             <SiReact className="inline" />
           </Link>
-          <a href="https://github.com/holgerdell/algo-learn/">
+          <Link to="https://github.com/goethe-tcs/algo-learn/">
             <AiFillGithub className="inline" />
-          </a>
+          </Link>
         </Trans>
       </p>
       <h2 className="mt-5">{t("About.inspiration.label")}</h2>
@@ -57,9 +61,7 @@ export function About() {
       </p>{" "}
       <h2 className="mt-5">{t("About.authors.label")}</h2>
       <p>
-        <Trans t={t} i18nKey="About.authors.text">
-          <Link to="https://holgerdell.com/"></Link>
-        </Trans>
+        <Markdown md={t("About.authors.text")} />
       </p>
     </HorizontallyCenteredDiv>
   )

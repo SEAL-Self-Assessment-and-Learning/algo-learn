@@ -8,7 +8,7 @@ import {
   sampleRecurrenceAnswers,
   sampleRecursiveFunction,
 } from "./recursiveFormulaUtils"
-import { Trans } from "react-i18next"
+import { Trans } from "../../hooks/useTranslation"
 import {
   MultipleChoiceQuestion,
   minimalMultipleChoiceFeedback,
