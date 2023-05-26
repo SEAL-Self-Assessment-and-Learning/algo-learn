@@ -12,6 +12,7 @@ import { Button } from "./Button"
 import { ScreenCenteredDiv } from "./CenteredDivs"
 import { useTranslation } from "../hooks/useTranslation"
 import Random from "../utils/random"
+import { Result } from "../routes/test/QuestionComponent"
 
 const great = {
   en_US: [
@@ -193,7 +194,7 @@ export function QuizSession({
     const [skillGroup, question, variant] = nextPath.split("/")
     if (!Q) throw Error(`Question with path '${nextPath}' not found!`)
 
-    const handleResult = (result: "correct" | "incorrect" | "abort") => {
+    const handleResult = (result: Result) => {
       if (result === "correct") {
         appendLogEntry({
           question: `${skillGroup}/${question}`,
@@ -212,7 +213,7 @@ export function QuizSession({
           timestamp: Date.now(),
         })
         setState({ ...state, numIncorrect: numIncorrect + 1 })
-      } else if (result === "abort") {
+      } else if (result === "abort" || result === "timeout") {
         setState({ ...state, status: "aborted" })
       }
     }

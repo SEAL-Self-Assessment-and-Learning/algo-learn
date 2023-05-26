@@ -1,5 +1,4 @@
 import Random from "../../utils/random"
-import { useTranslation } from "react-i18next"
 import { useState } from "react"
 import { QuestionComponent } from "./QuestionComponent"
 import { HorizontallyCenteredDiv } from "../../components/CenteredDivs"
@@ -10,18 +9,26 @@ import {
 } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { useTheme } from "../../hooks/useTheme"
 import { TestQuestion } from "./TestQuestion"
-import { questionToJSON } from "./QuestionGenerator"
+import { Question, questionToJSON } from "./QuestionGenerator"
 import { questionToLatex } from "./questionToTex"
+import { useTranslation } from "../../hooks/useTranslation"
 
 /** Component for testing the question generator */
-
 export function TestSimpleMC() {
-  const { i18n } = useTranslation()
+  const { lang } = useTranslation()
   const { theme } = useTheme()
   const [seed] = useState(new Random(Math.random()).base36string(7))
   const [format, setFormat] = useState("react" as "react" | "latex" | "json")
-  const lang = i18n.language === "de" ? "de_DE" : "en_US"
-  const { question } = TestQuestion.generate({ seed, lang })
+  const [{ question }, setQuestion] = useState(
+    {} as { question: Question | undefined }
+  )
+
+  if (!question) {
+    void Promise.resolve(TestQuestion.generate({ seed, lang })).then(
+      setQuestion
+    )
+    return <></>
+  }
   return (
     <>
       <HorizontallyCenteredDiv className="select-none">

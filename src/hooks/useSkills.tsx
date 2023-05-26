@@ -18,12 +18,13 @@ import { SimplifySum } from "../routes/asymptotics/SimplifySum"
 import { RecursionFormula } from "../routes/recursion/RecursionFormula"
 import { Loops } from "../routes/time/Loops"
 import { AsymptoticsPreciseLanguage } from "../routes/asymptotics/PreciseLanguage"
+import { Result } from "../routes/test/QuestionComponent"
 
 export type QuestionProps = {
   variant: string
   seed: string
   t: TFunction
-  onResult: (result: "correct" | "incorrect" | "abort") => void
+  onResult: (result: Result) => void
   regenerate?: () => void
   viewOnly?: boolean
 }

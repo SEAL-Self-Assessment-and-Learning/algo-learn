@@ -4,8 +4,11 @@ import Random from "./random"
 import { RecursionFormula } from "../routes/recursion/RecursionFormula"
 import { FlatTranslations, Language, Translations } from "./translations"
 import { format } from "./format"
-import { Markdown } from "../components/Markdown"
 import { useTranslation } from "../hooks/useTranslation"
+import {
+  MultipleChoiceQuestion,
+  minimalMultipleChoiceFeedback,
+} from "../routes/test/QuestionGenerator"
 
 /**
  * Interface for "basic" Multiple-Choice Questions. These are fairly static,
@@ -118,13 +121,13 @@ export const PreciseLanguageMeta: (
         .map((a: string, index: number) => ({
           correct: true,
           key: `answer-${index}`,
-          element: <Markdown md={format(a, p)} />,
+          element: format(a, p),
         }))
         .concat(
           ownt.wrongAnswers.map((a: string, index: number) => ({
             correct: false,
             key: `answer-${numCorrect + index}`,
-            element: <Markdown md={format(a, p)} />,
+            element: format(a, p),
           }))
         )
 
@@ -137,19 +140,28 @@ ${translations[lang]["consider"]}
 
 ${translations[lang]["what"]}
 `
-      console.log(markdown)
+      const question: MultipleChoiceQuestion = {
+        type: "MultipleChoiceQuestion",
+        name: t(title),
+        path: permalink,
+        answers: answers.map(({ element }) => element),
+        text: markdown,
+        allowMultiple: true,
+        feedback: minimalMultipleChoiceFeedback({
+          correctAnswerIndex: answers
+            .map((x, i) => ({ ...x, i }))
+            .filter((x) => x.correct)
+            .map((x) => x.i),
+        }),
+      }
       return (
         <ExerciseMultipleChoice
-          title={t(title)}
-          answers={answers}
+          question={question}
           onResult={onResult}
           regenerate={regenerate}
           permalink={permalink}
           viewOnly={viewOnly}
-          allowMultiple
-        >
-          <Markdown md={markdown} />
-        </ExerciseMultipleChoice>
+        />
       )
     },
   }

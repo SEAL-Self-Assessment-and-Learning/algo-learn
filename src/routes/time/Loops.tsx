@@ -1,8 +1,6 @@
-import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
 import TeX from "../../components/TeX"
 import { Question, QuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
-import { ExerciseTextInput } from "../../components/ExerciseTextInput"
 import {
   parseRecursiveFunction,
   sampleExactIfEven,
@@ -15,7 +13,13 @@ import {
   solarizedDark,
   solarizedLight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs"
-import { Trans } from "react-i18next"
+import {
+  MultipleChoiceQuestion,
+  minimalMultipleChoiceFeedback,
+} from "../test/QuestionGenerator"
+import { format } from "../../utils/format"
+import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
+import { ExerciseTextInput } from "../../components/ExerciseTextInput"
 
 /**
  * Generate and render a question about asymptotic notation
@@ -50,48 +54,25 @@ export const Loops: Question = {
     const T = random.choice("TABCDEFGHS".split(""))
     const answers = sampleRecurrenceAnswers({ random, T, n, a, b, c, d })
 
-    const desc = (
-      <>
-        <Trans t={t} i18nKey="time.loops.description">
-          <span className="font-mono">{functionName}</span>
-          <span className="font-mono">{n}</span>
-        </Trans>
-        <div className="my-5">
-          <SyntaxHighlighter
-            language="python3"
-            style={theme === "light" ? solarizedLight : solarizedDark}
-          >
-            {functionText}
-          </SyntaxHighlighter>
-        </div>
-        {/* </pre> */}
-        <Trans t={t} i18nKey="recursion.formula.description2">
-          <TeX>{`${T}(${n})`}</TeX>
-          <span className="font-mono">*</span>
-        </Trans>
-        {variant !== "choice" && (
-          <>
-            {" "}
-            {t("recursion.formula.basecase")}{" "}
-            <TeX>
-              {T}(1)={d}
-            </TeX>
-            .
-          </>
-        )}{" "}
-        {t("recursion.formula.question")}{" "}
-        <TeX>
-          {T}({n})
-        </TeX>
-        {variant !== "choice" && (
-          <>
-            {" "}
-            {t("for")} <TeX>{n} \geq 2</TeX>
-          </>
-        )}
-        ?
-      </>
-    )
+    let desc = `
+${format(t("time.loops.description", [functionName, n]))}
+
+\`\`\`python3
+${functionText}
+\`\`\`
+
+${format(t("time.loops.description2", [`${T}(${n})`]))}
+
+`
+    if (variant !== "choice") {
+      desc += ` ${t("recursion.formula.basecase")} $${T}(1)=${d}$. `
+    }
+    desc += t("recursion.formula.question") + " " + `${T}(${n})`
+    if (variant !== "choice") {
+      desc += ` ${t("for")} ${n} \\geq 2`
+    }
+    desc += "?"
+
     if (variant === "simpleExact") {
       const { code, numStars } = sampleExactIfEven({ random })
       const desc = (
@@ -148,17 +129,27 @@ export const Loops: Question = {
         </ExerciseTextInput>
       )
     } else if (variant === "choice") {
+      const question: MultipleChoiceQuestion = {
+        type: "MultipleChoiceQuestion",
+        name: t("time.loops.long-title"),
+        text: desc,
+        path: permalink,
+        answers: answers.map(({ element }) => element),
+        feedback: minimalMultipleChoiceFeedback({
+          correctAnswerIndex: answers
+            .map((x, i) => ({ ...x, i }))
+            .filter((x) => x.correct)
+            .map((x) => x.i),
+        }),
+      }
       return (
         <ExerciseMultipleChoice
-          title={t("time.loops.long-title")}
-          answers={answers}
+          question={question}
           onResult={onResult}
           regenerate={regenerate}
           permalink={permalink}
           viewOnly={viewOnly}
-        >
-          {desc}
-        </ExerciseMultipleChoice>
+        />
       )
     } else if (variant === "input") {
       const prompt = (

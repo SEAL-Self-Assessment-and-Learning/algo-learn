@@ -2,6 +2,10 @@ import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
 import TeX from "../../components/TeX"
 import { Question, QuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
+import {
+  MultipleChoiceQuestion,
+  minimalMultipleChoiceFeedback,
+} from "../test/QuestionGenerator"
 
 /**
  * Generate and render a question about asymptotic notation
@@ -67,18 +71,29 @@ export const LandauNotation: Question = {
 
     random.shuffle(answers)
 
+    const question: MultipleChoiceQuestion = {
+      type: "MultipleChoiceQuestion",
+      allowMultiple: true,
+      path: permalink,
+      name: t("asymptotics.landau.long-title"),
+      text: t("asymptotics.landau.text") ?? "",
+      answers: answers.map(({ key }) => `$${key}$`),
+      feedback: minimalMultipleChoiceFeedback({
+        correctAnswerIndex: answers
+          .map((x, i) => ({ ...x, i }))
+          .filter((x) => x.correct)
+          .map((x) => x.i),
+      }),
+    }
+
     return (
       <ExerciseMultipleChoice
-        title={t("asymptotics.landau.long-title")}
-        answers={answers}
+        question={question}
+        permalink={permalink}
         onResult={onResult}
         regenerate={regenerate}
-        permalink={permalink}
-        allowMultiple
         viewOnly={viewOnly}
-      >
-        {t("asymptotics.landau.text")}
-      </ExerciseMultipleChoice>
+      />
     )
   },
 }

@@ -8,13 +8,13 @@ import {
   sampleRecurrenceAnswers,
   sampleRecursiveFunction,
 } from "./recursiveFormulaUtils"
-import { useTheme } from "../../hooks/useTheme"
-import SyntaxHighlighter from "react-syntax-highlighter"
-import {
-  solarizedDark,
-  solarizedLight,
-} from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { Trans } from "react-i18next"
+import {
+  MultipleChoiceQuestion,
+  minimalMultipleChoiceFeedback,
+} from "../test/QuestionGenerator"
+import { format } from "../../utils/format"
+import { Markdown } from "../../components/Markdown"
 
 /**
  * Generate and render a question about recurrence formulas
@@ -40,7 +40,6 @@ export const RecursionFormula: Question = {
     regenerate,
     viewOnly,
   }: QuestionProps) => {
-    const { theme } = useTheme()
     const permalink = RecursionFormula.name + "/" + variant + "/" + seed
     const random = new Random(seed)
 
@@ -50,58 +49,84 @@ export const RecursionFormula: Question = {
     const T = random.choice("TABCDEFGHS".split(""))
     const answers = sampleRecurrenceAnswers({ random, T, n, a, b, c, d })
 
-    const desc = (
-      <>
-        <Trans t={t} i18nKey="recursion.formula.description">
-          <span className="font-mono">{functionName}</span>
-          <span className="font-mono">{n}</span>:
-        </Trans>
-        {/* <pre className="bg-shading m-2 max-w-max rounded-lg p-5"> */}
-        <div className="my-5">
-          <SyntaxHighlighter
-            language="python3"
-            style={theme === "light" ? solarizedLight : solarizedDark}
-          >
-            {functionText}
-          </SyntaxHighlighter>
-        </div>
-        {/* </pre> */}
-        <Trans t={t} i18nKey="recursion.formula.description2">
-          <TeX>{`${T}(${n})`}</TeX>
-          <span className="font-mono">*</span>
-        </Trans>
-        {variant !== "choice" && (
-          <>
-            {" "}
-            {t("recursion.formula.basecase")}{" "}
-            <TeX>
-              {T}(1)={d}
-            </TeX>
-            .
-          </>
-        )}{" "}
-        {t("recursion.formula.question")} <TeX>{`${T}(${n})`}</TeX>
-        {variant !== "choice" && (
-          <>
-            {" "}
-            {t("for")} <TeX>{n} \geq 2</TeX>
-          </>
-        )}
-        ?
-      </>
-    )
+    let desc = `
+${format(t("recursion.formula.description"), [functionName, n])}
+
+\`\`\`python3
+${functionText.trim()}
+\`\`\`
+
+${format(t("recursion.formula.description2"), [`${T}(${n})`])}`
+
+    if (variant !== "choice") {
+      desc += ` ${t("recursion.formula.basecase")} $${T}(1)=${d}$.`
+    }
+    desc += ` ${t("recursion.formula.question") + " "} $${`${T}(${n})`}$`
+
+    if (variant !== "choice") {
+      desc += ` ${t("for")} $${n} \\geq 2$`
+    }
+    desc += " ?"
+    // const desc2 = (
+    //   <>
+    //     <Trans t={t} i18nKey="recursion.formula.description">
+    //       <span className="font-mono">{functionName}</span>
+    //       <span className="font-mono">{n}</span>:
+    //     </Trans>
+    //     <div className="my-5">
+    //       <SyntaxHighlighter
+    //         language="python3"
+    //         style={theme === "light" ? solarizedLight : solarizedDark}
+    //       >
+    //         {functionText}
+    //       </SyntaxHighlighter>
+    //     </div>
+    //     <Trans t={t} i18nKey="recursion.formula.description2">
+    //       <TeX>{`${T}(${n})`}</TeX>
+    //       <span className="font-mono">*</span>
+    //     </Trans>
+    //     {variant !== "choice" && (
+    //       <>
+    //         {" "}
+    //         {t("recursion.formula.basecase")}{" "}
+    //         <TeX>
+    //           {T}(1)={d}
+    //         </TeX>
+    //         .
+    //       </>
+    //     )}{" "}
+    //     {t("recursion.formula.question")} <TeX>{`${T}(${n})`}</TeX>
+    //     {variant !== "choice" && (
+    //       <>
+    //         {" "}
+    //         {t("for")} <TeX>{n} \geq 2</TeX>
+    //       </>
+    //     )}
+    //     ?
+    //   </>
+    // )
     if (variant === "choice") {
+      const question: MultipleChoiceQuestion = {
+        type: "MultipleChoiceQuestion",
+        name: t("recursion.formula.long-title"),
+        path: permalink,
+        text: desc,
+        answers: answers.map(({ element }) => element),
+        feedback: minimalMultipleChoiceFeedback({
+          correctAnswerIndex: answers
+            .map((x, i) => ({ ...x, i }))
+            .filter((x) => x.correct)
+            .map((x) => x.i),
+        }),
+      }
       return (
         <ExerciseMultipleChoice
-          title={t("recursion.formula.long-title")}
-          answers={answers}
+          question={question}
           onResult={onResult}
           regenerate={regenerate}
           permalink={permalink}
           viewOnly={viewOnly}
-        >
-          {desc}
-        </ExerciseMultipleChoice>
+        />
       )
     } else if (variant === "input") {
       const prompt = (
@@ -153,7 +178,7 @@ export const RecursionFormula: Question = {
             </TeX>
           }
         >
-          {desc}
+          <Markdown md={desc} />
         </ExerciseTextInput>
       )
     } else {

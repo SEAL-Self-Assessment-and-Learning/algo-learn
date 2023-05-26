@@ -1,82 +1,102 @@
-import { ReactNode, useState } from "react"
-import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
+import { useState } from "react"
 import { AnswerBox } from "./AnswerBox"
-import { useSound } from "../hooks/useSound"
 import { Question } from "./Question"
+import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
+import { useSound } from "../hooks/useSound"
+import {
+  MultipleChoiceFeedback,
+  MultipleChoiceQuestion,
+} from "../routes/test/QuestionGenerator"
+import { Markdown } from "./Markdown"
+import { Result } from "../routes/test/QuestionComponent"
+
+/** The current display mode */
+export type MODE =
+  | "invalid" // Invalid selection (e.g. nothing selected), "Check" button is disabled
+  | "draft" // Valid selection (e.g. at least one answer), but not yet submitted
+  | "submitted" // "Check" was clicked, feedback was requested
+  | "correct" // According to the feedback, the answer was correct
+  | "incorrect" // According to the feedbackm, the answer was incorrect
 
 /**
  * ExerciseMultipleChoice is a multiple choice exercise.
  *
  * @param props
- * @param props.answers List of answers.
- * @param props.permalink Permalink to the question.
- * @param props.title Title of the question.
- * @param props.regenerate Function to regenerate the question.
- * @param props.children Main section of the question.
- * @param props.onResult Function to call when the user submits an answer.
- * @param props.allowMultiple Whether to allow multiple answers.
- * @param props.viewOnly Whether to disable answering.
+ * @param props.question The question.
+ * @param props.permalink Permalink to the question (optional)
+ * @param props.onResult Function to call after (optional)
+ * @param props.regenerate Function to regenerate the question (optional)
+ * @param props.viewOnly Whether the exercise is in view-only mode (optional)
  */
 export function ExerciseMultipleChoice({
-  children,
-  title,
-  answers,
-  regenerate,
-  onResult = () => {},
-  allowMultiple,
+  question,
   permalink,
+  onResult,
+  regenerate,
   viewOnly = false,
-  source = false,
 }: {
-  children: ReactNode
-  title: string
-  answers: { key: string; correct: boolean; element: ReactNode }[]
-  regenerate?: () => void
-  onResult?: (result: "correct" | "incorrect" | "abort") => void
-  allowMultiple?: boolean
+  question: MultipleChoiceQuestion
   permalink?: string
+  onResult?: (result: Result) => void
+  regenerate?: () => void
   viewOnly?: boolean
-  source?: boolean
 }) {
   const { playSound } = useSound()
-  const correctAnswers = answers.filter((x) => x.correct).sort()
-  if (correctAnswers.length === 0) {
-    throw new Error(
-      "ExerciseMultipleChoice: At least one correct answer must be provided"
-    )
-  }
-  allowMultiple ??= correctAnswers.length !== 1
 
-  const [checked, setChecked] = useState([] as Array<string>)
-  function setCheckedEntry(key: string, value: boolean) {
-    const newChecked = allowMultiple ? checked.filter((x) => x !== key) : []
+  const [state, setState] = useState({
+    mode: "invalid" as MODE,
+
+    /** The indices of the selected answers */
+    choice: [] as Array<number>,
+
+    /** The feedback object returned by question.feedback() */
+    feedbackObject: undefined as MultipleChoiceFeedback | undefined,
+  })
+
+  const { mode, choice, feedbackObject } = state
+
+  /**
+   * SetChoiceEntry sets the choice for a single entry.
+   *
+   * @param key The index of the entry
+   * @param value Whether the entry should be chosen
+   */
+  function setChoiceEntry(key: number, value: boolean) {
+    const newChoice = question.allowMultiple
+      ? choice.filter((x) => x !== key)
+      : []
     if (value) {
-      newChecked.push(key)
+      newChoice.push(key)
     }
-    setChecked(newChecked)
-  }
-
-  const [mode, setMode] = useState(
-    "disabled" as "disabled" | "verify" | "correct" | "incorrect"
-  )
-  if (mode == "disabled" && checked.length > 0) {
-    if (!viewOnly) setMode("verify")
-  } else if (mode === "verify" && checked.length === 0) {
-    setMode("disabled")
+    setState({
+      ...state,
+      mode: newChoice.length === 0 ? "invalid" : "draft",
+      choice: newChoice.sort(),
+    })
   }
 
   function handleClick() {
-    console.log("handleClick", mode)
-    if (mode === "disabled") {
+    if (mode === "invalid") {
       return
-    } else if (mode === "verify") {
-      const isCorrect =
-        checked.length === correctAnswers.length &&
-        correctAnswers.every((item) => checked.includes(item.key))
-      isCorrect ? playSound("pass") : playSound("fail")
-      setMode(isCorrect ? "correct" : "incorrect")
+    } else if (mode === "draft") {
+      if (question.feedback !== undefined) {
+        setState({ ...state, mode: "submitted" })
+        void Promise.resolve(question.feedback({ choice: choice })).then(
+          (feedbackObject) => {
+            let mode: MODE = "draft"
+            if (feedbackObject.correct === true) {
+              playSound("pass")
+              mode = "correct"
+            } else if (feedbackObject.correct === false) {
+              playSound("fail")
+              mode = "incorrect"
+            }
+            setState({ ...state, mode, feedbackObject })
+          }
+        )
+      }
     } else if (mode === "correct" || mode === "incorrect") {
-      onResult(mode)
+      onResult && onResult(mode)
     }
   }
 
@@ -96,86 +116,75 @@ export function ExerciseMultipleChoice({
         return
       }
       const num = parseInt(kbEvent.key)
-      if (!Number.isNaN(num) && num >= 1 && num <= answers.length) {
+      if (!Number.isNaN(num) && num >= 1 && num <= question.answers.length) {
         e.preventDefault()
-        const id = answers[num - 1].key
-        setCheckedEntry(id, !checked.includes(id))
+        const id = num - 1 // answers[num - 1].key
+        setChoiceEntry(id, !choice.includes(id))
         return
       }
     },
   })
-  const message =
-    mode === "correct" ? (
-      <b className="text-2xl">Correct!</b>
-    ) : mode === "incorrect" ? (
+  let message = null
+  if (mode === "correct") {
+    message = <b className="text-2xl">Correct!</b>
+  } else if (mode === "incorrect") {
+    message = feedbackObject?.correctChoice ? (
       <>
         <b className="text-xl">
-          Correct solution{correctAnswers.length > 1 ? "s" : ""}:
+          Correct solution
+          {feedbackObject.correctChoice.length > 1 ? "s" : ""}:
         </b>
         <br />
-        {correctAnswers.map((item) => (
-          <div key={item.key}>{item.element}</div>
+        {feedbackObject.correctChoice.map((item, index) => (
+          <div key={index}>{<Markdown md={question.answers[item]} />}</div>
         ))}
       </>
-    ) : null
-
-  if (source) {
-    return (
-      <Question
-        permalink={permalink}
-        title={title}
-        regenerate={regenerate}
-        footerMode={mode}
-        footerMessage={message}
-        handleFooterClick={handleClick}
-        source={source}
-      >
-        {children}
-        {"\n"}
-        {"\\begin{itemize}\n"}
-        {answers.map(({ element }) => (
-          <>
-            {"  \\item "}
-            {element}
-            {"\n"}
-          </>
-        ))}
-        {"\\end{itemize}\n"}
-      </Question>
+    ) : (
+      <>Incorrect</>
     )
   }
   return (
     <Question
       permalink={permalink}
-      title={title}
+      title={question.name}
       regenerate={regenerate}
-      footerMode={mode}
+      footerMode={
+        mode === "invalid" || viewOnly
+          ? "disabled"
+          : mode === "correct"
+          ? "correct"
+          : mode === "incorrect"
+          ? "incorrect"
+          : "verify"
+      }
       footerMessage={message}
       handleFooterClick={handleClick}
-      source={source}
     >
-      {children}
+      <Markdown md={question.text ?? ""} />
       <div className="mx-auto flex max-w-max flex-wrap gap-5 p-5">
-        {answers.map(({ key, element }) => {
+        {question.answers.map((answer, index) => {
+          const id = `${index}`
           return (
-            <div key={key} className="flex place-items-center">
+            <div key={index} className="flex place-items-center">
               <input
-                type={allowMultiple ? "checkbox" : "radio"}
-                id={key}
+                type={question.allowMultiple ? "checkbox" : "radio"}
+                id={id}
                 className="peer hidden"
-                checked={checked.includes(key)}
+                checked={choice.includes(index)}
                 onChange={(e) => {
-                  setCheckedEntry(e.target.id, e.target.checked)
+                  setChoiceEntry(parseInt(e.target.id, 10), e.target.checked)
                 }}
                 disabled={mode === "correct" || mode === "incorrect"}
               />
               <AnswerBox
+                checked={choice.includes(index)}
+                correct={feedbackObject?.correctChoice?.includes(index)}
+                disabled={mode === "correct" || mode === "incorrect"}
                 TagName="label"
-                disabled={mode === "disabled"}
-                htmlFor={key}
-                includePeerCheckedStyle
+                htmlFor={id}
+                className="relative"
               >
-                {element}
+                <Markdown md={answer} />
               </AnswerBox>
             </div>
           )

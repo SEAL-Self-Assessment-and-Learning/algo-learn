@@ -1,9 +1,12 @@
-import { Trans } from "react-i18next"
 import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
-import TeX from "../../components/TeX"
 import { Question, QuestionProps } from "../../hooks/useSkills"
 import { sampleTermSet, TermSetVariants } from "../../utils/AsymptoticTerm"
 import Random from "../../utils/random"
+import {
+  MultipleChoiceQuestion,
+  minimalMultipleChoiceFeedback,
+} from "../test/QuestionGenerator"
+import { format } from "../../utils/format"
 
 /**
  * Generate and render a question about simplifying sums
@@ -40,7 +43,7 @@ export const SimplifySum: Question = {
       .at(-1)
     const answers = sum.map((term) => ({
       key: term.toLatex(variable, true),
-      element: <TeX>\Theta\big({term.toLatex(variable, true)}\big)</TeX>,
+      element: `$\\Theta\\big(${term.toLatex(variable, true)}\\big)$`,
       correct: term === correctTerm,
     }))
 
@@ -49,21 +52,32 @@ export const SimplifySum: Question = {
       .map((t) => t.toLatex())
       .join(" + ")}`
 
+    const question: MultipleChoiceQuestion = {
+      type: "MultipleChoiceQuestion",
+      name: t(SimplifySum.title) ?? "",
+      text: format(
+        t("asymptotics.simplifySum.text" ?? "asymptotics.simplifySum.text", [
+          functionDeclaration,
+          functionDefinition,
+        ])
+      ),
+      answers: answers.map(({ element }) => element),
+      feedback: minimalMultipleChoiceFeedback({
+        correctAnswerIndex: answers
+          .map((x, i) => ({ ...x, i }))
+          .filter((x) => x.correct)
+          .map((x) => x.i),
+      }),
+      path: permalink,
+    }
     return (
       <ExerciseMultipleChoice
-        title={t(SimplifySum.title)}
-        answers={answers}
+        question={question}
         regenerate={regenerate}
-        allowMultiple={false}
         onResult={onResult}
         permalink={permalink}
         viewOnly={viewOnly}
-      >
-        <Trans t={t} i18nKey="asymptotics.simplifySum.text">
-          Let <TeX>{functionDeclaration}</TeX> be defined as
-          <TeX block>{functionDefinition}</TeX>
-        </Trans>
-      </ExerciseMultipleChoice>
+      />
     )
   },
 }

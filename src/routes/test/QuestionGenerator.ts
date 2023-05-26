@@ -113,7 +113,7 @@ export interface MultipleChoiceFeedback extends FeedbackBase {
 /** The signature of the feedback function for multiple-choice questions */
 export type MultipleChoiceFeedbackFunction = (
   answer: MultipleChoiceAnswer
-) => MultipleChoiceFeedback
+) => MultipleChoiceFeedback | Promise<MultipleChoiceFeedback>
 
 /**
  * This function returns a feedback function for multiple-choice questions that
@@ -191,7 +191,7 @@ export type FreeTextFeedback = FeedbackBase
 /** The signature of the feedback function for free-text questions */
 export type FreeTextFeedbackFunction = (
   answer: FreeTextAnswer
-) => FreeTextFeedback
+) => Promise<FreeTextFeedback>
 
 /**
  * Each QuestionGenerator may support multiple variants and parameters with
@@ -266,7 +266,10 @@ export interface QuestionGenerator {
    *   as a closure. Additional properties may be added to the output object to
    *   provide unit tests.
    */
-  generate: (parameters: Parameters, lang?: Language) => { question: Question }
+  generate: (
+    parameters: Parameters,
+    lang?: Language
+  ) => { question: Question } | Promise<{ question: Question }>
 }
 
 /**

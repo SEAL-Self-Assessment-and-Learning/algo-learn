@@ -1,6 +1,4 @@
-import { ReactElement } from "react"
 import Random from "../../utils/random"
-import TeX from "../../components/TeX"
 
 /**
  * Produce a string of the form " print(***)"
@@ -75,18 +73,12 @@ export function Recurrence({
   b: number
   c: number
   d: number
-}): ReactElement {
+}): string {
   const baseString = `${T}(1) = ${d}`
   const recString = `${T}(${n}) = ${a != 1 ? `${a} ` : ""}${T}(${n}${
     b != 1 ? ` / ${b}` : ""
   }) ${c != 0 ? ` + ${c}` : ""}`
-  return (
-    <div className="flex flex-col">
-      <TeX>
-        {baseString}\\{recString}
-      </TeX>
-    </div>
-  )
+  return `$${baseString}\\\\${recString}$`
 }
 
 /**
@@ -120,11 +112,11 @@ export function sampleRecurrenceAnswers({
   b: number
   c: number
   d: number
-}): Array<{ key: string; correct: boolean; element: ReactElement }> {
+}): Array<{ key: string; correct: boolean; element: string }> {
   const answers: Array<{
     key: string
     correct: boolean
-    element: ReactElement
+    element: string
   }> = []
   function tryAdding({
     a,
