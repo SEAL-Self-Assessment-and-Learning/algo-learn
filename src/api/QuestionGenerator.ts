@@ -242,15 +242,33 @@ export interface Parameters extends Record<string, string | number> {
  * example MultipleChoiceQuestion, etc.
  */
 export interface QuestionGenerator {
-  path: string // Can be used as part of the URL (only lower-case letters, numbers and dashes)
-  languages: Language[] // List of supported languages
-  name: (lang: Language) => string // Readable name of the question
-  description: (lang: Language) => string // Short description of the question
-  tags?: string[] // Tags for the question
-  author?: string // Author of the question
-  version?: string // Version of the question
-  license?: string // License of the question
-  link?: string // Link to the source code of the question
+  /**
+   * The path can be used as part of the URL (only lower-case letters, numbers,
+   * dashes, and slashes) to identify the question. For example, the path could
+   * be "python3/variables" for a question about Python variables.
+   */
+  path: string
+
+  /** List of supported languages. */
+  languages: Language[]
+
+  /** Human-readable name of the question. */
+  name: (lang: Language) => string
+
+  /** Human-readable short description of the question. */
+  description: (lang: Language) => string
+
+  /** Link to the source code of the question. (optional) */
+  link?: string // 
+
+  /** Tags for this question. (optional) */
+  tags?: string[]
+
+  /** Author(s) of the question. (optional) */
+  author?: string
+
+  /** License of the question. (optional) */
+  license?: string
 
   /** List of allowed parameters for the question. */
   allowedParameters: AllowedParameter[]
