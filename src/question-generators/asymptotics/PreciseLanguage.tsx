@@ -1,6 +1,6 @@
-import { Question } from "../../hooks/useSkills"
+import { OldQuestionGenerator } from "../../hooks/useSkills"
 import {
-  PreciseLanguageMeta as PreciseLanguageMeta,
+  PreciseLanguageMeta,
   BasicMCQuestion,
 } from "../../utils/PreciseLanguageMeta"
 
@@ -212,8 +212,9 @@ const questions: BasicMCQuestion[] = [
   },
 ]
 
-export const AsymptoticsPreciseLanguage: Question = PreciseLanguageMeta(
-  "asymptotics/precise-language",
-  "asymptotics.precise-language.title",
-  questions
-)
+export const AsymptoticsPreciseLanguage: OldQuestionGenerator =
+  PreciseLanguageMeta(
+    "asymptotics/precise-language",
+    "asymptotics.precise-language.title",
+    questions
+  )

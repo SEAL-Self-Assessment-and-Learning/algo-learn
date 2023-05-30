@@ -2,7 +2,7 @@ import { markdownToLatex } from "./markdown"
 import { Question, MultipleChoiceQuestion } from "../api/QuestionGenerator"
 
 /** Function to render the question in LaTeX */
-export function questionToLatex(question: Question): string {
+export function questionToTex(question: Question): string {
   if (question.type === "MultipleChoiceQuestion") {
     const q: MultipleChoiceQuestion = question
     return `\\begin{exercise}[${markdownToLatex(q.name)}]

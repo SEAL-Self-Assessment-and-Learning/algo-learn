@@ -11,8 +11,9 @@ import {
 import { useTheme } from "../hooks/useTheme"
 
 /**
- * Display question with a header, a main section, and a footer. The footer can
- * be used to verify the answer, or to show the correct/incorrect answer.
+ * (Deprecated) Display question with a header, a main section, and a footer.
+ * The footer can be used to verify the answer, or to show the correct/incorrect
+ * answer.
  *
  * @param props
  * @param props.permalink Permalink to the question.
@@ -24,7 +25,7 @@ import { useTheme } from "../hooks/useTheme"
  * @param props.footerMessage Message to display in the footer.
  * @param props.handleFooterClick Function to handle clicking the footer button.
  */
-export function Question({
+export function OldQuestionComponent({
   permalink,
   title,
   regenerate,

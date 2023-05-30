@@ -9,12 +9,12 @@ import {
   sampleFraction,
   IteratedLogarithms,
 } from "./asymptoticsUtils"
-import { Question, QuestionProps } from "../../hooks/useSkills"
+import { OldQuestionGenerator, OldQuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
 import { ExerciseTextInput } from "../../components/ExerciseTextInput"
 
 /** Generate and render a question about O/Omega/o/omega */
-export const Between: Question = {
+export const Between: OldQuestionGenerator = {
   name: "asymptotics/between",
   title: "asymptotics.between.title",
   description: "asymptotics.between.description",
@@ -27,7 +27,7 @@ export const Between: Question = {
     onResult,
     regenerate,
     viewOnly,
-  }: QuestionProps) => {
+  }: OldQuestionProps) => {
     const permalink = Between.name + "/" + variant + "/" + seed
     const random = new Random(seed)
     const functionName = random.choice("fghFGHT".split(""))

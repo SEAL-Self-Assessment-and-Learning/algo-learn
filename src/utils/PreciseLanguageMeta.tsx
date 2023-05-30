@@ -1,5 +1,5 @@
 import { ExerciseMultipleChoice } from "../components/ExerciseMultipleChoice"
-import { Question, QuestionProps } from "../hooks/useSkills"
+import { OldQuestionGenerator, OldQuestionProps } from "../hooks/useSkills"
 import Random from "./random"
 import { RecursionFormula } from "../question-generators/recursion/RecursionFormula"
 import { Translations, DeepTranslations } from "./translations"
@@ -72,7 +72,7 @@ export const PreciseLanguageMeta: (
   path: string,
   title: string,
   questions: BasicMCQuestion[]
-) => Question = (path, title, questions) => {
+) => OldQuestionGenerator = (path, title, questions) => {
   const variants = questions.map((_, i) => `${i}`)
   return {
     name: path,
@@ -87,7 +87,7 @@ export const PreciseLanguageMeta: (
       onResult,
       regenerate,
       viewOnly,
-    }: QuestionProps) => {
+    }: OldQuestionProps) => {
       const permalink = RecursionFormula.name + "/" + variant + "/" + seed
       const { t, lang } = useTranslation()
       const random = new Random(seed)

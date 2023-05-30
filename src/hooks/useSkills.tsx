@@ -20,7 +20,7 @@ import { Loops } from "../question-generators/time/Loops"
 import { AsymptoticsPreciseLanguage } from "../question-generators/asymptotics/PreciseLanguage"
 import { Result } from "../components/QuestionComponent"
 
-export type QuestionProps = {
+export type OldQuestionProps = {
   variant: string
   seed: string
   t: TFunction
@@ -29,24 +29,24 @@ export type QuestionProps = {
   viewOnly?: boolean
 }
 
-export interface Question {
+export interface OldQuestionGenerator {
   name: string
   variants: string[]
   examVariants: string[]
   independentVariants?: boolean // variants don't depend on each other
   title: string
   description?: string
-  Component: FunctionComponent<QuestionProps>
+  Component: FunctionComponent<OldQuestionProps>
   masteryThreshold?: number // number of subsequent correct answers required to "master"
 }
 
-export interface QuestionVariant {
-  question: Question
+export interface OldQuestionVariant {
+  question: OldQuestionGenerator
   variant: string
 }
 
 /** List of all questions */
-export const questions: Question[] = [
+export const questions: OldQuestionGenerator[] = [
   AsymptoticsPreciseLanguage,
   SortTerms,
   LandauNotation,
@@ -64,21 +64,21 @@ for (const q of questions) {
 }
 
 /** Return the question corresponding to a path */
-export function questionByPath(path: string): Question | undefined {
+export function questionByPath(path: string): OldQuestionGenerator | undefined {
   for (const e of questions) {
     if (path.startsWith(e.name)) return e
   }
 }
 
 /** List of all valid (question,variant) pairs */
-export const ALL_SKILLS: QuestionVariant[] = questions.flatMap((q) =>
+export const ALL_SKILLS: OldQuestionVariant[] = questions.flatMap((q) =>
   q.variants.map((v) => ({
     question: q,
     variant: v,
   }))
 )
 
-export const EXAM_SKILLS: QuestionVariant[] = questions.flatMap((q) =>
+export const EXAM_SKILLS: OldQuestionVariant[] = questions.flatMap((q) =>
   q.examVariants.map((v) => ({
     question: q,
     variant: v,
@@ -86,7 +86,7 @@ export const EXAM_SKILLS: QuestionVariant[] = questions.flatMap((q) =>
 )
 
 /** Return the path corresponding to a question variant */
-export function pathOfQuestionVariant(qv: QuestionVariant): string {
+export function pathOfQuestionVariant(qv: OldQuestionVariant): string {
   return qv.question.name + "/" + qv.variant
 }
 
@@ -101,14 +101,14 @@ export function pathOfQuestionVariant(qv: QuestionVariant): string {
 export function questionSetByPath(
   path: string,
   mode: "practice" | "exam" = "practice"
-): QuestionVariant[] {
+): OldQuestionVariant[] {
   const QV = mode === "practice" ? ALL_SKILLS : EXAM_SKILLS
   return QV.filter((qv) => pathOfQuestionVariant(qv).startsWith(path))
 }
 
 export function questionVariantByPath(
   path: string
-): QuestionVariant | undefined {
+): OldQuestionVariant | undefined {
   return questionSetByPath(path)[0]
 }
 

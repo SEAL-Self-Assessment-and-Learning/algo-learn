@@ -8,7 +8,7 @@ import {
   LogEntry,
   questionByPath,
   questions,
-  Question,
+  OldQuestionGenerator,
   ALL_SKILLS,
   useSkills,
   pathOfQuestionVariant,
@@ -291,7 +291,7 @@ function QuestionTableRow({
   onMouseOver,
   onMouseOut,
 }: {
-  question: Question
+  question: OldQuestionGenerator
   variant?: string
   strength: number
   halflife?: number

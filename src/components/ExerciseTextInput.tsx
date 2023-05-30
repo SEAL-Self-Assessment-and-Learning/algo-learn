@@ -2,7 +2,7 @@ import { ReactNode, useState } from "react"
 import { useTranslation } from "../hooks/useTranslation"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
-import { Question } from "./Question"
+import { OldQuestionComponent } from "./OldQuestionComponent"
 
 /**
  * ExerciseTextInput is an exercise that requires the user to type in text.
@@ -104,7 +104,7 @@ export function ExerciseTextInput({
     },
   })
   return (
-    <Question
+    <OldQuestionComponent
       permalink={permalink}
       title={title}
       regenerate={regenerate}
@@ -134,6 +134,6 @@ export function ExerciseTextInput({
       <div className="py-5 text-slate-600 dark:text-slate-400">
         {bottomNote}
       </div>
-    </Question>
+    </OldQuestionComponent>
   )
 }

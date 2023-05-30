@@ -1,4 +1,4 @@
-import { Question } from "../../hooks/useSkills"
+import { OldQuestionGenerator } from "../../hooks/useSkills"
 import {
   BasicMCQuestion,
   PreciseLanguageMeta,
@@ -168,7 +168,7 @@ const questions: BasicMCQuestion[] = [
   },
 ]
 
-export const MathPreciseLanguage: Question = PreciseLanguageMeta(
+export const MathPreciseLanguage: OldQuestionGenerator = PreciseLanguageMeta(
   "math/precise-language",
   "math.precise-language.title",
   questions

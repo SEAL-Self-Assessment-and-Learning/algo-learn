@@ -29,7 +29,6 @@ export const TestQuestion: QuestionGenerator = {
   tags: ["calculus", "sum"],
   languages: ["en_US", "de_DE"],
   author: "Max Mustermann",
-  version: "1.0.0",
   license: "MIT",
   link: "https://example.com",
   allowedParameters: [

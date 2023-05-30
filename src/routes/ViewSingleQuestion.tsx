@@ -1,8 +1,8 @@
 import { useTranslation } from "../hooks/useTranslation"
 import { useNavigate, useParams } from "react-router-dom"
-import { QuestionVariant, pathOfQuestionVariant } from "../hooks/useSkills"
+import { OldQuestionVariant, pathOfQuestionVariant } from "../hooks/useSkills"
 
-export function ViewSingleQuestion({ qv }: { qv: QuestionVariant }) {
+export function ViewSingleQuestion({ qv }: { qv: OldQuestionVariant }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { seed } = useParams() as {

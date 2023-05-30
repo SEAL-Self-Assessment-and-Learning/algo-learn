@@ -1,6 +1,6 @@
 import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
 import TeX from "../../components/TeX"
-import { Question, QuestionProps } from "../../hooks/useSkills"
+import { OldQuestionGenerator, OldQuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
 import { ExerciseTextInput } from "../../components/ExerciseTextInput"
 import {
@@ -27,7 +27,7 @@ import { Markdown } from "../../components/Markdown"
  * @returns Output
  */
 
-export const RecursionFormula: Question = {
+export const RecursionFormula: OldQuestionGenerator = {
   name: "recursion/formula",
   title: "recursion.formula.title",
   variants: ["choice", "input"],
@@ -39,7 +39,7 @@ export const RecursionFormula: Question = {
     onResult,
     regenerate,
     viewOnly,
-  }: QuestionProps) => {
+  }: OldQuestionProps) => {
     const permalink = RecursionFormula.name + "/" + variant + "/" + seed
     const random = new Random(seed)
 

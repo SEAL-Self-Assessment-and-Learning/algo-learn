@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { AnswerBox } from "./AnswerBox"
-import { Question } from "./Question"
+import { OldQuestionComponent } from "./OldQuestionComponent"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import {
@@ -144,7 +144,7 @@ export function ExerciseMultipleChoice({
     )
   }
   return (
-    <Question
+    <OldQuestionComponent
       permalink={permalink}
       title={question.name}
       regenerate={regenerate}
@@ -190,6 +190,6 @@ export function ExerciseMultipleChoice({
           )
         })}
       </div>
-    </Question>
+    </OldQuestionComponent>
   )
 }

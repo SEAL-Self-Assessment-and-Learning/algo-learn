@@ -8,21 +8,22 @@ import { renderToStaticMarkup } from "react-dom/server"
  *
  * @example
  *   ;```tsx
- *   <TeX>1 + 1 = 2</TeX>
+ *   <TeX tex="e^{i \pi} = -1" />
  *   ```
  *
  * @example
  *   ;```tsx
- *   <TeX block>1 + 1 = 2</TeX>
+ *   <TeX tex="e^{i \pi} = -1" block />
  *   ```
  *
  * @example
  *   ;```tsx
- *   <TeX block source>1 + 1 = 2</TeX>
+ *   <TeX tex="e^{i \pi} = -1" source />
  *   ```
  *
  * @param props
  * @param props.tex The TeX code to render.
+ * @param props.children (Deprecated) The TeX code to render.
  * @param props.block Whether to render as a block.
  * @param props.source Whether to print the LaTeX source or render it in react.
  * @returns The rendered TeX code. If `source` is `true`, the TeX source code is

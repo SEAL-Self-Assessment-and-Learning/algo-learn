@@ -1,6 +1,6 @@
 import { ExerciseSort } from "../../components/ExerciseSort"
 import TeX from "../../components/TeX"
-import { Question, QuestionProps } from "../../hooks/useSkills"
+import { OldQuestionGenerator, OldQuestionProps } from "../../hooks/useSkills"
 import {
   sampleTermSet,
   SimpleAsymptoticTerm,
@@ -26,7 +26,7 @@ import Random from "../../utils/random"
  *
  * @returns Output
  */
-export const SortTerms: Question = {
+export const SortTerms: OldQuestionGenerator = {
   name: "asymptotics/sort", // Name of the skill, used in the URL
   title: "asymptotics.sort.title",
   variants: ["start", "pure", "polylog", "polylogexp"],
@@ -38,7 +38,7 @@ export const SortTerms: Question = {
     onResult,
     regenerate,
     viewOnly,
-  }: QuestionProps) => {
+  }: OldQuestionProps) => {
     const permalink = SortTerms.name + "/" + variant + "/" + seed
     const random = new Random(seed)
 

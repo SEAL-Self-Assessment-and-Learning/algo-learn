@@ -259,7 +259,7 @@ export interface QuestionGenerator {
   description: (lang: Language) => string
 
   /** Link to the source code of the question. (optional) */
-  link?: string // 
+  link?: string //
 
   /** Tags for this question. (optional) */
   tags?: string[]

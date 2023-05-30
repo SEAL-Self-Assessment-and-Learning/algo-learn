@@ -1,5 +1,5 @@
 import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
-import { Question, QuestionProps } from "../../hooks/useSkills"
+import { OldQuestionGenerator, OldQuestionProps } from "../../hooks/useSkills"
 import { sampleTermSet, TermSetVariants } from "./asymptoticsUtils"
 import Random from "../../utils/random"
 import {
@@ -13,7 +13,7 @@ import { format } from "../../utils/format"
  *
  * @returns Output
  */
-export const SimplifySum: Question = {
+export const SimplifySum: OldQuestionGenerator = {
   name: "asymptotics/sum",
   title: "asymptotics.sum.title",
   variants: ["pure", "polylog", "polylogexp"],
@@ -25,7 +25,7 @@ export const SimplifySum: Question = {
     onResult,
     regenerate,
     viewOnly,
-  }: QuestionProps) => {
+  }: OldQuestionProps) => {
     const permalink = SimplifySum.name + "/" + variant + "/" + seed
     const random = new Random(seed)
 

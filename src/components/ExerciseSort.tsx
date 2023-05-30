@@ -3,7 +3,7 @@ import { useTranslation } from "../hooks/useTranslation"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { SortableList } from "./SortableList"
 import { useSound } from "../hooks/useSound"
-import { Question } from "./Question"
+import { OldQuestionComponent } from "./OldQuestionComponent"
 
 /**
  * ExerciseSort is a reordering exercise.
@@ -78,7 +78,7 @@ export function ExerciseSort({
     ) : null
 
   return (
-    <Question
+    <OldQuestionComponent
       permalink={permalink}
       title={title}
       regenerate={regenerate}
@@ -93,6 +93,6 @@ export function ExerciseSort({
         className="p-5"
         disabled={mode !== "verify"}
       />
-    </Question>
+    </OldQuestionComponent>
   )
 }

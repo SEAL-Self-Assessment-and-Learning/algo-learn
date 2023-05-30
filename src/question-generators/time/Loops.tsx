@@ -1,5 +1,5 @@
 import TeX from "../../components/TeX"
-import { Question, QuestionProps } from "../../hooks/useSkills"
+import { OldQuestionGenerator, OldQuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
 import {
   parseRecursiveFunction,
@@ -32,7 +32,7 @@ import { ExerciseTextInput } from "../../components/ExerciseTextInput"
  * @returns Output
  */
 
-export const Loops: Question = {
+export const Loops: OldQuestionGenerator = {
   name: "time/loops",
   title: "time.loops.title",
   variants: ["simpleExact"],
@@ -44,7 +44,7 @@ export const Loops: Question = {
     onResult,
     regenerate,
     viewOnly,
-  }: QuestionProps) => {
+  }: OldQuestionProps) => {
     const { theme } = useTheme()
     const permalink = Loops.name + "/" + variant + "/" + seed
     const random = new Random(seed)

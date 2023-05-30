@@ -10,7 +10,7 @@ import {
 import { useTheme } from "../hooks/useTheme"
 import { TestQuestion } from "../question-generators/test/TestQuestion"
 import { Question, questionToJSON } from "../api/QuestionGenerator"
-import { questionToLatex } from "../utils/questionToTex"
+import { questionToTex } from "../utils/questionToTex"
 import { useTranslation } from "../hooks/useTranslation"
 
 /** Component for testing the question generator */
@@ -71,7 +71,7 @@ export function TestSimpleMC() {
             style={theme === "dark" ? solarizedDark : solarizedLight}
           >
             {format === "latex"
-              ? questionToLatex(question)
+              ? questionToTex(question)
               : questionToJSON(question)}
           </SyntaxHighlighter>
         </HorizontallyCenteredDiv>

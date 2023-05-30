@@ -1,6 +1,6 @@
 import { ExerciseMultipleChoice } from "../../components/ExerciseMultipleChoice"
 import TeX from "../../components/TeX"
-import { Question, QuestionProps } from "../../hooks/useSkills"
+import { OldQuestionGenerator, OldQuestionProps } from "../../hooks/useSkills"
 import Random from "../../utils/random"
 import {
   MultipleChoiceQuestion,
@@ -17,8 +17,7 @@ import {
  * @param props.regeneratable - Whether the question can be regenerated
  * @returns Output
  */
-
-export const LandauNotation: Question = {
+export const LandauNotation: OldQuestionGenerator = {
   name: "asymptotics/landau",
   title: "asymptotics.landau.title",
   variants: ["default"],
@@ -30,7 +29,7 @@ export const LandauNotation: Question = {
     onResult,
     regenerate,
     viewOnly,
-  }: QuestionProps) => {
+  }: OldQuestionProps) => {
     const permalink = LandauNotation.name + "/" + variant + "/" + seed
     const random = new Random(seed)
 
