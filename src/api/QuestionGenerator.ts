@@ -200,7 +200,10 @@ export type FreeTextFeedbackFunction = (
  * their types, descriptions, and allowed values.
  */
 export interface ParameterBase {
+  /** Name of the parameter. */
   name: string
+
+  /** Human-readable description of the parameter. */
   description: (lang: Language) => string
 }
 
@@ -259,7 +262,7 @@ export interface QuestionGenerator {
   description: (lang: Language) => string
 
   /** Link to the source code of the question. (optional) */
-  link?: string //
+  link?: string
 
   /** Tags for this question. (optional) */
   tags?: string[]
@@ -288,6 +291,66 @@ export interface QuestionGenerator {
     parameters: Parameters,
     lang?: Language
   ) => { question: Question } | Promise<{ question: Question }>
+}
+
+/**
+ * Function that is given a question generator and a list of parameters and
+ * encodes this information in the URL path for the question.
+ *
+ * @param generator The question generator
+ * @param lang The language to use when generating the question
+ * @param parameters The parameters for a question
+ * @returns The URL path describing th
+ */
+export function toPath(
+  generator: QuestionGenerator,
+  lang: Language,
+  parameters: Parameters
+): string {
+  let path = lang === "de_DE" ? "de" : lang === "en_US" ? "en" : lang
+  path += "/" + generator.path
+  for (const { name } of generator.allowedParameters) {
+    const value = parameters[name] ?? ""
+    path += value !== "" ? `/${name}:${value}` : ""
+  }
+  return path
+}
+
+/**
+ * Deserializes a generator and parameters from a URL path.
+ *
+ * @param path The URL path
+ * @returns The generator and parameters
+ */
+export function fromPath(path: string): {
+  lang: Language
+  generatorPath: string
+  parameters: Parameters
+} {
+  const parts = path.split("/")
+
+  const lang: Language =
+    parts[0] === "de"
+      ? "de_DE"
+      : parts[0] === "en"
+      ? "en_US"
+      : (parts[0] as Language)
+
+  let generatorPath = ""
+  let i = 1
+  for (; i < parts.length && !parts[i].includes(":"); i++) {
+    generatorPath += (generatorPath !== "" ? "/" : "") + parts[i]
+  }
+
+  const parameters: Parameters = {}
+  for (; i < parts.length; i++) {
+    if (parts[i].includes(":")) {
+      const [name, value] = parts[i].split(":")
+      parameters[name] = value
+    }
+  }
+
+  return { lang, generatorPath, parameters }
 }
 
 /**
