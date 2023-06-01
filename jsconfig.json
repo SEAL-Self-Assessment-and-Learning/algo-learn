@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "module": "ES6",
+    "module": "ESNext",
     "jsx": "react-jsx",
     "checkJs": true
   },
-  "include": ["src/**/*"]
+  "include": ["src", "front-end/src"]
 }

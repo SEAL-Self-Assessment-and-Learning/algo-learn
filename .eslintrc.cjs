@@ -44,7 +44,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["src/**/*.ts", "src/**/*.tsx"],
+      files: ["*/src/**/*.ts", "*/src/**/*.tsx"],
       extends: [
         "eslint:recommended",
         "plugin:react/recommended",

@@ -66,7 +66,7 @@ jobs:
         with:
           options: ""
           ssh_options: ""
-          src: "dist/"
+          src: "front-end/dist/"
           dest: "dell-from-github@tcs.uni-frankfurt.de:/var/www/html/algo-learn/"
 
       - name: Display status from deploy
