@@ -1,18 +1,16 @@
 import { ReactElement, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
-import {
-  questionByPath,
-  useSkills,
-  sortByStrength,
-  allQuestionVariantsInPath,
-} from "../hooks/useSkills"
+import { useSkills, sortByStrength } from "../hooks/useSkills"
 import { Button } from "./Button"
 import { ScreenCenteredDiv } from "./CenteredDivs"
 import { useTranslation } from "../hooks/useTranslation"
 import Random from "../../../shared/src/utils/random"
-import { Result } from "./QuestionComponent"
-import { TermSetVariants } from "../../../shared/src/question-generators/asymptotics/asymptoticsUtils"
+import { QuestionComponent, Result } from "./QuestionComponent"
+import { generatorSetBelowPath } from "../listOfQuestions"
+import { serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
+import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
+import { Parameters } from "../../../shared/src/api/Parameters"
 
 const great = {
   en_US: [
@@ -126,7 +124,10 @@ export function QuizSession({
     sessionSeed: new Random(Math.random()).base36string(7),
   })
   const [state, setState] = useState({
-    questionVariants: [] as string[],
+    questionVariants: [] as Array<{
+      generator: QuestionGenerator
+      parameters: Parameters
+    }>,
     numCorrect: 0,
     numIncorrect: 0,
     status: "initializing" as
@@ -148,16 +149,16 @@ export function QuizSession({
   })
 
   if (status === "initializing") {
-    let newQuestionVariants = allQuestionVariantsInPath({
-      path: partialPath,
-      mode,
-    })
+    let newQuestionVariants = generatorSetBelowPath(partialPath)
     newQuestionVariants = sortByStrength({
       random: new Random(sessionSeed),
       featureMap,
-      questionVariants: newQuestionVariants,
+      generatorCalls: newQuestionVariants,
     })
     newQuestionVariants = newQuestionVariants.slice(0, targetNum)
+    if (newQuestionVariants.length === 0) {
+      throw new Error("No question variants available")
+    }
     setState({
       ...state,
       questionVariants: newQuestionVariants,
@@ -182,33 +183,33 @@ export function QuizSession({
     if (num === targetNum) {
       setState({ ...state, status: "finished" })
     }
-    const nextPath =
+
+    const obj =
       mode === "practice"
         ? sortByStrength({
             random,
             featureMap,
-            questionVariants,
+            generatorCalls: questionVariants,
           })[0]
         : random.choice(questionVariants)
-    const Q = questionByPath(nextPath)
-    const [skillGroup, question, variant] = nextPath.split("/")
-    if (!Q) throw Error(`Question with path '${nextPath}' not found!`)
+    const { generator, parameters } = obj
+    const nextPath = serializeGeneratorCall({
+      generator,
+      parameters,
+      seed: questionSeed,
+    })
 
     const handleResult = (result: Result) => {
       if (result === "correct") {
         appendLogEntry({
-          question: `${skillGroup}/${question}`,
-          variant,
-          seed: questionSeed,
+          path: nextPath,
           result: "pass",
           timestamp: Date.now(),
         })
         setState({ ...state, numCorrect: numCorrect + 1 })
       } else if (result === "incorrect") {
         appendLogEntry({
-          question: `${skillGroup}/${question}`,
-          variant,
-          seed: questionSeed,
+          path: nextPath,
           result: "fail",
           timestamp: Date.now(),
         })
@@ -218,13 +219,19 @@ export function QuizSession({
       }
     }
 
+    const question = Promise.resolve(
+      generator.generate(lang, parameters, questionSeed)
+    ).then((q) => q.question)
     return (
-      <Q.Component
-        key={questionSeed}
-        seed={questionSeed}
-        variant={variant as TermSetVariants}
+      <QuestionComponent
+        key={serializeGeneratorCall({
+          generator,
+          lang,
+          parameters,
+          seed: questionSeed,
+        })}
+        questionPromise={question}
         onResult={handleResult}
-        t={t}
       />
     )
   }

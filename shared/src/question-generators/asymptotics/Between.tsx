@@ -1,37 +1,71 @@
-import { Trans } from "../../../../front-end/src/hooks/useTranslation"
 import math, { getVars } from "../../utils/math"
-import TeX from "../../../../front-end/src/components/TeX"
 import {
-  SumProductTerm,
   mathNodeToSumProductTerm,
   ProductTerm,
   createProductTerm,
   sampleFraction,
   IteratedLogarithms,
+  SumProductTerm,
 } from "./asymptoticsUtils"
-import {
-  OldQuestionGenerator,
-  OldQuestionProps,
-} from "../../../../front-end/src/hooks/useSkills"
 import Random from "../../utils/random"
-import { ExerciseTextInput } from "../../../../front-end/src/components/ExerciseTextInput"
+import {
+  FreeTextFeedbackFunction,
+  FreeTextFormatFunction,
+  FreeTextQuestion,
+  QuestionGenerator,
+} from "../../api/QuestionGenerator"
+import { Translations, tFunction, tFunctional } from "../../utils/translations"
+import { serializeGeneratorCall } from "../../api/QuestionRouter"
+import { validateParameters } from "../../api/Parameters"
+import { MathNode } from "mathjs"
+
+const translation: Translations = {
+  en_US: {
+    "Theta.text": "Enter a function ${{0}}$ that satisfies ${{1}}$.",
+    note: "Note: This text field accepts *simple* mathematical formulas, such as `{{0}}`, `{{1}}`, or `{{2}}`.",
+    text: "Enter a function ${{0}}$ that satisfies \\[{{1}}\\] and \\[{{2}}\\,.\\]",
+    name: "Between",
+    "feedback.unknown-variable": "Unknown variable",
+    "feedback.expected": "Expected",
+    "feedback.invalid-expression": "invalid formula",
+    "feedback.incomplete": "Incomplete or too complex",
+  },
+  de_DE: {
+    "Theta.text": "Gib eine Funktion ${{0}}$ an, die $${{1}}$$ erfüllt.",
+    note: "Hinweis: Dieses Feld erwartet *einfache* mathematische Formeln, wie etwa `{{0}}`, `{{1}}`, oder `{{2}}`.",
+    text: "Gib eine Funktion ${{0}}$ an, die \\[{{1}}\\] und \\[{{2}}\\] erfüllt.",
+    name: "Dazwischen",
+    "feedback.unknown-variable": "Unbekannte Variable",
+    "feedback.expected": "Erwartet",
+    "feedback.invalid-expression": "ungültige Formel",
+    "feedback.incomplete": "Nicht vollständig oder zu komplex",
+  },
+}
 
 /** Generate and render a question about O/Omega/o/omega */
-export const Between: OldQuestionGenerator = {
-  name: "asymptotics/between",
-  title: "asymptotics.between.title",
-  description: "asymptotics.between.description",
-  variants: ["start", "log", "loglog", "nifty"],
-  examVariants: ["polylog"],
-  Component: ({
-    seed,
-    variant,
-    t,
-    onResult,
-    regenerate,
-    viewOnly,
-  }: OldQuestionProps) => {
-    const permalink = Between.name + "/" + variant + "/" + seed
+export const Between: QuestionGenerator = {
+  path: "asymptotics/between",
+  name: tFunctional(translation, "name"),
+  languages: ["en_US", "de_DE"],
+  expectedParameters: [
+    {
+      type: "string",
+      name: "variant",
+      allowedValues: ["start", "log", "loglog", "nifty"],
+    },
+  ],
+  generate: (lang, parameters, seed) => {
+    const { t } = tFunction(translation, lang)
+
+    if (!validateParameters(parameters, Between.expectedParameters)) {
+      throw new Error(
+        `Unknown variant ${
+          parameters.variant
+        }. Valid variants are: ${Between.expectedParameters.join(",")}`
+      )
+    }
+    const variant = parameters.variant as "start" | "log" | "loglog" | "nifty"
+
     const random = new Random(seed)
     const functionName = random.choice("fghFGHT".split(""))
     const variable = random.choice("nmNMxyztk".split(""))
@@ -45,147 +79,151 @@ export const Between: OldQuestionGenerator = {
       aLandau = "o"
       bLandau = "\\omega"
     }
-    let functionDeclaration
-    let aTeX, bTeX
-    const title = t(Between.title)
-    let condA, condB
-    let parsed: SumProductTerm
-    let condTheta
+
+    let text: string
+    const functionDeclaration = `${functionName}\\colon\\mathbb N\\to\\mathbb R`
     if (variant === "nifty") {
-      condTheta = `${functionName}(${variable}) \\in ${`${"\\Theta"}(${functionName}(${variable})^2)`}`
+      const condTheta = `${functionName}(${variable}) \\in ${`${"\\Theta"}(${functionName}(${variable})^2)`}`
+      text = t("Theta.text", [functionDeclaration, condTheta])
     } else {
-      functionDeclaration = `${functionName}\\colon\\mathbb N\\to\\mathbb R`
-      aTeX = `${aLandau}(${a.toLatex(variable)})`
-      bTeX = `${bLandau}(${b.toLatex(variable)})`
-      condA = `${functionName}(${variable}) \\in ${aTeX}`
-      condB = `${functionName}(${variable}) \\in ${bTeX}`
-    }
-    let desc
-    if (variant !== "nifty") {
-      desc = (
-        <>
-          <Trans t={t} i18nKey="asymptotics.between.text">
-            <TeX>{functionDeclaration}</TeX>
-            <TeX block>{condA}</TeX>
-            <TeX block>{condB}</TeX>
-          </Trans>
-          <div className="flex place-items-center gap-2 pl-3"></div>
-        </>
-      )
-    } else {
-      desc = (
-        <>
-          <Trans t={t} i18nKey="asymptotics.between.Theta.text">
-            <TeX>{functionDeclaration}</TeX>
-            <TeX block>{condTheta}</TeX>
-          </Trans>
-          <div className="flex place-items-center gap-2 pl-3"></div>
-        </>
-      )
+      const aTeX = `${aLandau}(${a.toLatex(variable)})`
+      const bTeX = `${bLandau}(${b.toLatex(variable)})`
+      const condA = `${functionName}(${variable}) \\in ${aTeX}`
+      const condB = `${functionName}(${variable}) \\in ${bTeX}`
+      text = t("text", [functionDeclaration, condA, condB])
     }
 
-    const prompt = (
-      <TeX>
-        {functionName}({variable}) ={" "}
-      </TeX>
-    )
+    const prompt = `$${functionName}(${variable}) =$ `
 
-    const bottomNote = (
-      <>
-        <Trans t={t} i18nKey="asymptotics.between.note">
-          Note: This text field accepts <i>simple</i> mathematical expressions,
-          such as
-        </Trans>{" "}
-        &ldquo;<span className="font-mono">96n^3</span>&rdquo;, &ldquo;
-        <span className="font-mono">n log(n)</span>&rdquo;, {t("or")} &ldquo;
-        <span className="font-mono">n^(2/3)</span>&rdquo;.
-      </>
-    )
-    const feedback = (input: string) => {
-      if (input === "")
+    const bottomText: string = t("note", ["96n^3", "n * log(n)", "n^(2/3)"])
+
+    const checkFormat: FreeTextFormatFunction = ({ text }) => {
+      if (text.trim() === "") {
         return {
-          isValid: false,
-          isCorrect: false,
-          FeedbackText: null,
+          valid: false,
         }
+      }
+      let mathNode: MathNode | undefined
+      let valid = true
       try {
-        const expr = math.parse(input)
-        const unknownVars = getVars(expr).filter((v) => v !== variable)
-        const unknownVar: string | null =
-          unknownVars.length > 0 ? unknownVars[0] : null
-        if (unknownVar) {
-          return {
-            isValid: false,
-            isCorrect: false,
-            FeedbackText: (
-              <>
-                {t("feedback.unknown-variable")}: <TeX>{unknownVar}</TeX>.<br />
-                {t("feedback.expected")}: <TeX>{variable}</TeX>.
-              </>
-            ),
-          }
+        mathNode = math.parse(text)
+      } catch (e) {
+        valid = false
+      }
+      if (
+        !valid ||
+        mathNode === undefined ||
+        (mathNode instanceof math.ConstantNode && mathNode.value === undefined)
+      ) {
+        return {
+          valid: false,
+          message: t("feedback.invalid-expression"),
         }
-        try {
-          parsed = mathNodeToSumProductTerm(math.parse(input))
-          if (variant === "nifty") {
-            return {
-              isValid: true,
-              isCorrect:
-                parsed.getTerms()[0].exponentialBase.n === 1 &&
-                parsed.getTerms()[0].exponentialBase.d === 1 &&
-                parsed.getTerms()[0].logarithmExponents.size === 0,
-              FeedbackText: (
-                <TeX>
-                  {expr.toTex({
-                    parenthesis: "auto",
-                    implicit: "show",
-                  })}
-                </TeX>
-              ),
-            }
-          } else {
-            return {
-              isValid: true,
-              isCorrect: parsed.compare(a) * parsed.compare(b) < 0,
-              FeedbackText: (
-                <TeX>
-                  {expr.toTex({
-                    parenthesis: "auto",
-                    implicit: "show",
-                  })}
-                </TeX>
-              ),
-            }
-          }
-        } catch (e) {
-          return {
-            isValid: false,
-            isCorrect: false,
-            FeedbackText: t("feedback.incomplete"),
-          }
+      }
+
+      const unknownVars = getVars(mathNode).filter((v) => v !== variable)
+      const unknownVar: string | null =
+        unknownVars.length > 0 ? unknownVars[0] : null
+      if (unknownVar) {
+        return {
+          valid: false,
+          message: `${t("feedback.unknown-variable")}: $${unknownVar}$.
+
+${t("feedback.expected")}: $${variable}$.`,
         }
+      }
+
+      return {
+        valid: true,
+        message:
+          "$" +
+          mathNode.toTex({
+            parenthesis: "auto",
+            implicit: "show",
+          }) +
+          "$",
+      }
+    }
+
+    const feedback: FreeTextFeedbackFunction = ({ text }) => {
+      let mathNode: MathNode
+      try {
+        mathNode = math.parse(text)
       } catch (e) {
         return {
-          isValid: false,
-          isCorrect: false,
-          FeedbackText: t("feedback.invalid-expression"),
+          correct: false,
+          message: t("feedback.invalid-expression"),
+        }
+      }
+
+      const unknownVars = getVars(mathNode).filter((v) => v !== variable)
+      const unknownVar: string | null =
+        unknownVars.length > 0 ? unknownVars[0] : null
+      if (unknownVar) {
+        return {
+          correct: false,
+          feedbackText: `${t(
+            "feedback.unknown-variable"
+          )}: $${unknownVar}$. ${t("feedback.expected")}: $${variable}$.`,
+        }
+      }
+
+      let sumProductTerm: SumProductTerm
+      try {
+        sumProductTerm = mathNodeToSumProductTerm(math.parse(text))
+      } catch (e) {
+        return {
+          correct: false,
+          feedbackText: t("feedback.incomplete"),
+        }
+      }
+
+      if (variant === "nifty") {
+        return {
+          correct:
+            sumProductTerm.getTerms()[0].exponentialBase.n === 1 &&
+            sumProductTerm.getTerms()[0].exponentialBase.d === 1 &&
+            sumProductTerm.getTerms()[0].logarithmExponents.size === 0,
+          feedbackText:
+            "$" +
+            mathNode.toTex({
+              parenthesis: "auto",
+              implicit: "show",
+            }) +
+            "$",
+        }
+      } else {
+        return {
+          correct: sumProductTerm.compare(a) * sumProductTerm.compare(b) < 0,
+          feedbackText:
+            "$" +
+            mathNode.toTex({
+              parenthesis: "auto",
+              implicit: "show",
+            }) +
+            "$",
         }
       }
     }
-    return (
-      <ExerciseTextInput
-        title={title}
-        feedback={feedback}
-        onResult={onResult}
-        regenerate={regenerate}
-        permalink={permalink}
-        viewOnly={viewOnly}
-        prompt={prompt}
-        bottomNote={bottomNote}
-      >
-        {desc}
-      </ExerciseTextInput>
-    )
+
+    const question: FreeTextQuestion = {
+      type: "FreeTextQuestion",
+      name: t("name"),
+      path: serializeGeneratorCall({
+        generator: Between,
+        lang,
+        parameters,
+        seed,
+      }),
+      text,
+      prompt,
+      placeholder: "mathematical formula",
+      bottomText,
+      feedback,
+      checkFormat,
+    }
+
+    return { question }
   },
 }
 

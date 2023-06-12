@@ -1,8 +1,9 @@
-import { OldQuestionGenerator } from "../../../../front-end/src/hooks/useSkills"
+import { QuestionGenerator } from "../../api/QuestionGenerator"
 import {
   PreciseLanguageMeta,
   BasicMCQuestion,
 } from "../../utils/PreciseLanguageMeta"
+import { tFunctional } from "../../utils/translations"
 
 const questions: BasicMCQuestion[] = [
   {
@@ -212,9 +213,14 @@ const questions: BasicMCQuestion[] = [
   },
 ]
 
-export const AsymptoticsPreciseLanguage: OldQuestionGenerator =
+const translations = {
+  en_US: { title: "Precise phrasing: Oh-Notation" },
+  de_DE: { title: "Präzises Formulieren: Oh-Notation" },
+}
+
+export const AsymptoticsPreciseLanguage: QuestionGenerator =
   PreciseLanguageMeta(
     "asymptotics/precise-language",
-    "asymptotics.precise-language.title",
+    tFunctional(translations, "title"),
     questions
   )

@@ -1,4 +1,4 @@
-import { Language } from "../api/QuestionGenerator"
+import { Language } from "../api/Language"
 import { format } from "./format"
 
 /** Type for keys in translations objects */
@@ -82,17 +82,17 @@ export function tFunctional(translations: Translations, key: string) {
 export function tFunction(
   translations: Translations,
   lang: Language
-): { t: (key: TKey, parameters: TFunctionParameters) => string }
+): { t: (key: TKey, parameters?: TFunctionParameters) => string }
 export function tFunction(
   translations: DeepTranslations,
   lang: Language
-): { t: (key: TKey, parameters: TFunctionParameters) => string | string[] }
+): { t: (key: TKey, parameters?: TFunctionParameters) => string | string[] }
 export function tFunction(
   translations: Translations | DeepTranslations,
   lang: Language
 ) {
   return {
-    t: (key: TKey, parameters: TFunctionParameters) =>
+    t: (key: TKey, parameters?: TFunctionParameters) =>
       t(translations, lang, key, parameters),
   }
 }

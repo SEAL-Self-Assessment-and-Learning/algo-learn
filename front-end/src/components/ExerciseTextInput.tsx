@@ -1,99 +1,101 @@
-import { ReactNode, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "../hooks/useTranslation"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
-import { OldQuestionComponent } from "./OldQuestionComponent"
+import { InteractWithQuestion, MODE } from "./InteractWithQuestion"
+import {
+  FreeTextFeedback,
+  FreeTextQuestion,
+} from "../../../shared/src/api/QuestionGenerator"
+import { Result } from "./QuestionComponent"
+import { Markdown } from "./Markdown"
 
 /**
  * ExerciseTextInput is an exercise that requires the user to type in text.
  *
  * @param props
- * @param props.permalink Permalink to the question.
- * @param props.title Title of the question.
+ * @param props.question The question.
  * @param props.regenerate Function to regenerate the question.
- * @param props.children Main section of the question.
  * @param props.onResult Function to call when the user submits an answer.
- * @param props.viewOnly Whether to disable answering.
- * @param props.possibleCorrectSolution Possible correct solution to show when
- *   the user gets the answer wrong.
- * @param props.feedback Function to generate feedback for the given text.
- * @param props.bottomNote Note to show at the bottom of the question.
- * @param props.prompt Prompt to show at the top of the question.
+ * @param props.permalink Permalink to the question.
  */
 export function ExerciseTextInput({
-  title,
-  children,
-  prompt,
-  feedback,
-  bottomNote,
+  question,
   regenerate,
-  onResult = () => {},
+  onResult,
   permalink,
-  viewOnly = false,
-  possibleCorrectSolution,
 }: {
-  title: string
-  children?: ReactNode
-  prompt?: ReactNode
-  feedback: (text: string) => {
-    isValid: boolean
-    isCorrect: boolean
-    FeedbackText: ReactNode
-  }
-  bottomNote?: ReactNode
+  question: FreeTextQuestion
   regenerate?: () => void
-  onResult?: (result: "correct" | "incorrect" | "abort") => void
-  allowMultiple?: boolean
+  onResult?: (result: Result) => void
   permalink?: string
-  viewOnly?: boolean
-  possibleCorrectSolution?: ReactNode
 }) {
-  const { t } = useTranslation()
   const { playSound } = useSound()
-  const [text, setText] = useState("")
-  const [savedMode, setMode] = useState(
-    "disabled" as "disabled" | "verify" | "correct" | "incorrect"
-  )
+  const { t } = useTranslation()
 
-  const { isValid, isCorrect, FeedbackText } = feedback(text)
-  const msgColor = isValid
-    ? "text-green-600 dark:text-green-400"
-    : "text-red-600 dark:text-red-400"
-  const mode = !isValid
-    ? "disabled"
-    : savedMode === "disabled"
-    ? "verify"
-    : savedMode
-  const message =
-    mode === "correct" ? (
-      <b className="text-2xl">{t("feedback.correct")}</b>
-    ) : mode === "incorrect" ? (
-      possibleCorrectSolution ? (
-        <>
-          <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
-          <br />
-          {possibleCorrectSolution}
-        </>
-      ) : (
-        <b className="text-2xl">{t("feedback.incorrect")}</b>
+  const [state, setState] = useState({
+    mode: "invalid" as MODE,
+
+    /** The indices of the selected answers */
+    text: "",
+
+    /**
+     * The feedback object returned by question.feedback(). Will be set when the
+     * Promise returned by question.feedback() resolves.
+     */
+    feedbackObject: undefined as FreeTextFeedback | undefined,
+
+    /**
+     * Message to show when the text is invalid. This is determined by the
+     * checkFormat method.
+     */
+    formatFeedback: undefined as string | undefined,
+  })
+
+  const { mode, text, feedbackObject, formatFeedback } = state
+
+  function setText(text: string) {
+    setState((state) => ({ ...state, text }))
+    if (question.checkFormat) {
+      void Promise.resolve(question.checkFormat({ text })).then(
+        ({ valid, message }) => {
+          setState({
+            ...state,
+            text,
+            mode: valid ? "draft" : "invalid",
+            formatFeedback: message,
+          })
+        }
       )
-    ) : null
-  function handleClick() {
-    if (mode === "disabled") {
-      if (!viewOnly) setMode("verify")
-    } else if (mode === "verify") {
-      if (FeedbackText === null || !isValid) return
-      if (isCorrect) {
-        playSound("pass")
-        setMode("correct")
-      } else {
-        playSound("fail")
-        setMode("incorrect")
-      }
-    } else if (mode === "correct" || mode === "incorrect") {
-      onResult(mode)
+    } else {
+      const valid = text.trim().length > 0
+      setState({ ...state, text, mode: valid ? "draft" : "invalid" })
     }
   }
+
+  function handleClick() {
+    if (mode === "draft") {
+      if (question.feedback !== undefined) {
+        setState({ ...state, mode: "submitted" })
+        void Promise.resolve(question.feedback({ text })).then(
+          (feedbackObject) => {
+            let mode: MODE = "draft"
+            if (feedbackObject.correct === true) {
+              playSound("pass")
+              mode = "correct"
+            } else if (feedbackObject.correct === false) {
+              playSound("fail")
+              mode = "incorrect"
+            }
+            setState({ ...state, mode, feedbackObject })
+          }
+        )
+      }
+    } else if (mode === "correct" || mode === "incorrect") {
+      onResult && onResult(mode)
+    }
+  }
+
   useGlobalDOMEvents({
     keydown(e: Event) {
       const key = (e as KeyboardEvent).key
@@ -103,20 +105,40 @@ export function ExerciseTextInput({
       }
     },
   })
+
+  const msgColor =
+    mode === "draft"
+      ? "text-green-600 dark:text-green-400"
+      : "text-red-600 dark:text-red-400"
+  const message =
+    mode === "correct" ? (
+      <b className="text-2xl">{t("feedback.correct")}</b>
+    ) : mode === "incorrect" ? (
+      feedbackObject?.correctAnswer ? (
+        <>
+          <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
+          <br />
+          <Markdown md={feedbackObject.correctAnswer} />
+        </>
+      ) : (
+        <b className="text-2xl">{t("feedback.incorrect")}</b>
+      )
+    ) : null
+
   return (
-    <OldQuestionComponent
+    <InteractWithQuestion
       permalink={permalink}
-      title={title}
+      name={question.name}
       regenerate={regenerate}
       footerMode={mode}
       footerMessage={message}
       handleFooterClick={handleClick}
     >
-      {children}
+      <Markdown md={question.text} />
       <br />
       <br />
       <div className="flex place-items-center gap-2 pl-3">
-        {prompt}
+        <Markdown md={question.prompt} />
         <input
           autoFocus
           type="text"
@@ -128,12 +150,14 @@ export function ExerciseTextInput({
           disabled={mode === "correct" || mode === "incorrect"}
         />
         <div className={`flex h-12 items-center ${msgColor}`}>
-          <div>{FeedbackText}</div>
+          <div>
+            <Markdown md={formatFeedback} />
+          </div>
         </div>
       </div>
       <div className="py-5 text-slate-600 dark:text-slate-400">
-        {bottomNote}
+        <Markdown md={question.bottomText} />
       </div>
-    </OldQuestionComponent>
+    </InteractWithQuestion>
   )
 }

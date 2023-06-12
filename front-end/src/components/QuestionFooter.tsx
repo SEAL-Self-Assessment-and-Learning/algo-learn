@@ -3,6 +3,7 @@ import { GiPlayButton } from "react-icons/gi"
 import { SiCheckmarx, SiIfixit } from "react-icons/si"
 import { Button } from "./Button"
 import { useTranslation } from "../hooks/useTranslation"
+import { MODE } from "./InteractWithQuestion"
 
 /**
  * QuestionFooter is the footer of a question. It contains a message and a
@@ -14,11 +15,11 @@ import { useTranslation } from "../hooks/useTranslation"
  * @param props.buttonClick Function to call when the button is clicked.
  */
 export function QuestionFooter({
-  mode = "disabled",
+  mode,
   message,
   buttonClick,
 }: {
-  mode?: "correct" | "incorrect" | "disabled" | "verify"
+  mode?: MODE
   message?: ReactNode
   buttonClick: () => void
 }) {
@@ -50,7 +51,7 @@ export function QuestionFooter({
       ? "text-red-900 dark:text-red-100"
       : ""
   const buttonColor =
-    mode === "correct" || mode === "verify"
+    mode === "correct" || mode === "draft"
       ? "green"
       : mode === "incorrect"
       ? "red"
@@ -68,7 +69,7 @@ export function QuestionFooter({
           color={buttonColor}
           onClick={buttonClick}
           className="self-end sm:self-center"
-          disabled={mode === "disabled"}
+          disabled={mode === "invalid" || mode === "submitted"}
         >
           {footerButtonText}
         </Button>

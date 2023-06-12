@@ -1,212 +1,113 @@
+import { sampleLoop } from "./loopsUtils"
 import {
-  parseRecursiveFunction,
-  sampleExactIfEven,
-  sampleLoop,
-  sampleRecurrenceAnswers,
-} from "./loopUtils"
-import SyntaxHighlighter from "react-syntax-highlighter"
-import {
-  solarizedDark,
-  solarizedLight,
-} from "react-syntax-highlighter/dist/esm/styles/hljs"
-import {
-  MultipleChoiceQuestion,
-  minimalMultipleChoiceFeedback,
+  FreeTextFeedbackFunction,
+  FreeTextQuestion,
+  QuestionGenerator,
 } from "../../api/QuestionGenerator"
-import TeX from "../../../../front-end/src/components/TeX"
-import { ExerciseMultipleChoice } from "../../../../front-end/src/components/ExerciseMultipleChoice"
-import { ExerciseTextInput } from "../../../../front-end/src/components/ExerciseTextInput"
-import {
-  OldQuestionGenerator,
-  OldQuestionProps,
-} from "../../../../front-end/src/hooks/useSkills"
-import { useTheme } from "../../../../front-end/src/hooks/useTheme"
 import Random from "../../utils/random"
-import { format } from "../../utils/format"
+import { Translations, tFunction, tFunctional } from "../../utils/translations"
+import { validateParameters } from "../../api/Parameters"
+import { serializeGeneratorCall } from "../../api/QuestionRouter"
+import { RecursionFormula } from "../recursion/formula"
 
-/**
- * Generate and render a question about asymptotic notation
- *
- * @param props
- * @param props.seed - Seed for random number generator
- * @param props.t - Translation function
- * @param props.onResult - Callback function
- * @param props.regeneratable - Whether the question can be regenerated
- * @returns Output
- */
+const translations: Translations = {
+  en_US: {
+    description:
+      "Consider the following procedure `{{0}}` with integer input ${{1}}$:",
+    description2:
+      "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
+    "long-title": "Loops",
+    "simpleExact.description": "Consider the following piece of code:",
+    "simpleExact.prompt": "Number of stars:",
+    "simpleExact.question": "How many stars are printed?",
+    name: "Loops",
+  },
+  de_DE: {
+    description:
+      "Betrachte die folgende Prozedur {{0}} mit ganzzahliger Eingabe {{1}}:",
+    description2:
+      "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
+    "long-title": "Schleifen",
+    "simpleExact.description": "Betrachte den folgenden Code:",
+    "simpleExact.prompt": "Anzahl der Sterne:",
+    "simpleExact.question": "Wie viele Sterne werden ausgegeben?",
+    name: "Schleifen",
+  },
+}
 
-export const Loops: OldQuestionGenerator = {
-  name: "time/loops",
-  title: "time.loops.title",
-  variants: ["simpleExact"],
-  examVariants: ["simpleExact"],
-  Component: ({
-    seed,
-    variant,
-    t,
-    onResult,
-    regenerate,
-    viewOnly,
-  }: OldQuestionProps) => {
-    const { theme } = useTheme()
-    const permalink = Loops.name + "/" + variant + "/" + seed
+export const Loops: QuestionGenerator = {
+  path: "time/loops",
+  name: tFunctional(translations, "name"),
+  languages: ["en_US", "de_DE"],
+  expectedParameters: [
+    {
+      type: "string",
+      name: "variant",
+      allowedValues: ["simpleExact"],
+    },
+  ],
+  generate(lang, parameters, seed) {
+    const { t } = tFunction(translations, lang)
+
+    if (!validateParameters(parameters, Loops.expectedParameters)) {
+      throw new Error(
+        `Unknown variant ${
+          parameters.variant
+        }. Valid variants are: ${Loops.expectedParameters.join(",")}`
+      )
+    }
+    const permalink = serializeGeneratorCall({
+      generator: RecursionFormula,
+      lang,
+      parameters,
+      seed,
+    })
+
     const random = new Random(seed)
-
-    const { functionText, functionName, n, b, a, d, c } = sampleLoop(random)
+    const { functionText, functionName, n, numStars } = sampleLoop(random)
 
     const T = random.choice("TABCDEFGHS".split(""))
-    const answers = sampleRecurrenceAnswers({ random, T, n, a, b, c, d })
-
-    let desc = `
-${format(t("time.loops.description", [functionName, n]))}
+    const description = `
+${t("description", [functionName, n])}
 
 \`\`\`python3
 ${functionText}
 \`\`\`
 
-${format(t("time.loops.description2", [`${T}(${n})`]))}
-
-`
-    if (variant !== "choice") {
-      desc += ` ${t("recursion.formula.basecase")} $${T}(1)=${d}$. `
-    }
-    desc += t("recursion.formula.question") + " " + `${T}(${n})`
-    if (variant !== "choice") {
-      desc += ` ${t("for")} ${n} \\geq 2`
-    }
-    desc += "?"
-
-    if (variant === "simpleExact") {
-      const { code, numStars } = sampleExactIfEven({ random })
-      const desc = (
-        <>
-          {t("time.loops.simpleExact.description")}
-          <div className="my-5">
-            <SyntaxHighlighter
-              language="python3"
-              style={theme === "light" ? solarizedLight : solarizedDark}
-            >
-              {code}
-            </SyntaxHighlighter>
-          </div>
-          {t("time.loops.simpleExact.question")}
-        </>
-      )
-      const prompt = t("time.loops.simpleExact.prompt")
-      const feedback = (input: string) => {
-        if (input === "") {
-          return {
-            isValid: false,
-            isCorrect: false,
-            FeedbackText: null,
-          }
-        }
-        const m = input.match(/^\d+$/)
-        const p = parseInt(input, 10)
-        if (m === null || isNaN(p)) {
-          return {
-            isValid: false,
-            isCorrect: false,
-            FeedbackText: t("feedback.nan"),
-          }
-        } else {
-          return {
-            isValid: true,
-            isCorrect: p === numStars,
-            FeedbackText: `${p}`,
-          }
+${t("description2", [`${T}(${n})`])}`
+    const prompt = t("simpleExact.prompt")
+    const feedback: FreeTextFeedbackFunction = ({ text }) => {
+      if (text === "") {
+        return {
+          isValid: false,
+          isCorrect: false,
+          FeedbackText: null,
         }
       }
-      return (
-        <ExerciseTextInput
-          title={t("time.loops.long-title")}
-          feedback={feedback}
-          onResult={onResult}
-          regenerate={regenerate}
-          permalink={permalink}
-          viewOnly={viewOnly}
-          prompt={prompt}
-          possibleCorrectSolution={numStars}
-        >
-          {desc}
-        </ExerciseTextInput>
-      )
-    } else if (variant === "choice") {
-      const question: MultipleChoiceQuestion = {
-        type: "MultipleChoiceQuestion",
-        name: t("time.loops.long-title"),
-        text: desc,
-        path: permalink,
-        answers: answers.map(({ element }) => element),
-        feedback: minimalMultipleChoiceFeedback({
-          correctAnswerIndex: answers
-            .map((x, i) => ({ ...x, i }))
-            .filter((x) => x.correct)
-            .map((x) => x.i),
-        }),
-      }
-      return (
-        <ExerciseMultipleChoice
-          question={question}
-          onResult={onResult}
-          regenerate={regenerate}
-          permalink={permalink}
-          viewOnly={viewOnly}
-        />
-      )
-    } else if (variant === "input") {
-      const prompt = (
-        <TeX>
-          {T}({n}) ={" "}
-        </TeX>
-      )
-      const feedback = (input: string) => {
-        if (input === "")
-          return {
-            isValid: false,
-            isCorrect: false,
-            FeedbackText: null,
-          }
-        try {
-          const p = parseRecursiveFunction(input)
-          return {
-            isValid: true,
-            isCorrect:
-              p.a === a && p.b === b && p.c === c && p.T === T && p.n === n,
-            FeedbackText: null,
-          }
-        } catch (e) {
-          return {
-            isValid: false,
-            isCorrect: false,
-            FeedbackText: t("feedback.incomplete"),
-          }
+      const m = text.match(/^\d+$/)
+      const p = parseInt(text, 10)
+      if (m === null || isNaN(p)) {
+        return {
+          correct: false,
+          message: t("feedback.nan"),
+          correctAnswer: `${numStars}`,
+        }
+      } else {
+        return {
+          correct: p === numStars,
+          message: `${p}`,
+          correctAnswer: `${numStars}`,
         }
       }
-      return (
-        <ExerciseTextInput
-          title={t("recursion.formula.long-title")}
-          feedback={feedback}
-          onResult={onResult}
-          regenerate={regenerate}
-          permalink={permalink}
-          viewOnly={viewOnly}
-          prompt={prompt}
-          possibleCorrectSolution={
-            <TeX>
-              {a} {T}({n}/{b}) + {c}
-            </TeX>
-          }
-        >
-          {desc}
-        </ExerciseTextInput>
-      )
-    } else {
-      throw new Error(
-        `Unknown variant ${variant}. Valid variants are: ${Loops.variants.join(
-          ", "
-        )}`
-      )
     }
+    const question: FreeTextQuestion = {
+      type: "FreeTextQuestion",
+      name: t("long-title"),
+      text: description,
+      path: permalink,
+      feedback,
+      prompt,
+    }
+    return { question }
   },
 }

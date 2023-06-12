@@ -20,7 +20,10 @@ import { useTheme } from "../hooks/useTheme"
  * @param props.md The markdown-like string to render
  * @returns The React component
  */
-export const Markdown: FunctionComponent<{ md: string }> = ({ md }) => {
+export const Markdown: FunctionComponent<{ md?: string }> = ({ md }) => {
+  if (!md) {
+    return <></>
+  }
   return <MarkdownTree parseTree={parseMarkdown(md)} />
 }
 

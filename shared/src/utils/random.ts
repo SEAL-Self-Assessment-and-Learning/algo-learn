@@ -1,3 +1,11 @@
+/** The length of base36-seed strings */
+export const SEED_LENGTH = 7
+
+/** Sample a uniformly random seed from Math.random(). */
+export function sampleRandomSeed(): string {
+  return new Random(Math.random()).base36string(SEED_LENGTH)
+}
+
 /** Class for generating random numbers from a given seed. */
 export default class Random {
   /**
@@ -116,10 +124,11 @@ export default class Random {
   /**
    * Generates a random base36 string of a given length.
    *
-   * @param length - The length of the string to generate.
+   * @param length - The length of the string to generate. (default:
+   *   SEED_LENGTH)
    * @returns A random base36 string of the given length.
    */
-  base36string(length: number): string {
+  base36string(length: number = SEED_LENGTH): string {
     const str = []
     for (let i = 0; i < length; i++) {
       str.push(this.int(0, 35).toString(36))

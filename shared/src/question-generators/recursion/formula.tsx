@@ -1,0 +1,167 @@
+import Random from "../../utils/random"
+import {
+  parseRecursiveFunction,
+  sampleRecurrenceAnswers,
+  sampleRecursiveFunction,
+} from "./formulaUtils"
+import {
+  FreeTextFeedbackFunction,
+  Question,
+  FreeTextFormatFunction,
+  QuestionGenerator,
+  minimalMultipleChoiceFeedback,
+} from "../../api/QuestionGenerator"
+import { format } from "../../utils/format"
+import { Translations, tFunction, tFunctional } from "../../utils/translations"
+import { serializeGeneratorCall } from "../../api/QuestionRouter"
+import { validateParameters } from "../../api/Parameters"
+
+const translations: Translations = {
+  en_US: {
+    basecase: "The base case is",
+    description:
+      "Consider the following recursive procedure `{{0}}` with integer input ${{1}}$:",
+    description2:
+      "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
+    "long-name": "Recurrence Relation",
+    question: "What is the recurrence relation of",
+    name: "Recurrence",
+    bottomnote:
+      "Note: This field expects a string of the form `{{0}}` as input.",
+    "feedback.incomplete": "Incomplete or too complex",
+  },
+  de_DE: {
+    basecase: "Der Basisfall ist",
+    description:
+      "Betrachte die folgende rekursive Prozedur `{{0}}` mit ganzzahliger Eingabe ${{1}}$:",
+    description2:
+      "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
+    "long-name": "Rekurrenzrelation",
+    question: "Was ist die Rekurrenzrelation von",
+    name: "Rekurrenz",
+    bottomnote:
+      "Hinweis: Dieses Feld erwartet einen String der Form `{{0}}` als Eingabe.",
+    "feedback.incomplete": "Nicht vollständig oder zu komplex",
+  },
+}
+
+export const RecursionFormula: QuestionGenerator = {
+  path: "recursion/formula",
+  name: tFunctional(translations, "name"),
+  languages: ["en_US", "de_DE"],
+  expectedParameters: [
+    {
+      type: "string",
+      name: "variant",
+      allowedValues: ["choice", "input"],
+    },
+  ],
+  generate(lang, parameters, seed) {
+    const permalink = serializeGeneratorCall({
+      generator: RecursionFormula,
+      lang,
+      parameters,
+      seed,
+    })
+    const random = new Random(seed)
+    const { t } = tFunction(translations, lang)
+
+    if (!validateParameters(parameters, RecursionFormula.expectedParameters)) {
+      throw new Error(
+        `Unknown variant ${
+          parameters.variant
+        }. Valid variants are: ${RecursionFormula.expectedParameters.join(
+          ", "
+        )}`
+      )
+    }
+
+    const variant = parameters.variant as "choice" | "input"
+    const { functionText, functionName, n, b, a, d, c } =
+      sampleRecursiveFunction(random)
+
+    const T = random.choice("TABCDEFGHS".split(""))
+    const answers = sampleRecurrenceAnswers({ random, T, n, a, b, c, d })
+
+    let text = `
+${format(t("description"), [functionName, n])}
+
+\`\`\`python3
+${functionText.trim()}
+\`\`\`
+
+${format(t("description2"), [`${T}(${n})`])}`
+
+    if (variant !== "choice") {
+      text += ` ${t("basecase")} $${T}(1)=${d}$.`
+    }
+    text += ` ${t("question") + " "} $${`${T}(${n})`}$`
+
+    if (variant !== "choice") {
+      text += ` ${t("for")} $${n} \\geq 2$`
+    }
+    text += " ?"
+
+    let question: Question
+    if (variant === "choice") {
+      question = {
+        type: "MultipleChoiceQuestion",
+        name: t("long-name"),
+        path: permalink,
+        text: text,
+        answers: answers.map(({ element }) => element),
+        feedback: minimalMultipleChoiceFeedback({
+          correctAnswerIndex: answers
+            .map((x, i) => ({ ...x, i }))
+            .filter((x) => x.correct)
+            .map((x) => x.i),
+        }),
+      }
+    } else {
+      const prompt = `$${T}(${n}) =$ `
+      const bottomText = t("bottomnote", [`a ${T}(${n}/b) + c`])
+
+      const checkFormat: FreeTextFormatFunction = ({ text }) => {
+        if (text.trim() === "") return { valid: false }
+        try {
+          const { a, b, c, T, n } = parseRecursiveFunction(text)
+          return { valid: true, message: `${a} ${T}(${n}/${b}) + ${c}` }
+        } catch (e) {
+          return { valid: false, message: t("feedback.incomplete") }
+        }
+      }
+
+      const feedback: FreeTextFeedbackFunction = ({ text }) => {
+        const correctAnswer = `$${a} ${T}(${n}/${b}) + ${c}$`
+
+        let p: ReturnType<typeof parseRecursiveFunction>
+        try {
+          p = parseRecursiveFunction(text)
+        } catch (e) {
+          return {
+            correct: false,
+            message: t("feedback.incomplete"),
+            correctAnswer,
+          }
+        }
+
+        return {
+          correct:
+            p.a === a && p.b === b && p.c === c && p.T === T && p.n === n,
+          correctAnswer,
+        }
+      }
+      question = {
+        type: "FreeTextQuestion",
+        path: permalink,
+        name: t("long-name"),
+        text,
+        prompt,
+        bottomText,
+        feedback,
+        checkFormat,
+      }
+    }
+    return { question }
+  },
+}

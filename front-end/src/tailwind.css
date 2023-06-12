@@ -24,7 +24,7 @@
   }
 
   .btn {
-    @apply inline-block rounded-lg px-4 py-2 font-bold shadow-lg;
+    @apply inline-block whitespace-nowrap rounded-lg px-4 py-2 font-bold shadow-lg;
   }
 
   .btn-blue {

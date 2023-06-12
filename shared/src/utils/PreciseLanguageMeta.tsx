@@ -1,18 +1,18 @@
-import { ExerciseMultipleChoice } from "../../../front-end/src/components/ExerciseMultipleChoice"
-import {
-  OldQuestionGenerator,
-  OldQuestionProps,
-} from "../../../front-end/src/hooks/useSkills"
 import Random from "./random"
-import { RecursionFormula } from "../question-generators/recursion/RecursionFormula"
 import { Translations, DeepTranslations } from "./translations"
 import { format } from "./format"
-import { useTranslation } from "../../../front-end/src/hooks/useTranslation"
 import {
-  Language,
   MultipleChoiceQuestion,
+  QuestionGenerator,
   minimalMultipleChoiceFeedback,
 } from "../api/QuestionGenerator"
+import { Language } from "../api/Language"
+import { serializeGeneratorCall } from "../api/QuestionRouter"
+import {
+  ExpectedParameters,
+  Parameters,
+  validateParameters,
+} from "../api/Parameters"
 
 /**
  * Interface for "basic" Multiple-Choice Questions. These are fairly static,
@@ -66,107 +66,104 @@ const translations: Translations = {
 /**
  * Generate and render a question formal mathematical language
  *
- * @param path The path to the question
- * @param title The title of the question
+ * @param generatorPath The path to the question
+ * @param name The title of the question
  * @param questions The questions to ask
  * @returns The question as a Question object
  */
-export const PreciseLanguageMeta: (
-  path: string,
-  title: string,
+export function PreciseLanguageMeta(
+  generatorPath: string,
+  name: (lang: Language) => string,
   questions: BasicMCQuestion[]
-) => OldQuestionGenerator = (path, title, questions) => {
-  const variants = questions.map((_, i) => `${i}`)
-  return {
-    name: path,
-    title: title,
-    variants: variants,
-    independentVariants: true,
-    examVariants: [],
-    masteryThreshold: 1,
-    Component: ({
-      seed,
-      variant,
-      onResult,
-      regenerate,
-      viewOnly,
-    }: OldQuestionProps) => {
-      const permalink = RecursionFormula.name + "/" + variant + "/" + seed
-      const { t, lang } = useTranslation()
-      const random = new Random(seed)
+): QuestionGenerator {
+  const variants = questions.map((_, i) => i)
+  const languages = Object.keys(questions[0].translations) as Language[]
+  const expectedParameters: ExpectedParameters =
+    variants.length > 0
+      ? [
+          {
+            type: "integer",
+            name: "number",
+            min: 0,
+            max: variants.length - 1,
+          },
+        ]
+      : []
 
-      if (!variants.includes(variant)) {
-        throw new Error(
-          `Unknown variant ${variant}. Valid variants are: ${variants.join(
-            ", "
-          )}`
-        )
-      }
-      const i = parseInt(variant, 10)
+  function generate(lang: Language, parameters: Parameters, seed: string) {
+    if (!validateParameters(parameters, expectedParameters)) {
+      throw new Error(
+        `Unknown variant ${
+          parameters.variant
+        }. Valid variants are: ${variants.join(", ")}`
+      )
+    }
+    const i = parameters.number as number
 
-      const parameters = questions[i].parameters
-      const p: Record<string, string> = {}
-      if (parameters !== undefined) {
-        const usedValues: string[] = []
-        Object.keys(parameters).forEach((pattern) => {
-          let replacement = parameters[pattern]
-          if (typeof replacement === "string") {
-            replacement = replacement.split("")
-          }
-          replacement = replacement.filter((c) => !usedValues.includes(c))
-          p[pattern] = random.choice(replacement)
-          usedValues.push(p[pattern])
-        })
-      }
+    const random = new Random(seed)
 
-      const ownt = questions[i].translations[lang]
-      const numCorrect = ownt.correctAnswers.length
-      const answers = ownt.correctAnswers
-        .map((a: string, index: number) => ({
-          correct: true,
-          key: `answer-${index}`,
+    const vars = questions[i].parameters
+    const p: Record<string, string> = {}
+    if (vars !== undefined) {
+      const usedValues: string[] = []
+      Object.keys(vars).forEach((pattern) => {
+        let replacement = vars[pattern]
+        if (typeof replacement === "string") {
+          replacement = replacement.split("")
+        }
+        replacement = replacement.filter((c) => !usedValues.includes(c))
+        p[pattern] = random.choice(replacement)
+        usedValues.push(p[pattern])
+      })
+    }
+
+    const ownt = questions[i].translations[lang]
+    const numCorrect = ownt.correctAnswers.length
+    const answers = ownt.correctAnswers
+      .map((a: string, index: number) => ({
+        correct: true,
+        key: `answer-${index}`,
+        element: format(a, p),
+      }))
+      .concat(
+        ownt.wrongAnswers.map((a: string, index: number) => ({
+          correct: false,
+          key: `answer-${numCorrect + index}`,
           element: format(a, p),
         }))
-        .concat(
-          ownt.wrongAnswers.map((a: string, index: number) => ({
-            correct: false,
-            key: `answer-${numCorrect + index}`,
-            element: format(a, p),
-          }))
-        )
+      )
 
-      random.shuffle(answers)
+    random.shuffle(answers)
 
-      const markdown = `
+    const markdown = `
 ${translations[lang]["consider"]}
 
 > ${format(ownt["text"], p)}
 
 ${translations[lang]["what"]}
 `
-      const question: MultipleChoiceQuestion = {
-        type: "MultipleChoiceQuestion",
-        name: t(title),
-        path: permalink,
-        answers: answers.map(({ element }) => element),
-        text: markdown,
-        allowMultiple: true,
-        feedback: minimalMultipleChoiceFeedback({
-          correctAnswerIndex: answers
-            .map((x, i) => ({ ...x, i }))
-            .filter((x) => x.correct)
-            .map((x) => x.i),
-        }),
-      }
-      return (
-        <ExerciseMultipleChoice
-          question={question}
-          onResult={onResult}
-          regenerate={regenerate}
-          permalink={permalink}
-          viewOnly={viewOnly}
-        />
-      )
-    },
+    const question: MultipleChoiceQuestion = {
+      type: "MultipleChoiceQuestion",
+      name: name(lang),
+      path: serializeGeneratorCall({ generator, lang, parameters, seed }),
+      answers: answers.map(({ element }) => element),
+      text: markdown,
+      allowMultiple: true,
+      feedback: minimalMultipleChoiceFeedback({
+        correctAnswerIndex: answers
+          .map((x, i) => ({ ...x, i }))
+          .filter((x) => x.correct)
+          .map((x) => x.i),
+      }),
+    }
+    return { question }
   }
+  const generator: QuestionGenerator = {
+    path: generatorPath,
+    name,
+    languages,
+    expectedParameters,
+    generate,
+  }
+  return generator
 }

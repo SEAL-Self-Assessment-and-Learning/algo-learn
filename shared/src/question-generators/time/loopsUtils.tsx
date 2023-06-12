@@ -1,5 +1,5 @@
 import Random from "../../utils/random"
-import { printStars } from "../recursion/recursiveFormulaUtils"
+import { printStars } from "../recursion/formulaUtils"
 
 // function sampleAtomicExpression({
 //   random,
@@ -37,11 +37,11 @@ export function sampleExactIfEven({
     if (cond === "odd" && (i & 1) === 1) numStars += numPrint
     else if (cond === "even" && (i & 1) === 0) numStars += numPrint
   }
-  return { code, numStars }
+  return { code: code.trim(), numStars }
 }
 
 /**
- * Sample the source code of a simple recursive procedure that prints stars
+ * Sample the source code of a simple loop that prints stars
  *
  * @param random - Random number generator
  * @returns - Object containing the source code, the name of the function, the
@@ -52,15 +52,8 @@ export function sampleExactIfEven({
 export function sampleLoop(random: Random) {
   const functionName = random.choice("fghPp".split(""))
   const variable = random.choice("nmNMxyztk".split(""))
-  const preStars = random.int(0, 3)
-  const baseStars = random.int(1, 4)
-  const recStars = random.int(0, 3)
-  const postStars = random.int(0, 3)
-  const numRecCalls = random.int(1, 3)
-  const divideBy = random.int(2, 7)
-
   const availableVarNames = "nmNMxyztk".split("").filter((c) => c !== variable)
-  const { code } = sampleExactIfEven({
+  const { code, numStars } = sampleExactIfEven({
     random,
     availableVarNames,
   })
@@ -68,10 +61,7 @@ export function sampleLoop(random: Random) {
     functionText: code,
     functionName,
     n: variable,
-    b: divideBy,
-    a: numRecCalls,
-    d: preStars + baseStars + postStars,
-    c: preStars + recStars + postStars,
+    numStars,
   }
 }
 

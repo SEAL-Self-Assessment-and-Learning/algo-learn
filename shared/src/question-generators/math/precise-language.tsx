@@ -1,8 +1,9 @@
-import { OldQuestionGenerator } from "../../../../front-end/src/hooks/useSkills"
+import { QuestionGenerator } from "../../api/QuestionGenerator"
 import {
   BasicMCQuestion,
   PreciseLanguageMeta,
 } from "../../utils/PreciseLanguageMeta"
+import { tFunctional } from "../../utils/translations"
 
 const questions: BasicMCQuestion[] = [
   {
@@ -168,8 +169,13 @@ const questions: BasicMCQuestion[] = [
   },
 ]
 
-export const MathPreciseLanguage: OldQuestionGenerator = PreciseLanguageMeta(
+const translations = {
+  en_US: { title: "Precise mathematical phrasing" },
+  de_DE: { title: "Präzise mathematische Ausdrucksweise" },
+}
+
+export const MathPreciseLanguage: QuestionGenerator = PreciseLanguageMeta(
   "math/precise-language",
-  "math.precise-language.title",
+  tFunctional(translations, "title"),
   questions
 )

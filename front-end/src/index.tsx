@@ -5,51 +5,107 @@ import "@fontsource/noto-sans/700-italic.css"
 import "@fontsource/noto-sans/700.css"
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
-import { createBrowserRouter, redirect, RouterProvider } from "react-router-dom"
-import Random from "../../shared/src/utils/random"
+import {
+  createBrowserRouter,
+  redirect,
+  RouterProvider,
+  useParams,
+} from "react-router-dom"
+import { sampleRandomSeed } from "../../shared/src/utils/random"
 import ErrorPage from "./components/ErrorPage"
 import { QuizSession } from "./components/QuizSession"
 import { BASENAME } from "./config"
-import { questions, ALL_SKILLS, pathOfQuestionVariant } from "./hooks/useSkills"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
 import { About } from "./routes/about"
 import { Legal } from "./routes/legal"
 import { LearningProgress } from "./routes/progress"
 import { TestSimpleMC } from "./routes/test"
 import Root from "./routes/root"
+import { allQuestionGeneratorRoutes } from "./listOfQuestions"
+import {
+  allParameterCombinations,
+  serializeParameters,
+} from "../../shared/src/api/Parameters"
+
+/**
+ * Redirects to the same URL but with a language prefix; uses the browser's
+ * default language.
+ *
+ * @param props
+ * @param props.request The request to redirect
+ */
+function redirectLang({ request }: { request: Request }) {
+  let lng = window.navigator.language
+  if (lng.startsWith("de")) {
+    lng = "de"
+  } else {
+    lng = "en"
+  }
+
+  const path = new URL(request.url).pathname
+  console.log("redirectLang", lng, path)
+  return redirect("/" + lng + path)
+}
 
 const routes = []
-for (const question of questions) {
-  const { name: path, variants } = question
-  console.assert(
-    variants.length > 0,
-    "Every question requires at least one variant."
-  )
-  routes.push({
-    path: `${path}`,
-    loader: () => redirect(variants[0]),
-  })
-}
-for (const qv of ALL_SKILLS) {
-  routes.push(
-    {
-      path: pathOfQuestionVariant(qv),
-      loader: () => redirect(new Random(Math.random()).base36string(7)),
-    },
-    {
-      path: `${pathOfQuestionVariant(qv)}/:seed`,
-      element: <ViewSingleQuestion qv={qv} />,
+for (const questionGeneratorRoute of allQuestionGeneratorRoutes) {
+  const { path, generator } = questionGeneratorRoute
+  for (const parameters of allParameterCombinations(
+    generator.expectedParameters
+  )) {
+    const parametersPath = serializeParameters(
+      parameters,
+      generator.expectedParameters
+    )
+    const route = path + (parametersPath ? "/" + parametersPath : "")
+    routes.push({
+      path: route,
+      loader: () => redirect(sampleRandomSeed()),
+    })
+    const Element = () => {
+      const { seed } = useParams()
+      // console.log("Element", lang)
+      // const { lang: oldLang, i18n } = useTranslation()
+      // if (oldLang !== lang) {
+      //   void i18n.changeLanguage(lang === "de_DE" ? "de" : "en")
+      // }
+      return (
+        <ViewSingleQuestion
+          generator={generator}
+          parameters={parameters}
+          seed={seed ?? ""}
+        />
+      )
     }
-  )
+    routes.push({
+      path: route + "/:seed",
+      loader: redirectLang,
+    })
+    routes.push({
+      path: ":lang/" + route + "/:seed",
+      element: <Element />,
+    })
+  }
 }
 
-const partialPaths = new Set<string>()
-for (const qv of ALL_SKILLS) {
-  const partialPath = pathOfQuestionVariant(qv)
-    .split("/")
-    .slice(0, -1)
-    .join("/")
-  partialPaths.add(partialPath)
+for (const { index, path, element } of [
+  { index: true, element: <LearningProgress /> },
+  { path: "legal", element: <Legal /> },
+  { path: "about", element: <About /> },
+  { path: "test", element: <TestSimpleMC /> },
+  { path: "practice/*", element: <QuizSession mode="practice" /> },
+  { path: "exam/*", element: <QuizSession mode="exam" /> },
+]) {
+  routes.push({
+    index,
+    path,
+    loader: redirectLang,
+  })
+  routes.push({
+    index,
+    path: ":lang/" + (path ?? ""),
+    element,
+  })
 }
 
 const router = createBrowserRouter(
@@ -58,15 +114,7 @@ const router = createBrowserRouter(
       path: "/",
       element: <Root />,
       errorElement: <ErrorPage />,
-      children: [
-        { index: true, element: <LearningProgress /> },
-        { path: "legal", element: <Legal /> },
-        { path: "about", element: <About /> },
-        { path: "test", element: <TestSimpleMC /> },
-        { path: "practice/*", element: <QuizSession mode="practice" /> },
-        { path: "exam/*", element: <QuizSession mode="exam" /> },
-        ...routes,
-      ],
+      children: routes,
     },
   ],
   {

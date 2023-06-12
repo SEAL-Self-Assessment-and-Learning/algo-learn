@@ -3,7 +3,7 @@ import {
   useTranslation as useTranslationsI18Next,
   Trans as TransI18Next,
 } from "react-i18next"
-import { Language } from "../../../shared/src/api/QuestionGenerator"
+import { Language } from "../../../shared/src/api/Language"
 import { use } from "i18next"
 import LanguageDetector from "i18next-browser-languagedetector"
 import de from "../locales/de.json"
@@ -12,6 +12,10 @@ import en from "../locales/en.json"
 void use(LanguageDetector)
   .use(initReactI18next)
   .init({
+    supportedLngs: ["en", "de"],
+    detection: {
+      order: ["path", "navigator"],
+    },
     debug: false,
     fallbackLng: "en",
     interpolation: {
@@ -23,6 +27,8 @@ void use(LanguageDetector)
     },
   })
 
+// // Default language set in the browser, as determined i18next:
+// export const defaultLang =
 /**
  * API-compatible shim for `useTranslation` that also returns the language.
  *

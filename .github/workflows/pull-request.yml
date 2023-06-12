@@ -46,10 +46,10 @@ jobs:
       - name: Yarn install 🔧
         uses: ./.github/actions/yarn-nm-install
 
-      - name: Write basename and version number to src/config.ts
+      - name: Write basename and version number to front-end/src/config.ts
         run: |
-          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$CLEAN_REF\"/g" src/config.ts
-          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" src/config.ts
+          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$CLEAN_REF\"/g" front-end/src/config.ts
+          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" front-end/src/config.ts
 
       - name: Run typescript check
         run: yarn check

@@ -8,7 +8,7 @@ import {
   solarizedLight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { useTheme } from "../hooks/useTheme"
-import { TestQuestion } from "../../../shared/src/question-generators/test/TestQuestion"
+import { TestQuestion } from "../../../shared/src/question-generators/test/test"
 import { questionToTex } from "../../../shared/src/utils/toLatex"
 import { useTranslation } from "../hooks/useTranslation"
 import {
@@ -27,7 +27,7 @@ export function TestSimpleMC() {
   )
 
   if (!question) {
-    void Promise.resolve(TestQuestion.generate({ seed, lang })).then(
+    void Promise.resolve(TestQuestion.generate(lang, {}, seed)).then(
       setQuestion
     )
     return <></>
@@ -62,7 +62,7 @@ export function TestSimpleMC() {
       </HorizontallyCenteredDiv>
       {format === "react" ? (
         <QuestionComponent
-          question={question}
+          questionPromise={question}
           key={seed}
           onResult={() => undefined}
         />

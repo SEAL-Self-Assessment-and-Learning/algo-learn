@@ -1,20 +1,8 @@
-import moment from "moment/moment"
 import { useTranslation } from "../hooks/useTranslation"
 import { BsFillCheckSquareFill, BsFillXSquareFill } from "react-icons/bs"
 import { Link } from "react-router-dom"
 import { Button } from "../components/Button"
-import {
-  averageStrength,
-  LogEntry,
-  questionByPath,
-  questions,
-  OldQuestionGenerator,
-  ALL_SKILLS,
-  useSkills,
-  pathOfQuestionVariant,
-  skillGroups,
-  questionSetByPath,
-} from "../hooks/useSkills"
+import { LogEntryV1, averageStrength, useSkills } from "../hooks/useSkills"
 import { StrengthMeter } from "../components/StrengthMeter"
 import { TiLockClosed, TiLockOpen } from "react-icons/ti"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
@@ -26,6 +14,22 @@ import {
 import { getImageURL } from "../effects/images"
 import { Tooltip } from "react-tooltip"
 import "react-tooltip/dist/react-tooltip.css"
+import {
+  allQuestionGeneratorRoutes,
+  generatorSetBelowPath as generatorCallsBelowPath,
+  generatorSetBelowPath,
+  skillGroups,
+} from "../listOfQuestions"
+import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
+import {
+  Parameters,
+  serializeParameters,
+} from "../../../shared/src/api/Parameters"
+import {
+  deserializePath,
+  serializeGeneratorCall,
+} from "../../../shared/src/api/QuestionRouter"
+import { howLongSince } from "../utils/howLongSince"
 
 /** LearningProgress component */
 export function LearningProgress() {
@@ -55,15 +59,15 @@ export function LearningProgress() {
       <table className="tbl">
         <tbody>
           <QuestionTableHead />
-          {questions.map((q) => (
+          {allQuestionGeneratorRoutes.map((q) => (
             <QuestionTableRow
-              key={q.name}
-              question={q}
+              key={q.path}
+              generator={q.generator}
               unlocked
               qualified
               strength={averageStrength({
                 strengthMap: featureMap,
-                path: q.name,
+                set: generatorCallsBelowPath(q.generator.path),
               })}
             />
           ))}
@@ -76,13 +80,13 @@ export function LearningProgress() {
       <table className="tbl">
         <tbody>
           <QuestionTableHead showVariant />
-          {ALL_SKILLS.map((qv) => {
-            const path = pathOfQuestionVariant(qv)
+          {generatorSetBelowPath("").map((c) => {
+            const path = serializeGeneratorCall(c)
             return (
               <QuestionTableRow
                 key={path}
-                question={qv.question}
-                variant={qv.variant}
+                generator={c.generator}
+                parameters={c.parameters}
                 qualified={featureMap[path].mastered}
                 unlocked={unlockedSkills.find((s) => s === path) !== undefined}
                 strength={featureMap[path].p}
@@ -104,7 +108,7 @@ function LogTable({
   log,
   className = "",
 }: {
-  log: LogEntry[]
+  log: Array<LogEntryV1>
   className?: string
 }) {
   const { t } = useTranslation()
@@ -129,10 +133,17 @@ function LogTable({
   )
 }
 
-function LogTableRow({ entry }: { entry: LogEntry }) {
-  const { t } = useTranslation()
-  const title = questionByPath(entry.question)?.title
-  if (title === undefined) return null
+function LogTableRow({ entry }: { entry: LogEntryV1 }) {
+  const { lang } = useTranslation()
+  const generatorCall = deserializePath({
+    routes: allQuestionGeneratorRoutes,
+    path: entry.path,
+  })
+  if (generatorCall === undefined) return null
+  const { generator, parameters, seed } = generatorCall
+  const parametersText = parameters
+    ? serializeParameters(parameters, generator.expectedParameters)
+    : ""
   return (
     <tr>
       <td>
@@ -140,11 +151,18 @@ function LogTableRow({ entry }: { entry: LogEntry }) {
           className="mr-2 inline opacity-50"
           result={entry.result}
         />
-        {moment(entry.timestamp).fromNow()}
+        {howLongSince(entry.timestamp, lang)}
       </td>
       <td>
-        {t(title)} ({entry.variant}) [
-        <Link to={`${entry.question}/${entry.variant}/${entry.seed}`}>
+        {generator.name(lang)} {parametersText && <>({parametersText}) </>}[
+        <Link
+          to={`${serializeGeneratorCall({
+            lang,
+            generator,
+            parameters,
+            seed,
+          })}`}
+        >
           view
         </Link>
         ]
@@ -179,12 +197,12 @@ function SkillGroupCard({
   featureMap: { [path: string]: SkillFeaturesAndPredictions }
 }) {
   const { t } = useTranslation()
-  const QVs = questionSetByPath(partialPath)
-  const qualified = QVs.filter(
-    (qv) => featureMap[pathOfQuestionVariant(qv)].mastered
+  const generatorCalls = generatorCallsBelowPath(partialPath)
+  const qualified = generatorCalls.filter(
+    (c) => featureMap[serializeGeneratorCall(c)].mastered
   )
   const done = qualified.length
-  const total = QVs.length
+  const total = generatorCalls.length
   const skillName = t("skill." + partialPath)
   return (
     <>
@@ -282,8 +300,8 @@ function QuestionTableHead({ showVariant = false }: { showVariant?: boolean }) {
 }
 
 function QuestionTableRow({
-  question,
-  variant,
+  generator,
+  parameters,
   strength,
   halflife,
   qualified,
@@ -291,8 +309,8 @@ function QuestionTableRow({
   onMouseOver,
   onMouseOut,
 }: {
-  question: OldQuestionGenerator
-  variant?: string
+  generator: QuestionGenerator
+  parameters?: Parameters
   strength: number
   halflife?: number
   qualified?: boolean
@@ -300,20 +318,26 @@ function QuestionTableRow({
   onMouseOver?: () => void
   onMouseOut?: () => void
 }) {
-  const { t } = useTranslation()
-  const id = question.name.replaceAll("/", "-") + (variant ? "-" + variant : "")
+  const { lang } = useTranslation()
+  const generatorCallPath = serializeGeneratorCall({ generator, parameters })
+  const id =
+    generatorCallPath.replaceAll("/", "-") +
+    (parameters === undefined ? "-coarse" : "")
   const percentage = Math.round(strength * 100)
   const strengthTooltip = `Estimated strength: ${percentage}%. Decays over time, so practice regularly!${
     halflife
       ? ` (Estimated halflife: ~${Math.round(halflife * 10) / 10} days.)`
       : ""
   }`
+  const parametersText = parameters
+    ? serializeParameters(parameters, generator.expectedParameters)
+    : ""
   return (
     <tr onMouseOver={onMouseOver} onMouseOut={onMouseOut}>
       <td>
-        <Link to={"practice/" + question.name + (variant ? "/" + variant : "")}>
-          {t(question.title)}
-          {variant ? ` (${variant})` : ""}
+        <Link to={"practice/" + generatorCallPath}>
+          {generator.name(lang)}
+          {parametersText && ` (${parametersText})`}
         </Link>
       </td>
       <td>

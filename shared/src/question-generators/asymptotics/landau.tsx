@@ -1,15 +1,23 @@
-import { ExerciseMultipleChoice } from "../../../../front-end/src/components/ExerciseMultipleChoice"
 import TeX from "../../../../front-end/src/components/TeX"
-import {
-  OldQuestionGenerator,
-  OldQuestionProps,
-} from "../../../../front-end/src/hooks/useSkills"
 import Random from "../../utils/random"
 import {
   MultipleChoiceQuestion,
+  QuestionGenerator,
   minimalMultipleChoiceFeedback,
 } from "../../api/QuestionGenerator"
+import { Translations, tFunction, tFunctional } from "../../utils/translations"
+import { serializeGeneratorCall } from "../../api/QuestionRouter"
 
+const translations: Translations = {
+  en_US: {
+    name: "Landau Notation",
+    text: "Which of these statements are true? Select all that apply.",
+  },
+  de_DE: {
+    name: "Landau Notation",
+    text: "Welche dieser Aussagen sind wahr? Wähle alle aus.",
+  },
+}
 /**
  * Generate and render a question about asymptotic notation
  *
@@ -20,21 +28,14 @@ import {
  * @param props.regeneratable - Whether the question can be regenerated
  * @returns Output
  */
-export const LandauNotation: OldQuestionGenerator = {
-  name: "asymptotics/landau",
-  title: "asymptotics.landau.title",
-  variants: ["default"],
-  examVariants: ["default"],
-  Component: ({
-    seed,
-    variant,
-    t,
-    onResult,
-    regenerate,
-    viewOnly,
-  }: OldQuestionProps) => {
-    const permalink = LandauNotation.name + "/" + variant + "/" + seed
+export const LandauNotation: QuestionGenerator = {
+  path: "asymptotics/landau",
+  name: tFunctional(translations, "name"),
+  expectedParameters: [],
+  languages: ["en_US", "de_DE"],
+  generate: (lang, parameters, seed) => {
     const random = new Random(seed)
+    const { t } = tFunction(translations, lang)
 
     const functionTypes = ["\\log n", "n", "n^2", "2^n"]
     const notationTypes = ["o", "O", "\\omega", "\\Theta", "\\Omega"]
@@ -76,9 +77,14 @@ export const LandauNotation: OldQuestionGenerator = {
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
       allowMultiple: true,
-      path: permalink,
-      name: t("asymptotics.landau.long-title"),
-      text: t("asymptotics.landau.text") ?? "",
+      path: serializeGeneratorCall({
+        generator: LandauNotation,
+        lang,
+        parameters,
+        seed,
+      }),
+      name: t("name"),
+      text: t("text"),
       answers: answers.map(({ key }) => `$${key}$`),
       feedback: minimalMultipleChoiceFeedback({
         correctAnswerIndex: answers
@@ -88,14 +94,6 @@ export const LandauNotation: OldQuestionGenerator = {
       }),
     }
 
-    return (
-      <ExerciseMultipleChoice
-        question={question}
-        permalink={permalink}
-        onResult={onResult}
-        regenerate={regenerate}
-        viewOnly={viewOnly}
-      />
-    )
+    return { question }
   },
 }

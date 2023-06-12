@@ -61,7 +61,7 @@ export function About() {
       </p>{" "}
       <h2 className="mt-5">{t("About.authors.label")}</h2>
       <p>
-        <Markdown md={t("About.authors.text")} />
+        <Markdown md={t("About.authors.text") ?? undefined} />
       </p>
     </HorizontallyCenteredDiv>
   )

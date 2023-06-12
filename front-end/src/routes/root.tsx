@@ -4,7 +4,7 @@ import { FiFileText, FiHome, FiInfo, FiSun } from "react-icons/fi"
 import { TbGitCommit } from "react-icons/tb"
 import { MdDarkMode } from "react-icons/md"
 import { FaVolumeMute, FaVolumeUp } from "react-icons/fa"
-import { Link, Outlet, useLocation } from "react-router-dom"
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { availableThemes, LIGHT, useTheme } from "../hooks/useTheme"
 import { GiHamburgerMenu } from "react-icons/gi"
 import { VERSION } from "../config"
@@ -22,17 +22,27 @@ export default function Root() {
 function GlobalHeader() {
   const { t, i18n } = useTranslation()
   const location = useLocation()
+  const navigate = useNavigate()
   const { muted, toggleMuted } = useSound()
   const lngs = ["en", "de"]
   const nativeName: Record<string, string> = {
     en: "English",
     de: "Deutsch",
   }
+  function setLanguage(newLang: string) {
+    // replace the language prefix in the URL
+    const newPath = location.pathname.replace(
+      new RegExp("^/" + i18n.resolvedLanguage + "/"),
+      "/" + newLang + "/"
+    )
+    void i18n.changeLanguage(newLang)
+    navigate(newPath)
+  }
   function nextLanguage() {
     const currentLngIndex = lngs.indexOf(i18n.resolvedLanguage)
     const nextLngIndex = (currentLngIndex + 1) % lngs.length
     const nextLng = lngs[nextLngIndex]
-    void i18n.changeLanguage(nextLng)
+    setLanguage(nextLng)
   }
   const { theme, userTheme, toggleTheme, setUserTheme } = useTheme()
   useEffect(() => {
@@ -110,7 +120,7 @@ function GlobalHeader() {
                   i18n.resolvedLanguage === lng ? "font-bold" : ""
                 }`}
                 type="button"
-                onClick={() => void i18n.changeLanguage(lng)}
+                onClick={() => setLanguage(lng)}
               >
                 {nativeName[lng] ?? "error"}
               </button>
