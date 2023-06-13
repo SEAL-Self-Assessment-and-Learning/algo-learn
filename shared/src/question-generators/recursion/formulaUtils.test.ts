@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest"
+
 import { parseRecursiveFunction } from "./formulaUtils"
 
 // Write the test cases

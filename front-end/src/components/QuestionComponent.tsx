@@ -1,6 +1,7 @@
 import { FunctionComponent, useEffect, useState } from "react"
-import { ExerciseMultipleChoice } from "./ExerciseMultipleChoice"
+
 import { Question } from "../../../shared/src/api/QuestionGenerator"
+import { ExerciseMultipleChoice } from "./ExerciseMultipleChoice"
 import { ExerciseTextInput } from "./ExerciseTextInput"
 
 /** Props for the React Component */

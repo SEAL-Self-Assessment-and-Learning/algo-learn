@@ -1,8 +1,10 @@
 import { useState } from "react"
-import { useTranslation } from "../hooks/useTranslation"
 import { BiLink, BiRefresh } from "react-icons/bi"
-import { prefixURL } from "../config"
 import { Tooltip } from "react-tooltip"
+
+import { prefixURL } from "../config"
+import { useTranslation } from "../hooks/useTranslation"
+
 import "react-tooltip/dist/react-tooltip.css"
 
 /**

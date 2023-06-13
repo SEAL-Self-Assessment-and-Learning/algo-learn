@@ -1,7 +1,11 @@
 import { CircularProgressbarWithChildren } from "react-circular-progressbar"
+
 import "react-circular-progressbar/dist/styles.css"
+
 import { Tooltip } from "react-tooltip"
+
 import "react-tooltip/dist/react-tooltip.css"
+
 import { useTranslation } from "../hooks/useTranslation"
 
 /**

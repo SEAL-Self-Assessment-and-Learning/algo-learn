@@ -1,15 +1,16 @@
 import { useState } from "react"
-import { AnswerBox } from "./AnswerBox"
-import { MODE, InteractWithQuestion } from "./InteractWithQuestion"
-import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
-import { useSound } from "../hooks/useSound"
+
 import {
   MultipleChoiceFeedback,
   MultipleChoiceQuestion,
 } from "../../../shared/src/api/QuestionGenerator"
+import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
+import { useSound } from "../hooks/useSound"
+import { useTranslation } from "../hooks/useTranslation"
+import { AnswerBox } from "./AnswerBox"
+import { InteractWithQuestion, MODE } from "./InteractWithQuestion"
 import { Markdown } from "./Markdown"
 import { Result } from "./QuestionComponent"
-import { useTranslation } from "../hooks/useTranslation"
 import { BaseItem, SortableList } from "./SortableList"
 
 /**

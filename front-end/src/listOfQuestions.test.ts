@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest"
-import { allQuestionGeneratorRoutes } from "./listOfQuestions"
+
 import { allParameterCombinations } from "../../shared/src/api/Parameters"
+import { allQuestionGeneratorRoutes } from "./listOfQuestions"
 
 for (const { path, generator } of allQuestionGeneratorRoutes) {
   describe(`Sanity-checks for question generator "${path}"`, () => {

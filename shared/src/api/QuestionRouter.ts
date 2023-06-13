@@ -1,8 +1,8 @@
 import { Language } from "./Language"
 import {
-  Parameters,
   deserializeParameters,
   missingParameters,
+  Parameters,
 } from "./Parameters"
 import { QuestionGenerator } from "./QuestionGenerator"
 

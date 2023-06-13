@@ -1,20 +1,20 @@
+import { validateParameters } from "../../api/Parameters"
+import {
+  FreeTextFeedbackFunction,
+  FreeTextFormatFunction,
+  minimalMultipleChoiceFeedback,
+  Question,
+  QuestionGenerator,
+} from "../../api/QuestionGenerator"
+import { serializeGeneratorCall } from "../../api/QuestionRouter"
+import { format } from "../../utils/format"
 import Random from "../../utils/random"
+import { tFunction, tFunctional, Translations } from "../../utils/translations"
 import {
   parseRecursiveFunction,
   sampleRecurrenceAnswers,
   sampleRecursiveFunction,
 } from "./formulaUtils"
-import {
-  FreeTextFeedbackFunction,
-  Question,
-  FreeTextFormatFunction,
-  QuestionGenerator,
-  minimalMultipleChoiceFeedback,
-} from "../../api/QuestionGenerator"
-import { format } from "../../utils/format"
-import { Translations, tFunction, tFunctional } from "../../utils/translations"
-import { serializeGeneratorCall } from "../../api/QuestionRouter"
-import { validateParameters } from "../../api/Parameters"
 
 const translations: Translations = {
   en_US: {

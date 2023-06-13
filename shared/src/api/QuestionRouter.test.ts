@@ -1,12 +1,12 @@
-import { test, expect } from "vitest"
+import { expect, test } from "vitest"
 
+import { QuestionGenerator } from "./QuestionGenerator"
 import {
-  QuestionRoutes,
   deserializePath,
   isSubPath,
+  QuestionRoutes,
   serializeGeneratorCall,
 } from "./QuestionRouter"
-import { QuestionGenerator } from "./QuestionGenerator"
 
 const ExampleQuestion: QuestionGenerator = {
   path: "test/test",

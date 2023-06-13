@@ -1,11 +1,12 @@
-import { useTranslation } from "../hooks/useTranslation"
 import { useNavigate } from "react-router-dom"
-import { QuestionComponent } from "../components/QuestionComponent"
+
 import {
   Parameters,
   validateParameters,
 } from "../../../shared/src/api/Parameters"
 import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
+import { QuestionComponent } from "../components/QuestionComponent"
+import { useTranslation } from "../hooks/useTranslation"
 
 export function ViewSingleQuestion({
   generator,

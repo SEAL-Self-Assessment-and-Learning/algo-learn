@@ -1,23 +1,24 @@
-import math, { getVars } from "../../utils/math"
-import {
-  mathNodeToSumProductTerm,
-  ProductTerm,
-  createProductTerm,
-  sampleFraction,
-  IteratedLogarithms,
-  SumProductTerm,
-} from "./asymptoticsUtils"
-import Random from "../../utils/random"
+import { MathNode } from "mathjs"
+
+import { validateParameters } from "../../api/Parameters"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
   QuestionGenerator,
 } from "../../api/QuestionGenerator"
-import { Translations, tFunction, tFunctional } from "../../utils/translations"
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
-import { validateParameters } from "../../api/Parameters"
-import { MathNode } from "mathjs"
+import math, { getVars } from "../../utils/math"
+import Random from "../../utils/random"
+import { tFunction, tFunctional, Translations } from "../../utils/translations"
+import {
+  createProductTerm,
+  IteratedLogarithms,
+  mathNodeToSumProductTerm,
+  ProductTerm,
+  sampleFraction,
+  SumProductTerm,
+} from "./asymptoticsUtils"
 
 const translation: Translations = {
   en_US: {

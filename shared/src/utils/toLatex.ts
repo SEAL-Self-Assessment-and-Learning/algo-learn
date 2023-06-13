@@ -1,5 +1,5 @@
-import { ParseTree, ParseTreeNode, parseMarkdown } from "./parseMarkdown"
-import { Question, MultipleChoiceQuestion } from "../api/QuestionGenerator"
+import { MultipleChoiceQuestion, Question } from "../api/QuestionGenerator"
+import { parseMarkdown, ParseTree, ParseTreeNode } from "./parseMarkdown"
 
 /**
  * Function to render a given markdown-like string in LaTeX

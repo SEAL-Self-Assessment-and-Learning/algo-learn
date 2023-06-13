@@ -1,16 +1,17 @@
 import { ReactElement, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
+
+import { Parameters } from "../../../shared/src/api/Parameters"
+import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
+import { serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
+import Random from "../../../shared/src/utils/random"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
-import { useSkills, sortByStrength } from "../hooks/useSkills"
+import { sortByStrength, useSkills } from "../hooks/useSkills"
+import { useTranslation } from "../hooks/useTranslation"
+import { generatorSetBelowPath } from "../listOfQuestions"
 import { Button } from "./Button"
 import { ScreenCenteredDiv } from "./CenteredDivs"
-import { useTranslation } from "../hooks/useTranslation"
-import Random from "../../../shared/src/utils/random"
 import { QuestionComponent, Result } from "./QuestionComponent"
-import { generatorSetBelowPath } from "../listOfQuestions"
-import { serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
-import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
-import { Parameters } from "../../../shared/src/api/Parameters"
 
 const great = {
   en_US: [

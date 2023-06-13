@@ -1,14 +1,15 @@
 import { ReactNode, useEffect } from "react"
-import { useTranslation } from "../hooks/useTranslation"
-import { FiFileText, FiHome, FiInfo, FiSun } from "react-icons/fi"
-import { TbGitCommit } from "react-icons/tb"
-import { MdDarkMode } from "react-icons/md"
 import { FaVolumeMute, FaVolumeUp } from "react-icons/fa"
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
-import { availableThemes, LIGHT, useTheme } from "../hooks/useTheme"
+import { FiFileText, FiHome, FiInfo, FiSun } from "react-icons/fi"
 import { GiHamburgerMenu } from "react-icons/gi"
+import { MdDarkMode } from "react-icons/md"
+import { TbGitCommit } from "react-icons/tb"
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
+
 import { VERSION } from "../config"
 import { useSound } from "../hooks/useSound"
+import { availableThemes, LIGHT, useTheme } from "../hooks/useTheme"
+import { useTranslation } from "../hooks/useTranslation"
 
 export default function Root() {
   return (

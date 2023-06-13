@@ -1,14 +1,15 @@
 import { ReactNode } from "react"
-import { HorizontallyCenteredDiv } from "./CenteredDivs"
-import { QuestionFooter } from "./QuestionFooter"
-import { QuestionHeader } from "./QuestionHeader"
-import SyntaxHighlighter from "react-syntax-highlighter"
 import { renderToStaticMarkup } from "react-dom/server"
+import SyntaxHighlighter from "react-syntax-highlighter"
 import {
   solarizedDark,
   solarizedLight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs"
+
 import { useTheme } from "../hooks/useTheme"
+import { HorizontallyCenteredDiv } from "./CenteredDivs"
+import { QuestionFooter } from "./QuestionFooter"
+import { QuestionHeader } from "./QuestionHeader"
 
 /** The current display mode */
 export type MODE =

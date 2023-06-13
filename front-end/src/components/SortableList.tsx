@@ -12,8 +12,8 @@ import {
 } from "@dnd-kit/sortable"
 import { ReactNode } from "react"
 import { RxDragHandleHorizontal } from "react-icons/rx"
-import { AnswerBox } from "./AnswerBox"
 
+import { AnswerBox } from "./AnswerBox"
 import { DragHandle, SortableItem } from "./SortableItem"
 
 export interface BaseItem {

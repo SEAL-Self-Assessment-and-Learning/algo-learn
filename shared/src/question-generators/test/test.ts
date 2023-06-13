@@ -1,11 +1,11 @@
-import Random from "../../utils/random"
-import { tFunctional, tFunction, Translations } from "../../utils/translations"
 import {
+  minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
   QuestionGenerator,
-  minimalMultipleChoiceFeedback,
 } from "../../api/QuestionGenerator"
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
+import Random from "../../utils/random"
+import { tFunction, tFunctional, Translations } from "../../utils/translations"
 
 const translations: Translations = {
   en_US: {

@@ -1,9 +1,9 @@
 import { QuestionGenerator } from "../../api/QuestionGenerator"
+import { tFunctional } from "../../utils/translations"
 import {
   BasicMCQuestion,
   PreciseLanguageMeta,
-} from "../../utils/PreciseLanguageMeta"
-import { tFunctional } from "../../utils/translations"
+} from "../meta/PreciseLanguageMeta"
 
 const questions: BasicMCQuestion[] = [
   {

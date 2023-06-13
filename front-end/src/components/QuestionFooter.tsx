@@ -1,8 +1,9 @@
 import { ReactNode } from "react"
 import { GiPlayButton } from "react-icons/gi"
 import { SiCheckmarx, SiIfixit } from "react-icons/si"
-import { Button } from "./Button"
+
 import { useTranslation } from "../hooks/useTranslation"
+import { Button } from "./Button"
 import { MODE } from "./InteractWithQuestion"
 
 /**

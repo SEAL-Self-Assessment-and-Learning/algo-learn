@@ -1,17 +1,17 @@
-import {
-  sampleTermSet,
-  SimpleAsymptoticTerm,
-  TermSetVariants,
-} from "./asymptoticsUtils"
-import Random from "../../utils/random"
+import { validateParameters } from "../../api/Parameters"
 import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
   QuestionGenerator,
 } from "../../api/QuestionGenerator"
-import { tFunction, tFunctional, Translations } from "../../utils/translations"
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
-import { validateParameters } from "../../api/Parameters"
+import Random from "../../utils/random"
+import { tFunction, tFunctional, Translations } from "../../utils/translations"
+import {
+  sampleTermSet,
+  SimpleAsymptoticTerm,
+  TermSetVariants,
+} from "./asymptoticsUtils"
 
 const translations: Translations = {
   en_US: {

@@ -1,12 +1,13 @@
-import { expect, test } from "vitest"
 import Fraction from "fraction.js"
+import { expect, test } from "vitest"
+
+import math from "../../utils/math"
 import {
   createProductTerm,
   mathNodeToSumProductTerm,
   ProductTerm,
   usedIterationNumbers,
 } from "./asymptoticsUtils"
-import math from "../../utils/math"
 
 test("ProductTerms: 2 * 7 equals 14", () => {
   const a = new ProductTerm({ coefficient: 2 })

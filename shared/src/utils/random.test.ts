@@ -1,5 +1,6 @@
 import { expect, test } from "vitest"
-import Random, { xmur3, sfc32 } from "./random"
+
+import Random, { sfc32, xmur3 } from "./random"
 
 test("Check that xmur3 and sfc32 return a known sequence.", () => {
   const hashSequence = xmur3("some fixed seed")

@@ -3,6 +3,7 @@ import "@fontsource/noto-sans/400-italic.css"
 import "@fontsource/noto-sans/400.css"
 import "@fontsource/noto-sans/700-italic.css"
 import "@fontsource/noto-sans/700.css"
+
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import {
@@ -11,21 +12,22 @@ import {
   RouterProvider,
   useParams,
 } from "react-router-dom"
-import { sampleRandomSeed } from "../../shared/src/utils/random"
-import ErrorPage from "./components/ErrorPage"
-import { QuizSession } from "./components/QuizSession"
-import { BASENAME } from "./config"
-import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
-import { About } from "./routes/about"
-import { Legal } from "./routes/legal"
-import { LearningProgress } from "./routes/progress"
-import { TestSimpleMC } from "./routes/test"
-import Root from "./routes/root"
-import { allQuestionGeneratorRoutes } from "./listOfQuestions"
+
 import {
   allParameterCombinations,
   serializeParameters,
 } from "../../shared/src/api/Parameters"
+import { sampleRandomSeed } from "../../shared/src/utils/random"
+import ErrorPage from "./components/ErrorPage"
+import { QuizSession } from "./components/QuizSession"
+import { BASENAME } from "./config"
+import { allQuestionGeneratorRoutes } from "./listOfQuestions"
+import { About } from "./routes/about"
+import { Legal } from "./routes/legal"
+import { LearningProgress } from "./routes/progress"
+import Root from "./routes/root"
+import { TestSimpleMC } from "./routes/test"
+import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
 
 /**
  * Redirects to the same URL but with a language prefix; uses the browser's

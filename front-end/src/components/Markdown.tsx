@@ -1,17 +1,18 @@
 import { Fragment, FunctionComponent } from "react"
-import TeX from "./TeX"
 import { Link } from "react-router-dom"
+import SyntaxHighlighter from "react-syntax-highlighter"
+import {
+  solarizedDark,
+  solarizedLight,
+} from "react-syntax-highlighter/dist/esm/styles/hljs"
+
 import {
   parseMarkdown,
   ParseTree,
   ParseTreeNode,
 } from "../../../shared/src/utils/parseMarkdown"
-import SyntaxHighlighter from "react-syntax-highlighter"
-import {
-  solarizedLight,
-  solarizedDark,
-} from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { useTheme } from "../hooks/useTheme"
+import TeX from "./TeX"
 
 /**
  * Function to render a given markdown-like string as a React component

@@ -1,18 +1,18 @@
-import Random from "./random"
-import { Translations, DeepTranslations } from "./translations"
-import { format } from "./format"
-import {
-  MultipleChoiceQuestion,
-  QuestionGenerator,
-  minimalMultipleChoiceFeedback,
-} from "../api/QuestionGenerator"
-import { Language } from "../api/Language"
-import { serializeGeneratorCall } from "../api/QuestionRouter"
+import { Language } from "../../api/Language"
 import {
   ExpectedParameters,
   Parameters,
   validateParameters,
-} from "../api/Parameters"
+} from "../../api/Parameters"
+import {
+  minimalMultipleChoiceFeedback,
+  MultipleChoiceQuestion,
+  QuestionGenerator,
+} from "../../api/QuestionGenerator"
+import { serializeGeneratorCall } from "../../api/QuestionRouter"
+import { format } from "../../utils/format"
+import Random from "../../utils/random"
+import { DeepTranslations, Translations } from "../../utils/translations"
 
 /**
  * Interface for "basic" Multiple-Choice Questions. These are fairly static,

@@ -1,11 +1,12 @@
-import {
-  initReactI18next,
-  useTranslation as useTranslationsI18Next,
-  Trans as TransI18Next,
-} from "react-i18next"
-import { Language } from "../../../shared/src/api/Language"
 import { use } from "i18next"
 import LanguageDetector from "i18next-browser-languagedetector"
+import {
+  initReactI18next,
+  Trans as TransI18Next,
+  useTranslation as useTranslationsI18Next,
+} from "react-i18next"
+
+import { Language } from "../../../shared/src/api/Language"
 import de from "../locales/de.json"
 import en from "../locales/en.json"
 

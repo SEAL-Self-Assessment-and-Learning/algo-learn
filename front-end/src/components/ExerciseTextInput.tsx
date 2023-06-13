@@ -1,14 +1,15 @@
 import { useState } from "react"
-import { useTranslation } from "../hooks/useTranslation"
-import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
-import { useSound } from "../hooks/useSound"
-import { InteractWithQuestion, MODE } from "./InteractWithQuestion"
+
 import {
   FreeTextFeedback,
   FreeTextQuestion,
 } from "../../../shared/src/api/QuestionGenerator"
-import { Result } from "./QuestionComponent"
+import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
+import { useSound } from "../hooks/useSound"
+import { useTranslation } from "../hooks/useTranslation"
+import { InteractWithQuestion, MODE } from "./InteractWithQuestion"
 import { Markdown } from "./Markdown"
+import { Result } from "./QuestionComponent"
 
 /**
  * ExerciseTextInput is an exercise that requires the user to type in text.

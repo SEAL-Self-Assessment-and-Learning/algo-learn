@@ -1,7 +1,7 @@
-import { useTranslation } from "../hooks/useTranslation"
-import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { format } from "../../../shared/src/utils/format"
+import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { Markdown } from "../components/Markdown"
+import { useTranslation } from "../hooks/useTranslation"
 
 export function Legal() {
   const { t } = useTranslation()

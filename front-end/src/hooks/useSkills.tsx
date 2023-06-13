@@ -1,27 +1,26 @@
-import Random from "../../../shared/src/utils/random"
+import { TFunction } from "i18next"
 import { FunctionComponent, useMemo } from "react"
 import useLocalStorageState from "use-local-storage-state"
-import { TFunction } from "i18next"
 
+import { Parameters } from "../../../shared/src/api/Parameters"
+import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
 import {
-  computeStrength,
-  SkillFeatures as BasicSkillFeatures,
-  SkillFeaturesAndPredictions as SkillFeatures,
-  SkillFeaturesAndPredictions,
-} from "../utils/memory-model"
+  deserializePath,
+  serializeGeneratorCall,
+} from "../../../shared/src/api/QuestionRouter"
 import { min } from "../../../shared/src/utils/math"
-
+import Random from "../../../shared/src/utils/random"
 import { Result } from "../components/QuestionComponent"
 import {
   allQuestionGeneratorRoutes,
   generatorSetBelowPath,
 } from "../listOfQuestions"
 import {
-  deserializePath,
-  serializeGeneratorCall,
-} from "../../../shared/src/api/QuestionRouter"
-import { Parameters } from "../../../shared/src/api/Parameters"
-import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
+  SkillFeatures as BasicSkillFeatures,
+  computeStrength,
+  SkillFeaturesAndPredictions as SkillFeatures,
+  SkillFeaturesAndPredictions,
+} from "../utils/memory-model"
 
 export type OldQuestionProps = {
   variant: string

@@ -1,12 +1,11 @@
-import TeX from "../../../../front-end/src/components/TeX"
-import Random from "../../utils/random"
 import {
+  minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
   QuestionGenerator,
-  minimalMultipleChoiceFeedback,
 } from "../../api/QuestionGenerator"
-import { Translations, tFunction, tFunctional } from "../../utils/translations"
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
+import Random from "../../utils/random"
+import { tFunction, tFunctional, Translations } from "../../utils/translations"
 
 const translations: Translations = {
   en_US: {
@@ -60,7 +59,6 @@ export const LandauNotation: QuestionGenerator = {
         "n",
         variable
       )} = ${notation}(${functionRight.replaceAll("n", variable)})`
-      const element = <TeX>{key}</TeX>
 
       const isDuplicate = answers.findIndex((e) => e.key === key) >= 0
       const allIncorrect =
@@ -68,7 +66,7 @@ export const LandauNotation: QuestionGenerator = {
         answers.findIndex((e) => e.correct) == -1 &&
         !correct
       if (!isDuplicate && !allIncorrect) {
-        answers.push({ key, correct, element })
+        answers.push({ key, correct })
       }
     }
 

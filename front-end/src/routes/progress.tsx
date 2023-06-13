@@ -1,34 +1,37 @@
-import { useTranslation } from "../hooks/useTranslation"
-import { BsFillCheckSquareFill, BsFillXSquareFill } from "react-icons/bs"
-import { Link } from "react-router-dom"
-import { Button } from "../components/Button"
-import { LogEntryV1, averageStrength, useSkills } from "../hooks/useSkills"
-import { StrengthMeter } from "../components/StrengthMeter"
-import { TiLockClosed, TiLockOpen } from "react-icons/ti"
-import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
-import { SkillFeaturesAndPredictions } from "../utils/memory-model"
 import {
-  CircularProgressbarWithChildren,
   buildStyles,
+  CircularProgressbarWithChildren,
 } from "react-circular-progressbar"
-import { getImageURL } from "../effects/images"
+import { BsFillCheckSquareFill, BsFillXSquareFill } from "react-icons/bs"
+import { TiLockClosed, TiLockOpen } from "react-icons/ti"
+import { Link } from "react-router-dom"
 import { Tooltip } from "react-tooltip"
+
+import { Button } from "../components/Button"
+import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
+import { StrengthMeter } from "../components/StrengthMeter"
+import { getImageURL } from "../effects/images"
+import { averageStrength, LogEntryV1, useSkills } from "../hooks/useSkills"
+import { useTranslation } from "../hooks/useTranslation"
+import { SkillFeaturesAndPredictions } from "../utils/memory-model"
+
 import "react-tooltip/dist/react-tooltip.css"
+
+import {
+  Parameters,
+  serializeParameters,
+} from "../../../shared/src/api/Parameters"
+import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
+import {
+  deserializePath,
+  serializeGeneratorCall,
+} from "../../../shared/src/api/QuestionRouter"
 import {
   allQuestionGeneratorRoutes,
   generatorSetBelowPath as generatorCallsBelowPath,
   generatorSetBelowPath,
   skillGroups,
 } from "../listOfQuestions"
-import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
-import {
-  Parameters,
-  serializeParameters,
-} from "../../../shared/src/api/Parameters"
-import {
-  deserializePath,
-  serializeGeneratorCall,
-} from "../../../shared/src/api/QuestionRouter"
 import { howLongSince } from "../utils/howLongSince"
 
 /** LearningProgress component */

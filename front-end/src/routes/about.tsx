@@ -1,10 +1,11 @@
-import { Trans, useTranslation } from "../hooks/useTranslation"
 import { AiFillGithub } from "react-icons/ai"
 import { SiDuolingo, SiReact } from "react-icons/si"
 import { Link } from "react-router-dom"
-import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
+
 import { format } from "../../../shared/src/utils/format"
+import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { Markdown } from "../components/Markdown"
+import { Trans, useTranslation } from "../hooks/useTranslation"
 
 export function About() {
   const { t, i18n } = useTranslation()
