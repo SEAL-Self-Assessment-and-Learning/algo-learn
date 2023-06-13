@@ -1,5 +1,4 @@
-import { TFunction } from "i18next"
-import { FunctionComponent, useMemo } from "react"
+import { useMemo } from "react"
 import useLocalStorageState from "use-local-storage-state"
 
 import { Parameters } from "../../../shared/src/api/Parameters"
@@ -10,7 +9,6 @@ import {
 } from "../../../shared/src/api/QuestionRouter"
 import { min } from "../../../shared/src/utils/math"
 import Random from "../../../shared/src/utils/random"
-import { Result } from "../components/QuestionComponent"
 import {
   allQuestionGeneratorRoutes,
   generatorSetBelowPath,
@@ -21,51 +19,6 @@ import {
   SkillFeaturesAndPredictions as SkillFeatures,
   SkillFeaturesAndPredictions,
 } from "../utils/memory-model"
-
-export type OldQuestionProps = {
-  variant: string
-  seed: string
-  t: TFunction
-  onResult: (result: Result) => void
-  regenerate?: () => void
-  viewOnly?: boolean
-}
-
-export interface OldQuestionGenerator {
-  path: string
-  variants: string[]
-  examVariants: string[]
-  title: string
-  description?: string
-  Component: FunctionComponent<OldQuestionProps>
-}
-
-export interface OldQuestionVariant {
-  question: OldQuestionGenerator
-  variant: string
-}
-
-/** List of all valid (question,variant) pairs */
-// export const ALL_SKILLS: OldQuestionVariant[] =
-//   listOfOldQuestionGenerators.flatMap((q) =>
-//     q.variants.map((v) => ({
-//       question: q,
-//       variant: v,
-//     }))
-//   )
-
-// export const EXAM_SKILLS: OldQuestionVariant[] =
-//   listOfOldQuestionGenerators.flatMap((q) =>
-//     q.examVariants.map((v) => ({
-//       question: q,
-//       variant: v,
-//     }))
-//   )
-
-/** Return the path corresponding to a question variant */
-export function pathOfQuestionVariant(qv: OldQuestionVariant): string {
-  return qv.question.path + "/" + qv.variant
-}
 
 /** Old format for log entries */
 type LogEntryV0 = {
@@ -106,44 +59,6 @@ function upgradeV0ToV1(e: LogEntryV0): LogEntryV1 {
   }
 }
 
-// const initialLogExample = [
-//   {
-//     question: "asymptotics/sort",
-//     variant: "pure",
-//     seed: "skkpjd93",
-//     result: "pass",
-//     timestamp: Date.now() - 24 * 3600 * 1000,
-//   },
-//   {
-//     question: "asymptotics/sort",
-//     variant: "start",
-//     seed: "jd930jz",
-//     result: "fail",
-//     timestamp: Date.now() - 400000,
-//   },
-//   {
-//     question: "asymptotics/sort",
-//     variant: "start",
-//     seed: "skm93js",
-//     result: "pass",
-//     timestamp: Date.now() - 200000,
-//   },
-//   {
-//     question: "asymptotics/sort",
-//     variant: "start",
-//     seed: "82sjh9w",
-//     result: "pass",
-//     timestamp: Date.now() - 100,
-//   },
-//   {
-//     question: "asymptotics/sort",
-//     variant: "start",
-//     seed: "skkpjd93",
-//     result: "pass",
-//     timestamp: Date.now() - 29,
-//   },
-// ]
-
 function byDescendingTimestamp(a: LogEntryV1, b: LogEntryV1) {
   return b.timestamp - a.timestamp
 }
@@ -166,9 +81,6 @@ export function useLog() {
   }
 
   const log: Array<LogEntryV1> = logV1.sort(byDescendingTimestamp)
-  // .filter(
-  //   (e) => questionVariantByPath(e.question + "/" + e.variant) !== undefined
-  // )
   for (let i = 0; i < log.length; i++) {
     if (logV1[i].timestamp !== log[i].timestamp) {
       console.log("Warning: The log in storage was not sorted... fixing it!")
@@ -348,53 +260,6 @@ export function averageStrength({
   }
   return avg / set.length
 }
-// OLD CODE:
-//   if (generator.variants.length === 0) return 0
-//   let avg = 0
-//   for (const v of generator.variants) {
-//     avg += strengthMap[path + "/" + v].p
-//   }
-//   avg /= generator.variants.length
-//   return avg
-
-/**
- * Function that returns all question variants in or below a given path.
- *
- * @param param
- * @param param.path The (partial) path of the skill tree that should be trained
- *   (or examined) in the session. For example, "asymptotics/sum" would train
- *   all variants of the question "sum", whereas "asymptotics/sum/pure" would
- *   only train a single question variant.
- * @param param.mode Determines the mode of the session.
- * @returns A list of question variants that should be trained (or examined) in
- *   the session.
- */
-// export function allQuestionVariantsInPath({
-//   path,
-//   mode = "practice",
-// }: {
-//   path: string
-//   mode: "practice" | "exam"
-// }): string[] {
-//   const allQuestionVariants =
-//     mode === "practice"
-//       ? ALL_SKILLS.map(pathOfQuestionVariant)
-//       : EXAM_SKILLS.map(pathOfQuestionVariant)
-//   return allQuestionVariants.filter((s) => {
-//     const skill = s.split("/")
-//     const splittedPath = path.split("/")
-//     /** Select all questions, when no path is selected */
-//     if (splittedPath[0] === "") {
-//       return true
-//     }
-//     for (let i = 0; i < splittedPath.length; i++) {
-//       if (splittedPath[i] !== skill[i]) {
-//         return false
-//       }
-//     }
-//     return true
-//   })
-// }
 
 /**
  * Return a list of question variants sorted by strength from lowest to highest

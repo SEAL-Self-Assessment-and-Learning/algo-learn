@@ -43,9 +43,11 @@ function redirectLang({ request }: { request: Request }) {
   } else {
     lng = "en"
   }
-
-  const path = new URL(request.url).pathname
-  console.log("redirectLang", lng, path)
+  let path = new URL(request.url).pathname
+  if (BASENAME !== undefined) {
+    if (!path.startsWith(BASENAME)) throw new Error("Unexpected path: " + path)
+    path = path.slice(BASENAME.length)
+  }
   return redirect("/" + lng + path)
 }
 
@@ -66,11 +68,6 @@ for (const questionGeneratorRoute of allQuestionGeneratorRoutes) {
     })
     const Element = () => {
       const { seed } = useParams()
-      // console.log("Element", lang)
-      // const { lang: oldLang, i18n } = useTranslation()
-      // if (oldLang !== lang) {
-      //   void i18n.changeLanguage(lang === "de_DE" ? "de" : "en")
-      // }
       return (
         <ViewSingleQuestion
           generator={generator}
@@ -83,10 +80,12 @@ for (const questionGeneratorRoute of allQuestionGeneratorRoutes) {
       path: route + "/:seed",
       loader: redirectLang,
     })
-    routes.push({
-      path: ":lang/" + route + "/:seed",
-      element: <Element />,
-    })
+    for (const lang of ["en", "de"]) {
+      routes.push({
+        path: lang + "/" + route + "/:seed",
+        element: <Element />,
+      })
+    }
   }
 }
 

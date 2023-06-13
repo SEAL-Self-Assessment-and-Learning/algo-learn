@@ -159,7 +159,7 @@ function LogTableRow({ entry }: { entry: LogEntryV1 }) {
       <td>
         {generator.name(lang)} {parametersText && <>({parametersText}) </>}[
         <Link
-          to={`${serializeGeneratorCall({
+          to={`/${serializeGeneratorCall({
             lang,
             generator,
             parameters,
