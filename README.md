@@ -21,13 +21,13 @@ corepack prepare yarn@stable --activate
 Run yarn to install the project's dependencies:
 
 ```bash
-yarn install
+yarn
 ```
 
 This command will start a local HTTP server for development:
 
 ```bash
-yarn start
+yarn dev
 ```
 
 ### Configure your IDE
@@ -49,22 +49,9 @@ Then follow [these instructions](https://yarnpkg.com/getting-started/editor-sdks
 
 ### Run tests
 
-Unit tests:
-
+Run all tests (format checker, unit tests, linter, type checker):
 ```bash
 yarn test
-```
-
-Lint all files:
-
-```bash
-yarn lint
-```
-
-Type-check all files:
-
-```bash
-yarn check
 ```
 
 ### Build for production

@@ -46,14 +46,8 @@ jobs:
           sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn\"/g" front-end/src/config.ts
           sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short $GITHUB_SHA)\"/g" front-end/src/config.ts
 
-      - name: Run typescript check
-        run: yarn check
-
       - name: Run test suite
         run: yarn test
-
-      - name: Run linter
-        run: yarn lint
 
       - name: Yarn Build 🔧
         run: yarn build --base /algo-learn/
@@ -71,18 +65,3 @@ jobs:
 
       - name: Display status from deploy
         run: echo "${{ steps.deploy.outputs.status }}"
-
-      # - name: Deploy to gh-pages branch 🚀
-      #   uses: JamesIves/github-pages-deploy-action@v4
-      #   with:
-      #     folder: dist # The folder the action should deploy.
-      # - name: Setup Pages
-      #   uses: actions/configure-pages@v3
-      # - name: Upload artifact
-      #   uses: actions/upload-pages-artifact@v1
-      #   with:
-      #     # Upload entire dist/ directory
-      #     path: 'dist'
-      # - name: Deploy to GitHub Pages
-      #   id: deployment
-      #   uses: actions/deploy-pages@v1
