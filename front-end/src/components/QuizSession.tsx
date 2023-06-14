@@ -227,7 +227,6 @@ export function QuizSession({
       <QuestionComponent
         key={serializeGeneratorCall({
           generator,
-          lang,
           parameters,
           seed: questionSeed,
         })}

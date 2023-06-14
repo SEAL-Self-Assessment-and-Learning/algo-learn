@@ -13,7 +13,7 @@ import { useTranslation } from "../hooks/useTranslation"
 
 export default function Root() {
   return (
-    <div className="flex h-screen flex-col overflow-x-scroll dark:bg-black dark:text-white">
+    <div className="flex h-screen flex-col overflow-x-scroll selection:bg-goethe-50 dark:bg-black dark:text-white dark:selection:bg-goethe-700">
       <GlobalHeader />
       <Outlet />
     </div>

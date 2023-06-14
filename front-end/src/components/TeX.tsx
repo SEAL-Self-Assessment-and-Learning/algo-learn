@@ -42,7 +42,7 @@ export default function TeX({
   block?: boolean
   source?: boolean
   children?: ReactNode
-  props?: Object
+  props?: object
 }): ReactElement {
   const pureText = tex ?? renderToStaticMarkup(<>{children}</>) ?? ""
   if (source) {

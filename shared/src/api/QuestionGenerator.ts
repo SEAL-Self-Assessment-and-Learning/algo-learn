@@ -53,14 +53,11 @@ export interface MultipleChoiceQuestion extends QuestionBase {
   feedback?: MultipleChoiceFeedbackFunction
 }
 
-/** The AnswerBase interface is the base type for all answer types. */
-export interface AnswerBase {}
-
 /**
  * After the user selects answer(s), these answeres are stored as a
  * MultipleChoiceAnswer object.
  */
-export interface MultipleChoiceAnswer extends AnswerBase {
+export interface MultipleChoiceAnswer {
   /**
    * The indices of all answers selected by the user; the order is relevant only
    * if sortingQuestion is true
@@ -172,7 +169,7 @@ export interface FreeTextQuestion extends QuestionBase {
  * After the user enters an answer, this answer is stored as a FreeTextAnswer
  * object.
  */
-export interface FreeTextAnswer extends AnswerBase {
+export interface FreeTextAnswer {
   /** The text entered by the user */
   text: string
 }

@@ -1,10 +1,7 @@
 module.exports = {
-  root: true,
   env: {
     browser: true,
-    es6: true,
-    node: true,
-    jest: true,
+    es2022: true,
   },
   settings: {
     react: {
@@ -13,50 +10,29 @@ module.exports = {
   },
   extends: [
     "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "plugin:react/recommended",
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
     "plugin:import/recommended",
     "plugin:import/typescript",
   ],
-  globals: {
-    Atomics: "readonly",
-    SharedArrayBuffer: "readonly",
-  },
-  parser: "@typescript-eslint/parser",
+  ignorePatterns: ["node_modules", "*.cjs"],
   parserOptions: {
-    ecmaFeatures: {
-      jsx: true,
-    },
-    ecmaVersion: 2022,
+    ecmaVersion: "latest",
     sourceType: "module",
+    project: true,
   },
-  plugins: ["react", "react-hooks", "@typescript-eslint"],
   rules: {
-    "react/jsx-uses-react": "off",
-    "react/react-in-jsx-scope": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
+    "@typescript-eslint/no-extra-semi": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
   },
-  overrides: [
-    {
-      files: ["*/src/**/*.ts", "*/src/**/*.tsx"],
-      extends: [
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:react/jsx-runtime",
-        "plugin:react-hooks/recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking",
-      ],
-      parserOptions: {
-        project: ["./tsconfig.json"],
-      },
-      rules: {
-        "no-unused-vars": "off",
-        "no-extra-semi": "off",
-        "@typescript-eslint/no-unused-vars": "warn",
-      },
-    },
-  ],
 }
