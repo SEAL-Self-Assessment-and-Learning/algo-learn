@@ -33,14 +33,14 @@ function GlobalHeader() {
   function setLanguage(newLang: string) {
     // replace the language prefix in the URL
     const newPath = location.pathname.replace(
-      new RegExp("^/" + i18n.resolvedLanguage + "/"),
+      new RegExp("^/" + (i18n.resolvedLanguage ?? "en") + "/"),
       "/" + newLang + "/"
     )
     void i18n.changeLanguage(newLang)
     navigate(newPath)
   }
   function nextLanguage() {
-    const currentLngIndex = lngs.indexOf(i18n.resolvedLanguage)
+    const currentLngIndex = lngs.indexOf(i18n.resolvedLanguage ?? "en")
     const nextLngIndex = (currentLngIndex + 1) % lngs.length
     const nextLng = lngs[nextLngIndex]
     setLanguage(nextLng)

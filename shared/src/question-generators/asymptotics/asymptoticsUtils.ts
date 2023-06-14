@@ -531,13 +531,13 @@ export function createProductTerm({
 
 export class SumProductTerm {
   private terms: ProductTerm[] // Should only be modified by constructor and normalize
-  constructor(x?: SumProductTerm | Array<ProductTerm> | ProductTerm) {
+  constructor(x?: ProductTerm | SumProductTerm | Array<ProductTerm>) {
     this.terms = []
     if (x instanceof ProductTerm) {
       this.terms.push(x)
     } else if (x instanceof SumProductTerm) {
       this.terms.push(...x.terms)
-    } else if (x instanceof Array<ProductTerm>) {
+    } else if (Array.isArray(x)) {
       this.terms.push(...x)
     }
     this.normalize()

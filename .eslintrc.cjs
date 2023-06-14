@@ -17,7 +17,7 @@ module.exports = {
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
     "plugin:import/recommended",
-    "plugin:import/typescript"
+    "plugin:import/typescript",
   ],
   globals: {
     Atomics: "readonly",
@@ -31,11 +31,7 @@ module.exports = {
     ecmaVersion: 2022,
     sourceType: "module",
   },
-  plugins: [
-    "react",
-    "react-hooks",
-    "@typescript-eslint",
-  ],
+  plugins: ["react", "react-hooks", "@typescript-eslint"],
   rules: {
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",

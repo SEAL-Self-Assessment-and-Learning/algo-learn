@@ -3,11 +3,9 @@
     "arcanis.vscode-zipfs",
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "akamud.vscode-theme-onedark",
     "formulahendry.auto-rename-tag",
     "github.copilot",
     "eamodio.gitlens",
-    "lokalise.i18n-ally",
     "stylelint.vscode-stylelint",
     "bradlc.vscode-tailwindcss"
   ]
