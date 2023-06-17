@@ -32,7 +32,7 @@ const translation: Translations = {
     "feedback.incomplete": "Incomplete or too complex",
   },
   de_DE: {
-    "Theta.text": "Gib eine Funktion ${{0}}$ an, die $${{1}}$$ erfüllt.",
+    "Theta.text": "Gib eine Funktion ${{0}}$ an, die ${{1}}$ erfüllt.",
     note: "Hinweis: Dieses Feld erwartet *einfache* mathematische Formeln, wie etwa `{{0}}`, `{{1}}`, oder `{{2}}`.",
     text: "Gib eine Funktion ${{0}}$ an, die \\[{{1}}\\] und \\[{{2}}\\] erfüllt.",
     name: "Dazwischen",
