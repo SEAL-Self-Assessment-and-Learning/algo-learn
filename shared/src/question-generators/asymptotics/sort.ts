@@ -93,7 +93,6 @@ export const SortTerms: QuestionGenerator = {
       text: `$${t.toLatex(variable, true)}$`,
       correctIndex: t.correctIndex,
     }))
-
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
       sorting: true,
@@ -107,7 +106,9 @@ export const SortTerms: QuestionGenerator = {
       text: t("text"),
       answers: answers.map((a) => a.text),
       feedback: minimalMultipleChoiceFeedback({
-        correctAnswerIndex: answers.map((a) => a.correctIndex),
+        correctAnswerIndex: answers
+          .sort((a, b) => a.correctIndex - b.correctIndex)
+          .map((a) => a.index),
         sorting: true,
       }),
     }
