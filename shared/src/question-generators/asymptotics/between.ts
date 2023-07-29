@@ -60,9 +60,9 @@ export const Between: QuestionGenerator = {
 
     if (!validateParameters(parameters, Between.expectedParameters)) {
       throw new Error(
-        `Unknown variant ${
-          parameters.variant
-        }. Valid variants are: ${Between.expectedParameters.join(",")}`
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${Between.expectedParameters.join(
+          ","
+        )}`
       )
     }
     const variant = parameters.variant as "start" | "log" | "loglog" | "nifty"

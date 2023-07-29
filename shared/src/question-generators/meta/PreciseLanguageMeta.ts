@@ -93,9 +93,9 @@ export function PreciseLanguageMeta(
   function generate(lang: Language, parameters: Parameters, seed: string) {
     if (!validateParameters(parameters, expectedParameters)) {
       throw new Error(
-        `Unknown variant ${
-          parameters.variant
-        }. Valid variants are: ${variants.join(", ")}`
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${variants.join(
+          ", "
+        )}`
       )
     }
     const i = parameters.number as number

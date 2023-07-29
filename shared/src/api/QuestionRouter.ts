@@ -50,7 +50,7 @@ export function serializeGeneratorCall({
 
   for (const { name } of generator.expectedParameters) {
     if (parameters[name] === undefined) return path.join("/")
-    path.push(`${parameters[name]}`)
+    path.push(parameters[name].toString())
   }
 
   if (seed === undefined) return path.join("/")

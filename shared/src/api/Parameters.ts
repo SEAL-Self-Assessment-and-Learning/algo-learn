@@ -9,7 +9,7 @@ import { Language } from "./Language"
  * QuestionGenerator should provide a list of allowed parameters along with
  * their types, descriptions, and allowed values.
  */
-export interface ParameterBase {
+export type ParameterBase = {
   /** Name of the parameter. */
   name: string
 
@@ -17,21 +17,20 @@ export interface ParameterBase {
   description?: (lang: Language) => string
 }
 
-/**
- * IntegerParameters are parameters that can be set to an integer value. They
- * may have a minimum and maximum value.
- */
-export interface IntegerParameter extends ParameterBase {
+/** BooleanParameter are parameters that can be set to an boolean value. */
+export type BooleanParameter = ParameterBase & {
+  type: "boolean"
+}
+
+/** IntegerParameters are parameters that can be set to an integer value. */
+export type IntegerParameter = ParameterBase & {
   type: "integer"
   min: number
   max: number
 }
 
-/**
- * StringParameters are parameters that can be set to a string value. They may
- * have an explicit list of allowed values.
- */
-export interface StringParameter extends ParameterBase {
+/** StringParameters are parameters that can be set to a string value. */
+export type StringParameter = ParameterBase & {
   type: "string"
   allowedValues: string[]
 }
@@ -39,13 +38,13 @@ export interface StringParameter extends ParameterBase {
 /** AllowedParameter is the union of all allowed parameter types. */
 
 export type ExpectedParameters = ReadonlyArray<
-  IntegerParameter | StringParameter
+  BooleanParameter | IntegerParameter | StringParameter
 >
 /**
  * An object of type Parameters is what is given as input to the
  * QuestionGenerator to generate a question.
  */
-export type Parameters = Record<string, string | number>
+export type Parameters = Record<string, boolean | number | string>
 
 /**
  * Check whether the given parameters are valid.
@@ -119,12 +118,15 @@ export function allParameterCombinations(
   )
   const newCombinations: Array<Parameters> = []
   for (const combinations of recCombinations) {
-    if (p.type === "string") {
-      for (const v of p.allowedValues) {
-        newCombinations.push({ ...combinations, [p.name]: v })
-      }
+    if (p.type === "boolean") {
+      newCombinations.push({ ...combinations, [p.name]: false })
+      newCombinations.push({ ...combinations, [p.name]: true })
     } else if (p.type === "integer") {
       for (let v = p.min; v <= p.max; v++) {
+        newCombinations.push({ ...combinations, [p.name]: v })
+      }
+    } else if (p.type === "string") {
+      for (const v of p.allowedValues) {
         newCombinations.push({ ...combinations, [p.name]: v })
       }
     }
@@ -157,7 +159,7 @@ export function serializeParameters(
 ): string {
   const parts = []
   for (const { name } of expectedParameters) {
-    parts.push(`${parameters[name]}`)
+    parts.push(parameters[name].toString())
   }
   return parts.join("/")
 }

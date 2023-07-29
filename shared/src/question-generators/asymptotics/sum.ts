@@ -48,7 +48,7 @@ export const SimplifySum: QuestionGenerator = {
 
     if (!validateParameters(parameters, SimplifySum.expectedParameters)) {
       throw new Error(
-        `Unknown variant ${parameters.variant}. Valid variants are: ${(
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${(
           SimplifySum.expectedParameters[0] as StringParameter
         ).allowedValues.join(", ")}`
       )

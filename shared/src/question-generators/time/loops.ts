@@ -51,9 +51,9 @@ export const Loops: QuestionGenerator = {
 
     if (!validateParameters(parameters, Loops.expectedParameters)) {
       throw new Error(
-        `Unknown variant ${
-          parameters.variant
-        }. Valid variants are: ${Loops.expectedParameters.join(",")}`
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${Loops.expectedParameters.join(
+          ","
+        )}`
       )
     }
     const permalink = serializeGeneratorCall({

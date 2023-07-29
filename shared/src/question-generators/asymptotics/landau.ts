@@ -17,20 +17,22 @@ const translations: Translations = {
     text: "Welche dieser Aussagen sind wahr? Wähle alle aus.",
   },
 }
-/**
- * Generate and render a question about asymptotic notation
- *
- * @param props
- * @param props.seed - Seed for random number generator
- * @param props.t - Translation function
- * @param props.onResult - Callback function
- * @param props.regeneratable - Whether the question can be regenerated
- * @returns Output
- */
+/** Multiple-choice questions for asymptotic notation */
 export const LandauNotation: QuestionGenerator = {
   path: "asymptotics/landau",
   name: tFunctional(translations, "name"),
-  expectedParameters: [],
+  expectedParameters: [
+    // {
+    //   type: "boolean",
+    //   name: "o/omega",
+    //   default: true,
+    // },
+    // {
+    //   type: "boolean",
+    //   name: "tilde",
+    //   default: false,
+    // },
+  ],
   languages: ["en_US", "de_DE"],
   generate: (lang, parameters, seed) => {
     const random = new Random(seed)
