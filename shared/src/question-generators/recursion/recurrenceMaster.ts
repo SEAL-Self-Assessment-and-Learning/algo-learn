@@ -16,8 +16,10 @@ import {
 } from "./formulaUtils"
 import { MathNode } from "mathjs"
 import math, { getVars } from "../../utils/math"
-import { mathNodeToSumProductTerm } from "../asymptotics/asymptoticsUtils"
-import { SumProductTerm } from "../asymptotics/asymptoticsUtils"
+import {
+  mathNodeToSumProductTerm,
+  SumProductTerm,
+} from "../asymptotics/asymptoticsUtils"
 import Fraction from "fraction.js"
 const translations: Translations = {
   en_US: {
@@ -136,9 +138,8 @@ export const RecurrenceMaster: QuestionGenerator = {
               )}: $${"n"}$.`,
             }
           }
-          let sumProductTerm: SumProductTerm
           try {
-            sumProductTerm = mathNodeToSumProductTerm(math.parse(text))
+            mathNodeToSumProductTerm(math.parse(text))
             return {
               valid: true,
               message:
@@ -164,7 +165,6 @@ export const RecurrenceMaster: QuestionGenerator = {
       }
 
       const feedback: FreeTextFeedbackFunction = ({ text }) => {
-        const mathNode: MathNode = math.parse(text)
         solution.coefficient = new Fraction(1)
         const correctAnswer = "$\\Theta(" + solution.toLatex("n") + ")$"
         const sumProductTerm: SumProductTerm = mathNodeToSumProductTerm(
