@@ -171,7 +171,7 @@ export function sfc32(
   a: number,
   b: number,
   c: number,
-  d: number
+  d: number,
 ): () => number {
   a |= 0
   b |= 0

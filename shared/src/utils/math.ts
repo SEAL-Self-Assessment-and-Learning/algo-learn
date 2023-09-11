@@ -32,7 +32,7 @@ const math = create(
     simplifyDependencies,
     subtractDependencies,
   },
-  config
+  config,
 )
 
 interface Func {

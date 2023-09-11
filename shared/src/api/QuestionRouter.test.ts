@@ -58,20 +58,20 @@ test("serializeGeneratorCall", () => {
   expect(
     serializeGeneratorCall({
       generator: ExampleQuestion,
-    })
+    }),
   ).toBe("test/test")
   expect(
     serializeGeneratorCall({
       generator: ExampleQuestion,
       parameters: { difficulty: 1, focus: "addition" },
-    })
+    }),
   ).toBe("test/test/1/addition")
   expect(
     serializeGeneratorCall({
       generator: ExampleQuestion,
       parameters: { difficulty: 1, focus: "addition" },
       seed: "myFancySeed",
-    })
+    }),
   ).toBe("test/test/1/addition/myFancySeed")
   expect(
     serializeGeneratorCall({
@@ -79,16 +79,16 @@ test("serializeGeneratorCall", () => {
       parameters: { difficulty: 1, focus: "addition" },
       seed: "myFancySeed",
       lang: "de_DE",
-    })
+    }),
   ).toBe("de/test/test/1/addition/myFancySeed")
 })
 
 test("deserializePath", () => {
   expect(
-    deserializePath({ routes: exampleRoutes, path: "test/dqopijjifwejipfw" })
+    deserializePath({ routes: exampleRoutes, path: "test/dqopijjifwejipfw" }),
   ).toBeUndefined()
   expect(
-    deserializePath({ routes: exampleRoutes, path: "dkdkd/test/test" })
+    deserializePath({ routes: exampleRoutes, path: "dkdkd/test/test" }),
   ).toBeUndefined()
 
   let ret = deserializePath({ routes: exampleRoutes, path: "test/test" })

@@ -29,7 +29,7 @@ export const QuestionComponent: FunctionComponent<QuestionComponentProps> = ({
   regenerate,
 }) => {
   const [question, setQuestion] = useState<Question | undefined>(
-    questionPromise instanceof Promise ? undefined : questionPromise
+    questionPromise instanceof Promise ? undefined : questionPromise,
   )
   useEffect(() => {
     void Promise.resolve(questionPromise).then((q) => setQuestion(q))

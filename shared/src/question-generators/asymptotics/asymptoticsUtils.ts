@@ -267,7 +267,7 @@ export class ProductTerm {
         usedIterationNumbers([this]).map((i) => [
           i,
           this.logarithmExponents.get(i).neg(),
-        ])
+        ]),
       ),
       exponentialBase: this.exponentialBase.inverse(),
     })
@@ -283,7 +283,7 @@ export class ProductTerm {
   add(t: ProductTerm): ProductTerm {
     if (!this.abs().Theta(t.abs())) {
       throw new Error(
-        "Cannot add ProductTerms with different asymptotic behaviour!"
+        "Cannot add ProductTerms with different asymptotic behaviour!",
       )
     }
     return new ProductTerm({
@@ -317,7 +317,7 @@ export class ProductTerm {
         usedIterationNumbers([this, t]).map((i) => [
           i,
           this.logarithmExponents.get(i).add(t.logarithmExponents.get(i)),
-        ])
+        ]),
       ),
       exponentialBase: this.exponentialBase.mul(t.exponentialBase),
     })
@@ -435,7 +435,7 @@ export class ProductTerm {
           usedIterationNumbers([this]).map((i) => [
             i,
             this.logarithmExponents.get(i).mul(e),
-          ])
+          ]),
         ),
         exponentialBase: this.exponentialBase.pow(e),
       })
@@ -452,7 +452,7 @@ export class ProductTerm {
     }
     throw new TooComplex(
       this,
-      `taking ${this.toString()} to the power of ${exponent.toString()} is not implemented yet.`
+      `taking ${this.toString()} to the power of ${exponent.toString()} is not implemented yet.`,
     )
   }
 
@@ -472,7 +472,7 @@ export class ProductTerm {
     newTerms.push(
       createProductTerm({
         coefficient: math.log(this.coefficient.valueOf(), base),
-      })
+      }),
     )
 
     // logarithm of each iterated-log factor
@@ -485,7 +485,7 @@ export class ProductTerm {
             [i + 1, new Fraction(1)],
           ]),
           exponentialBase: new Fraction(1),
-        })
+        }),
       )
     }
 
@@ -496,7 +496,7 @@ export class ProductTerm {
         createProductTerm({
           coefficient: math.log(this.exponentialBase.valueOf(), base),
           polyexponent: 1,
-        })
+        }),
       )
     }
 
@@ -684,7 +684,7 @@ export class SumProductTerm {
     }
     throw new TooComplex(
       this,
-      `Raising ${this.toString()} to the power of ${e.toString()} is not implemented`
+      `Raising ${this.toString()} to the power of ${e.toString()} is not implemented`,
     )
   }
 
@@ -697,7 +697,7 @@ export class SumProductTerm {
     } else {
       throw new TooComplex(
         this,
-        `Taking the logarithm of ${this.toString()} is not implemented.`
+        `Taking the logarithm of ${this.toString()} is not implemented.`,
       )
     }
   }
@@ -784,7 +784,7 @@ export class SumProductTerm {
  * @returns The used logarithm iteration numbers.
  */
 export function usedIterationNumbers(
-  terms: ProductTerm | ProductTerm[]
+  terms: ProductTerm | ProductTerm[],
 ): number[] {
   if (terms instanceof ProductTerm) terms = [terms]
   const S = new Set<number>()
@@ -802,7 +802,7 @@ export function mathNodeToSumProductTerm(node: math.MathNode): SumProductTerm {
   if (node.type === "ConstantNode") {
     const n = node as math.ConstantNode
     return new SumProductTerm(
-      createProductTerm({ coefficient: new Fraction(n.value) })
+      createProductTerm({ coefficient: new Fraction(n.value) }),
     )
   } else if (node.type === "OperatorNode") {
     const n = node as math.OperatorNode
@@ -812,7 +812,7 @@ export function mathNodeToSumProductTerm(node: math.MathNode): SumProductTerm {
       if (n.args.length !== 2)
         throw new Error("Invalid number of arguments for /")
       return mathNodeToSumProductTerm(n.args[0]).div(
-        mathNodeToSumProductTerm(n.args[1])
+        mathNodeToSumProductTerm(n.args[1]),
       )
     } else if (n.op === "+") {
       return n.args.map(mathNodeToSumProductTerm).reduce((a, b) => a.add(b))
@@ -821,7 +821,7 @@ export function mathNodeToSumProductTerm(node: math.MathNode): SumProductTerm {
         return mathNodeToSumProductTerm(n.args[0]).neg()
       } else if (n.args.length === 2) {
         return mathNodeToSumProductTerm(n.args[0]).sub(
-          mathNodeToSumProductTerm(n.args[1])
+          mathNodeToSumProductTerm(n.args[1]),
         )
       } else {
         throw new Error("Invalid number of arguments for -")
@@ -851,7 +851,7 @@ export function mathNodeToSumProductTerm(node: math.MathNode): SumProductTerm {
     return new SumProductTerm(
       createProductTerm({
         polyexponent: new Fraction(1),
-      })
+      }),
     )
   }
   throw new TooComplex(node)
@@ -873,7 +873,7 @@ function logToLatex(
   logexponent: Fraction,
   logbasis: Fraction,
   omitLogBasis: boolean = false,
-  verboseStyle: boolean = true
+  verboseStyle: boolean = true,
 ): string {
   if (logexponent.equals(0)) return "1"
 
@@ -959,7 +959,7 @@ export type TermVariants =
 export function sampleTerm(
   variable: string = "n",
   variant: TermVariants = "pure",
-  random: Random
+  random: Random,
 ): SimpleAsymptoticTerm {
   const terms = ["poly", "log", "exp"]
   const term: {
@@ -1156,7 +1156,7 @@ export function sampleTermSet({
           sampleTerm(
             variable,
             random.choice<TermVariants>(["log", "poly", "exp"]),
-            random
+            random,
           )
       : () => sampleTerm(variable, variant, random)
   let trials = 0
@@ -1182,7 +1182,7 @@ export interface GeneratedAsymptoticTerm {
   toLatex(
     variable?: string,
     omitCoefficient?: boolean,
-    omitLogBasis?: boolean
+    omitLogBasis?: boolean,
   ): string
   /** Print the term as a math string */
   toString(variable: string): string
@@ -1252,7 +1252,7 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
         polyexponent: this.polyexponent,
         logexponent: this.logexponent,
         exponentialBase: this.exponentialBase,
-      })
+      }),
     )
   }
 
@@ -1276,7 +1276,7 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
   toLatex(
     variable?: string,
     omitCoefficient: boolean = false,
-    omitLogBasis: boolean = false
+    omitLogBasis: boolean = false,
   ): string {
     variable = variable || this.variable
     variable = variable.length === 1 ? variable : `(${variable})`
@@ -1298,7 +1298,7 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
         variable,
         this.logexponent,
         this.logbasis,
-        omitLogBasis
+        omitLogBasis,
       )
     }
     if (this.exponentialBase.compare(1) > 0) {
@@ -1323,7 +1323,7 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
         variable,
         this.logexponent.neg(),
         this.logbasis,
-        omitLogBasis
+        omitLogBasis,
       )
     }
     if (this.exponentialBase.compare(1) < 0) {
@@ -1360,7 +1360,7 @@ export class TooComplex extends Error {
   node: math.MathNode | SumProductTerm | ProductTerm
   constructor(
     node: math.MathNode | SumProductTerm | ProductTerm,
-    message?: string
+    message?: string,
   ) {
     if (!message) {
       message =

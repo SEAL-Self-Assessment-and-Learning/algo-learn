@@ -65,23 +65,23 @@ for (const { path: route } of allQuestionGeneratorRoutes) {
  */
 export function generatorSetBelowPath(
   path: string,
-  generatorRoutes = allQuestionGeneratorRoutes
+  generatorRoutes = allQuestionGeneratorRoutes,
 ): Array<{ generator: QuestionGenerator; parameters: Parameters }> {
   const set = []
   for (const { path: generatorPath, generator } of generatorRoutes) {
     if (isSubPath(path, generatorPath)) {
       for (const parameters of allParameterCombinations(
-        generator.expectedParameters
+        generator.expectedParameters,
       )) {
         set.push({ generator, parameters })
       }
     } else if (isSubPath(generatorPath, path)) {
       const parameters = deserializeParameters(
         path.slice(generatorPath.length + 1),
-        generator.expectedParameters
+        generator.expectedParameters,
       )
       for (const paramExtensions of allParameterCombinations(
-        generator.expectedParameters.filter((p) => !(p.name in parameters))
+        generator.expectedParameters.filter((p) => !(p.name in parameters)),
       )) {
         set.push({
           generator,

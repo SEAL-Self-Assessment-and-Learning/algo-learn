@@ -221,7 +221,7 @@ export function QuizSession({
     }
 
     const question = Promise.resolve(
-      generator.generate(lang, parameters, questionSeed)
+      generator.generate(lang, parameters, questionSeed),
     ).then((q) => q.question)
     return (
       <QuestionComponent

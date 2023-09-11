@@ -30,13 +30,13 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
     })
 
     const allCombinations = allParameterCombinations(
-      generator.expectedParameters
+      generator.expectedParameters,
     )
     for (const lang of generator.languages) {
       expect(allCombinations.length).toBeGreaterThan(0)
       for (const parameters of allCombinations) {
         test(`Generate with language ${lang} and parameters ${JSON.stringify(
-          parameters
+          parameters,
         )}`, () => {
           const ret = generator.generate(lang, parameters, "myFancySeed")
           expect(!(ret instanceof Promise)).toBe(true)
@@ -45,7 +45,7 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
           expect(question.name).not.toBe("")
           expect(question.path).not.toBe("")
           expect(question.type).toMatch(
-            /^(MultipleChoiceQuestion|FreeTextQuestion)$/
+            /^(MultipleChoiceQuestion|FreeTextQuestion)$/,
           )
           expect(question.text).toBeDefined()
           expect(question.text).not.toBe("")
@@ -70,23 +70,23 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
           generator.generate(
             lang,
             { ...parameters, [p.name]: p.min - 1 },
-            "myFancySeed"
-          )
+            "myFancySeed",
+          ),
         ).toThrowError()
         expect(() =>
           generator.generate(
             lang,
             { ...parameters, [p.name]: p.max + 1 },
-            "myFancySeed"
-          )
+            "myFancySeed",
+          ),
         ).toThrowError()
       } else if (p.type === "string") {
         expect(() =>
           generator.generate(
             lang,
             { ...parameters, [p.name]: "non-existent-kjfewjokfwjiofw" },
-            "myFancySeed"
-          )
+            "myFancySeed",
+          ),
         ).toThrowError()
       }
     }

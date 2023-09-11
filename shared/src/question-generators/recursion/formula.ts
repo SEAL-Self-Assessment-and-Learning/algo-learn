@@ -69,8 +69,8 @@ export const RecursionFormula: QuestionGenerator = {
     if (!validateParameters(parameters, RecursionFormula.expectedParameters)) {
       throw new Error(
         `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${RecursionFormula.expectedParameters.join(
-          ", "
-        )}`
+          ", ",
+        )}`,
       )
     }
 

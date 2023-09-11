@@ -34,7 +34,7 @@ export function markdownTreeToLatex(tree: ParseTree | ParseTreeNode): string {
     return `\\texttt{${markdownTreeToLatex(tree.child)}}`
   } else if (tree.kind === "```") {
     return `\\begin{verbatim}\n${markdownTreeToLatex(
-      tree.child
+      tree.child,
     )}\n\\end{verbatim}`
   } else if (tree.kind === ">") {
     return `\\begin{quote}\n${markdownTreeToLatex(tree.child)}\n\\end{quote}`

@@ -71,13 +71,13 @@ test("ProductTerms: lim +/- x^{+/- 1/2}", () => {
   expect(
     createProductTerm({
       polyexponent: new Fraction(1, 2),
-    }).limit()
+    }).limit(),
   ).toBe("infty")
   expect(
     createProductTerm({
       coefficient: -1,
       polyexponent: new Fraction(1, 2),
-    }).limit()
+    }).limit(),
   ).toBe("-infty")
   expect(
     createProductTerm({
@@ -85,14 +85,14 @@ test("ProductTerms: lim +/- x^{+/- 1/2}", () => {
       polyexponent: new Fraction(1, 2),
     })
       .limit()
-      .valueOf()
+      .valueOf(),
   ).toBe(0)
   expect(
     createProductTerm({
       polyexponent: new Fraction(-1, 2),
     })
       .limit()
-      .valueOf()
+      .valueOf(),
   ).toBe(0)
   expect(
     createProductTerm({
@@ -100,7 +100,7 @@ test("ProductTerms: lim +/- x^{+/- 1/2}", () => {
       polyexponent: new Fraction(-1, 2),
     })
       .limit()
-      .valueOf()
+      .valueOf(),
   ).toBe(0)
 })
 
@@ -108,13 +108,13 @@ test("ProductTerms: lim +/- log(x)^{+/- 1/2}", () => {
   expect(
     createProductTerm({
       logexponent: new Fraction(1, 2),
-    }).limit()
+    }).limit(),
   ).toBe("infty")
   expect(
     createProductTerm({
       coefficient: -1,
       logexponent: new Fraction(1, 2),
-    }).limit()
+    }).limit(),
   ).toBe("-infty")
   expect(
     createProductTerm({
@@ -122,14 +122,14 @@ test("ProductTerms: lim +/- log(x)^{+/- 1/2}", () => {
       logexponent: new Fraction(1, 2),
     })
       .limit()
-      .valueOf()
+      .valueOf(),
   ).toBe(0)
   expect(
     createProductTerm({
       logexponent: new Fraction(-1, 2),
     })
       .limit()
-      .valueOf()
+      .valueOf(),
   ).toBe(0)
   expect(
     createProductTerm({
@@ -137,7 +137,7 @@ test("ProductTerms: lim +/- log(x)^{+/- 1/2}", () => {
       logexponent: new Fraction(-1, 2),
     })
       .limit()
-      .valueOf()
+      .valueOf(),
   ).toBe(0)
 })
 
@@ -149,7 +149,7 @@ test("ProductTerms: lim +/- c * x^0", () => {
         polyexponent: 0,
       })
         .limit()
-        .valueOf()
+        .valueOf(),
     ).toBe(d)
     expect(
       createProductTerm({
@@ -157,7 +157,7 @@ test("ProductTerms: lim +/- c * x^0", () => {
         logexponent: 0,
       })
         .limit()
-        .valueOf()
+        .valueOf(),
     ).toBe(d)
     expect(
       createProductTerm({
@@ -166,7 +166,7 @@ test("ProductTerms: lim +/- c * x^0", () => {
         logexponent: 0,
       })
         .limit()
-        .valueOf()
+        .valueOf(),
     ).toBe(d)
   }
 })
@@ -178,14 +178,14 @@ test("ProductTerms: lim +/- x^{+/- c} log(x)^{+/- d}", () => {
         coefficient: 7,
         polyexponent: 2,
         logexponent: d,
-      }).limit()
+      }).limit(),
     ).toBe("infty")
     expect(
       createProductTerm({
         coefficient: -7,
         polyexponent: 2,
         logexponent: d,
-      }).limit()
+      }).limit(),
     ).toBe("-infty")
   }
   for (const d of [-99, -2, -1, 0, 1, 2, 99]) {
@@ -196,7 +196,7 @@ test("ProductTerms: lim +/- x^{+/- c} log(x)^{+/- d}", () => {
         logexponent: d,
       })
         .limit()
-        .valueOf()
+        .valueOf(),
     ).toBe(0)
     expect(
       createProductTerm({
@@ -205,7 +205,7 @@ test("ProductTerms: lim +/- x^{+/- c} log(x)^{+/- d}", () => {
         logexponent: d,
       })
         .limit()
-        .valueOf()
+        .valueOf(),
     ).toBe(0)
   }
 })
@@ -220,9 +220,9 @@ test("ProductTerms.compare: -f(x) << constant << f(x)", () => {
         .compare(
           createProductTerm({
             logexponent: d,
-          })
+          }),
         )
-        .valueOf()
+        .valueOf(),
     ).toBe(-1)
   }
   expect(
@@ -230,9 +230,9 @@ test("ProductTerms.compare: -f(x) << constant << f(x)", () => {
       .compare(
         createProductTerm({
           logexponent: 0,
-        })
+        }),
       )
-      .valueOf()
+      .valueOf(),
   ).toBe(0)
   for (const d of [1, 2, 99, 100, 101]) {
     expect(
@@ -240,9 +240,9 @@ test("ProductTerms.compare: -f(x) << constant << f(x)", () => {
         .compare(
           createProductTerm({
             logexponent: -d,
-          })
+          }),
         )
-        .valueOf()
+        .valueOf(),
     ).toBe(1)
   }
   for (const d of [1, 2, 99, 100, 101]) {
@@ -251,9 +251,9 @@ test("ProductTerms.compare: -f(x) << constant << f(x)", () => {
         .compare(
           createProductTerm({
             polyexponent: d,
-          })
+          }),
         )
-        .valueOf()
+        .valueOf(),
     ).toBe(-1)
   }
   for (const d of [1, 2, 99, 100, 101]) {
@@ -262,9 +262,9 @@ test("ProductTerms.compare: -f(x) << constant << f(x)", () => {
         .compare(
           createProductTerm({
             polyexponent: -d,
-          })
+          }),
         )
-        .valueOf()
+        .valueOf(),
     ).toBe(1)
   }
 })
@@ -280,7 +280,7 @@ test("ProductTerms.compare: strict", () => {
         coefficient: d,
       })
       expect(
-        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0)
+        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0),
       ).toBeTruthy()
 
       tc = createProductTerm({
@@ -294,7 +294,7 @@ test("ProductTerms.compare: strict", () => {
         polyexponent: 17,
       })
       expect(
-        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0)
+        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0),
       ).toBeTruthy()
 
       tc = createProductTerm({
@@ -304,7 +304,7 @@ test("ProductTerms.compare: strict", () => {
         logexponent: d,
       })
       expect(
-        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0)
+        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0),
       ).toBeTruthy()
 
       tc = createProductTerm({
@@ -316,7 +316,7 @@ test("ProductTerms.compare: strict", () => {
         polyexponent: d,
       })
       expect(
-        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0)
+        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0),
       ).toBeTruthy()
     }
   }

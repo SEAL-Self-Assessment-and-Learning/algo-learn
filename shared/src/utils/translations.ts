@@ -38,19 +38,19 @@ function t(
   translations: Translations,
   lang: Language,
   key: TKey,
-  parameters?: TFunctionParameters
+  parameters?: TFunctionParameters,
 ): string
 function t(
   translations: DeepTranslations,
   lang: Language,
   key: TKey,
-  parameters?: TFunctionParameters
+  parameters?: TFunctionParameters,
 ): string | string[]
 function t(
   translations: DeepTranslations,
   lang: Language,
   key: TKey,
-  parameters?: TFunctionParameters
+  parameters?: TFunctionParameters,
 ): string | string[] {
   const text = translations[lang][key]
   if (text === undefined) {
@@ -81,15 +81,15 @@ export function tFunctional(translations: Translations, key: string) {
  */
 export function tFunction(
   translations: Translations,
-  lang: Language
+  lang: Language,
 ): { t: (key: TKey, parameters?: TFunctionParameters) => string }
 export function tFunction(
   translations: DeepTranslations,
-  lang: Language
+  lang: Language,
 ): { t: (key: TKey, parameters?: TFunctionParameters) => string | string[] }
 export function tFunction(
   translations: Translations | DeepTranslations,
-  lang: Language
+  lang: Language,
 ) {
   return {
     t: (key: TKey, parameters?: TFunctionParameters) =>

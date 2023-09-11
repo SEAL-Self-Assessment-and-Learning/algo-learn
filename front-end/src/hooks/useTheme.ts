@@ -14,7 +14,7 @@ export const availableThemes = [LIGHT, DARK, OSDEFAULT]
  */
 export function useOSdefaultTheme() {
   const [OSdefaultTheme, setOSdefaultTheme] = useState(
-    window.matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT
+    window.matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT,
   )
   useEffect(() => {
     window

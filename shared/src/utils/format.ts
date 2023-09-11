@@ -10,19 +10,19 @@
  */
 export function format(
   text: string,
-  parameters?: string[] | Record<string, string>
+  parameters?: string[] | Record<string, string>,
 ): string
 export function format(
   text: string[],
-  parameters?: string[] | Record<string, string>
+  parameters?: string[] | Record<string, string>,
 ): string[]
 export function format(
   text: string | string[],
-  parameters?: string[] | Record<string, string>
+  parameters?: string[] | Record<string, string>,
 ): string | string[]
 export function format(
   text: string | string[],
-  parameters: string[] | Record<string, string> = []
+  parameters: string[] | Record<string, string> = [],
 ): string | string[] {
   if (Array.isArray(text)) {
     return text.map((t) => format(t, parameters))

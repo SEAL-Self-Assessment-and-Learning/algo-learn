@@ -74,7 +74,7 @@ const translations: Translations = {
 export function PreciseLanguageMeta(
   generatorPath: string,
   name: (lang: Language) => string,
-  questions: BasicMCQuestion[]
+  questions: BasicMCQuestion[],
 ): QuestionGenerator {
   const variants = questions.map((_, i) => i)
   const languages = Object.keys(questions[0].translations) as Language[]
@@ -94,8 +94,8 @@ export function PreciseLanguageMeta(
     if (!validateParameters(parameters, expectedParameters)) {
       throw new Error(
         `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${variants.join(
-          ", "
-        )}`
+          ", ",
+        )}`,
       )
     }
     const i = parameters.number as number
@@ -130,7 +130,7 @@ export function PreciseLanguageMeta(
           correct: false,
           key: `answer-${numCorrect + index}`,
           element: format(a, p),
-        }))
+        })),
       )
 
     random.shuffle(answers)

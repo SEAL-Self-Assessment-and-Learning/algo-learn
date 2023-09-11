@@ -50,7 +50,7 @@ export const SimplifySum: QuestionGenerator = {
       throw new Error(
         `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${(
           SimplifySum.expectedParameters[0] as StringParameter
-        ).allowedValues.join(", ")}`
+        ).allowedValues.join(", ")}`,
       )
     }
     const variant = parameters.variant as TermSetVariants
@@ -77,7 +77,7 @@ export const SimplifySum: QuestionGenerator = {
       type: "MultipleChoiceQuestion",
       name: t("name"),
       text: format(
-        t("text" ?? "text", [functionDeclaration, functionDefinition])
+        t("text" ?? "text", [functionDeclaration, functionDefinition]),
       ),
       answers: answers.map(({ element }) => element),
       feedback: minimalMultipleChoiceFeedback({

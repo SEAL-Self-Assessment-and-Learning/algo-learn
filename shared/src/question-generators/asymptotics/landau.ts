@@ -59,7 +59,7 @@ export const LandauNotation: QuestionGenerator = {
           : notation == "\\omega" || notation == "\\Omega"
       const key = `${functionLeft.replaceAll(
         "n",
-        variable
+        variable,
       )} = ${notation}(${functionRight.replaceAll("n", variable)})`
 
       const isDuplicate = answers.findIndex((e) => e.key === key) >= 0

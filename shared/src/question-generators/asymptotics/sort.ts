@@ -60,8 +60,8 @@ export const SortTerms: QuestionGenerator = {
     if (!validateParameters(parameters, SortTerms.expectedParameters)) {
       throw new Error(
         `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${SortTerms.expectedParameters.join(
-          ", "
-        )}`
+          ", ",
+        )}`,
       )
     }
 

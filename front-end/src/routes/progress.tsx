@@ -202,7 +202,7 @@ function SkillGroupCard({
   const { t } = useTranslation()
   const generatorCalls = generatorCallsBelowPath(partialPath)
   const qualified = generatorCalls.filter(
-    (c) => featureMap[serializeGeneratorCall(c)].mastered
+    (c) => featureMap[serializeGeneratorCall(c)].mastered,
   )
   const done = qualified.length
   const total = generatorCalls.length

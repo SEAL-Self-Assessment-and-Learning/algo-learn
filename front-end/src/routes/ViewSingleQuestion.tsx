@@ -38,7 +38,7 @@ export function ViewSingleQuestion({
     throw new Error("Invalid parameters: " + JSON.stringify(parameters))
 
   const question = Promise.resolve(
-    generator.generate(lang, parameters, seed)
+    generator.generate(lang, parameters, seed),
   ).then((q) => q.question)
   return (
     <QuestionComponent

@@ -66,7 +66,7 @@ export function ExerciseTextInput({
             mode: valid ? "draft" : "invalid",
             formatFeedback: message,
           })
-        }
+        },
       )
     } else {
       const valid = text.trim().length > 0
@@ -89,7 +89,7 @@ export function ExerciseTextInput({
               mode = "incorrect"
             }
             setState({ ...state, mode, feedbackObject })
-          }
+          },
         )
       }
     } else if (mode === "correct" || mode === "incorrect") {

@@ -41,7 +41,7 @@ const translations: Translations = {
 export function printAgo(
   x: number,
   unit: "second" | "minute" | "hour" | "day" | "week" | "month" | "year",
-  lang: Language = "en_US"
+  lang: Language = "en_US",
 ) {
   const { t } = tFunction(translations, lang)
   if (x === 1) {
@@ -60,7 +60,7 @@ export function printAgo(
  */
 export function howLongSince(
   timestamp: number,
-  lang: Language = "en_US"
+  lang: Language = "en_US",
 ): string {
   const { t } = tFunction(translations, lang)
   const now = Date.now()

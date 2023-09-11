@@ -55,11 +55,11 @@ const routes = []
 for (const questionGeneratorRoute of allQuestionGeneratorRoutes) {
   const { path, generator } = questionGeneratorRoute
   for (const parameters of allParameterCombinations(
-    generator.expectedParameters
+    generator.expectedParameters,
   )) {
     const parametersPath = serializeParameters(
       parameters,
-      generator.expectedParameters
+      generator.expectedParameters,
     )
     const route = path + (parametersPath ? "/" + parametersPath : "")
     routes.push({
@@ -120,11 +120,11 @@ const router = createBrowserRouter(
   ],
   {
     basename: BASENAME,
-  }
+  },
 )
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RouterProvider router={router} />
-  </StrictMode>
+  </StrictMode>,
 )

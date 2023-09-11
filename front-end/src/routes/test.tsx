@@ -24,12 +24,12 @@ export function TestSimpleMC() {
   const [seed] = useState(new Random(Math.random()).base36string(7))
   const [format, setFormat] = useState("react" as "react" | "latex" | "json")
   const [{ question }, setQuestion] = useState(
-    {} as { question: Question | undefined }
+    {} as { question: Question | undefined },
   )
 
   if (!question) {
     void Promise.resolve(TestQuestion.generate(lang, {}, seed)).then(
-      setQuestion
+      setQuestion,
     )
     return <></>
   }

@@ -97,7 +97,7 @@ export interface MultipleChoiceFeedback extends FeedbackBase {
 
 /** The signature of the feedback function for multiple-choice questions */
 export type MultipleChoiceFeedbackFunction = (
-  answer: MultipleChoiceAnswer
+  answer: MultipleChoiceAnswer,
 ) => MultipleChoiceFeedback | Promise<MultipleChoiceFeedback>
 
 /**
@@ -182,12 +182,12 @@ export interface FreeTextFeedback extends FeedbackBase {
 
 /** The signature of the feedback function for free-text questions */
 export type FreeTextFeedbackFunction = (
-  answer: FreeTextAnswer
+  answer: FreeTextAnswer,
 ) => FreeTextFeedback | Promise<FreeTextFeedback>
 
 /** The signature of the function that checks the syntax or basic format. */
 export type FreeTextFormatFunction = (
-  answer: FreeTextAnswer
+  answer: FreeTextAnswer,
 ) =>
   | { valid: boolean; message?: string }
   | Promise<{ valid: boolean; message?: string }>
@@ -255,7 +255,7 @@ export interface QuestionGenerator {
   generate: (
     lang: Language,
     parameters: Parameters,
-    seed: string
+    seed: string,
   ) => { question: Question } | Promise<{ question: Question }>
 }
 

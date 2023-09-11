@@ -61,7 +61,7 @@ export const TestQuestion: QuestionGenerator = {
     }
     random.shuffle(answers)
     const correctAnswerIndex = answers.findIndex(
-      (a) => a === `$${correctAnswer}$`
+      (a) => a === `$${correctAnswer}$`,
     )
 
     const { t } = tFunction(translations, lang)

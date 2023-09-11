@@ -57,7 +57,7 @@ const BIAS = 1.011
 export function halflife(
   numPassed: number,
   numFailed: number,
-  n0: number = 0
+  n0: number = 0,
 ): number {
   const log_halflife = numPassed * RIGHT + numFailed * WRONG + n0 + BIAS
   const h = hclip(2 ** log_halflife)

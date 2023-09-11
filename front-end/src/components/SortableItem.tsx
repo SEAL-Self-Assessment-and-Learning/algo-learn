@@ -54,7 +54,7 @@ export function SortableItem({
       listeners,
       ref: setActivatorNodeRef,
     }),
-    [attributes, listeners, setActivatorNodeRef]
+    [attributes, listeners, setActivatorNodeRef],
   )
   return (
     <SortableItemContext.Provider value={context}>

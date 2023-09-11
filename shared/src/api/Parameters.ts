@@ -55,7 +55,7 @@ export type Parameters = Record<string, boolean | number | string>
  */
 export function validateParameters(
   parameters: Parameters,
-  allowedParameters: ExpectedParameters
+  allowedParameters: ExpectedParameters,
 ): boolean {
   let correct = true
   for (const allowedParameter of allowedParameters) {
@@ -96,7 +96,7 @@ export function validateParameters(
  */
 export function missingParameters(
   parameters: Parameters,
-  allowedParameters: ExpectedParameters
+  allowedParameters: ExpectedParameters,
 ) {
   return allowedParameters.filter((p) => parameters[p.name] === undefined)
 }
@@ -108,13 +108,13 @@ export function missingParameters(
  * @returns All possible combinations of parameters
  */
 export function allParameterCombinations(
-  expectedParameters: ExpectedParameters
+  expectedParameters: ExpectedParameters,
 ): Array<Parameters> {
   if (expectedParameters.length === 0) return [{}]
 
   const p = expectedParameters[0]
   const recCombinations: Array<Parameters> = allParameterCombinations(
-    expectedParameters.slice(1)
+    expectedParameters.slice(1),
   )
   const newCombinations: Array<Parameters> = []
   for (const combinations of recCombinations) {
@@ -155,7 +155,7 @@ export function allParameterCombinations(
  */
 export function serializeParameters(
   parameters: Parameters,
-  expectedParameters: ExpectedParameters
+  expectedParameters: ExpectedParameters,
 ): string {
   const parts = []
   for (const { name } of expectedParameters) {
@@ -184,7 +184,7 @@ export function serializeParameters(
  */
 export function deserializeParameters(
   path: string,
-  expectedParameters: ExpectedParameters
+  expectedParameters: ExpectedParameters,
 ): Parameters {
   const parameterList = path.split("/")
   const parameters: Parameters = {}

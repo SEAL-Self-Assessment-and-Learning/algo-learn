@@ -50,7 +50,7 @@ export function SortableList({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   )
   if (new Set(items.map(({ position }) => position)).size !== items.length) {
     throw new Error("Duplicate positions in SortableList!")
@@ -66,7 +66,7 @@ export function SortableList({
       onDragEnd={({ active, over }) => {
         if (over && active.id !== over?.id) {
           const activeIndex = itemsWithIds.findIndex(
-            ({ id }) => id === active.id
+            ({ id }) => id === active.id,
           )
           const overIndex = itemsWithIds.findIndex(({ id }) => id === over.id)
           onChange(arrayMove(items, activeIndex, overIndex))

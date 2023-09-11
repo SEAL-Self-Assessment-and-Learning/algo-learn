@@ -91,7 +91,7 @@ export function useLog() {
   for (let i = 0; i < log.length - 1; i++) {
     console.assert(
       log[i + 1].timestamp < log[i].timestamp,
-      "Invariant failed: Each timestamp in the log must be unique!"
+      "Invariant failed: Each timestamp in the log must be unique!",
     )
   }
   return { log, setLog: setLogV1 }
@@ -107,12 +107,12 @@ export function useSkills() {
   /* Compute the strength of each skill (number between 0 and 1) */
   const featureMap = useMemo(
     () => computeFeatureMap({ basicFeatureMap }),
-    [basicFeatureMap]
+    [basicFeatureMap],
   )
 
   const unlockedSkills = useMemo(
     () => computeUnlockedSkills({ featureMap }),
-    [featureMap]
+    [featureMap],
   )
 
   function appendLogEntry(entry: LogEntryV1) {
@@ -165,7 +165,7 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntryV1> }): {
     })
     if (generatorCall === undefined) {
       console.log(
-        `Path ${e.path} was not found in allQuestionGeneratorRoutes. Skipping...`
+        `Path ${e.path} was not found in allQuestionGeneratorRoutes. Skipping...`,
       )
       continue
     }
@@ -173,7 +173,7 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntryV1> }): {
     const path = serializeGeneratorCall({ generator, parameters })
     featureMap[path].lag = min(
       featureMap[path].lag,
-      (now - e.timestamp) / 3600 / 24 / 1000
+      (now - e.timestamp) / 3600 / 24 / 1000,
     )
 
     /**
@@ -292,7 +292,7 @@ export function sortByStrength({
   generatorCalls.sort(
     (a, b) =>
       featureMap[serializeGeneratorCall(a)].p -
-      featureMap[serializeGeneratorCall(b)].p
+      featureMap[serializeGeneratorCall(b)].p,
   )
   return generatorCalls
 }

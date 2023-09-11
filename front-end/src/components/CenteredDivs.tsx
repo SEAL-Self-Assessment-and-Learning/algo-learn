@@ -8,7 +8,7 @@ import { HTMLAttributes, ReactElement } from "react"
  * @returns
  */
 export function HorizontallyCenteredDiv(
-  props: HTMLAttributes<HTMLDivElement>
+  props: HTMLAttributes<HTMLDivElement>,
 ): ReactElement {
   return (
     <div
@@ -26,7 +26,7 @@ export function HorizontallyCenteredDiv(
  * @returns
  */
 export function ScreenCenteredDiv(
-  props: HTMLAttributes<HTMLDivElement>
+  props: HTMLAttributes<HTMLDivElement>,
 ): ReactElement {
   return (
     <div

@@ -101,7 +101,7 @@ export function ExerciseMultipleChoice({
               mode = "incorrect"
             }
             setState({ ...state, mode, feedbackObject })
-          }
+          },
         )
       }
     } else if (mode === "correct" || mode === "incorrect") {

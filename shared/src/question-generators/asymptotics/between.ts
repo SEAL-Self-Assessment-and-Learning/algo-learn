@@ -61,8 +61,8 @@ export const Between: QuestionGenerator = {
     if (!validateParameters(parameters, Between.expectedParameters)) {
       throw new Error(
         `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${Between.expectedParameters.join(
-          ","
-        )}`
+          ",",
+        )}`,
       )
     }
     const variant = parameters.variant as "start" | "log" | "loglog" | "nifty"
@@ -164,7 +164,7 @@ ${t("feedback.expected")}: $${variable}$.`,
         return {
           correct: false,
           feedbackText: `${t(
-            "feedback.unknown-variable"
+            "feedback.unknown-variable",
           )}: $${unknownVar}$. ${t("feedback.expected")}: $${variable}$.`,
         }
       }
@@ -230,7 +230,7 @@ ${t("feedback.expected")}: $${variable}$.`,
 
 export function generateBaseFunction(
   variant: string,
-  random: Random
+  random: Random,
 ): ProductTerm[] {
   switch (variant) {
     default: {
@@ -248,7 +248,7 @@ export function generateBaseFunction(
       do {
         b.logarithmExponents.get(0).n = random.int(
           a.logarithmExponents.get(0).n - 2,
-          a.logarithmExponents.get(0).n + 2
+          a.logarithmExponents.get(0).n + 2,
         )
       } while (b.logarithmExponents.get(0).n === a.logarithmExponents.get(0).n)
       return [a, b]
@@ -305,7 +305,7 @@ export function generateBaseFunction(
           minInt: 2,
           maxInt: 7,
           random,
-        })
+        }),
       )
 
       const a = new ProductTerm({

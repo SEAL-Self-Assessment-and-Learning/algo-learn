@@ -2,11 +2,11 @@ const images = {
   time: new URL("../../assets/images/skill-time.jpg", import.meta.url),
   asymptotics: new URL(
     "../../assets/images/skill-asymptotics.jpg",
-    import.meta.url
+    import.meta.url,
   ),
   recursion: new URL(
     "../../assets/images/skill-recursion.jpg",
-    import.meta.url
+    import.meta.url,
   ),
 }
 

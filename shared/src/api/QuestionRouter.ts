@@ -143,7 +143,7 @@ export function deserializePath({
 
     const parameters = deserializeParameters(
       parts.join("/"),
-      generator.expectedParameters
+      generator.expectedParameters,
     )
 
     const missing = missingParameters(parameters, generator.expectedParameters)

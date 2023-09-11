@@ -222,5 +222,5 @@ export const AsymptoticsPreciseLanguage: QuestionGenerator =
   PreciseLanguageMeta(
     "asymptotics/precise-language",
     tFunctional(translations, "title"),
-    questions
+    questions,
   )

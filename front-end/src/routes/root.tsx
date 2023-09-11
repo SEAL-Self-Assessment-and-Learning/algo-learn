@@ -34,7 +34,7 @@ function GlobalHeader() {
     // replace the language prefix in the URL
     const newPath = location.pathname.replace(
       new RegExp("^/" + (i18n.resolvedLanguage ?? "en") + "/"),
-      "/" + newLang + "/"
+      "/" + newLang + "/",
     )
     void i18n.changeLanguage(newLang)
     navigate(newPath)
