@@ -36,10 +36,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: "20"
-          cache: "yarn"
+          # cache: "yarn"
 
-      - name: Yarn install 🔧
-        uses: ./.github/actions/yarn-nm-install
+      - uses: oven-sh/setup-bun@v1
+
+      - name: Bun install 🔧
+        run: bun install --frozen-lockfile
 
       - name: Write basename and version number to front-end/src/config.ts
         run: |
@@ -47,10 +49,10 @@ jobs:
           sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short $GITHUB_SHA)\"/g" front-end/src/config.ts
 
       - name: Run test suite
-        run: yarn test
+        run: bun run test
 
-      - name: Yarn Build 🔧
-        run: yarn build --base /algo-learn/
+      - name: Build 🔧
+        run: bun run build --base /algo-learn/
 
       - name: Deploy to server 🚀
         id: deploy

@@ -9,25 +9,26 @@ This is the prototype of a modern learning platform for a typical algorithms and
 
 ## Development
 
-### Install modern yarn
+While you are free to use `npm` or `yarn`, we recommend `bun`.
 
-[Install yarn](https://yarnpkg.com/getting-started/install) (v3+):
+### Install bun
+
+Follow the instructions to [install bun](https://bun.sh/):
 
 ```bash
-corepack enable
-corepack prepare yarn@stable --activate
+curl -fsSL https://bun.sh/install | bash
 ```
 
-Run yarn to install the project's dependencies:
+Once bun is installed, you can download and install the project's dependencies:
 
 ```bash
-yarn
+bun install
 ```
 
-This command will start a local HTTP server for development:
+The following command will start a local HTTP server for development:
 
 ```bash
-yarn dev
+bun dev
 ```
 
 ### Configure your IDE
@@ -45,19 +46,17 @@ In principle, you're now in position to start development. However, we strongly 
 - optional: [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
 - optional: [Atom One Dark Theme](https://marketplace.visualstudio.com/items?itemName=akamud.vscode-theme-onedark)
 
-Then follow [these instructions](https://yarnpkg.com/getting-started/editor-sdks#vscode) to allow VS Code to use the project's PnP SDK.
-
 ### Run tests
 
 Run all tests (format checker, unit tests, linter, type checker):
 ```bash
-yarn test
+bun run test
 ```
 
 ### Build for production
 
 ```bash
-yarn build
+bun run build
 ```
 
 ### Major libraries used

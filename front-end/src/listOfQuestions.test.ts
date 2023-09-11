@@ -32,8 +32,10 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
     const allCombinations = allParameterCombinations(
       generator.expectedParameters,
     )
-    for (const lang of generator.languages) {
+    test(`Test that generator has at least one allowed input`, () => {
       expect(allCombinations.length).toBeGreaterThan(0)
+    })
+    for (const lang of generator.languages) {
       for (const parameters of allCombinations) {
         test(`Generate with language ${lang} and parameters ${JSON.stringify(
           parameters,
@@ -65,30 +67,32 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
     const lang = generator.languages[0]
     const parameters = allCombinations[0]
     for (const p of generator.expectedParameters) {
-      if (p.type === "integer") {
-        expect(() =>
-          generator.generate(
-            lang,
-            { ...parameters, [p.name]: p.min - 1 },
-            "myFancySeed",
-          ),
-        ).toThrowError()
-        expect(() =>
-          generator.generate(
-            lang,
-            { ...parameters, [p.name]: p.max + 1 },
-            "myFancySeed",
-          ),
-        ).toThrowError()
-      } else if (p.type === "string") {
-        expect(() =>
-          generator.generate(
-            lang,
-            { ...parameters, [p.name]: "non-existent-kjfewjokfwjiofw" },
-            "myFancySeed",
-          ),
-        ).toThrowError()
-      }
+      test(`Testing parameter ${JSON.stringify(p)}`, () => {
+        if (p.type === "integer") {
+          expect(() =>
+            generator.generate(
+              lang,
+              { ...parameters, [p.name]: p.min - 1 },
+              "myFancySeed",
+            ),
+          ).toThrowError()
+          expect(() =>
+            generator.generate(
+              lang,
+              { ...parameters, [p.name]: p.max + 1 },
+              "myFancySeed",
+            ),
+          ).toThrowError()
+        } else if (p.type === "string") {
+          expect(() =>
+            generator.generate(
+              lang,
+              { ...parameters, [p.name]: "non-existent-kjfewjokfwjiofw" },
+              "myFancySeed",
+            ),
+          ).toThrowError()
+        }
+      })
     }
   })
 }
