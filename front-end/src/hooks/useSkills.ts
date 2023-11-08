@@ -164,9 +164,9 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntryV1> }): {
       path: e.path,
     })
     if (generatorCall === undefined) {
-      console.log(
-        `Path ${e.path} was not found in allQuestionGeneratorRoutes. Skipping...`,
-      )
+      // console.log(
+      //   `Path ${e.path} was not found in allQuestionGeneratorRoutes. Skipping...`,
+      // )
       continue
     }
     const { generator, parameters } = generatorCall

@@ -11,7 +11,7 @@ export function Legal() {
       <p className="my-5">{t("Legal.text")}</p>
       <p className="my-5">
         <Markdown
-          md={format(t("Legal.authors.text"), [
+          md={format(t("Legal.detailed.text"), [
             "https://tcs.uni-frankfurt.de/legal",
           ])}
         />

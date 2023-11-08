@@ -2,7 +2,7 @@ import { Language } from "../../../shared/src/api/Language"
 import { tFunction, Translations } from "../../../shared/src/utils/translations"
 
 const translations: Translations = {
-  en_US: {
+  en: {
     future: "in the future",
     second: "one second ago",
     seconds: "{{0}} seconds ago",
@@ -19,7 +19,7 @@ const translations: Translations = {
     year: "last year",
     years: "{{0}} years ago",
   },
-  de_DE: {
+  de: {
     future: "in der Zukunft",
     second: "vor einer Sekunde",
     seconds: "vor {{0}} Sekunden",
@@ -41,7 +41,7 @@ const translations: Translations = {
 export function printAgo(
   x: number,
   unit: "second" | "minute" | "hour" | "day" | "week" | "month" | "year",
-  lang: Language = "en_US",
+  lang: Language = "en",
 ) {
   const { t } = tFunction(translations, lang)
   if (x === 1) {
@@ -55,13 +55,10 @@ export function printAgo(
  * Return a human-readable string of how long ago the given timestamp was
  *
  * @param timestamp Timestamp in milliseconds
- * @param lang Language to use (default: en_US)
+ * @param lang Language to use (default: en)
  * @returns Human-readable string
  */
-export function howLongSince(
-  timestamp: number,
-  lang: Language = "en_US",
-): string {
+export function howLongSince(timestamp: number, lang: Language = "en"): string {
   const { t } = tFunction(translations, lang)
   const now = Date.now()
   if (timestamp > now) {

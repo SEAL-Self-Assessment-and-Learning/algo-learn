@@ -28,32 +28,10 @@ import { LearningProgress } from "./routes/progress"
 import Root from "./routes/root"
 import { TestSimpleMC } from "./routes/test"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
-
-/**
- * Redirects to the same URL but with a language prefix; uses the browser's
- * default language.
- *
- * @param props
- * @param props.request The request to redirect
- */
-function redirectLang({ request }: { request: Request }) {
-  let lng = window.navigator.language
-  if (lng.startsWith("de")) {
-    lng = "de"
-  } else {
-    lng = "en"
-  }
-  let path = new URL(request.url).pathname
-  if (BASENAME !== undefined) {
-    if (!path.startsWith(BASENAME)) throw new Error("Unexpected path: " + path)
-    path = path.slice(BASENAME.length)
-  }
-  return redirect("/" + lng + path)
-}
+import { DEFAULT_LANGUAGE } from "./hooks/useTranslation"
 
 const routes = []
-for (const questionGeneratorRoute of allQuestionGeneratorRoutes) {
-  const { path, generator } = questionGeneratorRoute
+for (const { path, generator } of allQuestionGeneratorRoutes) {
   for (const parameters of allParameterCombinations(
     generator.expectedParameters,
   )) {
@@ -62,10 +40,6 @@ for (const questionGeneratorRoute of allQuestionGeneratorRoutes) {
       generator.expectedParameters,
     )
     const route = path + (parametersPath ? "/" + parametersPath : "")
-    routes.push({
-      path: route,
-      loader: () => redirect(sampleRandomSeed()),
-    })
     const Element = () => {
       const { seed } = useParams()
       return (
@@ -77,37 +51,44 @@ for (const questionGeneratorRoute of allQuestionGeneratorRoutes) {
       )
     }
     routes.push({
-      path: route + "/:seed",
-      loader: redirectLang,
+      path: ":lang/" + route,
+      loader: () => redirect(sampleRandomSeed()),
     })
-    for (const lang of ["en", "de"]) {
-      routes.push({
-        path: lang + "/" + route + "/:seed",
-        element: <Element />,
-      })
-    }
+    routes.push({
+      path: ":lang/" + route + "/:seed",
+      element: <Element />,
+    })
   }
 }
 
-for (const { index, path, element } of [
-  { index: true, element: <LearningProgress /> },
-  { path: "legal", element: <Legal /> },
-  { path: "about", element: <About /> },
-  { path: "test", element: <TestSimpleMC /> },
-  { path: "practice/*", element: <QuizSession mode="practice" /> },
-  { path: "exam/*", element: <QuizSession mode="exam" /> },
-]) {
-  routes.push({
-    index,
-    path,
-    loader: redirectLang,
-  })
-  routes.push({
-    index,
-    path: ":lang/" + (path ?? ""),
-    element,
-  })
-}
+routes.push({
+  path: `:lang`,
+  element: <LearningProgress />,
+})
+routes.push({
+  path: `:lang/legal`,
+  element: <Legal />,
+})
+routes.push({
+  path: `:lang/about`,
+  element: <About />,
+})
+routes.push({
+  path: `:lang/test`,
+  element: <TestSimpleMC />,
+})
+routes.push({
+  path: `:lang/practice/*`,
+  element: <QuizSession mode="practice" />,
+})
+routes.push({
+  path: `:lang/exam/*`,
+  element: <QuizSession mode="exam" />,
+})
+routes.push({
+  index: true,
+  loader: () => redirect(`/${DEFAULT_LANGUAGE}`),
+})
 
 const router = createBrowserRouter(
   [

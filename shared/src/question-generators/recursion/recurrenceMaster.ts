@@ -22,7 +22,7 @@ import {
 } from "../asymptotics/asymptoticsUtils"
 import Fraction from "fraction.js"
 const translations: Translations = {
-  en_US: {
+  en: {
     code: "\\[{{0}}\\]",
     description:
       "Let $ {{0}}(n) $ for positive integers $n$ be defined via the following recurrence relations:\\[{{1}}\\] \\[{{2}}\\,.\\]",
@@ -37,7 +37,7 @@ const translations: Translations = {
     "feedback.wrong.case1":
       "We are in case 1, because $f(n) = \\Oh\\left(n^log_{b}(a) - \\espilon\\right)$",
   },
-  de_DE: {
+  de: {
     code: "\\[{{0}}\\]",
     description:
       "Sei $ {{0}}(n) $ für positive ganze Zahlen $n$ definiert durch die folgende Rekursionsgleichung:\\[{{1}}\\] \\[{{2}}\\,.\\]",
@@ -57,7 +57,7 @@ const translations: Translations = {
 export const RecurrenceMaster: QuestionGenerator = {
   path: "recursion/master",
   name: tFunctional(translations, "name"),
-  languages: ["en_US", "de_DE"],
+  languages: ["en", "de"],
   expectedParameters: [
     {
       type: "string",

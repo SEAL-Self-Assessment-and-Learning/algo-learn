@@ -29,7 +29,7 @@
   "Home": "Home",
   "Legal.authors.label": "Authors",
   "Legal.authors.text": "Written by [Holger Dell]({{0}}) (2023), the source code is available on [GitHub]({{1}}).",
-  "Legal.detailed.text": "For detailed imprint and privacy information, see [this page]{{0}}.",
+  "Legal.detailed.text": "For detailed imprint and privacy information, see [this page]({{0}}).",
   "Legal.label": "Imprint and privacy",
   "Legal.text": "Note: The data on this site never leaves your browser! This includes your settings as well as your learning history.",
   "Look at this question again": "Look at this question again",

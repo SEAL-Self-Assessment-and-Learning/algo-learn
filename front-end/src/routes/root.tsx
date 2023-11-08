@@ -4,12 +4,16 @@ import { FiFileText, FiHome, FiInfo, FiSun } from "react-icons/fi"
 import { GiHamburgerMenu } from "react-icons/gi"
 import { MdDarkMode } from "react-icons/md"
 import { TbGitCommit } from "react-icons/tb"
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
+import { Link, Outlet, useLocation } from "react-router-dom"
 
 import { VERSION } from "../config"
 import { useSound } from "../hooks/useSound"
 import { availableThemes, LIGHT, useTheme } from "../hooks/useTheme"
-import { useTranslation } from "../hooks/useTranslation"
+import {
+  NATIVE_NAME,
+  SUPPORTED_LANGUAGES,
+  useTranslation,
+} from "../hooks/useTranslation"
 
 export default function Root() {
   return (
@@ -21,30 +25,10 @@ export default function Root() {
 }
 
 function GlobalHeader() {
-  const { t, i18n } = useTranslation()
+  const { t, i18n, setLang, nextLang } = useTranslation()
   const location = useLocation()
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   const { muted, toggleMuted } = useSound()
-  const lngs = ["en", "de"]
-  const nativeName: Record<string, string> = {
-    en: "English",
-    de: "Deutsch",
-  }
-  function setLanguage(newLang: string) {
-    // replace the language prefix in the URL
-    const newPath = location.pathname.replace(
-      new RegExp("^/" + (i18n.resolvedLanguage ?? "en") + "/"),
-      "/" + newLang + "/",
-    )
-    void i18n.changeLanguage(newLang)
-    navigate(newPath)
-  }
-  function nextLanguage() {
-    const currentLngIndex = lngs.indexOf(i18n.resolvedLanguage ?? "en")
-    const nextLngIndex = (currentLngIndex + 1) % lngs.length
-    const nextLng = lngs[nextLngIndex]
-    setLanguage(nextLng)
-  }
   const { theme, userTheme, toggleTheme, setUserTheme } = useTheme()
   useEffect(() => {
     document.body.className = theme
@@ -53,24 +37,25 @@ function GlobalHeader() {
   const mainMenuItems = [
     {
       label: t("Home"),
-      to: "/",
+      to: `/${i18n.resolvedLanguage}/`,
       icon: <FiHome />,
     },
     {
       label: t("About.label"),
-      to: "/about",
+      to: `/${i18n.resolvedLanguage}/about`,
       icon: <FiInfo />,
     },
     {
       label: t("Legal.label"),
-      to: "/legal",
+      to: `/${i18n.resolvedLanguage}/legal`,
       icon: <FiFileText />,
     },
     {
       label: `${t("Version")}: ${VERSION}`,
-      to: VERSION
-        ? `https://github.com/holgerdell/algo-learn/commit/${VERSION}`
-        : undefined,
+      to:
+        (VERSION as string) !== "local build"
+          ? `https://github.com/holgerdell/algo-learn/commit/${VERSION}`
+          : undefined,
       icon: <TbGitCommit />,
     },
   ]
@@ -111,19 +96,19 @@ function GlobalHeader() {
           icon={
             <span className="font-mono text-sm">{i18n.resolvedLanguage}</span>
           }
-          onClick={nextLanguage}
+          onClick={nextLang}
         >
           <div className="w-28">
-            {lngs.map((lng) => (
+            {SUPPORTED_LANGUAGES.map((lng) => (
               <button
                 key={lng}
                 className={`block w-full p-2 dark:hover:bg-goethe-500/50 ${
                   i18n.resolvedLanguage === lng ? "font-bold" : ""
                 }`}
                 type="button"
-                onClick={() => setLanguage(lng)}
+                onClick={() => setLang(lng)}
               >
-                {nativeName[lng] ?? "error"}
+                {NATIVE_NAME[lng]}
               </button>
             ))}
           </div>
@@ -131,7 +116,7 @@ function GlobalHeader() {
         <TopbarItem icon={<GiHamburgerMenu />}>
           {mainMenuItems.map(({ label, to, icon }) => (
             <Link
-              key={to}
+              key={label}
               to={to ?? ""}
               className="unstyled w-full no-underline"
             >
@@ -151,26 +136,6 @@ function GlobalHeader() {
     </header>
   )
 }
-
-// function AppHeader({ toggleSidebar }: { toggleSidebar: () => void }) {
-//   return (
-//     <header className="flex flex-none flex-row place-items-center bg-slate-100 p-0 dark:bg-slate-900">
-//       <a
-//         className="select-none p-3 hover:bg-amber-200 dark:hover:bg-amber-800"
-//         onClick={toggleSidebar}
-//       >
-//         <GiHamburgerMenu />
-//       </a>
-//       <div className="pl-2">
-//         <h2 className="font-bold">My activity</h2>
-//       </div>
-//     </header>
-//   )
-// }
-
-// function Sidebar(props: PropsWithChildren) {
-//   return <nav className="flex-none sm:static" {...props} />
-// }
 
 /**
  * A topbar item is a clickable element that can be used to navigate to a page

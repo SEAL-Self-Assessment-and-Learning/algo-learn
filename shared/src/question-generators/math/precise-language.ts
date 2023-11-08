@@ -13,7 +13,7 @@ const questions: BasicMCQuestion[] = [
       n: "mnktpqxyMNKTQPXY",
     },
     translations: {
-      en_US: {
+      en: {
         text: "Let ${{m}}$ and ${{n}}$ be integers such that $0 < {{m}} < {{n}}$ holds.",
         correctAnswers: [
           "${{m}}$ and ${{n}}$ are both positive",
@@ -27,7 +27,7 @@ const questions: BasicMCQuestion[] = [
           "${{m}}$ is equal to ${{n}}$",
         ],
       },
-      de_DE: {
+      de: {
         text: "Seien ${{m}}$ und ${{n}}$ ganze Zahlen, so dass $0 < {{m}} < {{n}}$ gilt.",
         correctAnswers: [
           "${{m}}$ und ${{n}}$ sind beide positiv",
@@ -50,7 +50,7 @@ const questions: BasicMCQuestion[] = [
       S: "STUVWXY",
     },
     translations: {
-      en_US: {
+      en: {
         text: "Let ${{x}}$ be an element of a set ${{S}}$ such that ${{S}}$ is a subset of the integers and ${{x}} > 0$.",
         correctAnswers: [
           "${{x}}$ is a positive integer",
@@ -66,7 +66,7 @@ const questions: BasicMCQuestion[] = [
           "${{S}}$ may contain negative numbers",
         ],
       },
-      de_DE: {
+      de: {
         text: "Sei ${{x}}$ ein Element einer Menge ${{S}}$, so dass ${{S}}$ eine Teilmenge der ganzen Zahlen ist und ${{x}} > 0$.",
         correctAnswers: [
           "${{x}}$ ist eine positive ganze Zahl",
@@ -91,7 +91,7 @@ const questions: BasicMCQuestion[] = [
       y: "xyznXYZN",
     },
     translations: {
-      en_US: {
+      en: {
         text: "Let ${{x}}$ be an even integer between $5$ and $9$, and let ${{y}}={{x}}/2$.",
         correctAnswers: [
           "${{x}}$ is an even integer",
@@ -108,7 +108,7 @@ const questions: BasicMCQuestion[] = [
           "${{x}}$ can be any even integer",
         ],
       },
-      de_DE: {
+      de: {
         text: "Sei ${{x}}$ eine gerade natürliche Zahl zwischen $5$ und $9$, und sei ${{y}}={{x}}/2$.",
         correctAnswers: [
           "${{x}}$ ist eine gerade Zahl",
@@ -135,7 +135,7 @@ const questions: BasicMCQuestion[] = [
       y: "abcdxyznmktspqr",
     },
     translations: {
-      en_US: {
+      en: {
         text: "Let ${{A}}$ and ${{B}}$ be two sets such that every element of ${{A}}$ is also an element of ${{B}}$. Let ${{y}}$ be an element of ${{A}}$.",
         correctAnswers: [
           "${{A}}$ is a subset of ${{B}}$",
@@ -150,7 +150,7 @@ const questions: BasicMCQuestion[] = [
           "${{y}}$ must be the only element of ${{A}}$",
         ],
       },
-      de_DE: {
+      de: {
         text: "Seien ${{A}}$ und ${{B}}$ zwei Mengen, so dass jedes Element von ${{A}}$ auch ein Element von ${{B}}$ ist. Sei ${{y}}$ ein Element von ${{A}}$.",
         correctAnswers: [
           "${{A}}$ ist eine Teilmenge von ${{B}}$",
@@ -170,8 +170,8 @@ const questions: BasicMCQuestion[] = [
 ]
 
 const translations = {
-  en_US: { title: "Precise mathematical phrasing" },
-  de_DE: { title: "Präzise mathematische Ausdrucksweise" },
+  en: { title: "Precise mathematical phrasing" },
+  de: { title: "Präzise mathematische Ausdrucksweise" },
 }
 
 export const MathPreciseLanguage: QuestionGenerator = PreciseLanguageMeta(

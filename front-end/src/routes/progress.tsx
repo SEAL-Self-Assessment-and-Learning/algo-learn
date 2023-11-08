@@ -1,13 +1,8 @@
-import {
-  buildStyles,
-  CircularProgressbarWithChildren,
-} from "react-circular-progressbar"
 import { BsFillCheckSquareFill, BsFillXSquareFill } from "react-icons/bs"
 import { TiLockClosed, TiLockOpen } from "react-icons/ti"
 import { Link } from "react-router-dom"
 import { Tooltip } from "react-tooltip"
 
-import { Button } from "../components/Button"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { StrengthMeter } from "../components/StrengthMeter"
 import { getImageURL } from "../effects/images"
@@ -49,13 +44,13 @@ export function LearningProgress() {
           <SkillGroupCard key={g} partialPath={g} featureMap={featureMap} />
         ))}
       </div>
-      <h2 className="mb-5 mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10">
+      {/* <h2 className="mb-5 mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10">
         {t("Exam")}
       </h2>
       <div>{t("Examine.desc")}</div>
-      <Button to="/exam" color="red" className="mt-5">
+      <Button to="exam" color="red" className="mt-5">
         {t("start exam")}
-      </Button>
+      </Button> */}
       <h2 className="mb-5 mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10">
         {t("your-learning-progress")}
       </h2>
@@ -211,7 +206,7 @@ function SkillGroupCard({
     <>
       <Link
         id={`skill-group-card-${partialPath}`}
-        to={"/practice/" + partialPath}
+        to={`practice/${partialPath}`}
         className="unstyled hover:bg-shading group rounded-lg p-2 text-center hover:cursor-pointer"
       >
         <div className="relative">
@@ -221,21 +216,7 @@ function SkillGroupCard({
               backgroundSize: "cover",
               backgroundImage: `url("${getImageURL(partialPath) ?? ""}")`,
             }}
-          >
-            {/* <CircularProgressbarWithChildren
-            value={done}
-            maxValue={total}
-            strokeWidth={14}
-            styles={buildStyles({
-              pathColor: "green",
-              trailColor: "transparent",
-            })}
-          ></CircularProgressbarWithChildren> */}
-          </div>
-          {/* // XP in circle at bottom right
-        <div className="absolute bottom-0 right-0 flex aspect-square w-8 items-center justify-center rounded-full bg-goethe-100 p-1 text-xs font-bold text-black">
-          <div>{done}</div>
-        </div> */}
+          ></div>
         </div>
         <div className="mx-auto flex w-max items-center justify-center text-xs font-bold">
           <div>
@@ -245,48 +226,11 @@ function SkillGroupCard({
         <div className="flex items-start justify-center group-hover:font-bold">
           {skillName}
         </div>
-        {/* <div className="absolute -ml-2 hidden bg-red-500 p-2 group-hover:block">
-        <div className="min-w-[8rem] text-white">Click to practice!</div>
-      </div> */}
       </Link>
       <Tooltip anchorSelect={`#skill-group-card-${partialPath}`} place="bottom">
         {t("Click to practice")}
       </Tooltip>
     </>
-  )
-  return (
-    <div className="bg-shading flex items-center gap-3 rounded-lg p-5">
-      <div className="w-min flex-grow font-bold">{skillName}</div>
-      {/* <div className="w-10 text-center text-xl"> */}
-      <div className="w-10">
-        <CircularProgressbarWithChildren
-          value={done}
-          maxValue={total}
-          strokeWidth={28}
-          background
-          styles={buildStyles({
-            pathColor: "green",
-            trailColor: "gray",
-          })}
-        >
-          {/* <div className="text-slate-500">
-            <span className="font-bold text-black">{done}</span>/{total}
-            <br />
-            XP
-          </div> */}
-        </CircularProgressbarWithChildren>
-      </div>
-      <div className="text-slate-500">
-        <span className="font-bold text-black">{done}</span>/{total} XP
-      </div>
-      {/* </div> */}
-      <Button to={"/practice/" + partialPath} color="green">
-        {t("Practice")}
-      </Button>
-      {/* <Button to={"/exam/" + partialPath} color="cyan">
-        {t("Exam")}
-      </Button> */}
-    </div>
   )
 }
 

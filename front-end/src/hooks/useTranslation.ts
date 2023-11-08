@@ -9,18 +9,28 @@ import {
 import { Language } from "../../../shared/src/api/Language"
 import de from "../locales/de.json"
 import en from "../locales/en.json"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { useEffect } from "react"
+
+export const SUPPORTED_LANGUAGES: Array<Language> = ["en", "de"]
+export const DEFAULT_LANGUAGE: Language = window.navigator.language.startsWith(
+  "de",
+)
+  ? "de"
+  : "en"
+export const NATIVE_NAME: Record<Language, string> = {
+  en: "English",
+  de: "Deutsch",
+}
 
 void use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    supportedLngs: ["en", "de"],
-    detection: {
-      order: ["path", "navigator"],
-    },
+    supportedLngs: SUPPORTED_LANGUAGES,
     debug: false,
-    fallbackLng: "en",
+    fallbackLng: DEFAULT_LANGUAGE,
     interpolation: {
-      escapeValue: false, // not needed for react as it escapes by default
+      escapeValue: false,
     },
     resources: {
       en: { translation: en },
@@ -28,17 +38,38 @@ void use(LanguageDetector)
     },
   })
 
-// // Default language set in the browser, as determined i18next:
-// export const defaultLang =
 /**
  * API-compatible shim for `useTranslation` that also returns the language.
  *
  * @returns The translation functions
  */
 export function useTranslation() {
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
   const obj = useTranslationsI18Next()
-  const lang: Language = obj.i18n.language === "de" ? "de_DE" : "en_US"
-  return { ...obj, lang }
+  const params = useParams()
+  const lang: Language =
+    params["lang"] && (params["lang"] == "en" || params["lang"] == "de")
+      ? params["lang"]
+      : DEFAULT_LANGUAGE
+
+  useEffect(() => {
+    if (lang !== obj.i18n.resolvedLanguage) void obj.i18n.changeLanguage(lang)
+  }, [lang, obj.i18n, obj.i18n.resolvedLanguage])
+
+  function setLang(newLang: Language) {
+    if (lang !== newLang) {
+      const regex = new RegExp(`^/(${SUPPORTED_LANGUAGES.join("|")})`)
+      const newPath = pathname.replace(regex, `/${newLang}`)
+      navigate(newPath)
+    }
+  }
+  function nextLang() {
+    const currentIndex = SUPPORTED_LANGUAGES.indexOf(lang)
+    const nextIndex = (currentIndex + 1) % SUPPORTED_LANGUAGES.length
+    setLang(SUPPORTED_LANGUAGES[nextIndex])
+  }
+  return { ...obj, lang, setLang, nextLang }
 }
 
 export const Trans = TransI18Next

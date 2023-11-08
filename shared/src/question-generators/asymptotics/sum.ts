@@ -11,11 +11,11 @@ import { tFunction, tFunctional, Translations } from "../../utils/translations"
 import { sampleTermSet, TermSetVariants } from "./asymptoticsUtils"
 
 const translations: Translations = {
-  en_US: {
+  en: {
     text: "Let ${{0}}$ be defined via \\[{{1}}\\,.\\] Which asymptotic growth is correct for this function? Choose exactly one answer:",
     name: "Sum",
   },
-  de_DE: {
+  de: {
     text: "Sei ${{0}}$ definiert durch \\[{{1}}\\,.\\] Welches asymptotische Wachstum ist für diese Funktion richtig? Wähle genau eine Antwort aus:",
     name: "Summe",
   },
@@ -28,7 +28,7 @@ const translations: Translations = {
 export const SimplifySum: QuestionGenerator = {
   path: "asymptotics/sum",
   name: tFunctional(translations, "name"),
-  languages: ["en_US", "de_DE"],
+  languages: ["en", "de"],
   expectedParameters: [
     {
       type: "string",

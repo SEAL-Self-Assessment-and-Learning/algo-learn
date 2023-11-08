@@ -53,11 +53,11 @@ export interface BasicMCQuestion {
 }
 
 const translations: Translations = {
-  en_US: {
+  en: {
     consider: "Consider the following sentence:",
     what: "What do we know now?",
   },
-  de_DE: {
+  de: {
     consider: "Betrachte den folgenden Satz:",
     what: "Was wissen wir jetzt?",
   },

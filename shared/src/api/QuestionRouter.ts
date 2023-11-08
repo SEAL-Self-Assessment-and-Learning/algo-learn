@@ -41,7 +41,7 @@ export function serializeGeneratorCall({
 }): string {
   const path: string[] = []
   if (lang !== undefined) {
-    const langURL = lang === "de_DE" ? "de" : lang === "en_US" ? "en" : lang
+    const langURL = lang === "de" ? "de" : lang === "en" ? "en" : lang
     path.push(langURL)
   }
 
@@ -88,7 +88,7 @@ export function isSubPath(A: string | string[], B: string | string[]): boolean {
  * @example
  *   deserializePath(routes, "de/arithmetic/addition/2/myFancySeed")
  *   // => {
- *   //   lang: "de_DE",
+ *   //   lang: "de",
  *   //   generator: ArithmeticAdditionQuestionGenerator,
  *   //   parameters: { difficulty: 2 },
  *   //   seed: "myFancySeed",
@@ -127,8 +127,8 @@ export function deserializePath({
   const lang: Language | undefined = !expectLang
     ? undefined
     : parts[0] === "de"
-    ? "de_DE"
-    : "en_US"
+    ? "de"
+    : "en"
 
   if (lang !== undefined) {
     parts = parts.slice(1)

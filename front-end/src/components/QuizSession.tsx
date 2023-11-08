@@ -1,10 +1,8 @@
-import { ReactElement, useState } from "react"
+import { ReactElement, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
-import { Parameters } from "../../../shared/src/api/Parameters"
-import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
 import { serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
-import Random from "../../../shared/src/utils/random"
+import Random, { sampleRandomSeed } from "../../../shared/src/utils/random"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { sortByStrength, useSkills } from "../hooks/useSkills"
 import { useTranslation } from "../hooks/useTranslation"
@@ -14,7 +12,7 @@ import { ScreenCenteredDiv } from "./CenteredDivs"
 import { QuestionComponent, Result } from "./QuestionComponent"
 
 const great = {
-  en_US: [
+  en: [
     "Perfect!",
     "Outstanding work!",
     "Fantastic job!",
@@ -27,7 +25,7 @@ const great = {
     "Brilliant work!",
     "Superb job!",
   ],
-  de_DE: [
+  de: [
     "Perfekt!",
     "Hervorragende Arbeit!",
     "Fantastische Arbeit!",
@@ -42,7 +40,7 @@ const great = {
   ],
 }
 const good = {
-  en_US: [
+  en: [
     "Nice job, keep it up!",
     "You're on the right track!",
     "Solid effort, keep practicing!",
@@ -54,7 +52,7 @@ const good = {
     "Impressive improvement!",
     "You're getting there!",
   ],
-  de_DE: [
+  de: [
     "Gute Arbeit, weiter so!",
     "Du bist auf dem richtigen Weg!",
     "Solide Anstrengung, weiter üben!",
@@ -68,7 +66,7 @@ const good = {
   ],
 }
 const meh = {
-  en_US: [
+  en: [
     "You'll do better next time!",
     "Not bad, keep working at it!",
     "You're making progress, keep going!",
@@ -82,7 +80,7 @@ const meh = {
     "You're improving!",
     "You're getting better!",
   ],
-  de_DE: [
+  de: [
     "Beim nächsten Mal wirst du es besser machen!",
     "Nicht schlecht, weiter so!",
     "Du machst Fortschritte, bleib dran!",
@@ -116,60 +114,52 @@ export function QuizSession({
   targetNum?: number
   mode: "practice" | "exam"
 }): ReactElement {
+  const { featureMap: fM, appendLogEntry } = useSkills()
+  const [{ sessionSeed, featureMap }] = useState({
+    sessionSeed: sampleRandomSeed(),
+    featureMap: fM, // store in state to prevent re-rendering
+  })
   const params = useParams()
   const partialPath = params["*"] ?? ""
+  const questionVariants = useMemo(() => {
+    if (mode === "exam") {
+      throw new Error("exam mode not implemented yet")
+    }
+    // TODO: if mode === "exam", use the most difficult questions instead
+    return sortByStrength({
+      random: new Random(sessionSeed),
+      featureMap,
+      generatorCalls: generatorSetBelowPath(partialPath),
+    }).slice(0, targetNum)
+  }, [sessionSeed, partialPath, targetNum, mode, featureMap])
 
   const { t, lang } = useTranslation()
-  const { featureMap, appendLogEntry } = useSkills()
-  const [{ sessionSeed }] = useState({
-    sessionSeed: new Random(Math.random()).base36string(7),
-  })
   const [state, setState] = useState({
-    questionVariants: [] as Array<{
-      generator: QuestionGenerator
-      parameters: Parameters
-    }>,
     numCorrect: 0,
     numIncorrect: 0,
-    status: "initializing" as
-      | "initializing"
-      | "running"
-      | "finished"
-      | "aborted",
+    aborted: false,
   })
-  const { questionVariants, numCorrect, numIncorrect, status } = state
+  const { numCorrect, numIncorrect, aborted } = state
   const navigate = useNavigate()
   useGlobalDOMEvents({
     keydown(e: Event) {
       const key = (e as KeyboardEvent).key
       if (key === "Enter" && status !== "running") {
         e.preventDefault()
-        navigate("/")
+        navigate(`/${lang}`)
       }
     },
   })
 
-  if (status === "initializing") {
-    let newQuestionVariants = generatorSetBelowPath(partialPath)
-    newQuestionVariants = sortByStrength({
-      random: new Random(sessionSeed),
-      featureMap,
-      generatorCalls: newQuestionVariants,
-    })
-    newQuestionVariants = newQuestionVariants.slice(0, targetNum)
-    if (newQuestionVariants.length === 0) {
-      throw new Error("No question variants available")
-    }
-    setState({
-      ...state,
-      questionVariants: newQuestionVariants,
-      status: "running",
-    })
-  }
-
   const num = numCorrect + numIncorrect
   const random = new Random(`${sessionSeed}${numCorrect + numIncorrect}`)
   const questionSeed = random.base36string(7)
+
+  const status: "running" | "finished" | "aborted" = aborted
+    ? "aborted"
+    : num < questionVariants.length
+    ? "running"
+    : "finished"
 
   if (status === "aborted") {
     return (
@@ -181,18 +171,7 @@ export function QuizSession({
       </ScreenCenteredDiv>
     )
   } else if (status === "running") {
-    if (num === targetNum) {
-      setState({ ...state, status: "finished" })
-    }
-
-    const obj =
-      mode === "practice"
-        ? sortByStrength({
-            random,
-            featureMap,
-            generatorCalls: questionVariants,
-          })[0]
-        : random.choice(questionVariants)
+    const obj = questionVariants[num]
     const { generator, parameters } = obj
     const nextPath = serializeGeneratorCall({
       generator,
@@ -216,7 +195,7 @@ export function QuizSession({
         })
         setState({ ...state, numIncorrect: numIncorrect + 1 })
       } else if (result === "abort" || result === "timeout") {
-        setState({ ...state, status: "aborted" })
+        setState({ ...state, aborted: true })
       }
     }
 

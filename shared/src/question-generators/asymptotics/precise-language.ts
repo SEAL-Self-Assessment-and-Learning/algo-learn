@@ -14,7 +14,7 @@ const questions: BasicMCQuestion[] = [
       n: "mnktpqxyMNKTQPXY",
     },
     translations: {
-      en_US: {
+      en: {
         text: "Let ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ be functions with ${{f}}({{n}}) = O({{g}}({{n}}))$.",
         correctAnswers: [
           "As ${{n}}$ grows large, the upper bound on ${{f}}({{n}})$ is at most a constant times ${{g}}({{n}})$",
@@ -26,7 +26,7 @@ const questions: BasicMCQuestion[] = [
           "${{f}}({{n}})$ is the same function as ${{g}}({{n}})$",
         ],
       },
-      de_DE: {
+      de: {
         text: "Seien ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ Funktionen mit ${{f}}({{n}}) = O({{g}}({{n}}))$.",
         correctAnswers: [
           "Wenn ${{n}}$ groß wird, ist ${{f}}({{n}})$ höchstens so groß wie ein konstantes Vielfaches von ${{g}}({{n}})$",
@@ -46,7 +46,7 @@ const questions: BasicMCQuestion[] = [
       n: "mnktpqxyMN",
     },
     translations: {
-      en_US: {
+      en: {
         text: "The algorithm operates in $O({{n}} \\log {{n}})$ time complexity.",
         correctAnswers: [
           "As ${{n}}$ grows, the algorithm's running time grows in the order of ${{n}}$ times the logarithm of ${{n}}$",
@@ -59,7 +59,7 @@ const questions: BasicMCQuestion[] = [
           "The algorithm will take exactly $\\Theta({{n}} \\log {{n}})$ steps to complete",
         ],
       },
-      de_DE: {
+      de: {
         text: "Der Algorithmus arbeitet mit einer Zeitkomplexität von $O({{n}} \\log {{n}})$.",
         correctAnswers: [
           "Mit zunehmendem ${{n}}$ wächst die Laufzeit des Algorithmus in der Größenordnung von ${{n}}$ mal dem Logarithmus von ${{n}}$",
@@ -82,7 +82,7 @@ const questions: BasicMCQuestion[] = [
       n: "mnktpqxyMNKTQPXY",
     },
     translations: {
-      en_US: {
+      en: {
         text: "Let ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ be functions with ${{f}}({{n}}) = \\Omega({{g}}({{n}}))$.",
         correctAnswers: [
           "As ${{n}}$ grows large, the lower bound on ${{f}}({{n}})$ is at least a constant times ${{g}}({{n}})$",
@@ -94,7 +94,7 @@ const questions: BasicMCQuestion[] = [
           "${{f}}({{n}})$ is the same function as ${{g}}({{n}})$",
         ],
       },
-      de_DE: {
+      de: {
         text: "Seien ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ Funktionen mit ${{f}}({{n}}) = \\Omega({{g}}({{n}}))$.",
         correctAnswers: [
           "Wenn ${{n}}$ groß wird, ist ${{f}}({{n}})$ mindestens so groß wie ein konstantes Vielfaches von ${{g}}({{n}})$",
@@ -116,7 +116,7 @@ const questions: BasicMCQuestion[] = [
       n: "mnktpqxyMNKTQPXY",
     },
     translations: {
-      en_US: {
+      en: {
         text: "Let ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ be functions with ${{f}}({{n}}) = \\Theta({{g}}({{n}}))$.",
         correctAnswers: [
           "As ${{n}}$ grows large, ${{f}}({{n}})$ has both an upper and a lower bound that are proportional to ${{g}}({{n}})$",
@@ -128,7 +128,7 @@ const questions: BasicMCQuestion[] = [
           "${{f}}({{n}})$ is the same function as ${{g}}({{n}})$",
         ],
       },
-      de_DE: {
+      de: {
         text: "Seien ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ Funktionen mit ${{f}}({{n}}) = \\Theta({{g}}({{n}}))$.",
         correctAnswers: [
           "Wenn ${{n}}$ groß wird, hat ${{f}}({{n}})$ sowohl eine obere als auch eine untere Schranke, die proportional zu ${{g}}({{n}})$ ist",
@@ -148,7 +148,7 @@ const questions: BasicMCQuestion[] = [
       n: "mnktpqxyMNKTQPXY",
     },
     translations: {
-      en_US: {
+      en: {
         text: "An algorithm has a best-case running time of $O(1)$ and a worst-case running time of $O({{n}}^2)$.",
         correctAnswers: [
           "In the best case scenario, the running time of the algorithm is constant",
@@ -161,7 +161,7 @@ const questions: BasicMCQuestion[] = [
           "The average running time of the algorithm is $O({{n}})$",
         ],
       },
-      de_DE: {
+      de: {
         text: "Ein Algorithmus hat eine *best-case* Laufzeit von $O(1)$ und eine *worst-case* Laufzeit von $O({{n}}^2)$.",
         correctAnswers: [
           "Im besten Fall hat der Algorithmus konstante Laufzeit",
@@ -183,7 +183,7 @@ const questions: BasicMCQuestion[] = [
       n: "mnktpqxyMNKTQPXY",
     },
     translations: {
-      en_US: {
+      en: {
         text: "An algorithm has a best-case running time of $\\Omega(1)$ and a worst-case running time of $\\Theta({{n}}^2)$.",
         correctAnswers: [
           "In the best case scenario, the running time of the algorithm is at most quadratic with respect to {{n}}",
@@ -196,7 +196,7 @@ const questions: BasicMCQuestion[] = [
           "The average running time of the algorithm is $O({{n}})$",
         ],
       },
-      de_DE: {
+      de: {
         text: "Ein Algorithmus hat eine *best-case* Laufzeit von $\\Omega(1)$ und eine *worst-case* Laufzeit von $\\Theta({{n}}^2)$.",
         correctAnswers: [
           "Im besten Fall wächst die Laufzeit des Algorithmus höchstens quadratisch mit {{n}}",
@@ -214,8 +214,8 @@ const questions: BasicMCQuestion[] = [
 ]
 
 const translations = {
-  en_US: { title: "Precise phrasing: Oh-Notation" },
-  de_DE: { title: "Präzises Formulieren: Oh-Notation" },
+  en: { title: "Precise phrasing: Oh-Notation" },
+  de: { title: "Präzises Formulieren: Oh-Notation" },
 }
 
 export const AsymptoticsPreciseLanguage: QuestionGenerator =

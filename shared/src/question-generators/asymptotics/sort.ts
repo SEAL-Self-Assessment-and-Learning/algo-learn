@@ -14,12 +14,12 @@ import {
 } from "./asymptoticsUtils"
 
 const translations: Translations = {
-  en_US: {
+  en: {
     name: "Sort",
     description: "Compare functions by their asymptotic growth.",
     text: "Sort the following terms from smallest to largest growth rate:",
   },
-  de_DE: {
+  de: {
     name: "Sortiere",
     text: "Sortiere die folgenden Terme von kleinstem zu größtem asymptotischen Wachstum:",
   },
@@ -46,7 +46,7 @@ export const SortTerms: QuestionGenerator = {
   path: "asymptotics/sort", // Name of the skill, used in the URL
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
-  languages: ["en_US", "de_DE"],
+  languages: ["en", "de"],
   expectedParameters: [
     {
       type: "string",

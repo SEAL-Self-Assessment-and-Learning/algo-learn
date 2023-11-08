@@ -17,7 +17,7 @@ import {
 } from "./formulaUtils"
 
 const translations: Translations = {
-  en_US: {
+  en: {
     basecase: "The base case is",
     description:
       "Consider the following recursive procedure `{{0}}` with integer input ${{1}}$:",
@@ -30,7 +30,7 @@ const translations: Translations = {
       "Note: This field expects a string of the form `{{0}}` as input.",
     "feedback.incomplete": "Incomplete or too complex",
   },
-  de_DE: {
+  de: {
     basecase: "Der Basisfall ist",
     description:
       "Betrachte die folgende rekursive Prozedur `{{0}}` mit ganzzahliger Eingabe ${{1}}$:",
@@ -48,7 +48,7 @@ const translations: Translations = {
 export const RecursionFormula: QuestionGenerator = {
   path: "recursion/formula",
   name: tFunctional(translations, "name"),
-  languages: ["en_US", "de_DE"],
+  languages: ["en", "de"],
   expectedParameters: [
     {
       type: "string",

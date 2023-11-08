@@ -8,11 +8,11 @@ import Random from "../../utils/random"
 import { tFunction, tFunctional, Translations } from "../../utils/translations"
 
 const translations: Translations = {
-  en_US: {
+  en: {
     name: "Landau Notation",
     text: "Which of these statements are true? Select all that apply.",
   },
-  de_DE: {
+  de: {
     name: "Landau Notation",
     text: "Welche dieser Aussagen sind wahr? Wähle alle aus.",
   },
@@ -33,7 +33,7 @@ export const LandauNotation: QuestionGenerator = {
     //   default: false,
     // },
   ],
-  languages: ["en_US", "de_DE"],
+  languages: ["en", "de"],
   generate: (lang, parameters, seed) => {
     const random = new Random(seed)
     const { t } = tFunction(translations, lang)

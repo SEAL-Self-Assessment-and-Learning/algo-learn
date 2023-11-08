@@ -11,7 +11,7 @@ import { RecursionFormula } from "../recursion/formula"
 import { sampleLoop } from "./loopsUtils"
 
 const translations: Translations = {
-  en_US: {
+  en: {
     description:
       "Consider the following procedure `{{0}}` with integer input ${{1}}$:",
     description2:
@@ -22,7 +22,7 @@ const translations: Translations = {
     "simpleExact.question": "How many stars are printed?",
     name: "Loops",
   },
-  de_DE: {
+  de: {
     description:
       "Betrachte die folgende Prozedur {{0}} mit ganzzahliger Eingabe {{1}}:",
     description2:
@@ -38,7 +38,7 @@ const translations: Translations = {
 export const Loops: QuestionGenerator = {
   path: "time/loops",
   name: tFunctional(translations, "name"),
-  languages: ["en_US", "de_DE"],
+  languages: ["en", "de"],
   expectedParameters: [
     {
       type: "string",

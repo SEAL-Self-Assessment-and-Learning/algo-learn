@@ -21,7 +21,7 @@ import {
 } from "./asymptoticsUtils"
 
 const translation: Translations = {
-  en_US: {
+  en: {
     "Theta.text": "Enter a function ${{0}}$ that satisfies ${{1}}$.",
     note: "Note: This text field accepts *simple* mathematical formulas, such as `{{0}}`, `{{1}}`, or `{{2}}`.",
     text: "Enter a function ${{0}}$ that satisfies \\[{{1}}\\] and \\[{{2}}\\,.\\]",
@@ -31,7 +31,7 @@ const translation: Translations = {
     "feedback.invalid-expression": "invalid formula",
     "feedback.incomplete": "Incomplete or too complex",
   },
-  de_DE: {
+  de: {
     "Theta.text": "Gib eine Funktion ${{0}}$ an, die ${{1}}$ erfüllt.",
     note: "Hinweis: Dieses Feld erwartet *einfache* mathematische Formeln, wie etwa `{{0}}`, `{{1}}`, oder `{{2}}`.",
     text: "Gib eine Funktion ${{0}}$ an, die \\[{{1}}\\] und \\[{{2}}\\] erfüllt.",
@@ -47,7 +47,7 @@ const translation: Translations = {
 export const Between: QuestionGenerator = {
   path: "asymptotics/between",
   name: tFunctional(translation, "name"),
-  languages: ["en_US", "de_DE"],
+  languages: ["en", "de"],
   expectedParameters: [
     {
       type: "string",

@@ -11,7 +11,7 @@ import {
 const ExampleQuestion: QuestionGenerator = {
   path: "test/test",
   name: () => "Example Question",
-  languages: ["en_US", "de_DE"],
+  languages: ["en", "de"],
   expectedParameters: [
     {
       name: "difficulty",
@@ -78,7 +78,7 @@ test("serializeGeneratorCall", () => {
       generator: ExampleQuestion,
       parameters: { difficulty: 1, focus: "addition" },
       seed: "myFancySeed",
-      lang: "de_DE",
+      lang: "de",
     }),
   ).toBe("de/test/test/1/addition/myFancySeed")
 })
@@ -100,7 +100,7 @@ test("deserializePath", () => {
 
   ret = deserializePath({ routes: exampleRoutes, path: "de/test/test" })
   expect(ret).toBeDefined()
-  expect(ret!.lang).toBe("de_DE")
+  expect(ret!.lang).toBe("de")
   expect(ret!.generator).toBe(ExampleQuestion)
   expect(ret!.parameters).toBeUndefined()
   expect(ret!.seed).toBeUndefined()
@@ -127,7 +127,7 @@ test("deserializePath", () => {
     path: "de/test/test/1/addition/myFancySeed",
   })
   expect(ret).toBeDefined()
-  expect(ret!.lang).toBe("de_DE")
+  expect(ret!.lang).toBe("de")
   expect(ret!.generator).toBe(ExampleQuestion)
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
 
@@ -136,7 +136,7 @@ test("deserializePath", () => {
     path: "en/test/test/1/addition/myFancySeed",
   })
   expect(ret).toBeDefined()
-  expect(ret!.lang).toBe("en_US")
+  expect(ret!.lang).toBe("en")
   expect(ret!.generator).toBe(ExampleQuestion)
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
 })

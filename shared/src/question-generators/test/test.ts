@@ -8,13 +8,13 @@ import Random from "../../utils/random"
 import { tFunction, tFunctional, Translations } from "../../utils/translations"
 
 const translations: Translations = {
-  en_US: {
+  en: {
     name: "Compute a sum",
     description: "Compute the sum of two integers",
     text: "Let {{0}} and {{1}} be two natural numbers. What is the **sum** {{2}}?",
     seedDescription: "Seed for the random number generator",
   },
-  de_DE: {
+  de: {
     name: "Summe berechnen",
     description: "Berechne die Summe zweier Zahlen",
     text: "Seien {{0}} und {{1}} zwei natürliche Zahlen. Was ist die **Summe** {{2}}?",
@@ -28,7 +28,7 @@ export const TestQuestion: QuestionGenerator = {
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["calculus", "sum"],
-  languages: ["en_US", "de_DE"],
+  languages: ["en", "de"],
   author: "Max Mustermann",
   license: "MIT",
   link: "https://example.com",
@@ -41,7 +41,7 @@ export const TestQuestion: QuestionGenerator = {
    * @param lang The language of the question
    * @returns A new SimpleMCTest question
    */
-  generate: (lang = "en_US", parameters, seed) => {
+  generate: (lang = "en", parameters, seed) => {
     const random = new Random(seed)
 
     const a = random.int(2, 10)

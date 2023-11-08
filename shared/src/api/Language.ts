@@ -1,2 +1,2 @@
 /** Type for supported languages */
-export type Language = "de_DE" | "en_US"
+export type Language = "de" | "en"
