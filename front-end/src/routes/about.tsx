@@ -1,14 +1,13 @@
 import { AiFillGithub } from "react-icons/ai"
 import { SiDuolingo, SiReact } from "react-icons/si"
-import { Link } from "react-router-dom"
 
 import { format } from "../../../shared/src/utils/format"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { Markdown } from "../components/Markdown"
-import { Trans, useTranslation } from "../hooks/useTranslation"
+import { useTranslation } from "../hooks/useTranslation"
 
 export function About() {
-  const { t, i18n } = useTranslation()
+  const { t, lang } = useTranslation()
 
   return (
     <HorizontallyCenteredDiv>
@@ -20,7 +19,7 @@ export function About() {
       <p>
         <Markdown
           md={format(t("About.spacedRepetition.text"), [
-            `https://${i18n.language}.wikipedia.org/wiki/Spaced_repetition`,
+            `https://${lang}.wikipedia.org/wiki/Spaced_repetition`,
           ])}
         />
       </p>
@@ -42,23 +41,20 @@ export function About() {
       </p>
       <h2 className="mt-5">{t("About.sourceCode.label")}</h2>
       <p>
-        <Trans t={t} i18nKey="About.sourceCode.text">
-          <Link to="https://reactjs.org/">
-            <SiReact className="inline" />
-          </Link>
-          <Link to="https://github.com/goethe-tcs/algo-learn/">
-            <AiFillGithub className="inline" />
-          </Link>
-        </Trans>
+        <Markdown md={t("About.sourceCode.text")}>
+          <SiReact className="inline" />
+          {"https://reactjs.org/"}
+          <AiFillGithub className="inline" />
+          {"https://github.com/goethe-tcs/algo-learn/"}
+        </Markdown>
       </p>
       <h2 className="mt-5">{t("About.inspiration.label")}</h2>
       <p>
-        <Trans t={t} i18nKey="About.inspiration.text">
-          <Link to="https://duolingo.com/">
-            <SiDuolingo className="inline" />
-          </Link>
-          <Link to="https://research.duolingo.com/"></Link>
-        </Trans>
+        <Markdown md={t("About.inspiration.text")}>
+          <SiDuolingo className="inline" />
+          {"https://duolingo.com/"}
+          {"https://research.duolingo.com/"}
+        </Markdown>
       </p>{" "}
       <h2 className="mt-5">{t("About.authors.label")}</h2>
       <p>

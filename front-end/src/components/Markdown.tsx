@@ -1,4 +1,4 @@
-import { Fragment, FunctionComponent } from "react"
+import { Fragment, FunctionComponent, ReactNode } from "react"
 import { Link } from "react-router-dom"
 import SyntaxHighlighter from "react-syntax-highlighter"
 import {
@@ -13,19 +13,24 @@ import {
 } from "../../../shared/src/utils/parseMarkdown"
 import { useTheme } from "../hooks/useTheme"
 import TeX from "./TeX"
+import { Format } from "./Format"
 
 /**
  * Function to render a given markdown-like string as a React component
  *
  * @param props
  * @param props.md The markdown-like string to render
+ * @param props.children The parameters to replace the mustache-style placeholders in the string
  * @returns The React component
  */
-export const Markdown: FunctionComponent<{ md?: string }> = ({ md }) => {
+export const Markdown: FunctionComponent<{
+  md?: string
+  children?: ReactNode[]
+}> = ({ md, children }) => {
   if (!md) {
     return <></>
   }
-  return <MarkdownTree parseTree={parseMarkdown(md)} />
+  return <MarkdownTree parseTree={parseMarkdown(md)} parameters={children} />
 }
 
 /**
@@ -37,13 +42,14 @@ export const Markdown: FunctionComponent<{ md?: string }> = ({ md }) => {
  */
 export const MarkdownTree: FunctionComponent<{
   parseTree: ParseTree
-}> = ({ parseTree }) => {
+  parameters?: ReactNode[]
+}> = ({ parseTree, parameters }) => {
   // TODO: Implement this function
   return (
     <>
       {parseTree.map((node, index) => (
         <Fragment key={index}>
-          <MarkdownTreeNode parseTreeNode={node} />
+          <MarkdownTreeNode parseTreeNode={node} parameters={parameters} />
         </Fragment>
       ))}
     </>
@@ -59,10 +65,11 @@ export const MarkdownTree: FunctionComponent<{
  */
 export const MarkdownTreeNode: FunctionComponent<{
   parseTreeNode: ParseTreeNode
-}> = ({ parseTreeNode }) => {
+  parameters?: ReactNode[]
+}> = ({ parseTreeNode, parameters }) => {
   const { theme } = useTheme()
   if (typeof parseTreeNode === "string") {
-    return <>{parseTreeNode}</>
+    return <Format template={parseTreeNode} parameters={parameters} />
   }
   if (parseTreeNode.kind === "$$") {
     return <TeX tex={parseTreeNode.child} block />
@@ -85,7 +92,11 @@ export const MarkdownTreeNode: FunctionComponent<{
     )
   }
   if (parseTreeNode.kind === "`") {
-    return <span className="font-mono">{parseTreeNode.child}</span>
+    return (
+      <span className="font-mono">
+        {format(parseTreeNode.child, parameters)}
+      </span>
+    )
   }
   if (parseTreeNode.kind === "```") {
     return (
@@ -101,8 +112,8 @@ export const MarkdownTreeNode: FunctionComponent<{
   }
   if (parseTreeNode.kind === "a") {
     return (
-      <Link to={parseTreeNode.url}>
-        <MarkdownTree parseTree={parseTreeNode.child} />
+      <Link to={format(parseTreeNode.url, parameters)}>
+        <MarkdownTree parseTree={parseTreeNode.child} parameters={parameters} />
       </Link>
     )
   }
@@ -116,4 +127,15 @@ export const MarkdownTreeNode: FunctionComponent<{
 
   // will never be reached:
   return <></>
+}
+
+function format(text: string, parameters?: ReactNode[]): string {
+  if (parameters) {
+    parameters.forEach((p, index) => {
+      if (typeof p === "string") {
+        text = text.replace(`{{${index}}}`, p)
+      }
+    })
+  }
+  return text
 }

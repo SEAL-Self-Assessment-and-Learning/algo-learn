@@ -25,7 +25,7 @@ export default function Root() {
 }
 
 function GlobalHeader() {
-  const { t, i18n, setLang, nextLang } = useTranslation()
+  const { t, lang, setLang, nextLang } = useTranslation()
   const location = useLocation()
   // const navigate = useNavigate()
   const { muted, toggleMuted } = useSound()
@@ -37,17 +37,17 @@ function GlobalHeader() {
   const mainMenuItems = [
     {
       label: t("Home"),
-      to: `/${i18n.resolvedLanguage}/`,
+      to: `/${lang}/`,
       icon: <FiHome />,
     },
     {
       label: t("About.label"),
-      to: `/${i18n.resolvedLanguage}/about`,
+      to: `/${lang}/about`,
       icon: <FiInfo />,
     },
     {
       label: t("Legal.label"),
-      to: `/${i18n.resolvedLanguage}/legal`,
+      to: `/${lang}/legal`,
       icon: <FiFileText />,
     },
     {
@@ -93,9 +93,7 @@ function GlobalHeader() {
           </div>
         </TopbarItem>
         <TopbarItem
-          icon={
-            <span className="font-mono text-sm">{i18n.resolvedLanguage}</span>
-          }
+          icon={<span className="font-mono text-sm">{lang}</span>}
           onClick={nextLang}
         >
           <div className="w-28">
@@ -103,7 +101,7 @@ function GlobalHeader() {
               <button
                 key={lng}
                 className={`block w-full p-2 dark:hover:bg-goethe-500/50 ${
-                  i18n.resolvedLanguage === lng ? "font-bold" : ""
+                  lang === lng ? "font-bold" : ""
                 }`}
                 type="button"
                 onClick={() => setLang(lng)}

@@ -2,7 +2,6 @@ import { use } from "i18next"
 import LanguageDetector from "i18next-browser-languagedetector"
 import {
   initReactI18next,
-  Trans as TransI18Next,
   useTranslation as useTranslationsI18Next,
 } from "react-i18next"
 
@@ -69,7 +68,5 @@ export function useTranslation() {
     const nextIndex = (currentIndex + 1) % SUPPORTED_LANGUAGES.length
     setLang(SUPPORTED_LANGUAGES[nextIndex])
   }
-  return { ...obj, lang, setLang, nextLang }
+  return { t: obj.t, lang, setLang, nextLang }
 }
-
-export const Trans = TransI18Next
