@@ -14,7 +14,7 @@
     "preview": "vite preview front-end",
     "build:json-schema": "$npm_execpath run ts-json-schema-generator --path 'src/**/QuestionGenerator.ts' --tsconfig ./tsconfig.ts-json-schema-generator.json --type 'Question'",
     "test": "$npm_execpath run test:format && $npm_execpath run test:check && $npm_execpath run test:unit && $npm_execpath run test:lint",
-    "test:unit": "vitest run",
+    "test:unit": "which bun && bun test || vitest run",
     "test:lint": "eslint */src/**/*.ts */src/**/*.tsx",
     "test:check": "tsc",
     "test:format": "prettier front-end/src/ shared/src --check",

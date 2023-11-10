@@ -53,7 +53,7 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
           expect(question.text).not.toBe("")
           expect(question.feedback).toBeDefined()
           if (question.type === "MultipleChoiceQuestion") {
-            expect(() => question.feedback!({ choice: [0] })).not.toThrowError()
+            expect(() => question.feedback!({ choice: [0] })).not.toThrow()
           } else {
             const f = question.feedback!({ text: "some random wrong answer" })
             expect(!(f instanceof Promise)).toBe(true)
@@ -75,14 +75,14 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
               { ...parameters, [p.name]: p.min - 1 },
               "myFancySeed",
             ),
-          ).toThrowError()
+          ).toThrow()
           expect(() =>
             generator.generate(
               lang,
               { ...parameters, [p.name]: p.max + 1 },
               "myFancySeed",
             ),
-          ).toThrowError()
+          ).toThrow()
         } else if (p.type === "string") {
           expect(() =>
             generator.generate(
@@ -90,7 +90,7 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
               { ...parameters, [p.name]: "non-existent-kjfewjokfwjiofw" },
               "myFancySeed",
             ),
-          ).toThrowError()
+          ).toThrow()
         }
       })
     }
