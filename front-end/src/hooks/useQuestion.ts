@@ -30,11 +30,12 @@ export function useQuestion(
   )
   const isLoading = question == undefined
   useEffect(() => {
-    if (questionPromise instanceof Promise && isLoading) {
+    if (questionPromise instanceof Promise) {
       void questionPromise.then((q) => setQuestion(q.question))
+    } else if (question !== questionPromise.question) {
+      setQuestion(questionPromise.question)
     }
-  }, [questionPromise, isLoading])
-
+  }, [questionPromise])
   if (isLoading) {
     return { isLoading: true }
   } else {
