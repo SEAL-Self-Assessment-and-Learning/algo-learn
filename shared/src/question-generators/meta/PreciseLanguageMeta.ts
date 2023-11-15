@@ -117,7 +117,15 @@ export function PreciseLanguageMeta(
       })
     }
 
-    const ownt = questions[i].translations[lang]
+    const ownt =
+      questions[i].translations[lang] ??
+      questions[i].translations["en"] ??
+      questions[i].translations["de"]
+    if (ownt === undefined) {
+      throw new Error(
+        `No translation for language ${lang} in question ${name(lang)}`,
+      )
+    }
     const numCorrect = ownt.correctAnswers.length
     const answers = ownt.correctAnswers
       .map((a: string, index: number) => ({
@@ -135,12 +143,16 @@ export function PreciseLanguageMeta(
 
     random.shuffle(answers)
 
+    const trl = translations[lang] ?? translations["en"] ?? translations["de"]
+    if (trl === undefined) {
+      throw new Error(`No translation for language ${lang}`)
+    }
     const markdown = `
-${translations[lang]["consider"]}
+${trl["consider"]}
 
 > ${format(ownt["text"], p)}
 
-${translations[lang]["what"]}
+${trl["what"]}
 `
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",

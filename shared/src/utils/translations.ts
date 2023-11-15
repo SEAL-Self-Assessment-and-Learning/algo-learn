@@ -5,18 +5,14 @@ import { format } from "./format"
 export type TKey = string
 
 /** Translation objects are not nested */
-export type Translations = Readonly<{
-  [lang in Language]: {
-    [key: TKey]: string
-  }
-}>
+export type Translations = Readonly<
+  Partial<Record<Language, Readonly<Record<TKey, string>>>>
+>
 
 /** DeepTranslation objects may contain strings or lists of strings */
-export type DeepTranslations = Readonly<{
-  [lang in Language]: {
-    [key: TKey]: string | string[]
-  }
-}>
+export type DeepTranslations = Readonly<
+  Partial<Record<Language, Readonly<Record<TKey, string | string[]>>>>
+>
 
 /** Type for optional parameters of the t function */
 export type TFunctionParameters = string[] | Readonly<Record<string, string>>
@@ -57,9 +53,13 @@ function t(
   )
     ? translations
     : [translations]
-  for (const tr of translationsArray) {
-    if (lang in tr && key in tr[lang]) {
-      return format(tr[lang][key], parameters)
+  const fallback: Language = lang == "en" ? "de" : "en"
+  for (const l of [lang, fallback]) {
+    for (const tr of translationsArray) {
+      const trl = tr[l]
+      if (trl && trl[key] !== undefined) {
+        return format(trl[key], parameters)
+      }
     }
   }
   return key
