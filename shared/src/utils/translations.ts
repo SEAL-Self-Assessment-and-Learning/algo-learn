@@ -5,21 +5,21 @@ import { format } from "./format"
 export type TKey = string
 
 /** Translation objects are not nested */
-export type Translations = {
+export type Translations = Readonly<{
   [lang in Language]: {
     [key: TKey]: string
   }
-}
+}>
 
 /** DeepTranslation objects may contain strings or lists of strings */
-export type DeepTranslations = {
+export type DeepTranslations = Readonly<{
   [lang in Language]: {
     [key: TKey]: string | string[]
   }
-}
+}>
 
 /** Type for optional parameters of the t function */
-export type TFunctionParameters = string[] | Record<string, string>
+export type TFunctionParameters = string[] | Readonly<Record<string, string>>
 
 /**
  * The global t function is given a translation object, a language, a key, and
@@ -35,28 +35,34 @@ export type TFunctionParameters = string[] | Record<string, string>
  * @returns The translated text
  */
 function t(
-  translations: Translations,
+  translations: Translations | ReadonlyArray<Translations>,
   lang: Language,
   key: TKey,
   parameters?: TFunctionParameters,
 ): string
 function t(
-  translations: DeepTranslations,
+  translations: DeepTranslations | ReadonlyArray<DeepTranslations>,
   lang: Language,
   key: TKey,
   parameters?: TFunctionParameters,
 ): string | string[]
 function t(
-  translations: DeepTranslations,
+  translations: DeepTranslations | ReadonlyArray<DeepTranslations>,
   lang: Language,
   key: TKey,
   parameters?: TFunctionParameters,
 ): string | string[] {
-  const text = translations[lang][key]
-  if (text === undefined) {
-    return key
+  const translationsArray: ReadonlyArray<DeepTranslations> = Array.isArray(
+    translations,
+  )
+    ? translations
+    : [translations]
+  for (const tr of translationsArray) {
+    if (lang in tr && key in tr[lang]) {
+      return format(tr[lang][key], parameters)
+    }
   }
-  return format(text, parameters)
+  return key
 }
 
 /**
@@ -80,15 +86,15 @@ export function tFunctional(translations: Translations, key: string) {
  * @returns A function that maps a key to a translation
  */
 export function tFunction(
-  translations: Translations,
+  translations: Translations | ReadonlyArray<Translations>,
   lang: Language,
 ): { t: (key: TKey, parameters?: TFunctionParameters) => string }
 export function tFunction(
-  translations: DeepTranslations,
+  translations: DeepTranslations | ReadonlyArray<DeepTranslations>,
   lang: Language,
 ): { t: (key: TKey, parameters?: TFunctionParameters) => string | string[] }
 export function tFunction(
-  translations: Translations | DeepTranslations,
+  translations: DeepTranslations | ReadonlyArray<DeepTranslations>,
   lang: Language,
 ) {
   return {

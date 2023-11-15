@@ -1,60 +1,41 @@
-import { use } from "i18next"
-import LanguageDetector from "i18next-browser-languagedetector"
-import {
-  initReactI18next,
-  useTranslation as useTranslationsI18Next,
-} from "react-i18next"
-
 import { Language } from "../../../shared/src/api/Language"
-import de from "../locales/de.json"
-import en from "../locales/en.json"
+import deJSON from "../locales/de.json"
+import enJSON from "../locales/en.json"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { useEffect } from "react"
+import { Translations, tFunction } from "../../../shared/src/utils/translations"
 
-export const SUPPORTED_LANGUAGES: Array<Language> = ["en", "de"]
+export const SUPPORTED_LANGUAGES: ReadonlyArray<Language> = ["en", "de"]
 export const DEFAULT_LANGUAGE: Language = window.navigator.language.startsWith(
   "de",
 )
   ? "de"
   : "en"
-export const NATIVE_NAME: Record<Language, string> = {
+export const NATIVE_NAME: Readonly<Record<Language, string>> = {
   en: "English",
   de: "Deutsch",
 }
 
-void use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    supportedLngs: SUPPORTED_LANGUAGES,
-    debug: false,
-    fallbackLng: DEFAULT_LANGUAGE,
-    interpolation: {
-      escapeValue: false,
-    },
-    resources: {
-      en: { translation: en },
-      de: { translation: de },
-    },
-  })
+const globalTranslations: Translations = {
+  en: enJSON,
+  de: deJSON,
+}
 
 /**
- * API-compatible shim for `useTranslation` that also returns the language.
+ * The `useTranslation` hook detects the current language from the URL, returns the translation function, and allows to change the language.
  *
- * @returns The translation functions
+ * @param additionalTranslations If provided, Additional translations to use (they have priority)
+ *
+ * @returns An object containing the translation function, the current language, and functions to change the language.
  */
-export function useTranslation() {
+export function useTranslation(additionalTranslations?: Translations) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const obj = useTranslationsI18Next()
   const params = useParams()
   const lang: Language =
-    params["lang"] && (params["lang"] == "en" || params["lang"] == "de")
-      ? params["lang"]
+    params["lang"] &&
+    (SUPPORTED_LANGUAGES as Array<string>).includes(params["lang"])
+      ? (params["lang"] as Language)
       : DEFAULT_LANGUAGE
-
-  useEffect(() => {
-    if (lang !== obj.i18n.resolvedLanguage) void obj.i18n.changeLanguage(lang)
-  }, [lang, obj.i18n, obj.i18n.resolvedLanguage])
 
   function setLang(newLang: Language) {
     if (lang !== newLang) {
@@ -68,5 +49,14 @@ export function useTranslation() {
     const nextIndex = (currentIndex + 1) % SUPPORTED_LANGUAGES.length
     setLang(SUPPORTED_LANGUAGES[nextIndex])
   }
-  return { t: obj.t, lang, setLang, nextLang }
+
+  const translations: ReadonlyArray<Translations> = Array.isArray(
+    additionalTranslations,
+  )
+    ? [...additionalTranslations, globalTranslations]
+    : additionalTranslations
+    ? [additionalTranslations, globalTranslations]
+    : [globalTranslations]
+  const t = tFunction(translations, lang).t
+  return { t, lang, setLang, nextLang }
 }
