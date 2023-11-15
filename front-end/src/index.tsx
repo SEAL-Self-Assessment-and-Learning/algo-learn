@@ -29,6 +29,7 @@ import Root from "./routes/root"
 import { TestSimpleMC } from "./routes/test"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
 import { DEFAULT_LANGUAGE } from "./hooks/useTranslation"
+import { Debug } from "./routes/debug"
 
 const routes = []
 for (const { path, generator } of allQuestionGeneratorRoutes) {
@@ -72,6 +73,10 @@ routes.push({
 routes.push({
   path: `:lang/about`,
   element: <About />,
+})
+routes.push({
+  path: `:lang/debug`,
+  element: <Debug />,
 })
 routes.push({
   path: `:lang/test`,

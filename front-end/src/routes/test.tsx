@@ -36,34 +36,44 @@ export function TestSimpleMC() {
   return (
     <>
       <HorizontallyCenteredDiv className="select-none">
-        <input
-          type="radio"
-          checked={format === "react"}
-          onChange={(e) => e.target.checked && setFormat("react")}
-          id="react-checkbox"
-          className="m-2"
-        />
-        <label htmlFor="react-checkbox">React</label>
-        <input
-          type="radio"
-          checked={format === "latex"}
-          onChange={(e) => e.target.checked && setFormat("latex")}
-          id="latex-checkbox"
-          className="m-2"
-        />
-        <label htmlFor="latex-checkbox">LaTeX</label>
-        <input
-          type="radio"
-          checked={format === "json"}
-          onChange={(e) => e.target.checked && setFormat("json")}
-          id="json-checkbox"
-          className="m-2"
-        />
-        <label htmlFor="json-checkbox">JSON</label>
+        <form action="" className="text-center">
+          <fieldset>
+            <legend>Select a display format:</legend>
+
+            <input
+              type="radio"
+              checked={format === "react"}
+              onChange={(e) => e.target.checked && setFormat("react")}
+              id="react-checkbox"
+              className="m-2"
+            />
+            <label className="" htmlFor="react-checkbox">
+              React
+            </label>
+
+            <input
+              type="radio"
+              checked={format === "latex"}
+              onChange={(e) => e.target.checked && setFormat("latex")}
+              id="latex-checkbox"
+              className="m-2"
+            />
+            <label htmlFor="latex-checkbox">LaTeX</label>
+
+            <input
+              type="radio"
+              checked={format === "json"}
+              onChange={(e) => e.target.checked && setFormat("json")}
+              id="json-checkbox"
+              className="m-2"
+            />
+            <label htmlFor="json-checkbox">JSON</label>
+          </fieldset>
+        </form>
       </HorizontallyCenteredDiv>
       {format === "react" ? (
         <QuestionComponent
-          questionPromise={question}
+          question={question}
           key={seed}
           onResult={() => undefined}
         />

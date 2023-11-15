@@ -1,4 +1,8 @@
-import { MultipleChoiceQuestion, Question } from "../api/QuestionGenerator"
+import {
+  FreeTextQuestion,
+  MultipleChoiceQuestion,
+  Question,
+} from "../api/QuestionGenerator"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "./parseMarkdown"
 
 /**
@@ -48,7 +52,8 @@ export function markdownTreeToLatex(tree: ParseTree | ParseTreeNode): string {
 
 /** Function to render the question in LaTeX */
 export function questionToTex(question: Question): string {
-  if (question.type === "MultipleChoiceQuestion") {
+  const t = question.type
+  if (t === "MultipleChoiceQuestion") {
     const q: MultipleChoiceQuestion = question
     return `\\begin{exercise}[${markdownToLatex(q.name)}]
 ${markdownToLatex(q.text ?? "")}
@@ -56,8 +61,15 @@ ${markdownToLatex(q.text ?? "")}
 ${q.answers.map((answer) => `    \\item ${markdownToLatex(answer)}`).join("\n")}
 \\end{itemize}
 \\end{exercise}`
+  } else if (t === "FreeTextQuestion") {
+    const q: FreeTextQuestion = question
+    return `\\begin{exercise}[${markdownToLatex(q.name)}]
+${markdownToLatex(q.text ?? "")}
+
+${markdownToLatex(q.prompt ?? "")}
+\\end{exercise}`
   } else {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    throw new Error(`Unsupported question type: ${question.type}`)
+    throw new Error(`Unsupported question type: ${t}`)
   }
 }

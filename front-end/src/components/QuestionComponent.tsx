@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useState } from "react"
+import { FunctionComponent } from "react"
 
 import { Question } from "../../../shared/src/api/QuestionGenerator"
 import { ExerciseMultipleChoice } from "./ExerciseMultipleChoice"
@@ -7,7 +7,7 @@ import { ExerciseTextInput } from "./ExerciseTextInput"
 /** Props for the React Component */
 export interface QuestionComponentProps {
   /** The question object, or a promise for the question object. */
-  questionPromise: Question | Promise<Question>
+  question: Question
 
   /** Callback for when a result is produced */
   onResult?: (result: Result) => void
@@ -24,20 +24,11 @@ export type Result = "correct" | "incorrect" | "abort" | "timeout"
 
 /** Function to render the question as a React component */
 export const QuestionComponent: FunctionComponent<QuestionComponentProps> = ({
-  questionPromise,
+  question,
   onResult,
   regenerate,
 }) => {
-  const [question, setQuestion] = useState<Question | undefined>(
-    questionPromise instanceof Promise ? undefined : questionPromise,
-  )
-  useEffect(() => {
-    void Promise.resolve(questionPromise).then((q) => setQuestion(q))
-  }, [questionPromise])
-
-  if (question === undefined) {
-    return <>Loading...</>
-  } else if (question.type === "MultipleChoiceQuestion") {
+  if (question.type === "MultipleChoiceQuestion") {
     return (
       <ExerciseMultipleChoice
         question={question}

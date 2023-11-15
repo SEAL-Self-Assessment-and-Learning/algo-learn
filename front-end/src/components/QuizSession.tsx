@@ -9,7 +9,8 @@ import { useTranslation } from "../hooks/useTranslation"
 import { generatorSetBelowPath } from "../listOfQuestions"
 import { Button } from "./Button"
 import { ScreenCenteredDiv } from "./CenteredDivs"
-import { QuestionComponent, Result } from "./QuestionComponent"
+import { Result } from "./QuestionComponent"
+import { ViewSingleQuestion } from "../routes/ViewSingleQuestion"
 
 const great = {
   en: [
@@ -199,17 +200,11 @@ export function QuizSession({
       }
     }
 
-    const question = Promise.resolve(
-      generator.generate(lang, parameters, questionSeed),
-    ).then((q) => q.question)
     return (
-      <QuestionComponent
-        key={serializeGeneratorCall({
-          generator,
-          parameters,
-          seed: questionSeed,
-        })}
-        questionPromise={question}
+      <ViewSingleQuestion
+        generator={generator}
+        parameters={parameters}
+        seed={questionSeed}
         onResult={handleResult}
       />
     )

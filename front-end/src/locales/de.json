@@ -27,6 +27,7 @@
   "Help": "Hilfe",
   "History": "Verlauf",
   "Home": "Start",
+  "loading": "Lade...",
   "Legal.authors.label": "Autoren",
   "Legal.authors.text": "Entwickelt von [Holger Dell]({{0}}) (2023), der Quellcode ist auf [GitHub]({{1}}) verfügbar.",
   "Legal.detailed.text": "Ausführliche Informationen zu Impressum und Datenschutz findest Du auf [dieser Seite]({{0}}).",
