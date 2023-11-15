@@ -1,12 +1,4 @@
 import { ReactNode } from "react"
-import { renderToStaticMarkup } from "react-dom/server"
-import SyntaxHighlighter from "react-syntax-highlighter"
-import {
-  solarizedDark,
-  solarizedLight,
-} from "react-syntax-highlighter/dist/esm/styles/hljs"
-
-import { useTheme } from "../hooks/useTheme"
 import { HorizontallyCenteredDiv } from "./CenteredDivs"
 import { QuestionFooter } from "./QuestionFooter"
 import { QuestionHeader } from "./QuestionHeader"
@@ -42,7 +34,6 @@ export function InteractWithQuestion({
   footerMode,
   footerMessage,
   handleFooterClick,
-  source = false,
 }: {
   permalink?: string
   name: string
@@ -51,40 +42,22 @@ export function InteractWithQuestion({
   footerMode: MODE
   footerMessage: ReactNode
   handleFooterClick: () => void
-  source?: boolean
 }) {
-  const { theme } = useTheme()
-  if (source) {
-    return (
-      <HorizontallyCenteredDiv className="w-full flex-grow overflow-y-scroll">
-        <SyntaxHighlighter
-          language="latex"
-          wrapLongLines
-          style={theme === "dark" ? solarizedDark : solarizedLight}
-        >
-          {`\\begin{exercise}[${name}]\n` +
-            renderToStaticMarkup(<>{children}</>) +
-            `\\end{exercise}`}
-        </SyntaxHighlighter>
-      </HorizontallyCenteredDiv>
-    )
-  } else {
-    return (
-      <>
-        <HorizontallyCenteredDiv className="w-full flex-grow overflow-y-scroll">
-          <QuestionHeader
-            permalink={permalink}
-            title={name}
-            regenerate={regenerate}
-          />
-          <div>{children}</div>
-        </HorizontallyCenteredDiv>
-        <QuestionFooter
-          mode={footerMode}
-          message={footerMessage}
-          buttonClick={handleFooterClick}
+  return (
+    <>
+      <HorizontallyCenteredDiv className="w-full flex-grow">
+        <QuestionHeader
+          permalink={permalink}
+          title={name}
+          regenerate={regenerate}
         />
-      </>
-    )
-  }
+        <div>{children}</div>
+      </HorizontallyCenteredDiv>
+      <QuestionFooter
+        mode={footerMode}
+        message={footerMessage}
+        buttonClick={handleFooterClick}
+      />
+    </>
+  )
 }
