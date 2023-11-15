@@ -13,7 +13,7 @@
     "build": "vite build front-end",
     "preview": "vite preview front-end",
     "build:json-schema": "$npm_execpath run ts-json-schema-generator --path 'src/**/QuestionGenerator.ts' --tsconfig ./tsconfig.ts-json-schema-generator.json --type 'Question'",
-    "test": "$npm_execpath run test:format && $npm_execpath run test:check && $npm_execpath run test:unit && $npm_execpath run test:lint",
+    "test": "$npm_execpath run test:check && $npm_execpath run test:unit && $npm_execpath run test:lint && $npm_execpath run test:format",
     "test:unit": "which bun && bun test --bail || vitest run --bail 1",
     "test:lint": "eslint */src/**/*.ts */src/**/*.tsx",
     "test:check": "tsc",
