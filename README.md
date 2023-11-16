@@ -41,8 +41,6 @@ In principle, you're now in position to start development. However, we strongly 
 - [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
 - [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 - [Auto Rename Tag](https://marketplace.visualstudio.com/items?itemName=formulahendry.auto-rename-tag)
-- [i18n Ally](https://marketplace.visualstudio.com/items?itemName=Lokalise.i18n-ally)
-- [ZipFS - a zip file system](https://marketplace.visualstudio.com/items?itemName=arcanis.vscode-zipfs)
 - optional: [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
 - optional: [Atom One Dark Theme](https://marketplace.visualstudio.com/items?itemName=akamud.vscode-theme-onedark)
 
@@ -63,7 +61,6 @@ bun run build
 
 - [React](https://reactjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
-- [i18next](https://www.i18next.com/)
 
 ### Staging and Deployment
 
