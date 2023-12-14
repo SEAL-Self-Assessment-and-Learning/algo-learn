@@ -35,7 +35,7 @@ export function useQuestion(
     } else if (question !== questionPromise.question) {
       setQuestion(questionPromise.question)
     }
-  }, [questionPromise])
+  }, [question, questionPromise])
   if (isLoading) {
     return { isLoading: true }
   } else {

@@ -54,9 +54,9 @@ export const LandauNotation: QuestionGenerator = {
         functionLeft === functionRight
           ? notation === "\\Theta" || notation === "O" || notation === "\\Omega"
           : functionTypes.findIndex((e) => e === functionLeft) <
-            functionTypes.findIndex((e) => e === functionRight)
-          ? notation == "o" || notation == "O"
-          : notation == "\\omega" || notation == "\\Omega"
+              functionTypes.findIndex((e) => e === functionRight)
+            ? notation == "o" || notation == "O"
+            : notation == "\\omega" || notation == "\\Omega"
       const key = `${functionLeft.replaceAll(
         "n",
         variable,

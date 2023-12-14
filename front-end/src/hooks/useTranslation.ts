@@ -55,8 +55,8 @@ export function useTranslation(additionalTranslations?: Translations) {
   )
     ? [...additionalTranslations, globalTranslations]
     : additionalTranslations
-    ? [additionalTranslations, globalTranslations]
-    : [globalTranslations]
+      ? [additionalTranslations, globalTranslations]
+      : [globalTranslations]
   const t = tFunction(translations, lang).t
   return { t, lang, setLang, nextLang }
 }
