@@ -4,55 +4,10 @@ import {
   Parameters,
 } from "../../shared/src/api/Parameters"
 import { QuestionGenerator } from "../../shared/src/api/QuestionGenerator"
-import { isSubPath, QuestionRoutes } from "../../shared/src/api/QuestionRouter"
-import { Between } from "../../shared/src/question-generators/asymptotics/between"
-import { LandauNotation } from "../../shared/src/question-generators/asymptotics/landau"
-import { AsymptoticsPreciseLanguage } from "../../shared/src/question-generators/asymptotics/precise-language"
-import { SortTerms } from "../../shared/src/question-generators/asymptotics/sort"
-import { SimplifySum } from "../../shared/src/question-generators/asymptotics/sum"
-import { RecursionFormula } from "../../shared/src/question-generators/recursion/formula"
-import { RecurrenceMaster } from "../../shared/src/question-generators/recursion/recurrenceMaster"
-import { Loops } from "../../shared/src/question-generators/time/loops"
+import { isSubPath } from "../../shared/src/api/QuestionRouter"
 
-/** List of all question routes */
-export const allQuestionGeneratorRoutes: QuestionRoutes = [
-  {
-    path: "asymptotics/precise-language",
-    generator: AsymptoticsPreciseLanguage,
-  },
-  {
-    path: "asymptotics/sort",
-    generator: SortTerms,
-  },
-  {
-    path: "asymptotics/landau",
-    generator: LandauNotation,
-  },
-  {
-    path: "asymptotics/sum",
-    generator: SimplifySum,
-  },
-  {
-    path: "asymptotics/between",
-    generator: Between,
-  },
-  {
-    path: "recursion/formula",
-    generator: RecursionFormula,
-  },
-  {
-    path: "recursion/master",
-    generator: RecurrenceMaster,
-  },
-  {
-    path: "time/loops",
-    generator: Loops,
-  },
-  // {
-  //   path: "test/test",
-  //   generator: TestQuestion,
-  // },
-]
+import { allQuestionGeneratorRoutes } from "../../settings/questionsSelection"
+export { allQuestionGeneratorRoutes }
 
 /** List of all skill groups. Will be the first part of the questions' routes. */
 export const skillGroups: string[] = []
