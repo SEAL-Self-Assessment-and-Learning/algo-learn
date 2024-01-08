@@ -146,8 +146,8 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntryV1> }): {
 } {
   const qualifyingPasses: { [path: string]: number } = {}
   const featureMap: { [path: string]: BasicSkillFeatures } = {}
-  for (const { generator, parameters } of generatorSetBelowPath("")) {
-    const path = serializeGeneratorCall({ generator, parameters })
+  for (const { generator, generatorPath, parameters } of generatorSetBelowPath("")) {
+    const path = serializeGeneratorCall({ generator, parameters, generatorPath})
     qualifyingPasses[path] = 0
     featureMap[path] = {
       mastered: false,
@@ -169,8 +169,8 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntryV1> }): {
       // )
       continue
     }
-    const { generator, parameters } = generatorCall
-    const path = serializeGeneratorCall({ generator, parameters })
+    const { generator, parameters, generatorPath } = generatorCall
+    const path = serializeGeneratorCall({ generator, parameters, generatorPath})
     featureMap[path].lag = min(
       featureMap[path].lag,
       (now - e.timestamp) / 3600 / 24 / 1000,
@@ -250,13 +250,13 @@ export function averageStrength({
   strengthMap: {
     [path: string]: { p: number; h: number }
   }
-  set: Array<{ generator: QuestionGenerator; parameters: Parameters }>
+  set: Array<{ generator: QuestionGenerator; generatorPath: string; parameters: Parameters }>
 }): number {
   if (set.length === 0) return 0
 
   let avg = 0
-  for (const { generator, parameters } of set) {
-    avg += strengthMap[serializeGeneratorCall({ generator, parameters })].p
+  for (const { generator, generatorPath, parameters } of set) {
+    avg += strengthMap[serializeGeneratorCall({ generator, parameters, generatorPath})].p
   }
   return avg / set.length
 }
@@ -282,10 +282,12 @@ export function sortByStrength({
   }
   generatorCalls: Array<{
     generator: QuestionGenerator
+    generatorPath: string
     parameters: Parameters
   }>
 }): Array<{
   generator: QuestionGenerator
+  generatorPath: string
   parameters: Parameters
 }> {
   random?.shuffle(generatorCalls) // If random was provided, shuffle to break ties
@@ -319,8 +321,8 @@ export function computeUnlockedSkills({
   // for now, we assume all question generators are independent and all variants strictly build on each other.
   const unlockedPaths = []
   for (const { path } of allQuestionGeneratorRoutes) {
-    for (const { generator, parameters } of generatorSetBelowPath(path)) {
-      const newPath = serializeGeneratorCall({ generator, parameters })
+    for (const { generator, generatorPath, parameters } of generatorSetBelowPath(path)) {
+      const newPath = serializeGeneratorCall({ generator, parameters, generatorPath })
       unlockedPaths.push(newPath)
       if (
         featureMap[newPath].p < thresholdStrength ||

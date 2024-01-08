@@ -36,7 +36,6 @@ const translations: Translations = {
 }
 
 export const Loops: QuestionGenerator = {
-  path: "time/loops",
   name: tFunctional(translations, "name"),
   languages: ["en", "de"],
   expectedParameters: [
@@ -46,7 +45,7 @@ export const Loops: QuestionGenerator = {
       allowedValues: ["simpleExact"],
     },
   ],
-  generate(lang, parameters, seed) {
+  generate(generatorPath, lang, parameters, seed) {
     const { t } = tFunction(translations, lang)
 
     if (!validateParameters(parameters, Loops.expectedParameters)) {
@@ -61,6 +60,7 @@ export const Loops: QuestionGenerator = {
       lang,
       parameters,
       seed,
+      generatorPath,
     })
 
     const random = new Random(seed)

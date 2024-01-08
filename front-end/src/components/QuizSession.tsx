@@ -173,11 +173,12 @@ export function QuizSession({
     )
   } else if (status === "running") {
     const obj = questionVariants[num]
-    const { generator, parameters } = obj
+    const { generator, generatorPath, parameters } = obj
     const nextPath = serializeGeneratorCall({
       generator,
       parameters,
       seed: questionSeed,
+      generatorPath: generatorPath,
     })
 
     const handleResult = (result: Result) => {
@@ -203,6 +204,7 @@ export function QuizSession({
     return (
       <ViewSingleQuestion
         generator={generator}
+        generatorPath={generatorPath}
         parameters={parameters}
         seed={questionSeed}
         onResult={handleResult}

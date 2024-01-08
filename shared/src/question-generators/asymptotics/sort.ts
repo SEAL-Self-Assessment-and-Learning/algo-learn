@@ -43,7 +43,6 @@ const translations: Translations = {
  * @returns Output
  */
 export const SortTerms: QuestionGenerator = {
-  path: "asymptotics/sort", // Name of the skill, used in the URL
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -54,7 +53,7 @@ export const SortTerms: QuestionGenerator = {
       allowedValues: ["start", "pure", "polylog", "polylogexp"],
     },
   ],
-  generate: (lang, parameters, seed) => {
+  generate: (generatorPath, lang, parameters, seed) => {
     const { t } = tFunction(translations, lang)
 
     if (!validateParameters(parameters, SortTerms.expectedParameters)) {
@@ -102,6 +101,7 @@ export const SortTerms: QuestionGenerator = {
         lang,
         parameters,
         seed,
+        generatorPath,
       }),
       text: t("text"),
       answers: answers.map((a) => a.text),

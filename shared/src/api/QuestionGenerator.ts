@@ -199,13 +199,6 @@ export type FreeTextFormatFunction = (
  * example MultipleChoiceQuestion, etc.
  */
 export interface QuestionGenerator {
-  /**
-   * The path can be used as part of the URL (only lower-case letters, numbers,
-   * dashes, and slashes) to identify the question. For example, the path could
-   * be "python3/variables" for a question about Python variables.
-   */
-  path: string
-
   /** List of supported languages. */
   languages: Language[]
 
@@ -246,13 +239,16 @@ export interface QuestionGenerator {
    * as well as the feedback function for this question. The function must be
    * implemented by each QuestionGenerator object.
    *
-   * @param parameters The parameters to use when generating the question
+   * @param generatorPath The path the generator is available at (defined under settings/questionSelection.ts)
    * @param lang The language to use when generating the question
+   * @param parameters The parameters to use when generating the question
+   * @param seed The seed used to generate the question
    * @returns The question object including its corresponding feedback function
    *   as a closure. Additional properties may be added to the output object to
    *   provide unit tests.
    */
   generate: (
+    generatorPath: string,
     lang: Language,
     parameters: Parameters,
     seed: string,

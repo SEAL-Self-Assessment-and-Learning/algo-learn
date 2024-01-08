@@ -72,7 +72,6 @@ const translations: Translations = {
  * @returns The question as a Question object
  */
 export function PreciseLanguageMeta(
-  generatorPath: string,
   name: (lang: Language) => string,
   questions: BasicMCQuestion[],
 ): QuestionGenerator {
@@ -90,7 +89,7 @@ export function PreciseLanguageMeta(
         ]
       : []
 
-  function generate(lang: Language, parameters: Parameters, seed: string) {
+  function generate(generatorPath: string, lang: Language, parameters: Parameters, seed: string) {
     if (!validateParameters(parameters, expectedParameters)) {
       throw new Error(
         `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${variants.join(
@@ -157,7 +156,7 @@ ${trl["what"]}
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
       name: name(lang),
-      path: serializeGeneratorCall({ generator, lang, parameters, seed }),
+      path: serializeGeneratorCall({ generator, lang, parameters, seed, generatorPath }),
       answers: answers.map(({ element }) => element),
       text: markdown,
       allowMultiple: true,
@@ -171,7 +170,6 @@ ${trl["what"]}
     return { question }
   }
   const generator: QuestionGenerator = {
-    path: generatorPath,
     name,
     languages,
     expectedParameters,
