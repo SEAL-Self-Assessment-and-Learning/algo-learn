@@ -61,11 +61,12 @@ export function LearningProgress() {
             <QuestionTableRow
               key={q.path}
               generator={q.generator}
+              generatorPath={q.path}
               unlocked
               qualified
               strength={averageStrength({
                 strengthMap: featureMap,
-                set: generatorCallsBelowPath(q.generator.path),
+                set: generatorCallsBelowPath(q.path),
               })}
             />
           ))}
@@ -84,6 +85,7 @@ export function LearningProgress() {
               <QuestionTableRow
                 key={path}
                 generator={c.generator}
+                generatorPath={c.generatorPath}
                 parameters={c.parameters}
                 qualified={featureMap[path].mastered}
                 unlocked={unlockedSkills.find((s) => s === path) !== undefined}
@@ -138,7 +140,7 @@ function LogTableRow({ entry }: { entry: LogEntryV1 }) {
     path: entry.path,
   })
   if (generatorCall === undefined) return null
-  const { generator, parameters, seed } = generatorCall
+  const { generator, generatorPath, parameters, seed } = generatorCall
   const parametersText = parameters
     ? serializeParameters(parameters, generator.expectedParameters)
     : ""
@@ -159,6 +161,7 @@ function LogTableRow({ entry }: { entry: LogEntryV1 }) {
             generator,
             parameters,
             seed,
+            generatorPath
           })}`}
         >
           view
@@ -248,6 +251,7 @@ function QuestionTableHead({ showVariant = false }: { showVariant?: boolean }) {
 
 function QuestionTableRow({
   generator,
+  generatorPath,
   parameters,
   strength,
   halflife,
@@ -257,6 +261,7 @@ function QuestionTableRow({
   onMouseOut,
 }: {
   generator: QuestionGenerator
+  generatorPath: string
   parameters?: Parameters
   strength: number
   halflife?: number
@@ -266,7 +271,7 @@ function QuestionTableRow({
   onMouseOut?: () => void
 }) {
   const { lang } = useTranslation()
-  const generatorCallPath = serializeGeneratorCall({ generator, parameters })
+  const generatorCallPath = serializeGeneratorCall({ generator, generatorPath, parameters })
   const id =
     generatorCallPath.replaceAll("/", "-") +
     (parameters === undefined ? "-coarse" : "")

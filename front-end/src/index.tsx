@@ -42,6 +42,7 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
       return (
         <ViewSingleQuestion
           generator={generator}
+          generatorPath={path}
           parameters={parameters}
           seed={seed ?? ""}
         />

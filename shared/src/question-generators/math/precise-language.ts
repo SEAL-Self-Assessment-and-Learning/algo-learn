@@ -175,7 +175,6 @@ const translations = {
 }
 
 export const MathPreciseLanguage: QuestionGenerator = PreciseLanguageMeta(
-  "math/precise-language",
   tFunctional(translations, "title"),
   questions,
 )

@@ -5,13 +5,8 @@ import { allQuestionGeneratorRoutes } from "./listOfQuestions"
 
 for (const { path, generator } of allQuestionGeneratorRoutes) {
   describe(`Sanity-checks for question generator "${path}"`, () => {
-    test("Front-end and generator use the same path", () => {
-      expect(path).toEqual(generator.path)
-    })
-
     test("Meta-data is present", () => {
       expect(path).not.toBe("")
-      expect(generator.path).not.toBe("")
       expect(generator.expectedParameters.length).toBeGreaterThanOrEqual(0)
       expect(generator.languages.length).toBeGreaterThan(0)
 
@@ -40,7 +35,7 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
         test(`Generate with language ${lang} and parameters ${JSON.stringify(
           parameters,
         )}`, () => {
-          const ret = generator.generate(lang, parameters, "myFancySeed")
+          const ret = generator.generate(path, lang, parameters, "myFancySeed")
           expect(!(ret instanceof Promise)).toBe(true)
           if (ret instanceof Promise) return
           const { question } = ret
@@ -71,6 +66,7 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
         if (p.type === "integer") {
           expect(() =>
             generator.generate(
+              path,
               lang,
               { ...parameters, [p.name]: p.min - 1 },
               "myFancySeed",
@@ -78,6 +74,7 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
           ).toThrow()
           expect(() =>
             generator.generate(
+              path,
               lang,
               { ...parameters, [p.name]: p.max + 1 },
               "myFancySeed",
@@ -86,6 +83,7 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
         } else if (p.type === "string") {
           expect(() =>
             generator.generate(
+              path,
               lang,
               { ...parameters, [p.name]: "non-existent-kjfewjokfwjiofw" },
               "myFancySeed",

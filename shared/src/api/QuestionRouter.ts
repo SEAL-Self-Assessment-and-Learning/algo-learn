@@ -33,11 +33,13 @@ export function serializeGeneratorCall({
   parameters,
   seed,
   lang,
+  generatorPath,
 }: {
   generator: QuestionGenerator
   parameters?: Parameters
   seed?: string
   lang?: Language
+  generatorPath: string
 }): string {
   const path: string[] = []
   if (lang !== undefined) {
@@ -45,7 +47,7 @@ export function serializeGeneratorCall({
     path.push(langURL)
   }
 
-  path.push(generator.path)
+  path.push(generatorPath)
   if (parameters === undefined) return path.join("/")
 
   for (const { name } of generator.expectedParameters) {
@@ -114,6 +116,7 @@ export function deserializePath({
   | {
       lang?: Language
       generator: QuestionGenerator
+      generatorPath: string
       parameters?: Parameters
       seed?: string
     }
@@ -139,7 +142,7 @@ export function deserializePath({
     if (!isSubPath(generatorPath, path)) continue
 
     parts = parts.slice(generatorPath.split("/").length)
-    if (parts.length === 0) return { lang, generator }
+    if (parts.length === 0) return { lang, generator, generatorPath }
 
     const parameters = deserializeParameters(
       parts.join("/"),
@@ -152,6 +155,6 @@ export function deserializePath({
       parts.length === generator.expectedParameters.length + 1
         ? parts.at(-1)
         : undefined
-    return { lang, generator, parameters, seed }
+    return { lang, generator, generatorPath, parameters, seed }
   }
 }

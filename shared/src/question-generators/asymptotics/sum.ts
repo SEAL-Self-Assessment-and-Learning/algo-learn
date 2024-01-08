@@ -26,7 +26,6 @@ const translations: Translations = {
  * @returns Output
  */
 export const SimplifySum: QuestionGenerator = {
-  path: "asymptotics/sum",
   name: tFunctional(translations, "name"),
   languages: ["en", "de"],
   expectedParameters: [
@@ -36,12 +35,13 @@ export const SimplifySum: QuestionGenerator = {
       allowedValues: ["pure", "polylog", "polylogexp"],
     },
   ],
-  generate(lang, parameters, seed) {
+  generate(generatorPath, lang, parameters, seed) {
     const permalink = serializeGeneratorCall({
       generator: SimplifySum,
       lang,
       parameters,
       seed,
+      generatorPath,
     })
     const random = new Random(seed)
     const { t } = tFunction(translations, lang)

@@ -24,7 +24,6 @@ const translations: Translations = {
 
 /** This question generator generates a simple multiple choice question. */
 export const ExampleQuestion: QuestionGenerator = {
-  path: "test/test",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["calculus", "sum"],
@@ -42,7 +41,7 @@ export const ExampleQuestion: QuestionGenerator = {
    * @param lang The language of the question
    * @returns A new SimpleMCTest question
    */
-  generate: (lang = "en", parameters, seed) => {
+  generate: (generatorPath, lang = "en", parameters, seed) => {
     const random = new Random(seed)
 
     const a = random.int(2, 10)
@@ -74,6 +73,7 @@ export const ExampleQuestion: QuestionGenerator = {
         lang,
         parameters,
         seed,
+        generatorPath,
       }),
       text: t("text", [`$${a}$`, `$${b}$`, `$${a}+${b}$`]),
       answers,

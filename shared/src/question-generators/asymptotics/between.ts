@@ -45,7 +45,6 @@ const translation: Translations = {
 
 /** Generate and render a question about O/Omega/o/omega */
 export const Between: QuestionGenerator = {
-  path: "asymptotics/between",
   name: tFunctional(translation, "name"),
   languages: ["en", "de"],
   expectedParameters: [
@@ -55,7 +54,7 @@ export const Between: QuestionGenerator = {
       allowedValues: ["start", "log", "loglog", "nifty"],
     },
   ],
-  generate: (lang, parameters, seed) => {
+  generate: (generatorPath, lang, parameters, seed) => {
     const { t } = tFunction(translation, lang)
 
     if (!validateParameters(parameters, Between.expectedParameters)) {
@@ -215,6 +214,7 @@ ${t("feedback.expected")}: $${variable}$.`,
         lang,
         parameters,
         seed,
+        generatorPath,
       }),
       text,
       prompt,

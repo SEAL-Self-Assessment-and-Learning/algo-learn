@@ -8,9 +8,8 @@ import {
   serializeGeneratorCall,
 } from "./QuestionRouter"
 
-const ExampleQuestion: QuestionGenerator = {
-  path: "test/test",
-  name: () => "Example Question",
+const TestQuestion: QuestionGenerator = {
+  name: () => "Test Question",
   languages: ["en", "de"],
   expectedParameters: [
     {
@@ -25,17 +24,18 @@ const ExampleQuestion: QuestionGenerator = {
       allowedValues: ["addition", "subtraction"],
     },
   ],
-  generate: (lang, parameters, seed) => {
+  generate: (generatorPath, lang, parameters, seed) => {
     return {
       question: {
         path: serializeGeneratorCall({
-          generator: ExampleQuestion,
+          generator: TestQuestion,
           parameters,
           seed,
           lang,
+          generatorPath,
         }),
         type: "MultipleChoiceQuestion",
-        name: "Example Question",
+        name: "Test Question",
         text: "What is 1 + 1?",
         answers: ["1", "2", "3", "4"],
       },
@@ -46,36 +46,43 @@ const ExampleQuestion: QuestionGenerator = {
 const exampleRoutes: QuestionRoutes = [
   {
     path: "test/test",
-    generator: ExampleQuestion,
+    generator: TestQuestion,
   },
   {
     path: "asymptotics/sum",
-    generator: ExampleQuestion,
+    generator: TestQuestion,
   },
 ]
 
 test("serializeGeneratorCall", () => {
+
+  let generatorPath = exampleRoutes[0].path
+
   expect(
     serializeGeneratorCall({
-      generator: ExampleQuestion,
+      generator: TestQuestion,
+      generatorPath
     }),
   ).toBe("test/test")
   expect(
     serializeGeneratorCall({
-      generator: ExampleQuestion,
+      generator: TestQuestion,
+      generatorPath,
       parameters: { difficulty: 1, focus: "addition" },
     }),
   ).toBe("test/test/1/addition")
   expect(
     serializeGeneratorCall({
-      generator: ExampleQuestion,
+      generator: TestQuestion,
+      generatorPath,
       parameters: { difficulty: 1, focus: "addition" },
       seed: "myFancySeed",
     }),
   ).toBe("test/test/1/addition/myFancySeed")
   expect(
     serializeGeneratorCall({
-      generator: ExampleQuestion,
+      generator: TestQuestion,
+      generatorPath,
       parameters: { difficulty: 1, focus: "addition" },
       seed: "myFancySeed",
       lang: "de",
@@ -94,21 +101,21 @@ test("deserializePath", () => {
   let ret = deserializePath({ routes: exampleRoutes, path: "test/test" })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBeUndefined()
-  expect(ret!.generator).toBe(ExampleQuestion)
+  expect(ret!.generator).toBe(TestQuestion)
   expect(ret!.parameters).toBeUndefined()
   expect(ret!.seed).toBeUndefined()
 
   ret = deserializePath({ routes: exampleRoutes, path: "de/test/test" })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBe("de")
-  expect(ret!.generator).toBe(ExampleQuestion)
+  expect(ret!.generator).toBe(TestQuestion)
   expect(ret!.parameters).toBeUndefined()
   expect(ret!.seed).toBeUndefined()
 
   ret = deserializePath({ routes: exampleRoutes, path: "test/test/1/addition" })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBeUndefined()
-  expect(ret!.generator).toBe(ExampleQuestion)
+  expect(ret!.generator).toBe(TestQuestion)
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
   expect(ret!.seed).toBeUndefined()
 
@@ -118,7 +125,7 @@ test("deserializePath", () => {
   })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBeUndefined()
-  expect(ret!.generator).toBe(ExampleQuestion)
+  expect(ret!.generator).toBe(TestQuestion)
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
   expect(ret!.seed).toBe("myFancySeed")
 
@@ -128,7 +135,7 @@ test("deserializePath", () => {
   })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBe("de")
-  expect(ret!.generator).toBe(ExampleQuestion)
+  expect(ret!.generator).toBe(TestQuestion)
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
 
   ret = deserializePath({
@@ -137,7 +144,7 @@ test("deserializePath", () => {
   })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBe("en")
-  expect(ret!.generator).toBe(ExampleQuestion)
+  expect(ret!.generator).toBe(TestQuestion)
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
 })
 

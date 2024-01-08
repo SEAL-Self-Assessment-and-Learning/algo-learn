@@ -28,7 +28,7 @@ export function TestSimpleMC() {
   )
 
   if (!question) {
-    void Promise.resolve(ExampleQuestion.generate(lang, {}, seed)).then(
+    void Promise.resolve(ExampleQuestion.generate("example/example", lang, {}, seed)).then(
       setQuestion,
     )
     return <></>
