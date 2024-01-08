@@ -9,7 +9,7 @@ import {
   Question,
   questionToJSON,
 } from "../../../shared/src/api/QuestionGenerator"
-import { TestQuestion } from "../../../shared/src/question-generators/test/test"
+import { ExampleQuestion } from "../../../shared/src/question-generators/example/example"
 import Random from "../../../shared/src/utils/random"
 import { questionToTex } from "../../../shared/src/utils/toLatex"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
@@ -28,7 +28,7 @@ export function TestSimpleMC() {
   )
 
   if (!question) {
-    void Promise.resolve(TestQuestion.generate(lang, {}, seed)).then(
+    void Promise.resolve(ExampleQuestion.generate(lang, {}, seed)).then(
       setQuestion,
     )
     return <></>
