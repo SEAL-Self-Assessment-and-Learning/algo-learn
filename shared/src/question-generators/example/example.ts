@@ -23,7 +23,7 @@ const translations: Translations = {
 }
 
 /** This question generator generates a simple multiple choice question. */
-export const TestQuestion: QuestionGenerator = {
+export const ExampleQuestion: QuestionGenerator = {
   path: "test/test",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
@@ -33,6 +33,7 @@ export const TestQuestion: QuestionGenerator = {
   license: "MIT",
   link: "https://example.com",
   expectedParameters: [],
+
   /**
    * Generates a new SimpleMCTest question.
    *
@@ -52,25 +53,24 @@ export const TestQuestion: QuestionGenerator = {
       `$${correctAnswer + 1}$`,
       `$${correctAnswer - 1}$`,
     ]
-    for (let i = 0; i < 1000; i++) {
-      const c = random.int(4, 20)
-      if (answers.findIndex((a) => a === `$${c}$`) === -1) {
-        answers.push(`$${c}$`)
-        break
-      }
+
+    let c
+    do {
+      c = random.int(4, 20)
     }
+    while (answers.includes(`$${c}$`))
+    answers.push(`$${c}$`)
+
     random.shuffle(answers)
-    const correctAnswerIndex = answers.findIndex(
-      (a) => a === `$${correctAnswer}$`,
-    )
+    const correctAnswerIndex = answers.indexOf(`$${correctAnswer}$`)
 
     const { t } = tFunction(translations, lang)
 
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
-      name: TestQuestion.name(lang),
+      name: ExampleQuestion.name(lang),
       path: serializeGeneratorCall({
-        generator: TestQuestion,
+        generator: ExampleQuestion,
         lang,
         parameters,
         seed,
