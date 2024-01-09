@@ -30,19 +30,19 @@ export type TFunctionParameters = string[] | Readonly<Record<string, string>>
  *   {{name}}, {{age}}, etc.).
  * @returns The translated text
  */
-function t(
+export function t(
   translations: Translations | ReadonlyArray<Translations>,
   lang: Language,
   key: TKey,
   parameters?: TFunctionParameters,
 ): string
-function t(
+export function t(
   translations: DeepTranslations | ReadonlyArray<DeepTranslations>,
   lang: Language,
   key: TKey,
   parameters?: TFunctionParameters,
 ): string | string[]
-function t(
+export function t(
   translations: DeepTranslations | ReadonlyArray<DeepTranslations>,
   lang: Language,
   key: TKey,
@@ -53,7 +53,7 @@ function t(
   )
     ? translations
     : [translations]
-  const fallback: Language = lang == "en" ? "de" : "en"
+  const fallback: Language = lang === "en" ? "de" : "en"
   for (const l of [lang, fallback]) {
     for (const tr of translationsArray) {
       const trl = tr[l]
@@ -79,11 +79,11 @@ export function tFunctional(translations: Translations, key: string) {
 
 /**
  * Returns a t function that maps a key to a translation. The language is fixed
- * at the time of creation, the key can be changed.
+ * at the time of creation, the key (and parameters) can be changed.
  *
  * @param translations The translations to use
  * @param lang The language to translate to
- * @returns A function that maps a key to a translation
+ * @returns A function that maps a key (and parameters) to a translation
  */
 export function tFunction(
   translations: Translations | ReadonlyArray<Translations>,
