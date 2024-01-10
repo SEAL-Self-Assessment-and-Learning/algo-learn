@@ -5,14 +5,10 @@ import { format } from "./format"
 export type TKey = string
 
 /** Translation objects are not nested */
-export type Translations = Readonly<
-  Partial<Record<Language, Readonly<Record<TKey, string>>>>
->
+export type Translations = Readonly<Partial<Record<Language, Readonly<Record<TKey, string>>>>>
 
 /** DeepTranslation objects may contain strings or lists of strings */
-export type DeepTranslations = Readonly<
-  Partial<Record<Language, Readonly<Record<TKey, string | string[]>>>>
->
+export type DeepTranslations = Readonly<Partial<Record<Language, Readonly<Record<TKey, string | string[]>>>>>
 
 /** Type for optional parameters of the t function */
 export type TFunctionParameters = string[] | Readonly<Record<string, string>>
@@ -48,9 +44,7 @@ export function t(
   key: TKey,
   parameters?: TFunctionParameters,
 ): string | string[] {
-  const translationsArray: ReadonlyArray<DeepTranslations> = Array.isArray(
-    translations,
-  )
+  const translationsArray: ReadonlyArray<DeepTranslations> = Array.isArray(translations)
     ? translations
     : [translations]
   const fallback: Language = lang === "en" ? "de" : "en"
@@ -93,12 +87,8 @@ export function tFunction(
   translations: DeepTranslations | ReadonlyArray<DeepTranslations>,
   lang: Language,
 ): { t: (key: TKey, parameters?: TFunctionParameters) => string | string[] }
-export function tFunction(
-  translations: DeepTranslations | ReadonlyArray<DeepTranslations>,
-  lang: Language,
-) {
+export function tFunction(translations: DeepTranslations | ReadonlyArray<DeepTranslations>, lang: Language) {
   return {
-    t: (key: TKey, parameters?: TFunctionParameters) =>
-      t(translations, lang, key, parameters),
+    t: (key: TKey, parameters?: TFunctionParameters) => t(translations, lang, key, parameters),
   }
 }
