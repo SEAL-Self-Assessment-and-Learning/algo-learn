@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Language } from "../../../shared/src/api/Language"
 import { Parameters } from "../../../shared/src/api/Parameters"
-import {
-  Question,
-  QuestionGenerator,
-} from "../../../shared/src/api/QuestionGenerator"
+import { Question, QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
 
 /**
  * A hook to fetch a question from a question generator. This is useful in case the question generator returns a promise, e.g. because it needs to fetch data from a server.
@@ -24,7 +21,7 @@ export function useQuestion(
 ): { isLoading: true } | { isLoading: false; question: Question } {
   const questionPromise = useMemo(
     () => generator.generate(generatorPath, lang, parameters, seed),
-    [generator, lang, parameters, seed],
+    [generator, generatorPath, lang, parameters, seed],
   )
   const [question, setQuestion] = useState<Question | undefined>(
     questionPromise instanceof Promise ? undefined : questionPromise.question,
