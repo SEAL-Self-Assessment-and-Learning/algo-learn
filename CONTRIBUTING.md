@@ -6,9 +6,15 @@
 
 We use prettier with the given config file. Just run it before checking in or configure your IDE to run it on save.
 
-Variables, keys, etc. are named in camelCase.  
-Classes, Interfaces, Types, etc. are named in PascalCase.
+### Naming Conventions
 
+- Variables, keys, etc.: camelCase
+- Classes, Interfaces, Types, etc.: PascalCase
+- Folders: dash-case
+- Files
+  - Containing Types, Interfaces, etc.: PascalCase
+  - Other: camelCase
+  - Tests have the extension `.test.ts`
 
 ### Git Workflow
 
