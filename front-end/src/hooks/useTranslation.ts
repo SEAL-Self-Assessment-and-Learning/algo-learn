@@ -50,8 +50,8 @@ export function useTranslation(additionalTranslations?: Translations) {
   const translations: ReadonlyArray<Translations> = Array.isArray(additionalTranslations)
     ? [...additionalTranslations, globalTranslations]
     : additionalTranslations
-    ? [additionalTranslations, globalTranslations]
-    : [globalTranslations]
+      ? [additionalTranslations, globalTranslations]
+      : [globalTranslations]
   const t = tFunction(translations, lang).t
   return { t, lang, setLang, nextLang }
 }

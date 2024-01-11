@@ -1,8 +1,4 @@
 import "./tailwind.css"
-import "@fontsource/noto-sans/400-italic.css"
-import "@fontsource/noto-sans/400.css"
-import "@fontsource/noto-sans/700-italic.css"
-import "@fontsource/noto-sans/700.css"
 
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"

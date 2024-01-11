@@ -130,8 +130,8 @@ export function deserializePath({
   const lang: Language | undefined = !expectLang
     ? undefined
     : parts[0] === "de"
-    ? "de"
-    : "en"
+      ? "de"
+      : "en"
 
   if (lang !== undefined) {
     parts = parts.slice(1)

@@ -159,8 +159,8 @@ export function QuizSession({
   const status: "running" | "finished" | "aborted" = aborted
     ? "aborted"
     : num < questionVariants.length
-    ? "running"
-    : "finished"
+      ? "running"
+      : "finished"
 
   if (status === "aborted") {
     return (
@@ -217,8 +217,8 @@ export function QuizSession({
     numIncorrect == 0
       ? great
       : numCorrect / (numCorrect + numIncorrect) >= 0.75
-      ? good
-      : meh
+        ? good
+        : meh
   const msg = random.choice(msgList[lang])
   return (
     <ScreenCenteredDiv>

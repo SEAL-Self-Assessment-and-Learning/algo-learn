@@ -19,10 +19,6 @@
     @apply text-lg font-bold;
   }
 
-  body {
-    font-family: "Noto Sans", sans-serif;
-  }
-
   .btn {
     @apply inline-block whitespace-nowrap rounded-lg px-4 py-2 font-bold shadow-lg;
   }

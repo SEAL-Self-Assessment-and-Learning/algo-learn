@@ -234,8 +234,11 @@ export function sampleMasterRecursion(random: Random) {
       a === 1
         ? random.choice([random.int(1, 2), new Fraction(1, random.int(2, 3))])
         : log(a, b) < 1
-        ? new Fraction(random.int(1, 3), Math.max(Math.round(log(b, a)) - 1, 1))
-        : log(a, b) + 1
+          ? new Fraction(
+              random.int(1, 3),
+              Math.max(Math.round(log(b, a)) - 1, 1),
+            )
+          : log(a, b) + 1
     c = createProductTerm({
       coefficient: coefficient,
       polyexponent: polyexponent,
@@ -281,13 +284,13 @@ export function sampleMasterRecursionAnswers({
     return log(a, b) === 0
       ? "1"
       : log(a, b) === 1
-      ? "n"
-      : log(a, b) >= 1
-      ? `n^${Math.round(log(a, b))}`
-      : createProductTerm({
-          coefficient: 1,
-          polyexponent: new Fraction(1, Math.round(log(b, a))),
-        }).toLatex("n")
+        ? "n"
+        : log(a, b) >= 1
+          ? `n^${Math.round(log(a, b))}`
+          : createProductTerm({
+              coefficient: 1,
+              polyexponent: new Fraction(1, Math.round(log(b, a))),
+            }).toLatex("n")
   }
   answers.push({
     key: "1",
@@ -308,19 +311,19 @@ export function sampleMasterRecursionAnswers({
       log(a, b) === 0
         ? "n"
         : log(a, b) === 1
-        ? "n^2"
-        : log(a, b) >= 1
-        ? createProductTerm({
-            coefficient: 1,
-            polyexponent: Math.round(log(a, b)) + random.choice([-1, 1]),
-          }).toLatex("n")
-        : createProductTerm({
-            coefficient: 1,
-            polyexponent: new Fraction(
-              random.int(1, 2),
-              Math.round(log(b, a)) + random.choice([-1, 1]),
-            ),
-          }).toLatex("n")
+          ? "n^2"
+          : log(a, b) >= 1
+            ? createProductTerm({
+                coefficient: 1,
+                polyexponent: Math.round(log(a, b)) + random.choice([-1, 1]),
+              }).toLatex("n")
+            : createProductTerm({
+                coefficient: 1,
+                polyexponent: new Fraction(
+                  random.int(1, 2),
+                  Math.round(log(b, a)) + random.choice([-1, 1]),
+                ),
+              }).toLatex("n")
   }
   answers.push({
     key: "3",

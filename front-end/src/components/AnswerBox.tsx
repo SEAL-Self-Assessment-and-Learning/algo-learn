@@ -47,10 +47,10 @@ export function AnswerBox({
         ? "goethe"
         : "gray"
       : checked
-      ? correct
-        ? "green"
-        : "red"
-      : "gray"
+        ? correct
+          ? "green"
+          : "red"
+        : "gray"
   return (
     <TagName
       {...props}
