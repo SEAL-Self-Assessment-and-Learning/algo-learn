@@ -22,7 +22,7 @@ curl -fsSL https://bun.sh/install | bash
 Once bun is installed, you can download and install the project's dependencies:
 
 ```bash
-bun install
+bun install --frozen-lockfile
 ```
 
 The following command will start a local HTTP server for development:
