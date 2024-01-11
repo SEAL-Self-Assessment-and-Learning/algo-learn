@@ -1,17 +1,44 @@
 import { QuestionGenerator } from "../../api/QuestionGenerator"
 import { tFunctional } from "../../utils/translations"
 import {
-  BasicMCQuestion,
-  PreciseLanguageMeta,
-} from "../meta/PreciseLanguageMeta"
+  BasicMultipleChoiceQuestion,
+  basicMultipleChoiceMetaGenerator,
+} from "../../api/BasicMultipleChoiceQuestion"
+import { Language } from "../../api/Language"
+import { Translations } from "../../utils/translations"
 
-const questions: BasicMCQuestion[] = [
+const questionFrameTranslations: Translations = {
+  en: {
+    consider: "Consider the following sentence:",
+    what: "What do we know now?",
+  },
+  de: {
+    consider: "Betrachte den folgenden Satz:",
+    what: "Was wissen wir jetzt?",
+  },
+}
+
+function addQuestionFrame(lang: Language, question: string): string {
+  const trl = questionFrameTranslations[lang]
+  if (trl === undefined) throw new Error(`No translation for language ${lang}`)
+
+  return `
+${trl.consider}
+
+> ${question}
+
+${trl.what}
+`
+}
+
+const questions: BasicMultipleChoiceQuestion[] = [
   {
     ////////////////////////////////////////////
     parameters: {
       m: "mnktpqxyMNKTQPXY",
       n: "mnktpqxyMNKTQPXY",
     },
+    frame: addQuestionFrame,
     translations: {
       en: {
         text: "Let ${{m}}$ and ${{n}}$ be integers such that $0 < {{m}} < {{n}}$ holds.",
@@ -49,6 +76,7 @@ const questions: BasicMCQuestion[] = [
       x: "xyznXYZN",
       S: "STUVWXY",
     },
+    frame: addQuestionFrame,
     translations: {
       en: {
         text: "Let ${{x}}$ be an element of a set ${{S}}$ such that ${{S}}$ is a subset of the integers and ${{x}} > 0$.",
@@ -90,6 +118,7 @@ const questions: BasicMCQuestion[] = [
       x: "xyznXYZN",
       y: "xyznXYZN",
     },
+    frame: addQuestionFrame,
     translations: {
       en: {
         text: "Let ${{x}}$ be an even integer between $5$ and $9$, and let ${{y}}={{x}}/2$.",
@@ -134,6 +163,7 @@ const questions: BasicMCQuestion[] = [
       B: "ABCDSTUVW",
       y: "abcdxyznmktspqr",
     },
+    frame: addQuestionFrame,
     translations: {
       en: {
         text: "Let ${{A}}$ and ${{B}}$ be two sets such that every element of ${{A}}$ is also an element of ${{B}}$. Let ${{y}}$ be an element of ${{A}}$.",
@@ -169,12 +199,12 @@ const questions: BasicMCQuestion[] = [
   },
 ]
 
-const translations = {
+const titleTranslations = {
   en: { title: "Precise mathematical phrasing" },
   de: { title: "Präzise mathematische Ausdrucksweise" },
 }
 
-export const MathPreciseLanguage: QuestionGenerator = PreciseLanguageMeta(
-  tFunctional(translations, "title"),
+export const MathPreciseLanguage: QuestionGenerator = basicMultipleChoiceMetaGenerator(
+  tFunctional(titleTranslations, "title"),
   questions,
 )
