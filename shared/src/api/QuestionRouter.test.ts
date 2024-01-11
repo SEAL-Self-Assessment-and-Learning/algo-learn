@@ -1,12 +1,7 @@
 import { expect, test } from "vitest"
 
 import { QuestionGenerator } from "./QuestionGenerator"
-import {
-  deserializePath,
-  isSubPath,
-  QuestionRoutes,
-  serializeGeneratorCall,
-} from "./QuestionRouter"
+import { deserializePath, isSubPath, QuestionRoutes, serializeGeneratorCall } from "./QuestionRouter"
 
 const TestQuestion: QuestionGenerator = {
   name: () => "Test Question",
@@ -55,13 +50,12 @@ const exampleRoutes: QuestionRoutes = [
 ]
 
 test("serializeGeneratorCall", () => {
-
-  let generatorPath = exampleRoutes[0].path
+  const generatorPath = exampleRoutes[0].path
 
   expect(
     serializeGeneratorCall({
       generator: TestQuestion,
-      generatorPath
+      generatorPath,
     }),
   ).toBe("test/test")
   expect(
@@ -91,12 +85,8 @@ test("serializeGeneratorCall", () => {
 })
 
 test("deserializePath", () => {
-  expect(
-    deserializePath({ routes: exampleRoutes, path: "test/dqopijjifwejipfw" }),
-  ).toBeUndefined()
-  expect(
-    deserializePath({ routes: exampleRoutes, path: "dkdkd/test/test" }),
-  ).toBeUndefined()
+  expect(deserializePath({ routes: exampleRoutes, path: "test/dqopijjifwejipfw" })).toBeUndefined()
+  expect(deserializePath({ routes: exampleRoutes, path: "dkdkd/test/test" })).toBeUndefined()
 
   let ret = deserializePath({ routes: exampleRoutes, path: "test/test" })
   expect(ret).toBeDefined()
