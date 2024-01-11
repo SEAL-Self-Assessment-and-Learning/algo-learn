@@ -1,18 +1,10 @@
-import { Language } from "../../api/Language"
-import {
-  ExpectedParameters,
-  Parameters,
-  validateParameters,
-} from "../../api/Parameters"
-import {
-  minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-  QuestionGenerator,
-} from "../../api/QuestionGenerator"
-import { serializeGeneratorCall } from "../../api/QuestionRouter"
-import { format } from "../../utils/format"
-import Random from "../../utils/random"
-import { DeepTranslations, Translations } from "../../utils/translations"
+import { Language } from "./Language"
+import { ExpectedParameters, Parameters, validateParameters } from "./Parameters"
+import { minimalMultipleChoiceFeedback, MultipleChoiceQuestion, QuestionGenerator } from "./QuestionGenerator"
+import { serializeGeneratorCall } from "./QuestionRouter"
+import { format } from "../utils/format"
+import Random from "../utils/random"
+import { DeepTranslations } from "../utils/translations"
 
 /**
  * Interface for "basic" Multiple-Choice Questions. These are fairly static,
@@ -20,7 +12,7 @@ import { DeepTranslations, Translations } from "../../utils/translations"
  * random string (usually variable and function names) and to shuffle the
  * answers.
  */
-export interface BasicMCQuestion {
+export interface BasicMultipleChoiceQuestion {
   /**
    * Optionally, we can declare parameters that are replaced with random
    * strings, for example, "{{var}}" could be replaced with "x", "y", or "z".
@@ -40,40 +32,46 @@ export interface BasicMCQuestion {
   parameters?: Record<string, string | string[]>
 
   /**
+   * Is invoked to add a frame around the question that could be similar to several questions.
+   * If provided, make sure frame() provides all languages the questions support.
+   * @param lang
+   * @param question
+   * @returns
+   */
+  frame?: (lang: Language, question: string) => string
+
+  /**
    * Provides translations for the question text as well as for the correct and
    * wrong answers.
    */
   translations: DeepTranslations &
-    Partial<
-      Record<
-        Language,
-        { text: string; correctAnswers: string[]; wrongAnswers: string[] }
-      >
-    >
+    Partial<Record<Language, { text: string; correctAnswers: string[]; wrongAnswers: string[] }>>
 }
 
-const translations: Translations = {
-  en: {
-    consider: "Consider the following sentence:",
-    what: "What do we know now?",
-  },
-  de: {
-    consider: "Betrachte den folgenden Satz:",
-    what: "Was wissen wir jetzt?",
-  },
+function getValidLanguage(lang: Language, translations: DeepTranslations): Language | undefined {
+  console.log(translations)
+  for (const l of [lang, "en", "de"]) {
+    console.log(l)
+    if (translations[l as Language] !== undefined) {
+      console.log(" -> ", l)
+      return l as Language
+    }
+  }
+
+  return undefined
 }
 
 /**
- * Generate and render a question formal mathematical language
+ * Given a name function and a set of BasicMultipleChoiceQuestions,
+ * the function returns a QuestionGenerator for the set of questions.
  *
- * @param generatorPath The path to the question
  * @param name The title of the question
  * @param questions The questions to ask
- * @returns The question as a Question object
+ * @returns The question as a QuestionGenerator object
  */
-export function PreciseLanguageMeta(
+export function basicMultipleChoiceMetaGenerator(
   name: (lang: Language) => string,
-  questions: BasicMCQuestion[],
+  questions: BasicMultipleChoiceQuestion[],
 ): QuestionGenerator {
   const variants = questions.map((_, i) => i)
   const languages = Object.keys(questions[0].translations) as Language[]
@@ -92,9 +90,7 @@ export function PreciseLanguageMeta(
   function generate(generatorPath: string, lang: Language, parameters: Parameters, seed: string) {
     if (!validateParameters(parameters, expectedParameters)) {
       throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${variants.join(
-          ", ",
-        )}`,
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${variants.join(", ")}`,
       )
     }
     const i = parameters.number as number
@@ -116,15 +112,13 @@ export function PreciseLanguageMeta(
       })
     }
 
-    const ownt =
-      questions[i].translations[lang] ??
-      questions[i].translations["en"] ??
-      questions[i].translations["de"]
-    if (ownt === undefined) {
-      throw new Error(
-        `No translation for language ${lang} in question ${name(lang)}`,
-      )
+    const l = getValidLanguage(lang, questions[i].translations)
+    if (l === undefined) {
+      throw new Error(`testNo translation for language ${lang} in question ${name(lang)}`)
     }
+
+    const ownt = questions[i].translations[l]!
+
     const numCorrect = ownt.correctAnswers.length
     const answers = ownt.correctAnswers
       .map((a: string, index: number) => ({
@@ -142,23 +136,14 @@ export function PreciseLanguageMeta(
 
     random.shuffle(answers)
 
-    const trl = translations[lang] ?? translations["en"] ?? translations["de"]
-    if (trl === undefined) {
-      throw new Error(`No translation for language ${lang}`)
-    }
-    const markdown = `
-${trl["consider"]}
+    const markdown = questions[i].frame === undefined ? ownt["text"] : questions[i].frame!(l, ownt["text"])
 
-> ${format(ownt["text"], p)}
-
-${trl["what"]}
-`
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
       name: name(lang),
       path: serializeGeneratorCall({ generator, lang, parameters, seed, generatorPath }),
       answers: answers.map(({ element }) => element),
-      text: markdown,
+      text: format(markdown, p),
       allowMultiple: true,
       feedback: minimalMultipleChoiceFeedback({
         correctAnswerIndex: answers
@@ -169,11 +154,13 @@ ${trl["what"]}
     }
     return { question }
   }
+
   const generator: QuestionGenerator = {
     name,
     languages,
     expectedParameters,
     generate,
   }
+
   return generator
 }

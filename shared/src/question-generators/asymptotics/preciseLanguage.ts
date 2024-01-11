@@ -1,11 +1,37 @@
+import { Language } from "../../api/Language"
 import { QuestionGenerator } from "../../api/QuestionGenerator"
 import { tFunctional } from "../../utils/translations"
 import {
-  BasicMCQuestion,
-  PreciseLanguageMeta,
-} from "../meta/PreciseLanguageMeta"
+  BasicMultipleChoiceQuestion,
+  basicMultipleChoiceMetaGenerator,
+} from "../../api/BasicMultipleChoiceQuestion"
+import { Translations } from "../../utils/translations"
 
-const questions: BasicMCQuestion[] = [
+const questionFrameTranslations: Translations = {
+  en: {
+    consider: "Consider the following sentence:",
+    what: "What do we know now?",
+  },
+  de: {
+    consider: "Betrachte den folgenden Satz:",
+    what: "Was wissen wir jetzt?",
+  },
+}
+
+function addQuestionFrame(lang: Language, question: string): string {
+  const trl = questionFrameTranslations[lang]
+  if (trl === undefined) throw new Error(`No translation for language ${lang}`)
+
+  return `
+${trl.consider}
+
+> ${question}
+
+${trl.what}
+`
+}
+
+const questions: BasicMultipleChoiceQuestion[] = [
   {
     ////////////////////////////////////////////
     parameters: {
@@ -13,9 +39,10 @@ const questions: BasicMCQuestion[] = [
       g: "fgh",
       n: "mnktpqxyMNKTQPXY",
     },
+    frame: addQuestionFrame,
     translations: {
       en: {
-        text: "Let ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ be functions with ${{f}}({{n}}) = O({{g}}({{n}}))$.",
+        text: "Let ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ be functions with ${{f}}({{n}}) = \\mathcal{O}({{g}}({{n}}))$.",
         correctAnswers: [
           "As ${{n}}$ grows large, the upper bound on ${{f}}({{n}})$ is at most a constant times ${{g}}({{n}})$",
         ],
@@ -27,7 +54,7 @@ const questions: BasicMCQuestion[] = [
         ],
       },
       de: {
-        text: "Seien ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ Funktionen mit ${{f}}({{n}}) = O({{g}}({{n}}))$.",
+        text: "Seien ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ Funktionen mit ${{f}}({{n}}) = \\mathcal{O}({{g}}({{n}}))$.",
         correctAnswers: [
           "Wenn ${{n}}$ groß wird, ist ${{f}}({{n}})$ höchstens so groß wie ein konstantes Vielfaches von ${{g}}({{n}})$",
         ],
@@ -45,9 +72,10 @@ const questions: BasicMCQuestion[] = [
     parameters: {
       n: "mnktpqxyMN",
     },
+    frame: addQuestionFrame,
     translations: {
       en: {
-        text: "The algorithm operates in $O({{n}} \\log {{n}})$ time complexity.",
+        text: "The algorithm operates in $\\mathcal{O}({{n}} \\log {{n}})$ time complexity.",
         correctAnswers: [
           "As ${{n}}$ grows, the algorithm's running time grows in the order of ${{n}}$ times the logarithm of ${{n}}$",
         ],
@@ -60,7 +88,7 @@ const questions: BasicMCQuestion[] = [
         ],
       },
       de: {
-        text: "Der Algorithmus arbeitet mit einer Zeitkomplexität von $O({{n}} \\log {{n}})$.",
+        text: "Der Algorithmus arbeitet mit einer Zeitkomplexität von $\\mathcal{O}({{n}} \\log {{n}})$.",
         correctAnswers: [
           "Mit zunehmendem ${{n}}$ wächst die Laufzeit des Algorithmus in der Größenordnung von ${{n}}$ mal dem Logarithmus von ${{n}}$",
         ],
@@ -81,6 +109,7 @@ const questions: BasicMCQuestion[] = [
       g: "fgh",
       n: "mnktpqxyMNKTQPXY",
     },
+    frame: addQuestionFrame,
     translations: {
       en: {
         text: "Let ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ be functions with ${{f}}({{n}}) = \\Omega({{g}}({{n}}))$.",
@@ -115,6 +144,7 @@ const questions: BasicMCQuestion[] = [
       g: "fgh",
       n: "mnktpqxyMNKTQPXY",
     },
+    frame: addQuestionFrame,
     translations: {
       en: {
         text: "Let ${{f}},{{g}}\\colon\\mathbb{N}\\to\\mathbb{N}$ be functions with ${{f}}({{n}}) = \\Theta({{g}}({{n}}))$.",
@@ -147,9 +177,10 @@ const questions: BasicMCQuestion[] = [
     parameters: {
       n: "mnktpqxyMNKTQPXY",
     },
+    frame: addQuestionFrame,
     translations: {
       en: {
-        text: "An algorithm has a best-case running time of $O(1)$ and a worst-case running time of $O({{n}}^2)$.",
+        text: "An algorithm has a best-case running time of $\\mathcal{O}(1)$ and a worst-case running time of $\\mathcal{O}({{n}}^2)$.",
         correctAnswers: [
           "In the best case scenario, the running time of the algorithm is constant",
           "In the best case scenario, the running time of the algorithm is at most linear with respect to {{n}}",
@@ -158,11 +189,11 @@ const questions: BasicMCQuestion[] = [
         wrongAnswers: [
           "In the best case scenario, the running time of the algorithm grows linearly with {{n}}",
           "In the worst case scenario, the running time of the algorithm is exactly quadratic with respect to {{n}}",
-          "The average running time of the algorithm is $O({{n}})$",
+          "The average running time of the algorithm is $\\mathcal{O}({{n}})$",
         ],
       },
       de: {
-        text: "Ein Algorithmus hat eine *best-case* Laufzeit von $O(1)$ und eine *worst-case* Laufzeit von $O({{n}}^2)$.",
+        text: "Ein Algorithmus hat eine *best-case* Laufzeit von $\\mathcal{O}(1)$ und eine *worst-case* Laufzeit von $\\mathcal{O}({{n}}^2)$.",
         correctAnswers: [
           "Im besten Fall hat der Algorithmus konstante Laufzeit",
           "Im besten Fall ist die Laufzeit des Algorithmus höchstens linear in {{n}}",
@@ -171,7 +202,7 @@ const questions: BasicMCQuestion[] = [
         wrongAnswers: [
           "Im besten Fall ist die Laufzeit des Algorithmus mindestens linear in {{n}}",
           "Im schlimmsten Fall ist die Laufzeit des Algorithmus genau quadratisch in {{n}}",
-          "Die durchschnittliche Laufzeit des Algorithmus ist $O({{n}})$",
+          "Die durchschnittliche Laufzeit des Algorithmus ist $\\mathcal{O}({{n}})$",
         ],
       },
     },
@@ -182,6 +213,7 @@ const questions: BasicMCQuestion[] = [
     parameters: {
       n: "mnktpqxyMNKTQPXY",
     },
+    frame: addQuestionFrame,
     translations: {
       en: {
         text: "An algorithm has a best-case running time of $\\Omega(1)$ and a worst-case running time of $\\Theta({{n}}^2)$.",
@@ -193,7 +225,7 @@ const questions: BasicMCQuestion[] = [
         wrongAnswers: [
           "In the best case scenario, the running time of the algorithm is constant",
           "In the best case scenario, the running time of the algorithm grows linearly with {{n}}",
-          "The average running time of the algorithm is $O({{n}})$",
+          "The average running time of the algorithm is $\\mathcal{O}({{n}})$",
         ],
       },
       de: {
@@ -206,20 +238,19 @@ const questions: BasicMCQuestion[] = [
         wrongAnswers: [
           "Im besten Fall hat der Algorithmus konstante Laufzeit",
           "Im besten Fall wächst die Laufzeit des Algorithmus linear mit {{n}}",
-          "Die durchschnittliche Laufzeit des Algorithmus ist $O({{n}})$",
+          "Die durchschnittliche Laufzeit des Algorithmus ist $\\mathcal{O}({{n}})$",
         ],
       },
     },
   },
 ]
 
-const translations = {
+const titleTranslations = {
   en: { title: "Precise phrasing: Oh-Notation" },
   de: { title: "Präzises Formulieren: Oh-Notation" },
 }
 
-export const AsymptoticsPreciseLanguage: QuestionGenerator =
-  PreciseLanguageMeta(
-    tFunctional(translations, "title"),
-    questions,
-  )
+export const AsymptoticsPreciseLanguage: QuestionGenerator = basicMultipleChoiceMetaGenerator(
+  tFunctional(titleTranslations, "title"),
+  questions,
+)
