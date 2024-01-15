@@ -5,6 +5,7 @@ docs
 vite-bundle-visualizer.html
 .npm-packages
 .pnp.*
+.vscode/*
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
