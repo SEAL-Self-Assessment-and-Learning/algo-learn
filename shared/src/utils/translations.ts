@@ -92,3 +92,21 @@ export function tFunction(translations: DeepTranslations | ReadonlyArray<DeepTra
     t: (key: TKey, parameters?: TFunctionParameters) => t(translations, lang, key, parameters),
   }
 }
+
+/**
+ * Checks if lang is supported by translations. If not it try the fallback languages "en" and "de" (in that order).
+ * Throws an error if no supported language is found.
+
+ * @param lang
+ * @param translations
+ * @returns A Language supported by the given translations object.
+ */
+export function getValidLanguage(lang: Language, translations: DeepTranslations): keyof typeof translations {
+  for (const l of [lang, "en", "de"] as Language[]) {
+    if (translations[l] !== undefined) {
+      return l
+    }
+  }
+
+  throw new Error(`No translation for language ${lang} and no valid fallback.`)
+}
