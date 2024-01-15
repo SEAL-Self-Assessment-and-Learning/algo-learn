@@ -1,11 +1,10 @@
 import { QuestionGenerator } from "../../api/QuestionGenerator"
-import { tFunctional } from "../../utils/translations"
+import { tFunctional, t, Translations } from "../../utils/translations"
 import {
   BasicMultipleChoiceQuestion,
   basicMultipleChoiceMetaGenerator,
 } from "../../api/BasicMultipleChoiceQuestion"
 import { Language } from "../../api/Language"
-import { Translations } from "../../utils/translations"
 
 const questionFrameTranslations: Translations = {
   en: {
@@ -19,15 +18,12 @@ const questionFrameTranslations: Translations = {
 }
 
 function addQuestionFrame(lang: Language, question: string): string {
-  const trl = questionFrameTranslations[lang]
-  if (trl === undefined) throw new Error(`No translation for language ${lang}`)
-
   return `
-${trl.consider}
+${t(questionFrameTranslations, lang, "consider")}
 
 > ${question}
 
-${trl.what}
+${t(questionFrameTranslations, lang, "what")}
 `
 }
 

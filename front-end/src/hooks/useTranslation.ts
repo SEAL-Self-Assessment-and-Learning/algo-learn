@@ -14,8 +14,8 @@ export const NATIVE_NAME: Readonly<Record<Language, string>> = {
 }
 
 const globalTranslations: Translations = {
-  en: Object.assign({}, enJSON, enQuestionGroupJSON),
-  de: Object.assign({}, deJSON, deQuestionGroupJSON),
+  en: { ...enJSON, ...enQuestionGroupJSON },
+  de: { ...deJSON, ...deQuestionGroupJSON },
 }
 
 /**

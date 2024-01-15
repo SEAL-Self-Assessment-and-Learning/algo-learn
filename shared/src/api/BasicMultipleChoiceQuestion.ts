@@ -4,7 +4,7 @@ import { minimalMultipleChoiceFeedback, MultipleChoiceQuestion, QuestionGenerato
 import { serializeGeneratorCall } from "./QuestionRouter"
 import { format } from "../utils/format"
 import Random from "../utils/random"
-import { DeepTranslations } from "../utils/translations"
+import { getValidLanguage, DeepTranslations } from "../utils/translations"
 
 /**
  * Interface for "basic" Multiple-Choice Questions. These are fairly static,
@@ -46,19 +46,6 @@ export interface BasicMultipleChoiceQuestion {
    */
   translations: DeepTranslations &
     Partial<Record<Language, { text: string; correctAnswers: string[]; wrongAnswers: string[] }>>
-}
-
-function getValidLanguage(lang: Language, translations: DeepTranslations): Language | undefined {
-  console.log(translations)
-  for (const l of [lang, "en", "de"]) {
-    console.log(l)
-    if (translations[l as Language] !== undefined) {
-      console.log(" -> ", l)
-      return l as Language
-    }
-  }
-
-  return undefined
 }
 
 /**
@@ -113,10 +100,6 @@ export function basicMultipleChoiceMetaGenerator(
     }
 
     const l = getValidLanguage(lang, questions[i].translations)
-    if (l === undefined) {
-      throw new Error(`testNo translation for language ${lang} in question ${name(lang)}`)
-    }
-
     const ownt = questions[i].translations[l]!
 
     const numCorrect = ownt.correctAnswers.length

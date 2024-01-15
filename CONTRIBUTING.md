@@ -22,6 +22,8 @@ New features should be developed in extra branches named `feat*`. These branches
 
 Bigger refactorings should be discussed first.
 
+Please write meaningful commit messages. Commit messages can also have more than just a short title if needed.
+
 ## Writing generators
 
 Question generators are located in `shared/src/question-generators`.
