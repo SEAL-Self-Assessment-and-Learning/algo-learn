@@ -4,7 +4,7 @@
  */
 import { QuestionRoutes } from "../shared/src/api/QuestionRouter"
 
-import { ExampleQuestion } from "../shared/src/question-generators/example/example"
+// import { ExampleQuestion } from "../shared/src/question-generators/example/example"
 import { Between } from "../shared/src/question-generators/asymptotics/between"
 import { LandauNotation } from "../shared/src/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "../shared/src/question-generators/asymptotics/preciseLanguage"
@@ -16,10 +16,10 @@ import { Loops } from "../shared/src/question-generators/time/loops"
 
 /** List of all question routes */
 export const allQuestionGeneratorRoutes: QuestionRoutes = [
-  {
-    path: "example/example",
-    generator: ExampleQuestion,
-  },
+  // {
+  //   path: "example/example",
+  //   generator: ExampleQuestion,
+  // },
   {
     path: "asymptotics/precise-language",
     generator: AsymptoticsPreciseLanguage,
