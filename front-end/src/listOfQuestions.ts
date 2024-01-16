@@ -26,7 +26,11 @@ for (const { path: route } of allQuestionGeneratorRoutes) {
 export function generatorSetBelowPath(
   path: string,
   generatorRoutes = allQuestionGeneratorRoutes,
-): Array<{ generator: QuestionGenerator; generatorPath: string; parameters: Parameters }> {
+): Array<{
+  generator: QuestionGenerator
+  generatorPath: string
+  parameters: Parameters
+}> {
   const set = []
   for (const { path: generatorPath, generator } of generatorRoutes) {
     if (isSubPath(path, generatorPath)) {

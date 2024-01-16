@@ -250,7 +250,8 @@ const titleTranslations = {
   de: { title: "Präzises Formulieren: Oh-Notation" },
 }
 
-export const AsymptoticsPreciseLanguage: QuestionGenerator = basicMultipleChoiceMetaGenerator(
-  tFunctional(titleTranslations, "title"),
-  questions,
-)
+export const AsymptoticsPreciseLanguage: QuestionGenerator =
+  basicMultipleChoiceMetaGenerator(
+    tFunctional(titleTranslations, "title"),
+    questions,
+  )

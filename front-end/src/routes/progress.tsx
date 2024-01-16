@@ -161,7 +161,7 @@ function LogTableRow({ entry }: { entry: LogEntryV1 }) {
             generator,
             parameters,
             seed,
-            generatorPath
+            generatorPath,
           })}`}
         >
           view
@@ -271,7 +271,11 @@ function QuestionTableRow({
   onMouseOut?: () => void
 }) {
   const { lang } = useTranslation()
-  const generatorCallPath = serializeGeneratorCall({ generator, generatorPath, parameters })
+  const generatorCallPath = serializeGeneratorCall({
+    generator,
+    generatorPath,
+    parameters,
+  })
   const id =
     generatorCallPath.replaceAll("/", "-") +
     (parameters === undefined ? "-coarse" : "")

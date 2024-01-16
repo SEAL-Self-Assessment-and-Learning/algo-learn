@@ -200,7 +200,8 @@ const titleTranslations = {
   de: { title: "Präzise mathematische Ausdrucksweise" },
 }
 
-export const MathPreciseLanguage: QuestionGenerator = basicMultipleChoiceMetaGenerator(
-  tFunctional(titleTranslations, "title"),
-  questions,
-)
+export const MathPreciseLanguage: QuestionGenerator =
+  basicMultipleChoiceMetaGenerator(
+    tFunctional(titleTranslations, "title"),
+    questions,
+  )
