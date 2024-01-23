@@ -1,0 +1,226 @@
+import { describe, expect, test } from "vitest"
+import {
+  associativeOperators,
+  Operator,
+  Literal,
+  BinaryOperatorType,
+  PropositionalLogicParser,
+  ParserError,
+} from "./propositionalLogic"
+
+const v = [new Literal("x_1"), new Literal("x_2"), new Literal("x_3")]
+const not_v = [new Literal("x_1", true), new Literal("x_2", true), new Literal("x_3", true)]
+
+describe("operators", () => {
+  test("not", () => {
+    const expression = not_v[0]
+    expect(expression.eval({ x_1: false })).toStrictEqual(true)
+    expect(expression.eval({ x_1: true })).toStrictEqual(false)
+  })
+
+  test("and", () => {
+    const expression = new Operator("\\and", v[0], v[1])
+    expect(expression.eval({ x_1: false, x_2: false })).toStrictEqual(false)
+    expect(expression.eval({ x_1: false, x_2: true })).toStrictEqual(false)
+    expect(expression.eval({ x_1: true, x_2: false })).toStrictEqual(false)
+    expect(expression.eval({ x_1: true, x_2: true })).toStrictEqual(true)
+  })
+
+  test("or", () => {
+    const expression = new Operator("\\or", v[0], v[1])
+    expect(expression.eval({ x_1: false, x_2: false })).toStrictEqual(false)
+    expect(expression.eval({ x_1: false, x_2: true })).toStrictEqual(true)
+    expect(expression.eval({ x_1: true, x_2: false })).toStrictEqual(true)
+    expect(expression.eval({ x_1: true, x_2: true })).toStrictEqual(true)
+  })
+
+  test("xor", () => {
+    const expression = new Operator("\\xor", v[0], v[1])
+    expect(expression.eval({ x_1: false, x_2: false })).toStrictEqual(false)
+    expect(expression.eval({ x_1: false, x_2: true })).toStrictEqual(true)
+    expect(expression.eval({ x_1: true, x_2: false })).toStrictEqual(true)
+    expect(expression.eval({ x_1: true, x_2: true })).toStrictEqual(false)
+  })
+
+  test("implication", () => {
+    const expression = new Operator("=>", v[0], v[1])
+    expect(expression.eval({ x_1: false, x_2: false })).toStrictEqual(true)
+    expect(expression.eval({ x_1: false, x_2: true })).toStrictEqual(true)
+    expect(expression.eval({ x_1: true, x_2: false })).toStrictEqual(false)
+    expect(expression.eval({ x_1: true, x_2: true })).toStrictEqual(true)
+  })
+
+  test("equality", () => {
+    const expression = new Operator("<=>", v[0], v[1])
+    expect(expression.eval({ x_1: false, x_2: false })).toStrictEqual(true)
+    expect(expression.eval({ x_1: false, x_2: true })).toStrictEqual(false)
+    expect(expression.eval({ x_1: true, x_2: false })).toStrictEqual(false)
+    expect(expression.eval({ x_1: true, x_2: true })).toStrictEqual(true)
+  })
+})
+
+test("eval", () => {
+  const expression = new Operator("\\and", new Operator("\\and", v[0], v[1]), not_v[2])
+  expect(expression.eval({ x_1: true, x_2: true, x_3: true })).toEqual(false)
+  expect(expression.eval({ x_1: true, x_2: true, x_3: false })).toEqual(true)
+})
+
+describe("toString", () => {
+  test("basic", () => {
+    expect(v[0].toString()).toBe("x_1")
+
+    const expression = new Operator("\\and", new Operator("\\or", v[0], v[1]), not_v[2])
+    expect(expression.toString()).toBe("(x_1 \\or x_2) \\and \\not x_3")
+  })
+
+  describe("no unnecessary parenthesis", () => {
+    for (const x of associativeOperators) {
+      test(x, () => {
+        const expression = new Operator(x, new Operator(x, v[0], v[1]), not_v[2])
+        expect(expression.toString()).toBe(`x_1 ${x} x_2 ${x} \\not x_3`)
+      })
+    }
+  })
+})
+
+test("variable names", () => {
+  const expression = new Operator("=>", new Operator("\\xor", v[1], not_v[0]), v[0])
+  const variableNames = expression.getVariableNames()
+
+  expect(variableNames).toEqual([v[0].name, v[1].name])
+  expect(variableNames.length).toEqual(2)
+})
+
+test("truth table", () => {
+  const expression = new Operator("\\xor", v[0], v[1])
+  const { truthTable } = expression.getTruthTable()
+  expect(Object.keys(truthTable).length).toEqual(4)
+  expect(truthTable).toEqual([false, true, true, false])
+})
+
+describe("normal forms", () => {
+  test("literals", () => {
+    expect(v[0].isDisjunction()).toEqual(true)
+    expect(v[0].isCNF()).toEqual(true)
+    expect(not_v[0].isDisjunction()).toEqual(true)
+    expect(not_v[0].isCNF()).toEqual(true)
+  })
+
+  describe("CNF", () => {
+    const disjunction = new Operator("\\or", new Operator("\\or", v[0], not_v[2]), v[1])
+    const cnf = new Operator("\\and", disjunction, disjunction)
+    test("single disjunction", () => {
+      expect(disjunction.isDisjunction()).toEqual(true)
+      expect(disjunction.isCNF()).toEqual(true)
+    })
+    test("full CNF", () => {
+      expect(cnf.isConjunction()).toEqual(false)
+      expect(cnf.isCNF()).toEqual(true)
+      expect(cnf.isDisjunction()).toEqual(false)
+      expect(cnf.isDNF()).toEqual(false)
+    })
+  })
+
+  describe("DNF", () => {
+    const conjunction = new Operator("\\and", new Operator("\\and", v[0], not_v[2]), v[1])
+    const dnf = new Operator("\\or", conjunction, conjunction)
+    test("single conjunction", () => {
+      expect(conjunction.isConjunction()).toEqual(true)
+      expect(conjunction.isDNF()).toEqual(true)
+    })
+    test("full DNF", () => {
+      expect(dnf.isConjunction()).toEqual(false)
+      expect(dnf.isCNF()).toEqual(false)
+      expect(dnf.isDisjunction()).toEqual(false)
+      expect(dnf.isDNF()).toEqual(true)
+    })
+  })
+  // (not x_1 and x_2) => x_3
+  const expression = new Operator("=>", new Operator("\\and", not_v[0], v[1]), v[2])
+  const exprTT = expression.getTruthTable()
+
+  describe("generate CNF", () => {
+    const cnf = expression.toCNF()
+    const cnfTT = cnf.getTruthTable()
+    test("is CNF", () => {
+      expect(cnf.isCNF()).toEqual(true)
+    })
+    test("is equal expression", () => {
+      expect(exprTT.truthTable).toEqual(cnfTT.truthTable)
+    })
+  })
+
+  describe("generate DNF", () => {
+    const dnf = expression.toDNF()
+    const dnfTT = dnf.getTruthTable()
+    test("is DNF", () => {
+      expect(dnf.isDNF()).toEqual(true)
+    })
+    test("is equal expression", () => {
+      expect(exprTT.truthTable).toEqual(dnfTT.truthTable)
+    })
+  })
+})
+
+describe("simplify", () => {
+  for (const op of ["\\xor", "=>", "<=>"] as BinaryOperatorType[])
+    test(op, () => {
+      const expression = new Operator(op, v[0], v[1])
+      const simplifiedExpression = expression.copy().simplify()
+      const tt1 = expression.getTruthTable()
+      const tt2 = simplifiedExpression.getTruthTable()
+      expect(tt1.variableNames).toEqual(tt2.variableNames)
+      expect(tt1.truthTable).toEqual(tt2.truthTable)
+      expect(simplifiedExpression.toString()).not.toContain(op)
+    })
+})
+
+describe("negation", () => {
+  for (const op of ["\\and", "\\or", "\\xor", "=>", "<=>"] as BinaryOperatorType[])
+    test(op, () => {
+      const expression = new Operator(op, v[0], v[1])
+      const negatedExpression = expression.copy().negate()
+      const tt1 = expression.getTruthTable()
+      const tt2 = negatedExpression.getTruthTable()
+      expect(tt1.variableNames).toEqual(tt2.variableNames)
+      tt1.truthTable.forEach((val, index) => {
+        expect(val).toEqual(!tt2.truthTable[index])
+      })
+    })
+})
+
+describe("parser", () => {
+  test("errors", () => {
+    for (const expr of ["(()", "(A", "\\not", "A \\and"]) {
+      try {
+        PropositionalLogicParser.parse(expr)
+        expect(true).toBe(false)
+      } catch (e) {
+        expect(e).toBeInstanceOf(ParserError)
+      }
+    }
+  })
+
+  test("literals", () => {
+    for (const [expr, expectedStr] of Object.entries({
+      A: "A",
+      "\\not A": "\\not A",
+      "(A)": "A",
+      "\\not(A)": "\\not A",
+      "(\\not A)": "\\not A",
+    })) {
+      expect(PropositionalLogicParser.parse(expr).toString()).toEqual(expectedStr)
+    }
+  })
+
+  test("complex", () => {
+    for (const expr of [
+      "\\not A \\and B",
+      "\\not(A \\and B)",
+      "\\not A \\and (B \\or C)",
+      "(\\not A \\or B) \\and (B \\or C)",
+    ]) {
+      expect(PropositionalLogicParser.parse(expr).toString()).toEqual(expr)
+    }
+  })
+})
