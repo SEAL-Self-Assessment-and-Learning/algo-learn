@@ -24,11 +24,11 @@ abstract class SyntaxTreeNode {
   /**
    * Moves negation inwards to the literals
    */
-  public abstract simplifyNegation(): void
+  public abstract simplifyNegation(): this
   /**
    * replaces all \\xor, => and <=> operators by an equivalent \\and / \\or expression
    */
-  public abstract simplify(): void
+  public abstract simplify(): this
   /**
    * returns an array containing all variable names in the expression
    */
@@ -152,13 +152,13 @@ export class Literal extends SyntaxTreeNode {
   }
 
   // does nothing on literals
-  public simplifyNegation(): void {
-    return
+  public simplifyNegation(): this {
+    return this
   }
 
   // does nothing on literals
-  public simplify(): void {
-    return
+  public simplify(): this {
+    return this
   }
 
   public eval(values: VariableValues): boolean {
@@ -293,8 +293,12 @@ export class Operator extends SyntaxTreeNode {
     return str
   }
 
-  public simplifyNegation(): void {
+  public simplifyNegation(): this {
     if (this.negated) {
+      if (["\\xor", "=>", "<=>"].includes(this.type)) {
+        this.simplifyLocal() // changes this.type to "\\and" or "\\or", this.leftOperand, this.rightOperand
+      }
+
       this.negated = false
 
       switch (this.type) {
@@ -308,19 +312,17 @@ export class Operator extends SyntaxTreeNode {
           this.leftOperand.negate()
           this.rightOperand.negate()
           break
-        default:
-          this.simplify()
-          this.simplifyNegation()
-          break
       }
     }
 
     this.leftOperand.simplifyNegation()
     this.rightOperand.simplifyNegation()
+
+    return this
   }
 
-  public simplify(): this {
-    if (this.type in ["\\and", "\\or"]) return this
+  private simplifyLocal(): this {
+    if (["\\and", "\\or"].includes(this.type)) return this
 
     let newLeftOp, newRightOp
     switch (this.type) {
@@ -346,6 +348,14 @@ export class Operator extends SyntaxTreeNode {
     }
 
     this.type = "\\or"
+    return this
+  }
+
+  public simplify(): this {
+    this.simplifyLocal()
+    this.leftOperand.simplify()
+    this.rightOperand.simplify()
+
     return this
   }
 

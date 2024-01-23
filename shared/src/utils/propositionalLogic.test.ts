@@ -175,6 +175,32 @@ describe("simplify", () => {
     })
 })
 
+describe("simplify negations", () => {
+  test("no negated operators", () => {
+    for (const op of ["\\and", "\\or", "\\xor", "=>", "<=>"] as BinaryOperatorType[]) {
+      const expr = new Operator(
+        op,
+        new Operator("\\xor", v[0], v[1]),
+        new Operator("<=>", v[2], not_v[1]),
+        true,
+      )
+      const exprSimplified = expr.copy().simplifyNegation()
+      // contains no negated groups
+      expect(exprSimplified.toString()).not.toMatch(/\\not\s*\(/)
+      // is still equal to the original
+      expect(exprSimplified.getTruthTable().truthTable).toEqual(expr.getTruthTable().truthTable)
+    }
+  })
+
+  test("no change if not needed", () => {
+    for (const op of ["\\and", "\\or", "\\xor", "=>", "<=>"] as BinaryOperatorType[]) {
+      const expr = new Operator(op, new Operator("\\xor", v[0], v[1]), new Operator("<=>", v[2], not_v[1]))
+      const exprSimplified = expr.copy().simplifyNegation()
+      expect(exprSimplified.toString()).toEqual(expr.toString())
+    }
+  })
+})
+
 describe("negation", () => {
   for (const op of ["\\and", "\\or", "\\xor", "=>", "<=>"] as BinaryOperatorType[])
     test(op, () => {
