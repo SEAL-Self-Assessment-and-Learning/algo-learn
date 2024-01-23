@@ -10,11 +10,28 @@ export type TruthTable = boolean[]
 
 abstract class SyntaxTreeNode {
   protected negated: boolean = false
+  /**
+   * Returns a deep copy of the Operator
+   * @returns
+   */
   public abstract copy(): SyntaxTreeNode
+  /**
+   * Evaluates the expression for the given values
+   * @param values
+   */
   public abstract eval(values: VariableValues): boolean
   public abstract toString(): string
+  /**
+   * Moves negation inwards to the literals
+   */
   public abstract simplifyNegation(): void
+  /**
+   * replaces all \\xor, => and <=> operators by an equivalent \\and / \\or expression
+   */
   public abstract simplify(): void
+  /**
+   * returns an array containing all variable names in the expression
+   */
   public abstract getVariableNames(): string[]
   public abstract isConjunction(): boolean
   public abstract isDisjunction(): boolean
@@ -31,6 +48,11 @@ abstract class SyntaxTreeNode {
     return 1 << size
   }
 
+  /**
+   * Generates a truth table (array of boolean values) where each index corresponds to variable values
+   * according to the numToVariableValues(index, variableNames).
+   * @returns
+   */
   public getTruthTable(): { truthTable: TruthTable; variableNames: string[] } {
     const variableNames = this.getVariableNames()
 
@@ -44,6 +66,10 @@ abstract class SyntaxTreeNode {
     return { truthTable, variableNames }
   }
 
+  /**
+   * Returns variable names and checks if the expression is satisfiable or falsifiable and if so providing an example in each case.
+   * @returns
+   */
   public getProperties(): ExpressionProperties {
     const properties: ExpressionProperties = {
       variables: this.getVariableNames(),
@@ -87,6 +113,10 @@ abstract class SyntaxTreeNode {
     return setting.outer(innerNodes)
   }
 
+  /**
+   * Generates an equivalent CNF
+   * @returns
+   */
   public toCNF(): SyntaxTreeNodeType {
     return this.makeNormalForm({
       inner: Operator.makeDisjunction,
@@ -95,6 +125,10 @@ abstract class SyntaxTreeNode {
     })
   }
 
+  /**
+   * Generates an equivalent DNF
+   * @returns
+   */
   public toDNF(): SyntaxTreeNodeType {
     return this.makeNormalForm({
       inner: Operator.makeConjunction,
@@ -365,6 +399,12 @@ function isOperator(obj: any): obj is Operator {
   return (obj as Operator).type !== undefined
 }
 
+/**
+ * Turns a number into an name/value object. The i-th bit of num is interpreted as the value of the i-th variable.
+ * @param num
+ * @param variableNames
+ * @returns
+ */
 export function numToVariableValues(num: number, variableNames: string[]): VariableValues {
   const values: VariableValues = {}
   let i = 0
@@ -381,6 +421,13 @@ export function numToVariableValues(num: number, variableNames: string[]): Varia
   return values
 }
 
+/**
+ *
+ * @param variableValues Object of variable name / value pairs
+ * @param invert
+ * @returns Array of one literal for each variable. The literal is negated if the value is false.
+ *          If invert is true the literal is negated if the value is true
+ */
 export function variableValuesToLiterals(
   variableValues: VariableValues,
   invert: boolean,
@@ -394,6 +441,10 @@ export function variableValuesToLiterals(
   return nodes
 }
 
+/**
+ * Error class that could be thrown by PropositionalLogicParser.
+ * The infoToStr() function can show the position of a missing or unexpected token.
+ */
 export class ParserError extends Error {
   readonly str: string | undefined
   readonly pos: number | undefined
@@ -423,7 +474,6 @@ export class PropositionalLogicParser {
     // strBeginning[1] = "\\not" | undefined
     // strBeginning[2] = "(" | string (without whitespace)
     const strBeginning = /^(\\not)?\s*(\(|[^\s()])/.exec(str)
-    // console.log(strBeginning)
     if (strBeginning === null) throw new ParserError("Empty expression")
     else if (strBeginning[2] in binaryOperatorTypes)
       throw new ParserError(
@@ -456,7 +506,6 @@ export class PropositionalLogicParser {
     nextTokenRegEx.lastIndex = nextTokenStartIndex
     const operator = nextTokenRegEx.exec(str)
     if (operator === null || !binaryOperatorTypes.includes(operator[1] as BinaryOperatorType)) {
-      console.log(operator, nextTokenStartIndex, nextTokenRegEx.lastIndex)
       throw new ParserError("Missing operator", str, nextTokenStartIndex)
     }
     const nextTokenEndIndex = nextTokenStartIndex + operator[0].length
