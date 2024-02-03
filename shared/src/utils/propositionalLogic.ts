@@ -91,7 +91,7 @@ abstract class SyntaxTreeNode {
     for (let i = 0; i < truthTableSize; i++) {
       const variableValues = numToVariableValues(i, properties.variables)
       const expressionValue = this.eval(variableValues)
-      if (expressionValue === true) {
+      if (expressionValue) {
         properties.satisfiable = variableValues
       } else {
         properties.falsifiable = variableValues
@@ -175,6 +175,7 @@ export class Literal extends SyntaxTreeNode {
     return this
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public shuffle(random: Random): this {
     return this
   }

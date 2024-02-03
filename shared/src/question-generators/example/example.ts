@@ -25,7 +25,7 @@ const translations: Translations = {
 }
 
 function generateWrongAnswers(random: Random, correctAnswer: number): Array<string> {
-  let wrongAnswers = [
+  const wrongAnswers = [
     `$${correctAnswer + 3}$`,
     `$${correctAnswer + 2}$`,
     `$${correctAnswer + 1}$`,
