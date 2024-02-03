@@ -37,6 +37,14 @@ export default class Random {
   }
 
   /**
+   * Returns a random boolean
+   * @param chanceToBeTrue - The chance that the result is true
+   */
+  bool(chanceToBeTrue: number = 0.5): boolean {
+    return this.uniform() < chanceToBeTrue
+  }
+
+  /**
    * Returns a random integer.
    *
    * @param min - The minimum number.
@@ -44,6 +52,8 @@ export default class Random {
    * @returns A random integer between min (inclusive) and max (inclusive).
    */
   int(min: number, max: number): number {
+    if (min > max) throw new Error("Value Error: min > max")
+    if (min === max) return min
     return Math.floor(this.float(min, max + 1))
   }
 
@@ -53,7 +63,7 @@ export default class Random {
    * @param array - An array of elements.
    * @returns A random element from the array.
    */
-  choice<T>(array: Array<T>): T {
+  choice<T>(array: ReadonlyArray<T>): T {
     return array[this.int(0, array.length - 1)]
   }
 
@@ -64,7 +74,7 @@ export default class Random {
    * @param size - The size of the subset.
    * @returns A list of size distinct elements from the array.
    */
-  subset<T>(array: Array<T>, size: number): Array<T> {
+  subset<T>(array: ReadonlyArray<T>, size: number): Array<T> {
     if (size > array.length) {
       throw new Error("Subset size cannot be larger than the array size")
     }
@@ -101,10 +111,10 @@ export default class Random {
    * @param array - An array of tuples of the form [element, weight]
    * @returns A random element from the array.
    */
-  weightedChoice<T>(array: Array<[element: T, weight: number]>): T {
+  weightedChoice<T>(array: ReadonlyArray<[element: T, weight: number]>): T {
     const elements = array.map((w) => w[0])
-    const weigths = array.map((w) => w[1])
-    return elements[this.weightedIndex(weigths)]
+    const weights = array.map((w) => w[1])
+    return elements[this.weightedIndex(weights)]
   }
 
   /**
