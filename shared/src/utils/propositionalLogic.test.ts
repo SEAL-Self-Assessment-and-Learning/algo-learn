@@ -7,6 +7,7 @@ import {
   PropositionalLogicParser,
   ParserError,
 } from "./propositionalLogic"
+import Random, { sampleRandomSeed } from "./random.ts"
 
 const v = [new Literal("x_1"), new Literal("x_2"), new Literal("x_3")]
 const not_v = [new Literal("x_1", true), new Literal("x_2", true), new Literal("x_3", true)]
@@ -213,6 +214,24 @@ describe("negation", () => {
         expect(val).toEqual(!tt2.truthTable[index])
       })
     })
+})
+
+test("shuffle", () => {
+  const seed = sampleRandomSeed()
+  // console.log(seed)
+  const random = new Random(seed)
+  const expression = new Operator(
+    "\\and",
+    new Operator("\\or", new Operator("=>", v[0], not_v[1], true), new Operator("\\xor", not_v[2], v[1])),
+    new Operator("\\and", new Operator("\\xor", v[1], new Operator("\\xor", v[2], v[1]), true), not_v[0]),
+  )
+
+  // console.log("orig: " + expression.toString())
+  for (let i = 0; i < 20; i++) {
+    const shuffledExpression = expression.copy().shuffle(random)
+    // console.log(i, "shuffled: " + shuffledExpression.toString())
+    expect(shuffledExpression.getTruthTable()).toEqual(expression.getTruthTable())
+  }
 })
 
 describe("parser", () => {

@@ -1,3 +1,5 @@
+import Random from "./random.ts"
+
 export type VariableValues = Record<string, boolean>
 
 export type ExpressionProperties = {
@@ -9,7 +11,7 @@ export type ExpressionProperties = {
 export type TruthTable = boolean[]
 
 abstract class SyntaxTreeNode {
-  protected negated: boolean = false
+  public negated: boolean = false
   /**
    * Returns a deep copy of the Operator
    * @returns
@@ -20,7 +22,7 @@ abstract class SyntaxTreeNode {
    * @param values
    */
   public abstract eval(values: VariableValues): boolean
-  public abstract toString(): string
+  public abstract toString(latex: boolean): string
   /**
    * Moves negation inwards to the literals
    */
@@ -28,7 +30,15 @@ abstract class SyntaxTreeNode {
   /**
    * replaces all \\xor, => and <=> operators by an equivalent \\and / \\or expression
    */
+  public abstract simplifyLocal(): this
+  /**
+   * replaces all \\xor, => and <=> operators by an equivalent \\and / \\or expression
+   */
   public abstract simplify(): this
+  /**
+   * Permutes the syntax tree
+   */
+  public abstract shuffle(random: Random): this
   /**
    * returns an array containing all variable names in the expression
    */
@@ -157,7 +167,15 @@ export class Literal extends SyntaxTreeNode {
   }
 
   // does nothing on literals
+  public simplifyLocal(): this {
+    return this
+  }
+
   public simplify(): this {
+    return this
+  }
+
+  public shuffle(random: Random): this {
     return this
   }
 
@@ -165,12 +183,12 @@ export class Literal extends SyntaxTreeNode {
     return this.negated ? !values[this.name] : values[this.name]
   }
 
-  public toString(): string {
-    return this.addNegation(this.name)
+  public toString(latex: boolean = false): string {
+    return this.addNegation(this.name, latex)
   }
 
-  private addNegation(str: string): string {
-    if (this.negated) return `${negationType} ${str}`
+  private addNegation(str: string, latex = false): string {
+    if (this.negated) return `${latex ? operatorToLatex[negationType] : negationType} ${str}`
 
     return str
   }
@@ -201,7 +219,7 @@ type NegationOperatorType = typeof negationType
 
 export const binaryOperatorTypes = ["\\and", "\\or", "\\xor", "=>", "<=>"] as const
 export type BinaryOperatorType = (typeof binaryOperatorTypes)[number]
-export const associativeOperators: BinaryOperatorType[] = ["\\and", "\\or", "\\xor"] as const
+export const associativeOperators: ReadonlyArray<BinaryOperatorType> = ["\\and", "\\or", "\\xor"]
 export type AssociativeOperatorsType = (typeof associativeOperators)[number]
 
 const operatorToLatex: Record<BinaryOperatorType | NegationOperatorType, string> = {
@@ -281,47 +299,58 @@ export class Operator extends SyntaxTreeNode {
     return this.negated ? !value : value
   }
 
-  public toString(): string {
+  public toString(latex: boolean = false): string {
     return this.addNegation(
-      `${this.addParenthesis(this.leftOperand)} ${this.type} ${this.addParenthesis(this.rightOperand)}`,
+      `${this.addParenthesis(this.leftOperand, latex)} ${
+        latex ? operatorToLatex[this.type] : this.type
+      } ${this.addParenthesis(this.rightOperand, latex)}`,
+      latex,
     )
   }
 
-  private addNegation(str: string): string {
-    if (this.negated) return `${negationType}(${str})`
+  private addNegation(str: string, latex: boolean = false): string {
+    if (this.negated) return `${latex ? operatorToLatex[negationType] : negationType}(${str})`
 
     return str
   }
 
-  public simplifyNegation(): this {
-    if (this.negated) {
-      if (["\\xor", "=>", "<=>"].includes(this.type)) {
-        this.simplifyLocal() // changes this.type to "\\and" or "\\or", this.leftOperand, this.rightOperand
-      }
+  public simplifyNegationLocal(): this {
+    if (!this.negated) return this
 
-      this.negated = false
-
-      switch (this.type) {
-        case "\\and":
-          this.type = "\\or"
-          this.leftOperand.negate()
-          this.rightOperand.negate()
-          break
-        case "\\or":
-          this.type = "\\and"
-          this.leftOperand.negate()
-          this.rightOperand.negate()
-          break
-      }
+    if (["\\xor", "=>", "<=>"].includes(this.type)) {
+      this.simplifyLocal() // changes this.type to "\\and" or "\\or", this.leftOperand, this.rightOperand
     }
 
+    this.negated = false
+
+    switch (this.type) {
+      case "\\and":
+        this.type = "\\or"
+        this.leftOperand.negate()
+        this.rightOperand.negate()
+        break
+      case "\\or":
+        this.type = "\\and"
+        this.leftOperand.negate()
+        this.rightOperand.negate()
+        break
+    }
+
+    return this
+  }
+
+  public simplifyNegation(): this {
+    this.simplifyNegationLocal()
     this.leftOperand.simplifyNegation()
     this.rightOperand.simplifyNegation()
 
     return this
   }
 
-  private simplifyLocal(): this {
+  /**
+   * Replaces xor, => and <=> by an equivalent and/or expression only on the current node
+   */
+  public simplifyLocal(): this {
     if (["\\and", "\\or"].includes(this.type)) return this
 
     let newLeftOp, newRightOp
@@ -351,6 +380,9 @@ export class Operator extends SyntaxTreeNode {
     return this
   }
 
+  /**
+   * Replaces all xor, => and <=> by an equivalent and/or expression
+   */
   public simplify(): this {
     this.simplifyLocal()
     this.leftOperand.simplify()
@@ -359,12 +391,120 @@ export class Operator extends SyntaxTreeNode {
     return this
   }
 
-  private addParenthesis(node: SyntaxTreeNodeType): string {
-    if (!isOperator(node)) return node.toString()
+  public shuffle(random: Random): this {
+    // obscure operators
+    if (random.bool(0.2)) {
+      if (["=>", "<=>", "\\xor"].includes(this.type)) {
+        this.simplifyLocal()
+      } else if (this.type === "\\and") {
+        this.type = "=>"
+        this.negate()
+        this.rightOperand.negate()
+      } else if (this.type === "\\or") {
+        this.type = "=>"
+        this.leftOperand.negate()
+      }
+    }
 
-    if (node.type === this.type && associativeOperators.includes(this.type)) return node.toString()
+    // obscure negation
+    if (random.bool(0.3) && this.negated) {
+      this.simplifyNegationLocal()
+    }
 
-    return `(${node.toString()})`
+    // permute syntax tree
+    if (this.type !== "=>") {
+      switch (random.int(0, 5)) {
+        case 0:
+          ;[this.leftOperand, this.rightOperand] = [this.rightOperand, this.leftOperand]
+          break
+        case 1:
+          if (
+            isOperator(this.leftOperand) &&
+            this.leftOperand.type === this.type &&
+            !this.leftOperand.negated
+          ) {
+            if (random.bool()) {
+              ;[this.rightOperand, this.leftOperand.rightOperand] = [
+                this.leftOperand.rightOperand,
+                this.rightOperand,
+              ]
+            } else {
+              ;[this.rightOperand, this.leftOperand.leftOperand] = [
+                this.leftOperand.leftOperand,
+                this.rightOperand,
+              ]
+            }
+          }
+          break
+        case 2:
+          if (
+            isOperator(this.rightOperand) &&
+            this.rightOperand.type === this.type &&
+            !this.rightOperand.negated
+          ) {
+            if (random.bool()) {
+              ;[this.leftOperand, this.rightOperand.rightOperand] = [
+                this.rightOperand.rightOperand,
+                this.leftOperand,
+              ]
+            } else {
+              ;[this.leftOperand, this.rightOperand.leftOperand] = [
+                this.rightOperand.leftOperand,
+                this.leftOperand,
+              ]
+            }
+          }
+          break
+        case 3:
+          if (
+            isOperator(this.leftOperand) &&
+            isOperator(this.rightOperand) &&
+            this.type === this.leftOperand.type &&
+            this.type === this.rightOperand.type &&
+            !this.leftOperand.negated &&
+            !this.rightOperand.negated
+          ) {
+            if (random.bool()) {
+              if (random.bool()) {
+                ;[this.leftOperand.leftOperand, this.rightOperand.leftOperand] = [
+                  this.rightOperand.leftOperand,
+                  this.leftOperand.leftOperand,
+                ]
+              } else {
+                ;[this.leftOperand.leftOperand, this.rightOperand.rightOperand] = [
+                  this.rightOperand.rightOperand,
+                  this.leftOperand.leftOperand,
+                ]
+              }
+            } else {
+              if (random.bool()) {
+                ;[this.leftOperand.rightOperand, this.rightOperand.leftOperand] = [
+                  this.rightOperand.leftOperand,
+                  this.leftOperand.rightOperand,
+                ]
+              } else {
+                ;[this.leftOperand.rightOperand, this.rightOperand.rightOperand] = [
+                  this.rightOperand.rightOperand,
+                  this.leftOperand.rightOperand,
+                ]
+              }
+            }
+          }
+          break
+      }
+    }
+
+    this.leftOperand.shuffle(random)
+    this.rightOperand.shuffle(random)
+    return this
+  }
+
+  private addParenthesis(node: SyntaxTreeNodeType, latex: boolean): string {
+    if (!isOperator(node)) return node.toString(latex)
+
+    if (node.type === this.type && associativeOperators.includes(this.type)) return node.toString(latex)
+
+    return `(${node.toString(latex)})`
   }
 
   public getVariableNames(): string[] {
@@ -403,7 +543,7 @@ export class Operator extends SyntaxTreeNode {
   }
 }
 
-type SyntaxTreeNodeType = Operator | Literal
+export type SyntaxTreeNodeType = Operator | Literal
 
 function isOperator(obj: any): obj is Operator {
   return (obj as Operator).type !== undefined
