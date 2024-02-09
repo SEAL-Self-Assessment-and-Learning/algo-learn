@@ -58,6 +58,36 @@ export default class Random {
   }
 
   /**
+   * Splits an input number into an array of random numbers that sum up to the input number
+   * @param input the number to split
+   * @param numSplits how often the number is split
+   * @param min the minimal value a random split must have
+   * @param max the maximal value a random split must have
+   */
+  split(input: number, numSplits: number, min: number = 0, max: number | undefined = undefined): number[] {
+    if (max === undefined) max = input
+    if (numSplits < 1) throw new Error("Value Error: numSplits needs to be positive")
+    if (numSplits * min > input)
+      throw new Error("Value Error: input cannot be split into numSplits values that are at least min big")
+    if (numSplits * max < input)
+      throw new Error("Value Error: input cannot be split into numSplits values that are at most max big")
+
+    let leftToSplit = input
+    const result = []
+    for (let i = 0; i < numSplits - 1; i++) {
+      const nextInt = this.int(
+        Math.max(min, leftToSplit - (numSplits - i - 1) * max),
+        Math.min(max, leftToSplit - (numSplits - i - 1) * min),
+      )
+      leftToSplit -= nextInt
+      result.push(nextInt)
+    }
+
+    result.push(leftToSplit)
+    return this.shuffle(result)
+  }
+
+  /**
    * Chooses a uniformly random element from an array.
    *
    * @param array - An array of elements.
@@ -81,6 +111,24 @@ export default class Random {
     const copy = array.slice()
     this.shuffle(copy)
     return copy.slice(0, size)
+  }
+
+  /**
+   * Splits an array into two random disjoint subsets of arrays such that their union is the full array
+   * @param array
+   * @param size Size of the first array. If not provided a random number is chosen.
+   */
+  splitArray<T>(array: ReadonlyArray<T>, size?: number): Array<T>[] {
+    if (size === undefined) size = this.int(1, array.length - 1)
+
+    if (size > array.length) {
+      throw new Error("Subset size cannot be larger than the array size")
+    }
+
+    const copy = array.slice()
+    this.shuffle(copy)
+
+    return [copy.slice(0, size), copy.slice(size, array.length)]
   }
 
   /**
