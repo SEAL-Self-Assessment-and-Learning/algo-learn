@@ -13,9 +13,10 @@ import {
   Literal,
   Operator,
   SyntaxTreeNodeType,
+  VariableValues,
 } from "../../utils/propositionalLogic.ts"
+import { Language } from "../../api/Language.ts"
 
-// todo
 const translations: Translations = {
   en: {
     name: "Satisfiability Properties",
@@ -26,6 +27,9 @@ const translations: Translations = {
     answer_verifiable: "The expression is **verifiable**",
     answer_falsifiable: "The expression is **falsifiable**",
     answer_contradiction: "The expression is  a **contradiction**",
+    feedback_contradiction: "The expression evaluates to false for all variable assignments.",
+    feedback_tautology: "The expression evaluates to true for all variable assignments.",
+    feedback_examples: "The expression can be **falsified** by \\[{{0}}\\] and **verified** by \\[{{1}}\\]",
   },
   de: {
     name: "Erfüllbarkeitseigenschaften",
@@ -36,6 +40,10 @@ const translations: Translations = {
     answer_verifiable: "Die Aussage is **erfüllbar**",
     answer_falsifiable: "Die Aussage is **falsifizierbar**",
     answer_contradiction: "Die Aussage is ein **Widerspruch**",
+    feedback_contradiction: "Die Aussage ist für alle Variablenbelegungen falsifiziert",
+    feedback_tautology: "Die Aussage ist für alle Variablenbelegungen erfüllt",
+    feedback_examples:
+      "Die Aussage wird **falsifiziert** durch \\[{{0}}\\] und **erfüllt** durch \\[{{1}}\\]",
   },
 }
 
@@ -88,6 +96,23 @@ function generateRandomContradiction(
   } else {
     return new Operator(rootOperator, operand.copy().negate(), operand).shuffle(random).simplifyNegation()
   }
+}
+
+function getAdditionalFeedbackText(
+  satisfiable: false | VariableValues,
+  falsifiable: false | VariableValues,
+  lang: Language,
+): string {
+  if (satisfiable === false) return t(translations, lang, "feedback_contradiction")
+  if (falsifiable === false) return t(translations, lang, "feedback_tautology")
+
+  const falsifiedBy = Object.keys(satisfiable)
+    .map((variable) => `${variable} = ${satisfiable[variable] ? "\\mathtt{true}" : "\\mathtt{false}"}`)
+    .join(", ")
+  const verifiedBy = Object.keys(falsifiable)
+    .map((variable) => `${variable} = ${falsifiable[variable] ? "\\mathtt{true}" : "\\mathtt{false}"}`)
+    .join(", ")
+  return t(translations, lang, "feedback_examples", [falsifiedBy, verifiedBy])
 }
 
 export const Satisfiability: QuestionGenerator = {
@@ -158,8 +183,10 @@ export const Satisfiability: QuestionGenerator = {
         t(translations, lang, "answer_contradiction"),
       ],
       allowMultiple: true,
-      // todo add better feedback (variable values for satisfiable/falsifiable
-      feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
+      feedback: minimalMultipleChoiceFeedback({
+        correctAnswerIndex,
+        feedbackText: getAdditionalFeedbackText(satisfiable, falsifiable, lang),
+      }),
     }
 
     return {
