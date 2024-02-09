@@ -47,43 +47,47 @@ const variableNames = [
 
 function generateRandomExpression(
   random: Random,
-  depth: number,
+  numLeaves: number,
   variableNames: string[],
 ): SyntaxTreeNodeType {
-  if (depth === 0) {
+  if (numLeaves === 1) {
     return new Literal(random.choice(variableNames), random.bool(0.2))
   } else {
-    const operandDepths = random.shuffle([depth - 1, random.int(Math.min(depth - 1, 1), depth - 1)])
-    const leftOperand = generateRandomExpression(random, operandDepths[0], variableNames)
-    const rightOperand = generateRandomExpression(random, operandDepths[1], variableNames)
-    return new Operator(
-      random.choice(binaryOperatorTypes),
-      leftOperand,
-      rightOperand,
-      random.bool(0.2),
-    ).simplifyNegation()
+    const [leftVariables, rightVariables] =
+      numLeaves == 2 ? random.splitArray(variableNames) : [variableNames, variableNames]
+    const leafDistribution = random.split(numLeaves, 2, 1)
+    const leftOperand = generateRandomExpression(random, leafDistribution[0], leftVariables)
+    const rightOperand = generateRandomExpression(random, leafDistribution[1], rightVariables)
+    return new Operator(random.choice(binaryOperatorTypes), leftOperand, rightOperand)
   }
 }
 
-function generateRandomTautology(random: Random, depth: number, variableNames: string[]): SyntaxTreeNodeType {
-  const operand = generateRandomExpression(random, depth - 1, variableNames)
+function generateRandomTautology(
+  random: Random,
+  numLeaves: number,
+  variableNames: string[],
+): SyntaxTreeNodeType {
+  const operand = generateRandomExpression(random, Math.floor(numLeaves / 2), variableNames)
   const rootOperator = random.choice(["<=>", "=>", "\\xor", "\\or"] as BinaryOperatorType[])
   if (rootOperator === "\\or") {
-    return new Operator(rootOperator, operand.copy().negate(), operand).shuffle(random).simplifyNegation()
+    return new Operator(rootOperator, operand.copy().negate(), operand).shuffle(random)
   } else {
-    return new Operator(rootOperator, operand.copy(), operand)
-      .simplifyLocal()
-      .shuffle(random)
-      .simplifyNegation()
+    return new Operator(rootOperator, operand.copy(), operand).shuffle(random)
   }
 }
 
 function generateRandomContradiction(
   random: Random,
-  depth: number,
+  numLeaves: number,
   variableNames: string[],
 ): SyntaxTreeNodeType {
-  return generateRandomTautology(random, depth, variableNames).negate().simplifyNegation()
+  const operand = generateRandomExpression(random, Math.floor(numLeaves / 2), variableNames)
+  const rootOperator = random.choice(["<=>", "\\xor", "\\and"] as BinaryOperatorType[])
+  if (rootOperator === "\\xor") {
+    return new Operator(rootOperator, operand.copy(), operand).shuffle(random).simplifyNegation()
+  } else {
+    return new Operator(rootOperator, operand.copy().negate(), operand).shuffle(random).simplifyNegation()
+  }
 }
 
 export const Satisfiability: QuestionGenerator = {
@@ -116,18 +120,18 @@ export const Satisfiability: QuestionGenerator = {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
 
-    const size = <number>parameters.size ?? 2
-    const varNames = random.choice(variableNames).slice(0, size)
+    const numLeaves = (<number>parameters.size ?? 2) * 2
+    const varNames = random.choice(variableNames).slice(0, numLeaves)
     let expression
-    switch (random.int(0, 4)) {
+    switch (random.int(0, 3)) {
       case 0:
-        expression = generateRandomTautology(random, size, varNames)
+        expression = generateRandomTautology(random, numLeaves, varNames)
         break
       case 1:
-        expression = generateRandomContradiction(random, size, varNames)
+        expression = generateRandomContradiction(random, numLeaves, varNames)
         break
       default:
-        expression = generateRandomExpression(random, size, varNames)
+        expression = generateRandomExpression(random, numLeaves, varNames)
         break
     }
 
