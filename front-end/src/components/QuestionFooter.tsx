@@ -3,7 +3,7 @@ import { GiPlayButton } from "react-icons/gi"
 import { SiCheckmarx, SiIfixit } from "react-icons/si"
 
 import { useTranslation } from "../hooks/useTranslation"
-import { Button } from "./Button"
+import { Button } from "@/components/ui/button"
 import { MODE } from "./InteractWithQuestion"
 
 /**
@@ -41,22 +41,22 @@ export function QuestionFooter({
     ) : null
   const backgroundColor =
     mode === "correct"
-      ? "bg-green-200 dark:bg-green-700"
+      ? "bg-green-200"
       : mode === "incorrect"
-        ? "bg-red-200 dark:bg-red-700"
-        : "bg-gray-100 dark:bg-gray-800"
+        ? "bg-red-200"
+        : "bg-secondary"
   const textColor =
     mode === "correct"
-      ? "text-green-900 dark:text-green-200"
+      ? "text-green-900"
       : mode === "incorrect"
-        ? "text-red-900 dark:text-red-100"
+        ? "text-red-900"
         : ""
-  const buttonColor =
-    mode === "correct" || mode === "draft"
-      ? "green"
-      : mode === "incorrect"
-        ? "red"
-        : "disabled"
+  // const buttonColor =
+  //   mode === "correct" || mode === "draft"
+  //     ? "green"
+  //     : mode === "incorrect"
+  //       ? "red"
+  //       : "disabled"
   return (
     <div className={`${backgroundColor}`}>
       <div className="m-auto flex max-w-xl flex-col justify-end gap-4 p-5 sm:min-h-[8rem] sm:flex-row sm:justify-between">
@@ -67,7 +67,13 @@ export function QuestionFooter({
           <div>{message}</div>
         </div>
         <Button
-          color={buttonColor}
+          variant={
+            mode === "incorrect"
+              ? "wrongAnswer"
+              : mode === "correct"
+                ? "rightAnswer"
+                : "default"
+          }
           onClick={buttonClick}
           className="self-end sm:self-center"
           disabled={mode === "invalid" || mode === "submitted"}

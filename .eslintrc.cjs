@@ -7,6 +7,15 @@ module.exports = {
     react: {
       version: "detect",
     },
+    "import/resolver": {
+      alias: {
+        map: [
+          ["@", "./front-end/src"],
+          ["@shared", "./shared/src"],
+        ],
+        extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
+      },
+    },
   },
   extends: [
     "eslint:recommended",

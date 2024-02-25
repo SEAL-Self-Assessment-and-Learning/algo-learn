@@ -6,10 +6,10 @@ import { useTranslation } from "../hooks/useTranslation"
 export function Legal() {
   const { t } = useTranslation()
   return (
-    <HorizontallyCenteredDiv>
+    <HorizontallyCenteredDiv className="prose">
       <h1>{t("Legal.label")}</h1>
-      <p className="my-5">{t("Legal.text")}</p>
-      <p className="my-5">
+      <p>{t("Legal.text")}</p>
+      <p>
         <Markdown
           md={format(t("Legal.detailed.text"), [
             "https://tcs.uni-frankfurt.de/legal",

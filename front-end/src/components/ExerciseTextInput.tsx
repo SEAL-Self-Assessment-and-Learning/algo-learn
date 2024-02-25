@@ -10,6 +10,7 @@ import { useTranslation } from "../hooks/useTranslation"
 import { InteractWithQuestion, MODE } from "./InteractWithQuestion"
 import { Markdown } from "./Markdown"
 import { Result } from "./QuestionComponent"
+import { Input } from "@/components/ui/input"
 
 /**
  * ExerciseTextInput is an exercise that requires the user to type in text.
@@ -140,15 +141,15 @@ export function ExerciseTextInput({
       <br />
       <div className="flex place-items-center gap-2 pl-3">
         <Markdown md={question.prompt} />
-        <input
+        <Input
           autoFocus
-          type="text"
+          disabled={mode === "correct" || mode === "incorrect"}
+          value={text}
           onChange={(e) => {
             setText(e.target.value)
           }}
-          value={text}
-          className="rounded-md bg-gray-300 p-2 dark:bg-gray-900"
-          disabled={mode === "correct" || mode === "incorrect"}
+          type="text"
+          placeholder={question.placeholder}
         />
         <div className={`flex h-12 items-center ${msgColor}`}>
           <div>

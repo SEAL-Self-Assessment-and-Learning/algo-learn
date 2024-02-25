@@ -45,7 +45,7 @@ export function InteractWithQuestion({
 }) {
   return (
     <>
-      <HorizontallyCenteredDiv className="w-full flex-grow">
+      <HorizontallyCenteredDiv className="flex-grow">
         <QuestionHeader
           permalink={permalink}
           title={name}

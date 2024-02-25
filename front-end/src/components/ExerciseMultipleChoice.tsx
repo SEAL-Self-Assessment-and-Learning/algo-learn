@@ -3,15 +3,17 @@ import { useState } from "react"
 import {
   MultipleChoiceFeedback,
   MultipleChoiceQuestion,
-} from "../../../shared/src/api/QuestionGenerator"
+} from "@shared/api/QuestionGenerator"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
-import { AnswerBox } from "./AnswerBox"
 import { InteractWithQuestion, MODE } from "./InteractWithQuestion"
 import { Markdown } from "./Markdown"
 import { Result } from "./QuestionComponent"
 import { BaseItem, SortableList } from "./SortableList"
+import { Checkbox } from "./ui/checkbox"
+import { CheckCheck, XCircle } from "lucide-react"
+import { Tooltip } from "react-tooltip"
 
 /**
  * ExerciseMultipleChoice is a multiple choice exercise.
@@ -144,19 +146,15 @@ export function ExerciseMultipleChoice({
     } else if (mode === "incorrect") {
       message = feedbackObject?.correctChoice ? (
         <>
-          <b className="text-xl">
-            Correct solution
-            {feedbackObject.correctChoice.length > 1 ? "s" : ""}:
-          </b>
+          <b className="text-xl">{t("correct.solution")}:</b>
           <br />
-          {feedbackObject.correctChoice.map((item, index) => (
-            <div key={index}>{<Markdown md={question.answers[item]} />}</div>
-          ))}
+          {t("see.above")}
         </>
       ) : (
-        <>Incorrect</>
+        t("incorrect")
       )
     }
+    const disabled = mode === "correct" || mode === "incorrect"
     return (
       <InteractWithQuestion
         permalink={permalink}
@@ -167,31 +165,37 @@ export function ExerciseMultipleChoice({
         handleFooterClick={handleClick}
       >
         <Markdown md={question.text ?? ""} />
-        <div className="mx-auto flex max-w-max flex-wrap gap-5 p-5">
+        <div className="flex flex-col flex-wrap gap-4 p-4">
           {question.answers.map((answer, index) => {
+            const isCorrectAnswer =
+              true === feedbackObject?.correctChoice?.includes(index)
             const id = `${index}`
             return (
-              <div key={index} className="flex place-items-center">
-                <input
-                  type={question.allowMultiple ? "checkbox" : "radio"}
+              <div key={index} className="flex items-center space-x-2">
+                <FeedbackIconAndTooltip
+                  isCorrectAnswer={isCorrectAnswer}
+                  userGaveCorrectAnswer={
+                    isCorrectAnswer === choice.includes(index)
+                  }
+                  hidden={!disabled}
                   id={id}
-                  className="peer hidden"
-                  checked={choice.includes(index)}
-                  onChange={(e) => {
-                    setChoiceEntry(parseInt(e.target.id, 10), e.target.checked)
-                  }}
-                  disabled={mode === "correct" || mode === "incorrect"}
                 />
-                <AnswerBox
+                <Checkbox
+                  id={id}
                   checked={choice.includes(index)}
-                  correct={feedbackObject?.correctChoice?.includes(index)}
-                  disabled={mode === "correct" || mode === "incorrect"}
-                  TagName="label"
-                  htmlFor={id}
-                  className="relative"
-                >
-                  <Markdown md={answer} />
-                </AnswerBox>
+                  disabled={disabled}
+                  onCheckedChange={() => {
+                    setChoiceEntry(index, !choice.includes(index))
+                  }}
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor={id}
+                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    <Markdown md={answer} />
+                  </label>
+                </div>
               </div>
             )
           })}
@@ -237,5 +241,52 @@ export function ExerciseMultipleChoice({
         />
       </InteractWithQuestion>
     )
+  }
+}
+
+function FeedbackIconAndTooltip({
+  isCorrectAnswer,
+  userGaveCorrectAnswer,
+  hidden,
+  id = "",
+}: {
+  isCorrectAnswer: boolean
+  userGaveCorrectAnswer: boolean
+  hidden: boolean
+  id?: string
+}) {
+  const { t } = useTranslation()
+  const correctnessMsg = isCorrectAnswer
+    ? t("answer.correct")
+    : t("answer.wrong")
+  const choiceMsg = userGaveCorrectAnswer
+    ? t("choice.correct")
+    : t("choice.wrong")
+  return (
+    <>
+      <a id={`myid-${id}`}>
+        <FeedbackIcon correct={isCorrectAnswer} hidden={hidden} />
+      </a>
+      <Tooltip anchorSelect={`#myid-${id}`} place="left" className="z-10">
+        {correctnessMsg}
+        <br />
+        {choiceMsg}
+      </Tooltip>
+    </>
+  )
+}
+
+function FeedbackIcon({
+  correct,
+  hidden,
+}: {
+  correct: boolean
+  hidden: boolean
+}) {
+  const cn = hidden ? " invisible" : ""
+  if (correct) {
+    return <CheckCheck className={"h-4 w-4 text-green-700" + cn} />
+  } else {
+    return <XCircle className={"h-4 w-4 text-destructive" + cn} />
   }
 }

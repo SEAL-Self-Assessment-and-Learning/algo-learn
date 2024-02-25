@@ -28,7 +28,7 @@ export function Debug() {
   const { debug, setDebug } = useDebug()
   const { format, setFormat } = useFormat()
   return (
-    <HorizontallyCenteredDiv className="flex w-full flex-col gap-4">
+    <HorizontallyCenteredDiv className="prose">
       <h1>{t("title")}</h1>
       <p>{t("description")}</p>
       <form action="" className="mt-4 flex select-none flex-col gap-4">

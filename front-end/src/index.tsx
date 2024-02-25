@@ -20,7 +20,7 @@ import { BASENAME } from "./config"
 import { allQuestionGeneratorRoutes } from "./listOfQuestions"
 import { About } from "./routes/about"
 import { Legal } from "./routes/legal"
-import { LearningProgress } from "./routes/progress"
+import { Catalogue } from "./routes/catalogue"
 import Root from "./routes/root"
 import { TestSimpleMC } from "./routes/test"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
@@ -61,7 +61,7 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
 
 routes.push({
   path: `:lang`,
-  element: <LearningProgress />,
+  element: <Catalogue />,
 })
 routes.push({
   path: `:lang/legal`,

@@ -10,12 +10,12 @@ export function About() {
   const { t, lang } = useTranslation()
 
   return (
-    <HorizontallyCenteredDiv>
+    <HorizontallyCenteredDiv className="prose">
       <h1>{t("About.label")}</h1>
       <p>{t("About.text")}</p>
-      <h2 className="mt-5">{t("About.activeLearning.label")}</h2>
+      <h2>{t("About.activeLearning.label")}</h2>
       <p>{t("About.activeLearning.text")}</p>
-      <h2 className="mt-5">{t("About.spacedRepetition.label")}</h2>
+      <h2>{t("About.spacedRepetition.label")}</h2>
       <p>
         <Markdown
           md={format(t("About.spacedRepetition.text"), [
@@ -23,7 +23,7 @@ export function About() {
           ])}
         />
       </p>
-      <h2 className="mt-5">{t("About.individuallyAdaptive.label")}</h2>
+      <h2>{t("About.individuallyAdaptive.label")}</h2>
       <p>
         <Markdown
           md={format(t("About.individuallyAdaptive.text"), [
@@ -31,7 +31,7 @@ export function About() {
           ])}
         />
       </p>
-      <h2 className="mt-5">{t("About.development.label")}</h2>
+      <h2>{t("About.development.label")}</h2>
       <p>
         <Markdown
           md={format(t("About.development.text"), [
@@ -39,7 +39,7 @@ export function About() {
           ])}
         />
       </p>
-      <h2 className="mt-5">{t("About.sourceCode.label")}</h2>
+      <h2>{t("About.sourceCode.label")}</h2>
       <p>
         <Markdown md={t("About.sourceCode.text")}>
           <SiReact className="inline" />
@@ -48,7 +48,7 @@ export function About() {
           {"https://github.com/goethe-tcs/algo-learn/"}
         </Markdown>
       </p>
-      <h2 className="mt-5">{t("About.inspiration.label")}</h2>
+      <h2>{t("About.inspiration.label")}</h2>
       <p>
         <Markdown md={t("About.inspiration.text")}>
           <SiDuolingo className="inline" />
@@ -56,7 +56,7 @@ export function About() {
           {"https://research.duolingo.com/"}
         </Markdown>
       </p>{" "}
-      <h2 className="mt-5">{t("About.authors.label")}</h2>
+      <h2>{t("About.authors.label")}</h2>
       <p>
         <Markdown md={t("About.authors.text") ?? undefined} />
       </p>

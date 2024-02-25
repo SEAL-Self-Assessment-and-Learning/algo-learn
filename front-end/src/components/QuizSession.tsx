@@ -1,5 +1,5 @@
 import { ReactElement, useMemo, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 
 import { serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
 import Random, { sampleRandomSeed } from "../../../shared/src/utils/random"
@@ -7,7 +7,7 @@ import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { sortByStrength, useSkills } from "../hooks/useSkills"
 import { useTranslation } from "../hooks/useTranslation"
 import { generatorSetBelowPath } from "../listOfQuestions"
-import { Button } from "./Button"
+import { Button } from "@/components/ui/button"
 import { ScreenCenteredDiv } from "./CenteredDivs"
 import { Result } from "./QuestionComponent"
 import { ViewSingleQuestion } from "../routes/ViewSingleQuestion"
@@ -166,8 +166,8 @@ export function QuizSession({
     return (
       <ScreenCenteredDiv>
         {t("quiz-session-aborted")}
-        <Button to={"/"} color="green">
-          {t("Continue")}
+        <Button asChild variant="rightAnswer">
+          <Link to={"/"}>{t("Continue")}</Link>
         </Button>
       </ScreenCenteredDiv>
     )
@@ -225,11 +225,11 @@ export function QuizSession({
       <div className="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
         <div className="font-serif italic">{msg}</div>
         <Button
-          to={"/"}
-          color="green"
+          asChild
+          variant="rightAnswer"
           className="ml-auto mt-12 block max-w-max"
         >
-          {t("Continue")}
+          <Link to="/">{t("Continue")}</Link>
         </Button>
       </div>
     </ScreenCenteredDiv>

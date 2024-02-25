@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     "target": "ESNext",
+    "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "Bundler",
+    "moduleResolution": "bundler",
     "types": ["vite/client"],
 
     "allowImportingTsExtensions": true,
@@ -24,7 +25,8 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./front-end/src/*"]
+      "@/*": ["front-end/src/*"],
+      "@shared/*": ["shared/src/*"]
     }
   },
   "include": ["shared/src", "front-end/src"],

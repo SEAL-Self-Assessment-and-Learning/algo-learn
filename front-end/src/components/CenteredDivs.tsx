@@ -1,4 +1,5 @@
 import { HTMLAttributes, ReactElement } from "react"
+import { twMerge } from "tailwind-merge"
 
 /**
  * A container for horizontally centered content. Intended to be used as a
@@ -13,7 +14,10 @@ export function HorizontallyCenteredDiv(
   return (
     <div
       {...props}
-      className={`mx-auto block max-w-xl p-3 ${props.className ?? ""}`}
+      className={twMerge(
+        "mx-auto block w-full max-w-xl p-3 pt-12",
+        props.className,
+      )}
     />
   )
 }
@@ -31,9 +35,10 @@ export function ScreenCenteredDiv(
   return (
     <div
       {...props}
-      className={`m-auto flex h-full max-w-xl place-items-center p-8 text-xl ${
-        props.className ?? ""
-      }`}
+      className={twMerge(
+        "m-auto flex h-full max-w-xl place-items-center p-8 text-xl",
+        props.className,
+      )}
     />
   )
 }

@@ -2,6 +2,7 @@ import { validateParameters } from "../../api/Parameters"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
+  FreeTextQuestion,
   minimalMultipleChoiceFeedback,
   Question,
   QuestionGenerator,
@@ -185,9 +186,10 @@ export const RecurrenceMaster: QuestionGenerator = {
         text,
         prompt,
         bottomText,
+        placeholder: "n^2 * log(n)",
         feedback,
         checkFormat,
-      }
+      } as FreeTextQuestion
     }
     return { question }
   },

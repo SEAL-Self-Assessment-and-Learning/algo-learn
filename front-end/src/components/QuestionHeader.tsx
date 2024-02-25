@@ -28,7 +28,7 @@ export function QuestionHeader({
   const idString = permalink ? permalink.replaceAll("/", "-") : ""
   const [recentlyCopied, setRecentlyCopied] = useState(false)
   return (
-    <h1>
+    <h1 className="text-2xl font-bold">
       {title != undefined && title + " "}
       {permalink && (
         <>

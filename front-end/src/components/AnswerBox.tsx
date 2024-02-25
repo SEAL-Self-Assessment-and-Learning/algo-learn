@@ -58,7 +58,7 @@ export function AnswerBox({
       className={`select-none rounded-lg p-2 ring-4 ${
         disabled
           ? ""
-          : "cursor-pointer hover:bg-goethe-100 hover:dark:bg-goethe-900"
+          : "hover:bg-goethe-100 hover:dark:bg-goethe-900 cursor-pointer"
       } ${AnswerBoxStyle[style]} ${className}`}
     >
       {children}
