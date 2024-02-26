@@ -8,12 +8,10 @@ import {
 import { serializeGeneratorCall } from "../../api/QuestionRouter.ts"
 
 import {
-  BinaryOperatorType,
-  binaryOperatorTypes,
-  Literal,
-  Operator,
-  SyntaxTreeNodeType,
   VariableValues,
+  generateRandomExpression,
+  generateRandomTautology,
+  generateRandomContradiction,
 } from "../../utils/propositionalLogic.ts"
 import { Language } from "../../api/Language.ts"
 
@@ -52,51 +50,6 @@ const variableNames = [
   ["A", "B", "C", "D", "E", "F"],
   ["u", "v", "w", "x", "y", "z"],
 ]
-
-function generateRandomExpression(
-  random: Random,
-  numLeaves: number,
-  variableNames: string[],
-): SyntaxTreeNodeType {
-  if (numLeaves === 1) {
-    return new Literal(random.choice(variableNames), random.bool(0.2))
-  } else {
-    const [leftVariables, rightVariables] =
-      numLeaves == 2 ? random.splitArray(variableNames) : [variableNames, variableNames]
-    const leafDistribution = random.split(numLeaves, 2, 1)
-    const leftOperand = generateRandomExpression(random, leafDistribution[0], leftVariables)
-    const rightOperand = generateRandomExpression(random, leafDistribution[1], rightVariables)
-    return new Operator(random.choice(binaryOperatorTypes), leftOperand, rightOperand)
-  }
-}
-
-function generateRandomTautology(
-  random: Random,
-  numLeaves: number,
-  variableNames: string[],
-): SyntaxTreeNodeType {
-  const operand = generateRandomExpression(random, Math.floor(numLeaves / 2), variableNames)
-  const rootOperator = random.choice(["<=>", "=>", "\\xor", "\\or"] as BinaryOperatorType[])
-  if (rootOperator === "\\or") {
-    return new Operator(rootOperator, operand.copy().negate(), operand).shuffle(random)
-  } else {
-    return new Operator(rootOperator, operand.copy(), operand).shuffle(random)
-  }
-}
-
-function generateRandomContradiction(
-  random: Random,
-  numLeaves: number,
-  variableNames: string[],
-): SyntaxTreeNodeType {
-  const operand = generateRandomExpression(random, Math.floor(numLeaves / 2), variableNames)
-  const rootOperator = random.choice(["<=>", "\\xor", "\\and"] as BinaryOperatorType[])
-  if (rootOperator === "\\xor") {
-    return new Operator(rootOperator, operand.copy(), operand).shuffle(random).simplifyNegation()
-  } else {
-    return new Operator(rootOperator, operand.copy().negate(), operand).shuffle(random).simplifyNegation()
-  }
-}
 
 function getAdditionalFeedbackText(
   satisfiable: false | VariableValues,

@@ -53,6 +53,15 @@ abstract class SyntaxTreeNode {
     return this
   }
 
+  public abstract invertAllLiterals(): this
+
+  /**
+   * Inverts at most maxNumVariables many literals but at least one
+   * @param random
+   * @param maxNumVariables
+   */
+  public abstract invertRandomLiterals(random: Random, maxNumVariables: number): this
+
   protected static getTruthTableSize(vs: number | string[]): number {
     const size = typeof vs === "number" ? vs : vs.length
     return 1 << size
@@ -212,6 +221,16 @@ export class Literal extends SyntaxTreeNode {
 
   public isDNF(): boolean {
     return true
+  }
+
+  public invertAllLiterals(): this {
+    return this.negate()
+  }
+
+  public invertRandomLiterals(random: Random, maxNumVariables: number): this {
+    if (maxNumVariables > 0) this.negate()
+
+    return this
   }
 }
 
@@ -542,6 +561,23 @@ export class Operator extends SyntaxTreeNode {
       (this.type === "\\and" && this.leftOperand.isConjunction() && this.rightOperand.isConjunction())
     )
   }
+
+  public invertAllLiterals(): this {
+    this.leftOperand.invertAllLiterals()
+    this.rightOperand.invertAllLiterals()
+
+    return this
+  }
+
+  public invertRandomLiterals(random: Random, maxNumVariables: number): this {
+    if (maxNumVariables > 0) {
+      const maxNumVariablesSplit = random.split(maxNumVariables, 2)
+      this.leftOperand.invertRandomLiterals(random, maxNumVariablesSplit[0])
+      this.rightOperand.invertRandomLiterals(random, maxNumVariablesSplit[1])
+    }
+
+    return this
+  }
 }
 
 export type SyntaxTreeNodeType = Operator | Literal
@@ -653,7 +689,7 @@ export class PropositionalLogicParser {
     if (nextTokenStartIndex === str.length) return leftOperand
 
     // operator
-    const nextTokenRegEx = /\s*([^\s]*)/g
+    const nextTokenRegEx = /\s*(\S*)/g
     nextTokenRegEx.lastIndex = nextTokenStartIndex
     const operator = nextTokenRegEx.exec(str)
     if (operator === null || !binaryOperatorTypes.includes(operator[1] as BinaryOperatorType)) {
@@ -685,5 +721,60 @@ export class PropositionalLogicParser {
     }
 
     throw new ParserError(`Missing closing parenthesis (level: ${level})`)
+  }
+}
+
+export function generateRandomExpression(
+  random: Random,
+  numLeaves: number,
+  variableNames: string[],
+): SyntaxTreeNodeType {
+  if (numLeaves === 1) {
+    return new Literal(random.choice(variableNames), random.bool(0.2))
+  } else {
+    const [leftVariables, rightVariables] =
+      numLeaves == 2 ? random.splitArray(variableNames) : [variableNames, variableNames]
+    const leafDistribution = random.split(numLeaves, 2, 1)
+    const leftOperand = generateRandomExpression(random, leafDistribution[0], leftVariables)
+    const rightOperand = generateRandomExpression(random, leafDistribution[1], rightVariables)
+    return new Operator(
+      random.weightedChoice(binaryOperatorTypes, [0.35, 0.35, 0.1, 0.1, 0.1]),
+      leftOperand,
+      rightOperand,
+    )
+  }
+}
+
+export function generateRandomTautology(
+  random: Random,
+  numLeaves: number,
+  variableNames: string[],
+): SyntaxTreeNodeType {
+  const operand = generateRandomExpression(random, Math.floor(numLeaves / 2), variableNames)
+  const rootOperator = random.weightedChoice(
+    ["\\or", "<=>", "=>", "\\xor"] as BinaryOperatorType[],
+    [0.6, 0.15, 0.15, 0.1],
+  )
+  if (rootOperator === "\\or") {
+    return new Operator(rootOperator, operand.copy().negate(), operand).shuffle(random)
+  } else {
+    return new Operator(rootOperator, operand.copy(), operand).shuffle(random)
+  }
+}
+
+export function generateRandomContradiction(
+  random: Random,
+  numLeaves: number,
+  variableNames: string[],
+): SyntaxTreeNodeType {
+  const operand = generateRandomExpression(random, Math.floor(numLeaves / 2), variableNames)
+  const rootOperator = random.weightedChoice(
+    ["\\and", "<=>", "\\xor"] as BinaryOperatorType[],
+    [0.7, 0.2, 0.1],
+  )
+  if (rootOperator === "\\xor") {
+    return new Operator(rootOperator, operand.copy(), operand).shuffle(random)
+  } else {
+    return new Operator(rootOperator, operand.copy().negate(), operand).shuffle(random)
   }
 }
