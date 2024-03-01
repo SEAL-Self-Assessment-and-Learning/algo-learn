@@ -72,6 +72,7 @@ export interface BasicMultipleChoiceQuestion {
 export function basicMultipleChoiceMetaGenerator(
   name: (lang: Language) => string,
   questions: BasicMultipleChoiceQuestion[],
+  description?: (lang: Language) => string,
 ): QuestionGenerator {
   const variants = questions.map((_, i) => i)
   const languages = Object.keys(questions[0].translations) as Language[]
@@ -169,6 +170,7 @@ export function basicMultipleChoiceMetaGenerator(
 
   const generator: QuestionGenerator = {
     name,
+    description,
     languages,
     expectedParameters,
     generate,

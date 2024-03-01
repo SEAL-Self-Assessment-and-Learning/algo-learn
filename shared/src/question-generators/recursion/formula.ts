@@ -19,26 +19,28 @@ import {
 const translations: Translations = {
   en: {
     basecase: "The base case is",
-    description:
+    text1:
       "Consider the following recursive procedure `{{0}}` with integer input ${{1}}$:",
-    description2:
+    text2:
       "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
     "long-name": "Recurrence Relation",
     question: "What is the recurrence relation of",
     name: "Recurrence",
+    description: "Determine the recurrence relation of a recursive function",
     bottomnote:
       "Note: This field expects a string of the form `{{0}}` as input.",
     "feedback.incomplete": "Incomplete or too complex",
   },
   de: {
     basecase: "Der Basisfall ist",
-    description:
+    text1:
       "Betrachte die folgende rekursive Prozedur `{{0}}` mit ganzzahliger Eingabe ${{1}}$:",
-    description2:
+    text2:
       "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
     "long-name": "Rekurrenzrelation",
     question: "Was ist die Rekurrenzrelation von",
     name: "Rekurrenz",
+    description: "Bestimme die Rekurrenzrelation einer rekursiven Funktion",
     bottomnote:
       "Hinweis: Dieses Feld erwartet einen String der Form `{{0}}` als Eingabe.",
     "feedback.incomplete": "Nicht vollständig oder zu komplex",
@@ -47,6 +49,7 @@ const translations: Translations = {
 
 export const RecursionFormula: QuestionGenerator = {
   name: tFunctional(translations, "name"),
+  description: tFunctional(translations, "description"),
   languages: ["en", "de"],
   expectedParameters: [
     {
@@ -82,13 +85,13 @@ export const RecursionFormula: QuestionGenerator = {
     const answers = sampleRecurrenceAnswers({ random, T, n, a, b, c, d })
 
     let text = `
-${format(t("description"), [functionName, n])}
+${format(t("text1"), [functionName, n])}
 
 \`\`\`python3
 ${functionText.trim()}
 \`\`\`
 
-${format(t("description2"), [`${T}(${n})`])}`
+${format(t("text2"), [`${T}(${n})`])}`
 
     if (variant !== "choice") {
       text += ` ${t("basecase")} $${T}(1)=${d}$.`

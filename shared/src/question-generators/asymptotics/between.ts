@@ -26,6 +26,7 @@ const translation: Translations = {
     note: "Note: This text field accepts *simple* mathematical formulas, such as `{{0}}`, `{{1}}`, or `{{2}}`.",
     text: "Enter a function ${{0}}$ that satisfies \\[{{1}}\\] and \\[{{2}}\\,.\\]",
     name: "Between",
+    description: "Find a function satisfying asymptotic conditions",
     "feedback.unknown-variable": "Unknown variable",
     "feedback.expected": "Expected",
     "feedback.invalid-expression": "invalid formula",
@@ -35,6 +36,7 @@ const translation: Translations = {
     "Theta.text": "Gib eine Funktion ${{0}}$ an, die ${{1}}$ erfüllt.",
     note: "Hinweis: Dieses Feld erwartet *einfache* mathematische Formeln, wie etwa `{{0}}`, `{{1}}`, oder `{{2}}`.",
     text: "Gib eine Funktion ${{0}}$ an, die \\[{{1}}\\] und \\[{{2}}\\] erfüllt.",
+    description: "Finde eine Funktion, die asymptotische Bedingungen erfüllt",
     name: "Dazwischen",
     "feedback.unknown-variable": "Unbekannte Variable",
     "feedback.expected": "Erwartet",
@@ -46,6 +48,7 @@ const translation: Translations = {
 /** Generate and render a question about O/Omega/o/omega */
 export const Between: QuestionGenerator = {
   name: tFunctional(translation, "name"),
+  description: tFunctional(translation, "description"),
   languages: ["en", "de"],
   expectedParameters: [
     {

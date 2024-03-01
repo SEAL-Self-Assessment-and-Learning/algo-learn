@@ -25,10 +25,11 @@ import Fraction from "fraction.js"
 const translations: Translations = {
   en: {
     code: "\\[{{0}}\\]",
-    description:
+    text1:
       "Let $ {{0}}(n) $ for positive integers $n$ be defined via the following recurrence relations:\\[{{1}}\\] \\[{{2}}\\,.\\]",
-    description2: `Use the master theorem to find a closed form of $ {{0}} $ in $\\Theta$-notation.`,
-    name: "RecurrenceMaster",
+    text2: `Use the master theorem to find a closed form of $ {{0}} $ in $\\Theta$-notation.`,
+    name: "Master Theorem",
+    description: "Find the closed form of a recurrence relation",
     bottomnote:
       "Note: You can assume that $n = {{0}}$ for a $k \\in \\mathbb{N}$ with $k>0$",
     "feedback.incomplete": "Incomplete or too complex",
@@ -40,10 +41,11 @@ const translations: Translations = {
   },
   de: {
     code: "\\[{{0}}\\]",
-    description:
+    text1:
       "Sei $ {{0}}(n) $ für positive ganze Zahlen $n$ definiert durch die folgende Rekursionsgleichung:\\[{{1}}\\] \\[{{2}}\\,.\\]",
-    description2: `Verwende das Mastertheorem, um für $ {{0}} $ eine geschlossene Form in $\\Theta$-Notation zu erhalten.`,
-    name: "RecurrenceMaster",
+    text2: `Verwende das Mastertheorem, um für $ {{0}} $ eine geschlossene Form in $\\Theta$-Notation zu erhalten.`,
+    name: "Mastertheorem",
+    description: "Finde die geschlossene Form für eine Rekursionsgleichung",
     bottomnote:
       "Hinweis: Du kannst davon ausgehen, dass $n = {{0}}$ gilt für ein $k\\in \\mathbb{N}$ mit $k>0$",
     "feedback.incomplete": "Unvollständig oder zu komplex",
@@ -57,6 +59,7 @@ const translations: Translations = {
 
 export const RecurrenceMaster: QuestionGenerator = {
   name: tFunctional(translations, "name"),
+  description: tFunctional(translations, "description"),
   languages: ["en", "de"],
   expectedParameters: [
     {
@@ -98,13 +101,13 @@ export const RecurrenceMaster: QuestionGenerator = {
       c,
     })
     const text = `
-    ${format(t("description"), [
+    ${format(t("text1"), [
       T,
       `${T}(n) = ${a === 1 ? "" : a} ${T}(n/${b}) + ${c.toLatex("n")}`,
       `${T}(1) = ${d}`,
     ])}
 
-    ${format(t("description2"), [`${T}(n)`])}`
+    ${format(t("text2"), [`${T}(n)`])}`
     let question: Question
     if (variant === "choice") {
       question = {

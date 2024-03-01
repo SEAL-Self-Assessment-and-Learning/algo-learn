@@ -10,16 +10,19 @@ import { tFunction, tFunctional, Translations } from "../../utils/translations"
 const translations: Translations = {
   en: {
     name: "Landau Notation",
+    description: "Compare functions by their asymptotic growth",
     text: "Which of these statements are true? Select all that apply.",
   },
   de: {
     name: "Landau Notation",
+    description: "Vergleiche Funktionen nach ihrem asymptotischen Wachstum",
     text: "Welche dieser Aussagen sind wahr? Wähle alle aus.",
   },
 }
 /** Multiple-choice questions for asymptotic notation */
 export const LandauNotation: QuestionGenerator = {
   name: tFunctional(translations, "name"),
+  description: tFunctional(translations, "description"),
   expectedParameters: [
     // {
     //   type: "boolean",

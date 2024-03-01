@@ -245,13 +245,20 @@ const questions: BasicMultipleChoiceQuestion[] = [
   },
 ]
 
-const titleTranslations = {
-  en: { title: "Precise phrasing: Oh-Notation" },
-  de: { title: "Präzises Formulieren: Oh-Notation" },
+const metaTranslations = {
+  en: {
+    title: "Oh-Notation",
+    description: "Correctly interpret Oh-Notation",
+  },
+  de: {
+    title: "Oh-Notation",
+    description: "Oh-Notation korrekt interpretieren",
+  },
 }
 
 export const AsymptoticsPreciseLanguage: QuestionGenerator =
   basicMultipleChoiceMetaGenerator(
-    tFunctional(titleTranslations, "title"),
+    tFunctional(metaTranslations, "title"),
     questions,
+    tFunctional(metaTranslations, "description"),
   )

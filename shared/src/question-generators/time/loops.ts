@@ -12,31 +12,34 @@ import { sampleLoop } from "./loopsUtils"
 
 const translations: Translations = {
   en: {
-    description:
+    name: "Loops",
+    description: "Determine the number of iterations in a loop",
+    text1:
       "Consider the following procedure `{{0}}` with integer input ${{1}}$:",
-    description2:
+    text2:
       "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
     "long-title": "Loops",
     "simpleExact.description": "Consider the following piece of code:",
     "simpleExact.prompt": "Number of stars:",
     "simpleExact.question": "How many stars are printed?",
-    name: "Loops",
   },
   de: {
-    description:
+    name: "Schleifen",
+    description: "Bestimme die Anzahl der Iterationen in einer Schleife",
+    text1:
       "Betrachte die folgende Prozedur {{0}} mit ganzzahliger Eingabe {{1}}:",
-    description2:
+    text2:
       "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
     "long-title": "Schleifen",
     "simpleExact.description": "Betrachte den folgenden Code:",
     "simpleExact.prompt": "Anzahl der Sterne:",
     "simpleExact.question": "Wie viele Sterne werden ausgegeben?",
-    name: "Schleifen",
   },
 }
 
 export const Loops: QuestionGenerator = {
   name: tFunctional(translations, "name"),
+  description: tFunctional(translations, "description"),
   languages: ["en", "de"],
   expectedParameters: [
     {
@@ -68,13 +71,13 @@ export const Loops: QuestionGenerator = {
 
     const T = random.choice("TABCDEFGHS".split(""))
     const description = `
-${t("description", [functionName, n])}
+${t("text1", [functionName, n])}
 
 \`\`\`python3
 ${functionText}
 \`\`\`
 
-${t("description2", [`${T}(${n})`])}`
+${t("text2", [`${T}(${n})`])}`
     const prompt = t("simpleExact.prompt")
     const feedback: FreeTextFeedbackFunction = ({ text }) => {
       if (text === "") {

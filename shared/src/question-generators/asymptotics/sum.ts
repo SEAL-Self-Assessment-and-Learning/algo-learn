@@ -13,10 +13,12 @@ import { sampleTermSet, TermSetVariants } from "./asymptoticsUtils"
 const translations: Translations = {
   en: {
     text: "Let ${{0}}$ be defined via \\[{{1}}\\,.\\] Which asymptotic growth is correct for this function? Choose exactly one answer:",
+    description: "Determine the asymptotically dominant term in a sum",
     name: "Sum",
   },
   de: {
     text: "Sei ${{0}}$ definiert durch \\[{{1}}\\,.\\] Welches asymptotische Wachstum ist für diese Funktion richtig? Wähle genau eine Antwort aus:",
+    description: "Bestimme den asymptotisch dominanten Term in einer Summe",
     name: "Summe",
   },
 }
@@ -27,6 +29,7 @@ const translations: Translations = {
  */
 export const SimplifySum: QuestionGenerator = {
   name: tFunctional(translations, "name"),
+  description: tFunctional(translations, "description"),
   languages: ["en", "de"],
   expectedParameters: [
     {

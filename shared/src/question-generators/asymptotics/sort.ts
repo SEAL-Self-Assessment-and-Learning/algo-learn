@@ -16,11 +16,12 @@ import {
 const translations: Translations = {
   en: {
     name: "Sort",
-    description: "Compare functions by their asymptotic growth.",
+    description: "Compare functions by their asymptotic growth",
     text: "Sort the following terms from smallest to largest growth rate:",
   },
   de: {
     name: "Sortiere",
+    description: "Vergleiche Funktionen nach ihrem asymptotischen Wachstum",
     text: "Sortiere die folgenden Terme von kleinstem zu größtem asymptotischen Wachstum:",
   },
 }

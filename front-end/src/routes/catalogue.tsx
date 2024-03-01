@@ -75,17 +75,26 @@ export function Catalogue() {
       </Card>
       {selectedGroup && (
         <>
-          <h2 className="font-bold">{t("Catalogue.selectExercise")}</h2>
-          <ol className="my-4">
-            {generatorsInGroup(selectedGroup).map((x) => (
-              <li
-                key={x?.generatorPath}
-                className="list-item list-inside list-decimal"
-              >
+          <h2 className="mt-16 text-xl font-bold">
+            {t("Catalogue.selectExercise")}
+          </h2>
+          {generatorsInGroup(selectedGroup).map((x) => (
+            <Card className="text-fixed-foreground my-8 w-fit bg-fixed p-0">
+              <CardHeader key={x?.generatorPath} className="m-0 p-3">
+                <CardTitle className="text-base">
+                  {x?.generator.name(lang)}
+                </CardTitle>
+                {x?.generator.description && (
+                  <CardDescription>
+                    {x?.generator.description(lang)}
+                  </CardDescription>
+                )}
+              </CardHeader>
+              <CardContent className="m-0 p-3">
                 <div className="inline-flex items-center gap-2">
-                  <Button asChild variant="link">
+                  <Button asChild variant="secondary" size="sm">
                     <Link to={`/${lang}/practice/${x?.generatorPath}`}>
-                      {x?.generator.name(lang)}
+                      {t("Catalogue.practice")}
                     </Link>
                   </Button>
                   {showAllVariants &&
@@ -100,9 +109,9 @@ export function Catalogue() {
                       </Link>
                     ))}
                 </div>
-              </li>
-            ))}
-          </ol>
+              </CardContent>
+            </Card>
+          ))}
         </>
       )}
     </HorizontallyCenteredDiv>
