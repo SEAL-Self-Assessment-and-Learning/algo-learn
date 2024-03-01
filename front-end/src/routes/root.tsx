@@ -51,13 +51,11 @@ function GlobalHeader() {
   }, [theme])
 
   return (
-    <header className="flex flex-none flex-wrap place-items-center justify-between gap-1 bg-primary p-2 text-primary-foreground">
+    <header className="flex flex-none flex-wrap place-items-center justify-between gap-1 border-b-2 bg-goethe p-2 text-goethe-foreground">
       <div className="flex-grow text-2xl">
         <Link to="/" className="unstyled no-underline">
           algo learn{" "}
-          <span className="font-mono text-sm text-yellow-500 dark:text-yellow-800">
-            alpha
-          </span>
+          <span className="font-mono text-sm text-yellow-200">alpha</span>
         </Link>
       </div>
       <DropdownMenu>

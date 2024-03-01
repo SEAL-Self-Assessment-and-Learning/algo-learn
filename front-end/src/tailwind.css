@@ -33,6 +33,9 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+
+    --goethe: 199.3, 100%, 28.04%;
+    --goethe-foreground: 0 0% 100%;
   }
 
   .dark {
