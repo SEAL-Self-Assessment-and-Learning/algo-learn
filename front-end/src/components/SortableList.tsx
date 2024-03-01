@@ -13,8 +13,9 @@ import {
 import { ReactNode } from "react"
 import { RxDragHandleHorizontal } from "react-icons/rx"
 
-import { AnswerBox } from "./AnswerBox"
 import { DragHandle, SortableItem } from "./SortableItem"
+import { cn } from "@/lib/utils"
+import { Button } from "./ui/button"
 
 export interface BaseItem {
   position: number
@@ -76,15 +77,18 @@ export function SortableList({
       <SortableContext items={itemsWithIds.map(({ id }) => ({ id }))}>
         <ul
           {...props}
-          className={`mx-auto flex max-w-max list-none flex-col gap-2 ${className}`}
+          className={cn(
+            "mx-auto flex max-w-max list-none flex-col gap-2",
+            className,
+          )}
           role="application"
         >
           {itemsWithIds.map((item) => (
             <SortableList.Item key={item.id} id={item.id} disabled={disabled}>
               <RxDragHandleHorizontal />
-              <AnswerBox TagName="div" disabled={disabled}>
-                {item.element}
-              </AnswerBox>
+              <Button variant="outline" asChild>
+                <div>{item.element}</div>
+              </Button>
               <div></div>
             </SortableList.Item>
           ))}

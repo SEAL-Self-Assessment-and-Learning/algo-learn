@@ -28,6 +28,7 @@ import {
   skillGroups,
 } from "../listOfQuestions"
 import { howLongSince } from "../utils/howLongSince"
+import { cn } from "@/lib/utils"
 
 /** LearningProgress component */
 export function LearningProgress() {
@@ -181,11 +182,17 @@ function PassFailButton({
 }) {
   return result === "pass" ? (
     <BsFillCheckSquareFill
-      className={`mb-[0.2ex] inline w-[0.75em] text-lg text-green-700 dark:text-green-500 ${className}`}
+      className={cn(
+        "mb-[0.2ex] inline w-[0.75em] text-lg text-green-700 dark:text-green-500",
+        className,
+      )}
     />
   ) : (
     <BsFillXSquareFill
-      className={`mb-[0.2ex] inline w-[0.75em] text-lg text-red-700 dark:text-red-500 ${className}`}
+      className={cn(
+        "mb-[0.2ex] inline w-[0.75em] text-lg text-red-700 dark:text-red-500",
+        className,
+      )}
     />
   )
 }
