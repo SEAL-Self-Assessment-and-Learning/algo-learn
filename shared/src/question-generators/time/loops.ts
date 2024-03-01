@@ -28,8 +28,7 @@ const translations: Translations = {
     description: "Bestimme die Anzahl der Iterationen in einer Schleife",
     text1:
       "Betrachte die folgende Prozedur {{0}} mit ganzzahliger Eingabe {{1}}:",
-    text2:
-      "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
+    text2: "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
     "long-title": "Schleifen",
     "simpleExact.description": "Betrachte den folgenden Code:",
     "simpleExact.prompt": "Anzahl der Sterne:",

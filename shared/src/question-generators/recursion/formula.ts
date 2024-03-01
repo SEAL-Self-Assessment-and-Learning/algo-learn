@@ -35,8 +35,7 @@ const translations: Translations = {
     basecase: "Der Basisfall ist",
     text1:
       "Betrachte die folgende rekursive Prozedur `{{0}}` mit ganzzahliger Eingabe ${{1}}$:",
-    text2:
-      "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
+    text2: "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
     "long-name": "Rekurrenzrelation",
     question: "Was ist die Rekurrenzrelation von",
     name: "Rekurrenz",

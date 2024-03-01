@@ -79,8 +79,11 @@ export function Catalogue() {
             {t("Catalogue.selectExercise")}
           </h2>
           {generatorsInGroup(selectedGroup).map((x) => (
-            <Card className="text-fixed-foreground my-8 w-fit bg-fixed p-0">
-              <CardHeader key={x?.generatorPath} className="m-0 p-3">
+            <Card
+              key={x?.generatorPath}
+              className="text-fixed-foreground my-8 w-fit bg-fixed p-0"
+            >
+              <CardHeader className="m-0 p-3">
                 <CardTitle className="text-base">
                   {x?.generator.name(lang)}
                 </CardTitle>
