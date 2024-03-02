@@ -217,7 +217,7 @@ function SkillGroupCard({
       <Link
         id={`skill-group-card-${partialPath}`}
         to={`practice/${partialPath}`}
-        className="unstyled hover:bg-shading group rounded-lg p-2 text-center hover:cursor-pointer"
+        className="hover:bg-shading group rounded-lg p-2 text-center hover:cursor-pointer"
       >
         <div className="relative">
           <div

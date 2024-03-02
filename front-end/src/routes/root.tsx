@@ -53,19 +53,24 @@ function GlobalHeader() {
   return (
     <header className="flex flex-none flex-wrap place-items-center justify-between gap-1 border-b-2 bg-goethe p-2 text-goethe-foreground">
       <div className="flex-grow text-2xl">
-        <Link to="/" className="unstyled no-underline">
+        <Link to="/">
           algo learn{" "}
           <span className="font-mono text-sm text-yellow-200">alpha</span>
         </Link>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="bg-inherit">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="bg-inherit hover:bg-primary hover:text-primary-foreground"
+            aria-label={t("menu.settings")}
+          >
             <Settings className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
-          <DropdownMenuLabel>Language</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("menu.language")}</DropdownMenuLabel>
           <DropdownMenuRadioGroup
             value={lang}
             onValueChange={(s) => setLang(s as Language)}
@@ -81,7 +86,7 @@ function GlobalHeader() {
             ))}
           </DropdownMenuRadioGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuLabel>Sound</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("menu.sound")}</DropdownMenuLabel>
           <DropdownMenuRadioGroup
             value={muted ? "off" : "on"}
             onValueChange={(s) => setMuted(s === "off")}
@@ -90,17 +95,17 @@ function GlobalHeader() {
               value="on"
               onSelect={(e) => e.preventDefault()}
             >
-              on
+              {t("on")}
             </DropdownMenuRadioItem>
             <DropdownMenuRadioItem
               value="off"
               onSelect={(e) => e.preventDefault()}
             >
-              off
+              {t("off")}
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuLabel>Theme</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("menu.theme")}</DropdownMenuLabel>
           <DropdownMenuRadioGroup
             value={userTheme}
             onValueChange={(s) => setUserTheme(s)}
@@ -119,7 +124,12 @@ function GlobalHeader() {
       </DropdownMenu>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="bg-inherit">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="bg-inherit hover:bg-primary hover:text-primary-foreground"
+            aria-label={t("menu")}
+          >
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
@@ -127,45 +137,37 @@ function GlobalHeader() {
           <DropdownMenuLabel>Menu</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Button asChild variant="link">
-                <Link to={`/${lang}/`}>
-                  <Home className="mr-2 h-4 w-4" /> {t("Home")}
-                </Link>
-              </Button>
+            <DropdownMenuItem asChild>
+              <Link to={`/${lang}/`}>
+                <Home className="mr-2 h-4 w-4" /> {t("Home")}
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Button asChild variant="link">
-                <Link to={`/${lang}/about`}>
-                  <Info className="mr-2 h-4 w-4" /> {t("About.label")}
-                </Link>
-              </Button>
+            <DropdownMenuItem asChild>
+              <Link to={`/${lang}/about`}>
+                <Info className="mr-2 h-4 w-4" /> {t("About.label")}
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Button asChild variant="link">
-                <Link to={`/${lang}/legal`}>
-                  <FileKey2 className="mr-2 h-4 w-4" /> {t("Legal.label")}
-                </Link>
-              </Button>
+            <DropdownMenuItem asChild>
+              <Link to={`/${lang}/legal`}>
+                <FileKey2 className="mr-2 h-4 w-4" /> {t("Legal.label")}
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              {(VERSION as string) === "local build" ? (
-                <Button variant="link">
-                  <WifiOff className="mr-2 h-4 w-4" />
+            {(VERSION as string) === "local build" ? (
+              <DropdownMenuItem>
+                <WifiOff className="mr-2 h-4 w-4" />
+                {`${t("Version")}: ${VERSION}`}
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem asChild>
+                <Link
+                  to={`https://github.com/holgerdell/algo-learn/commit/${VERSION}`}
+                >
+                  <GitCommitHorizontal className="mr-2 h-4 w-4" />{" "}
                   {`${t("Version")}: ${VERSION}`}
-                </Button>
-              ) : (
-                <Button asChild variant="link">
-                  <Link
-                    to={`https://github.com/holgerdell/algo-learn/commit/${VERSION}`}
-                  >
-                    <GitCommitHorizontal className="mr-2 h-4 w-4" />{" "}
-                    {`${t("Version")}: ${VERSION}`}
-                  </Link>
-                </Button>
-              )}
-            </DropdownMenuItem>
+                </Link>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
