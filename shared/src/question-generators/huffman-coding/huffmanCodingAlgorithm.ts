@@ -1,0 +1,106 @@
+/**
+ * This file contains the Huffman Coding Algorithm
+ */
+
+/**
+ * This function takes in a string and returns the Huffman Coding of the string
+ * @param input_word the word to be encoded
+ * @param sorting_variant the variant of the sorting algorithm
+ *                        currently not implemented
+ */
+export function huffmanCodingAlgorithm(input_word: string, sorting_variant : number): string {
+    // split the input word into an dictionary of characters
+    if (sorting_variant === 1) {
+        // currently not implemented
+    }
+    const characters: { [key: string]: number } = {};
+    for (let i = 0; i < input_word.length; i++) {
+        if (characters[input_word[i]]) {
+            characters[input_word[i]] += 1;
+        } else {
+            characters[input_word[i]] = 1;
+        }
+    }
+
+    // create nodes for each character
+    const nodes: Node[] = [];
+    for (const character in characters) {
+        nodes.push(new Node(character, characters[character], null, null));
+    }
+
+    // create a tree based on the characters
+    // connect the two smallest values together
+    while (nodes.length > 1) {
+        // TODO: sort the nodes based on a custom sort function (or store those in a priority queue)
+        nodes.sort((a, b) => sortNodes(a, b));
+        const left = nodes.shift();
+        const right = nodes.shift();
+        if (left && right) {
+            const newNode = new Node(left.value + right.value, left.frequency + right.frequency, left, right);
+            nodes.push(newNode);
+        }
+    }
+
+    const main_node : Node = nodes[0];
+
+    // create the huffman coding for each character
+    const huffmanCoding: { [key: string]: string } = {}
+    for (const character in characters) {
+        huffmanCoding[character] = "";
+    }
+
+    createHuffmanCoding(huffmanCoding, main_node, "");
+
+    let result : string = "";
+    for (let i = 0; i < input_word.length; i++) {
+        result += huffmanCoding[input_word[i]];
+    }
+
+    return result;
+
+    /*
+    Additional functions to create the huffman coding
+     */
+    function createHuffmanCoding(huffmanCode : {[key: string] : string} ,node: Node, code: string) {
+        if (node.left) {
+            huffmanCode = createHuffmanCoding(huffmanCode, node.left, code + "0");
+        }
+        if (node.right) {
+            huffmanCode = createHuffmanCoding(huffmanCode, node.right, code + "1");
+        }
+        if (node.value.length === 1) {
+            huffmanCode[node.value] = code;
+        }
+        return huffmanCode;
+    }
+
+    function sortNodes(a: Node, b: Node) {
+        // if a equals b compare them alphabetically
+        // compare the frequency of the two nodes
+        if (a.frequency === b.frequency) {
+            // compare the smallest letter of the two node strings
+            return (a.value.split('').sort().join('')).localeCompare(
+                (b.value.split('').sort().join('')));
+        }
+        return a.frequency - b.frequency;
+    }
+}
+
+/**
+ * This class represents a node in the huffman tree
+ */
+class Node {
+    public value: string;
+    public frequency: number;
+    public left: Node | null;
+    public right: Node | null;
+    public personalCode: string;
+
+    constructor(value: string, frequency: number, left: Node | null, right: Node | null) {
+        this.value = value;
+        this.frequency = frequency;
+        this.left = left;
+        this.right = right;
+        this.personalCode = "";
+    }
+}
