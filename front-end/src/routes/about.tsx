@@ -10,7 +10,7 @@ export function About() {
   const { t, lang } = useTranslation()
 
   return (
-    <HorizontallyCenteredDiv className="prose">
+    <HorizontallyCenteredDiv className="prose dark:prose-invert">
       <h1>{t("About.label")}</h1>
       <p>{t("About.text")}</p>
       <h2>{t("About.activeLearning.label")}</h2>
