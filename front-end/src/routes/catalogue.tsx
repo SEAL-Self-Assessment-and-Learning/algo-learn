@@ -28,6 +28,7 @@ import {
 import { QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { ChevronRight } from "lucide-react"
 import { useHistoryState } from "@/hooks/useHistoryState"
+import { Label } from "@/components/ui/label"
 
 export function Catalogue() {
   const { t } = useTranslation()
@@ -117,12 +118,7 @@ function TopicSelectorCard({
               onCheckedChange={(b) => setShowAllVariants(b === true)}
             />
             <div className="grid gap-1.5 leading-none">
-              <label
-                htmlFor="terms1"
-                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                {t("Catalogue.showVariants")}
-              </label>
+              <Label htmlFor="terms1">{t("Catalogue.showVariants")}</Label>
             </div>
           </div>
         )}

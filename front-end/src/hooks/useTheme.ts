@@ -4,6 +4,7 @@ import useLocalStorageState from "use-local-storage-state"
 export const LIGHT = "light"
 export const DARK = "dark"
 export const OSDEFAULT = "OS default"
+export type Themes = typeof LIGHT | typeof DARK | typeof OSDEFAULT
 export const availableThemes = [LIGHT, DARK, OSDEFAULT]
 
 /**
@@ -13,9 +14,9 @@ export const availableThemes = [LIGHT, DARK, OSDEFAULT]
  *   be either `LIGHT` or `DARK`.
  */
 export function useOSdefaultTheme() {
-  const [OSdefaultTheme, setOSdefaultTheme] = useState(
-    window.matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT,
-  )
+  const [OSdefaultTheme, setOSdefaultTheme] = useState<
+    typeof LIGHT | typeof DARK
+  >(window.matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT)
   useEffect(() => {
     window
       .matchMedia("(prefers-color-scheme: dark)")
@@ -35,7 +36,7 @@ export function useOSdefaultTheme() {
  */
 export function useTheme() {
   const [userTheme, setUserTheme] = useLocalStorageState("theme", {
-    defaultValue: OSDEFAULT,
+    defaultValue: OSDEFAULT as Themes,
   })
   const OSdefaultTheme = useOSdefaultTheme()
   const theme = userTheme == OSDEFAULT ? OSdefaultTheme : userTheme

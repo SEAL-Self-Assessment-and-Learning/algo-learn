@@ -12,7 +12,7 @@ import {
 
 import { VERSION } from "@/config"
 import { useSound } from "@/hooks/useSound"
-import { availableThemes, useTheme } from "@/hooks/useTheme"
+import { Themes, availableThemes, useTheme } from "@/hooks/useTheme"
 import {
   NATIVE_NAME,
   SUPPORTED_LANGUAGES,
@@ -111,7 +111,7 @@ function GlobalHeader() {
           <DropdownMenuLabel>{t("menu.theme")}</DropdownMenuLabel>
           <DropdownMenuRadioGroup
             value={userTheme}
-            onValueChange={(s) => setUserTheme(s)}
+            onValueChange={(s) => setUserTheme(s as Themes)}
           >
             {availableThemes.map((thm) => (
               <DropdownMenuRadioItem
