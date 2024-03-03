@@ -105,5 +105,6 @@
   "theme.light": "light",
   "time": "Time",
   "train.skills.desc": "Gain experience points (XP) through practice! Choose a topic:",
-  "your-learning-progress": "Your learning progress"
+  "your-learning-progress": "Your learning progress",
+  "skill.huffmancoding": "Huffman-Coding"
 }

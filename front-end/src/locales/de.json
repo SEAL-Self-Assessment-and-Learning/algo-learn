@@ -105,5 +105,6 @@
   "theme.light": "hell",
   "time": "Zeit",
   "train.skills.desc": "Sammle Erfahrungspunkte (XP) durch Übung! Wähle ein Thema:",
-  "your-learning-progress": "Dein Lernfortschritt"
+  "your-learning-progress": "Dein Lernfortschritt",
+  "skill.huffmancoding": "Huffman-Codierung"
 }
