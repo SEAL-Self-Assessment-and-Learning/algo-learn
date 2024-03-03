@@ -6,7 +6,6 @@ import { HTMLAttributes, ReactElement } from "react"
  * direct child of <main>.
  *
  * @param props The props to pass to the div.
- * @returns
  */
 export function HorizontallyCenteredDiv(
   props: HTMLAttributes<HTMLDivElement>,
@@ -24,7 +23,6 @@ export function HorizontallyCenteredDiv(
  * used as a direct child of <main>.
  *
  * @param props The props to pass to the div.
- * @returns
  */
 export function ScreenCenteredDiv(
   props: HTMLAttributes<HTMLDivElement>,

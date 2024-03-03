@@ -14,7 +14,6 @@ import {
   generatorSetBelowPath as generatorCallsBelowPath,
   skillGroups,
 } from "../listOfQuestions"
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { badgeVariants } from "@/components/ui/badge"
@@ -28,11 +27,18 @@ import {
 } from "@/components/ui/card"
 import { QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { ChevronRight } from "lucide-react"
+import { useHistoryState } from "@/hooks/useHistoryState"
 
 export function Catalogue() {
   const { t } = useTranslation()
-  const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
-  const [showAllVariants, setShowAllVariants] = useState(false)
+  const [selectedGroup, setSelectedGroup] = useHistoryState(
+    "selectedGroup",
+    null as string | null,
+  )
+  const [showAllVariants, setShowAllVariants] = useHistoryState(
+    "showAllVariants",
+    false,
+  )
 
   return (
     <HorizontallyCenteredDiv>

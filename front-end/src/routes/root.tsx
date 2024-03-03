@@ -31,13 +31,16 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import { Language } from "@shared/api/Language"
+import { YScroll } from "@/components/YScroll"
 
 export default function Root() {
   return (
-    <div className="flex h-screen flex-col overflow-x-scroll">
-      <GlobalHeader />
-      <Outlet />
-    </div>
+    <YScroll>
+      <div className="flex h-screen flex-col">
+        <GlobalHeader />
+        <Outlet />
+      </div>
+    </YScroll>
   )
 }
 
