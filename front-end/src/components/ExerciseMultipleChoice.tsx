@@ -14,6 +14,7 @@ import { BaseItem, SortableList } from "./SortableList"
 import { Checkbox } from "./ui/checkbox"
 import { CheckCheck, XCircle } from "lucide-react"
 import { Tooltip } from "react-tooltip"
+import { Label } from "./ui/label"
 
 /**
  * ExerciseMultipleChoice is a multiple choice exercise.
@@ -189,12 +190,9 @@ export function ExerciseMultipleChoice({
                   }}
                 />
                 <div className="grid gap-1.5 leading-none">
-                  <label
-                    htmlFor={id}
-                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
+                  <Label htmlFor={id}>
                     <Markdown md={answer} />
-                  </label>
+                  </Label>
                 </div>
               </div>
             )

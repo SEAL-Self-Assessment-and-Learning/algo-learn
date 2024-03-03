@@ -14,13 +14,14 @@ import Random from "../../../shared/src/utils/random"
 import { questionToTex } from "../../../shared/src/utils/toLatex"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { QuestionComponent } from "../components/QuestionComponent"
-import { useTheme } from "../hooks/useTheme"
+import { LIGHT, useTheme } from "../hooks/useTheme"
 import { useTranslation } from "../hooks/useTranslation"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
 
 /** Component for testing the question generator */
 export function TestSimpleMC() {
   const { lang } = useTranslation()
-  const { theme } = useTheme()
   const [seed] = useState(new Random(Math.random()).base36string(7))
   const [format, setFormat] = useState("react" as "react" | "latex" | "json")
   const [{ question }, setQuestion] = useState(
@@ -39,57 +40,55 @@ export function TestSimpleMC() {
         <form action="" className="text-center">
           <fieldset>
             <legend>Select a display format:</legend>
-
-            <input
-              type="radio"
-              checked={format === "react"}
-              onChange={(e) => e.target.checked && setFormat("react")}
-              id="react-checkbox"
-              className="m-2"
-            />
-            <label className="" htmlFor="react-checkbox">
-              React
-            </label>
-
-            <input
-              type="radio"
-              checked={format === "latex"}
-              onChange={(e) => e.target.checked && setFormat("latex")}
-              id="latex-checkbox"
-              className="m-2"
-            />
-            <label htmlFor="latex-checkbox">LaTeX</label>
-
-            <input
-              type="radio"
-              checked={format === "json"}
-              onChange={(e) => e.target.checked && setFormat("json")}
-              id="json-checkbox"
-              className="m-2"
-            />
-            <label htmlFor="json-checkbox">JSON</label>
+            <RadioGroup
+              value={format}
+              className="mx-auto mt-2 flex w-fit gap-6"
+              onValueChange={(f) => setFormat(f as "react" | "latex" | "json")}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="react" id="r1" />
+                <Label htmlFor="r1">React</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="latex" id="r2" />
+                <Label htmlFor="r2">LaTeX</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="json" id="r3" />
+                <Label htmlFor="r3">JSON</Label>
+              </div>
+            </RadioGroup>
           </fieldset>
         </form>
       </HorizontallyCenteredDiv>
-      {format === "react" ? (
-        <QuestionComponent
-          question={question}
-          key={seed}
-          onResult={() => undefined}
-        />
-      ) : (
-        <HorizontallyCenteredDiv className="w-full flex-grow overflow-y-scroll">
-          <SyntaxHighlighter
-            language={format}
-            wrapLongLines
-            style={theme === "dark" ? solarizedDark : solarizedLight}
-          >
-            {format === "latex"
-              ? questionToTex(question)
-              : questionToJSON(question)}
-          </SyntaxHighlighter>
-        </HorizontallyCenteredDiv>
-      )}
+      <RenderQuestionAsFormat key={seed} question={question} format={format} />
     </>
+  )
+}
+
+function RenderQuestionAsFormat({
+  format,
+  question,
+}: {
+  format: "react" | "latex" | "json"
+  question: Question
+}) {
+  const { userTheme } = useTheme()
+  if (format === "react") {
+    return <QuestionComponent question={question} onResult={() => undefined} />
+  }
+
+  return (
+    <HorizontallyCenteredDiv className="w-full flex-grow overflow-y-scroll">
+      <SyntaxHighlighter
+        language={format}
+        style={userTheme === LIGHT ? solarizedLight : solarizedDark}
+        wrapLongLines
+      >
+        {format === "latex"
+          ? questionToTex(question)
+          : questionToJSON(question)}
+      </SyntaxHighlighter>
+    </HorizontallyCenteredDiv>
   )
 }
