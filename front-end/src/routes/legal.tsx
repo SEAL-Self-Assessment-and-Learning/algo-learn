@@ -6,7 +6,7 @@ import { useTranslation } from "../hooks/useTranslation"
 export function Legal() {
   const { t } = useTranslation()
   return (
-    <HorizontallyCenteredDiv className="prose">
+    <HorizontallyCenteredDiv className="prose dark:prose-invert">
       <h1>{t("Legal.label")}</h1>
       <p>{t("Legal.text")}</p>
       <p>
