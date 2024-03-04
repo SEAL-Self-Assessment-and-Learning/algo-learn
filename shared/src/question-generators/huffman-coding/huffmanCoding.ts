@@ -10,7 +10,7 @@ import {
     Question,
     QuestionGenerator
 } from "@shared/api/QuestionGenerator.ts";
-import {huffmanCodingAlgorithm, TreeNode} from "@shared/question-generators/huffman-coding/huffmanCodingAlgorithm.ts";
+import {huffmanCodingAlgorithm} from "@shared/question-generators/huffman-coding/huffmanCodingAlgorithm.ts";
 import {serializeGeneratorCall} from "@shared/api/QuestionRouter.ts";
 import {validateParameters} from "@shared/api/Parameters.ts";
 
@@ -96,29 +96,6 @@ function generateWordBasedOnFrequency(chosenFrequency : number[], random : Rando
     return word
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getAllFrequencies(currentnode : TreeNode) {
-
-    let frequencies : number[] = []
-
-    if (currentnode.left) {
-        frequencies = frequencies.concat(getAllFrequencies(currentnode.left))
-    }
-    if (currentnode.right) {
-        frequencies = frequencies.concat(getAllFrequencies(currentnode.right))
-    }
-    if (currentnode.value.length === 1) {
-        frequencies.push(currentnode.frequency)
-    }
-    return frequencies
-
-}
-
-
-
-/**
- * This question generator generates a multiple choice question for Huffman-Coding
- */
 
 export const HuffmanCodingMultipleChoice: QuestionGenerator = {
     name: tFunctional(translations, "name"),
@@ -140,6 +117,8 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
      * @param seed
      */
     generate: (generatorPath, lang , parameters, seed) => {
+
+
 
         // first create a permalink for the question
         const permalink = serializeGeneratorCall({
@@ -177,14 +156,20 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
         const correctAnswerIndex = answers.indexOf(correctAnswer)
 
         const checkFormat: FreeTextFormatFunction = ({ text }) => {
-            // TODO check if the text only consists of 0 and 1
             if (text.trim() === "") return { valid: false }
             try {
-                return { valid: true, message: text }
+                // iterate over each letter to check if either 0 or 1
+                for (let i = 0; i < text.length; i++) {
+                    if (text[i] !== '0' && text[i] !== '1') {
+                        return  { valid: false, message: 't("feedback.incomplete")' };
+                    }
+                }
             } catch (e) {
-                // TODO correct feedback incomplete
-                return { valid: false, message: "t(feedback.incomplete)" }
+                return { valid: false, message: 'tFunc("feedback.incomplete")' };
             }
+
+            // no format error
+            return { valid: true, message: text };
         }
 
         const feedback: FreeTextFeedbackFunction = ({ text }) => {
