@@ -4,8 +4,7 @@ import type {
 } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
 import { useSortable } from "@dnd-kit/sortable"
-import { createContext, PropsWithChildren, useContext, useMemo } from "react"
-import { RxDragHandleHorizontal } from "react-icons/rx"
+import { createContext, PropsWithChildren, useMemo } from "react"
 
 export interface Props {
   id: UniqueIdentifier
@@ -70,20 +69,5 @@ export function SortableItem({
         {children}
       </li>
     </SortableItemContext.Provider>
-  )
-}
-
-export function DragHandle() {
-  const { attributes, listeners, ...rest } = useContext(SortableItemContext)
-  const ref = (x: HTMLElement | null) => rest.ref(x)
-  return (
-    <button
-      className="px-2 py-5 hover:bg-black/20"
-      {...attributes}
-      {...listeners}
-      ref={ref}
-    >
-      <RxDragHandleHorizontal />
-    </button>
   )
 }
