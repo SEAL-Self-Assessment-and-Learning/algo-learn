@@ -1,5 +1,4 @@
 import { FunctionComponent } from "react"
-
 import { Question } from "../../../shared/src/api/QuestionGenerator"
 import { ExerciseMultipleChoice } from "./ExerciseMultipleChoice"
 import { ExerciseTextInput } from "./ExerciseTextInput"

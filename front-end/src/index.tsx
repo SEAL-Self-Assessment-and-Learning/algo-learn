@@ -1,5 +1,3 @@
-import "./tailwind.css"
-
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import {
@@ -8,7 +6,6 @@ import {
   RouterProvider,
   useParams,
 } from "react-router-dom"
-
 import {
   allParameterCombinations,
   serializeParameters,
@@ -17,15 +14,16 @@ import { sampleRandomSeed } from "../../shared/src/utils/random"
 import ErrorPage from "./components/ErrorPage"
 import { QuizSession } from "./components/QuizSession"
 import { BASENAME } from "./config"
+import { DEFAULT_LANGUAGE } from "./hooks/useTranslation"
 import { allQuestionGeneratorRoutes } from "./listOfQuestions"
 import { About } from "./routes/about"
-import { Legal } from "./routes/legal"
 import { Catalogue } from "./routes/catalogue"
+import { Debug } from "./routes/debug"
+import { Legal } from "./routes/legal"
 import Root from "./routes/root"
 import { TestSimpleMC } from "./routes/test"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
-import { DEFAULT_LANGUAGE } from "./hooks/useTranslation"
-import { Debug } from "./routes/debug"
+import "./tailwind.css"
 
 const routes = []
 for (const { path, generator } of allQuestionGeneratorRoutes) {

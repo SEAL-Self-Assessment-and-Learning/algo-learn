@@ -1,8 +1,7 @@
+import Fraction from "fraction.js"
 import { log } from "mathjs"
 import Random from "../../utils/random"
-import { ProductTerm } from "../asymptotics/asymptoticsUtils"
-import { createProductTerm } from "../asymptotics/asymptoticsUtils"
-import Fraction from "fraction.js"
+import { createProductTerm, ProductTerm } from "../asymptotics/asymptoticsUtils"
 
 /**
  * Produce a string of the form " print(***)"

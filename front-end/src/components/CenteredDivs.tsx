@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils"
 import { HTMLAttributes, ReactElement } from "react"
+import { cn } from "@/lib/utils"
 
 /**
  * A container for horizontally centered content. Intended to be used as a

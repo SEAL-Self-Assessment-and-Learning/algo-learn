@@ -1,10 +1,10 @@
-import { Language } from "../../../shared/src/api/Language"
-import deJSON from "../locales/de.json"
-import deQuestionGroupJSON from "../../../settings/question-group-locales/de.json"
-import enJSON from "../locales/en.json"
-import enQuestionGroupJSON from "../../../settings/question-group-locales/en.json"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { Translations, tFunction } from "../../../shared/src/utils/translations"
+import deQuestionGroupJSON from "../../../settings/question-group-locales/de.json"
+import enQuestionGroupJSON from "../../../settings/question-group-locales/en.json"
+import { Language } from "../../../shared/src/api/Language"
+import { tFunction, Translations } from "../../../shared/src/utils/translations"
+import deJSON from "../locales/de.json"
+import enJSON from "../locales/en.json"
 
 export const SUPPORTED_LANGUAGES: ReadonlyArray<Language> = ["en", "de"]
 export const DEFAULT_LANGUAGE: Language = window.navigator.language.startsWith(

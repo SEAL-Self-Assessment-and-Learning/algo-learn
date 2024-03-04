@@ -4,7 +4,8 @@ import {
   solarizedDark,
   solarizedLight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs"
-
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {
   Question,
   questionToJSON,
@@ -16,8 +17,6 @@ import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { QuestionComponent } from "../components/QuestionComponent"
 import { LIGHT, useTheme } from "../hooks/useTheme"
 import { useTranslation } from "../hooks/useTranslation"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
 
 /** Component for testing the question generator */
 export function TestSimpleMC() {

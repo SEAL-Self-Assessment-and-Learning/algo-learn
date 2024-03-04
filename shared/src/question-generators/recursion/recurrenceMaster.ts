@@ -1,3 +1,5 @@
+import Fraction from "fraction.js"
+import { MathNode } from "mathjs"
 import { validateParameters } from "../../api/Parameters"
 import {
   FreeTextFeedbackFunction,
@@ -9,19 +11,18 @@ import {
 } from "../../api/QuestionGenerator"
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
 import { format } from "../../utils/format"
+import math, { getVars } from "../../utils/math"
 import Random from "../../utils/random"
 import { tFunction, tFunctional, Translations } from "../../utils/translations"
-import {
-  sampleMasterRecursion,
-  sampleMasterRecursionAnswers,
-} from "./formulaUtils"
-import { MathNode } from "mathjs"
-import math, { getVars } from "../../utils/math"
 import {
   mathNodeToSumProductTerm,
   SumProductTerm,
 } from "../asymptotics/asymptoticsUtils"
-import Fraction from "fraction.js"
+import {
+  sampleMasterRecursion,
+  sampleMasterRecursionAnswers,
+} from "./formulaUtils"
+
 const translations: Translations = {
   en: {
     code: "\\[{{0}}\\]",

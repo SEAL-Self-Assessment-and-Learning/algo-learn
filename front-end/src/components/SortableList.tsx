@@ -1,3 +1,5 @@
+import { GripHorizontal } from "lucide-react"
+import { ReactNode } from "react"
 import {
   DndContext,
   KeyboardSensor,
@@ -10,11 +12,8 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable"
-import { ReactNode } from "react"
-import { RxDragHandleHorizontal } from "react-icons/rx"
-
-import { DragHandle, SortableItem } from "./SortableItem"
 import { cn } from "@/lib/utils"
+import { SortableItem } from "./SortableItem"
 import { Button } from "./ui/button"
 
 export interface BaseItem {
@@ -85,7 +84,7 @@ export function SortableList({
         >
           {itemsWithIds.map((item) => (
             <SortableList.Item key={item.id} id={item.id} disabled={disabled}>
-              <RxDragHandleHorizontal />
+              <GripHorizontal />
               <Button variant="outline" asChild>
                 <div>{item.element}</div>
               </Button>
@@ -99,4 +98,3 @@ export function SortableList({
 }
 
 SortableList.Item = SortableItem
-SortableList.DragHandle = DragHandle

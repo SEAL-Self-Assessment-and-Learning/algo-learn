@@ -1,5 +1,4 @@
 import { MathNode } from "mathjs"
-
 import { validateParameters } from "../../api/Parameters"
 import {
   FreeTextFeedbackFunction,

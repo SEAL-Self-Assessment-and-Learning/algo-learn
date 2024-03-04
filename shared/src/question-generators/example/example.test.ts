@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
-import { ExampleQuestion } from "./example"
 import { MultipleChoiceQuestion } from "../../api/QuestionGenerator"
 import { sampleRandomSeed } from "../../utils/random"
+import { ExampleQuestion } from "./example"
 
 interface TestingObject {
   question: MultipleChoiceQuestion

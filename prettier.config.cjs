@@ -1,4 +1,12 @@
 module.exports = {
   semi: false,
-  plugins: ["prettier-plugin-css-order", "prettier-plugin-tailwindcss"],
+  plugins: [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-css-order",
+    "prettier-plugin-tailwindcss",
+  ],
+  importOrder: ["^@(?!/)", "^@/", "^[./]"],
+  // importOrderSeparation: false,
+  // importOrderSortSpecifiers: true,
+  importOrderTypeScriptVersion: "5.0.0",
 }

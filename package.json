@@ -24,6 +24,7 @@
     "docs": "$npm_execpath run typedoc --out docs shared/src/**/*.ts shared/src/**/*.tsx"
   },
   "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.1.1",
     "@tailwindcss/typography": "^0.5.10",
     "@types/katex": "^0.16.7",
     "@types/react": "^18.2.61",
@@ -32,7 +33,7 @@
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
     "@vitejs/plugin-react": "^4.2.1",
-    "bun-types": "^1.0.29",
+    "bun-types": "^1.0.30",
     "eslint": "^8.57.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.29.1",
@@ -48,7 +49,7 @@
     "stylelint-config-tailwindcss": "^0.0.7",
     "tailwindcss": "^3.4.1",
     "ts-json-schema-generator": "^1.5.0",
-    "typedoc": "^0.25.9",
+    "typedoc": "^0.25.10",
     "typescript": "^5.3.3",
     "vite": "^5.1.4",
     "vite-bundle-visualizer": "^1.0.1",

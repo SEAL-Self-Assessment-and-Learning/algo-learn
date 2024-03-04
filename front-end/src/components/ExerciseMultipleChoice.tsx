@@ -1,5 +1,6 @@
+import { CheckCheck, XCircle } from "lucide-react"
 import { useState } from "react"
-
+import { Tooltip } from "react-tooltip"
 import {
   MultipleChoiceFeedback,
   MultipleChoiceQuestion,
@@ -12,8 +13,6 @@ import { Markdown } from "./Markdown"
 import { Result } from "./QuestionComponent"
 import { BaseItem, SortableList } from "./SortableList"
 import { Checkbox } from "./ui/checkbox"
-import { CheckCheck, XCircle } from "lucide-react"
-import { Tooltip } from "react-tooltip"
 import { Label } from "./ui/label"
 
 /**

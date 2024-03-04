@@ -2,16 +2,8 @@ import { BsFillCheckSquareFill, BsFillXSquareFill } from "react-icons/bs"
 import { TiLockClosed, TiLockOpen } from "react-icons/ti"
 import { Link } from "react-router-dom"
 import { Tooltip } from "react-tooltip"
-
-import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
-import { StrengthMeter } from "../components/StrengthMeter"
-import { getImageURL } from "../effects/images"
-import { averageStrength, LogEntryV1, useSkills } from "../hooks/useSkills"
-import { useTranslation } from "../hooks/useTranslation"
-import { SkillFeaturesAndPredictions } from "../utils/memory-model"
-
 import "react-tooltip/dist/react-tooltip.css"
-
+import { cn } from "@/lib/utils"
 import {
   Parameters,
   serializeParameters,
@@ -21,6 +13,11 @@ import {
   deserializePath,
   serializeGeneratorCall,
 } from "../../../shared/src/api/QuestionRouter"
+import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
+import { StrengthMeter } from "../components/StrengthMeter"
+import { getImageURL } from "../effects/images"
+import { averageStrength, LogEntryV1, useSkills } from "../hooks/useSkills"
+import { useTranslation } from "../hooks/useTranslation"
 import {
   allQuestionGeneratorRoutes,
   generatorSetBelowPath as generatorCallsBelowPath,
@@ -28,7 +25,7 @@ import {
   skillGroups,
 } from "../listOfQuestions"
 import { howLongSince } from "../utils/howLongSince"
-import { cn } from "@/lib/utils"
+import { SkillFeaturesAndPredictions } from "../utils/memory-model"
 
 /** LearningProgress component */
 export function LearningProgress() {

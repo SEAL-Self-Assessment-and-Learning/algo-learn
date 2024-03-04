@@ -1,3 +1,6 @@
+import { format } from "../utils/format"
+import Random from "../utils/random"
+import { DeepTranslations, getValidLanguage } from "../utils/translations"
 import { Language } from "./Language"
 import {
   ExpectedParameters,
@@ -10,9 +13,6 @@ import {
   QuestionGenerator,
 } from "./QuestionGenerator"
 import { serializeGeneratorCall } from "./QuestionRouter"
-import { format } from "../utils/format"
-import Random from "../utils/random"
-import { getValidLanguage, DeepTranslations } from "../utils/translations"
 
 /**
  * Interface for "basic" Multiple-Choice Questions. These are fairly static,
