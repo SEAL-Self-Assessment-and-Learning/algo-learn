@@ -1,34 +1,31 @@
+import { ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
-
-import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
-import { useTranslation } from "../hooks/useTranslation"
-
 import "react-tooltip/dist/react-tooltip.css"
-
+import { QuestionGenerator } from "@shared/api/QuestionGenerator"
+import { badgeVariants } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { useHistoryState } from "@/hooks/useHistoryState"
 import {
   deserializePath,
   serializeGeneratorCall,
 } from "../../../shared/src/api/QuestionRouter"
+import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
+import { useTranslation } from "../hooks/useTranslation"
 import {
   allQuestionGeneratorRoutes,
   generatorSetBelowPath as generatorCallsBelowPath,
   skillGroups,
 } from "../listOfQuestions"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { badgeVariants } from "@/components/ui/badge"
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-  CardFooter,
-} from "@/components/ui/card"
-import { QuestionGenerator } from "@shared/api/QuestionGenerator"
-import { ChevronRight } from "lucide-react"
-import { useHistoryState } from "@/hooks/useHistoryState"
-import { Label } from "@/components/ui/label"
 
 export function Catalogue() {
   const { t } = useTranslation()

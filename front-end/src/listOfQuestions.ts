@@ -1,3 +1,4 @@
+import { allQuestionGeneratorRoutes } from "../../settings/questionsSelection"
 import {
   allParameterCombinations,
   deserializeParameters,
@@ -6,7 +7,6 @@ import {
 import { QuestionGenerator } from "../../shared/src/api/QuestionGenerator"
 import { isSubPath } from "../../shared/src/api/QuestionRouter"
 
-import { allQuestionGeneratorRoutes } from "../../settings/questionsSelection"
 export { allQuestionGeneratorRoutes }
 
 /** List of all skill groups. Will be the first part of the questions' routes. */

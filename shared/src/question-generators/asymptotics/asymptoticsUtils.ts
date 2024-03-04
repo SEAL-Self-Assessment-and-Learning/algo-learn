@@ -1,5 +1,4 @@
 import Fraction from "fraction.js"
-
 import math, {
   baseOfLog,
   exponentToLatex,

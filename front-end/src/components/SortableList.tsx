@@ -1,3 +1,5 @@
+import { GripHorizontal } from "lucide-react"
+import { ReactNode } from "react"
 import {
   DndContext,
   KeyboardSensor,
@@ -10,12 +12,9 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable"
-import { ReactNode } from "react"
-
-import { SortableItem } from "./SortableItem"
 import { cn } from "@/lib/utils"
+import { SortableItem } from "./SortableItem"
 import { Button } from "./ui/button"
-import { GripHorizontal } from "lucide-react"
 
 export interface BaseItem {
   position: number

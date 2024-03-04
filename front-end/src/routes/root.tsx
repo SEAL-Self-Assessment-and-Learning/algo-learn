@@ -1,5 +1,3 @@
-import { useEffect } from "react"
-import { Link, Outlet } from "react-router-dom"
 import {
   FileKey2,
   GitCommitHorizontal,
@@ -9,29 +7,30 @@ import {
   Settings,
   WifiOff,
 } from "lucide-react"
-
+import { useEffect } from "react"
+import { Link, Outlet } from "react-router-dom"
+import { Language } from "@shared/api/Language"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { YScroll } from "@/components/YScroll"
 import { VERSION } from "@/config"
 import { useSound } from "@/hooks/useSound"
-import { Themes, availableThemes, useTheme } from "@/hooks/useTheme"
+import { availableThemes, Themes, useTheme } from "@/hooks/useTheme"
 import {
   NATIVE_NAME,
   SUPPORTED_LANGUAGES,
   useTranslation,
 } from "@/hooks/useTranslation"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
-import { Language } from "@shared/api/Language"
-import { YScroll } from "@/components/YScroll"
 
 export default function Root() {
   return (

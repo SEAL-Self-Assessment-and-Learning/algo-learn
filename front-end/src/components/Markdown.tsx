@@ -5,15 +5,14 @@ import {
   solarizedDark,
   solarizedLight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs"
-
 import {
   parseMarkdown,
   ParseTree,
   ParseTreeNode,
 } from "../../../shared/src/utils/parseMarkdown"
 import { useTheme } from "../hooks/useTheme"
-import TeX from "./TeX"
 import { Format } from "./Format"
+import TeX from "./TeX"
 
 /**
  * Function to render a given markdown-like string as a React component

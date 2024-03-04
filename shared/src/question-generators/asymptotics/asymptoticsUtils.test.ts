@@ -1,6 +1,5 @@
 import Fraction from "fraction.js"
 import { expect, test } from "vitest"
-
 import math from "../../utils/math"
 import {
   createProductTerm,

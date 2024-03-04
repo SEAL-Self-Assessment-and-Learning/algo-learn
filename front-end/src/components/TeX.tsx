@@ -1,9 +1,7 @@
-import ReactTeX from "@matejmazur/react-katex"
-
 import "katex/dist/katex.min.css"
-
 import { ReactElement, ReactNode } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
+import ReactTeX from "@matejmazur/react-katex"
 
 /**
  * TeX is a component that renders TeX math expressions.

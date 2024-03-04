@@ -1,5 +1,9 @@
 import { useNavigate } from "react-router-dom"
-
+import SyntaxHighlighter from "react-syntax-highlighter"
+import {
+  solarizedDark,
+  solarizedLight,
+} from "react-syntax-highlighter/dist/esm/styles/hljs"
 import {
   Parameters,
   validateParameters,
@@ -8,20 +12,15 @@ import {
   QuestionGenerator,
   questionToJSON,
 } from "../../../shared/src/api/QuestionGenerator"
-import { QuestionComponent, Result } from "../components/QuestionComponent"
-import { useTranslation } from "../hooks/useTranslation"
-import { useFormat } from "../hooks/useDebug"
-import SyntaxHighlighter from "react-syntax-highlighter"
-import {
-  solarizedDark,
-  solarizedLight,
-} from "react-syntax-highlighter/dist/esm/styles/hljs"
+import { serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
 import { questionToTex } from "../../../shared/src/utils/toLatex"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
-import { useTheme } from "../hooks/useTheme"
 import Loading from "../components/Loading"
-import { serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
+import { QuestionComponent, Result } from "../components/QuestionComponent"
+import { useFormat } from "../hooks/useDebug"
 import { useQuestion } from "../hooks/useQuestion"
+import { useTheme } from "../hooks/useTheme"
+import { useTranslation } from "../hooks/useTranslation"
 import { Debug } from "./debug"
 
 export function ViewSingleQuestion({

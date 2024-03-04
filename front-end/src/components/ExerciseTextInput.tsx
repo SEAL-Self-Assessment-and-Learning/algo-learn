@@ -1,5 +1,5 @@
 import { useState } from "react"
-
+import { Input } from "@/components/ui/input"
 import {
   FreeTextFeedback,
   FreeTextQuestion,
@@ -10,7 +10,6 @@ import { useTranslation } from "../hooks/useTranslation"
 import { InteractWithQuestion, MODE } from "./InteractWithQuestion"
 import { Markdown } from "./Markdown"
 import { Result } from "./QuestionComponent"
-import { Input } from "@/components/ui/input"
 
 /**
  * ExerciseTextInput is an exercise that requires the user to type in text.

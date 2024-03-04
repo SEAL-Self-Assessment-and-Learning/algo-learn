@@ -1,16 +1,15 @@
 import { ReactElement, useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-
+import { Button } from "@/components/ui/button"
 import { serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
 import Random, { sampleRandomSeed } from "../../../shared/src/utils/random"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { sortByStrength, useSkills } from "../hooks/useSkills"
 import { useTranslation } from "../hooks/useTranslation"
 import { generatorSetBelowPath } from "../listOfQuestions"
-import { Button } from "@/components/ui/button"
+import { ViewSingleQuestion } from "../routes/ViewSingleQuestion"
 import { ScreenCenteredDiv } from "./CenteredDivs"
 import { Result } from "./QuestionComponent"
-import { ViewSingleQuestion } from "../routes/ViewSingleQuestion"
 
 const great = {
   en: [

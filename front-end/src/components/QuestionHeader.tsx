@@ -1,11 +1,9 @@
 import { useState } from "react"
 import { BiLink, BiRefresh } from "react-icons/bi"
 import { Tooltip } from "react-tooltip"
-
+import "react-tooltip/dist/react-tooltip.css"
 import { prefixURL } from "../config"
 import { useTranslation } from "../hooks/useTranslation"
-
-import "react-tooltip/dist/react-tooltip.css"
 
 /**
  * QuestionHeader is a header for a question.

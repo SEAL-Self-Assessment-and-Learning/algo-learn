@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
-import { Language } from "../../../shared/src/api/Language"
-import { Parameters } from "../../../shared/src/api/Parameters"
-import {
-  Question,
-  QuestionGenerator,
-} from "../../../shared/src/api/QuestionGenerator"
+import { Language } from "@shared/api/Language"
+import { Parameters } from "@shared/api/Parameters"
+import { Question, QuestionGenerator } from "@shared/api/QuestionGenerator"
 
 /**
  * A hook to fetch a question from a question generator. This is useful in case the question generator returns a promise, e.g. because it needs to fetch data from a server.

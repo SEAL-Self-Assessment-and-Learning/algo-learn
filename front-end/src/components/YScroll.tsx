@@ -1,5 +1,5 @@
-import { useHistoryState } from "@/hooks/useHistoryState"
 import { ReactNode, useEffect, useLayoutEffect } from "react"
+import { useHistoryState } from "@/hooks/useHistoryState"
 
 /**
  * A component that saves and restores the scroll position when navigating

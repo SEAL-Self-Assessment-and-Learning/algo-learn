@@ -1,5 +1,4 @@
 import { expect, test } from "vitest"
-
 import Random, { sfc32, xmur3 } from "./random"
 
 test("Check that xmur3 and sfc32 return a known sequence.", () => {

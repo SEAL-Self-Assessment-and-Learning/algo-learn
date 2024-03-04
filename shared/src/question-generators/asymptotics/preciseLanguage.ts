@@ -1,11 +1,10 @@
+import {
+  basicMultipleChoiceMetaGenerator,
+  BasicMultipleChoiceQuestion,
+} from "../../api/BasicMultipleChoiceQuestion"
 import { Language } from "../../api/Language"
 import { QuestionGenerator } from "../../api/QuestionGenerator"
-import { tFunctional } from "../../utils/translations"
-import {
-  BasicMultipleChoiceQuestion,
-  basicMultipleChoiceMetaGenerator,
-} from "../../api/BasicMultipleChoiceQuestion"
-import { Translations } from "../../utils/translations"
+import { tFunctional, Translations } from "../../utils/translations"
 
 const questionFrameTranslations: Translations = {
   en: {

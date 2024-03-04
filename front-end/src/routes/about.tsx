@@ -1,6 +1,5 @@
 import { AiFillGithub } from "react-icons/ai"
 import { SiDuolingo, SiReact } from "react-icons/si"
-
 import { format } from "../../../shared/src/utils/format"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { Markdown } from "../components/Markdown"
