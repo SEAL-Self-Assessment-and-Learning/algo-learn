@@ -13,6 +13,7 @@ import { RecursionFormula } from "../shared/src/question-generators/recursion/fo
 import { RecurrenceMaster } from "../shared/src/question-generators/recursion/recurrenceMaster"
 import { Loops } from "../shared/src/question-generators/time/loops"
 import { Satisfiability } from "../shared/src/question-generators/propositional-logic/satisfiability"
+import { NormalForms } from "../shared/src/question-generators/propositional-logic/normalForms.ts"
 
 /** List of all question routes */
 export const allQuestionGeneratorRoutes: QuestionRoutes = [
@@ -52,7 +53,14 @@ export const allQuestionGeneratorRoutes: QuestionRoutes = [
     path: "time/loops",
     generator: Loops,
   },
-  { path: "propositional-logic/satisfiability", generator: Satisfiability },
+  {
+    path: "propositional-logic/satisfiability",
+    generator: Satisfiability,
+  },
+  {
+    path: "propositional-logic/normalForms",
+    generator: NormalForms,
+  },
 ]
 
 // links to images of question groups
