@@ -81,6 +81,9 @@ export function generateWrongAnswerChangeWord (random: Random, word: string) {
 /**
  * We use another function and build the random, sometimes left is 0 and sometime 1
  * So we don't have a prefix free code
+ * TODO is this really a wrong answer? Because it will still be a minimal prefix free code, but not correctly
+ *      implemented huffman code
+ *      You could still decode the word
  * @Difficulty Medium
  * @param random
  * @param word
