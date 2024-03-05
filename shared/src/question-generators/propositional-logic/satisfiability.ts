@@ -71,7 +71,7 @@ function getAdditionalFeedbackText(
 export const Satisfiability: QuestionGenerator = {
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
-  tags: ["boolean logic", "propositional logic", "propositional calculus"],
+  tags: ["boolean logic", "propositional logic", "propositional calculus", "satisfiability"],
   languages: ["en", "de"],
   author: "Alex Schickedanz",
   license: "MIT",
