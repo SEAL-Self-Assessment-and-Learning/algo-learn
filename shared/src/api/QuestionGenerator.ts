@@ -163,6 +163,11 @@ export interface FreeTextQuestion extends QuestionBase {
    * the given answer is correct and to provide feedback on the syntax.
    */
   checkFormat?: FreeTextFormatFunction
+
+  /**
+   * If provided, the data can be used to provide buttons to add specific text to the input field.
+   */
+  typingAid?: { text: string; input: string }[]
 }
 
 /**

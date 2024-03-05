@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { FreeTextFeedback, FreeTextQuestion } from "../../../shared/src/api/QuestionGenerator"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
@@ -7,6 +7,7 @@ import { useTranslation } from "../hooks/useTranslation"
 import { InteractWithQuestion, MODE } from "./InteractWithQuestion"
 import { Markdown } from "./Markdown"
 import { Result } from "./QuestionComponent"
+import { Button } from "./Button"
 
 /**
  * ExerciseTextInput is an exercise that requires the user to type in text.
@@ -52,6 +53,8 @@ export function ExerciseTextInput({
 
   const { mode, text, feedbackObject, formatFeedback } = state
 
+  const userInputRef = useRef<HTMLInputElement>(null)
+
   function setText(text: string) {
     setState((state) => ({ ...state, text }))
     if (question.checkFormat) {
@@ -67,6 +70,19 @@ export function ExerciseTextInput({
       const valid = text.trim().length > 0
       setState({ ...state, text, mode: valid ? "draft" : "invalid" })
     }
+  }
+
+  function insertText(text: string): void {
+    if (userInputRef.current === null) {
+      setText(text)
+      return
+    }
+
+    setText(
+      userInputRef.current.value.slice(0, userInputRef.current.selectionStart ?? 0) +
+        text +
+        userInputRef.current.value.slice(userInputRef.current.selectionEnd ?? 0),
+    )
   }
 
   function handleClick() {
@@ -100,21 +116,28 @@ export function ExerciseTextInput({
     },
   })
 
-  const msgColor =
-    mode === "draft" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+  const msgColor = mode === "draft" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
   const message =
     mode === "correct" ? (
       <b className="text-2xl">{t("feedback.correct")}</b>
     ) : mode === "incorrect" ? (
-      feedbackObject?.correctAnswer ? (
-        <>
-          <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
-          <br />
-          <Markdown md={feedbackObject.correctAnswer} />
-        </>
-      ) : (
-        <b className="text-2xl">{t("feedback.incorrect")}</b>
-      )
+      [
+        feedbackObject?.feedbackText ? (
+          <>
+            <Markdown md={feedbackObject.feedbackText} />
+            <br />
+          </>
+        ) : null,
+        feedbackObject?.correctAnswer ? (
+          <>
+            <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
+            <br />
+            <Markdown md={feedbackObject.correctAnswer} />
+          </>
+        ) : (
+          <b className="text-2xl">{t("feedback.incorrect")}</b>
+        ),
+      ]
     ) : null
 
   return (
@@ -132,6 +155,7 @@ export function ExerciseTextInput({
       <div className="flex place-items-center gap-2 pl-3">
         <Markdown md={question.prompt} />
         <Input
+          ref={userInputRef}
           autoFocus
           disabled={mode === "correct" || mode === "incorrect"}
           value={text}
@@ -150,6 +174,11 @@ export function ExerciseTextInput({
       <div className="py-5 text-slate-600 dark:text-slate-400">
         <Markdown md={question.bottomText} />
       </div>
+      {(question.typingAid ?? []).map((el, index) => (
+        <Button key={`ta-${index}`} onClick={() => insertText(el.input)}>
+          <Markdown md={el.text} />
+        </Button>
+      ))}
     </InteractWithQuestion>
   )
 }
