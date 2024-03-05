@@ -16,19 +16,25 @@ export function generateString(length: number, difficulty: number, random: Rando
         return ''
     }
 
-    const chosenFrequency = [1,3,5]
-    console.log(length)
+    if (difficulty === 1) {
+        // generate a word length at maximum of 13 chars
+        const chosenFrequency = tmpFrequencies[length]
+        const randomIndex = random.int(0, chosenFrequency.length-1)
 
-    const word = generateWordBasedOnFrequency(chosenFrequency, random)
+        return generateWordBasedOnFrequency(chosenFrequency[randomIndex], random)
+    }
+    else {
+        // generate a word length with any amount of chars
+        return ''
+    }
 
-    return word
 }
 
 function generateWordBasedOnFrequency(chosenFrequency : number[], random : Random) {
 
     let word = ''
-
-    let possibleChars :string = "abcdefghijklmnopqrstuvwxyz"
+    // not using "i", "j", "l", "n", "q" because they have similar shapes
+    let possibleChars :string = "abcdefghkmoprstuvwxyz"
 
     // create the word based on the chosen frequencies
     for (let i = 0; i < chosenFrequency.length; i++) {
@@ -39,4 +45,46 @@ function generateWordBasedOnFrequency(chosenFrequency : number[], random : Rando
         }
     }
     return word
+}
+
+const tmpFrequencies : {[key: number] : number[][] } = {
+    8: [
+        [1, 2, 5],
+        [1, 3, 4],
+    ],
+    9: [
+        [1, 2, 6],
+        [1, 3, 5],
+        [2, 3, 4],
+    ],
+    10: [
+        [1, 2, 7],
+        [1, 3, 6],
+    ],
+    11: [
+        [1, 2, 8],
+        [1, 3, 7],
+        [1, 4, 6],
+        [2, 4, 5],
+        [2, 3, 6],
+    ],
+    12: [
+        //[1, 2, 9],
+        //[1, 3, 8],
+        //[1, 4, 7],
+        [2, 3, 7],
+        [3, 4, 5],
+        [1, 2, 4, 5],
+        [1, 2, 4, 5],
+    ],
+    13: [
+        //[1, 4, 8],
+        //[1, 5, 7],
+        //[2, 3, 8],
+        [2, 4, 7],
+        //[2, 5, 6],
+        [3, 4, 6],
+        [1, 2, 4, 6],
+        [1, 2, 4, 6],
+    ]
 }

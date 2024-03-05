@@ -1,7 +1,7 @@
 
 // TODO: add the options that more than one question can be generated
 
-import {t, tFunctional, Translations} from "@shared/utils/translations.ts";
+import {t, tFunction, tFunctional, Translations} from "@shared/utils/translations.ts";
 import Random from "@shared/utils/random.ts";
 import {
     FreeTextFeedbackFunction,
@@ -36,12 +36,14 @@ const translations: Translations = {
     en: {
         name: "Compute a Huffman-Coding",
         description: "Compute the Huffman-Coding of a given string",
-        text: "Let ${{0}}$ be string. What is a correct **Huffman-Coding** of this string ${{0}}$?",
+        text: "Let \"*{{0}}*\" be string. What is a correct **Huffman-Coding** of this string \"*{{0}}*\"?",
+        "feedback.invalid": "Can only contain 1 and 0",
     },
     de: {
         name: "Berechne eine Hufmann-Codierung",
         description: "Bestimme die Huffman-Codierung eines gegebenen Strings",
-        text: "Sei ${{0}}$ eine Zeichenkette. Was ist eine korrekte **Huffman-Codierung** dieser Zeichenkette ${{0}}$?",
+        text: "Sei \"*{{0}}*\" eine Zeichenkette. Was ist eine korrekte **Huffman-Codierung** dieser Zeichenkette \"*{{0}}*\"?",
+        "feedback.invalid": "Darf nur 1 und 0 enthalten",
     },
 }
 
@@ -94,7 +96,11 @@ function generateObviousWrongAnswers(
         }
     }
 
-    return random.subset(wrongAnswers, 4)
+    let subset_size = 4;
+    if (wrongAnswers.length < 4) {
+        subset_size = wrongAnswers.length
+    }
+    return random.subset(wrongAnswers, subset_size)
 }
 
 /**
@@ -168,7 +174,15 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
         Generate the random word and get the correct answer
          */
         const random = new Random(seed)
-        const wordlength = random.int(15,20)
+        let wordlength = 8;
+        const probLength = random.uniform();
+        // if P > 0.75 --> length = 13, > 0.5 length --> 12 > rest 0.125 steps
+        if (probLength > 0.75) wordlength = 13;
+        else if (probLength > 0.5) wordlength = 12;
+        else if (probLength > 0.375) wordlength = 11;
+        else if (probLength > 0.25) wordlength = 10;
+        else if (probLength > 0.125) wordlength = 9;
+
         let word = generateString(wordlength, 1, random)
         word = random.shuffle(word.split('')).join('')
 
@@ -188,11 +202,11 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
                 // iterate over each letter to check if either 0 or 1
                 for (let i = 0; i < text.length; i++) {
                     if (text[i] !== '0' && text[i] !== '1') {
-                        return  { valid: false, message: 't("feedback.incomplete")' };
+                        return  { valid: false, message: tFunction(translations, lang).t("feedback.invalid") };
                     }
                 }
             } catch (e) {
-                return { valid: false, message: 'tFunc("feedback.incomplete")' };
+                return { valid: false, message: tFunction(translations, lang).t("feedback.invalid") };
             }
 
             // no format error
@@ -235,7 +249,7 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
                 name: HuffmanCodingMultipleChoice.name(lang),
                 path: permalink,
                 text: t(translations, lang, "text", [word]),
-                prompt: `What is the Huffman-Coding of the string ${word}?`,
+                prompt: `What is a possible Huffman-Coding?`,
                 bottomText: "Please enter the Huffman-Coding of the given string",
                 feedback,
                 checkFormat,
