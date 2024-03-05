@@ -26,6 +26,7 @@
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.1.1",
     "@tailwindcss/typography": "^0.5.10",
+    "@types/d3": "^7.4.3",
     "@types/katex": "^0.16.7",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
@@ -69,6 +70,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "d3": "^7.8.5",
     "fraction.js": "^4.3.7",
     "katex": "^0.16.9",
     "lucide-react": "^0.344.0",

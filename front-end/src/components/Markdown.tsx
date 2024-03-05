@@ -4,6 +4,7 @@ import SyntaxHighlighter from "react-syntax-highlighter"
 import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "../../../shared/src/utils/parseMarkdown"
 import { useTheme } from "../hooks/useTheme"
+import { DrawGraph } from "./DrawGraph"
 import { Format } from "./Format"
 import TeX from "./TeX"
 
@@ -87,6 +88,17 @@ export const MarkdownTreeNode: FunctionComponent<{
     return <span className="font-mono">{format(parseTreeNode.child, parameters)}</span>
   }
   if (parseTreeNode.kind === "```") {
+    if (parseTreeNode.language === "graph") {
+      return (
+        <div className="my-5">
+          <DrawGraph
+            width={320}
+            height={180}
+            graph={parseDimacsGraph(parseTreeNode.child)}
+          />
+        </div>
+      )
+    }
     return (
       <div className="my-5">
         <SyntaxHighlighter
