@@ -587,7 +587,7 @@ function isOperator(obj: any): obj is Operator {
 }
 
 /**
- * Turns a number into an name/value object. The i-th bit of num is interpreted as the value of the i-th variable.
+ * Turns a number into a name/value object. The i-th bit of num is interpreted as the value of the i-th variable.
  * @param num
  * @param variableNames
  * @returns
@@ -724,25 +724,89 @@ export class PropositionalLogicParser {
   }
 }
 
+function generateBetterRandomExpression(
+  random: Random,
+  allVariableNames: string[],
+  numLeaves: number,
+  parentOperator: BinaryOperatorType | null = null,
+  restrictedVariableNames: string[] | null = null,
+): [string[], SyntaxTreeNodeType] {
+  if (restrictedVariableNames === null) restrictedVariableNames = allVariableNames
+
+  if (numLeaves === 1) {
+    const variableName = random.choice(restrictedVariableNames)
+    return [[variableName], new Literal(variableName, random.bool(0.2))]
+  }
+
+  // at this point we have at least 2 more leaves, so we need to assure that either there are enough allowed variable names
+  // or we switch to a different operator than the parent in order to use the whole set of variable names again
+  const allowedOperators =
+    restrictedVariableNames.length < 2
+      ? binaryOperatorTypes.filter((o) => o !== parentOperator)
+      : binaryOperatorTypes
+  const thisOperator = random.weightedChoice(
+    allowedOperators,
+    allowedOperators.length < binaryOperatorTypes.length
+      ? [0.35, 0.1, 0.1, 0.1]
+      : [0.35, 0.35, 0.1, 0.1, 0.1],
+  )
+
+  const restrictVariableNames: boolean =
+    ["\\and", "\\or"].includes(thisOperator) && thisOperator === parentOperator
+
+  if (!restrictVariableNames) restrictedVariableNames = allVariableNames
+
+  if (numLeaves === 2) {
+    // if both children are leaves, make sure they are not the same
+    const varNames = random.subset(restrictedVariableNames, 2)
+    return [
+      // only report the used variable names to the parent if it is the same operator and it is \\and or \\or
+      restrictVariableNames ? varNames : [],
+      new Operator(
+        thisOperator,
+        new Literal(varNames[0], random.bool(0.2)),
+        new Literal(varNames[1], random.bool(0.2)),
+      ),
+    ]
+  }
+
+  // At this point we have at least 3 more leaves, so we distribute them over the two branches of this operator and recurse
+  const [leftNumLeaves, rightNumLeaves] = random.split(numLeaves, 2, 1)
+
+  // if the right subtree will be a leave, reserve its name
+  const reservedName = rightNumLeaves === 1 ? random.choice(restrictedVariableNames) : null
+
+  const [leftVars, leftOperand] = generateBetterRandomExpression(
+    random,
+    allVariableNames,
+    leftNumLeaves,
+    thisOperator,
+    reservedName === null
+      ? restrictedVariableNames
+      : restrictedVariableNames.filter((v) => v !== reservedName),
+  )
+
+  const [rightVars, rightOperand] = generateBetterRandomExpression(
+    random,
+    allVariableNames,
+    rightNumLeaves,
+    thisOperator,
+    reservedName === null ? restrictedVariableNames.filter((v) => !leftVars.includes(v)) : [reservedName],
+  )
+
+  return [
+    // only report the used variable names to the parent if it is the same operator and it is \\and or \\or
+    restrictVariableNames ? leftVars.concat(rightVars) : [],
+    new Operator(thisOperator, leftOperand, rightOperand),
+  ]
+}
+
 export function generateRandomExpression(
   random: Random,
   numLeaves: number,
   variableNames: string[],
 ): SyntaxTreeNodeType {
-  if (numLeaves === 1) {
-    return new Literal(random.choice(variableNames), random.bool(0.2))
-  } else {
-    const [leftVariables, rightVariables] =
-      numLeaves == 2 ? random.splitArray(variableNames) : [variableNames, variableNames]
-    const leafDistribution = random.split(numLeaves, 2, 1)
-    const leftOperand = generateRandomExpression(random, leafDistribution[0], leftVariables)
-    const rightOperand = generateRandomExpression(random, leafDistribution[1], rightVariables)
-    return new Operator(
-      random.weightedChoice(binaryOperatorTypes, [0.35, 0.35, 0.1, 0.1, 0.1]),
-      leftOperand,
-      rightOperand,
-    )
-  }
+  return generateBetterRandomExpression(random, variableNames, numLeaves)[1]
 }
 
 export function generateRandomTautology(

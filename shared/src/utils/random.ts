@@ -155,13 +155,30 @@ export default class Random {
 
   /**
    * Chooses a random element from an array of weighted elements.
-   *
-   * @param array - An array of tuples of the form [element, weight]
+   * @param elements
+   * @param weights
    * @returns A random element from the array.
    */
-  weightedChoice<T>(array: ReadonlyArray<[element: T, weight: number]>): T {
-    const elements = array.map((w) => w[0])
-    const weights = array.map((w) => w[1])
+  weightedChoice<T>(elements: ReadonlyArray<T>, weights: number[]): T
+  /**
+   * Chooses a random element from an array of weighted elements.
+   * @param choicesAndWeights An array of element-weight tuples
+   * @returns A random element from the array.
+   */
+  weightedChoice<T>(choicesAndWeights: ReadonlyArray<[element: T, weight: number]>): T
+  weightedChoice<T>(
+    data: ReadonlyArray<[element: T, weight: number]> | ReadonlyArray<T>,
+    weights: number[] | undefined = undefined,
+  ): T {
+    let elements: readonly T[]
+
+    if (weights === undefined) {
+      elements = (data as ReadonlyArray<[element: T, weight: number]>).map((w) => w[0])
+      weights = (data as ReadonlyArray<[element: T, weight: number]>).map((w) => w[1])
+    } else {
+      elements = data as ReadonlyArray<T>
+    }
+
     return elements[this.weightedIndex(weights)]
   }
 
