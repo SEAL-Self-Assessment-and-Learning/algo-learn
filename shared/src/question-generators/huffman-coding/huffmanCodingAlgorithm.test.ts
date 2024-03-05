@@ -1,4 +1,6 @@
 import { huffmanCodingAlgorithm } from './huffmanCodingAlgorithm.ts';
+import { generateRandomWrongAnswer } from './huffmanCoding.ts';
+import Random from "@shared/utils/random.ts";;
 import { expect, test } from "vitest"
 
 /**
@@ -31,4 +33,9 @@ test('huffmanCodingAlgorithm', () => {
     // Already by the code generated words (recreated them by hand)
     expect(huffmanCodingAlgorithm('ijyipmps',0)).toBe('00010111001001110110');
 
+});
+
+test('generateRandomWrongAnswer', () => {
+    expect(generateRandomWrongAnswer(new Random('sddfgh'), '000')).toBe('111');
+    expect(generateRandomWrongAnswer(new Random('asdads'), '000')).toBe('111');
 });

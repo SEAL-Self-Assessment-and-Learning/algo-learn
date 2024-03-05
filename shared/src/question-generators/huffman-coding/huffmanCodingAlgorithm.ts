@@ -2,6 +2,8 @@
  * This file contains the Huffman Coding Algorithm
  */
 
+import Random from "@shared/utils/random.ts";
+
 /**
  * This function takes in a string and returns the Huffman Coding of the string
  * @param input_word the word to be encoded
@@ -61,22 +63,6 @@ export function huffmanCodingAlgorithm(input_word: string, sorting_variant : num
 
     return {result, main_node};
 
-    /*
-    Additional functions to create the huffman coding
-     */
-    function createHuffmanCoding(huffmanCode : {[key: string] : string} ,node: TreeNode, code: string) {
-        if (node.left) {
-            huffmanCode = createHuffmanCoding(huffmanCode, node.left, code + "0");
-        }
-        if (node.right) {
-            huffmanCode = createHuffmanCoding(huffmanCode, node.right, code + "1");
-        }
-        if (node.value.length === 1) {
-            huffmanCode[node.value] = code;
-        }
-        return huffmanCode;
-    }
-
     function sortNodes(a: TreeNode, b: TreeNode) {
         // if a equals b compare them alphabetically
         // compare the frequency of the two nodes
@@ -88,6 +74,44 @@ export function huffmanCodingAlgorithm(input_word: string, sorting_variant : num
         return a.frequency - b.frequency;
     }
 }
+
+
+/*
+   Additional functions to create the huffman coding
+    */
+export function createHuffmanCoding(huffmanCode : {[key: string] : string},
+                                    node: TreeNode,
+                                    code: string) {
+    if (node.left) {
+        huffmanCode = createHuffmanCoding(huffmanCode, node.left, code + "0");
+    }
+    if (node.right) {
+        huffmanCode = createHuffmanCoding(huffmanCode, node.right, code + "1");
+    }
+    if (node.value.length === 1) {
+        huffmanCode[node.value] = code;
+    }
+    return huffmanCode;
+}
+
+export function createHuffmanCodingBitError(huffmanCode : {[key: string] : string},
+                                            node: TreeNode,
+                                            code: string,
+                                            random: Random) {
+    const firstValue = random.int(0, 1);
+    const secondValue = (firstValue + 1) % 2
+    if (node.left) {
+        huffmanCode = createHuffmanCodingBitError(huffmanCode, node.left, code + firstValue.toString(), random);
+    }
+    if (node.right) {
+        huffmanCode = createHuffmanCodingBitError(huffmanCode, node.right, code + secondValue.toString(), random);
+    }
+    if (node.value.length === 1) {
+        huffmanCode[node.value] = code;
+    }
+    return huffmanCode;
+}
+
 
 /**
  * This class represents a node in the huffman tree

@@ -10,10 +10,23 @@ import {
     Question,
     QuestionGenerator
 } from "@shared/api/QuestionGenerator.ts";
-import {huffmanCodingAlgorithm} from "@shared/question-generators/huffman-coding/huffmanCodingAlgorithm.ts";
+import {
+    huffmanCodingAlgorithm,
+    TreeNode
+} from "@shared/question-generators/huffman-coding/huffmanCodingAlgorithm.ts";
 import {serializeGeneratorCall} from "@shared/api/QuestionRouter.ts";
 import {validateParameters} from "@shared/api/Parameters.ts";
+import {
+    generateRandomWrongAnswer,
+    generateWrongAnswerSwitchLetters,
+    generateWrongAnswerShuffleWord,
+    generateWrongAnswerChangeWord,
+    generateWrongAnswerFalseTreeConstrution,
+    generateWrongAnswerReduceCodeOfLetter
+}
+    from "@shared/question-generators/huffman-coding/huffmanCodingGenerateWrongAnswers.ts";
 
+import { generateString } from "@shared/question-generators/huffman-coding/huffManCodingGenerateWords.ts"
 
 /**
  * All text displayed text goes into the translations object.
@@ -23,12 +36,12 @@ const translations: Translations = {
     en: {
         name: "Compute a Huffman-Coding",
         description: "Compute the Huffman-Coding of a given string",
-        text: "Let ${{0}}$ be string. What is the **Huffman-Coding** of this string ${{0}}$?",
+        text: "Let ${{0}}$ be string. What is a correct **Huffman-Coding** of this string ${{0}}$?",
     },
     de: {
         name: "Berechne eine Hufmann-Codierung",
         description: "Bestimme die Huffman-Codierung eines gegebenen Strings",
-        text: "Sei ${{0}}$ eine Zeichenkette. Was ist die **Huffman-Codierung** dieser Zeichenkette ${{0}}$?",
+        text: "Sei ${{0}}$ eine Zeichenkette. Was ist eine korrekte **Huffman-Codierung** dieser Zeichenkette ${{0}}$?",
     },
 }
 
@@ -36,64 +49,69 @@ const translations: Translations = {
  * This function generates very obvious wrong answers.
  * @param random
  * @param correctAnswer
+ * @param correctTree
+ * @param word
  */
 function generateObviousWrongAnswers(
     random: Random,
     correctAnswer: string,
-): Array<string> {
-    const wrongAnswers = [
-        '000',
-        '001',
-        '010',
-        '011',
-        '100',
-        '101',
-        correctAnswer + '0',
-    ]
+    correctTree: TreeNode,
+    word: string): Array<string> {
+    const wrongAnswers : string[] = []
+    const w1 = generateRandomWrongAnswer(random, correctAnswer);
+    const otherCorrectAnswer = switchAllOneZero(correctAnswer);
+    if (wrongAnswers.indexOf(w1) === -1 && w1 !== correctAnswer && w1 !== otherCorrectAnswer) {
+        wrongAnswers.push(w1)
+    }
+    const w2 = generateWrongAnswerSwitchLetters(random, correctTree, word);
+    if (wrongAnswers.indexOf(w2) === -1 && w2 !== correctAnswer && w2 !== otherCorrectAnswer) {
+        wrongAnswers.push(w2)
+    }
 
-    return random.subset(wrongAnswers, 3)
+    // Only chose one, because they are both quite easy and identically
+    const random_uniform = random.uniform();
+    if (random_uniform < 0.5) {
+        const w3 = generateWrongAnswerShuffleWord(random, word);
+        if (wrongAnswers.indexOf(w3) === -1 && w3 !== correctAnswer && w3 !== otherCorrectAnswer) {
+            wrongAnswers.push(w3)
+        }
+    }
+    else {
+        const w4 = generateWrongAnswerChangeWord(random, word);
+        if (wrongAnswers.indexOf(w4) === -1 && w4 !== correctAnswer && w4 !== otherCorrectAnswer) {
+            wrongAnswers.push(w4)
+        }
+    }
+    // This has a higher difficulty, so when want more of those answers
+    for (let i = 0; i < 3; i++) {
+        const w5 = generateWrongAnswerFalseTreeConstrution(random, word, correctTree);
+        if (wrongAnswers.indexOf(w5) === -1 && w5 !== correctAnswer && w5 !== otherCorrectAnswer) {
+            wrongAnswers.push(w5)
+        }
+        const w6 = generateWrongAnswerReduceCodeOfLetter(word, correctTree);
+        if (wrongAnswers.indexOf(w6) === -1 && w6 !== correctAnswer && w6 !== otherCorrectAnswer) {
+            wrongAnswers.push(w6)
+        }
+    }
+
+    return random.subset(wrongAnswers, 4)
 }
 
 /**
- * This function generates a random string of a given length and difficulty
- * @param length the length of the string
- * @param difficulty the difficulty of the string
- *                   if the string should be more difficult, it's probably also longer
- *                   it has 3 stages
- *                   1 - very easy - no choosing between characters
- *                   2 - medium - choosing between characters but not too many
- *                   3 - hard - choosing often between characters
- * @param random the random object
+ * This function switches all zeros and ones, because this will still be a correct Huffman-Coding
+ * @param correctword
  */
-function generateString(length: number, difficulty: number, random: Random): string {
-    if (difficulty === 0) {
-        return ''
-    }
-
-    const chosenFrequency = [1,3,5]
-
-    const word = generateWordBasedOnFrequency(chosenFrequency, random)
-    console.log("Length: " + length)
-    console.log("word: " + word)
-
-    return word
-}
-
-function generateWordBasedOnFrequency(chosenFrequency : number[], random : Random) {
-
-    let word = ''
-
-    let possibleChars :string = "abcdefghijklmnopqrstuvwxyz"
-
-    // create the word based on the chosen frequencies
-    for (let i = 0; i < chosenFrequency.length; i++) {
-        const char = possibleChars[random.int(0, possibleChars.length - 1)]
-        possibleChars = possibleChars.replace(char, "")
-        for (let j = 0; j < chosenFrequency[i]; j++) {
-            word += char
+export function switchAllOneZero (correctword : string) {
+    const correctWordArray : string[] = correctword.split('');
+    for (let i = 0; i<correctWordArray.length; i++) {
+        if (correctWordArray[i] === '1') {
+            correctWordArray[i] = '0';
+        }
+        else {
+            correctWordArray[i] = '1';
         }
     }
-    return word
+    return correctWordArray.join('')
 }
 
 
@@ -105,20 +123,27 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
         {
             type: "string",
             name: "variant",
-            allowedValues: ["choice", "input"],
+            // Still need to change the choice to choice1 and input to input1
+            allowedValues: ["choice", "input", "choice2"],
         },
     ],
 
     /**
      * Generates a new question (currently only MultipleChoiceQuestion)
      * @param generatorPath
-     * @param lang
-     * @param parameters
+     * @param lang provided language
+     * @param parameters the following options are possible
+     *                      - choice-1: this displays are "real" word maximum length of 13 chars, it has a unique coding
+     *                                  only the 1 and 0 can be flipped. The goal is to find the correct Huffman Coding
+     *                                  of the String
+     *                      - input-1:  this has the same base as choice-1, but instead of options, the user has to
+     *                                  provide an input
+     *                      - choice-2: Here the user does not get a word anymore (instead a table or an array), but
+     *                                  here the user has to find the correct coding of the letters and do not concat
+     *                                  those
      * @param seed
      */
     generate: (generatorPath, lang , parameters, seed) => {
-
-
 
         // first create a permalink for the question
         const permalink = serializeGeneratorCall({
@@ -144,12 +169,14 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
          */
         const random = new Random(seed)
         const wordlength = random.int(15,20)
-        const word = generateString(wordlength, 1, random)
+        let word = generateString(wordlength, 1, random)
+        word = random.shuffle(word.split('')).join('')
 
-        const correctAnswer = huffmanCodingAlgorithm(word, 0)["result"]
-        console.log(correctAnswer)
+        const correctAnswer_list = huffmanCodingAlgorithm(word, 0)
+        const correctAnswer = correctAnswer_list["result"]
+        const correctTree = correctAnswer_list["main_node"]
         // get a set of obvious wrong answers
-        const answers = generateObviousWrongAnswers(random, correctAnswer)
+        const answers = generateObviousWrongAnswers(random, correctAnswer, correctTree, word)
 
         answers.push(correctAnswer)
         random.shuffle(answers)
@@ -174,7 +201,9 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
 
         const feedback: FreeTextFeedbackFunction = ({ text }) => {
 
-            if (text == correctAnswer) {
+            // also switch 1 and 0 to keep a correct solution
+            const switched_correctAnswer = switchAllOneZero(correctAnswer);
+            if (text == correctAnswer || text === switched_correctAnswer) {
                 return {
                     correct: true,
                     message: "t(feedback.correct)",
@@ -187,10 +216,10 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
             }
         }
 
-        const variant = parameters.variant as "choice" | "input"
+        const variant = parameters.variant as "choice" | "input" | "choice2"
         let question: Question
 
-        if (variant === "choice") {
+        if (variant === "choice" || variant === "choice2") {
             question = {
                 type: "MultipleChoiceQuestion",
                 name: HuffmanCodingMultipleChoice.name(lang),
