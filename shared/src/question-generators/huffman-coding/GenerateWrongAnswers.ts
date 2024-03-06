@@ -3,7 +3,7 @@ import {
   createHuffmanCodingBitError,
   huffmanCodingAlgorithm,
   TreeNode,
-} from "@shared/question-generators/huffman-coding/huffmanCodingAlgorithm.ts"
+} from "@shared/question-generators/huffman-coding/Algorithm.ts"
 import Random from "@shared/utils/random.ts"
 
 /**

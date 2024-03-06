@@ -1,5 +1,5 @@
 import { expect, test } from "vitest"
-import { huffmanCodingAlgorithm } from "./huffmanCodingAlgorithm.ts"
+import { huffmanCodingAlgorithm } from "./Algorithm.ts"
 
 /**
  * Test to check if the huffmanCodingAlgorithm function works correctly

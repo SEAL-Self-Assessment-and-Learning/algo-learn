@@ -180,6 +180,7 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntryV1> }): {
       parameters,
       generatorPath,
     })
+    if (path === 'huffmancoding/huffmanCoding/choice2') continue;
     // TODO: check if the variant still exists, cause otherwise you get an error
     featureMap[path].lag = min(
       featureMap[path].lag,

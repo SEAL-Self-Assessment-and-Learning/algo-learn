@@ -13,7 +13,7 @@ import { SimplifySum } from "../shared/src/question-generators/asymptotics/sum"
 import { RecursionFormula } from "../shared/src/question-generators/recursion/formula"
 import { RecurrenceMaster } from "../shared/src/question-generators/recursion/recurrenceMaster"
 import { Loops } from "../shared/src/question-generators/time/loops"
-import { HuffmanCodingMultipleChoice} from "@shared/question-generators/huffman-coding/huffmanCoding.ts";
+import { HuffmanCoding} from "@shared/question-generators/huffman-coding/huffmanCoding.ts";
 
 /** List of all question routes */
 export const allQuestionGeneratorRoutes: QuestionRoutes = [
@@ -56,7 +56,7 @@ export const allQuestionGeneratorRoutes: QuestionRoutes = [
   },
   {
     path: "huffmancoding/huffmanCoding",
-    generator: HuffmanCodingMultipleChoice,
+    generator: HuffmanCoding,
   },
 ]
 

@@ -13,11 +13,11 @@ import {
   createHuffmanCoding,
   huffmanCodingAlgorithm,
   TreeNode,
-} from "@shared/question-generators/huffman-coding/huffmanCodingAlgorithm.ts"
+} from "@shared/question-generators/huffman-coding/Algorithm.ts"
 import {
   generateString,
   generateWordArray,
-} from "@shared/question-generators/huffman-coding/huffManCodingGenerateWords.ts"
+} from "@shared/question-generators/huffman-coding/GenerateWords.ts"
 import {
   generateRandomWrongAnswer,
   generateWrongAnswerChangeWord,
@@ -26,7 +26,7 @@ import {
   generateWrongAnswerReduceCodeOfLetter,
   generateWrongAnswerShuffleWord,
   generateWrongAnswerSwitchLetters,
-} from "@shared/question-generators/huffman-coding/huffmanCodingGenerateWrongAnswers.ts"
+} from "@shared/question-generators/huffman-coding/GenerateWrongAnswers.ts"
 import Random from "@shared/utils/random.ts"
 import {
   t,
@@ -161,7 +161,7 @@ export function switchAllOneZero(correctword: string) {
   return correctWordArray.join("")
 }
 
-export const HuffmanCodingMultipleChoice: QuestionGenerator = {
+export const HuffmanCoding: QuestionGenerator = {
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -170,7 +170,7 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
       type: "string",
       name: "variant",
       // Still need to change the choice to choice1 and input to input1
-      allowedValues: ["choice", "input", "choice2"],
+      allowedValues: ["choice", "input"],
     },
   ],
 
@@ -192,7 +192,7 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
   generate: (generatorPath, lang, parameters, seed) => {
     // first create a permalink for the question
     const permalink = serializeGeneratorCall({
-      generator: HuffmanCodingMultipleChoice,
+      generator: HuffmanCoding,
       lang,
       parameters,
       seed,
@@ -203,12 +203,12 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
     if (
       !validateParameters(
         parameters,
-        HuffmanCodingMultipleChoice.expectedParameters,
+          HuffmanCoding.expectedParameters,
       )
     ) {
       throw new Error(
         `Unknown variant ${parameters.variant.toString()}. 
-                Valid variants are: ${HuffmanCodingMultipleChoice.expectedParameters.join(
+                Valid variants are: ${HuffmanCoding.expectedParameters.join(
                   ", ",
                 )}`,
       )
@@ -227,7 +227,11 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
     else if (probLength > 0.25) wordlength = 10
     else if (probLength > 0.125) wordlength = 9
 
-    const variant = parameters.variant as "choice" | "input" | "choice2"
+    let variant : string = parameters.variant as "choice" | "input"
+    if (variant === 'choice') {
+      const choice1orchoice2 = random.uniform();
+      if (choice1orchoice2 >= 0.5) variant = 'choice2'
+    }
     let question: Question
 
     if (variant === "choice" || variant === "input") {
@@ -291,7 +295,7 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
       if (variant === "choice") {
         question = {
           type: "MultipleChoiceQuestion",
-          name: HuffmanCodingMultipleChoice.name(lang),
+          name: HuffmanCoding.name(lang),
           path: permalink,
           text: t(translations, lang, "text", [word, "string"]),
           answers: answers,
@@ -300,7 +304,7 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
       } else {
         question = {
           type: "FreeTextQuestion",
-          name: HuffmanCodingMultipleChoice.name(lang),
+          name: HuffmanCoding.name(lang),
           path: permalink,
           text: t(translations, lang, "text", [word, "string"]),
           prompt: `What is a possible Huffman-Coding?`,
@@ -343,7 +347,7 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
 
       question = {
         type: "MultipleChoiceQuestion",
-        name: HuffmanCodingMultipleChoice.name(lang),
+        name: HuffmanCoding.name(lang),
         path: permalink,
         text: t(translations, lang, "text", [
           wordArrayDisplay,
