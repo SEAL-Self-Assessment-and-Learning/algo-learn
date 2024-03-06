@@ -83,6 +83,7 @@ export function generateWrongAnswerChangeWord (random: Random, word: string) {
  * So we don't have a prefix free code
  * TODO is this really a wrong answer? Because it will still be a minimal prefix free code, but not correctly
  *      implemented huffman code
+ *      I took this question out, but I will leave it here for now, maybe we can use it for priority queue
  *      You could still decode the word
  * @Difficulty Medium
  * @param random
@@ -110,9 +111,37 @@ export function generateWrongAnswerFalseTreeConstrution(random: Random,
  */
 export function generateWrongAnswerReduceCodeOfLetter(word: string,
                                                       currentTree: TreeNode) {
+    const huffmanDictKey = createHuffmanDict(currentTree);
+    const huffmanDict = huffmanDictKey.huffmanDict;
+    const current_longest_key = huffmanDictKey.current_longest_key;
+    huffmanDict[current_longest_key] = huffmanDict[current_longest_key].slice(0, huffmanDict[current_longest_key].length - 1)
+    let wrongAnswerCoding = ""
+    for (let i = 0; i < word.length; i++) {
+        wrongAnswerCoding += huffmanDict[word[i]]
+    }
+    return wrongAnswerCoding;
+}
+
+export function generateWrongAnswerFlip01InCodeChar(random: Random, currentTree: TreeNode, word: string) {
+    const huffmanDictKey = createHuffmanDict(currentTree);
+    const huffmanDict = huffmanDictKey.huffmanDict;
+    const current_longest_key = huffmanDictKey.current_longest_key;
+    // flip a 0 or 1 in the longest key
+    const randomIndex = random.int(0, huffmanDict[current_longest_key].length - 1)
+    const newChar = huffmanDict[current_longest_key][randomIndex] === "0" ? "1" : "0"
+    huffmanDict[current_longest_key] = huffmanDict[current_longest_key].slice(0, randomIndex) + newChar + huffmanDict[current_longest_key].slice(randomIndex + 1)
+    let wrongAnswerCoding = ""
+    for (let i = 0; i < word.length; i++) {
+        wrongAnswerCoding += huffmanDict[word[i]]
+    }
+    return wrongAnswerCoding;
+
+}
+
+function createHuffmanDict(currentTree: TreeNode) {
     let huffmanDict : { [key: string]: string } = {}
     huffmanDict = createHuffmanCoding(huffmanDict, currentTree, "")
-    // get the key with longest value
+    // get the key with the longest value
     let current_longest_key : string = "";
     for (const current_key in huffmanDict) {
         if (current_longest_key === "") {
@@ -123,14 +152,12 @@ export function generateWrongAnswerReduceCodeOfLetter(word: string,
             current_longest_key = current_key
         }
     }
-    huffmanDict[current_longest_key] = huffmanDict[current_longest_key].slice(0, huffmanDict[current_longest_key].length - 1)
-    let wrongAnswerCoding = ""
-    for (let i = 0; i < word.length; i++) {
-        wrongAnswerCoding += huffmanDict[word[i]]
-    }
-    return wrongAnswerCoding;
+    return {huffmanDict, current_longest_key};
 }
 
 /*
 Maybe add more difficult wrong answers, but I don't have any idea at the moment
- */
+
+- Maybe another wrong answer where the code is too short at the end
+
+*/

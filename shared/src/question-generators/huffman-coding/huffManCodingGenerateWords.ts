@@ -16,6 +16,48 @@ export function generateString(length: number, difficulty: number, random: Rando
         return ''
     }
 
+    const tmpFrequencies : {[key: number] : number[][] } = {
+        8: [
+            [1, 2, 5],
+            [1, 3, 4],
+        ],
+        9: [
+            [1, 2, 6],
+            [1, 3, 5],
+            [2, 3, 4],
+        ],
+        10: [
+            [1, 2, 7],
+            [1, 3, 6],
+        ],
+        11: [
+            [1, 2, 8],
+            [1, 3, 7],
+            [1, 4, 6],
+            [2, 4, 5],
+            [2, 3, 6],
+        ],
+        12: [
+            //[1, 2, 9],
+            //[1, 3, 8],
+            //[1, 4, 7],
+            [2, 3, 7],
+            [3, 4, 5],
+            [1, 2, 4, 5],
+            [1, 2, 4, 5],
+        ],
+        13: [
+            //[1, 4, 8],
+            //[1, 5, 7],
+            //[2, 3, 8],
+            [2, 4, 7],
+            //[2, 5, 6],
+            [3, 4, 6],
+            [1, 2, 4, 6],
+            [1, 2, 4, 6],
+        ]
+    }
+
     if (difficulty === 1) {
         // generate a word length at maximum of 13 chars
         const chosenFrequency = tmpFrequencies[length]
@@ -47,44 +89,42 @@ function generateWordBasedOnFrequency(chosenFrequency : number[], random : Rando
     return word
 }
 
-const tmpFrequencies : {[key: number] : number[][] } = {
-    8: [
-        [1, 2, 5],
-        [1, 3, 4],
-    ],
-    9: [
-        [1, 2, 6],
-        [1, 3, 5],
-        [2, 3, 4],
-    ],
-    10: [
-        [1, 2, 7],
-        [1, 3, 6],
-    ],
-    11: [
-        [1, 2, 8],
-        [1, 3, 7],
-        [1, 4, 6],
-        [2, 4, 5],
-        [2, 3, 6],
-    ],
-    12: [
-        //[1, 2, 9],
-        //[1, 3, 8],
-        //[1, 4, 7],
-        [2, 3, 7],
-        [3, 4, 5],
-        [1, 2, 4, 5],
-        [1, 2, 4, 5],
-    ],
-    13: [
-        //[1, 4, 8],
-        //[1, 5, 7],
-        //[2, 3, 8],
-        [2, 4, 7],
-        //[2, 5, 6],
-        [3, 4, 6],
-        [1, 2, 4, 6],
-        [1, 2, 4, 6],
-    ]
+
+/**
+ * This function creates an array of chars, this is for more difficult questions (but more easy too read, instead of a
+ * word with 26 letters or so)
+ * @param diffrentLetters
+ * @param difficulty
+ * @param random
+ */
+export function generateWordArray(diffrentLetters: number, difficulty: number, random: Random) {
+
+    // TODO better control over how the array is constructed and not only random use
+
+    if (difficulty === 0) {
+        return {charArray: {}, word: ""}
+    }
+
+    const possibleChars :string = "abcdefghijklmnopqrstuvwxyz"
+    const amountCharsArray = []
+    for (let i = 0; i < diffrentLetters; i++) {
+        amountCharsArray.push(random.int(3, 50))
+    }
+    const charArray : {[key: string]: number} = {}
+    amountCharsArray.forEach(item => {
+        const randomLetter = random.choice(possibleChars.split(''))
+        possibleChars.replace(randomLetter, "")
+        charArray[randomLetter] = item
+    });
+
+    // also create the word for faster huffman Coding
+    let word = ""
+    for (const key in charArray) {
+        for (let i = 0; i < charArray[key]; i++) {
+            word += key
+        }
+    }
+
+    return {charArray, word};
+
 }

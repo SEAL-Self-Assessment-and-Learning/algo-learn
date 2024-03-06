@@ -11,6 +11,7 @@ import {
     QuestionGenerator
 } from "@shared/api/QuestionGenerator.ts";
 import {
+    createHuffmanCoding,
     huffmanCodingAlgorithm,
     TreeNode
 } from "@shared/question-generators/huffman-coding/huffmanCodingAlgorithm.ts";
@@ -21,12 +22,15 @@ import {
     generateWrongAnswerSwitchLetters,
     generateWrongAnswerShuffleWord,
     generateWrongAnswerChangeWord,
-    generateWrongAnswerFalseTreeConstrution,
-    generateWrongAnswerReduceCodeOfLetter
+    // generateWrongAnswerFalseTreeConstrution,
+    generateWrongAnswerReduceCodeOfLetter, generateWrongAnswerFlip01InCodeChar
 }
     from "@shared/question-generators/huffman-coding/huffmanCodingGenerateWrongAnswers.ts";
 
-import { generateString } from "@shared/question-generators/huffman-coding/huffManCodingGenerateWords.ts"
+import {
+    generateString,
+    generateWordArray
+} from "@shared/question-generators/huffman-coding/huffManCodingGenerateWords.ts"
 
 /**
  * All text displayed text goes into the translations object.
@@ -36,19 +40,28 @@ const translations: Translations = {
     en: {
         name: "Compute a Huffman-Coding",
         description: "Compute the Huffman-Coding of a given string",
-        text: "Let \"*{{0}}*\" be string. What is a correct **Huffman-Coding** of this string \"*{{0}}*\"?",
+        text: "Let \"*{{0}}*\" be {{1}}. What is a correct **Huffman-Coding** of this {{1}} \"*{{0}}*\"?",
         "feedback.invalid": "Can only contain 1 and 0",
+        "bottomtext": "Hints for the Huffman-Code: If you have to choose between nodes with the same weight, " +
+            "first choose the one in whose subtree the alphabetically smaller character is contained." +
+            " Also choose as the left node, the node with the smaller weight."
     },
     de: {
         name: "Berechne eine Hufmann-Codierung",
         description: "Bestimme die Huffman-Codierung eines gegebenen Strings",
-        text: "Sei \"*{{0}}*\" eine Zeichenkette. Was ist eine korrekte **Huffman-Codierung** dieser Zeichenkette \"*{{0}}*\"?",
+        text: "Sei \"*{{0}}*\" eine {{1}}. Was ist eine korrekte **Huffman-Codierung** dieser {{1}} \"*{{0}}*\"?",
         "feedback.invalid": "Darf nur 1 und 0 enthalten",
+        "bottomtext": "Hinweise zum Huffman-Code: Wenn Sie zwischen Knoten mit gleichem Gewicht wählen müssen, " +
+            "wählen Sie zuerst jenen, in dessen Teilbaum das alphabetisch kleinste Zeichen enthalten ist." +
+            " Wähle zudem als linken Knoten den mit dem kleineren Gewicht."
     },
 }
 
 /**
  * This function generates very obvious wrong answers.
+ *
+ * TODO Maybe add slicing so the words are not too long ...
+ *
  * @param random
  * @param correctAnswer
  * @param correctTree
@@ -60,8 +73,8 @@ function generateObviousWrongAnswers(
     correctTree: TreeNode,
     word: string): Array<string> {
     const wrongAnswers : string[] = []
-    const w1 = generateRandomWrongAnswer(random, correctAnswer);
     const otherCorrectAnswer = switchAllOneZero(correctAnswer);
+    const w1 = generateRandomWrongAnswer(random, correctAnswer);
     if (wrongAnswers.indexOf(w1) === -1 && w1 !== correctAnswer && w1 !== otherCorrectAnswer) {
         wrongAnswers.push(w1)
     }
@@ -86,11 +99,11 @@ function generateObviousWrongAnswers(
     }
     // This has a higher difficulty, so when want more of those answers
     for (let i = 0; i < 3; i++) {
-        const w5 = generateWrongAnswerFalseTreeConstrution(random, word, correctTree);
+        const w5 = generateWrongAnswerReduceCodeOfLetter(word, correctTree);
         if (wrongAnswers.indexOf(w5) === -1 && w5 !== correctAnswer && w5 !== otherCorrectAnswer) {
             wrongAnswers.push(w5)
         }
-        const w6 = generateWrongAnswerReduceCodeOfLetter(word, correctTree);
+        const w6 = generateWrongAnswerFlip01InCodeChar(random, correctTree, word);
         if (wrongAnswers.indexOf(w6) === -1 && w6 !== correctAnswer && w6 !== otherCorrectAnswer) {
             wrongAnswers.push(w6)
         }
@@ -183,81 +196,120 @@ export const HuffmanCodingMultipleChoice: QuestionGenerator = {
         else if (probLength > 0.25) wordlength = 10;
         else if (probLength > 0.125) wordlength = 9;
 
-        let word = generateString(wordlength, 1, random)
-        word = random.shuffle(word.split('')).join('')
-
-        const correctAnswer_list = huffmanCodingAlgorithm(word, 0)
-        const correctAnswer = correctAnswer_list["result"]
-        const correctTree = correctAnswer_list["main_node"]
-        // get a set of obvious wrong answers
-        const answers = generateObviousWrongAnswers(random, correctAnswer, correctTree, word)
-
-        answers.push(correctAnswer)
-        random.shuffle(answers)
-        const correctAnswerIndex = answers.indexOf(correctAnswer)
-
-        const checkFormat: FreeTextFormatFunction = ({ text }) => {
-            if (text.trim() === "") return { valid: false }
-            try {
-                // iterate over each letter to check if either 0 or 1
-                for (let i = 0; i < text.length; i++) {
-                    if (text[i] !== '0' && text[i] !== '1') {
-                        return  { valid: false, message: tFunction(translations, lang).t("feedback.invalid") };
-                    }
-                }
-            } catch (e) {
-                return { valid: false, message: tFunction(translations, lang).t("feedback.invalid") };
-            }
-
-            // no format error
-            return { valid: true, message: text };
-        }
-
-        const feedback: FreeTextFeedbackFunction = ({ text }) => {
-
-            // also switch 1 and 0 to keep a correct solution
-            const switched_correctAnswer = switchAllOneZero(correctAnswer);
-            if (text == correctAnswer || text === switched_correctAnswer) {
-                return {
-                    correct: true,
-                    message: "t(feedback.correct)",
-                }
-            }
-            return {
-                correct: false,
-                message: "t(feedback.incomplete)",
-                correctAnswer,
-            }
-        }
-
         const variant = parameters.variant as "choice" | "input" | "choice2"
         let question: Question
 
-        if (variant === "choice" || variant === "choice2") {
+        if (variant === 'choice' || variant === 'input') {
+
+            let word = generateString(wordlength, 1, random)
+            word = random.shuffle(word.split('')).join('')
+
+            const correctAnswer_list = huffmanCodingAlgorithm(word, 0)
+            const correctAnswer = correctAnswer_list["result"]
+            const correctTree = correctAnswer_list["main_node"]
+            // get a set of obvious wrong answers
+            const answers = generateObviousWrongAnswers(random, correctAnswer, correctTree, word)
+
+            answers.push(correctAnswer)
+            random.shuffle(answers)
+            const correctAnswerIndex = answers.indexOf(correctAnswer)
+
+            const checkFormat: FreeTextFormatFunction = ({text}) => {
+                if (text.trim() === "") return {valid: false}
+                try {
+                    // iterate over each letter to check if either 0 or 1
+                    for (let i = 0; i < text.length; i++) {
+                        if (text[i] !== '0' && text[i] !== '1') {
+                            return {valid: false, message: tFunction(translations, lang).t("feedback.invalid")};
+                        }
+                    }
+                } catch (e) {
+                    return {valid: false, message: tFunction(translations, lang).t("feedback.invalid")};
+                }
+
+                // no format error
+                return {valid: true, message: text};
+            }
+
+            const feedback: FreeTextFeedbackFunction = ({text}) => {
+
+                // also switch 1 and 0 to keep a correct solution
+                const switched_correctAnswer = switchAllOneZero(correctAnswer);
+                if (text == correctAnswer || text === switched_correctAnswer) {
+                    return {
+                        correct: true,
+                        message: "t(feedback.correct)",
+                    }
+                }
+                return {
+                    correct: false,
+                    message: "t(feedback.incomplete)",
+                    correctAnswer,
+                }
+            }
+
+            if (variant === "choice") {
+                question = {
+                    type: "MultipleChoiceQuestion",
+                    name: HuffmanCodingMultipleChoice.name(lang),
+                    path: permalink,
+                    text: t(translations, lang, "text", [word, "string"]),
+                    answers: answers,
+                    feedback: minimalMultipleChoiceFeedback({correctAnswerIndex}),
+                }
+            } else {
+                question = {
+                    type: "FreeTextQuestion",
+                    name: HuffmanCodingMultipleChoice.name(lang),
+                    path: permalink,
+                    text: t(translations, lang, "text", [word, "string"]),
+                    prompt: `What is a possible Huffman-Coding?`,
+                    bottomText: t(translations, lang, "bottomtext"),
+                    feedback,
+                    checkFormat,
+                }
+            }
+
+            return {
+                question
+            }
+        }
+        else {
+
+            // this question is also MultipleChoice, but the user has to find the correct coding of the letters
+            // he does not get the word, but instead the number of times a word appears
+
+            const wordArrayOverview = generateWordArray(7, 1, random)
+            const wordArray = wordArrayOverview.charArray
+            // only temporary displaying the word array
+            const wordArrayDisplay = JSON.stringify(wordArray, null, 2)
+            const word = wordArrayOverview.word
+            const correctAnswerTreeNode = huffmanCodingAlgorithm(word, 0).main_node
+            let coorectAnswerDict : {[key: string]: string} = {}
+            coorectAnswerDict = createHuffmanCoding(coorectAnswerDict, correctAnswerTreeNode, "")
+
+            // TODO create more complex wrong answers
+            const possibleAnswers : string[] = []
+            possibleAnswers.push(JSON.stringify(coorectAnswerDict, null, 2))
+            possibleAnswers.push("Placeholder at the moment 1")
+            possibleAnswers.push("Placeholder at the moment 2")
+            possibleAnswers.push("Placeholder at the moment 3")
+
+            const correctAnswerIndex = possibleAnswers.indexOf(JSON.stringify(coorectAnswerDict, null, 2))
+
             question = {
                 type: "MultipleChoiceQuestion",
                 name: HuffmanCodingMultipleChoice.name(lang),
                 path: permalink,
-                text: t(translations, lang, "text", [word]),
-                answers: answers,
-                feedback: minimalMultipleChoiceFeedback({correctAnswerIndex}),
+                text: t(translations, lang, "text", [wordArrayDisplay, "frequency-table"]),
+                answers: possibleAnswers,
+                // maybe add a bottom text
+                feedback: minimalMultipleChoiceFeedback({correctAnswerIndex: correctAnswerIndex}),
             }
-        }
-        else {
-            question = {
-                type: "FreeTextQuestion",
-                name: HuffmanCodingMultipleChoice.name(lang),
-                path: permalink,
-                text: t(translations, lang, "text", [word]),
-                prompt: `What is a possible Huffman-Coding?`,
-                bottomText: "Please enter the Huffman-Coding of the given string",
-                feedback,
-                checkFormat,
-            }
-        }
 
-        return {
-            question
+            return {
+                question: question
+            }
         }
 
     }
