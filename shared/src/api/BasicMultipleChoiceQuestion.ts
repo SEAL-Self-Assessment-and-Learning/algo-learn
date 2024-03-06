@@ -79,12 +79,12 @@ export function basicMultipleChoiceMetaGenerator(
         ]
       : []
 
-  function generate(generatorPath: string, lang: Language, parameters: Parameters, seed: string) {
-    if (!validateParameters(parameters, expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${variants.join(", ")}`,
-      )
-    }
+  function generate(
+    generatorPath: string,
+    lang: Language,
+    parameters: Parameters,
+    seed: string,
+  ) {
     const i = parameters.number as number
 
     const random = new Random(seed)
