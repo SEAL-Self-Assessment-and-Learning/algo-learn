@@ -185,7 +185,7 @@ export class Literal extends SyntaxTreeNode {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public shuffle(random: Random): this {
+  public shuffle(_random: Random): this {
     return this
   }
 
@@ -227,7 +227,7 @@ export class Literal extends SyntaxTreeNode {
     return this.negate()
   }
 
-  public invertRandomLiterals(random: Random, maxNumVariables: number): this {
+  public invertRandomLiterals(_random: Random, maxNumVariables: number): this {
     if (maxNumVariables > 0) this.negate()
 
     return this
