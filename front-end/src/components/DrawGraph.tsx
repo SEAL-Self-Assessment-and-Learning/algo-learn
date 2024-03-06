@@ -28,11 +28,7 @@ export function DrawGraph({
     .forceSimulation(vertices)
     .force(
       "link",
-      d3
-        .forceLink(edges)
-        .id((d) =>
-          d.index === undefined ? "" : graph.vertices[d.index].id ?? "",
-        ),
+      d3.forceLink(edges).id((d) => (d.index === undefined ? "" : graph.vertices[d.index].id ?? "")),
     )
     .force("charge", d3.forceManyBody().strength(-500))
     .force("center", d3.forceCenter(width / 2, height / 2))
@@ -48,17 +44,13 @@ export function DrawGraph({
       .join("line")
       .classed("stroke-2 stroke-primary", true)
 
-    const circles: d3.Selection<Element, d3.SimulationNodeDatum, Element, any> =
-      svg
-        .append("g")
-        .selectAll<Element, null>("circle")
-        .data(vertices)
-        .join("circle")
-        .attr("r", 7)
-        .classed(
-          "fill-primary hover:fill-accent stroke-secondary stroke-2",
-          true,
-        )
+    const circles: d3.Selection<Element, d3.SimulationNodeDatum, Element, any> = svg
+      .append("g")
+      .selectAll<Element, null>("circle")
+      .data(vertices)
+      .join("circle")
+      .attr("r", 7)
+      .classed("fill-primary hover:fill-accent stroke-secondary stroke-2", true)
 
     function ticked() {
       lines
@@ -69,11 +61,7 @@ export function DrawGraph({
       circles.attr("cx", (d) => d.x ?? 0).attr("cy", (d) => d.y ?? 0)
     }
 
-    type DragEvent = d3.D3DragEvent<
-      Element,
-      d3.SimulationNodeDatum,
-      d3.SimulationNodeDatum
-    >
+    type DragEvent = d3.D3DragEvent<Element, d3.SimulationNodeDatum, d3.SimulationNodeDatum>
 
     // Reheat the simulation when drag starts, and fix the subject position.
     function dragstarted(event: DragEvent) {
