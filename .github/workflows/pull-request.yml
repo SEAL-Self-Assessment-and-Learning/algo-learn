@@ -6,6 +6,7 @@ name: Build and deploy to testing when pushed to main branch
 on:
   # Triggers the workflow on pull request events
   pull_request_target:
+    types: [assigned, opened, synchronize, reopened]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -50,11 +51,9 @@ jobs:
           # cache: "yarn"
 
       - uses: oven-sh/setup-bun@v1
-  
-      # See https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables for a definition of GITHUB_REF.
-      # The GITHUB_REF is in the form of refs/heads/<branch_name> or refs/pull/<pull_request_number>/merge. We replace the slashes with underscores.
+
       - name: Get a clean name of the current branch or pull request
-        run: echo "CLEAN_REF=$(echo "$GITHUB_REF" | sed -e 's/\//_/g')" >> $GITHUB_ENV
+        run: echo "CLEAN_REF=pull_request_${{github.event.pull_request.number}}" >> $GITHUB_ENV
         shell: bash
 
       - name: Bun install 🔧
