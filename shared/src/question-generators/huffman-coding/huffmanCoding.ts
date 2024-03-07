@@ -223,15 +223,18 @@ export const HuffmanCoding: QuestionGenerator = {
     ];
     const wordlength = random.weightedChoice(wordLengths);
 
-    let variant : string = parameters.variant as "choice" | "input"
-    if (variant === 'choice') {
-      const choice1OrChoice2 = random.uniform();
-      if (choice1OrChoice2 >= 0.5) variant = 'choice2'
+    const variantParameter = parameters.variant as "choice" | "input"
+    let variant : string;
+    if (variantParameter === "choice") {
+      variant = random.choice(["choice", "choice2"])
     }
-    let question: Question
+    else {
+      variant = variantParameter
+    }
 
+    let question: Question
     if (variant === "choice" || variant === "input") {
-      let word = generateString(wordlength, 1, random)
+      let word = generateString(wordlength, random)
       word = random.shuffle(word.split("")).join("")
 
       const correctAnswerList = huffmanCodingAlgorithm(word, 0)
@@ -317,7 +320,7 @@ export const HuffmanCoding: QuestionGenerator = {
       // this question is also MultipleChoice, but the user has to find the correct coding of the letters
       // he does not get the word, but instead the number of times a word appears
 
-      const wordArrayOverview = generateWordArray(7, 1, random)
+      const wordArrayOverview = generateWordArray(random)
       const wordArray = wordArrayOverview.charArray
       // only temporary displaying the word array
       const wordArrayDisplay = JSON.stringify(wordArray, null, 2)

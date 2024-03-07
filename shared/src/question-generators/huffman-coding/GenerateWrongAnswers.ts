@@ -1,6 +1,5 @@
 import {
   createHuffmanCoding,
-  createHuffmanCodingBitError,
   huffmanCodingAlgorithm,
   TreeNode,
 } from "@shared/question-generators/huffman-coding/Algorithm.ts"
@@ -18,16 +17,16 @@ export function generateRandomWrongAnswer(
   correctAnswer: string,
 ) {
   const wrongAnswer = correctAnswer.split("")
-  while (wrongAnswer.join("") === correctAnswer) {
-    for (let i = 0; i < correctAnswer.length / 2; i++) {
-      const randomChangedIndex = random.int(0, correctAnswer.length - 1)
-      if (wrongAnswer[randomChangedIndex] === "0") {
-        wrongAnswer[randomChangedIndex] = "1"
-      } else {
-        wrongAnswer[randomChangedIndex] = "0"
-      }
+  const flipPositions = random.subset(Array.from({length: correctAnswer.length}, (_, i) => i), random.int(1, 5))
+
+  for (let i = 0; i < flipPositions.length / 2; i++) {
+    if (wrongAnswer[flipPositions[i]] === "0") {
+      wrongAnswer[flipPositions[i]] = "1"
+    } else {
+      wrongAnswer[flipPositions[i]] = "0"
     }
   }
+  console.log(correctAnswer, wrongAnswer.join(""))
   return wrongAnswer.join("")
 }
 
@@ -92,6 +91,36 @@ export function generateWrongAnswerChangeWord(random: Random, word: string) {
   }
   wordArray[randomIndex] = word[randomIndex2]
   return huffmanCodingAlgorithm(wordArray.join(""), 0)["result"]
+}
+
+export function createHuffmanCodingBitError(
+    huffmanCode: { [key: string]: string },
+    node: TreeNode,
+    code: string,
+    random: Random,
+) {
+  const firstValue = random.int(0, 1)
+  const secondValue = 1 - firstValue
+  if (node.left) {
+    huffmanCode = createHuffmanCodingBitError(
+        huffmanCode,
+        node.left,
+        code + firstValue.toString(),
+        random,
+    )
+  }
+  if (node.right) {
+    huffmanCode = createHuffmanCodingBitError(
+        huffmanCode,
+        node.right,
+        code + secondValue.toString(),
+        random,
+    )
+  }
+  if (node.value.length === 1) {
+    huffmanCode[node.value] = code
+  }
+  return huffmanCode
 }
 
 /**

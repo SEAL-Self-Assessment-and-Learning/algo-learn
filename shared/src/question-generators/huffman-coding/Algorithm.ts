@@ -2,8 +2,6 @@
  * This file contains the Huffman Coding Algorithm
  */
 
-import Random from "@shared/utils/random.ts"
-
 /**
  * This function takes in a string and returns the Huffman Coding of the string
  * @param inputWord the word to be encoded
@@ -33,7 +31,13 @@ export function huffmanCodingAlgorithm(
   // create nodes for each character
   const nodes: TreeNode[] = []
   for (const character in characters) {
-    nodes.push(new TreeNode(character, characters[character], null, null))
+    nodes.push({
+      value: character,
+      frequency: characters[character],
+      left: null,
+      right: null,
+      personalCode: ""
+    });
   }
 
   // create a tree based on the characters
@@ -44,12 +48,13 @@ export function huffmanCodingAlgorithm(
     const left = nodes.shift()
     const right = nodes.shift()
     if (left && right) {
-      const newNode = new TreeNode(
-        left.value + right.value,
-        left.frequency + right.frequency,
-        left,
-        right,
-      )
+      let newNode: TreeNode = {
+        value: left.value + right.value,
+        frequency: left.frequency + right.frequency,
+        left: left,
+        right: right,
+        personalCode: ""
+      };
       nodes.push(newNode)
     }
   }
@@ -106,57 +111,13 @@ export function createHuffmanCoding(
   return huffmanCode
 }
 
-export function createHuffmanCodingBitError(
-  huffmanCode: { [key: string]: string },
-  node: TreeNode,
-  code: string,
-  random: Random,
-) {
-  const firstValue = random.int(0, 1)
-  const secondValue = (firstValue + 1) % 2
-  if (node.left) {
-    huffmanCode = createHuffmanCodingBitError(
-      huffmanCode,
-      node.left,
-      code + firstValue.toString(),
-      random,
-    )
-  }
-  if (node.right) {
-    huffmanCode = createHuffmanCodingBitError(
-      huffmanCode,
-      node.right,
-      code + secondValue.toString(),
-      random,
-    )
-  }
-  if (node.value.length === 1) {
-    huffmanCode[node.value] = code
-  }
-  return huffmanCode
-}
-
 /**
- * This class represents a node in the huffman tree
+ * This type represents a node in the huffman tree
  */
-export class TreeNode {
-  public value: string
-  public frequency: number
-  public left: TreeNode | null
-  public right: TreeNode | null
-  public personalCode: string
-
-  constructor(
-    value: string,
-    frequency: number,
-    left: TreeNode | null,
-    right: TreeNode | null,
-  ) {
-    this.value = value
-    this.frequency = frequency
-    this.left = left
-    this.right = right
-    this.personalCode = ""
-  }
-
-}
+export type TreeNode = {
+  value: string;
+  frequency: number;
+  left: TreeNode | null;
+  right: TreeNode | null;
+  personalCode: string;
+};
