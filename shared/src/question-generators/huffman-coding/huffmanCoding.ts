@@ -200,12 +200,7 @@ export const HuffmanCoding: QuestionGenerator = {
     })
 
     // throw an error if the variant is unknown
-    if (
-      !validateParameters(
-        parameters,
-          HuffmanCoding.expectedParameters,
-      )
-    ) {
+    if (!validateParameters(parameters, HuffmanCoding.expectedParameters)) {
       throw new Error(
         `Unknown variant ${parameters.variant.toString()}. 
                 Valid variants are: ${HuffmanCoding.expectedParameters.join(
@@ -219,17 +214,21 @@ export const HuffmanCoding: QuestionGenerator = {
          */
     const random = new Random(seed)
     const wordLengths: Array<[number, number]> = [
-      [13, 0.25], [12, 0.25], [11, 0.125], [10, 0.125], [9, 0.125], [8, 0.125]
-    ];
-    const wordlength = random.weightedChoice(wordLengths);
+      [13, 0.25],
+      [12, 0.25],
+      [11, 0.125],
+      [10, 0.125],
+      [9, 0.125],
+      [8, 0.125],
+    ]
+    const wordlength = random.weightedChoice(wordLengths)
 
     const variantParameter = parameters.variant as "choice" | "input"
-    let variant : string;
+    let variant: string
     if (variantParameter === "choice") {
       variant = random.choice(["choice", "choice2"])
-    }
-    else {
-      variant = variantParameter
+    } else {
+      variant = "input"
     }
 
     let question: Question

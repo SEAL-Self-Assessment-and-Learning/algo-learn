@@ -36,8 +36,8 @@ export function huffmanCodingAlgorithm(
       frequency: characters[character],
       left: null,
       right: null,
-      personalCode: ""
-    });
+      personalCode: "",
+    })
   }
 
   // create a tree based on the characters
@@ -53,8 +53,8 @@ export function huffmanCodingAlgorithm(
         frequency: left.frequency + right.frequency,
         left: left,
         right: right,
-        personalCode: ""
-      };
+        personalCode: "",
+      }
       nodes.push(newNode)
     }
   }
@@ -115,9 +115,9 @@ export function createHuffmanCoding(
  * This type represents a node in the huffman tree
  */
 export type TreeNode = {
-  value: string;
-  frequency: number;
-  left: TreeNode | null;
-  right: TreeNode | null;
-  personalCode: string;
-};
+  value: string
+  frequency: number
+  left: TreeNode | null
+  right: TreeNode | null
+  personalCode: string
+}

@@ -17,7 +17,10 @@ export function generateRandomWrongAnswer(
   correctAnswer: string,
 ) {
   const wrongAnswer = correctAnswer.split("")
-  const flipPositions = random.subset(Array.from({length: correctAnswer.length}, (_, i) => i), random.int(1, 5))
+  const flipPositions = random.subset(
+    Array.from({ length: correctAnswer.length }, (_, i) => i),
+    random.int(1, 5),
+  )
 
   for (let i = 0; i < flipPositions.length / 2; i++) {
     if (wrongAnswer[flipPositions[i]] === "0") {
@@ -49,9 +52,10 @@ export function generateWrongAnswerSwitchLetters(
     "",
   )
   const keySet: string[] = Object.keys(huffmanDict)
-  const randomKeys = random.subset(keySet, 2);
-  [huffmanDict[randomKeys[0]], huffmanDict[randomKeys[1]]] = [
-    huffmanDict[randomKeys[1]], huffmanDict[randomKeys[0]],
+  const randomKeys = random.subset(keySet, 2)
+  ;[huffmanDict[randomKeys[0]], huffmanDict[randomKeys[1]]] = [
+    huffmanDict[randomKeys[1]],
+    huffmanDict[randomKeys[0]],
   ]
   const resultWord: string = word
     .split("")
@@ -94,27 +98,27 @@ export function generateWrongAnswerChangeWord(random: Random, word: string) {
 }
 
 export function createHuffmanCodingBitError(
-    huffmanCode: { [key: string]: string },
-    node: TreeNode,
-    code: string,
-    random: Random,
+  huffmanCode: { [key: string]: string },
+  node: TreeNode,
+  code: string,
+  random: Random,
 ) {
   const firstValue = random.int(0, 1)
   const secondValue = 1 - firstValue
   if (node.left) {
     huffmanCode = createHuffmanCodingBitError(
-        huffmanCode,
-        node.left,
-        code + firstValue.toString(),
-        random,
+      huffmanCode,
+      node.left,
+      code + firstValue.toString(),
+      random,
     )
   }
   if (node.right) {
     huffmanCode = createHuffmanCodingBitError(
-        huffmanCode,
-        node.right,
-        code + secondValue.toString(),
-        random,
+      huffmanCode,
+      node.right,
+      code + secondValue.toString(),
+      random,
     )
   }
   if (node.value.length === 1) {

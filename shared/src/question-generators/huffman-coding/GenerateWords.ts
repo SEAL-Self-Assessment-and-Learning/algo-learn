@@ -57,13 +57,11 @@ export function generateString(
   length: keyof typeof tmpFrequencies,
   random: Random,
 ): string {
+  // generate a word length at maximum of 13 chars
+  const chosenFrequency = tmpFrequencies[length]
+  const randomIndex = random.int(0, chosenFrequency.length - 1)
 
-    // generate a word length at maximum of 13 chars
-    const chosenFrequency = tmpFrequencies[length]
-    const randomIndex = random.int(0, chosenFrequency.length - 1)
-
-    return generateWordBasedOnFrequency(chosenFrequency[randomIndex], random)
-
+  return generateWordBasedOnFrequency(chosenFrequency[randomIndex], random)
 }
 
 function generateWordBasedOnFrequency(
@@ -73,10 +71,13 @@ function generateWordBasedOnFrequency(
   let word = ""
   // not using "i", "j", "l", "n", "q" because they have similar shapes
   let possibleChars: string = "abcdefghkmoprstuvwxyz"
-  const chosenChars = random.subset(possibleChars.split(""), chosenFrequency.length)
+  const chosenChars = random.subset(
+    possibleChars.split(""),
+    chosenFrequency.length,
+  )
 
   for (let j = 0; j < chosenFrequency.length; j++) {
-    word += chosenChars[j].repeat(chosenFrequency[j]);
+    word += chosenChars[j].repeat(chosenFrequency[j])
   }
 
   return word
@@ -88,9 +89,7 @@ function generateWordBasedOnFrequency(
  * @param difficulty
  * @param random
  */
-export function generateWordArray(
-    random: Random,
-) {
+export function generateWordArray(random: Random) {
   // TODO better control over how the array is constructed and not only random use
 
   const differentLetters = random.int(7, 12)
