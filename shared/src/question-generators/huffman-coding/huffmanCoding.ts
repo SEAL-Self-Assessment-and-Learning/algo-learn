@@ -98,8 +98,8 @@ function generateObviousWrongAnswers(
   }
 
   // Only chose one, because they are both quite easy and identically
-  const random_uniform = random.uniform()
-  if (random_uniform < 0.5) {
+  const randomUniform = random.uniform()
+  if (randomUniform < 0.5) {
     const w3 = generateWrongAnswerShuffleWord(random, word)
     if (
       wrongAnswers.indexOf(w3) === -1 &&
@@ -138,19 +138,19 @@ function generateObviousWrongAnswers(
     }
   }
 
-  let subset_size = 4
+  let subsetSize = 4
   if (wrongAnswers.length < 4) {
-    subset_size = wrongAnswers.length
+    subsetSize = wrongAnswers.length
   }
-  return random.subset(wrongAnswers, subset_size)
+  return random.subset(wrongAnswers, subsetSize)
 }
 
 /**
  * This function switches all zeros and ones, because this will still be a correct Huffman-Coding
- * @param correctword
+ * @param correctWord
  */
-export function switchAllOneZero(correctword: string) {
-  const correctWordArray: string[] = correctword.split("")
+export function switchAllOneZero(correctWord: string) {
+  const correctWordArray: string[] = correctWord.split("")
   for (let i = 0; i < correctWordArray.length; i++) {
     if (correctWordArray[i] === "1") {
       correctWordArray[i] = "0"
@@ -218,19 +218,15 @@ export const HuffmanCoding: QuestionGenerator = {
         Generate the random word and get the correct answer
          */
     const random = new Random(seed)
-    let wordlength = 8
-    const probLength = random.uniform()
-    // if P > 0.75 --> length = 13, > 0.5 length --> 12 > rest 0.125 steps
-    if (probLength > 0.75) wordlength = 13
-    else if (probLength > 0.5) wordlength = 12
-    else if (probLength > 0.375) wordlength = 11
-    else if (probLength > 0.25) wordlength = 10
-    else if (probLength > 0.125) wordlength = 9
+    const wordLengths: Array<[number, number]> = [
+      [13, 0.25], [12, 0.25], [11, 0.125], [10, 0.125], [9, 0.125], [8, 0.125]
+    ];
+    const wordlength = random.weightedChoice(wordLengths);
 
     let variant : string = parameters.variant as "choice" | "input"
     if (variant === 'choice') {
-      const choice1orchoice2 = random.uniform();
-      if (choice1orchoice2 >= 0.5) variant = 'choice2'
+      const choice1OrChoice2 = random.uniform();
+      if (choice1OrChoice2 >= 0.5) variant = 'choice2'
     }
     let question: Question
 
@@ -238,9 +234,9 @@ export const HuffmanCoding: QuestionGenerator = {
       let word = generateString(wordlength, 1, random)
       word = random.shuffle(word.split("")).join("")
 
-      const correctAnswer_list = huffmanCodingAlgorithm(word, 0)
-      const correctAnswer = correctAnswer_list["result"]
-      const correctTree = correctAnswer_list["main_node"]
+      const correctAnswerList = huffmanCodingAlgorithm(word, 0)
+      const correctAnswer = correctAnswerList["result"]
+      const correctTree = correctAnswerList["mainNode"]
       // get a set of obvious wrong answers
       const answers = generateObviousWrongAnswers(
         random,
@@ -278,8 +274,8 @@ export const HuffmanCoding: QuestionGenerator = {
 
       const feedback: FreeTextFeedbackFunction = ({ text }) => {
         // also switch 1 and 0 to keep a correct solution
-        const switched_correctAnswer = switchAllOneZero(correctAnswer)
-        if (text == correctAnswer || text === switched_correctAnswer) {
+        const switchedCorrectAnswer = switchAllOneZero(correctAnswer)
+        if (text == correctAnswer || text === switchedCorrectAnswer) {
           return {
             correct: true,
             message: "t(feedback.correct)",
@@ -326,23 +322,23 @@ export const HuffmanCoding: QuestionGenerator = {
       // only temporary displaying the word array
       const wordArrayDisplay = JSON.stringify(wordArray, null, 2)
       const word = wordArrayOverview.word
-      const correctAnswerTreeNode = huffmanCodingAlgorithm(word, 0).main_node
-      let coorectAnswerDict: { [key: string]: string } = {}
-      coorectAnswerDict = createHuffmanCoding(
-        coorectAnswerDict,
+      const correctAnswerTreeNode = huffmanCodingAlgorithm(word, 0).mainNode
+      let correctAnswerDict: { [key: string]: string } = {}
+      correctAnswerDict = createHuffmanCoding(
+        correctAnswerDict,
         correctAnswerTreeNode,
         "",
       )
 
       // TODO create more complex wrong answers
       const possibleAnswers: string[] = []
-      possibleAnswers.push(JSON.stringify(coorectAnswerDict, null, 2))
+      possibleAnswers.push(JSON.stringify(correctAnswerDict, null, 2))
       possibleAnswers.push("Placeholder at the moment 1")
       possibleAnswers.push("Placeholder at the moment 2")
       possibleAnswers.push("Placeholder at the moment 3")
 
       const correctAnswerIndex = possibleAnswers.indexOf(
-        JSON.stringify(coorectAnswerDict, null, 2),
+        JSON.stringify(correctAnswerDict, null, 2),
       )
 
       question = {

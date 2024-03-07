@@ -6,27 +6,27 @@ import Random from "@shared/utils/random.ts"
 
 /**
  * This function takes in a string and returns the Huffman Coding of the string
- * @param input_word the word to be encoded
- * @param sorting_variant the variant of the sorting algorithm
+ * @param inputWord the word to be encoded
+ * @param sortingVariant the variant of the sorting algorithm
  *                        currently not implemented
  */
 export function huffmanCodingAlgorithm(
-  input_word: string,
-  sorting_variant: number,
+  inputWord: string,
+  sortingVariant: number,
 ): {
   result: string
-  main_node: TreeNode
+  mainNode: TreeNode
 } {
   // split the input word into an dictionary of characters
-  if (sorting_variant === 1) {
+  if (sortingVariant === 1) {
     // currently not implemented
   }
   const characters: { [key: string]: number } = {}
-  for (let i = 0; i < input_word.length; i++) {
-    if (characters[input_word[i]]) {
-      characters[input_word[i]] += 1
+  for (let i = 0; i < inputWord.length; i++) {
+    if (characters[inputWord[i]]) {
+      characters[inputWord[i]] += 1
     } else {
-      characters[input_word[i]] = 1
+      characters[inputWord[i]] = 1
     }
   }
 
@@ -54,7 +54,7 @@ export function huffmanCodingAlgorithm(
     }
   }
 
-  const main_node: TreeNode = nodes[0]
+  const mainNode: TreeNode = nodes[0]
 
   // create the huffman coding for each character
   const huffmanCoding: { [key: string]: string } = {}
@@ -62,14 +62,14 @@ export function huffmanCodingAlgorithm(
     huffmanCoding[character] = ""
   }
 
-  createHuffmanCoding(huffmanCoding, main_node, "")
+  createHuffmanCoding(huffmanCoding, mainNode, "")
 
   let result: string = ""
-  for (let i = 0; i < input_word.length; i++) {
-    result += huffmanCoding[input_word[i]]
+  for (let i = 0; i < inputWord.length; i++) {
+    result += huffmanCoding[inputWord[i]]
   }
 
-  return { result, main_node }
+  return { result, mainNode: mainNode }
 
   function sortNodes(a: TreeNode, b: TreeNode) {
     // if a equals b compare them alphabetically
@@ -159,21 +159,4 @@ export class TreeNode {
     this.personalCode = ""
   }
 
-  /**
-   * Function to get the frequency of all leafs
-   */
-  public getLeafs(leafs: number[]) {
-    if (this.left) {
-      this.left.getLeafs(leafs)
-    }
-    if (this.right) {
-      this.right.getLeafs(leafs)
-    }
-
-    if (!this.left && !this.right) {
-      leafs.push(this.frequency)
-    }
-
-    return leafs
-  }
 }

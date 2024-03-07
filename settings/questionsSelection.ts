@@ -21,7 +21,6 @@ export const allQuestionGeneratorRoutes: QuestionRoutes = [
   //   path: "example/example",
   //   generator: ExampleQuestion,
   // },
-  // you cannot use any '-' in the path name
   {
     path: "asymptotics/precise-language",
     generator: AsymptoticsPreciseLanguage,

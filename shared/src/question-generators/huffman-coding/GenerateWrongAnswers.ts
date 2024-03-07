@@ -50,12 +50,9 @@ export function generateWrongAnswerSwitchLetters(
     "",
   )
   const keySet: string[] = Object.keys(huffmanDict)
-  const [randomKey1, randomKey2] = keySet
-    .sort(() => random.uniform() - 0.5)
-    .slice(0, 2)
-  ;[huffmanDict[randomKey1], huffmanDict[randomKey2]] = [
-    huffmanDict[randomKey2],
-    huffmanDict[randomKey1],
+  const randomKeys = random.subset(keySet, 2);
+  [huffmanDict[randomKeys[0]], huffmanDict[randomKeys[1]]] = [
+    huffmanDict[randomKeys[1]], huffmanDict[randomKeys[0]],
   ]
   const resultWord: string = word
     .split("")
@@ -141,10 +138,10 @@ export function generateWrongAnswerReduceCodeOfLetter(
 ) {
   const huffmanDictKey = createHuffmanDict(currentTree)
   const huffmanDict = huffmanDictKey.huffmanDict
-  const current_longest_key = huffmanDictKey.current_longest_key
-  huffmanDict[current_longest_key] = huffmanDict[current_longest_key].slice(
+  const currentLongestKey = huffmanDictKey.currentLongestKey
+  huffmanDict[currentLongestKey] = huffmanDict[currentLongestKey].slice(
     0,
-    huffmanDict[current_longest_key].length - 1,
+    huffmanDict[currentLongestKey].length - 1,
   )
   let wrongAnswerCoding = ""
   for (let i = 0; i < word.length; i++) {
@@ -160,15 +157,15 @@ export function generateWrongAnswerFlip01InCodeChar(
 ) {
   const huffmanDictKey = createHuffmanDict(currentTree)
   const huffmanDict = huffmanDictKey.huffmanDict
-  const current_longest_key = huffmanDictKey.current_longest_key
+  const currentLongestKey = huffmanDictKey.currentLongestKey
   // flip a 0 or 1 in the longest key
-  const randomIndex = random.int(0, huffmanDict[current_longest_key].length - 1)
+  const randomIndex = random.int(0, huffmanDict[currentLongestKey].length - 1)
   const newChar =
-    huffmanDict[current_longest_key][randomIndex] === "0" ? "1" : "0"
-  huffmanDict[current_longest_key] =
-    huffmanDict[current_longest_key].slice(0, randomIndex) +
+    huffmanDict[currentLongestKey][randomIndex] === "0" ? "1" : "0"
+  huffmanDict[currentLongestKey] =
+    huffmanDict[currentLongestKey].slice(0, randomIndex) +
     newChar +
-    huffmanDict[current_longest_key].slice(randomIndex + 1)
+    huffmanDict[currentLongestKey].slice(randomIndex + 1)
   let wrongAnswerCoding = ""
   for (let i = 0; i < word.length; i++) {
     wrongAnswerCoding += huffmanDict[word[i]]
@@ -180,19 +177,19 @@ function createHuffmanDict(currentTree: TreeNode) {
   let huffmanDict: { [key: string]: string } = {}
   huffmanDict = createHuffmanCoding(huffmanDict, currentTree, "")
   // get the key with the longest value
-  let current_longest_key: string = ""
+  let currentLongestKey: string = ""
   for (const current_key in huffmanDict) {
-    if (current_longest_key === "") {
-      current_longest_key = current_key
+    if (currentLongestKey === "") {
+      currentLongestKey = current_key
       continue
     }
     if (
-      huffmanDict[current_key].length > huffmanDict[current_longest_key].length
+      huffmanDict[current_key].length > huffmanDict[currentLongestKey].length
     ) {
-      current_longest_key = current_key
+      currentLongestKey = current_key
     }
   }
-  return { huffmanDict, current_longest_key }
+  return { huffmanDict, currentLongestKey: currentLongestKey }
 }
 
 /*
