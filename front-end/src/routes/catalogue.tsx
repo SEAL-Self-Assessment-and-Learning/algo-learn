@@ -1,6 +1,6 @@
 import { ChevronRight } from "lucide-react"
+import { HTMLAttributes } from "react"
 import { Link } from "react-router-dom"
-import "react-tooltip/dist/react-tooltip.css"
 import { QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { badgeVariants } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -15,11 +15,11 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { useHistoryState } from "@/hooks/useHistoryState"
+import { cn } from "@/lib/utils"
 import {
   deserializePath,
   serializeGeneratorCall,
 } from "../../../shared/src/api/QuestionRouter"
-import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { useTranslation } from "../hooks/useTranslation"
 import {
   allQuestionGeneratorRoutes,
@@ -28,7 +28,6 @@ import {
 } from "../listOfQuestions"
 
 export function Catalogue() {
-  const { t } = useTranslation()
   const [selectedGroup, setSelectedGroup] = useHistoryState(
     "selectedGroup",
     null as string | null,
@@ -39,90 +38,91 @@ export function Catalogue() {
   )
 
   return (
-    <HorizontallyCenteredDiv>
-      <h1 className="text-4xl font-bold">{t("Catalogue")}</h1>
-      <p>{t("Catalogue.desc")}</p>
-      <TopicSelectorCard
+    <div className="mx-auto flex w-full max-w-screen-md flex-col items-start justify-center gap-6 p-6 sm:flex-row">
+      <TopicSelectorSidebar
         selectedGroup={selectedGroup}
         setSelectedGroup={setSelectedGroup}
         showAllVariants={showAllVariants}
         setShowAllVariants={setShowAllVariants}
+        className="mx-auto sm:mx-0"
       />
-      {selectedGroup && (
-        <>
-          <h2 className="mt-16 text-xl font-bold">
-            {t("Catalogue.selectExercise")}
-          </h2>
-          {generatorsInGroup(selectedGroup).map(
-            (x) =>
-              x && (
-                <QuestionGeneratorCard
-                  key={x.generatorPath}
-                  generatorPath={x.generatorPath}
-                  generator={x.generator}
-                  showAllVariants={showAllVariants}
-                />
-              ),
-          )}
-        </>
-      )}
-    </HorizontallyCenteredDiv>
+      <div className="w-full">
+        {selectedGroup && (
+          <div className="flex flex-col gap-6">
+            {generatorsInGroup(selectedGroup).map(
+              (x) =>
+                x && (
+                  <QuestionGeneratorCard
+                    key={x.generatorPath}
+                    generatorPath={x.generatorPath}
+                    generator={x.generator}
+                    showAllVariants={showAllVariants}
+                    className="w-full"
+                  />
+                ),
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 
+interface TopicSelectorProps extends HTMLAttributes<HTMLDivElement> {
+  selectedGroup: string | null
+  setSelectedGroup: (s: string) => void
+  showAllVariants: boolean
+  setShowAllVariants: (b: boolean) => void
+}
+
 /**
- * A card that allows the user to select a topic and whether to show all variants of a question generator
+ * A sidebar that allows the user to select a topic and whether to show all variants of a question generator
  * @param selectedGroup The currently selected group
  * @param setSelectedGroup A function to set the selected group
  * @param showAllVariants Whether to show all variants of a question generator
  * @param setShowAllVariants A function to set whether to show all variants of a question generator
  */
-function TopicSelectorCard({
+function TopicSelectorSidebar({
+  className,
   selectedGroup,
   setSelectedGroup,
   showAllVariants,
   setShowAllVariants,
-}: {
-  selectedGroup: string | null
-  setSelectedGroup: (s: string) => void
-  showAllVariants: boolean
-  setShowAllVariants: (b: boolean) => void
-}) {
+}: TopicSelectorProps) {
   const { t } = useTranslation()
   return (
-    <Card className="my-8 w-fit bg-secondary text-secondary-foreground">
+    <Card
+      className={cn(
+        "border-0 bg-secondary text-secondary-foreground",
+        className,
+      )}
+    >
       <CardHeader>
         <CardTitle>{t("Catalogue.topic")}</CardTitle>
         <CardDescription>{t("Catalogue.choose.desc")}</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap justify-start gap-4">
-          {skillGroups.map((g) => (
-            <Button
-              key={g}
-              onClick={() => setSelectedGroup(g)}
-              variant={selectedGroup === g ? "default" : "outline"}
-            >
-              {t("skill." + g)}
-            </Button>
-          ))}
-        </div>
+      <CardContent className="flex flex-col flex-wrap gap-1">
+        {skillGroups.map((g) => (
+          <Button
+            key={g}
+            onClick={() => setSelectedGroup(g)}
+            variant={selectedGroup === g ? "default" : "ghost"}
+            className="justify-start"
+          >
+            {t("skill." + g)}
+          </Button>
+        ))}
         {selectedGroup && (
-          <div className="items-top mt-6 flex space-x-2 font-medium">
+          <div className="ml-2 mt-4 flex gap-2">
             <Checkbox
               id="terms1"
               checked={showAllVariants}
               onCheckedChange={(b) => setShowAllVariants(b === true)}
             />
-            <div className="grid gap-1.5 leading-none">
-              <Label htmlFor="terms1">{t("Catalogue.showVariants")}</Label>
-            </div>
+            <Label htmlFor="terms1">{t("Catalogue.showVariants")}</Label>
           </div>
         )}
       </CardContent>
-      {/* <CardFooter>
-        <p>Card Footer</p>
-      </CardFooter> */}
     </Card>
   )
 }
@@ -138,22 +138,24 @@ function QuestionGeneratorCard({
   generator,
   showAllVariants,
   showDescription = true,
+  className,
 }: {
   generatorPath: string
   generator: QuestionGenerator
   showAllVariants: boolean
   showDescription?: boolean
+  className?: string
 }) {
   const { t, lang } = useTranslation()
   return (
-    <Card className="my-8 w-fit p-0">
+    <Card className={cn("border-4", className)}>
       <CardHeader className="m-0 p-3">
         <CardTitle className="text-base">{generator.name(lang)}</CardTitle>
         {showDescription && generator.description && (
           <CardDescription>{generator.description(lang)}</CardDescription>
         )}
       </CardHeader>
-      <CardFooter className="m-0 flex items-center gap-2 p-3">
+      <CardFooter className="m-0 flex flex-wrap items-center gap-2 p-3">
         <Button asChild variant="secondary" size="sm">
           <Link to={`/${lang}/practice/${generatorPath}`}>
             {t("Catalogue.practice")} <ChevronRight className="ml-1 h-4 w-4" />
