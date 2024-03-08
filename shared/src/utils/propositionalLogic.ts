@@ -125,7 +125,9 @@ abstract class SyntaxTreeNode {
       if (value === setting.invert) return
 
       innerNodes.push(
-        setting.inner(variableValuesToLiterals(numToVariableValues(index, variableNames), setting.invert)),
+        setting.inner(
+          variableValuesToLiterals(numToVariableValues(index, variableNames), setting.invert),
+        ),
       )
     })
 
@@ -791,7 +793,9 @@ function generateBetterRandomExpression(
     allVariableNames,
     rightNumLeaves,
     thisOperator,
-    reservedName === null ? restrictedVariableNames.filter((v) => !leftVars.includes(v)) : [reservedName],
+    reservedName === null
+      ? restrictedVariableNames.filter((v) => !leftVars.includes(v))
+      : [reservedName],
   )
 
   return [

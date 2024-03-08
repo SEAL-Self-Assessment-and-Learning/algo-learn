@@ -2,7 +2,7 @@ import { format } from "../utils/format"
 import Random from "../utils/random"
 import { DeepTranslations, getValidLanguage } from "../utils/translations"
 import { Language } from "./Language"
-import { ExpectedParameters, Parameters, validateParameters } from "./Parameters"
+import { ExpectedParameters, Parameters } from "./Parameters"
 import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
@@ -79,12 +79,7 @@ export function basicMultipleChoiceMetaGenerator(
         ]
       : []
 
-  function generate(
-    generatorPath: string,
-    lang: Language,
-    parameters: Parameters,
-    seed: string,
-  ) {
+  function generate(generatorPath: string, lang: Language, parameters: Parameters, seed: string) {
     const i = parameters.number as number
 
     const random = new Random(seed)

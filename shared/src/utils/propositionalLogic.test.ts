@@ -1,11 +1,11 @@
 import { describe, expect, test } from "vitest"
 import {
   associativeOperators,
-  Operator,
-  Literal,
   BinaryOperatorType,
-  PropositionalLogicParser,
+  Literal,
+  Operator,
   ParserError,
+  PropositionalLogicParser,
 } from "./propositionalLogic"
 import Random, { sampleRandomSeed } from "./random.ts"
 
@@ -195,7 +195,11 @@ describe("simplify negations", () => {
 
   test("no change if not needed", () => {
     for (const op of ["\\and", "\\or", "\\xor", "=>", "<=>"] as BinaryOperatorType[]) {
-      const expr = new Operator(op, new Operator("\\xor", v[0], v[1]), new Operator("<=>", v[2], not_v[1]))
+      const expr = new Operator(
+        op,
+        new Operator("\\xor", v[0], v[1]),
+        new Operator("<=>", v[2], not_v[1]),
+      )
       const exprSimplified = expr.copy().simplifyNegation()
       expect(exprSimplified.toString()).toEqual(expr.toString())
     }
@@ -222,8 +226,16 @@ test("shuffle", () => {
   const random = new Random(seed)
   const expression = new Operator(
     "\\and",
-    new Operator("\\or", new Operator("=>", v[0], not_v[1], true), new Operator("\\xor", not_v[2], v[1])),
-    new Operator("\\and", new Operator("\\xor", v[1], new Operator("\\xor", v[2], v[1]), true), not_v[0]),
+    new Operator(
+      "\\or",
+      new Operator("=>", v[0], not_v[1], true),
+      new Operator("\\xor", not_v[2], v[1]),
+    ),
+    new Operator(
+      "\\and",
+      new Operator("\\xor", v[1], new Operator("\\xor", v[2], v[1]), true),
+      not_v[0],
+    ),
   )
 
   // console.log("orig: " + expression.toString())

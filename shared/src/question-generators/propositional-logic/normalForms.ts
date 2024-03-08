@@ -1,5 +1,4 @@
-import { t, tFunctional, Translations } from "../../utils/translations.ts"
-import Random from "../../utils/random.ts"
+import { Language } from "../../api/Language.ts"
 import {
   FreeTextFeedbackFunction,
   FreeTextQuestion,
@@ -9,12 +8,13 @@ import {
 } from "../../api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "../../api/QuestionRouter.ts"
 import {
-  generateRandomExpression,
-  SyntaxTreeNodeType,
   ExpressionProperties,
+  generateRandomExpression,
   PropositionalLogicParser,
+  SyntaxTreeNodeType,
 } from "../../utils/propositionalLogic.ts"
-import { Language } from "../../api/Language.ts"
+import Random from "../../utils/random.ts"
+import { t, tFunctional, Translations } from "../../utils/translations.ts"
 
 const translations: Translations = {
   en: {
@@ -28,7 +28,8 @@ const translations: Translations = {
     freetext_prompt: "Normal Form:",
     freetext_bottom_text: "Use the following buttons for easier input",
     freetext_feedback_not_equivalent: "Your answer is not equivalent to the given expression.",
-    freetext_feedback_unknown_variables: "Your answer contains variables not used in the given expression.",
+    freetext_feedback_unknown_variables:
+      "Your answer contains variables not used in the given expression.",
     freetext_feedback_no_normal_form: "Your answer is not a {{0}}.",
     freetext_feedback_parse_error: "Your answer couldn't be parsed.",
     dnf: "disjunctive normal form (DNF)",
@@ -45,7 +46,8 @@ const translations: Translations = {
     freetext_prompt: "Normalform:",
     freetext_bottom_text: "Verwenden sie die folgenden Buttons als Eingabehilfe.",
     freetext_feedback_not_equivalent: "Ihre Antwort ist nicht äquivalent zum gegebenen Ausdruck.",
-    freetext_feedback_unknown_variables: "Ihre Antwort verwendet andere Variablen als der gegebene Ausdruck.",
+    freetext_feedback_unknown_variables:
+      "Ihre Antwort verwendet andere Variablen als der gegebene Ausdruck.",
     freetext_feedback_no_normal_form: "Ihre Antwort ist keine {{0}}.",
     freetext_feedback_parse_error: "Ihre Antwort ist kein gültiger aussagenlogischer Ausdruck.",
     dnf: "disjunktive Normalform (DNF)",

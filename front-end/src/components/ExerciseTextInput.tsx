@@ -116,7 +116,8 @@ export function ExerciseTextInput({
     },
   })
 
-  const msgColor = mode === "draft" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+  const msgColor =
+    mode === "draft" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
   const message =
     mode === "correct" ? (
       <b className="text-2xl">{t("feedback.correct")}</b>

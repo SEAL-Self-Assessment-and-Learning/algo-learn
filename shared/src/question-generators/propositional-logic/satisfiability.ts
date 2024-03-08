@@ -1,19 +1,18 @@
-import { t, tFunctional, Translations } from "../../utils/translations.ts"
-import Random from "../../utils/random.ts"
+import { Language } from "../../api/Language.ts"
 import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
   QuestionGenerator,
 } from "../../api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "../../api/QuestionRouter.ts"
-
 import {
-  VariableValues,
+  generateRandomContradiction,
   generateRandomExpression,
   generateRandomTautology,
-  generateRandomContradiction,
+  VariableValues,
 } from "../../utils/propositionalLogic.ts"
-import { Language } from "../../api/Language.ts"
+import Random from "../../utils/random.ts"
+import { t, tFunctional, Translations } from "../../utils/translations.ts"
 
 const translations: Translations = {
   en: {
@@ -27,11 +26,13 @@ const translations: Translations = {
     answer_contradiction: "The expression is  a **contradiction**",
     feedback_contradiction: "The expression evaluates to false for all variable assignments.",
     feedback_tautology: "The expression evaluates to true for all variable assignments.",
-    feedback_examples: "The expression can be **falsified** by \\[{{0}}\\] and **verified** by \\[{{1}}\\]",
+    feedback_examples:
+      "The expression can be **falsified** by \\[{{0}}\\] and **verified** by \\[{{1}}\\]",
   },
   de: {
     name: "Erfüllbarkeitseigenschaften",
-    description: "Wähle die richtigen Erfüllbarkeitseigenschaften eines aussagenlogischen Ausdrucks aus.",
+    description:
+      "Wähle die richtigen Erfüllbarkeitseigenschaften eines aussagenlogischen Ausdrucks aus.",
     size: "Die Größe des erzeugten Ausdrucks.",
     text: "Betrachten Sie den folgenden aussagenlogischen Ausdruck \\[{{0}}\\] Welche der folgenden Aussagen treffen auf den Ausdruck zu?",
     answer_tautology: "Die Aussage is eine **Tautologie**",

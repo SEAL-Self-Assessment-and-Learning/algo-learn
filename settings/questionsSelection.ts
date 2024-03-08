@@ -9,11 +9,11 @@ import { LandauNotation } from "../shared/src/question-generators/asymptotics/la
 import { AsymptoticsPreciseLanguage } from "../shared/src/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "../shared/src/question-generators/asymptotics/sort"
 import { SimplifySum } from "../shared/src/question-generators/asymptotics/sum"
+import { NormalForms } from "../shared/src/question-generators/propositional-logic/normalForms.ts"
+import { Satisfiability } from "../shared/src/question-generators/propositional-logic/satisfiability"
 import { RecursionFormula } from "../shared/src/question-generators/recursion/formula"
 import { RecurrenceMaster } from "../shared/src/question-generators/recursion/recurrenceMaster"
 import { Loops } from "../shared/src/question-generators/time/loops"
-import { Satisfiability } from "../shared/src/question-generators/propositional-logic/satisfiability"
-import { NormalForms } from "../shared/src/question-generators/propositional-logic/normalForms.ts"
 
 /** List of all question routes */
 export const allQuestionGeneratorRoutes: QuestionRoutes = [

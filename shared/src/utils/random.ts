@@ -64,13 +64,22 @@ export default class Random {
    * @param min the minimal value a random split must have
    * @param max the maximal value a random split must have
    */
-  split(input: number, numSplits: number, min: number = 0, max: number | undefined = undefined): number[] {
+  split(
+    input: number,
+    numSplits: number,
+    min: number = 0,
+    max: number | undefined = undefined,
+  ): number[] {
     if (max === undefined) max = input
     if (numSplits < 1) throw new Error("Value Error: numSplits needs to be positive")
     if (numSplits * min > input)
-      throw new Error("Value Error: input cannot be split into numSplits values that are at least min big")
+      throw new Error(
+        "Value Error: input cannot be split into numSplits values that are at least min big",
+      )
     if (numSplits * max < input)
-      throw new Error("Value Error: input cannot be split into numSplits values that are at most max big")
+      throw new Error(
+        "Value Error: input cannot be split into numSplits values that are at most max big",
+      )
 
     let leftToSplit = input
     const result = []
