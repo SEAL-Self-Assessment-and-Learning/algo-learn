@@ -176,7 +176,7 @@ export function ExerciseTextInput({
         <Markdown md={question.bottomText} />
       </div>
       {(question.typingAid ?? []).map((el, index) => (
-        <Button key={`ta-${index}`} onClick={() => insertText(el.input)}>
+        <Button variant="secondary" key={`ta-${index}`} onClick={() => insertText(el.input)}>
           <Markdown md={el.text} />
         </Button>
       ))}
