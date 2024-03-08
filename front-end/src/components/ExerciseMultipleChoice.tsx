@@ -1,10 +1,7 @@
 import { CheckCheck, XCircle } from "lucide-react"
 import { useState } from "react"
 import { Tooltip } from "react-tooltip"
-import {
-  MultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-} from "@shared/api/QuestionGenerator"
+import { MultipleChoiceFeedback, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
@@ -43,9 +40,7 @@ export function ExerciseMultipleChoice({
     mode: (question.sorting ? "draft" : "invalid") as MODE,
 
     /** The indices of the selected answers */
-    choice: (question.sorting
-      ? [...Array(question.answers.length).keys()]
-      : []) as Array<number>,
+    choice: (question.sorting ? [...Array(question.answers.length).keys()] : []) as Array<number>,
 
     /**
      * The feedback object returned by question.feedback(). Will be set when the
@@ -75,9 +70,7 @@ export function ExerciseMultipleChoice({
    * @param value Whether the entry should be chosen
    */
   function setChoiceEntry(key: number, value: boolean): void {
-    const newChoice = question.allowMultiple
-      ? choice.filter((x) => x !== key)
-      : []
+    const newChoice = question.allowMultiple ? choice.filter((x) => x !== key) : []
     if (value) {
       newChoice.push(key)
     }
@@ -92,19 +85,17 @@ export function ExerciseMultipleChoice({
     if (mode === "draft") {
       if (question.feedback !== undefined) {
         setState({ ...state, mode: "submitted" })
-        void Promise.resolve(question.feedback({ choice })).then(
-          (feedbackObject) => {
-            let mode: MODE = "draft"
-            if (feedbackObject.correct === true) {
-              playSound("pass")
-              mode = "correct"
-            } else if (feedbackObject.correct === false) {
-              playSound("fail")
-              mode = "incorrect"
-            }
-            setState({ ...state, mode, feedbackObject })
-          },
-        )
+        void Promise.resolve(question.feedback({ choice })).then((feedbackObject) => {
+          let mode: MODE = "draft"
+          if (feedbackObject.correct === true) {
+            playSound("pass")
+            mode = "correct"
+          } else if (feedbackObject.correct === false) {
+            playSound("fail")
+            mode = "incorrect"
+          }
+          setState({ ...state, mode, feedbackObject })
+        })
       }
     } else if (mode === "correct" || mode === "incorrect") {
       onResult && onResult(mode)
@@ -167,16 +158,13 @@ export function ExerciseMultipleChoice({
         <Markdown md={question.text ?? ""} />
         <div className="flex flex-col flex-wrap gap-4 p-4">
           {question.answers.map((answer, index) => {
-            const isCorrectAnswer =
-              true === feedbackObject?.correctChoice?.includes(index)
+            const isCorrectAnswer = true === feedbackObject?.correctChoice?.includes(index)
             const id = `${index}`
             return (
               <div key={index} className="flex items-center space-x-2">
                 <FeedbackIconAndTooltip
                   isCorrectAnswer={isCorrectAnswer}
-                  userGaveCorrectAnswer={
-                    isCorrectAnswer === choice.includes(index)
-                  }
+                  userGaveCorrectAnswer={isCorrectAnswer === choice.includes(index)}
                   hidden={!disabled}
                   id={id}
                 />
@@ -217,8 +205,7 @@ export function ExerciseMultipleChoice({
         element: <Markdown md={question.answers[position]} />,
       })
     }
-    const onChange = (newItems: Array<BaseItem>) =>
-      setChoice(newItems.map((item) => item.position))
+    const onChange = (newItems: Array<BaseItem>) => setChoice(newItems.map((item) => item.position))
 
     return (
       <InteractWithQuestion
@@ -230,12 +217,7 @@ export function ExerciseMultipleChoice({
         handleFooterClick={handleClick}
       >
         <Markdown md={question.text ?? ""} />
-        <SortableList
-          items={items}
-          onChange={onChange}
-          className="p-5"
-          disabled={mode !== "draft"}
-        />
+        <SortableList items={items} onChange={onChange} className="p-5" disabled={mode !== "draft"} />
       </InteractWithQuestion>
     )
   }
@@ -253,12 +235,8 @@ function FeedbackIconAndTooltip({
   id?: string
 }) {
   const { t } = useTranslation()
-  const correctnessMsg = isCorrectAnswer
-    ? t("answer.correct")
-    : t("answer.wrong")
-  const choiceMsg = userGaveCorrectAnswer
-    ? t("choice.correct")
-    : t("choice.wrong")
+  const correctnessMsg = isCorrectAnswer ? t("answer.correct") : t("answer.wrong")
+  const choiceMsg = userGaveCorrectAnswer ? t("choice.correct") : t("choice.wrong")
   return (
     <>
       <a id={`myid-${id}`}>
@@ -273,13 +251,7 @@ function FeedbackIconAndTooltip({
   )
 }
 
-function FeedbackIcon({
-  correct,
-  hidden,
-}: {
-  correct: boolean
-  hidden: boolean
-}) {
+function FeedbackIcon({ correct, hidden }: { correct: boolean; hidden: boolean }) {
   const cn = hidden ? " invisible" : ""
   if (correct) {
     return <CheckCheck className={"h-4 w-4 text-green-700" + cn} />

@@ -1,12 +1,4 @@
-import {
-  FileKey2,
-  GitCommitHorizontal,
-  Home,
-  Info,
-  MoreVertical,
-  Settings,
-  WifiOff,
-} from "lucide-react"
+import { FileKey2, GitCommitHorizontal, Home, Info, MoreVertical, Settings, WifiOff } from "lucide-react"
 import { useEffect } from "react"
 import { Link, Outlet } from "react-router-dom"
 import { Language } from "@shared/api/Language"
@@ -26,11 +18,7 @@ import { YScroll } from "@/components/YScroll"
 import { VERSION } from "@/config"
 import { useSound } from "@/hooks/useSound"
 import { availableThemes, Themes, useTheme } from "@/hooks/useTheme"
-import {
-  NATIVE_NAME,
-  SUPPORTED_LANGUAGES,
-  useTranslation,
-} from "@/hooks/useTranslation"
+import { NATIVE_NAME, SUPPORTED_LANGUAGES, useTranslation } from "@/hooks/useTranslation"
 
 export default function Root() {
   return (
@@ -56,8 +44,7 @@ function GlobalHeader() {
     <header className="flex flex-none flex-wrap place-items-center justify-between gap-1 border-b-2 bg-goethe p-2 text-goethe-foreground">
       <div className="flex-grow text-2xl">
         <Link to="/">
-          algo learn{" "}
-          <span className="font-mono text-sm text-yellow-200">alpha</span>
+          algo learn <span className="font-mono text-sm text-yellow-200">alpha</span>
         </Link>
       </div>
       <DropdownMenu>
@@ -73,16 +60,9 @@ function GlobalHeader() {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuLabel>{t("menu.language")}</DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={lang}
-            onValueChange={(s) => setLang(s as Language)}
-          >
+          <DropdownMenuRadioGroup value={lang} onValueChange={(s) => setLang(s as Language)}>
             {SUPPORTED_LANGUAGES.map((lng) => (
-              <DropdownMenuRadioItem
-                key={lng}
-                value={lng}
-                onSelect={(e) => e.preventDefault()}
-              >
+              <DropdownMenuRadioItem key={lng} value={lng} onSelect={(e) => e.preventDefault()}>
                 {NATIVE_NAME[lng]}
               </DropdownMenuRadioItem>
             ))}
@@ -93,31 +73,18 @@ function GlobalHeader() {
             value={muted ? "off" : "on"}
             onValueChange={(s) => setMuted(s === "off")}
           >
-            <DropdownMenuRadioItem
-              value="on"
-              onSelect={(e) => e.preventDefault()}
-            >
+            <DropdownMenuRadioItem value="on" onSelect={(e) => e.preventDefault()}>
               {t("on")}
             </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem
-              value="off"
-              onSelect={(e) => e.preventDefault()}
-            >
+            <DropdownMenuRadioItem value="off" onSelect={(e) => e.preventDefault()}>
               {t("off")}
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
           <DropdownMenuSeparator />
           <DropdownMenuLabel>{t("menu.theme")}</DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={userTheme}
-            onValueChange={(s) => setUserTheme(s as Themes)}
-          >
+          <DropdownMenuRadioGroup value={userTheme} onValueChange={(s) => setUserTheme(s as Themes)}>
             {availableThemes.map((thm) => (
-              <DropdownMenuRadioItem
-                key={thm}
-                value={thm}
-                onSelect={(e) => e.preventDefault()}
-              >
+              <DropdownMenuRadioItem key={thm} value={thm} onSelect={(e) => e.preventDefault()}>
                 {t("theme." + thm)}
               </DropdownMenuRadioItem>
             ))}
@@ -162,11 +129,8 @@ function GlobalHeader() {
               </DropdownMenuItem>
             ) : (
               <DropdownMenuItem asChild>
-                <Link
-                  to={`https://github.com/holgerdell/algo-learn/commit/${VERSION}`}
-                >
-                  <GitCommitHorizontal className="mr-2 h-4 w-4" />{" "}
-                  {`${t("Version")}: ${VERSION}`}
+                <Link to={`https://github.com/holgerdell/algo-learn/commit/${VERSION}`}>
+                  <GitCommitHorizontal className="mr-2 h-4 w-4" /> {`${t("Version")}: ${VERSION}`}
                 </Link>
               </DropdownMenuItem>
             )}

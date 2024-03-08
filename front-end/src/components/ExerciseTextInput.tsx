@@ -1,9 +1,6 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
-import {
-  FreeTextFeedback,
-  FreeTextQuestion,
-} from "../../../shared/src/api/QuestionGenerator"
+import { FreeTextFeedback, FreeTextQuestion } from "../../../shared/src/api/QuestionGenerator"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
@@ -58,16 +55,14 @@ export function ExerciseTextInput({
   function setText(text: string) {
     setState((state) => ({ ...state, text }))
     if (question.checkFormat) {
-      void Promise.resolve(question.checkFormat({ text })).then(
-        ({ valid, message }) => {
-          setState({
-            ...state,
-            text,
-            mode: valid ? "draft" : "invalid",
-            formatFeedback: message,
-          })
-        },
-      )
+      void Promise.resolve(question.checkFormat({ text })).then(({ valid, message }) => {
+        setState({
+          ...state,
+          text,
+          mode: valid ? "draft" : "invalid",
+          formatFeedback: message,
+        })
+      })
     } else {
       const valid = text.trim().length > 0
       setState({ ...state, text, mode: valid ? "draft" : "invalid" })
@@ -78,19 +73,17 @@ export function ExerciseTextInput({
     if (mode === "draft") {
       if (question.feedback !== undefined) {
         setState({ ...state, mode: "submitted" })
-        void Promise.resolve(question.feedback({ text })).then(
-          (feedbackObject) => {
-            let mode: MODE = "draft"
-            if (feedbackObject.correct === true) {
-              playSound("pass")
-              mode = "correct"
-            } else if (feedbackObject.correct === false) {
-              playSound("fail")
-              mode = "incorrect"
-            }
-            setState({ ...state, mode, feedbackObject })
-          },
-        )
+        void Promise.resolve(question.feedback({ text })).then((feedbackObject) => {
+          let mode: MODE = "draft"
+          if (feedbackObject.correct === true) {
+            playSound("pass")
+            mode = "correct"
+          } else if (feedbackObject.correct === false) {
+            playSound("fail")
+            mode = "incorrect"
+          }
+          setState({ ...state, mode, feedbackObject })
+        })
       }
     } else if (mode === "correct" || mode === "incorrect") {
       onResult && onResult(mode)
@@ -108,9 +101,7 @@ export function ExerciseTextInput({
   })
 
   const msgColor =
-    mode === "draft"
-      ? "text-green-600 dark:text-green-400"
-      : "text-red-600 dark:text-red-400"
+    mode === "draft" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
   const message =
     mode === "correct" ? (
       <b className="text-2xl">{t("feedback.correct")}</b>

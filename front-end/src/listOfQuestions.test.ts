@@ -23,26 +23,20 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
       }
     })
 
-    const allCombinations = allParameterCombinations(
-      generator.expectedParameters,
-    )
+    const allCombinations = allParameterCombinations(generator.expectedParameters)
     test(`Test that generator has at least one allowed input`, () => {
       expect(allCombinations.length).toBeGreaterThan(0)
     })
     for (const lang of generator.languages) {
       for (const parameters of allCombinations) {
-        test(`Generate with language ${lang} and parameters ${JSON.stringify(
-          parameters,
-        )}`, () => {
+        test(`Generate with language ${lang} and parameters ${JSON.stringify(parameters)}`, () => {
           const ret = generator.generate(path, lang, parameters, "myFancySeed")
           expect(!(ret instanceof Promise)).toBe(true)
           if (ret instanceof Promise) return
           const { question } = ret
           expect(question.name).not.toBe("")
           expect(question.path).not.toBe("")
-          expect(question.type).toMatch(
-            /^(MultipleChoiceQuestion|FreeTextQuestion)$/,
-          )
+          expect(question.type).toMatch(/^(MultipleChoiceQuestion|FreeTextQuestion)$/)
           expect(question.text).toBeDefined()
           expect(question.text).not.toBe("")
           expect(question.feedback).toBeDefined()
@@ -64,20 +58,10 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
       test(`Testing parameter ${JSON.stringify(p)}`, () => {
         if (p.type === "integer") {
           expect(() =>
-            generator.generate(
-              path,
-              lang,
-              { ...parameters, [p.name]: p.min - 1 },
-              "myFancySeed",
-            ),
+            generator.generate(path, lang, { ...parameters, [p.name]: p.min - 1 }, "myFancySeed"),
           ).toThrow()
           expect(() =>
-            generator.generate(
-              path,
-              lang,
-              { ...parameters, [p.name]: p.max + 1 },
-              "myFancySeed",
-            ),
+            generator.generate(path, lang, { ...parameters, [p.name]: p.max + 1 }, "myFancySeed"),
           ).toThrow()
         } else if (p.type === "string") {
           expect(() =>

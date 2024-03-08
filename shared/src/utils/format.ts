@@ -8,14 +8,8 @@
  *   {{name}}, {{age}}, etc.).
  * @returns The translated text
  */
-export function format(
-  text: string,
-  parameters?: string[] | Record<string, string>,
-): string
-export function format(
-  text: string[],
-  parameters?: string[] | Record<string, string>,
-): string[]
+export function format(text: string, parameters?: string[] | Record<string, string>): string
+export function format(text: string[], parameters?: string[] | Record<string, string>): string[]
 export function format(
   text: string | string[],
   parameters?: string[] | Record<string, string>,

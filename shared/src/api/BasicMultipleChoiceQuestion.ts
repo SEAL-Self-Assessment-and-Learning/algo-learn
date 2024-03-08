@@ -2,11 +2,7 @@ import { format } from "../utils/format"
 import Random from "../utils/random"
 import { DeepTranslations, getValidLanguage } from "../utils/translations"
 import { Language } from "./Language"
-import {
-  ExpectedParameters,
-  Parameters,
-  validateParameters,
-} from "./Parameters"
+import { ExpectedParameters, Parameters, validateParameters } from "./Parameters"
 import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
@@ -53,12 +49,7 @@ export interface BasicMultipleChoiceQuestion {
    * wrong answers.
    */
   translations: DeepTranslations &
-    Partial<
-      Record<
-        Language,
-        { text: string; correctAnswers: string[]; wrongAnswers: string[] }
-      >
-    >
+    Partial<Record<Language, { text: string; correctAnswers: string[]; wrongAnswers: string[] }>>
 }
 
 /**
@@ -88,17 +79,10 @@ export function basicMultipleChoiceMetaGenerator(
         ]
       : []
 
-  function generate(
-    generatorPath: string,
-    lang: Language,
-    parameters: Parameters,
-    seed: string,
-  ) {
+  function generate(generatorPath: string, lang: Language, parameters: Parameters, seed: string) {
     if (!validateParameters(parameters, expectedParameters)) {
       throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${variants.join(
-          ", ",
-        )}`,
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${variants.join(", ")}`,
       )
     }
     const i = parameters.number as number
@@ -141,9 +125,7 @@ export function basicMultipleChoiceMetaGenerator(
     random.shuffle(answers)
 
     const markdown =
-      questions[i].frame === undefined
-        ? ownt["text"]
-        : questions[i].frame!(l, ownt["text"])
+      questions[i].frame === undefined ? ownt["text"] : questions[i].frame!(l, ownt["text"])
 
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",

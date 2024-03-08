@@ -54,11 +54,7 @@ const BIAS = 1.011
  * @param n0 - The inherent difficulty of the question
  * @returns The half-life of the skill in days
  */
-export function halflife(
-  numPassed: number,
-  numFailed: number,
-  n0: number = 0,
-): number {
+export function halflife(numPassed: number, numFailed: number, n0: number = 0): number {
   const logHalflife = numPassed * RIGHT + numFailed * WRONG + n0 + BIAS
   return hclip(2 ** logHalflife)
 }

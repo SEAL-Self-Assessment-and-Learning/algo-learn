@@ -1,17 +1,7 @@
 import { GripHorizontal } from "lucide-react"
 import { ReactNode } from "react"
-import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core"
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable"
+import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
+import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { cn } from "@/lib/utils"
 import { SortableItem } from "./SortableItem"
 import { Button } from "./ui/button"
@@ -39,13 +29,7 @@ export interface Props {
  * @param props.disabled Whether the list is disabled.
  * @param props.children Children of the list.
  */
-export function SortableList({
-  items,
-  onChange,
-  className = "",
-  disabled = false,
-  ...props
-}: Props) {
+export function SortableList({ items, onChange, className = "", disabled = false, ...props }: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -65,9 +49,7 @@ export function SortableList({
       sensors={sensors}
       onDragEnd={({ active, over }) => {
         if (over && active.id !== over?.id) {
-          const activeIndex = itemsWithIds.findIndex(
-            ({ id }) => id === active.id,
-          )
+          const activeIndex = itemsWithIds.findIndex(({ id }) => id === active.id)
           const overIndex = itemsWithIds.findIndex(({ id }) => id === over.id)
           onChange(arrayMove(items, activeIndex, overIndex))
         }
@@ -76,10 +58,7 @@ export function SortableList({
       <SortableContext items={itemsWithIds.map(({ id }) => ({ id }))}>
         <ul
           {...props}
-          className={cn(
-            "mx-auto flex max-w-max list-none flex-col gap-2",
-            className,
-          )}
+          className={cn("mx-auto flex max-w-max list-none flex-col gap-2", className)}
           role="application"
         >
           {itemsWithIds.map((item) => (

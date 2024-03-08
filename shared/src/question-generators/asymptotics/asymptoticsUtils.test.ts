@@ -278,9 +278,7 @@ test("ProductTerms.compare: strict", () => {
       td = createProductTerm({
         coefficient: d,
       })
-      expect(
-        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0),
-      ).toBeTruthy()
+      expect(tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0)).toBeTruthy()
 
       tc = createProductTerm({
         coefficient: c,
@@ -292,9 +290,7 @@ test("ProductTerms.compare: strict", () => {
         logexponent: 22,
         polyexponent: 17,
       })
-      expect(
-        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0),
-      ).toBeTruthy()
+      expect(tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0)).toBeTruthy()
 
       tc = createProductTerm({
         logexponent: c,
@@ -302,9 +298,7 @@ test("ProductTerms.compare: strict", () => {
       td = createProductTerm({
         logexponent: d,
       })
-      expect(
-        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0),
-      ).toBeTruthy()
+      expect(tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0)).toBeTruthy()
 
       tc = createProductTerm({
         coefficient: 6,
@@ -314,9 +308,7 @@ test("ProductTerms.compare: strict", () => {
         coefficient: 6,
         polyexponent: d,
       })
-      expect(
-        tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0),
-      ).toBeTruthy()
+      expect(tc.compare(td, true).valueOf() === (c > d ? 1 : c < d ? -1 : 0)).toBeTruthy()
     }
   }
 })

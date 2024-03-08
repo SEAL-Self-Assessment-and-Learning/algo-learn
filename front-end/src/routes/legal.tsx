@@ -10,11 +10,7 @@ export function Legal() {
       <h1>{t("Legal.label")}</h1>
       <p>{t("Legal.text")}</p>
       <p>
-        <Markdown
-          md={format(t("Legal.detailed.text"), [
-            "https://tcs.uni-frankfurt.de/legal",
-          ])}
-        />
+        <Markdown md={format(t("Legal.detailed.text"), ["https://tcs.uni-frankfurt.de/legal"])} />
       </p>
       <h2>{t("Legal.authors.label")}</h2>
       <p>

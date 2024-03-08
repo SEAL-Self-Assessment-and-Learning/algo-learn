@@ -66,9 +66,7 @@ export const LandauNotation: QuestionGenerator = {
 
       const isDuplicate = answers.findIndex((e) => e.key === key) >= 0
       const allIncorrect =
-        answers.length == NUM_QUESTIONS - 1 &&
-        answers.findIndex((e) => e.correct) == -1 &&
-        !correct
+        answers.length == NUM_QUESTIONS - 1 && answers.findIndex((e) => e.correct) == -1 && !correct
       if (!isDuplicate && !allIncorrect) {
         answers.push({ key, correct })
       }

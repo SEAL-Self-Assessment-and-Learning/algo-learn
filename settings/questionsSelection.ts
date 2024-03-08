@@ -56,16 +56,7 @@ export const allQuestionGeneratorRoutes: QuestionRoutes = [
 // links to images of question groups
 export const images = {
   time: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
-  asymptotics: new URL(
-    "../front-end/assets/images/skill-asymptotics.jpg",
-    import.meta.url,
-  ),
-  recursion: new URL(
-    "../front-end/assets/images/skill-recursion.jpg",
-    import.meta.url,
-  ),
-  example: new URL(
-    "../front-end/assets/images/skill-default.jpg",
-    import.meta.url,
-  ),
+  asymptotics: new URL("../front-end/assets/images/skill-asymptotics.jpg", import.meta.url),
+  recursion: new URL("../front-end/assets/images/skill-recursion.jpg", import.meta.url),
+  example: new URL("../front-end/assets/images/skill-default.jpg", import.meta.url),
 }

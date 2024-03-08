@@ -7,11 +7,7 @@ import {
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
 import Random from "../../utils/random"
 import { tFunction, tFunctional, Translations } from "../../utils/translations"
-import {
-  sampleTermSet,
-  SimpleAsymptoticTerm,
-  TermSetVariants,
-} from "./asymptoticsUtils"
+import { sampleTermSet, SimpleAsymptoticTerm, TermSetVariants } from "./asymptoticsUtils"
 
 const translations: Translations = {
   en: {
@@ -107,9 +103,7 @@ export const SortTerms: QuestionGenerator = {
       text: t("text"),
       answers: answers.map((a) => a.text),
       feedback: minimalMultipleChoiceFeedback({
-        correctAnswerIndex: answers
-          .sort((a, b) => a.correctIndex - b.correctIndex)
-          .map((a) => a.index),
+        correctAnswerIndex: answers.sort((a, b) => a.correctIndex - b.correctIndex).map((a) => a.index),
         sorting: true,
       }),
     }

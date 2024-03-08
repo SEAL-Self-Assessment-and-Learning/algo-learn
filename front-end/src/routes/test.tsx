@@ -1,15 +1,9 @@
 import { useState } from "react"
 import SyntaxHighlighter from "react-syntax-highlighter"
-import {
-  solarizedDark,
-  solarizedLight,
-} from "react-syntax-highlighter/dist/esm/styles/hljs"
+import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import {
-  Question,
-  questionToJSON,
-} from "../../../shared/src/api/QuestionGenerator"
+import { Question, questionToJSON } from "../../../shared/src/api/QuestionGenerator"
 import { ExampleQuestion } from "../../../shared/src/question-generators/example/example"
 import Random from "../../../shared/src/utils/random"
 import { questionToTex } from "../../../shared/src/utils/toLatex"
@@ -23,14 +17,10 @@ export function TestSimpleMC() {
   const { lang } = useTranslation()
   const [seed] = useState(new Random(Math.random()).base36string(7))
   const [format, setFormat] = useState("react" as "react" | "latex" | "json")
-  const [{ question }, setQuestion] = useState(
-    {} as { question: Question | undefined },
-  )
+  const [{ question }, setQuestion] = useState({} as { question: Question | undefined })
 
   if (!question) {
-    void Promise.resolve(
-      ExampleQuestion.generate("example/example", lang, {}, seed),
-    ).then(setQuestion)
+    void Promise.resolve(ExampleQuestion.generate("example/example", lang, {}, seed)).then(setQuestion)
     return <></>
   }
   return (
@@ -84,9 +74,7 @@ function RenderQuestionAsFormat({
         style={userTheme === LIGHT ? solarizedLight : solarizedDark}
         wrapLongLines
       >
-        {format === "latex"
-          ? questionToTex(question)
-          : questionToJSON(question)}
+        {format === "latex" ? questionToTex(question) : questionToJSON(question)}
       </SyntaxHighlighter>
     </HorizontallyCenteredDiv>
   )

@@ -255,9 +255,8 @@ const metaTranslations = {
   },
 }
 
-export const AsymptoticsPreciseLanguage: QuestionGenerator =
-  basicMultipleChoiceMetaGenerator(
-    tFunctional(metaTranslations, "title"),
-    questions,
-    tFunctional(metaTranslations, "description"),
-  )
+export const AsymptoticsPreciseLanguage: QuestionGenerator = basicMultipleChoiceMetaGenerator(
+  tFunctional(metaTranslations, "title"),
+  questions,
+  tFunctional(metaTranslations, "description"),
+)

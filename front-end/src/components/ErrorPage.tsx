@@ -7,10 +7,7 @@ export default function ErrorPage() {
 
   const error = useRouteError()
   return (
-    <div
-      id="error-page"
-      className="mx-auto grid h-screen max-w-md place-items-center text-center"
-    >
+    <div id="error-page" className="mx-auto grid h-screen max-w-md place-items-center text-center">
       <div className="flex flex-col gap-5">
         <h1 className="text-7xl font-bold">{t("Errors.oops")}</h1>
         <p>{t("Errors.sorry")}</p>

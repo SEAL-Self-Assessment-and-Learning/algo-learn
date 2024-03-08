@@ -31,9 +31,7 @@ export const Format: FunctionComponent<{
 
   const result = parts.reduce(
     (prev, curr, i) => {
-      const childIndex = matches[i]
-        ? parseInt(matches[i].replace(/[{}]/g, ""))
-        : -1
+      const childIndex = matches[i] ? parseInt(matches[i].replace(/[{}]/g, "")) : -1
       if (childIndex >= 0 && childIndex < parameters.length) {
         return (
           <>
@@ -67,14 +65,8 @@ export const Format: FunctionComponent<{
  *   {{name}}, {{age}}, etc.).
  * @returns The translated text
  */
-export function format(
-  text: string,
-  parameters?: string[] | Record<string, string>,
-): string
-export function format(
-  text: string[],
-  parameters?: string[] | Record<string, string>,
-): string[]
+export function format(text: string, parameters?: string[] | Record<string, string>): string
+export function format(text: string[], parameters?: string[] | Record<string, string>): string[]
 export function format(
   text: string | string[],
   parameters?: string[] | Record<string, string>,

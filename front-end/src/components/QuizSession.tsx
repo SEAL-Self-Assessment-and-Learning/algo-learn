@@ -213,21 +213,13 @@ export function QuizSession({
 
   // now we have status === "finished"
   const msgList =
-    numIncorrect == 0
-      ? great
-      : numCorrect / (numCorrect + numIncorrect) >= 0.75
-        ? good
-        : meh
+    numIncorrect == 0 ? great : numCorrect / (numCorrect + numIncorrect) >= 0.75 ? good : meh
   const msg = random.choice(msgList[lang])
   return (
     <ScreenCenteredDiv>
       <div className="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
         <div className="font-serif italic">{msg}</div>
-        <Button
-          asChild
-          variant="rightAnswer"
-          className="ml-auto mt-12 block max-w-max"
-        >
+        <Button asChild variant="rightAnswer" className="ml-auto mt-12 block max-w-max">
           <Link to="/">{t("Continue")}</Link>
         </Button>
       </div>

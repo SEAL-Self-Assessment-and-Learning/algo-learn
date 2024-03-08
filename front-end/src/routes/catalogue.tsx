@@ -16,10 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { useHistoryState } from "@/hooks/useHistoryState"
 import { cn } from "@/lib/utils"
-import {
-  deserializePath,
-  serializeGeneratorCall,
-} from "../../../shared/src/api/QuestionRouter"
+import { deserializePath, serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
 import { useTranslation } from "../hooks/useTranslation"
 import {
   allQuestionGeneratorRoutes,
@@ -28,14 +25,8 @@ import {
 } from "../listOfQuestions"
 
 export function Catalogue() {
-  const [selectedGroup, setSelectedGroup] = useHistoryState(
-    "selectedGroup",
-    null as string | null,
-  )
-  const [showAllVariants, setShowAllVariants] = useHistoryState(
-    "showAllVariants",
-    false,
-  )
+  const [selectedGroup, setSelectedGroup] = useHistoryState("selectedGroup", null as string | null)
+  const [showAllVariants, setShowAllVariants] = useHistoryState("showAllVariants", false)
 
   return (
     <div className="mx-auto flex w-full max-w-screen-md flex-col items-start justify-center gap-6 p-6 sm:flex-row">
@@ -91,12 +82,7 @@ function TopicSelectorSidebar({
 }: TopicSelectorProps) {
   const { t } = useTranslation()
   return (
-    <Card
-      className={cn(
-        "border-0 bg-secondary text-secondary-foreground",
-        className,
-      )}
-    >
+    <Card className={cn("border-0 bg-secondary text-secondary-foreground", className)}>
       <CardHeader>
         <CardTitle>{t("Catalogue.topic")}</CardTitle>
         <CardDescription>{t("Catalogue.choose.desc")}</CardDescription>
@@ -178,9 +164,7 @@ function QuestionGeneratorCard({
 
 function generatorsInGroup(group: string) {
   return removeDuplicates(
-    generatorCallsBelowPath(group).map((x) =>
-      serializeGeneratorCall({ ...x, parameters: undefined }),
-    ),
+    generatorCallsBelowPath(group).map((x) => serializeGeneratorCall({ ...x, parameters: undefined })),
   ).map((x) => deserializePath({ routes: allQuestionGeneratorRoutes, path: x }))
 }
 

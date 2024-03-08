@@ -118,9 +118,7 @@ export function minimalMultipleChoiceFeedback({
   sorting?: boolean
 }): MultipleChoiceFeedbackFunction {
   const correctChoice =
-    typeof correctAnswerIndex === "number"
-      ? [correctAnswerIndex]
-      : correctAnswerIndex.slice()
+    typeof correctAnswerIndex === "number" ? [correctAnswerIndex] : correctAnswerIndex.slice()
   if (!sorting) correctChoice.sort()
   const feedback: MultipleChoiceFeedbackFunction = ({ choice }) => {
     const sameLength = choice.length === correctChoice.length
@@ -188,9 +186,7 @@ export type FreeTextFeedbackFunction = (
 /** The signature of the function that checks the syntax or basic format. */
 export type FreeTextFormatFunction = (
   answer: FreeTextAnswer,
-) =>
-  | { valid: boolean; message?: string }
-  | Promise<{ valid: boolean; message?: string }>
+) => { valid: boolean; message?: string } | Promise<{ valid: boolean; message?: string }>
 
 /**
  * QuestionGenerator type for generating questions.

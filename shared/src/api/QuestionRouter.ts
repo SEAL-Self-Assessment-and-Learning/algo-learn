@@ -1,9 +1,5 @@
 import { Language } from "./Language"
-import {
-  deserializeParameters,
-  missingParameters,
-  Parameters,
-} from "./Parameters"
+import { deserializeParameters, missingParameters, Parameters } from "./Parameters"
 import { QuestionGenerator } from "./QuestionGenerator"
 
 /**
@@ -127,11 +123,7 @@ export function deserializePath({
     expectLang = parts[0] === "de" || parts[0] === "en"
   }
 
-  const lang: Language | undefined = !expectLang
-    ? undefined
-    : parts[0] === "de"
-      ? "de"
-      : "en"
+  const lang: Language | undefined = !expectLang ? undefined : parts[0] === "de" ? "de" : "en"
 
   if (lang !== undefined) {
     parts = parts.slice(1)
@@ -144,15 +136,11 @@ export function deserializePath({
     parts = parts.slice(generatorPath.split("/").length)
     if (parts.length === 0) return { lang, generator, generatorPath }
 
-    const parameters = deserializeParameters(
-      parts.join("/"),
-      generator.expectedParameters,
-    )
+    const parameters = deserializeParameters(parts.join("/"), generator.expectedParameters)
 
     const missing = missingParameters(parameters, generator.expectedParameters)
     const seed =
-      missing.length === 0 &&
-      parts.length === generator.expectedParameters.length + 1
+      missing.length === 0 && parts.length === generator.expectedParameters.length + 1
         ? parts.at(-1)
         : undefined
     return { lang, generator, generatorPath, parameters, seed }

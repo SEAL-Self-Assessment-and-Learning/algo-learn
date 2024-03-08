@@ -2,16 +2,10 @@ import { useMemo } from "react"
 import useLocalStorageState from "use-local-storage-state"
 import { Parameters } from "../../../shared/src/api/Parameters"
 import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
-import {
-  deserializePath,
-  serializeGeneratorCall,
-} from "../../../shared/src/api/QuestionRouter"
+import { deserializePath, serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
 import { min } from "../../../shared/src/utils/math"
 import Random from "../../../shared/src/utils/random"
-import {
-  allQuestionGeneratorRoutes,
-  generatorSetBelowPath,
-} from "../listOfQuestions"
+import { allQuestionGeneratorRoutes, generatorSetBelowPath } from "../listOfQuestions"
 import {
   SkillFeatures as BasicSkillFeatures,
   computeStrength,
@@ -104,15 +98,9 @@ export function useSkills() {
   const basicFeatureMap = computeBasicFeatureMap({ log })
 
   /* Compute the strength of each skill (number between 0 and 1) */
-  const featureMap = useMemo(
-    () => computeFeatureMap({ basicFeatureMap }),
-    [basicFeatureMap],
-  )
+  const featureMap = useMemo(() => computeFeatureMap({ basicFeatureMap }), [basicFeatureMap])
 
-  const unlockedSkills = useMemo(
-    () => computeUnlockedSkills({ featureMap }),
-    [featureMap],
-  )
+  const unlockedSkills = useMemo(() => computeUnlockedSkills({ featureMap }), [featureMap])
 
   function appendLogEntry(entry: LogEntryV1) {
     const newLog = log.slice()
@@ -145,9 +133,7 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntryV1> }): {
 } {
   const qualifyingPasses: { [path: string]: number } = {}
   const featureMap: { [path: string]: BasicSkillFeatures } = {}
-  for (const { generator, generatorPath, parameters } of generatorSetBelowPath(
-    "",
-  )) {
+  for (const { generator, generatorPath, parameters } of generatorSetBelowPath("")) {
     const path = serializeGeneratorCall({
       generator,
       parameters,
@@ -180,10 +166,7 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntryV1> }): {
       parameters,
       generatorPath,
     })
-    featureMap[path].lag = min(
-      featureMap[path].lag,
-      (now - e.timestamp) / 3600 / 24 / 1000,
-    )
+    featureMap[path].lag = min(featureMap[path].lag, (now - e.timestamp) / 3600 / 24 / 1000)
 
     /**
      * The mastery threshold is defined on each Question, or a default value of
@@ -269,10 +252,7 @@ export function averageStrength({
 
   let avg = 0
   for (const { generator, generatorPath, parameters } of set) {
-    avg +=
-      strengthMap[
-        serializeGeneratorCall({ generator, parameters, generatorPath })
-      ].p
+    avg += strengthMap[serializeGeneratorCall({ generator, parameters, generatorPath })].p
   }
   return avg / set.length
 }
@@ -308,9 +288,7 @@ export function sortByStrength({
 }> {
   random?.shuffle(generatorCalls) // If random was provided, shuffle to break ties
   generatorCalls.sort(
-    (a, b) =>
-      featureMap[serializeGeneratorCall(a)].p -
-      featureMap[serializeGeneratorCall(b)].p,
+    (a, b) => featureMap[serializeGeneratorCall(a)].p - featureMap[serializeGeneratorCall(b)].p,
   )
   return generatorCalls
 }
@@ -337,22 +315,14 @@ export function computeUnlockedSkills({
   // for now, we assume all question generators are independent and all variants strictly build on each other.
   const unlockedPaths = []
   for (const { path } of allQuestionGeneratorRoutes) {
-    for (const {
-      generator,
-      generatorPath,
-      parameters,
-    } of generatorSetBelowPath(path)) {
+    for (const { generator, generatorPath, parameters } of generatorSetBelowPath(path)) {
       const newPath = serializeGeneratorCall({
         generator,
         parameters,
         generatorPath,
       })
       unlockedPaths.push(newPath)
-      if (
-        featureMap[newPath].p < thresholdStrength ||
-        !featureMap[newPath].mastered
-      )
-        break
+      if (featureMap[newPath].p < thresholdStrength || !featureMap[newPath].mastered) break
     }
   }
   return unlockedPaths

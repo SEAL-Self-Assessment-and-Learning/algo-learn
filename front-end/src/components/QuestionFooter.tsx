@@ -39,17 +39,8 @@ export function QuestionFooter({
       <SiIfixit className="mr-5 inline-block text-6xl" />
     ) : null
   const backgroundColor =
-    mode === "correct"
-      ? "bg-green-200"
-      : mode === "incorrect"
-        ? "bg-red-200"
-        : "bg-secondary"
-  const textColor =
-    mode === "correct"
-      ? "text-green-900"
-      : mode === "incorrect"
-        ? "text-red-900"
-        : ""
+    mode === "correct" ? "bg-green-200" : mode === "incorrect" ? "bg-red-200" : "bg-secondary"
+  const textColor = mode === "correct" ? "text-green-900" : mode === "incorrect" ? "text-red-900" : ""
   // const buttonColor =
   //   mode === "correct" || mode === "draft"
   //     ? "green"
@@ -59,20 +50,12 @@ export function QuestionFooter({
   return (
     <div className={`${backgroundColor}`}>
       <div className="m-auto flex max-w-xl flex-col justify-end gap-4 p-5 sm:min-h-[8rem] sm:flex-row sm:justify-between">
-        <div
-          className={`flex place-items-center self-center text-left ${textColor}`}
-        >
+        <div className={`flex place-items-center self-center text-left ${textColor}`}>
           {icon}
           <div>{message}</div>
         </div>
         <Button
-          variant={
-            mode === "incorrect"
-              ? "wrongAnswer"
-              : mode === "correct"
-                ? "rightAnswer"
-                : "default"
-          }
+          variant={mode === "incorrect" ? "wrongAnswer" : mode === "correct" ? "rightAnswer" : "default"}
           onClick={buttonClick}
           className="self-end sm:self-center"
           disabled={mode === "invalid" || mode === "submitted"}

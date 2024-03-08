@@ -14,10 +14,8 @@ const translations: Translations = {
   en: {
     name: "Loops",
     description: "Determine the number of iterations in a loop",
-    text1:
-      "Consider the following procedure `{{0}}` with integer input ${{1}}$:",
-    text2:
-      "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
+    text1: "Consider the following procedure `{{0}}` with integer input ${{1}}$:",
+    text2: "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
     "long-title": "Loops",
     "simpleExact.description": "Consider the following piece of code:",
     "simpleExact.prompt": "Number of stars:",
@@ -26,8 +24,7 @@ const translations: Translations = {
   de: {
     name: "Schleifen",
     description: "Bestimme die Anzahl der Iterationen in einer Schleife",
-    text1:
-      "Betrachte die folgende Prozedur {{0}} mit ganzzahliger Eingabe {{1}}:",
+    text1: "Betrachte die folgende Prozedur {{0}} mit ganzzahliger Eingabe {{1}}:",
     text2: "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
     "long-title": "Schleifen",
     "simpleExact.description": "Betrachte den folgenden Code:",
