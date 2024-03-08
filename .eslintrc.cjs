@@ -71,6 +71,10 @@ module.exports = {
         selector: 'typeLike',
         format: ['PascalCase'],
       },
+      {
+        selector: "objectLiteralProperty",
+        format: null
+      }
     ]
   },
   overrides: [
@@ -102,6 +106,10 @@ module.exports = {
             selector: 'typeLike',
             format: ['PascalCase'],
           },
+          {
+            selector: "objectLiteralProperty",
+            format: null
+          }
         ]
       }
     }
