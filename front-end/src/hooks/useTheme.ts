@@ -3,9 +3,9 @@ import useLocalStorageState from "use-local-storage-state"
 
 export const LIGHT = "light"
 export const DARK = "dark"
-export const OSDEFAULT = "OS default"
-export type Themes = typeof LIGHT | typeof DARK | typeof OSDEFAULT
-export const availableThemes = [LIGHT, DARK, OSDEFAULT]
+export const OS_DEFAULT = "OS default"
+export type Themes = typeof LIGHT | typeof DARK | typeof OS_DEFAULT
+export const availableThemes = [LIGHT, DARK, OS_DEFAULT]
 
 /**
  * A hook that returns the value of the operating system's default color scheme.
@@ -13,19 +13,19 @@ export const availableThemes = [LIGHT, DARK, OSDEFAULT]
  * @returns The value of the operating system's default color scheme. This will
  *   be either `LIGHT` or `DARK`.
  */
-export function useOSdefaultTheme() {
-  const [OSdefaultTheme, setOSdefaultTheme] = useState<
+export function useOSDefaultTheme() {
+  const [osDefaultTheme, setOSDefaultTheme] = useState<
     typeof LIGHT | typeof DARK
   >(window.matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT)
   useEffect(() => {
     window
       .matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", (e) => e.matches && setOSdefaultTheme(DARK))
+      .addEventListener("change", (e) => e.matches && setOSDefaultTheme(DARK))
     window
       .matchMedia("(prefers-color-scheme: light)")
-      .addEventListener("change", (e) => e.matches && setOSdefaultTheme(LIGHT))
-  }, [OSdefaultTheme])
-  return OSdefaultTheme
+      .addEventListener("change", (e) => e.matches && setOSDefaultTheme(LIGHT))
+  }, [osDefaultTheme])
+  return osDefaultTheme
 }
 
 /**
@@ -36,10 +36,10 @@ export function useOSdefaultTheme() {
  */
 export function useTheme() {
   const [userTheme, setUserTheme] = useLocalStorageState("theme", {
-    defaultValue: OSDEFAULT as Themes,
+    defaultValue: OS_DEFAULT as Themes,
   })
-  const OSdefaultTheme = useOSdefaultTheme()
-  const theme = userTheme == OSDEFAULT ? OSdefaultTheme : userTheme
+  const osDefaultTheme = useOSDefaultTheme()
+  const theme = userTheme == OS_DEFAULT ? osDefaultTheme : userTheme
   const toggleTheme = () => {
     if (theme === LIGHT) {
       setUserTheme(DARK)

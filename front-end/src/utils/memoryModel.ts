@@ -59,9 +59,8 @@ export function halflife(
   numFailed: number,
   n0: number = 0,
 ): number {
-  const log_halflife = numPassed * RIGHT + numFailed * WRONG + n0 + BIAS
-  const h = hclip(2 ** log_halflife)
-  return h
+  const logHalflife = numPassed * RIGHT + numFailed * WRONG + n0 + BIAS
+  return hclip(2 ** logHalflife)
 }
 
 /**

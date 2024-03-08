@@ -17,7 +17,7 @@ import {
   computeStrength,
   SkillFeaturesAndPredictions as SkillFeatures,
   SkillFeaturesAndPredictions,
-} from "../utils/memory-model"
+} from "../utils/memoryModel.ts"
 
 /** Old format for log entries */
 type LogEntryV0 = {

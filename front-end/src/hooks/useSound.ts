@@ -12,9 +12,9 @@ const sounds = {
 }
 
 // Asynchronously prefetch audio files
-const Audios = {} as Record<string, HTMLAudioElement>
+const audios = {} as Record<string, HTMLAudioElement>
 for (const [name, url] of Object.entries(sounds)) {
-  Audios[name] = new Audio(url.href)
+  audios[name] = new Audio(url.href)
 }
 
 /**
@@ -33,7 +33,7 @@ export function useSound() {
   }
   function playSound(name: string): void {
     if (muted) return
-    void Audios[name].play()
+    void audios[name].play()
   }
   return { muted, setMuted, toggleMuted, playSound }
 }

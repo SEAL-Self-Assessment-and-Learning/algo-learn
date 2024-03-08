@@ -72,14 +72,14 @@ export function serializeGeneratorCall({
  */
 export function isSubPath(pathA: string, pathB: string): boolean
 export function isSubPath(partsA: string[], partsB: string[]): boolean
-export function isSubPath(A: string | string[], B: string | string[]): boolean {
-  if (typeof A === "string") A = A.split("/")
-  if (typeof B === "string") B = B.split("/")
-  A = A.filter((part) => part !== "")
-  B = B.filter((part) => part !== "")
-  if (A.length > B.length) return false
-  for (let i = 0; i < A.length; i++) {
-    if (A[i] !== B[i]) return false
+export function isSubPath(a: string | string[], b: string | string[]): boolean {
+  if (typeof a === "string") a = a.split("/")
+  if (typeof b === "string") b = b.split("/")
+  a = a.filter((part) => part !== "")
+  b = b.filter((part) => part !== "")
+  if (a.length > b.length) return false
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false
   }
   return true
 }

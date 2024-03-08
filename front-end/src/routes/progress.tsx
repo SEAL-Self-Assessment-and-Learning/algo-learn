@@ -25,7 +25,7 @@ import {
   skillGroups,
 } from "../listOfQuestions"
 import { howLongSince } from "../utils/howLongSince"
-import { SkillFeaturesAndPredictions } from "../utils/memory-model"
+import { SkillFeaturesAndPredictions } from "../utils/memoryModel.ts"
 
 /** LearningProgress component */
 export function LearningProgress() {
