@@ -36,17 +36,21 @@ export function ExerciseMultipleChoice({
   const { playSound } = useSound()
   const { t } = useTranslation()
 
-  const [state, setState] = useState({
-    mode: (question.sorting ? "draft" : "invalid") as MODE,
+  const [state, setState] = useState<{
+    /** The current state of the exercise interaction */
+    mode: MODE
 
     /** The indices of the selected answers */
-    choice: (question.sorting ? [...Array(question.answers.length).keys()] : []) as Array<number>,
+    choice: Array<number>
 
     /**
      * The feedback object returned by question.feedback(). Will be set when the
      * Promise returned by question.feedback() resolves.
      */
-    feedbackObject: undefined as MultipleChoiceFeedback | undefined,
+    feedbackObject?: MultipleChoiceFeedback
+  }>({
+    mode: question.sorting ? "draft" : "invalid",
+    choice: question.sorting ? [...Array(question.answers.length).keys()] : [],
   })
 
   const { mode, choice, feedbackObject } = state
@@ -104,22 +108,17 @@ export function ExerciseMultipleChoice({
 
   useGlobalDOMEvents({
     keydown(e: Event) {
-      const kbEvent = e as KeyboardEvent
-      if (kbEvent.ctrlKey || kbEvent.metaKey || kbEvent.altKey) {
-        return
-      }
-
-      if (kbEvent.key === "Enter") {
+      if (!(e instanceof KeyboardEvent)) return
+      if (e.ctrlKey || e.metaKey || e.altKey) return
+      if (e.key === "Enter") {
         e.preventDefault()
         handleClick()
         return
       }
-      if (mode === "correct" || mode === "incorrect") {
-        return
-      }
+      if (mode === "correct" || mode === "incorrect") return
 
       if (!question.sorting) {
-        const num = parseInt(kbEvent.key)
+        const num = parseInt(e.key)
         if (!Number.isNaN(num) && num >= 1 && num <= question.answers.length) {
           e.preventDefault()
           const id = num - 1 // answers[num - 1].key

@@ -31,23 +31,27 @@ export function ExerciseTextInput({
   const { playSound } = useSound()
   const { t } = useTranslation()
 
-  const [state, setState] = useState({
-    mode: "invalid" as MODE,
+  const [state, setState] = useState<{
+    /** The current state of the exercise interaction */
+    mode: MODE
 
-    /** The indices of the selected answers */
-    text: "",
+    /** The current input text */
+    text: string
 
     /**
      * The feedback object returned by question.feedback(). Will be set when the
      * Promise returned by question.feedback() resolves.
      */
-    feedbackObject: undefined as FreeTextFeedback | undefined,
+    feedbackObject?: FreeTextFeedback
 
     /**
      * Message to show when the text is invalid. This is determined by the
      * checkFormat method.
      */
-    formatFeedback: undefined as string | undefined,
+    formatFeedback?: string
+  }>({
+    mode: "invalid",
+    text: "",
   })
 
   const { mode, text, feedbackObject, formatFeedback } = state
@@ -92,7 +96,10 @@ export function ExerciseTextInput({
 
   useGlobalDOMEvents({
     keydown(e: Event) {
-      const key = (e as KeyboardEvent).key
+      if (!(e instanceof KeyboardEvent)) {
+        return
+      }
+      const key = e.key
       if (key === "Enter") {
         e.preventDefault()
         handleClick()

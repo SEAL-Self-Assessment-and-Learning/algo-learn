@@ -35,8 +35,8 @@ export function useOSDefaultTheme() {
  *   selected theme, and functions to set and toggle the user's selected theme.
  */
 export function useTheme() {
-  const [userTheme, setUserTheme] = useLocalStorageState("theme", {
-    defaultValue: OS_DEFAULT as Themes,
+  const [userTheme, setUserTheme] = useLocalStorageState<Themes>("theme", {
+    defaultValue: OS_DEFAULT,
   })
   const osDefaultTheme = useOSDefaultTheme()
   const theme = userTheme == OS_DEFAULT ? osDefaultTheme : userTheme

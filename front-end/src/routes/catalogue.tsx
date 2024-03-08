@@ -25,7 +25,7 @@ import {
 } from "../listOfQuestions"
 
 export function Catalogue() {
-  const [selectedGroup, setSelectedGroup] = useHistoryState("selectedGroup", null as string | null)
+  const [selectedGroup, setSelectedGroup] = useHistoryState<string | null>("selectedGroup", null)
   const [showAllVariants, setShowAllVariants] = useHistoryState("showAllVariants", false)
 
   return (

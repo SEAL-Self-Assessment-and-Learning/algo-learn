@@ -6,7 +6,7 @@ const sounds = {
 }
 
 // Asynchronously prefetch audio files
-const audios = {} as Record<string, HTMLAudioElement>
+const audios: Record<string, HTMLAudioElement> = {}
 for (const [name, url] of Object.entries(sounds)) {
   audios[name] = new Audio(url.href)
 }
