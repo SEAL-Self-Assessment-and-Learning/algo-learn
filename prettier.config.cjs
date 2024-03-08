@@ -1,4 +1,5 @@
 module.exports = {
+  printWidth: 105,
   semi: false,
   plugins: [
     "@ianvs/prettier-plugin-sort-imports",
