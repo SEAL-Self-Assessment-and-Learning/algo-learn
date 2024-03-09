@@ -48,7 +48,7 @@ export function huffmanCodingAlgorithm(
     const left = nodes.shift()
     const right = nodes.shift()
     if (left && right) {
-      let newNode: TreeNode = {
+      const newNode: TreeNode = {
         value: left.value + right.value,
         frequency: left.frequency + right.frequency,
         left: left,
@@ -81,11 +81,7 @@ export function huffmanCodingAlgorithm(
     // compare the frequency of the two nodes
     if (a.frequency === b.frequency) {
       // compare the smallest letter of the two node strings
-      return a.value
-        .split("")
-        .sort()
-        .join("")
-        .localeCompare(b.value.split("").sort().join(""))
+      return a.value.split("").sort().join("").localeCompare(b.value.split("").sort().join(""))
     }
     return a.frequency - b.frequency
   }

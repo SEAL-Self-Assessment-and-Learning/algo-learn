@@ -2,6 +2,7 @@ import { Fragment, FunctionComponent, ReactNode } from "react"
 import { Link } from "react-router-dom"
 import SyntaxHighlighter from "react-syntax-highlighter"
 import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
+import { DrawTable } from "@/components/DrawTable.tsx"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "../../../shared/src/utils/parseMarkdown"
 import { useTheme } from "../hooks/useTheme"
 import { Format } from "./Format"
@@ -87,6 +88,13 @@ export const MarkdownTreeNode: FunctionComponent<{
     return <span className="font-mono">{format(parseTreeNode.child, parameters)}</span>
   }
   if (parseTreeNode.kind === "```") {
+    if (parseTreeNode.language === "table") {
+      return (
+        <div className="my-5">
+          <DrawTable table={parseTreeNode.child} />
+        </div>
+      )
+    }
     return (
       <div className="my-5">
         <SyntaxHighlighter

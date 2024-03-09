@@ -1,5 +1,6 @@
 import Random from "@shared/utils/random.ts"
 
+/* eslint-disable @typescript-eslint/naming-convention */
 const tmpFrequencies: { [key: number]: number[][] } = {
   8: [
     [1, 2, 5],
@@ -45,18 +46,9 @@ const tmpFrequencies: { [key: number]: number[][] } = {
 /**
  * This function generates a random string of a given length and difficulty
  * @param length the length of the string
- * @param difficulty the difficulty of the string
- *                   if the string should be more difficult, it's probably also longer
- *                   it has 3 stages
- *                   1 - very easy - no choosing between characters
- *                   2 - medium - choosing between characters but not too many
- *                   3 - hard - choosing often between characters
  * @param random the random object
  */
-export function generateString(
-  length: keyof typeof tmpFrequencies,
-  random: Random,
-): string {
+export function generateString(length: keyof typeof tmpFrequencies, random: Random): string {
   // generate a word length at maximum of 13 chars
   const chosenFrequency = tmpFrequencies[length]
   const randomIndex = random.int(0, chosenFrequency.length - 1)
@@ -64,17 +56,11 @@ export function generateString(
   return generateWordBasedOnFrequency(chosenFrequency[randomIndex], random)
 }
 
-function generateWordBasedOnFrequency(
-  chosenFrequency: number[],
-  random: Random,
-) {
+function generateWordBasedOnFrequency(chosenFrequency: number[], random: Random) {
   let word = ""
   // not using "i", "j", "l", "n", "q" because they have similar shapes
-  let possibleChars: string = "abcdefghkmoprstuvwxyz"
-  const chosenChars = random.subset(
-    possibleChars.split(""),
-    chosenFrequency.length,
-  )
+  const possibleChars: string = "abcdefghkmoprstuvwxyz"
+  const chosenChars = random.subset(possibleChars.split(""), chosenFrequency.length)
 
   for (let j = 0; j < chosenFrequency.length; j++) {
     word += chosenChars[j].repeat(chosenFrequency[j])
@@ -86,7 +72,6 @@ function generateWordBasedOnFrequency(
 /**
  * This function creates an array of chars, this is for more difficult questions (but more easy too read, instead of a
  * word with 26 letters or so)
- * @param difficulty
  * @param random
  */
 export function generateWordArray(random: Random) {

@@ -12,10 +12,7 @@ import Random from "@shared/utils/random.ts"
  * @param random
  * @param correctAnswer
  */
-export function generateRandomWrongAnswer(
-  random: Random,
-  correctAnswer: string,
-) {
+export function generateRandomWrongAnswer(random: Random, correctAnswer: string) {
   const wrongAnswer = correctAnswer.split("")
   const flipPositions = random.subset(
     Array.from({ length: correctAnswer.length }, (_, i) => i),
@@ -41,16 +38,8 @@ export function generateRandomWrongAnswer(
  * @param currentTree
  * @param word
  */
-export function generateWrongAnswerSwitchLetters(
-  random: Random,
-  currentTree: TreeNode,
-  word: string,
-) {
-  const huffmanDict: { [key: string]: string } = createHuffmanCoding(
-    {},
-    currentTree,
-    "",
-  )
+export function generateWrongAnswerSwitchLetters(random: Random, currentTree: TreeNode, word: string) {
+  const huffmanDict: { [key: string]: string } = createHuffmanCoding({}, currentTree, "")
   const keySet: string[] = Object.keys(huffmanDict)
   const randomKeys = random.subset(keySet, 2)
   ;[huffmanDict[randomKeys[0]], huffmanDict[randomKeys[1]]] = [
@@ -145,12 +134,7 @@ export function generateWrongAnswerFalseTreeConstrution(
   currentTree: TreeNode,
 ) {
   let wrongHuffmanDict: { [key: string]: string } = {}
-  wrongHuffmanDict = createHuffmanCodingBitError(
-    wrongHuffmanDict,
-    currentTree,
-    "",
-    random,
-  )
+  wrongHuffmanDict = createHuffmanCodingBitError(wrongHuffmanDict, currentTree, "", random)
   // create the word based on the wrong coding
   let wrongAnswerCoding = ""
   for (let i = 0; i < word.length; i++) {
@@ -165,10 +149,7 @@ export function generateWrongAnswerFalseTreeConstrution(
  * @param word
  * @param currentTree
  */
-export function generateWrongAnswerReduceCodeOfLetter(
-  word: string,
-  currentTree: TreeNode,
-) {
+export function generateWrongAnswerReduceCodeOfLetter(word: string, currentTree: TreeNode) {
   const huffmanDictKey = createHuffmanDict(currentTree)
   const huffmanDict = huffmanDictKey.huffmanDict
   const currentLongestKey = huffmanDictKey.currentLongestKey
@@ -193,8 +174,7 @@ export function generateWrongAnswerFlip01InCodeChar(
   const currentLongestKey = huffmanDictKey.currentLongestKey
   // flip a 0 or 1 in the longest key
   const randomIndex = random.int(0, huffmanDict[currentLongestKey].length - 1)
-  const newChar =
-    huffmanDict[currentLongestKey][randomIndex] === "0" ? "1" : "0"
+  const newChar = huffmanDict[currentLongestKey][randomIndex] === "0" ? "1" : "0"
   huffmanDict[currentLongestKey] =
     huffmanDict[currentLongestKey].slice(0, randomIndex) +
     newChar +
@@ -211,15 +191,13 @@ function createHuffmanDict(currentTree: TreeNode) {
   huffmanDict = createHuffmanCoding(huffmanDict, currentTree, "")
   // get the key with the longest value
   let currentLongestKey: string = ""
-  for (const current_key in huffmanDict) {
+  for (const currentKey in huffmanDict) {
     if (currentLongestKey === "") {
-      currentLongestKey = current_key
+      currentLongestKey = currentKey
       continue
     }
-    if (
-      huffmanDict[current_key].length > huffmanDict[currentLongestKey].length
-    ) {
-      currentLongestKey = current_key
+    if (huffmanDict[currentKey].length > huffmanDict[currentLongestKey].length) {
+      currentLongestKey = currentKey
     }
   }
   return { huffmanDict, currentLongestKey: currentLongestKey }
