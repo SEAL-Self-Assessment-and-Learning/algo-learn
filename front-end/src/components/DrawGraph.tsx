@@ -45,10 +45,10 @@ export function DrawGraph({
       .join("line")
       .classed("stroke-2 stroke-primary", true)
 
-    const circles = svg
+    const circles: d3.Selection<SVGGElement, d3.SimulationNodeDatum, SVGGElement, any> = svg
       .append("g")
       // .attr("class", "nodes")
-      .selectAll("g")
+      .selectAll<Element, null>("g")
       .data(vertices)
       .enter()
       .append("g")
@@ -85,7 +85,7 @@ export function DrawGraph({
     }
 
     // Add a drag behavior
-    const drag = d3.drag<Element, d3.SimulationNodeDatum>().on("drag", dragged)
+    const drag = d3.drag<SVGGElement, d3.SimulationNodeDatum>().on("drag", dragged)
     circles.call(drag)
 
     // advance simulation 300 ticks without drawing
