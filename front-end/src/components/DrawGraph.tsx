@@ -32,6 +32,7 @@ export function DrawGraph({
     )
     .force("charge", d3.forceManyBody().strength(-500))
     .force("center", d3.forceCenter(width / 2, height / 2))
+    .stop() // stop simulation immediately
 
   useEffect(() => {
     const svg = d3.select(svgRef.current)
@@ -44,56 +45,54 @@ export function DrawGraph({
       .join("line")
       .classed("stroke-2 stroke-primary", true)
 
-    const circles: d3.Selection<Element, d3.SimulationNodeDatum, Element, any> = svg
+    const circles = svg
       .append("g")
-      .selectAll<Element, null>("circle")
+      // .attr("class", "nodes")
+      .selectAll("g")
       .data(vertices)
-      .join("circle")
-      .attr("r", 7)
-      .classed("fill-primary hover:fill-accent stroke-secondary stroke-2", true)
+      .enter()
+      .append("g")
+      .classed("group", true)
 
-    function ticked() {
+    circles
+      .append("circle")
+      .attr("r", 14)
+      .classed("fill-primary group-hover:fill-accent stroke-secondary stroke-2", true)
+
+    circles
+      .append("text")
+      .text((d) => d.index?.toString() ?? "")
+      .attr("text-anchor", "middle")
+      .attr("dy", 5)
+      .classed("fill-accent group-hover:fill-primary cursor-default", true)
+
+    function drawGraph() {
       lines
         .attr("x1", (d) => d.source.x ?? 0)
         .attr("y1", (d) => d.source.y ?? 0)
         .attr("x2", (d) => d.target.x ?? 0)
         .attr("y2", (d) => d.target.y ?? 0)
-      circles.attr("cx", (d) => d.x ?? 0).attr("cy", (d) => d.y ?? 0)
+      circles.attr("transform", (d) => `translate(${d.x},${d.y})`)
     }
 
     type DragEvent = d3.D3DragEvent<Element, d3.SimulationNodeDatum, d3.SimulationNodeDatum>
 
-    // Reheat the simulation when drag starts, and fix the subject position.
-    function dragstarted(event: DragEvent) {
-      if (!event.active) simulation.alphaTarget(0.3).restart()
-      event.subject.fx = event.subject.x
-      event.subject.fy = event.subject.y
-    }
-
     // Update the subject (dragged node) position during drag.
     function dragged(event: DragEvent) {
-      event.subject.fx = event.x
-      event.subject.fy = event.y
+      event.subject.x = event.x
+      event.subject.y = event.y
+      drawGraph()
     }
 
-    // Restore the target alpha so the simulation cools after dragging ends.
-    // Unfix the subject position now that it’s no longer being dragged.
-    function dragended(event: DragEvent) {
-      if (!event.active) simulation.alphaTarget(0)
-      event.subject.fx = null
-      event.subject.fy = null
-    }
-
-    // Add a drag behavior.
-    const drag = d3
-      .drag<Element, d3.SimulationNodeDatum>()
-      .on("start", dragstarted)
-      .on("drag", dragged)
-      .on("end", dragended)
+    // Add a drag behavior
+    const drag = d3.drag<Element, d3.SimulationNodeDatum>().on("drag", dragged)
     circles.call(drag)
 
-    // Start the simulation.
-    simulation.on("tick", ticked)
+    // advance simulation 300 ticks without drawing
+    simulation.tick(300)
+    drawGraph()
+    // remove all nodes from the simulation
+    simulation.nodes([])
   }, [graph, simulation, edges, vertices, width, height])
   return (
     <svg
