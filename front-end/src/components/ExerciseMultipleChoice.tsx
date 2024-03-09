@@ -241,7 +241,7 @@ function FeedbackIconAndTooltip({
       <a id={`myid-${id}`}>
         <FeedbackIcon correct={isCorrectAnswer} hidden={hidden} />
       </a>
-      <Tooltip anchorSelect={`#myid-${id}`} place="left" className="z-10">
+      <Tooltip anchorSelect={`#myid-${id}`} place="left" className="z-10" hidden={hidden}>
         {correctnessMsg}
         <br />
         {choiceMsg}
