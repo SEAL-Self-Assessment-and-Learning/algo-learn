@@ -64,7 +64,7 @@ export function DrawGraph({
       .text((d) => d.index?.toString() ?? "")
       .attr("text-anchor", "middle")
       .attr("dy", 5)
-      .classed("fill-accent group-hover:fill-primary cursor-default", true)
+      .classed("fill-primary-foreground group-hover:fill-accent-foreground cursor-default select-none", true)
 
     function drawGraph() {
       lines
