@@ -1,13 +1,8 @@
 import { expect, test } from "vitest"
 import { QuestionGenerator } from "./QuestionGenerator"
-import {
-  deserializePath,
-  isSubPath,
-  QuestionRoutes,
-  serializeGeneratorCall,
-} from "./QuestionRouter"
+import { deserializePath, isSubPath, QuestionRoutes, serializeGeneratorCall } from "./QuestionRouter"
 
-const TestQuestion: QuestionGenerator = {
+const testQuestion: QuestionGenerator = {
   name: () => "Test Question",
   languages: ["en", "de"],
   expectedParameters: [
@@ -27,7 +22,7 @@ const TestQuestion: QuestionGenerator = {
     return {
       question: {
         path: serializeGeneratorCall({
-          generator: TestQuestion,
+          generator: testQuestion,
           parameters,
           seed,
           lang,
@@ -45,11 +40,11 @@ const TestQuestion: QuestionGenerator = {
 const exampleRoutes: QuestionRoutes = [
   {
     path: "test/test",
-    generator: TestQuestion,
+    generator: testQuestion,
   },
   {
     path: "asymptotics/sum",
-    generator: TestQuestion,
+    generator: testQuestion,
   },
 ]
 
@@ -58,20 +53,20 @@ test("serializeGeneratorCall", () => {
 
   expect(
     serializeGeneratorCall({
-      generator: TestQuestion,
+      generator: testQuestion,
       generatorPath,
     }),
   ).toBe("test/test")
   expect(
     serializeGeneratorCall({
-      generator: TestQuestion,
+      generator: testQuestion,
       generatorPath,
       parameters: { difficulty: 1, focus: "addition" },
     }),
   ).toBe("test/test/1/addition")
   expect(
     serializeGeneratorCall({
-      generator: TestQuestion,
+      generator: testQuestion,
       generatorPath,
       parameters: { difficulty: 1, focus: "addition" },
       seed: "myFancySeed",
@@ -79,7 +74,7 @@ test("serializeGeneratorCall", () => {
   ).toBe("test/test/1/addition/myFancySeed")
   expect(
     serializeGeneratorCall({
-      generator: TestQuestion,
+      generator: testQuestion,
       generatorPath,
       parameters: { difficulty: 1, focus: "addition" },
       seed: "myFancySeed",
@@ -89,31 +84,27 @@ test("serializeGeneratorCall", () => {
 })
 
 test("deserializePath", () => {
-  expect(
-    deserializePath({ routes: exampleRoutes, path: "test/dqopijjifwejipfw" }),
-  ).toBeUndefined()
-  expect(
-    deserializePath({ routes: exampleRoutes, path: "dkdkd/test/test" }),
-  ).toBeUndefined()
+  expect(deserializePath({ routes: exampleRoutes, path: "test/dqopijjifwejipfw" })).toBeUndefined()
+  expect(deserializePath({ routes: exampleRoutes, path: "dkdkd/test/test" })).toBeUndefined()
 
   let ret = deserializePath({ routes: exampleRoutes, path: "test/test" })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBeUndefined()
-  expect(ret!.generator).toBe(TestQuestion)
+  expect(ret!.generator).toBe(testQuestion)
   expect(ret!.parameters).toBeUndefined()
   expect(ret!.seed).toBeUndefined()
 
   ret = deserializePath({ routes: exampleRoutes, path: "de/test/test" })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBe("de")
-  expect(ret!.generator).toBe(TestQuestion)
+  expect(ret!.generator).toBe(testQuestion)
   expect(ret!.parameters).toBeUndefined()
   expect(ret!.seed).toBeUndefined()
 
   ret = deserializePath({ routes: exampleRoutes, path: "test/test/1/addition" })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBeUndefined()
-  expect(ret!.generator).toBe(TestQuestion)
+  expect(ret!.generator).toBe(testQuestion)
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
   expect(ret!.seed).toBeUndefined()
 
@@ -123,7 +114,7 @@ test("deserializePath", () => {
   })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBeUndefined()
-  expect(ret!.generator).toBe(TestQuestion)
+  expect(ret!.generator).toBe(testQuestion)
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
   expect(ret!.seed).toBe("myFancySeed")
 
@@ -133,7 +124,7 @@ test("deserializePath", () => {
   })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBe("de")
-  expect(ret!.generator).toBe(TestQuestion)
+  expect(ret!.generator).toBe(testQuestion)
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
 
   ret = deserializePath({
@@ -142,7 +133,7 @@ test("deserializePath", () => {
   })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBe("en")
-  expect(ret!.generator).toBe(TestQuestion)
+  expect(ret!.generator).toBe(testQuestion)
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
 })
 

@@ -1,9 +1,6 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
-import {
-  FreeTextFeedback,
-  FreeTextQuestion,
-} from "../../../shared/src/api/QuestionGenerator"
+import { FreeTextFeedback, FreeTextQuestion } from "../../../shared/src/api/QuestionGenerator"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
@@ -34,23 +31,27 @@ export function ExerciseTextInput({
   const { playSound } = useSound()
   const { t } = useTranslation()
 
-  const [state, setState] = useState({
-    mode: "invalid" as MODE,
+  const [state, setState] = useState<{
+    /** The current state of the exercise interaction */
+    mode: MODE
 
-    /** The indices of the selected answers */
-    text: "",
+    /** The current input text */
+    text: string
 
     /**
      * The feedback object returned by question.feedback(). Will be set when the
      * Promise returned by question.feedback() resolves.
      */
-    feedbackObject: undefined as FreeTextFeedback | undefined,
+    feedbackObject?: FreeTextFeedback
 
     /**
      * Message to show when the text is invalid. This is determined by the
      * checkFormat method.
      */
-    formatFeedback: undefined as string | undefined,
+    formatFeedback?: string
+  }>({
+    mode: "invalid",
+    text: "",
   })
 
   const { mode, text, feedbackObject, formatFeedback } = state
@@ -58,16 +59,14 @@ export function ExerciseTextInput({
   function setText(text: string) {
     setState((state) => ({ ...state, text }))
     if (question.checkFormat) {
-      void Promise.resolve(question.checkFormat({ text })).then(
-        ({ valid, message }) => {
-          setState({
-            ...state,
-            text,
-            mode: valid ? "draft" : "invalid",
-            formatFeedback: message,
-          })
-        },
-      )
+      void Promise.resolve(question.checkFormat({ text })).then(({ valid, message }) => {
+        setState({
+          ...state,
+          text,
+          mode: valid ? "draft" : "invalid",
+          formatFeedback: message,
+        })
+      })
     } else {
       const valid = text.trim().length > 0
       setState({ ...state, text, mode: valid ? "draft" : "invalid" })
@@ -78,19 +77,17 @@ export function ExerciseTextInput({
     if (mode === "draft") {
       if (question.feedback !== undefined) {
         setState({ ...state, mode: "submitted" })
-        void Promise.resolve(question.feedback({ text })).then(
-          (feedbackObject) => {
-            let mode: MODE = "draft"
-            if (feedbackObject.correct === true) {
-              playSound("pass")
-              mode = "correct"
-            } else if (feedbackObject.correct === false) {
-              playSound("fail")
-              mode = "incorrect"
-            }
-            setState({ ...state, mode, feedbackObject })
-          },
-        )
+        void Promise.resolve(question.feedback({ text })).then((feedbackObject) => {
+          let mode: MODE = "draft"
+          if (feedbackObject.correct === true) {
+            playSound("pass")
+            mode = "correct"
+          } else if (feedbackObject.correct === false) {
+            playSound("fail")
+            mode = "incorrect"
+          }
+          setState({ ...state, mode, feedbackObject })
+        })
       }
     } else if (mode === "correct" || mode === "incorrect") {
       onResult && onResult(mode)
@@ -99,7 +96,10 @@ export function ExerciseTextInput({
 
   useGlobalDOMEvents({
     keydown(e: Event) {
-      const key = (e as KeyboardEvent).key
+      if (!(e instanceof KeyboardEvent)) {
+        return
+      }
+      const key = e.key
       if (key === "Enter") {
         e.preventDefault()
         handleClick()
@@ -108,9 +108,7 @@ export function ExerciseTextInput({
   })
 
   const msgColor =
-    mode === "draft"
-      ? "text-green-600 dark:text-green-400"
-      : "text-red-600 dark:text-red-400"
+    mode === "draft" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
   const message =
     mode === "correct" ? (
       <b className="text-2xl">{t("feedback.correct")}</b>

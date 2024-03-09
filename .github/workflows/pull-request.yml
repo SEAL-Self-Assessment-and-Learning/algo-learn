@@ -5,7 +5,8 @@ name: Build and deploy to testing when pushed to main branch
 # Controls when the workflow will run
 on:
   # Triggers the workflow on pull request events
-  pull_request:
+  pull_request_target:
+    types: [assigned, opened, synchronize, reopened]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -23,13 +24,25 @@ concurrency:
 jobs:
   # This workflow contains a single job called "build"
   build-and-deploy:
+    if: github.event.pull_request.user.login == 'Fabianstw' || github.event.pull_request.user.login == 'AbcAeffchen'
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/github-script@v6
+        id: pr
+        with:
+          script: |
+            const { data: pullRequest } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+            return pullRequest
+
       - uses: actions/checkout@v4
         with:
+          ref: ${{fromJSON(steps.pr.outputs.result).merge_commit_sha}}
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -38,11 +51,9 @@ jobs:
           # cache: "yarn"
 
       - uses: oven-sh/setup-bun@v1
-  
-      # See https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables for a definition of GITHUB_REF.
-      # The GITHUB_REF is in the form of refs/heads/<branch_name> or refs/pull/<pull_request_number>/merge. We replace the slashes with underscores.
+
       - name: Get a clean name of the current branch or pull request
-        run: echo "CLEAN_REF=$(echo "$GITHUB_REF" | sed -e 's/\//_/g')" >> $GITHUB_ENV
+        run: echo "CLEAN_REF=pull_request_${{github.event.pull_request.number}}" >> $GITHUB_ENV
         shell: bash
 
       - name: Bun install 🔧
@@ -54,7 +65,21 @@ jobs:
           sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" front-end/src/config.ts
 
       - name: Run test suite
-        run: bun test
+        run: bun run test
 
       - name: Build 🔧
         run: bun run build --base /algo-learn-testing/$CLEAN_REF/
+
+      - name: Deploy to server 🚀
+        id: deploy
+        uses: Pendect/action-rsyncer@v2.0.0
+        env:
+          DEPLOY_KEY: ${{secrets.DEPLOY_KEY}}
+        with:
+          options: ""
+          ssh_options: ""
+          src: "front-end/dist/"
+          dest: "dell-from-github@tcs.uni-frankfurt.de:/var/www/html/algo-learn-testing/$CLEAN_REF/"
+
+      - name: Display status from deploy
+        run: echo "${{ steps.deploy.outputs.status }}"

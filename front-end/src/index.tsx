@@ -1,15 +1,7 @@
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
-import {
-  createBrowserRouter,
-  redirect,
-  RouterProvider,
-  useParams,
-} from "react-router-dom"
-import {
-  allParameterCombinations,
-  serializeParameters,
-} from "../../shared/src/api/Parameters"
+import { createBrowserRouter, redirect, RouterProvider, useParams } from "react-router-dom"
+import { allParameterCombinations, serializeParameters } from "../../shared/src/api/Parameters"
 import { sampleRandomSeed } from "../../shared/src/utils/random"
 import ErrorPage from "./components/ErrorPage"
 import { QuizSession } from "./components/QuizSession"
@@ -23,17 +15,13 @@ import { Legal } from "./routes/legal"
 import Root from "./routes/root"
 import { TestSimpleMC } from "./routes/test"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
+import "react-tooltip/dist/react-tooltip.css"
 import "./tailwind.css"
 
 const routes = []
 for (const { path, generator } of allQuestionGeneratorRoutes) {
-  for (const parameters of allParameterCombinations(
-    generator.expectedParameters,
-  )) {
-    const parametersPath = serializeParameters(
-      parameters,
-      generator.expectedParameters,
-    )
+  for (const parameters of allParameterCombinations(generator.expectedParameters)) {
+    const parametersPath = serializeParameters(parameters, generator.expectedParameters)
     const route = path + (parametersPath ? "/" + parametersPath : "")
     const Element = () => {
       const { seed } = useParams()

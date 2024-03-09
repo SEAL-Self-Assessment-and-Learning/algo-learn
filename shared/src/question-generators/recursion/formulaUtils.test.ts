@@ -64,53 +64,33 @@ describe("parseRecursiveFunction", () => {
   })
 
   test("Handles invalid input - missing function name", () => {
-    expect(() => parseRecursiveFunction("7 * (n/3) + 5")).toThrow(
-      "Invalid input format",
-    )
+    expect(() => parseRecursiveFunction("7 * (n/3) + 5")).toThrow("Invalid input format")
   })
 
   test("Handles invalid input - extra parentheses", () => {
-    expect(() => parseRecursiveFunction("5 * T((n/2)) + 4")).toThrow(
-      "Invalid input format",
-    )
+    expect(() => parseRecursiveFunction("5 * T((n/2)) + 4")).toThrow("Invalid input format")
   })
 
   test("Handles invalid input - wrong operator", () => {
-    expect(() => parseRecursiveFunction("3 * T(n-2) + 6")).toThrow(
-      "Invalid input format",
-    )
+    expect(() => parseRecursiveFunction("3 * T(n-2) + 6")).toThrow("Invalid input format")
   })
 
   test("Handles invalid input - no variable", () => {
-    expect(() => parseRecursiveFunction("3 * T(/2) + 6")).toThrow(
-      "Invalid input format",
-    )
+    expect(() => parseRecursiveFunction("3 * T(/2) + 6")).toThrow("Invalid input format")
   })
 
   test("Handles invalid input - invalid characters", () => {
-    expect(() => parseRecursiveFunction("4 * T(@/2) + 8")).toThrow(
-      "Invalid input format",
-    )
-    expect(() => parseRecursiveFunction("4 * 5(n/2) + 8")).toThrow(
-      "Invalid input format",
-    )
-    expect(() => parseRecursiveFunction("4 * T(n/2) + T")).toThrow(
-      "Invalid input format",
-    )
-    expect(() => parseRecursiveFunction("4 * T(n/2) + n")).toThrow(
-      "Invalid input format",
-    )
+    expect(() => parseRecursiveFunction("4 * T(@/2) + 8")).toThrow("Invalid input format")
+    expect(() => parseRecursiveFunction("4 * 5(n/2) + 8")).toThrow("Invalid input format")
+    expect(() => parseRecursiveFunction("4 * T(n/2) + T")).toThrow("Invalid input format")
+    expect(() => parseRecursiveFunction("4 * T(n/2) + n")).toThrow("Invalid input format")
   })
 
   test("Handles invalid input - incomplete expression", () => {
-    expect(() => parseRecursiveFunction("T(n/2")).toThrow(
-      "Invalid input format",
-    )
+    expect(() => parseRecursiveFunction("T(n/2")).toThrow("Invalid input format")
   })
 
   test("Handles invalid input - no plus sign", () => {
-    expect(() => parseRecursiveFunction("4*T(n/2)5")).toThrow(
-      "Invalid input format",
-    )
+    expect(() => parseRecursiveFunction("4*T(n/2)5")).toThrow("Invalid input format")
   })
 })

@@ -4,15 +4,9 @@ import { Link } from "react-router-dom"
 import { Tooltip } from "react-tooltip"
 import "react-tooltip/dist/react-tooltip.css"
 import { cn } from "@/lib/utils"
-import {
-  Parameters,
-  serializeParameters,
-} from "../../../shared/src/api/Parameters"
+import { Parameters, serializeParameters } from "../../../shared/src/api/Parameters"
 import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
-import {
-  deserializePath,
-  serializeGeneratorCall,
-} from "../../../shared/src/api/QuestionRouter"
+import { deserializePath, serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { StrengthMeter } from "../components/StrengthMeter"
 import { getImageURL } from "../effects/images"
@@ -25,7 +19,7 @@ import {
   skillGroups,
 } from "../listOfQuestions"
 import { howLongSince } from "../utils/howLongSince"
-import { SkillFeaturesAndPredictions } from "../utils/memory-model"
+import { SkillFeaturesAndPredictions } from "../utils/memoryModel.ts"
 
 /** LearningProgress component */
 export function LearningProgress() {
@@ -94,21 +88,12 @@ export function LearningProgress() {
           })}
         </tbody>
       </table>
-      <LogTable
-        log={log}
-        className="mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10"
-      />
+      <LogTable log={log} className="mt-20 border-t-8 border-black/10 pt-2 dark:border-white/10" />
     </HorizontallyCenteredDiv>
   )
 }
 
-function LogTable({
-  log,
-  className = "",
-}: {
-  log: Array<LogEntryV1>
-  className?: string
-}) {
+function LogTable({ log, className = "" }: { log: Array<LogEntryV1>; className?: string }) {
   const { t } = useTranslation()
   return (
     <div className={className}>
@@ -139,16 +124,11 @@ function LogTableRow({ entry }: { entry: LogEntryV1 }) {
   })
   if (generatorCall === undefined) return null
   const { generator, generatorPath, parameters, seed } = generatorCall
-  const parametersText = parameters
-    ? serializeParameters(parameters, generator.expectedParameters)
-    : ""
+  const parametersText = parameters ? serializeParameters(parameters, generator.expectedParameters) : ""
   return (
     <tr>
       <td>
-        <PassFailButton
-          className="mr-2 inline opacity-50"
-          result={entry.result}
-        />
+        <PassFailButton className="mr-2 inline opacity-50" result={entry.result} />
         {howLongSince(entry.timestamp, lang)}
       </td>
       <td>
@@ -170,13 +150,7 @@ function LogTableRow({ entry }: { entry: LogEntryV1 }) {
   )
 }
 
-function PassFailButton({
-  className = "",
-  result,
-}: {
-  className?: string
-  result: "pass" | "fail"
-}) {
+function PassFailButton({ className = "", result }: { className?: string; result: "pass" | "fail" }) {
   return result === "pass" ? (
     <BsFillCheckSquareFill
       className={cn(
@@ -186,10 +160,7 @@ function PassFailButton({
     />
   ) : (
     <BsFillXSquareFill
-      className={cn(
-        "mb-[0.2ex] inline w-[0.75em] text-lg text-red-700 dark:text-red-500",
-        className,
-      )}
+      className={cn("mb-[0.2ex] inline w-[0.75em] text-lg text-red-700 dark:text-red-500", className)}
     />
   )
 }
@@ -203,9 +174,7 @@ function SkillGroupCard({
 }) {
   const { t } = useTranslation()
   const generatorCalls = generatorCallsBelowPath(partialPath)
-  const qualified = generatorCalls.filter(
-    (c) => featureMap[serializeGeneratorCall(c)].mastered,
-  )
+  const qualified = generatorCalls.filter((c) => featureMap[serializeGeneratorCall(c)].mastered)
   const done = qualified.length
   const total = generatorCalls.length
   const skillName = t("skill." + partialPath)
@@ -230,9 +199,7 @@ function SkillGroupCard({
             {done}/{total} XP
           </div>
         </div>
-        <div className="flex items-start justify-center group-hover:font-bold">
-          {skillName}
-        </div>
+        <div className="flex items-start justify-center group-hover:font-bold">{skillName}</div>
       </Link>
       <Tooltip anchorSelect={`#skill-group-card-${partialPath}`} place="bottom">
         {t("Click to practice")}
@@ -280,18 +247,12 @@ function QuestionTableRow({
     generatorPath,
     parameters,
   })
-  const id =
-    generatorCallPath.replaceAll("/", "-") +
-    (parameters === undefined ? "-coarse" : "")
+  const id = generatorCallPath.replaceAll("/", "-") + (parameters === undefined ? "-coarse" : "")
   const percentage = Math.round(strength * 100)
   const strengthTooltip = `Estimated strength: ${percentage}%. Decays over time, so practice regularly!${
-    halflife
-      ? ` (Estimated halflife: ~${Math.round(halflife * 10) / 10} days.)`
-      : ""
+    halflife ? ` (Estimated halflife: ~${Math.round(halflife * 10) / 10} days.)` : ""
   }`
-  const parametersText = parameters
-    ? serializeParameters(parameters, generator.expectedParameters)
-    : ""
+  const parametersText = parameters ? serializeParameters(parameters, generator.expectedParameters) : ""
   return (
     <tr onMouseOver={onMouseOver} onMouseOut={onMouseOut}>
       <td>
@@ -310,11 +271,7 @@ function QuestionTableRow({
             <TiLockOpen className="mb-[0.3ex] inline" /> (practicing...)
           </span>
         ) : (
-          <StrengthMeter
-            id={id}
-            strength={strength}
-            tooltip={strengthTooltip}
-          />
+          <StrengthMeter id={id} strength={strength} tooltip={strengthTooltip} />
         )}
       </td>
     </tr>

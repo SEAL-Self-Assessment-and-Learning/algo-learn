@@ -1,17 +1,8 @@
 import { useNavigate } from "react-router-dom"
 import SyntaxHighlighter from "react-syntax-highlighter"
-import {
-  solarizedDark,
-  solarizedLight,
-} from "react-syntax-highlighter/dist/esm/styles/hljs"
-import {
-  Parameters,
-  validateParameters,
-} from "../../../shared/src/api/Parameters"
-import {
-  QuestionGenerator,
-  questionToJSON,
-} from "../../../shared/src/api/QuestionGenerator"
+import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
+import { Parameters, validateParameters } from "../../../shared/src/api/Parameters"
+import { QuestionGenerator, questionToJSON } from "../../../shared/src/api/QuestionGenerator"
 import { serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
 import { questionToTex } from "../../../shared/src/utils/toLatex"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"

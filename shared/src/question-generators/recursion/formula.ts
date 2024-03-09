@@ -10,38 +10,29 @@ import { serializeGeneratorCall } from "../../api/QuestionRouter"
 import { format } from "../../utils/format"
 import Random from "../../utils/random"
 import { tFunction, tFunctional, Translations } from "../../utils/translations"
-import {
-  parseRecursiveFunction,
-  sampleRecurrenceAnswers,
-  sampleRecursiveFunction,
-} from "./formulaUtils"
+import { parseRecursiveFunction, sampleRecurrenceAnswers, sampleRecursiveFunction } from "./formulaUtils"
 
 const translations: Translations = {
   en: {
     basecase: "The base case is",
-    text1:
-      "Consider the following recursive procedure `{{0}}` with integer input ${{1}}$:",
-    text2:
-      "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
+    text1: "Consider the following recursive procedure `{{0}}` with integer input ${{1}}$:",
+    text2: "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
     "long-name": "Recurrence Relation",
     question: "What is the recurrence relation of",
     name: "Recurrence",
     description: "Determine the recurrence relation of a recursive function",
-    bottomnote:
-      "Note: This field expects a string of the form `{{0}}` as input.",
+    bottomnote: "Note: This field expects a string of the form `{{0}}` as input.",
     "feedback.incomplete": "Incomplete or too complex",
   },
   de: {
     basecase: "Der Basisfall ist",
-    text1:
-      "Betrachte die folgende rekursive Prozedur `{{0}}` mit ganzzahliger Eingabe ${{1}}$:",
+    text1: "Betrachte die folgende rekursive Prozedur `{{0}}` mit ganzzahliger Eingabe ${{1}}$:",
     text2: "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
     "long-name": "Rekurrenzrelation",
     question: "Was ist die Rekurrenzrelation von",
     name: "Rekurrenz",
     description: "Bestimme die Rekurrenzrelation einer rekursiven Funktion",
-    bottomnote:
-      "Hinweis: Dieses Feld erwartet einen String der Form `{{0}}` als Eingabe.",
+    bottomnote: "Hinweis: Dieses Feld erwartet einen String der Form `{{0}}` als Eingabe.",
     "feedback.incomplete": "Nicht vollständig oder zu komplex",
   },
 }
@@ -77,8 +68,7 @@ export const RecursionFormula: QuestionGenerator = {
     }
 
     const variant = parameters.variant as "choice" | "input"
-    const { functionText, functionName, n, b, a, d, c } =
-      sampleRecursiveFunction(random)
+    const { functionText, functionName, n, b, a, d, c } = sampleRecursiveFunction(random)
 
     const T = random.choice("TABCDEFGHS".split(""))
     const answers = sampleRecurrenceAnswers({ random, T, n, a, b, c, d })
@@ -146,8 +136,7 @@ ${format(t("text2"), [`${T}(${n})`])}`
         }
 
         return {
-          correct:
-            p.a === a && p.b === b && p.c === c && p.T === T && p.n === n,
+          correct: p.a === a && p.b === b && p.c === c && p.T === T && p.n === n,
           correctAnswer,
         }
       }

@@ -209,10 +209,7 @@ export function sampleMasterRecursion(random: Random) {
   let solution: ProductTerm
   const coefficient = random.int(2, 99)
   if (masterCase === 1) {
-    const polyexponent =
-      log(a, b) <= 1
-        ? new Fraction(1, Math.round(log(b, a)) + 1)
-        : log(a, b) - 1
+    const polyexponent = log(a, b) <= 1 ? new Fraction(1, Math.round(log(b, a)) + 1) : log(a, b) - 1
     c = createProductTerm({
       coefficient: coefficient,
       polyexponent: polyexponent,
@@ -233,10 +230,7 @@ export function sampleMasterRecursion(random: Random) {
       a === 1
         ? random.choice([random.int(1, 2), new Fraction(1, random.int(2, 3))])
         : log(a, b) < 1
-          ? new Fraction(
-              random.int(1, 3),
-              Math.max(Math.round(log(b, a)) - 1, 1),
-            )
+          ? new Fraction(random.int(1, 3), Math.max(Math.round(log(b, a)) - 1, 1))
           : log(a, b) + 1
     c = createProductTerm({
       coefficient: coefficient,

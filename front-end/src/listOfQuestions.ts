@@ -34,9 +34,7 @@ export function generatorSetBelowPath(
   const set = []
   for (const { path: generatorPath, generator } of generatorRoutes) {
     if (isSubPath(path, generatorPath)) {
-      for (const parameters of allParameterCombinations(
-        generator.expectedParameters,
-      )) {
+      for (const parameters of allParameterCombinations(generator.expectedParameters)) {
         set.push({ generator, generatorPath, parameters })
       }
     } else if (isSubPath(generatorPath, path)) {

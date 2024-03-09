@@ -167,12 +167,7 @@ export function xmur3(str: string): () => number {
  * @returns Each call to this function returns the next random number
  * @see https://github.com/bryc/code/blob/master/jshash/PRNGs.md#sfc32
  */
-export function sfc32(
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-): () => number {
+export function sfc32(a: number, b: number, c: number, d: number): () => number {
   a |= 0
   b |= 0
   c |= 0

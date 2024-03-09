@@ -1,15 +1,8 @@
 import { Fragment, FunctionComponent, ReactNode } from "react"
 import { Link } from "react-router-dom"
 import SyntaxHighlighter from "react-syntax-highlighter"
-import {
-  solarizedDark,
-  solarizedLight,
-} from "react-syntax-highlighter/dist/esm/styles/hljs"
-import {
-  parseMarkdown,
-  ParseTree,
-  ParseTreeNode,
-} from "../../../shared/src/utils/parseMarkdown"
+import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
+import { parseMarkdown, ParseTree, ParseTreeNode } from "../../../shared/src/utils/parseMarkdown"
 import { useTheme } from "../hooks/useTheme"
 import { Format } from "./Format"
 import TeX from "./TeX"
@@ -91,11 +84,7 @@ export const MarkdownTreeNode: FunctionComponent<{
     )
   }
   if (parseTreeNode.kind === "`") {
-    return (
-      <span className="font-mono">
-        {format(parseTreeNode.child, parameters)}
-      </span>
-    )
+    return <span className="font-mono">{format(parseTreeNode.child, parameters)}</span>
   }
   if (parseTreeNode.kind === "```") {
     return (

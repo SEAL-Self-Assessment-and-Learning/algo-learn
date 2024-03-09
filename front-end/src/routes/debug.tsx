@@ -14,8 +14,7 @@ const tr: Translations = {
   },
   de: {
     title: "Debug",
-    description:
-      "Hier kannst du einige Debug-Funktionen aktivieren oder deaktivieren.",
+    description: "Hier kannst du einige Debug-Funktionen aktivieren oder deaktivieren.",
     debugMode: "Debug-Modus",
     selectDisplay: "Anzeigeformat auswählen",
     enabled: "Aktiviert",

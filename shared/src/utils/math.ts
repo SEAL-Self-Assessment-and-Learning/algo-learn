@@ -5,7 +5,7 @@ import {
   create,
   divideDependencies,
   formatDependencies,
-  FractionDependencies,
+  FractionDependencies as fractionDependencies,
   log,
   log2,
   multiplyDependencies,
@@ -15,9 +15,9 @@ import {
   subtractDependencies,
 } from "mathjs"
 
-const config = {
+const config: ConfigOptions = {
   number: "Fraction",
-} as ConfigOptions
+}
 
 // Create just the functions we need
 const math = create(
@@ -25,7 +25,7 @@ const math = create(
     addDependencies,
     divideDependencies,
     formatDependencies,
-    FractionDependencies,
+    fractionDependencies,
     multiplyDependencies,
     parseDependencies,
     powDependencies,
@@ -40,9 +40,9 @@ interface Func {
   toTex?: string //express of function in object literal
 }
 
-const customFunctions = {
-  log: ((a: number, b: number = 2) => log(a) / log(b)) as Func,
-  log2: ((a: number) => log2(a)) as Func,
+const customFunctions: { log: Func; log2: Func } = {
+  log: (a: number, b: number = 2) => log(a) / log(b),
+  log2: (a: number) => log2(a),
 }
 customFunctions.log.toTex = "\\mathrm{${name}}\\left(${args}\\right)"
 customFunctions.log2.toTex = "\\mathrm{${name}}\\left(${args}\\right)"

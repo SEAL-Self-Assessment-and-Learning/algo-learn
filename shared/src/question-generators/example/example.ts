@@ -24,11 +24,8 @@ const translations: Translations = {
   },
 }
 
-function generateWrongAnswers(
-  random: Random,
-  correctAnswer: number,
-): Array<string> {
-  const wrongAnswers = [
+function generateWrongAnswers(random: Random, correctAnswer: number): Array<string> {
+  let wrongAnswers = [
     `$${correctAnswer + 3}$`,
     `$${correctAnswer + 2}$`,
     `$${correctAnswer + 1}$`,

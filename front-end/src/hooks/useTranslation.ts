@@ -7,11 +7,7 @@ import deJSON from "../locales/de.json"
 import enJSON from "../locales/en.json"
 
 export const SUPPORTED_LANGUAGES: ReadonlyArray<Language> = ["en", "de"]
-export const DEFAULT_LANGUAGE: Language = window.navigator.language.startsWith(
-  "de",
-)
-  ? "de"
-  : "en"
+export const DEFAULT_LANGUAGE: Language = window.navigator.language.startsWith("de") ? "de" : "en"
 export const NATIVE_NAME: Readonly<Record<Language, string>> = {
   en: "English",
   de: "Deutsch",
@@ -34,8 +30,7 @@ export function useTranslation(additionalTranslations?: Translations) {
   const navigate = useNavigate()
   const params = useParams()
   const lang: Language =
-    params["lang"] &&
-    (SUPPORTED_LANGUAGES as Array<string>).includes(params["lang"])
+    params["lang"] && (SUPPORTED_LANGUAGES as Array<string>).includes(params["lang"])
       ? (params["lang"] as Language)
       : DEFAULT_LANGUAGE
 
@@ -52,9 +47,7 @@ export function useTranslation(additionalTranslations?: Translations) {
     setLang(SUPPORTED_LANGUAGES[nextIndex])
   }
 
-  const translations: ReadonlyArray<Translations> = Array.isArray(
-    additionalTranslations,
-  )
+  const translations: ReadonlyArray<Translations> = Array.isArray(additionalTranslations)
     ? [...additionalTranslations, globalTranslations]
     : additionalTranslations
       ? [additionalTranslations, globalTranslations]

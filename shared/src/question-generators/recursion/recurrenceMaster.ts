@@ -14,14 +14,8 @@ import { format } from "../../utils/format"
 import math, { getVars } from "../../utils/math"
 import Random from "../../utils/random"
 import { tFunction, tFunctional, Translations } from "../../utils/translations"
-import {
-  mathNodeToSumProductTerm,
-  SumProductTerm,
-} from "../asymptotics/asymptoticsUtils"
-import {
-  sampleMasterRecursion,
-  sampleMasterRecursionAnswers,
-} from "./formulaUtils"
+import { mathNodeToSumProductTerm, SumProductTerm } from "../asymptotics/asymptoticsUtils"
+import { sampleMasterRecursion, sampleMasterRecursionAnswers } from "./formulaUtils"
 
 const translations: Translations = {
   en: {
@@ -31,8 +25,7 @@ const translations: Translations = {
     text2: `Use the master theorem to find a closed form of $ {{0}} $ in $\\Theta$-notation.`,
     name: "Master Theorem",
     description: "Find the closed form of a recurrence relation",
-    bottomnote:
-      "Note: You can assume that $n = {{0}}$ for a $k \\in \\mathbb{N}$ with $k>0$",
+    bottomnote: "Note: You can assume that $n = {{0}}$ for a $k \\in \\mathbb{N}$ with $k>0$",
     "feedback.incomplete": "Incomplete or too complex",
     "feedback.unknown-variable": "Unknown variable",
     "feedback.expected": "Expected",
@@ -84,9 +77,7 @@ export const RecurrenceMaster: QuestionGenerator = {
       throw new Error(
         `Unknown variant ${
           parameters.variant
-        }. Valid variants are: ${RecurrenceMaster.expectedParameters.join(
-          ", ",
-        )}`,
+        }. Valid variants are: ${RecurrenceMaster.expectedParameters.join(", ")}`,
       )
     }
 
@@ -116,9 +107,7 @@ export const RecurrenceMaster: QuestionGenerator = {
         name: t("name"),
         path: permalink,
         text: text,
-        answers: answers.map(
-          ({ element }) => `${format(t("code"), [element])}`,
-        ),
+        answers: answers.map(({ element }) => `${format(t("code"), [element])}`),
         feedback: minimalMultipleChoiceFeedback({
           correctAnswerIndex: answers
             .map((x, i) => ({ ...x, i }))
@@ -135,8 +124,7 @@ export const RecurrenceMaster: QuestionGenerator = {
         try {
           mathNode = math.parse(text)
           const unknownVars = getVars(mathNode).filter((v) => v !== "n")
-          const unknownVar: string | null =
-            unknownVars.length > 0 ? unknownVars[0] : null
+          const unknownVar: string | null = unknownVars.length > 0 ? unknownVars[0] : null
           if (unknownVar) {
             return {
               valid: false,
@@ -174,9 +162,7 @@ export const RecurrenceMaster: QuestionGenerator = {
       const feedback: FreeTextFeedbackFunction = ({ text }) => {
         solution.coefficient = new Fraction(1)
         const correctAnswer = "$\\Theta(" + solution.toLatex("n") + ")$"
-        const sumProductTerm: SumProductTerm = mathNodeToSumProductTerm(
-          math.parse(text),
-        )
+        const sumProductTerm: SumProductTerm = mathNodeToSumProductTerm(math.parse(text))
 
         return {
           correct: solution.Theta(sumProductTerm.dominantTerm()),

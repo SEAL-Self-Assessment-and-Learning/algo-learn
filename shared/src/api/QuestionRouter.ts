@@ -1,9 +1,5 @@
 import { Language } from "./Language"
-import {
-  deserializeParameters,
-  missingParameters,
-  Parameters,
-} from "./Parameters"
+import { deserializeParameters, missingParameters, Parameters } from "./Parameters"
 import { QuestionGenerator } from "./QuestionGenerator"
 
 /**
@@ -72,14 +68,14 @@ export function serializeGeneratorCall({
  */
 export function isSubPath(pathA: string, pathB: string): boolean
 export function isSubPath(partsA: string[], partsB: string[]): boolean
-export function isSubPath(A: string | string[], B: string | string[]): boolean {
-  if (typeof A === "string") A = A.split("/")
-  if (typeof B === "string") B = B.split("/")
-  A = A.filter((part) => part !== "")
-  B = B.filter((part) => part !== "")
-  if (A.length > B.length) return false
-  for (let i = 0; i < A.length; i++) {
-    if (A[i] !== B[i]) return false
+export function isSubPath(a: string | string[], b: string | string[]): boolean {
+  if (typeof a === "string") a = a.split("/")
+  if (typeof b === "string") b = b.split("/")
+  a = a.filter((part) => part !== "")
+  b = b.filter((part) => part !== "")
+  if (a.length > b.length) return false
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false
   }
   return true
 }
@@ -127,11 +123,7 @@ export function deserializePath({
     expectLang = parts[0] === "de" || parts[0] === "en"
   }
 
-  const lang: Language | undefined = !expectLang
-    ? undefined
-    : parts[0] === "de"
-      ? "de"
-      : "en"
+  const lang: Language | undefined = !expectLang ? undefined : parts[0] === "de" ? "de" : "en"
 
   if (lang !== undefined) {
     parts = parts.slice(1)
@@ -144,15 +136,11 @@ export function deserializePath({
     parts = parts.slice(generatorPath.split("/").length)
     if (parts.length === 0) return { lang, generator, generatorPath }
 
-    const parameters = deserializeParameters(
-      parts.join("/"),
-      generator.expectedParameters,
-    )
+    const parameters = deserializeParameters(parts.join("/"), generator.expectedParameters)
 
     const missing = missingParameters(parameters, generator.expectedParameters)
     const seed =
-      missing.length === 0 &&
-      parts.length === generator.expectedParameters.length + 1
+      missing.length === 0 && parts.length === generator.expectedParameters.length + 1
         ? parts.at(-1)
         : undefined
     return { lang, generator, generatorPath, parameters, seed }

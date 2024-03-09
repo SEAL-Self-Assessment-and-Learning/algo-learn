@@ -25,9 +25,7 @@ export function About() {
       <h2>{t("About.individuallyAdaptive.label")}</h2>
       <p>
         <Markdown
-          md={format(t("About.individuallyAdaptive.text"), [
-            "https://doi.org/10.18653/v1/p16-1174",
-          ])}
+          md={format(t("About.individuallyAdaptive.text"), ["https://doi.org/10.18653/v1/p16-1174"])}
         />
       </p>
       <h2>{t("About.development.label")}</h2>

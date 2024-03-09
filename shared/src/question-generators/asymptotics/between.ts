@@ -124,8 +124,7 @@ export const Between: QuestionGenerator = {
       }
 
       const unknownVars = getVars(mathNode).filter((v) => v !== variable)
-      const unknownVar: string | null =
-        unknownVars.length > 0 ? unknownVars[0] : null
+      const unknownVar: string | null = unknownVars.length > 0 ? unknownVars[0] : null
       if (unknownVar) {
         return {
           valid: false,
@@ -159,8 +158,7 @@ ${t("feedback.expected")}: $${variable}$.`,
       }
 
       const unknownVars = getVars(mathNode).filter((v) => v !== variable)
-      const unknownVar: string | null =
-        unknownVars.length > 0 ? unknownVars[0] : null
+      const unknownVar: string | null = unknownVars.length > 0 ? unknownVars[0] : null
       if (unknownVar) {
         return {
           correct: false,
@@ -230,10 +228,7 @@ ${t("feedback.expected")}: $${variable}$.`,
   },
 }
 
-export function generateBaseFunction(
-  variant: string,
-  random: Random,
-): ProductTerm[] {
+export function generateBaseFunction(variant: string, random: Random): ProductTerm[] {
   switch (variant) {
     default: {
       return [new ProductTerm(), new ProductTerm()]

@@ -37,9 +37,7 @@ export type StringParameter = ParameterBase & {
 
 /** AllowedParameter is the union of all allowed parameter types. */
 
-export type ExpectedParameters = ReadonlyArray<
-  BooleanParameter | IntegerParameter | StringParameter
->
+export type ExpectedParameters = ReadonlyArray<BooleanParameter | IntegerParameter | StringParameter>
 /**
  * An object of type Parameters is what is given as input to the
  * QuestionGenerator to generate a question.
@@ -63,14 +61,10 @@ export function validateParameters(
     correct &&= value !== undefined
     if (allowedParameter.type === "integer") {
       correct &&=
-        typeof value === "number" &&
-        value >= allowedParameter.min &&
-        value <= allowedParameter.max
+        typeof value === "number" && value >= allowedParameter.min && value <= allowedParameter.max
     } else if (allowedParameter.type === "string") {
       correct &&=
-        typeof value === "string" &&
-        value !== "" &&
-        allowedParameter.allowedValues.includes(value)
+        typeof value === "string" && value !== "" && allowedParameter.allowedValues.includes(value)
     }
   }
   return correct
@@ -94,10 +88,7 @@ export function validateParameters(
  * @param allowedParameters The allowed parameters
  * @returns The missing parameters
  */
-export function missingParameters(
-  parameters: Parameters,
-  allowedParameters: ExpectedParameters,
-) {
+export function missingParameters(parameters: Parameters, allowedParameters: ExpectedParameters) {
   return allowedParameters.filter((p) => parameters[p.name] === undefined)
 }
 
@@ -107,15 +98,11 @@ export function missingParameters(
  * @param expectedParameters The allowed parameters
  * @returns All possible combinations of parameters
  */
-export function allParameterCombinations(
-  expectedParameters: ExpectedParameters,
-): Array<Parameters> {
+export function allParameterCombinations(expectedParameters: ExpectedParameters): Array<Parameters> {
   if (expectedParameters.length === 0) return [{}]
 
   const p = expectedParameters[0]
-  const recCombinations: Array<Parameters> = allParameterCombinations(
-    expectedParameters.slice(1),
-  )
+  const recCombinations: Array<Parameters> = allParameterCombinations(expectedParameters.slice(1))
   const newCombinations: Array<Parameters> = []
   for (const combinations of recCombinations) {
     if (p.type === "boolean") {
@@ -182,17 +169,10 @@ export function serializeParameters(
  * @param expectedParameters The expected parameters
  * @returns The Parameters object
  */
-export function deserializeParameters(
-  path: string,
-  expectedParameters: ExpectedParameters,
-): Parameters {
+export function deserializeParameters(path: string, expectedParameters: ExpectedParameters): Parameters {
   const parameterList = path.split("/")
   const parameters: Parameters = {}
-  for (
-    let i = 0;
-    i < parameterList.length && i < expectedParameters.length;
-    i++
-  ) {
+  for (let i = 0; i < parameterList.length && i < expectedParameters.length; i++) {
     if (expectedParameters[i].type === "integer") {
       parameters[expectedParameters[i].name] = parseInt(parameterList[i], 10)
     } else if (expectedParameters[i].type === "string") {

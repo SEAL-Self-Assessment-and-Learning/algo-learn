@@ -17,8 +17,8 @@
     "test:unit": "which bun && bun test --bail || vitest run --bail 1",
     "test:lint": "eslint */src/**/*.ts */src/**/*.tsx",
     "test:check": "tsc",
-    "test:format": "prettier front-end/src/ shared/src --check",
-    "format": "prettier ./front-end/src/ ./shared/src ./*/src/**/*.css --write",
+    "test:format": "prettier ./settings ./front-end/src ./shared/src ./*/src/**/*.css --check",
+    "format": "prettier ./settings ./front-end/src ./shared/src ./*/src/**/*.css --write",
     "clean": "rm -rf dist/ .yarn/cache/ node_modules/ docs/ vite-bundle-visualizer.html",
     "visualize": "$npm_execpath run vite-bundle-visualizer -o vite-bundle-visualizer.html",
     "docs": "$npm_execpath run typedoc --out docs shared/src/**/*.ts shared/src/**/*.tsx"

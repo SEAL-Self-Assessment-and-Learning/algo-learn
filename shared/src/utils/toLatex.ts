@@ -1,8 +1,4 @@
-import {
-  FreeTextQuestion,
-  MultipleChoiceQuestion,
-  Question,
-} from "../api/QuestionGenerator"
+import { FreeTextQuestion, MultipleChoiceQuestion, Question } from "../api/QuestionGenerator"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "./parseMarkdown"
 
 /**
@@ -37,9 +33,7 @@ export function markdownTreeToLatex(tree: ParseTree | ParseTreeNode): string {
   } else if (tree.kind === "`") {
     return `\\texttt{${markdownTreeToLatex(tree.child)}}`
   } else if (tree.kind === "```") {
-    return `\\begin{verbatim}\n${markdownTreeToLatex(
-      tree.child,
-    )}\n\\end{verbatim}`
+    return `\\begin{verbatim}\n${markdownTreeToLatex(tree.child)}\n\\end{verbatim}`
   } else if (tree.kind === ">") {
     return `\\begin{quote}\n${markdownTreeToLatex(tree.child)}\n\\end{quote}`
   } else if (tree.kind === "a") {

@@ -72,16 +72,12 @@ export const SimplifySum: QuestionGenerator = {
     }))
 
     const functionDeclaration = `${functionName}\\colon\\mathbb N\\to\\mathbb R`
-    const functionDefinition = `${functionName}(${variable})=${sum
-      .map((t) => t.toLatex())
-      .join(" + ")}`
+    const functionDefinition = `${functionName}(${variable})=${sum.map((t) => t.toLatex()).join(" + ")}`
 
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
       name: t("name"),
-      text: format(
-        t("text" ?? "text", [functionDeclaration, functionDefinition]),
-      ),
+      text: format(t("text" ?? "text", [functionDeclaration, functionDefinition])),
       answers: answers.map(({ element }) => element),
       feedback: minimalMultipleChoiceFeedback({
         correctAnswerIndex: answers

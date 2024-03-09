@@ -46,18 +46,10 @@ export function InteractWithQuestion({
   return (
     <>
       <HorizontallyCenteredDiv className="flex-grow">
-        <QuestionHeader
-          permalink={permalink}
-          title={name}
-          regenerate={regenerate}
-        />
+        <QuestionHeader permalink={permalink} title={name} regenerate={regenerate} />
         <div>{children}</div>
       </HorizontallyCenteredDiv>
-      <QuestionFooter
-        mode={footerMode}
-        message={footerMessage}
-        buttonClick={handleFooterClick}
-      />
+      <QuestionFooter mode={footerMode} message={footerMessage} buttonClick={handleFooterClick} />
     </>
   )
 }

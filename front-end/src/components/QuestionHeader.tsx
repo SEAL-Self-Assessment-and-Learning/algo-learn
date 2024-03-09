@@ -44,23 +44,14 @@ export function QuestionHeader({
           >
             <BiLink className="inline" />
           </button>
-          <Tooltip
-            anchorSelect={`#copy-link-${idString}`}
-            place="right"
-            className="text-sm font-normal"
-          >
-            {(recentlyCopied ? t("copyLinkCopied") : t("copyLinkTooltip")) ||
-              ""}
+          <Tooltip anchorSelect={`#copy-link-${idString}`} place="right" className="text-sm font-normal">
+            {(recentlyCopied ? t("copyLinkCopied") : t("copyLinkTooltip")) || ""}
           </Tooltip>
         </>
       )}
       {regenerate && (
         <>
-          <button
-            type="button"
-            id={`regenerate-${idString}`}
-            onClick={regenerate}
-          >
+          <button type="button" id={`regenerate-${idString}`} onClick={regenerate}>
             <BiRefresh className="inline" />
           </button>
           <Tooltip

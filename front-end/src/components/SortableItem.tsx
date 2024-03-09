@@ -1,8 +1,5 @@
 import { createContext, PropsWithChildren, useMemo } from "react"
-import type {
-  DraggableSyntheticListeners,
-  UniqueIdentifier,
-} from "@dnd-kit/core"
+import type { DraggableSyntheticListeners, UniqueIdentifier } from "@dnd-kit/core"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
@@ -31,22 +28,11 @@ const SortableItemContext = createContext<Context>({
  * @param props.id A unique id for the item.
  * @param props.disabled Whether the item is disabled.
  */
-export function SortableItem({
-  children,
-  id,
-  disabled = false,
-}: PropsWithChildren<Props>) {
-  const {
-    attributes,
-    isDragging,
-    listeners,
-    setNodeRef,
-    setActivatorNodeRef,
-    transform,
-    transition,
-  } = useSortable({
-    id,
-  })
+export function SortableItem({ children, id, disabled = false }: PropsWithChildren<Props>) {
+  const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef, transform, transition } =
+    useSortable({
+      id,
+    })
   const context = useMemo(
     () => ({
       attributes,
