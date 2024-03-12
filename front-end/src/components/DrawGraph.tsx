@@ -47,7 +47,6 @@ export function DrawGraph({
 
     const circles: d3.Selection<SVGGElement, d3.SimulationNodeDatum, SVGGElement, any> = svg
       .append("g")
-      // .attr("class", "nodes")
       .selectAll<Element, null>("g")
       .data(vertices)
       .enter()
