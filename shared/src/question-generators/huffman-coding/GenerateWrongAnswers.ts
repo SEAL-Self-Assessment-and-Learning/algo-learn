@@ -37,8 +37,14 @@ export function generateRandomWrongAnswer(random: Random, correctAnswer: string)
  * @param random
  * @param currentTree
  * @param word
+ * @param table if the question is a table question of a question where the word is represented
  */
-export function generateWrongAnswerSwitchLetters(random: Random, currentTree: TreeNode, word: string) {
+export function generateWrongAnswerSwitchLetters(
+  random: Random,
+  currentTree: TreeNode,
+  word: string,
+  table: boolean,
+) {
   const huffmanDict: { [key: string]: string } = createHuffmanCoding({}, currentTree, "")
   const keySet: string[] = Object.keys(huffmanDict)
   const randomKeys = random.subset(keySet, 2)
@@ -46,13 +52,19 @@ export function generateWrongAnswerSwitchLetters(random: Random, currentTree: Tr
     huffmanDict[randomKeys[1]],
     huffmanDict[randomKeys[0]],
   ]
-  const resultWord: string = word
-    .split("")
-    .map((char) => huffmanDict[char])
-    .join("")
+  let resultWord: string = ""
+  if (!table) {
+    resultWord = word
+      .split("")
+      .map((char) => huffmanDict[char])
+      .join("")
+  }
   // crop the result word to the same length as the correct answer
   resultWord.slice(0, word.length - 1)
-  return resultWord
+  return {
+    resultWord,
+    huffmanDict,
+  }
 }
 
 /**
@@ -65,55 +77,7 @@ export function generateWrongAnswerSwitchLetters(random: Random, currentTree: Tr
  */
 export function generateWrongAnswerShuffleWord(random: Random, word: string) {
   const wrongAnswer = random.shuffle(word.split("")).join("")
-  return huffmanCodingAlgorithm(wrongAnswer, 0)["result"]
-}
-
-/**
- * This function generates a new random word by changing a random letter to another random letter
- * The new word coding could be a little longer or shorter than the correct answer
- * @Difficulty Easy
- * @param random
- * @param word
- */
-export function generateWrongAnswerChangeWord(random: Random, word: string) {
-  const wordArray = word.split("")
-  const randomIndex = random.int(0, word.length - 1)
-  let randomIndex2 = random.int(0, word.length - 1)
-  while (randomIndex === randomIndex2) {
-    randomIndex2 = random.int(0, word.length - 1)
-  }
-  wordArray[randomIndex] = word[randomIndex2]
-  return huffmanCodingAlgorithm(wordArray.join(""), 0)["result"]
-}
-
-export function createHuffmanCodingBitError(
-  huffmanCode: { [key: string]: string },
-  node: TreeNode,
-  code: string,
-  random: Random,
-) {
-  const firstValue = random.int(0, 1)
-  const secondValue = 1 - firstValue
-  if (node.left) {
-    huffmanCode = createHuffmanCodingBitError(
-      huffmanCode,
-      node.left,
-      code + firstValue.toString(),
-      random,
-    )
-  }
-  if (node.right) {
-    huffmanCode = createHuffmanCodingBitError(
-      huffmanCode,
-      node.right,
-      code + secondValue.toString(),
-      random,
-    )
-  }
-  if (node.value.length === 1) {
-    huffmanCode[node.value] = code
-  }
-  return huffmanCode
+  return huffmanCodingAlgorithm(wrongAnswer).result
 }
 
 /**
@@ -161,7 +125,7 @@ export function generateWrongAnswerReduceCodeOfLetter(word: string, currentTree:
   for (let i = 0; i < word.length; i++) {
     wrongAnswerCoding += huffmanDict[word[i]]
   }
-  return wrongAnswerCoding
+  return { wrongAnswerCoding, huffmanDict }
 }
 
 export function generateWrongAnswerFlip01InCodeChar(
@@ -179,11 +143,13 @@ export function generateWrongAnswerFlip01InCodeChar(
     huffmanDict[currentLongestKey].slice(0, randomIndex) +
     newChar +
     huffmanDict[currentLongestKey].slice(randomIndex + 1)
+
   let wrongAnswerCoding = ""
   for (let i = 0; i < word.length; i++) {
     wrongAnswerCoding += huffmanDict[word[i]]
   }
-  return wrongAnswerCoding
+
+  return { wrongAnswerCoding, huffmanDict }
 }
 
 function createHuffmanDict(currentTree: TreeNode) {
@@ -204,8 +170,58 @@ function createHuffmanDict(currentTree: TreeNode) {
 }
 
 /*
-Maybe add more difficult wrong answers, but I don't have any idea at the moment
-
+Maybe add more challenging wrong answers, but I don't have any idea at the moment
 - Maybe another wrong answer where the code is too short at the end
-
 */
+
+/*
+Helper
+ */
+
+/**
+ * This function generates a new random word by changing a random letter to another random letter
+ * The new word coding could be a little longer or shorter than the correct answer
+ * @Difficulty Easy
+ * @param random
+ * @param word
+ */
+export function generateWrongAnswerChangeWord(random: Random, word: string) {
+  const wordArray = word.split("")
+  const randomIndex = random.int(0, word.length - 1)
+  let randomIndex2 = random.int(0, word.length - 1)
+  while (randomIndex === randomIndex2) {
+    randomIndex2 = random.int(0, word.length - 1)
+  }
+  wordArray[randomIndex] = word[randomIndex2]
+  return huffmanCodingAlgorithm(wordArray.join("")).result
+}
+
+export function createHuffmanCodingBitError(
+  huffmanCode: { [key: string]: string },
+  node: TreeNode,
+  code: string,
+  random: Random,
+) {
+  const firstValue = random.int(0, 1)
+  const secondValue = 1 - firstValue
+  if (node.left) {
+    huffmanCode = createHuffmanCodingBitError(
+      huffmanCode,
+      node.left,
+      code + firstValue.toString(),
+      random,
+    )
+  }
+  if (node.right) {
+    huffmanCode = createHuffmanCodingBitError(
+      huffmanCode,
+      node.right,
+      code + secondValue.toString(),
+      random,
+    )
+  }
+  if (node.value.length === 1) {
+    huffmanCode[node.value] = code
+  }
+  return huffmanCode
+}

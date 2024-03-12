@@ -59,7 +59,7 @@ export function generateString(length: keyof typeof tmpFrequencies, random: Rand
 function generateWordBasedOnFrequency(chosenFrequency: number[], random: Random) {
   let word = ""
   // not using "i", "j", "l", "n", "q" because they have similar shapes
-  const possibleChars: string = "abcdefghkmoprstuvwxyz"
+  const possibleChars: string = "ABCDEFGHKMOPRSTUVWXYZ"
   const chosenChars = random.subset(possibleChars.split(""), chosenFrequency.length)
 
   for (let j = 0; j < chosenFrequency.length; j++) {
@@ -70,7 +70,7 @@ function generateWordBasedOnFrequency(chosenFrequency: number[], random: Random)
 }
 
 /**
- * This function creates an array of chars, this is for more difficult questions (but more easy too read, instead of a
+ * This function creates an array of chars, this is for more difficult questions (but easier to read, instead of a
  * word with 26 letters or so)
  * @param random
  */
@@ -79,7 +79,7 @@ export function generateWordArray(random: Random) {
 
   const differentLetters = random.int(7, 12)
 
-  const possibleChars: string = "abcdefghijklmnopqrstuvwxyz"
+  const possibleChars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
   const chosenChars = random.subset(possibleChars.split(""), differentLetters)
   const amountCharsArray = []
   for (let i = 0; i < differentLetters; i++) {
@@ -90,13 +90,5 @@ export function generateWordArray(random: Random) {
     charArray[chosenChars[i]] = amountCharsArray[i]
   }
 
-  // also create the word for faster huffman Coding
-  let word = ""
-  for (const key in charArray) {
-    for (let i = 0; i < charArray[key]; i++) {
-      word += key
-    }
-  }
-
-  return { charArray, word }
+  return charArray
 }

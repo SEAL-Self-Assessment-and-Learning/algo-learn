@@ -5,26 +5,27 @@
 /**
  * This function takes in a string and returns the Huffman Coding of the string
  * @param inputWord the word to be encoded
- * @param sortingVariant the variant of the sorting algorithm
- *                        currently not implemented
+ * @param characters the characters and their frequency, if this is provided, the inputWord is ignored
  */
 export function huffmanCodingAlgorithm(
   inputWord: string,
-  sortingVariant: number,
+  characters: { [key: string]: number } = {},
 ): {
   result: string
   mainNode: TreeNode
 } {
-  // split the input word into an dictionary of characters
-  if (sortingVariant === 1) {
-    // currently not implemented
+  let computeBasedOnWord = false
+  if (Object.keys(characters).length === 0) {
+    computeBasedOnWord = true
   }
-  const characters: { [key: string]: number } = {}
-  for (let i = 0; i < inputWord.length; i++) {
-    if (characters[inputWord[i]]) {
-      characters[inputWord[i]] += 1
-    } else {
-      characters[inputWord[i]] = 1
+
+  if (computeBasedOnWord) {
+    for (let i = 0; i < inputWord.length; i++) {
+      if (characters[inputWord[i]]) {
+        characters[inputWord[i]] += 1
+      } else {
+        characters[inputWord[i]] = 1
+      }
     }
   }
 
@@ -41,7 +42,7 @@ export function huffmanCodingAlgorithm(
   }
 
   // create a tree based on the characters
-  // connect the two smallest values together
+  // connect the two smallest values
   while (nodes.length > 1) {
     // TODO: sort the nodes based on a custom sort function (or store those in a priority queue)
     nodes.sort((a, b) => sortNodes(a, b))
@@ -70,14 +71,16 @@ export function huffmanCodingAlgorithm(
   createHuffmanCoding(huffmanCoding, mainNode, "")
 
   let result: string = ""
-  for (let i = 0; i < inputWord.length; i++) {
-    result += huffmanCoding[inputWord[i]]
+  if (computeBasedOnWord) {
+    for (let i = 0; i < inputWord.length; i++) {
+      result += huffmanCoding[inputWord[i]]
+    }
   }
 
   return { result, mainNode: mainNode }
 
   function sortNodes(a: TreeNode, b: TreeNode) {
-    // if a equals b compare them alphabetically
+    // if 'a' equals 'b' compare them alphabetically
     // compare the frequency of the two nodes
     if (a.frequency === b.frequency) {
       // compare the smallest letter of the two node strings
@@ -116,4 +119,42 @@ export type TreeNode = {
   left: TreeNode | null
   right: TreeNode | null
   personalCode: string
+}
+
+export function checkProvidedCode(
+  inputFrequencies: { [key: string]: number },
+  possibleCode: { [key: string]: string },
+  providedCode: { [key: string]: string },
+) {
+  // first check if the provided code will have the same length as the possible code
+  const possibleCodeLength = Object.keys(possibleCode).reduce((acc, key) => {
+    return acc + possibleCode[key].length * inputFrequencies[key]
+  }, 0)
+  const providedCodeLength = Object.keys(providedCode).reduce((acc, key) => {
+    // could be simplified, but I think this is more readable
+    if (inputFrequencies[key] === undefined) {
+      return NaN
+    }
+    return acc + providedCode[key].length * inputFrequencies[key]
+  }, 0)
+
+  if (possibleCodeLength !== providedCodeLength) {
+    return false
+  }
+
+  // convert the provided code to an array
+  const providedCodeArray = Object.keys(providedCode).map((key) => providedCode[key])
+  providedCodeArray.sort((a, b) => a.length - b.length)
+
+  // checks if the code is prefix-free
+  // is it possible to optimize this?
+  for (let i = 0; i < providedCodeArray.length - 1; i++) {
+    for (let j = i + 1; j < providedCodeArray.length; j++) {
+      if (providedCodeArray[j].startsWith(providedCodeArray[i])) {
+        return false
+      }
+    }
+  }
+
+  return true
 }
