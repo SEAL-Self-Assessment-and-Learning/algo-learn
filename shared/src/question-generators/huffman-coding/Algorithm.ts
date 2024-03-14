@@ -10,6 +10,7 @@
 export function huffmanCodingAlgorithm(
   inputWord: string,
   characters: { [key: string]: number } = {},
+  wrongAddition: number = 0,
 ): {
   result: string
   mainNode: TreeNode
@@ -44,14 +45,13 @@ export function huffmanCodingAlgorithm(
   // create a tree based on the characters
   // connect the two smallest values
   while (nodes.length > 1) {
-    // TODO: sort the nodes based on a custom sort function (or store those in a priority queue)
     nodes.sort((a, b) => sortNodes(a, b))
     const left = nodes.shift()
     const right = nodes.shift()
     if (left && right) {
       const newNode: TreeNode = {
         value: left.value + right.value,
-        frequency: left.frequency + right.frequency,
+        frequency: left.frequency + right.frequency + wrongAddition,
         left: left,
         right: right,
         personalCode: "",

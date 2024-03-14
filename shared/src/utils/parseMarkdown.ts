@@ -23,7 +23,10 @@ export type ParseTreeNode =
   | { kind: "$$" | "$"; child: string }
   | { kind: "**" | "*" | ">"; child: ParseTree }
   | { kind: "a"; child: ParseTree; url: string }
-  | { kind: "table"; child: string }
+  | {
+      kind: "table"
+      child: { header: string[]; content: string[][]; alignment: string[]; extraFeature: string }
+    }
 
 /**
  * The parseMarkdown function parses markdown-like text into a parse tree.
@@ -63,7 +66,7 @@ export function parseMarkdown(md: string): ParseTree {
       if (kind === "table") {
         const node = {
           kind,
-          child: match[0],
+          child: parseTable(match[0]),
         } as ParseTreeNode
         const before = md.slice(0, match.index)
         const after = md.slice(match.index + match[0].length)
@@ -91,13 +94,26 @@ export function parseMarkdown(md: string): ParseTree {
  * The parseMarkdown function parses markdown-like text into arrays of content
  *
  * @param table The markdown-like text to parse
- * @returns Header, content and alignment of the table
+ * @returns Header, content and alignment of the table, can also add extra Feature (not md specific) see below
  */
 export function parseTable(table: string) {
   const rows = table.split("\n")
   const header: string[] = []
   const content: string[][] = []
   const alignment: string[] = []
+  let extraFeature: string = ""
+
+  /*
+  The extra feature should be in the last row of the table.
+  It only needs to stand in the first column as well, but keep the table format.
+  Currently possible extraFeatures:
+   - #div_xxx# -> this creates a div around the table with the class=xxx
+   */
+
+  // regex expression for extra features
+  const regexExtraFeatures: { [key: string]: RegExp } = {
+    hashtag: /^#.*#$/,
+  }
 
   const separator = rows[1].split("|")
   const headerPattern = /[ -]*-{3,}[ -]*/
@@ -166,6 +182,20 @@ export function parseTable(table: string) {
     const contentSplit = rows[i].split("|")
     let contentRow: string[] = []
     for (let j = 0; j < contentSplit.length; j++) {
+      let regexMatch = false
+      // check for an extra feature
+      for (const key in regexExtraFeatures) {
+        if (regexExtraFeatures[key].test(contentSplit[j])) {
+          if (key == "hashtag") {
+            // replace all #
+            extraFeature = contentSplit[j].replace(/#/g, "")
+          }
+          regexMatch = true
+          break
+        }
+      }
+
+      if (regexMatch) break
       if (contentSplit[j] === "") {
         if (j === 0 || j === contentSplit.length - 1) {
           continue
@@ -200,5 +230,6 @@ export function parseTable(table: string) {
     header,
     content,
     alignment,
+    extraFeature,
   }
 }

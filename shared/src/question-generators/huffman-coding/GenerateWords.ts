@@ -70,24 +70,18 @@ function generateWordBasedOnFrequency(chosenFrequency: number[], random: Random)
 }
 
 /**
- * This function creates an array of chars, this is for more difficult questions (but easier to read, instead of a
+ * This function creates an array of chars, this is for more challenging questions (but easier to read, instead of a
  * word with 26 letters or so)
  * @param random
  */
-export function generateWordArray(random: Random) {
-  // TODO better control over how the array is constructed and not only random use
-
-  const differentLetters = random.int(7, 12)
-
+export function generateWordArray(differentLetters: number, random: Random) {
   const possibleChars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
   const chosenChars = random.subset(possibleChars.split(""), differentLetters)
-  const amountCharsArray = []
-  for (let i = 0; i < differentLetters; i++) {
-    amountCharsArray.push(random.int(3, 50))
-  }
+  // create an array with values 1 to 100
+  const amountCharsArray = random.shuffle([...Array(99).keys()]).slice(0, differentLetters)
   const charArray: { [key: string]: number } = {}
   for (let i = 0; i < differentLetters; i++) {
-    charArray[chosenChars[i]] = amountCharsArray[i]
+    charArray[chosenChars[i]] = amountCharsArray[i] + 1
   }
 
   return charArray

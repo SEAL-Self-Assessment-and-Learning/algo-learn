@@ -81,33 +81,6 @@ export function generateWrongAnswerShuffleWord(random: Random, word: string) {
 }
 
 /**
- * We use another function and build the random, sometimes left is 0 and sometime 1
- * So we don't have a prefix free code
- * TODO is this really a wrong answer? Because it will still be a minimal prefix free code, but not correctly
- *      implemented huffman code
- *      I took this question out, but I will leave it here for now, maybe we can use it for priority queue
- *      You could still decode the word
- * @Difficulty Medium
- * @param random
- * @param word
- * @param currentTree
- */
-export function generateWrongAnswerFalseTreeConstrution(
-  random: Random,
-  word: string,
-  currentTree: TreeNode,
-) {
-  let wrongHuffmanDict: { [key: string]: string } = {}
-  wrongHuffmanDict = createHuffmanCodingBitError(wrongHuffmanDict, currentTree, "", random)
-  // create the word based on the wrong coding
-  let wrongAnswerCoding = ""
-  for (let i = 0; i < word.length; i++) {
-    wrongAnswerCoding += wrongHuffmanDict[word[i]]
-  }
-  return wrongAnswerCoding
-}
-
-/**
  * Function to generate a wrong code, it takes the longest code and reduces the length by 1 (deleting the last char)
  * @Difficulty Medium
  * @param word
@@ -152,27 +125,74 @@ export function generateWrongAnswerFlip01InCodeChar(
   return { wrongAnswerCoding, huffmanDict }
 }
 
-function createHuffmanDict(currentTree: TreeNode) {
-  let huffmanDict: { [key: string]: string } = {}
-  huffmanDict = createHuffmanCoding(huffmanDict, currentTree, "")
-  // get the key with the longest value
-  let currentLongestKey: string = ""
-  for (const currentKey in huffmanDict) {
-    if (currentLongestKey === "") {
-      currentLongestKey = currentKey
-      continue
-    }
-    if (huffmanDict[currentKey].length > huffmanDict[currentLongestKey].length) {
-      currentLongestKey = currentKey
-    }
-  }
-  return { huffmanDict, currentLongestKey: currentLongestKey }
-}
-
 /*
 Maybe add more challenging wrong answers, but I don't have any idea at the moment
 - Maybe another wrong answer where the code is too short at the end
 */
+
+/**
+ * This function swaps the two letters with the lowest frequency, then the next two and so on
+ * Does not always create a wrong answer, but it is a good way to create a wrong answer
+ */
+export function swapManyLetters(inputDict: { [key: string]: number }) {
+  const charList: string[] = Object.keys(inputDict)
+  const frequencyList: number[] = charList.map((char) => inputDict[char])
+
+  // sort the frequency list and keep the order in the charList
+  // could also be done with mergesort or so (but this is easier) and we have only 13 different letters
+  for (let i = 0; i < frequencyList.length; i++) {
+    for (let j = i + 1; j < frequencyList.length; j++) {
+      if (frequencyList[i] > frequencyList[j]) {
+        const temp = frequencyList[i]
+        frequencyList[i] = frequencyList[j]
+        frequencyList[j] = temp
+        const tempChar = charList[i]
+        charList[i] = charList[j]
+        charList[j] = tempChar
+      }
+    }
+  }
+
+  for (let i = 0; i < charList.length; i += 2) {
+    const temp = frequencyList[i]
+    frequencyList[i] = frequencyList[i + 1]
+    frequencyList[i + 1] = temp
+  }
+
+  // create the new dictionary
+  const newDict: { [key: string]: number } = {}
+  for (let i = 0; i < frequencyList.length; i++) {
+    newDict[charList[i]] = frequencyList[i]
+  }
+
+  // create a correct huffman dictionary
+  return createHuffmanDict(huffmanCodingAlgorithm("", newDict).mainNode).huffmanDict
+}
+
+/**
+ * Quite easy, it just changes the frequencies randomly by adding a value between -10 and 10
+ * @param random
+ * @param inputDict
+ */
+export function changeFrequenciesRandomly(random: Random, inputDict: { [key: string]: number }) {
+  for (const key in inputDict) {
+    inputDict[key] += random.int(-10, 10)
+    if (inputDict[key] < 1) {
+      inputDict[key] = 1
+    } else if (inputDict[key] > 100) {
+      inputDict[key] = 100
+    }
+  }
+
+  // create a correct huffman dictionary
+  return createHuffmanDict(huffmanCodingAlgorithm("", inputDict).mainNode).huffmanDict
+}
+
+export function wrongAdditionTree(random: Random, inputDict: { [key: string]: number }) {
+  // create a correct huffman dictionary
+  return createHuffmanDict(huffmanCodingAlgorithm("", inputDict, random.int(-10, 20)).mainNode)
+    .huffmanDict
+}
 
 /*
 Helper
@@ -194,6 +214,23 @@ export function generateWrongAnswerChangeWord(random: Random, word: string) {
   }
   wordArray[randomIndex] = word[randomIndex2]
   return huffmanCodingAlgorithm(wordArray.join("")).result
+}
+
+function createHuffmanDict(currentTree: TreeNode) {
+  let huffmanDict: { [key: string]: string } = {}
+  huffmanDict = createHuffmanCoding(huffmanDict, currentTree, "")
+  // get the key with the longest value
+  let currentLongestKey: string = ""
+  for (const currentKey in huffmanDict) {
+    if (currentLongestKey === "") {
+      currentLongestKey = currentKey
+      continue
+    }
+    if (huffmanDict[currentKey].length > huffmanDict[currentLongestKey].length) {
+      currentLongestKey = currentKey
+    }
+  }
+  return { huffmanDict, currentLongestKey: currentLongestKey }
 }
 
 export function createHuffmanCodingBitError(

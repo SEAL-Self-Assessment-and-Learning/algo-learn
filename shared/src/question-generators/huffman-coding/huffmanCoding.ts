@@ -1,5 +1,6 @@
 // TODO: check if the table could be to wide to be represented as possible answer
 
+import { min } from "mathjs"
 import { validateParameters } from "@shared/api/Parameters.ts"
 import {
   FreeTextFeedbackFunction,
@@ -10,6 +11,7 @@ import {
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import {
+  checkProvidedCode,
   createHuffmanCoding,
   huffmanCodingAlgorithm,
   TreeNode,
@@ -19,12 +21,15 @@ import {
   generateWordArray,
 } from "@shared/question-generators/huffman-coding/GenerateWords.ts"
 import {
+  changeFrequenciesRandomly,
   generateRandomWrongAnswer,
   generateWrongAnswerChangeWord,
   generateWrongAnswerFlip01InCodeChar,
   generateWrongAnswerReduceCodeOfLetter,
   generateWrongAnswerShuffleWord,
   generateWrongAnswerSwitchLetters,
+  swapManyLetters,
+  wrongAdditionTree,
 } from "@shared/question-generators/huffman-coding/GenerateWrongAnswers.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunction, tFunctional, Translations } from "@shared/utils/translations.ts"
@@ -37,7 +42,8 @@ const translations: Translations = {
   en: {
     name: "Compute a Huffman-Coding",
     description: "Compute the Huffman-Coding of a given string",
-    text: 'Let "*{{0}}*" be {{1}}. What is a correct **Huffman-Coding** of this {{1}} "*{{0}}*"?',
+    text: 'Let "*{{0}}*" be {{1}}. What is a correct **Huffman-Coding** of this {{1}}?',
+    prompt: "What is a possible Huffman-Coding?",
     textTable: `Suppose we have the following table, which represents how often a char appears in a string:
 {{0}}
 What could be a correct **Huffman-Coding** for each char?`,
@@ -50,7 +56,8 @@ What could be a correct **Huffman-Coding** for each char?`,
   de: {
     name: "Berechne eine Hufmann-Codierung",
     description: "Bestimme die Huffman-Codierung eines gegebenen Strings",
-    text: 'Sei "*{{0}}*" eine {{1}}. Was ist eine korrekte **Huffman-Codierung** dieser {{1}} "*{{0}}*"?',
+    text: 'Sei "*{{0}}*" ein {{1}}. Was ist eine korrekte **Huffman-Codierung** für diesen {{1}}?',
+    prompt: "Was ist eine mögliche Huffman-Codierung?",
     textTable: `Angenommen wir habe die folgende Tabelle, welche angebibt, wie oft ein bestimmter Buchstabe in einem String vorkommt:
 {{0}}
         Was wäre eine korrekte **Huffman-Codierung** für jeden Buchstaben?`,
@@ -77,7 +84,7 @@ function generateWrongAnswers(
   word: string,
 ): Array<string> {
   const correctAnswerLength = correctAnswer.length + 3 // add a factor so not every answer has the same length
-  const otherCorrectAnswer = switchAllOneZero(correctAnswer)
+  const otherCorrectAnswer = switchAllOneZeroString(correctAnswer)
   const wrongAnswersStrings: string[] = []
   const w1 = generateRandomWrongAnswer(random, correctAnswer)
   if (wrongAnswersStrings.indexOf(w1) === -1 && w1 !== correctAnswer && w1 !== otherCorrectAnswer) {
@@ -122,34 +129,98 @@ function generateWrongAnswers(
 
 /**
  * This function generates wrong answers for the table questions
+ * Maybe optimize the wrong answer generation later (but I don't have any idea at the moment)
  * @param random
- * @param _inputDict
+ * @param inputDict
  * @param correctTree
  */
 function generateWrongAnswersDict(
   random: Random,
-  _inputDict: { [p: string]: number },
+  inputDict: { [p: string]: number },
   correctTree: TreeNode,
 ) {
-  const wrongAnswerList = []
+  // List of correct answers
+  const correctAnswer = createHuffmanCoding({}, correctTree, "")
 
-  // TODO could be a correct solution, need a check
-  wrongAnswerList.push(generateWrongAnswerSwitchLetters(random, correctTree, "", true).huffmanDict)
+  const wrongAnswerList: { [key: string]: string }[] = []
 
-  // will always be wrong, only check if already in the possible answers
-  wrongAnswerList.push(generateWrongAnswerReduceCodeOfLetter("", correctTree).huffmanDict)
+  for (let i = 0; i < 5; i++) {
+    const w2 = changeFrequenciesRandomly(random, inputDict)
+    if (!isDictInList(w2, wrongAnswerList) && !checkProvidedCode(inputDict, correctAnswer, w2)) {
+      wrongAnswerList.push(w2)
+    }
+  }
 
-  // TODO: can this be a correct solution? Shouldn't or?
-  wrongAnswerList.push(generateWrongAnswerFlip01InCodeChar(random, correctTree, "").huffmanDict)
+  for (let i = 0; i < 5; i++) {
+    const w3 = wrongAdditionTree(random, inputDict)
+    if (!isDictInList(w3, wrongAnswerList) && !checkProvidedCode(inputDict, correctAnswer, w3)) {
+      wrongAnswerList.push(w3)
+    }
+  }
 
-  return wrongAnswerList
+  // only add this if the list is not full
+  if (wrongAnswerList.length < 3) {
+    // sometimes this does not generate any wrong answer
+    const w4 = swapManyLetters(inputDict)
+    if (!isDictInList(w4, wrongAnswerList) && !checkProvidedCode(inputDict, correctAnswer, w4)) {
+      wrongAnswerList.push(w4)
+    }
+    const w5 = generateWrongAnswerFlip01InCodeChar(random, correctTree, "").huffmanDict
+    if (!isDictInList(w5, wrongAnswerList) && !checkProvidedCode(inputDict, correctAnswer, w5)) {
+      wrongAnswerList.push(w5)
+    }
+    const w6 = generateWrongAnswerSwitchLetters(random, correctTree, "", true).huffmanDict
+    if (!isDictInList(w6, wrongAnswerList) && !checkProvidedCode(inputDict, correctAnswer, w6)) {
+      wrongAnswerList.push(w6)
+    }
+  }
+
+  const size = wrongAnswerList.length
+  const subSetSize = min(3, size)
+  return random.subset(wrongAnswerList, subSetSize)
+}
+
+/**
+ * Function to check if two dictionaries are equal
+ * @param dict1
+ * @param dict2
+ */
+function isDictEqual(dict1: { [key: string]: any }, dict2: { [key: string]: any }): boolean {
+  const keys1 = Object.keys(dict1)
+  const keys2 = Object.keys(dict2)
+
+  if (keys1.length !== keys2.length) {
+    return false
+  }
+
+  for (const key of keys1) {
+    if (dict1[key] !== dict2[key]) {
+      return false
+    }
+  }
+
+  return true
+}
+
+/**
+ * Function to check if a dict is already in a list of dictionaries
+ * @param dict
+ * @param listDict
+ */
+function isDictInList(dict: { [key: string]: any }, listDict: { [key: string]: any }[]): boolean {
+  for (const item of listDict) {
+    if (isDictEqual(dict, item)) {
+      return true
+    }
+  }
+  return false
 }
 
 /**
  * This function switches all zeros and ones, because this will still be a correct Huffman-Coding
  * @param correctWord
  */
-export function switchAllOneZero(correctWord: string) {
+export function switchAllOneZeroString(correctWord: string) {
   const correctWordArray: string[] = correctWord.split("")
   for (let i = 0; i < correctWordArray.length; i++) {
     if (correctWordArray[i] === "1") {
@@ -165,16 +236,21 @@ export function switchAllOneZero(correctWord: string) {
  * Creates the table for the markdown
  * @param wordArray the word arrays with frequency of each letter
  */
-function convertDictToMdTable(wordArray: { [key: string]: any }) {
+function convertDictToMdTable(wordArray: { [key: string]: any }, extraFeature: string = "none") {
   const header = Object.keys(wordArray)
   const middleLine = header.map(() => "-------")
   const content = Object.values(wordArray)
   // create a table format for markdown (numbers are with $$)
-  return `
+  const returnValue = `
 |${header.join("|")}|
 |${middleLine.join("|")}|
 |$${content.join("$|$")}$|
 `
+  if (extraFeature !== "none") {
+    const extraFeatureLine = header.map(() => extraFeature)
+    return returnValue + `|${extraFeatureLine.join("|")}|`
+  }
+  return returnValue
 }
 
 export const huffmanCoding: QuestionGenerator = {
@@ -242,7 +318,7 @@ export const huffmanCoding: QuestionGenerator = {
     if (variantParameter === "choice") {
       variant = random.choice(["choice", "choice2"])
     } else {
-      variant = "input"
+      variant = random.choice(["input"])
     }
     let question: Question
     if (variant === "choice" || variant === "input") {
@@ -250,8 +326,8 @@ export const huffmanCoding: QuestionGenerator = {
       word = random.shuffle(word.split("")).join("")
 
       const correctAnswerList = huffmanCodingAlgorithm(word)
-      const correctAnswer = correctAnswerList["result"]
-      const correctTree = correctAnswerList["mainNode"]
+      const correctAnswer = correctAnswerList.result
+      const correctTree = correctAnswerList.mainNode
       // get a set of obvious wrong answers
       const answers = generateWrongAnswers(random, correctAnswer, correctTree, word)
 
@@ -279,12 +355,12 @@ export const huffmanCoding: QuestionGenerator = {
         }
 
         // no format error
-        return { valid: true, message: text }
+        return { valid: true, message: "\u2713" }
       }
 
       const feedback: FreeTextFeedbackFunction = ({ text }) => {
         // also switch 1 and 0 to keep the correct solution
-        const switchedCorrectAnswer = switchAllOneZero(correctAnswer)
+        const switchedCorrectAnswer = switchAllOneZeroString(correctAnswer)
         if (text == correctAnswer || text === switchedCorrectAnswer) {
           return {
             correct: true,
@@ -312,8 +388,7 @@ export const huffmanCoding: QuestionGenerator = {
           type: "FreeTextQuestion",
           name: huffmanCoding.name(lang),
           path: permalink,
-          text: t(translations, lang, "text", [word, "string"]),
-          prompt: `What is a possible Huffman-Coding?`,
+          text: t(translations, lang, "text", [word, "String"]),
           bottomText: t(translations, lang, "bottomtext"),
           feedback,
           checkFormat,
@@ -323,13 +398,18 @@ export const huffmanCoding: QuestionGenerator = {
       return {
         question,
       }
+      // else of choice2 or input2
     } else {
+      // TODO: for input2 missing: - feedback and checkFormat functions
+
       // this question is also MultipleChoice, but the user has to find the correct coding of the letters
       // he does not get the word, but instead the number of times a word appears
 
-      const wordArray = generateWordArray(random)
+      const differentLetters = random.int(8, 11)
+      const wordArray = generateWordArray(differentLetters, random)
       // only temporary displaying the word array
-      const displayTable = convertDictToMdTable(wordArray)
+      // add some spacing to table in the question text using extra feature div_my-5
+      const displayTable = convertDictToMdTable(wordArray, "#div_my-5#")
       const correctAnswerTreeNode = huffmanCodingAlgorithm("", wordArray).mainNode
       let correctAnswerDict: { [key: string]: string } = {}
       correctAnswerDict = createHuffmanCoding(correctAnswerDict, correctAnswerTreeNode, "")

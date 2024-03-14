@@ -100,11 +100,7 @@ export const MarkdownTreeNode: FunctionComponent<{
     )
   }
   if (parseTreeNode.kind === "table") {
-    return (
-      <div className="my-5">
-        <DrawTable table={parseTreeNode.child} />
-      </div>
-    )
+    return <DrawTable table={parseTreeNode.child} />
   }
   if (parseTreeNode.kind === "a") {
     return (
