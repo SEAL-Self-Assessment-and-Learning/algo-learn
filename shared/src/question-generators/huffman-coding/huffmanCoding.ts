@@ -44,7 +44,7 @@ const translations: Translations = {
     description: "Compute the Huffman-Coding of a given string",
     text: 'Let "*{{0}}*" be {{1}}. What is a correct **Huffman-Coding** of this {{1}}?',
     prompt: "What is a possible Huffman-Coding?",
-    textTable: `Suppose we have the following table, which represents how often a char appears in a string:
+    textTable: `Suppose we have the following table, which represents how often each character appears in a given string:
 {{0}}
 What could be a correct **Huffman-Coding** for each char?`,
     feedbackInvalid: "Can only contain 1 and 0",
@@ -58,7 +58,7 @@ What could be a correct **Huffman-Coding** for each char?`,
     description: "Bestimme die Huffman-Codierung eines gegebenen Strings",
     text: 'Sei "*{{0}}*" ein {{1}}. Was ist eine korrekte **Huffman-Codierung** für diesen {{1}}?',
     prompt: "Was ist eine mögliche Huffman-Codierung?",
-    textTable: `Angenommen wir habe die folgende Tabelle, welche angebibt, wie oft ein bestimmter Buchstabe in einem String vorkommt:
+    textTable: `Angenommen wir habe die folgende Tabelle, welche angebibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:
 {{0}}
         Was wäre eine korrekte **Huffman-Codierung** für jeden Buchstaben?`,
     feedbackInvalid: "Darf nur 1 und 0 enthalten",
