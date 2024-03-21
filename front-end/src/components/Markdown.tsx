@@ -2,7 +2,7 @@ import { Fragment, FunctionComponent, ReactNode } from "react"
 import { Link } from "react-router-dom"
 import SyntaxHighlighter from "react-syntax-highlighter"
 import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
-import { parseDimacsGraph } from "@shared/utils/graph"
+import { Graph } from "@shared/utils/graph"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "../../../shared/src/utils/parseMarkdown"
 import { useTheme } from "../hooks/useTheme"
 import { DrawGraph } from "./DrawGraph"
@@ -92,7 +92,7 @@ export const MarkdownTreeNode: FunctionComponent<{
     if (parseTreeNode.language === "graph") {
       return (
         <div className="my-5">
-          <DrawGraph width={320} height={180} graph={parseDimacsGraph(parseTreeNode.child)} />
+          <DrawGraph width={320} height={180} graph={Graph.parse(parseTreeNode.child)} />
         </div>
       )
     }

@@ -1,4 +1,4 @@
-import { randomGraph, toDimacsGraph } from "@shared/utils/graph"
+import { RandomGraph } from "@shared/utils/graph"
 import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
@@ -13,24 +13,24 @@ const translations: Translations = {
   en: {
     name: "Breadth-first search",
     description: "Run breadth-first search (BFS) on a graph",
-    text: `Let \${{0}}\$ be the following graph:
+    text: `Let \${{0}}$ be the following graph:
 
 \`\`\`graph
 {{1}}
 \`\`\`
 
-Suppose we start breadth-first search (BFS) at node \${{2}}\$. In which order might BFS visit the nodes of graph?`,
+Suppose we start breadth-first search (BFS) at node \${{2}}$. In which order might BFS visit the nodes of graph?`,
   },
   de: {
     name: "Breitensuche",
     description: "Führe Breitensuche (BFS) auf einem Graphen aus",
-    text: `Sei \${{0}}\$ der folgende Graph:
+    text: `Sei \${{0}}$ der folgende Graph:
     
 \`\`\`graph
 {{1}}
 \`\`\`
 
-Angenommen, wir starten Breitensuche (BFS) bei Knoten \${{2}}\$. In welcher Reihenfolge könnte BFS die Knoten des Graphen besuchen?`,
+Angenommen, wir starten Breitensuche (BFS) bei Knoten \${{2}}$. In welcher Reihenfolge könnte BFS die Knoten des Graphen besuchen?`,
   },
 }
 
@@ -59,17 +59,19 @@ export const BFS: QuestionGenerator = {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
 
-    const n = 5
-    const m = 8
-    const G = randomGraph(n, m, random)
-
-    if (G === undefined) {
-      throw new Error("Error in bfs.ts: randomGraph() returned undefined.")
-    }
+    const G = RandomGraph.grid(
+      random,
+      [4, 3],
+      0.8,
+      random.choice(["triangle", "square", "square-width-diagonals"]),
+      random.choice(["unique", "random", null]),
+      random.float(0, 1) < 0.5,
+      random.float(0, 1) < 0.5,
+    )
 
     // generate the question values
     const a = random.choice(["G"])
-    const b = random.int(1, n)
+    const b = random.int(1, 10)
     const correctAnswer = "TODO"
 
     // get a set of wrong answers
@@ -91,7 +93,7 @@ export const BFS: QuestionGenerator = {
         seed,
         generatorPath,
       }),
-      text: t(translations, lang, "text", [`${a}`, toDimacsGraph(G), `${b}`]),
+      text: t(translations, lang, "text", [`${a}`, G.toString(), `${b}`]),
       answers,
       feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
     }
