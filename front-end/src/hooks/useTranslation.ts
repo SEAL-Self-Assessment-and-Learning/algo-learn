@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import deQuestionGroupJSON from "../../../settings/question-group-locales/de.json"
 import enQuestionGroupJSON from "../../../settings/question-group-locales/en.json"
@@ -33,6 +34,10 @@ export function useTranslation(additionalTranslations?: Translations) {
     params["lang"] && (SUPPORTED_LANGUAGES as Array<string>).includes(params["lang"])
       ? (params["lang"] as Language)
       : DEFAULT_LANGUAGE
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
 
   function setLang(newLang: Language) {
     if (lang !== newLang) {
