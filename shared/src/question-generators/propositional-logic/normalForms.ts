@@ -34,6 +34,12 @@ const translations: Translations = {
     freetext_feedback_parse_error: "Your answer couldn't be parsed.",
     dnf: "disjunctive normal form (DNF)",
     cnf: "conjunctive normal form (CNF)",
+    "aria.left-parenthesis": "left parenthesis",
+    "aria.right-parenthesis": "right parenthesis",
+    "aria.or": "logical or",
+    "aria.and": "logical and",
+    "aria.not": "negation",
+    "aria.variable": "variable {{0}}"
   },
   de: {
     name: "Normalformen",
@@ -52,6 +58,12 @@ const translations: Translations = {
     freetext_feedback_parse_error: "Ihre Antwort ist kein gültiger aussagenlogischer Ausdruck.",
     dnf: "disjunktive Normalform (DNF)",
     cnf: "konjunktive Normalform (KNF)",
+    "aria.left-parenthesis": "Klammer auf",
+    "aria.right-parenthesis": "Klammer zu",
+    "aria.or": "logisches Oder",
+    "aria.and": "logisches Und",
+    "aria.not": "Negation",
+    "aria.variable": "Variable {{0}}"
   },
 }
 
@@ -267,14 +279,14 @@ function makeFreeTextQuestion(
     feedback: getFreeTextFeedbackFunction(lang, expression, isDNF),
     // checkFormat:,
     typingAid: [
-      { text: "$($", input: "(" },
-      { text: "$)$", input: ")" },
-      { text: "$\\vee$", input: "\\or" },
-      { text: "$\\wedge$", input: "\\and" },
-      { text: "$\\neg$", input: "\\not" },
+      { text: "$($", input: "(", label: t(translations, lang, "aria.left-parenthesis") },
+      { text: "$)$", input: ")", label: t(translations, lang, "aria.right-parenthesis") },
+      { text: "$\\vee$", input: "\\or", label: t(translations, lang, "aria.or") },
+      { text: "$\\wedge$", input: "\\and", label: t(translations, lang, "aria.and") },
+      { text: "$\\neg$", input: "\\not", label: t(translations, lang, "aria.not") },
     ].concat(
       expression.getVariableNames().map((v) => {
-        return { text: `$${v}$`, input: v }
+        return { text: `$${v}$`, input: ` ${v}`, label: t(translations, lang, "aria.variable", [v]) }
       }),
     ),
   }

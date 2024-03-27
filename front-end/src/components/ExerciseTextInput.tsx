@@ -176,7 +176,13 @@ export function ExerciseTextInput({
         <Markdown md={question.bottomText} />
       </div>
       {(question.typingAid ?? []).map((el, index) => (
-        <Button variant="secondary" key={`ta-${index}`} onClick={() => insertText(el.input)}>
+        <Button
+          className="mx-1"
+          variant="secondary"
+          key={`ta-${index}`}
+          onClick={() => insertText(el.input)}
+          aria-label={t("typing-aid.label", [el.label])}
+        >
           <Markdown md={el.text} />
         </Button>
       ))}

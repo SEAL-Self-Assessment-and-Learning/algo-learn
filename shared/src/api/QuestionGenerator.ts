@@ -167,7 +167,7 @@ export interface FreeTextQuestion extends QuestionBase {
   /**
    * If provided, the data can be used to provide buttons to add specific text to the input field.
    */
-  typingAid?: { text: string; input: string }[]
+  typingAid?: { text: string; input: string, label:string }[]
 }
 
 /**
