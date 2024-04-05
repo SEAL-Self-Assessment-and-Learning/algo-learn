@@ -1,14 +1,14 @@
 import { validateParameters } from "../../api/Parameters"
 import {
   FreeTextFeedbackFunction,
+  FreeTextFormatFunction,
   FreeTextQuestion,
   QuestionGenerator,
 } from "../../api/QuestionGenerator"
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
 import Random from "../../utils/random"
 import { tFunction, tFunctional, Translations } from "../../utils/translations"
-import { RecursionFormula } from "../recursion/formula"
-import { sampleLoop } from "./loopsUtils"
+import { sampleLoop } from "./loopsUtilsStars.ts"
 
 const translations: Translations = {
   en: {
@@ -16,24 +16,24 @@ const translations: Translations = {
     description: "Determine the number of iterations in a loop",
     text1: "Consider the following procedure `{{0}}` with integer input ${{1}}$:",
     text2: "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
-    "long-title": "Loops",
-    "simpleExact.description": "Consider the following piece of code:",
-    "simpleExact.prompt": "Number of stars:",
-    "simpleExact.question": "How many stars are printed?",
+    longTitle: "Loops",
+    simpleExactDescription: "Consider the following piece of code:",
+    simpleExactPrompt: "Number of stars:",
+    simpleExactQuestion: "How many stars are printed?",
   },
   de: {
     name: "Schleifen",
     description: "Bestimme die Anzahl der Iterationen in einer Schleife",
     text1: "Betrachte die folgende Prozedur {{0}} mit ganzzahliger Eingabe {{1}}:",
     text2: "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
-    "long-title": "Schleifen",
-    "simpleExact.description": "Betrachte den folgenden Code:",
-    "simpleExact.prompt": "Anzahl der Sterne:",
-    "simpleExact.question": "Wie viele Sterne werden ausgegeben?",
+    longTitle: "Schleifen",
+    simpleExactDescription: "Betrachte den folgenden Code:",
+    simpleExactPrompt: "Anzahl der Sterne:",
+    simpleExactQuestion: "Wie viele Sterne werden ausgegeben?",
   },
 }
 
-export const Loops: QuestionGenerator = {
+export const loops: QuestionGenerator = {
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -47,15 +47,15 @@ export const Loops: QuestionGenerator = {
   generate(generatorPath, lang, parameters, seed) {
     const { t } = tFunction(translations, lang)
 
-    if (!validateParameters(parameters, Loops.expectedParameters)) {
+    if (!validateParameters(parameters, loops.expectedParameters)) {
       throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${Loops.expectedParameters.join(
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${loops.expectedParameters.join(
           ",",
         )}`,
       )
     }
     const permalink = serializeGeneratorCall({
-      generator: RecursionFormula,
+      generator: loops,
       lang,
       parameters,
       seed,
@@ -69,18 +69,28 @@ export const Loops: QuestionGenerator = {
     const description = `
 ${t("text1", [functionName, n])}
 
-\`\`\`python3
+\`\`\`python
 ${functionText}
 \`\`\`
 
 ${t("text2", [`${T}(${n})`])}`
-    const prompt = t("simpleExact.prompt")
+    const prompt = t("simpleExactPrompt")
+    const checkFormat: FreeTextFormatFunction = ({ text }) => {
+      text = text.replace(/\s/g, "")
+      if (text === "") {
+        return { valid: false }
+      }
+      if (isNaN(parseInt(text, 10))) {
+        return { valid: false, message: t("feedback.nan") }
+      }
+      return { valid: true }
+    }
     const feedback: FreeTextFeedbackFunction = ({ text }) => {
       if (text === "") {
         return {
           isValid: false,
           isCorrect: false,
-          FeedbackText: null,
+          message: null,
         }
       }
       const m = text.match(/^\d+$/)
@@ -101,9 +111,10 @@ ${t("text2", [`${T}(${n})`])}`
     }
     const question: FreeTextQuestion = {
       type: "FreeTextQuestion",
-      name: t("long-title"),
+      name: t("longTitle"),
       text: description,
       path: permalink,
+      checkFormat,
       feedback,
       prompt,
     }
