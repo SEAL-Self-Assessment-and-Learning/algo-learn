@@ -27,7 +27,7 @@ export type BoundsOptions =
   | DivisionOption
   | PowOption
 
-export type IfOptions = "none" | "even" | "odd" | "square" | "same"
+export type IfOptions = "none" | "even" | "odd" | "square" | "same" | ">" | "<"
 
 export type WhileOrderOptions = "xy" | "yx" | "xn"
 export type WhileCompareOptions = "==" | "<" | ">" | "<=" | ">="
@@ -194,6 +194,7 @@ export function createIfCondition({
   elseStatement = false,
   numPrint = 0,
   numPrintElse = 0,
+  writeCode = "",
   indent = 0,
 }: {
   innerVar1: string
@@ -202,18 +203,24 @@ export function createIfCondition({
   elseStatement?: boolean
   numPrint?: number
   numPrintElse?: number
+  writeCode?: string
   indent?: number
 }): string {
   let code = ""
   const _ = " ".repeat(indent)
-  if (condition === "same") {
+  if (condition === "same" || condition === ">" || condition === "<") {
     code += `${_}if ${innerVar1} == ${innerVar2}:\n`
   } else {
     if (condition !== "none") {
       code += `${_}if ${innerVar1} is ${condition}:\n`
     }
   }
-  code += printStars(numPrint, indent + (condition !== "none" ? 2 : 0))
+  if (numPrint > 0) {
+    code += printStars(numPrint, indent + (condition !== "none" ? 2 : 0))
+  }
+  if (writeCode !== "") {
+    code += `${_}  ${writeCode}`
+  }
 
   if (elseStatement) {
     code += `${_}else:\n`
@@ -231,7 +238,7 @@ export function createIfBreak({ br = true }: { br?: boolean }): string {
   return br ? "break\n" : ""
 }
 
-export function createVariable ({
+export function createVariable({
   variable,
   value,
   indent = 0,
@@ -240,7 +247,7 @@ export function createVariable ({
   value: string
   indent?: number
 }): string {
-  return `  ${" ".repeat(indent)}${variable} = ${value}\n`
+  return `${" ".repeat(indent)}${variable} = ${value}\n`
 }
 
 export function createWhileChangeValues({

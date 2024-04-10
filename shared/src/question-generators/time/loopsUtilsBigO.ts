@@ -56,25 +56,14 @@ export function sampleBigO({
   const loopType = random.choice(loopTypes)
   let code = ``
   let solution: ProductTerm | undefined = undefined
+  const innerVar = random.choice(availableVarNames)
 
   if (loopType === "for") {
-    const innerVar = random.choice(availableVarNames)
 
-    // const options = random.choice([])
-    const start = "2"
-    code += createForLine({
-      innerVar,
-      start,
-      startManipulation: { type: "mult", value: 2 },
-      end: variable,
-      endManipulation: { type: "pow", value: 2 },
-      step: { type: "add", value: -2 },
-      indent,
-    })
+    const { code: forCode, solution: forSolution } = createForLoop({ random, variable, innerVar, indent })
+    code += forCode
+    solution = forSolution
 
-    solution = createProductTerm({
-      polyexponent: 1,
-    })
   }
 
   if (solution === undefined) {
@@ -82,4 +71,32 @@ export function sampleBigO({
   }
 
   return { code, solution }
+}
+
+function createForLoop ({
+    random,
+    variable,
+    innerVar,
+    indent
+  }: {
+  random: Random,
+  variable: string,
+  innerVar: string,
+  indent: number
+}) {
+
+  const asymptoticOptions = random.weightedChoice([
+    ["1", 1],
+    ["log(n)", 1],
+    ["n", 1],
+    ["n log(n)", 1],
+    ["n^2", 1],
+    ["n^2 log(n)", 1],
+    ["n^3", 1],
+    ["2^n", 1],
+  ])
+
+  const solution: ProductTerm = createProductTerm({ polyexponent: 1 })
+
+  return { code: "", solution: solution}
 }

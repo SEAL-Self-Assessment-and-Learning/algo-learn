@@ -227,7 +227,7 @@ ${t("bigOQuestion", [variable])}
 
     const feedback: FreeTextFeedbackFunction = ({ text }) => {
       solution.coefficient = new Fraction(1)
-      const correctAnswer = "$\\Theta(" + solution.toLatex("n") + ")$"
+      const correctAnswer = "$\\Theta(" + solution.toLatex(variable) + ")$"
       const sumProductTerm: SumProductTerm = mathNodeToSumProductTerm(math.parse(text))
 
       return {

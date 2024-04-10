@@ -1,8 +1,11 @@
 import {
   allWhileCases,
   BoundsOptions,
-  createForLine, createIfBreak,
-  createIfCondition, createIfContinue, createVariable,
+  createForLine,
+  createIfBreak,
+  createIfCondition,
+  createIfContinue,
+  createVariable,
   createWhileChangeValues,
   createWhileLine,
   getCompare,
@@ -469,7 +472,7 @@ function createForForLoop(
   })
 
   // continue middle
-  code += createIfContinue({con: continueMiddle})
+  code += createIfContinue({ con: continueMiddle })
 
   let startManipulation: BoundsOptions = "none"
   let startValue = startSecond.toString()
@@ -508,7 +511,7 @@ function createForForLoop(
   })
 
   // break end
-  code += createIfBreak({br: breakEnd})
+  code += createIfBreak({ br: breakEnd })
 
   // print stars after
   if (printStarsAfter) {
@@ -608,7 +611,6 @@ function createWhileLoop(
   starsSecondLoop: number = 0,
   insertCode: string = "",
 ) {
-
   function condition(i: number, j: number) {
     return vars === "xy"
       ? compareTwoValues(
@@ -1097,14 +1099,14 @@ function createWhileLoop(
   ) {
     compareVar = random.choice(["var1", "var2"])
     // introduce var1 and var2
-    code += createVariable({variable: innerVar, value: startVar1.toString()})
-    code += createVariable({variable: innerVar2, value: startVar2.toString()})
+    code += createVariable({ variable: innerVar, value: startVar1.toString(), indent: 0 })
+    code += createVariable({ variable: innerVar2, value: startVar2.toString(), indent: 0 })
   } else if (cOption.toLowerCase().indexOf("x") !== -1) {
-    code += createVariable({variable: innerVar, value: startVar1.toString()})
+    code += createVariable({ variable: innerVar, value: startVar1.toString(), indent: 0 })
     compareVar = "var1"
   } else if (cOption.toLowerCase().indexOf("y") !== -1) {
     compareVar = "var2"
-    code += createVariable({variable: innerVar, value: startVar2.toString()})
+    code += createVariable({ variable: innerVar, value: startVar2.toString(), indent: 0 })
   }
 
   // while loop statement
