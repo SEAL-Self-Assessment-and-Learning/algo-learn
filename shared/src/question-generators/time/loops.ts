@@ -7,7 +7,7 @@ import {
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
 import Random from "../../utils/random"
 import { tFunction, tFunctional, Translations } from "../../utils/translations"
-import { RecursionFormula } from "../recursion/formula"
+import { recursionFormula } from "../recursion/formula"
 import { sampleLoop } from "./loopsUtils"
 
 const translations: Translations = {
@@ -55,7 +55,7 @@ export const Loops: QuestionGenerator = {
       )
     }
     const permalink = serializeGeneratorCall({
-      generator: RecursionFormula,
+      generator: recursionFormula,
       lang,
       parameters,
       seed,

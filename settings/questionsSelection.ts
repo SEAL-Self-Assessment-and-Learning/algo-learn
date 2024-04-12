@@ -10,8 +10,8 @@ import { LandauNotation } from "../shared/src/question-generators/asymptotics/la
 import { AsymptoticsPreciseLanguage } from "../shared/src/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "../shared/src/question-generators/asymptotics/sort"
 import { SimplifySum } from "../shared/src/question-generators/asymptotics/sum"
-import { RecursionFormula } from "../shared/src/question-generators/recursion/formula"
-import { RecurrenceMaster } from "../shared/src/question-generators/recursion/recurrenceMaster"
+import { recursionFormula } from "../shared/src/question-generators/recursion/formula"
+import { recurrenceMaster } from "../shared/src/question-generators/recursion/recurrenceMaster"
 import { Loops } from "../shared/src/question-generators/time/loops"
 
 /** List of all question routes */
@@ -42,11 +42,11 @@ export const allQuestionGeneratorRoutes: QuestionRoutes = [
   },
   {
     path: "recursion/formula",
-    generator: RecursionFormula,
+    generator: recursionFormula,
   },
   {
     path: "recursion/master",
-    generator: RecurrenceMaster,
+    generator: recurrenceMaster,
   },
   {
     path: "time/loops",

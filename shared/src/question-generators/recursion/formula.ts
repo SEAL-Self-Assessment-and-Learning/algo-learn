@@ -17,27 +17,29 @@ const translations: Translations = {
     basecase: "The base case is",
     text1: "Consider the following recursive procedure `{{0}}` with integer input ${{1}}$:",
     text2: "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
-    "long-name": "Recurrence Relation",
+    longName: "Recurrence Relation",
     question: "What is the recurrence relation of",
     name: "Recurrence",
     description: "Determine the recurrence relation of a recursive function",
     bottomnote: "Note: This field expects a string of the form `{{0}}` as input.",
-    "feedback.incomplete": "Incomplete or too complex",
+    feedbackIncomplete: "Incomplete or too complex",
+    invalidName: "Invalid function name, please use: {{0}} and {{1}}",
   },
   de: {
     basecase: "Der Basisfall ist",
     text1: "Betrachte die folgende rekursive Prozedur `{{0}}` mit ganzzahliger Eingabe ${{1}}$:",
     text2: "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
-    "long-name": "Rekurrenzrelation",
+    longName: "Rekurrenzrelation",
     question: "Was ist die Rekurrenzrelation von",
     name: "Rekurrenz",
     description: "Bestimme die Rekurrenzrelation einer rekursiven Funktion",
     bottomnote: "Hinweis: Dieses Feld erwartet einen String der Form `{{0}}` als Eingabe.",
-    "feedback.incomplete": "Nicht vollständig oder zu komplex",
+    feedbackIncomplete: "Nicht vollständig oder zu komplex",
+    invalidName: "Ungültiger Funktionsname, bitte verwende: {{0}} und {{1}}",
   },
 }
 
-export const RecursionFormula: QuestionGenerator = {
+export const recursionFormula: QuestionGenerator = {
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -50,7 +52,7 @@ export const RecursionFormula: QuestionGenerator = {
   ],
   generate(generatorPath, lang, parameters, seed) {
     const permalink = serializeGeneratorCall({
-      generator: RecursionFormula,
+      generator: recursionFormula,
       lang,
       parameters,
       seed,
@@ -59,24 +61,26 @@ export const RecursionFormula: QuestionGenerator = {
     const random = new Random(seed)
     const { t } = tFunction(translations, lang)
 
-    if (!validateParameters(parameters, RecursionFormula.expectedParameters)) {
+    if (!validateParameters(parameters, recursionFormula.expectedParameters)) {
       throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${RecursionFormula.expectedParameters.join(
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${recursionFormula.expectedParameters.join(
           ", ",
         )}`,
       )
     }
 
     const variant = parameters.variant as "choice" | "input"
-    const { functionText, functionName, n, b, a, d, c } = sampleRecursiveFunction(random)
+    const divOrSub: "div" | "sub" = random.choice(["div", "sub"])
+    const { functionText, functionName, n, b, a, d, c } = sampleRecursiveFunction(divOrSub, random)
 
     const T = random.choice("TABCDEFGHS".split(""))
-    const answers = sampleRecurrenceAnswers({ random, T, n, a, b, c, d })
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const answers = sampleRecurrenceAnswers({ random, divOrSub, T, n, a, b, c, d })
 
     let text = `
 ${format(t("text1"), [functionName, n])}
 
-\`\`\`python3
+\`\`\`python
 ${functionText.trim()}
 \`\`\`
 
@@ -96,7 +100,7 @@ ${format(t("text2"), [`${T}(${n})`])}`
     if (variant === "choice") {
       question = {
         type: "MultipleChoiceQuestion",
-        name: t("long-name"),
+        name: t("longName"),
         path: permalink,
         text: text,
         answers: answers.map(({ element }) => element),
@@ -109,20 +113,26 @@ ${format(t("text2"), [`${T}(${n})`])}`
       }
     } else {
       const prompt = `$${T}(${n}) =$ `
-      const bottomText = t("bottomnote", [`a ${T}(${n}/b) + c`])
+      const bottomText = t("bottomnote", [`a ${T}(${n}${divOrSub === "div" ? "/" : "-"}b) + c`])
 
       const checkFormat: FreeTextFormatFunction = ({ text }) => {
         if (text.trim() === "") return { valid: false }
         try {
-          const { a, b, c, T, n } = parseRecursiveFunction(text)
-          return { valid: true, message: `${a} ${T}(${n}/${b}) + ${c}` }
+          const parsed = parseRecursiveFunction(text)
+          if (parsed.T !== T || parsed.n !== n) {
+            return { valid: false, message: t("invalidName", [T, n]) }
+          }
+          return {
+            valid: true,
+            message: `${parsed.a} ${parsed.T}(${parsed.n}${parsed.divOrSub === "div" ? "/" : "-"}${parsed.b}) + ${parsed.c}`,
+          }
         } catch (e) {
-          return { valid: false, message: t("feedback.incomplete") }
+          return { valid: false, message: t("feedbackIncomplete") }
         }
       }
 
       const feedback: FreeTextFeedbackFunction = ({ text }) => {
-        const correctAnswer = `$${a} ${T}(${n}/${b}) + ${c}$`
+        const correctAnswer = `$${a} ${T}(${n}${divOrSub === "div" ? "/" : "-"}${b}) + ${c}$`
 
         let p: ReturnType<typeof parseRecursiveFunction>
         try {
@@ -130,20 +140,21 @@ ${format(t("text2"), [`${T}(${n})`])}`
         } catch (e) {
           return {
             correct: false,
-            message: t("feedback.incomplete"),
+            message: t("feedbackIncomplete"),
             correctAnswer,
           }
         }
 
         return {
-          correct: p.a === a && p.b === b && p.c === c && p.T === T && p.n === n,
+          correct:
+            p.a === a && p.b === b && p.c === c && p.T === T && p.n === n && p.divOrSub === divOrSub,
           correctAnswer,
         }
       }
       question = {
         type: "FreeTextQuestion",
         path: permalink,
-        name: t("long-name"),
+        name: t("longName"),
         text,
         prompt,
         bottomText,
