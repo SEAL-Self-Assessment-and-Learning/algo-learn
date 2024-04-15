@@ -83,7 +83,7 @@ export function sampleExactIfEven({
   - whilewhileBlock -> nested while loop (the second is independent of the first)
    */
   // const loopType = random.choice(["for", "forfor", "while", "whilewhileBlock"])
-  const loopType = random.choice(["while"])
+  const loopType = random.choice(["for", "forfor", "while"])
 
   if (loopType === "for") {
     const forResult = createForLoop(innerVar, numPrint, numPrintElse, code, _, indent, numStars, random)
@@ -472,7 +472,7 @@ function createForForLoop(
   })
 
   // continue middle
-  code += createIfContinue({ con: continueMiddle })
+  code += createIfContinue({ con: continueMiddle, indent: 2 })
 
   let startManipulation: BoundsOptions = "none"
   let startValue = startSecond.toString()
@@ -511,7 +511,7 @@ function createForForLoop(
   })
 
   // break end
-  code += createIfBreak({ br: breakEnd })
+  code += createIfBreak({ br: breakEnd, indent: 4 })
 
   // print stars after
   if (printStarsAfter) {
