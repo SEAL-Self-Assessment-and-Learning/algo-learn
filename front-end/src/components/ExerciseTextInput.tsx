@@ -83,6 +83,8 @@ export function ExerciseTextInput({
         text +
         userInputRef.current.value.slice(userInputRef.current.selectionEnd ?? 0),
     )
+
+    userInputRef.current.focus()
   }
 
   function handleClick() {
@@ -118,28 +120,31 @@ export function ExerciseTextInput({
 
   const msgColor =
     mode === "draft" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
-  const message =
-    mode === "correct" ? (
-      <b className="text-2xl">{t("feedback.correct")}</b>
-    ) : mode === "incorrect" ? (
-      [
-        feedbackObject?.feedbackText ? (
-          <>
-            <Markdown md={feedbackObject.feedbackText} />
-            <br />
-          </>
-        ) : null,
-        feedbackObject?.correctAnswer ? (
-          <>
-            <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
-            <br />
-            <Markdown md={feedbackObject.correctAnswer} />
-          </>
-        ) : (
-          <b className="text-2xl">{t("feedback.incorrect")}</b>
-        ),
-      ]
-    ) : null
+
+  const message = []
+  if (mode === "correct") {
+    message.push(<b className="text-2xl">{t("feedback.correct")}</b>)
+  } else if (mode === "incorrect") {
+    if (feedbackObject?.feedbackText) {
+      message.push(
+        <>
+          <Markdown md={feedbackObject.feedbackText} />
+          <br />
+        </>,
+      )
+    }
+    if (feedbackObject?.correctAnswer) {
+      message.push(
+        <>
+          <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
+          <br />
+          <Markdown md={feedbackObject.correctAnswer} />
+        </>,
+      )
+    } else {
+      message.push(<b className="text-2xl">{t("feedback.incorrect")}</b>)
+    }
+  }
 
   return (
     <InteractWithQuestion
@@ -175,17 +180,18 @@ export function ExerciseTextInput({
       <div className="py-5 text-slate-600 dark:text-slate-400">
         <Markdown md={question.bottomText} />
       </div>
-      {(question.typingAid ?? []).map((el, index) => (
-        <Button
-          className="mx-1"
-          variant="secondary"
-          key={`ta-${index}`}
-          onClick={() => insertText(el.input)}
-          aria-label={t("typing-aid.label", [el.label])}
-        >
-          <Markdown md={el.text} />
-        </Button>
-      ))}
+      <div className="flex flex-wrap gap-2">
+        {(question.typingAid ?? []).map((el, index) => (
+          <Button
+            variant="secondary"
+            key={`ta-${index}`}
+            onClick={() => insertText(el.input)}
+            aria-label={t("typing-aid.label", [el.label])}
+          >
+            <Markdown md={el.text} />
+          </Button>
+        ))}
+      </div>
     </InteractWithQuestion>
   )
 }

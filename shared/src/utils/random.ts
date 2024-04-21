@@ -58,42 +58,52 @@ export default class Random {
   }
 
   /**
-   * Splits an input number into an array of random numbers that sum up to the input number
-   * @param input the number to split
-   * @param numSplits how often the number is split
-   * @param min the minimal value a random split must have
-   * @param max the maximal value a random split must have
+   * Generates a uniform random integer partition of input into numParts parts
+   * where each part is at least minPartSize big.
+   * @param input the number to partition
+   * @param numParts the number of parts in the partition
+   * @param minPartSize the minimal value a random split must have
    */
-  split(
-    input: number,
-    numSplits: number,
-    min: number = 0,
-    max: number | undefined = undefined,
-  ): number[] {
-    if (max === undefined) max = input
-    if (numSplits < 1) throw new Error("Value Error: numSplits needs to be positive")
-    if (numSplits * min > input)
+  partition(input: number, numParts: number, minPartSize: number = 0): number[] {
+    if (numParts < 1) throw new Error("Value Error: numSplits needs to be positive")
+    if (minPartSize < 0) throw new Error("Value Error: min needs to be non-negative")
+    if (numParts * minPartSize > input)
       throw new Error(
-        "Value Error: input cannot be split into numSplits values that are at least min big",
-      )
-    if (numSplits * max < input)
-      throw new Error(
-        "Value Error: input cannot be split into numSplits values that are at most max big",
+        "Value Error: input cannot be partitioned into numSplits values that are at least min big",
       )
 
-    let leftToSplit = input
-    const result = []
-    for (let i = 0; i < numSplits - 1; i++) {
-      const nextInt = this.int(
-        Math.max(min, leftToSplit - (numSplits - i - 1) * max),
-        Math.min(max, leftToSplit - (numSplits - i - 1) * min),
-      )
-      leftToSplit -= nextInt
-      result.push(nextInt)
+    // handle trivial case
+    if (numParts === 1) return [input]
+
+    const maxBoundaryPosition = input - minPartSize * numParts + numParts - 1
+
+    // draw random subset of {1,2,...,maxBoundaryPosition}
+    let boundaries: number[] = []
+    if (maxBoundaryPosition < 2 * numParts) {
+      // optimize for small input / big numParts => generate full list and get random subset
+      const tmp = Array.from({ length: maxBoundaryPosition }, (_, i) => i + 1)
+      boundaries = this.subset(tmp, numParts - 1)
+    } else {
+      // optimize for big input / small numParts => rejection sampling
+      let boundary
+      for (let i = 0; i < numParts - 1; i++) {
+        do {
+          boundary = this.int(1, maxBoundaryPosition)
+        } while (boundaries.includes(boundary))
+        boundaries.push(boundary)
+      }
     }
 
-    result.push(leftToSplit)
-    return this.shuffle(result)
+    boundaries.sort()
+
+    // turn boundaries into partition
+    const partition: number[] = [boundaries[0] - 1 + minPartSize]
+    for (let i = 1; i < boundaries.length; i++) {
+      partition.push(boundaries[i] - boundaries[i - 1] - 1 + minPartSize)
+    }
+    partition.push(maxBoundaryPosition - boundaries[boundaries.length - 1] + minPartSize)
+
+    return partition
   }
 
   /**
@@ -127,11 +137,9 @@ export default class Random {
    * @param array
    * @param size Size of the first array. If not provided a random number is chosen.
    */
-  splitArray<T>(array: ReadonlyArray<T>, size?: number): Array<T>[] {
-    if (size === undefined) size = this.int(1, array.length - 1)
-
-    if (size > array.length) {
-      throw new Error("Subset size cannot be larger than the array size")
+  splitArray<T>(array: ReadonlyArray<T>, size: number): Array<T>[] {
+    if (size <= 0 || size > array.length) {
+      throw new Error("Subset size has to be in [0, array.length-1]")
     }
 
     const copy = array.slice()
@@ -147,7 +155,7 @@ export default class Random {
    * @param weights - An array of weights.
    * @returns A random index from the array.
    */
-  weightedIndex(weights: number[]): number {
+  weightedIndex(weights: readonly number[]): number {
     const sumOfWeights = weights.reduce((acc, weight) => acc + weight, 0)
     const randomValue = this.float(0, sumOfWeights)
     let accumulatedWeight = 0
@@ -177,18 +185,29 @@ export default class Random {
   weightedChoice<T>(choicesAndWeights: ReadonlyArray<[element: T, weight: number]>): T
   weightedChoice<T>(
     data: ReadonlyArray<[element: T, weight: number]> | ReadonlyArray<T>,
-    weights: number[] | undefined = undefined,
+    weights?: number[],
   ): T {
-    let elements: readonly T[]
+    if (data.length === 0) throw new Error("Value Error: no elements to choose from.")
 
-    if (weights === undefined) {
-      elements = (data as ReadonlyArray<[element: T, weight: number]>).map((w) => w[0])
-      weights = (data as ReadonlyArray<[element: T, weight: number]>).map((w) => w[1])
-    } else {
-      elements = data as ReadonlyArray<T>
+    let elements: readonly T[]
+    let tmpWeights: readonly number[]
+
+    function isSingleValueCall(_: any, weights: any): _ is ReadonlyArray<[element: T, weight: number]> {
+      return weights === undefined
     }
 
-    return elements[this.weightedIndex(weights)]
+    if (isSingleValueCall(data, weights)) {
+      elements = data.map((w) => w[0])
+      tmpWeights = data.map((w) => w[1])
+    } else {
+      elements = data
+      tmpWeights = weights ?? []
+    }
+
+    if (tmpWeights === undefined || elements.length !== tmpWeights.length)
+      throw new Error("Value Error: number of elements and number of weights are not equal.")
+
+    return elements[this.weightedIndex(tmpWeights)]
   }
 
   /**

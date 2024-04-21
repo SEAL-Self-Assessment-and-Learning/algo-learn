@@ -241,12 +241,7 @@ test("shuffle", () => {
 describe("parser", () => {
   test("errors", () => {
     for (const expr of ["(()", "(A", "\\not", "A \\and"]) {
-      try {
-        PropositionalLogicParser.parse(expr)
-        expect(true).toBe(false)
-      } catch (e) {
-        expect(e).toBeInstanceOf(ParserError)
-      }
+      expect(PropositionalLogicParser.parse(expr)).toBeInstanceOf(ParserError)
     }
   })
 
@@ -258,7 +253,13 @@ describe("parser", () => {
       ["\\not(A)", "\\not A"],
       ["(\\not A)", "\\not A"],
     ].forEach(([expr, expectedStr]) => {
-      expect(PropositionalLogicParser.parse(expr).toString()).toEqual(expectedStr)
+      const parseResult = PropositionalLogicParser.parse(expr)
+      if (parseResult instanceof ParserError) {
+        // expect() does not narrow down the type, so if is used here
+        expect(parseResult).not.toBeInstanceOf(ParserError)
+      } else {
+        expect(parseResult.toString()).toEqual(expectedStr)
+      }
     })
   })
 
@@ -269,7 +270,13 @@ describe("parser", () => {
       "\\not A \\and (B \\or C)",
       "(\\not A \\or B) \\and (B \\or C)",
     ]) {
-      expect(PropositionalLogicParser.parse(expr).toString()).toEqual(expr)
+      const parseResult = PropositionalLogicParser.parse(expr)
+      if (parseResult instanceof ParserError) {
+        // expect() does not narrow down the type, so if is used here
+        expect(parseResult).not.toBeInstanceOf(ParserError)
+      } else {
+        expect(parseResult.toString()).toEqual(expr)
+      }
     }
   })
 })

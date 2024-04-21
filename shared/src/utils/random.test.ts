@@ -86,36 +86,28 @@ test("Check that random.subset returns a subset of the correct size.", () => {
   }
 })
 
-describe("random.split", () => {
+describe("random.partition", () => {
   const random = new Random("some fixed seed")
-  test("correct num of splits", () => {
-    expect(random.split(100, 5).length).toEqual(5)
+  test("correct num of parts", () => {
+    expect(random.partition(100, 1).length).toEqual(1)
+    expect(random.partition(100, 5).length).toEqual(5)
   })
 
   test("correct sum", () => {
-    expect(random.split(100, 5).reduce((sum, val) => sum + val, 0)).toEqual(100)
+    expect(random.partition(100, 5).reduce((sum, val) => sum + val, 0)).toEqual(100)
   })
 
-  test("values in [min, max]", () => {
-    random.split(100, 5).forEach((value) => {
+  test("valid part sizes", () => {
+    random.partition(100, 5).forEach((value) => {
       expect(value).toBeGreaterThanOrEqual(0)
       expect(value).toBeLessThanOrEqual(100)
     })
 
-    random.split(100, 5, 15, 25).forEach((value) => {
+    random.partition(100, 5, 15).forEach((value) => {
       expect(value).toBeGreaterThanOrEqual(15)
-      expect(value).toBeLessThanOrEqual(25)
     })
 
-    random.split(100, 5, 20).forEach((value) => {
-      expect(value).toEqual(20)
-    })
-
-    random.split(100, 5, 0, 20).forEach((value) => {
-      expect(value).toEqual(20)
-    })
-
-    random.split(100, 5, 20, 20).forEach((value) => {
+    random.partition(100, 5, 20).forEach((value) => {
       expect(value).toEqual(20)
     })
   })
@@ -124,7 +116,7 @@ describe("random.split", () => {
 describe("random.splitArray", () => {
   const random = new Random("some fixed seed")
   const array = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-  const [leftArr, rightArr] = random.splitArray(array)
+  const [leftArr, rightArr] = random.splitArray(array, random.int(1, array.length - 1))
   test("No elements are lost", () => {
     array.forEach((el) => {
       expect(leftArr.includes(el) || rightArr.includes(el)).toBeTruthy()

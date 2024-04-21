@@ -27,7 +27,7 @@ const translations: Translations = {
     feedback_contradiction: "The expression evaluates to false for all variable assignments.",
     feedback_tautology: "The expression evaluates to true for all variable assignments.",
     feedback_examples:
-      "The expression can be **falsified** by \\[{{0}}\\] and **verified** by \\[{{1}}\\]",
+      "The expression can be **falsified** by \\[{{0}}\\] and **satisfied** by \\[{{1}}\\]",
   },
   de: {
     name: "Erfüllbarkeitseigenschaften",
@@ -60,11 +60,11 @@ function getAdditionalFeedbackText(
   if (satisfiable === false) return t(translations, lang, "feedback_contradiction")
   if (falsifiable === false) return t(translations, lang, "feedback_tautology")
 
-  const falsifiedBy = Object.keys(satisfiable)
-    .map((variable) => `${variable} = ${satisfiable[variable] ? "\\mathtt{true}" : "\\mathtt{false}"}`)
-    .join(", ")
-  const verifiedBy = Object.keys(falsifiable)
+  const falsifiedBy = Object.keys(falsifiable)
     .map((variable) => `${variable} = ${falsifiable[variable] ? "\\mathtt{true}" : "\\mathtt{false}"}`)
+    .join(", ")
+  const verifiedBy = Object.keys(satisfiable)
+    .map((variable) => `${variable} = ${satisfiable[variable] ? "\\mathtt{true}" : "\\mathtt{false}"}`)
     .join(", ")
   return t(translations, lang, "feedback_examples", [falsifiedBy, verifiedBy])
 }

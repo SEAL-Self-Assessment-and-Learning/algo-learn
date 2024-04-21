@@ -12,40 +12,52 @@ export type TruthTable = boolean[]
 
 abstract class SyntaxTreeNode {
   public negated: boolean = false
+
   /**
    * Returns a deep copy of the Operator
    * @returns
    */
   public abstract copy(): SyntaxTreeNode
+
   /**
    * Evaluates the expression for the given values
    * @param values
    */
   public abstract eval(values: VariableValues): boolean
+
   public abstract toString(latex: boolean): string
+
   /**
    * Moves negation inwards to the literals
    */
   public abstract simplifyNegation(): this
+
   /**
    * replaces all \\xor, => and <=> operators by an equivalent \\and / \\or expression
    */
   public abstract simplifyLocal(): this
+
   /**
    * replaces all \\xor, => and <=> operators by an equivalent \\and / \\or expression
    */
   public abstract simplify(): this
+
   /**
    * Permutes the syntax tree
    */
   public abstract shuffle(random: Random): this
+
   /**
    * returns an array containing all variable names in the expression
    */
   public abstract getVariableNames(): string[]
+
   public abstract isConjunction(): boolean
+
   public abstract isDisjunction(): boolean
+
   public abstract isCNF(): boolean
+
   public abstract isDNF(): boolean
 
   public negate(): this {
@@ -573,9 +585,9 @@ export class Operator extends SyntaxTreeNode {
 
   public invertRandomLiterals(random: Random, maxNumVariables: number): this {
     if (maxNumVariables > 0) {
-      const maxNumVariablesSplit = random.split(maxNumVariables, 2)
-      this.leftOperand.invertRandomLiterals(random, maxNumVariablesSplit[0])
-      this.rightOperand.invertRandomLiterals(random, maxNumVariablesSplit[1])
+      const [maxNumVariablesLeft, maxNumVariablesRight] = random.partition(maxNumVariables, 2)
+      this.leftOperand.invertRandomLiterals(random, maxNumVariablesLeft)
+      this.rightOperand.invertRandomLiterals(random, maxNumVariablesRight)
     }
 
     return this
@@ -585,7 +597,7 @@ export class Operator extends SyntaxTreeNode {
 export type SyntaxTreeNodeType = Operator | Literal
 
 function isOperator(obj: any): obj is Operator {
-  return (obj as Operator).type !== undefined
+  return obj instanceof Operator
 }
 
 /**
@@ -597,7 +609,7 @@ function isOperator(obj: any): obj is Operator {
 export function numToVariableValues(num: number, variableNames: string[]): VariableValues {
   const values: VariableValues = {}
   let i = 0
-  while (num) {
+  while (num && i < variableNames.length) {
     values[variableNames[i]] = (num & 1) === 1
     num >>= 1
     i++
@@ -656,7 +668,7 @@ export class ParserError extends Error {
 }
 
 export class PropositionalLogicParser {
-  public static parse(str: string): SyntaxTreeNodeType {
+  private static parseRec(str: string): SyntaxTreeNodeType {
     str = str.trim()
 
     // strBeginning[0] is the whole matched string
@@ -676,7 +688,7 @@ export class PropositionalLogicParser {
     if (strBeginning[2] === "(") {
       nextTokenStartIndex =
         PropositionalLogicParser.findClosingParenthesisPos(str, strBeginning[0].length - 1) + 1
-      leftOperand = PropositionalLogicParser.parse(
+      leftOperand = PropositionalLogicParser.parseRec(
         str.substring(strBeginning[0].length, nextTokenStartIndex - 1),
       )
     } else {
@@ -702,8 +714,18 @@ export class PropositionalLogicParser {
     return new Operator(
       operator[1] as BinaryOperatorType,
       leftOperand,
-      PropositionalLogicParser.parse(str.slice(nextTokenEndIndex)),
+      PropositionalLogicParser.parseRec(str.slice(nextTokenEndIndex)),
     )
+  }
+
+  public static parse(str: string): SyntaxTreeNodeType | ParserError {
+    try {
+      return PropositionalLogicParser.parseRec(str)
+    } catch (e) {
+      if (e instanceof ParserError) return e
+
+      throw e
+    }
   }
 
   /**
@@ -773,7 +795,7 @@ function generateBetterRandomExpression(
   }
 
   // At this point we have at least 3 more leaves, so we distribute them over the two branches of this operator and recurse
-  const [leftNumLeaves, rightNumLeaves] = random.split(numLeaves, 2, 1)
+  const [leftNumLeaves, rightNumLeaves] = random.partition(numLeaves, 2, 1)
 
   // if the right subtree will be a leave, reserve its name
   const reservedName = rightNumLeaves === 1 ? random.choice(restrictedVariableNames) : null

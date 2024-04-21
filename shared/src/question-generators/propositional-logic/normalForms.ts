@@ -7,9 +7,11 @@ import {
   QuestionGenerator,
 } from "../../api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "../../api/QuestionRouter.ts"
+import { _ } from "../../utils/generics.ts"
 import {
   ExpressionProperties,
   generateRandomExpression,
+  ParserError,
   PropositionalLogicParser,
   SyntaxTreeNodeType,
 } from "../../utils/propositionalLogic.ts"
@@ -39,23 +41,23 @@ const translations: Translations = {
     "aria.or": "logical or",
     "aria.and": "logical and",
     "aria.not": "negation",
-    "aria.variable": "variable {{0}}"
+    "aria.variable": "variable {{0}}",
   },
   de: {
     name: "Normalformen",
     description: "Finde die richtige Normalform zu einer gegebenen aussagenlogischen Formel.",
     param_size: "Die Anzahl der verwendeten Variablen",
     choice_question:
-      "Betrachten Sie den folgenden aussagenlogischen Ausdruck \\[{{0}}\\] Welche der folgenden Aussagen treffen auf den Ausdruck zu?",
+      "Betrachte den folgenden aussagenlogischen Ausdruck \\[{{0}}\\] Welche der folgenden Aussagen treffen auf den Ausdruck zu?",
     freetext_question:
-      "Betrachten Sie den folgenden aussagenlogischen Ausdruck \\[{{0}}\\] Geben Sie eine äquivalente {{1}} an.",
+      "Betrachte den folgenden aussagenlogischen Ausdruck \\[{{0}}\\] Geben Sie eine äquivalente {{1}} an.",
     freetext_prompt: "Normalform:",
-    freetext_bottom_text: "Verwenden sie die folgenden Buttons als Eingabehilfe.",
-    freetext_feedback_not_equivalent: "Ihre Antwort ist nicht äquivalent zum gegebenen Ausdruck.",
+    freetext_bottom_text: "Verwende die folgenden Buttons als Eingabehilfe.",
+    freetext_feedback_not_equivalent: "Deine Antwort ist nicht äquivalent zum gegebenen Ausdruck.",
     freetext_feedback_unknown_variables:
-      "Ihre Antwort verwendet andere Variablen als der gegebene Ausdruck.",
-    freetext_feedback_no_normal_form: "Ihre Antwort ist keine {{0}}.",
-    freetext_feedback_parse_error: "Ihre Antwort ist kein gültiger aussagenlogischer Ausdruck.",
+      "Deine Antwort verwendet andere Variablen als der gegebene Ausdruck.",
+    freetext_feedback_no_normal_form: "Deine Antwort ist keine {{0}}.",
+    freetext_feedback_parse_error: "Deine Antwort ist kein gültiger aussagenlogischer Ausdruck.",
     dnf: "disjunktive Normalform (DNF)",
     cnf: "konjunktive Normalform (KNF)",
     "aria.left-parenthesis": "Klammer auf",
@@ -63,7 +65,7 @@ const translations: Translations = {
     "aria.or": "logisches Oder",
     "aria.and": "logisches Und",
     "aria.not": "Negation",
-    "aria.variable": "Variable {{0}}"
+    "aria.variable": "Variable {{0}}",
   },
 }
 
@@ -132,7 +134,7 @@ export const NormalForms: QuestionGenerator = {
 
     const question =
       parameters["variant"] === undefined || <string>parameters["variant"] === "choice"
-        ? makeMultipleChoiceQuestion(lang, path, random, expression, dnf)
+        ? makeMultipleChoiceQuestion(lang, path, random, expression, normalForm, dnf)
         : makeFreeTextQuestion(lang, path, expression, dnf)
 
     return {
@@ -151,37 +153,42 @@ function makeMultipleChoiceQuestion(
   path: string,
   random: Random,
   expression: SyntaxTreeNodeType,
+  correctNormalForm: SyntaxTreeNodeType,
   isDNF: boolean,
 ): MultipleChoiceQuestion {
-  const correctNormalForm = isDNF ? expression.toDNF() : expression.toCNF()
   const correctAnswerTruthTable = correctNormalForm.getTruthTable().truthTable
   const correctAnswerStr = correctNormalForm.toString(true)
 
   const answers: string[] = []
-
-  let newWrongAnswer: SyntaxTreeNodeType
-  let newWrongAnswerStr: string
 
   const wrongAnswerStrategies: (() => SyntaxTreeNodeType)[] = [
     () => {
       return correctNormalForm.copy().invertRandomLiterals(random, random.int(2, 4))
     },
     () => {
-      const tmpExpr = expression.copy().invertRandomLiterals(random, 1)
-      return isDNF ? tmpExpr.toDNF() : tmpExpr.toCNF()
+      while (true) {
+        const tmpExpr = expression.copy().invertRandomLiterals(random, random.int(1, 3))
+        const { satisfiable, falsifiable } = tmpExpr.getProperties()
+        if (satisfiable !== false && falsifiable !== false)
+          return isDNF ? tmpExpr.toDNF() : tmpExpr.toCNF()
+      }
     },
     () => {
-      const tmpExpr = expression.copy().invertRandomLiterals(random, 1)
-      return random.bool() ? tmpExpr.toDNF() : tmpExpr.toCNF()
+      while (true) {
+        const tmpExpr = expression.copy().invertRandomLiterals(random, random.int(1, 3))
+        const { satisfiable, falsifiable } = tmpExpr.getProperties()
+        if (satisfiable !== false && falsifiable !== false)
+          return random.bool() ? tmpExpr.toDNF() : tmpExpr.toCNF()
+      }
     },
   ]
 
   const wrongAnswersStrategy = random.choice(wrongAnswerStrategies)
   while (answers.length < 3) {
-    newWrongAnswer = wrongAnswersStrategy()
-    newWrongAnswerStr = newWrongAnswer.toString(true)
+    const newWrongAnswer = wrongAnswersStrategy()
+    const newWrongAnswerStr = newWrongAnswer.toString(true)
     if (
-      correctAnswerTruthTable != newWrongAnswer.getTruthTable().truthTable &&
+      !_.isEqual(correctAnswerTruthTable, newWrongAnswer.getTruthTable().truthTable) &&
       answers.every((answerStr) => answerStr !== newWrongAnswerStr)
     )
       answers.push(newWrongAnswerStr)
@@ -192,7 +199,7 @@ function makeMultipleChoiceQuestion(
 
   const correctAnswerIndex = answers.indexOf(correctAnswerStr)
 
-  return <MultipleChoiceQuestion>{
+  return {
     type: "MultipleChoiceQuestion",
     name: NormalForms.name(lang),
     path: path,
@@ -220,41 +227,42 @@ function getFreeTextFeedbackFunction(
   isDNF: boolean,
 ): FreeTextFeedbackFunction {
   return ({ text }) => {
-    try {
-      const answer = PropositionalLogicParser.parse(text)
-      if (isDNF ? answer.isDNF() : answer.isCNF)
-        return {
-          correct: false,
-          correctAnswer: "$" + getCorrectNormalFormStr(expression, isDNF) + "$",
-          feedbackText: t(translations, lang, "freetext_feedback_no_normal_form"),
-        }
+    const answer = PropositionalLogicParser.parse(text)
 
-      const { variableNames: exprVars, truthTable: exprTruthTable } = expression.getTruthTable()
-      const { variableNames: answerVars, truthTable: answerTruthTable } = answer.getTruthTable()
-
-      if (exprVars !== answerVars)
-        return {
-          correct: false,
-          correctAnswer: getCorrectNormalFormStr(expression, isDNF),
-          feedbackText: t(translations, lang, "freetext_feedback_unknown_variables"),
-        }
-
-      if (exprTruthTable !== answerTruthTable)
-        return {
-          correct: false,
-          correctAnswer: getCorrectNormalFormStr(expression, isDNF),
-          feedbackText: t(translations, lang, "freetext_feedback_not_equivalent"),
-        }
-
-      return {
-        correct: true,
-      }
-    } catch (e) {
+    if (answer instanceof ParserError) {
       return {
         correct: false,
         correctAnswer: getCorrectNormalFormStr(expression, isDNF),
         feedbackText: t(translations, lang, "freetext_feedback_parse_error"),
       }
+    }
+
+    if (isDNF ? answer.isDNF() : answer.isCNF)
+      return {
+        correct: false,
+        correctAnswer: getCorrectNormalFormStr(expression, isDNF),
+        feedbackText: t(translations, lang, "freetext_feedback_no_normal_form"),
+      }
+
+    const { variableNames: exprVars, truthTable: exprTruthTable } = expression.getTruthTable()
+    const { variableNames: answerVars, truthTable: answerTruthTable } = answer.getTruthTable()
+
+    if (_.isEqual(exprVars, answerVars))
+      return {
+        correct: false,
+        correctAnswer: getCorrectNormalFormStr(expression, isDNF),
+        feedbackText: t(translations, lang, "freetext_feedback_unknown_variables"),
+      }
+
+    if (_.isEqual(exprTruthTable, answerTruthTable))
+      return {
+        correct: false,
+        correctAnswer: getCorrectNormalFormStr(expression, isDNF),
+        feedbackText: t(translations, lang, "freetext_feedback_not_equivalent"),
+      }
+
+    return {
+      correct: true,
     }
   }
 }
@@ -265,7 +273,7 @@ function makeFreeTextQuestion(
   expression: SyntaxTreeNodeType,
   isDNF: boolean,
 ): FreeTextQuestion {
-  return <FreeTextQuestion>{
+  return {
     type: "FreeTextQuestion",
     name: NormalForms.name(lang),
     path: path,
