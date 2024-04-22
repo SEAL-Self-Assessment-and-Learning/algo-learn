@@ -1,8 +1,7 @@
-import fs from "fs"
-import path from "path"
+import primesJSON from "./primes.json"
 
-export type HashFunction = (key: number) => number
-export type DoubleHashFunction = (key: number, i: number) => number
+export type HashFunction = (key: number, size: number) => number
+export type DoubleHashFunction = (key: number, i: number, size: number) => number
 
 /**
  * This is a hash map implementation using linear probing to handle collisions
@@ -13,7 +12,7 @@ export type DoubleHashFunction = (key: number, i: number) => number
  *
  * If the same key is inserted twice, the value of the first insert is updated
  */
-export class HashMapLinProbing {
+export class MapLinProbing {
   private mapKeys: (number | null)[]
   private mapValues: (string | null)[]
   private size: number
@@ -23,15 +22,23 @@ export class HashMapLinProbing {
   private readonly doubleHashing: boolean = false
   private readonly resize: boolean = false
 
-  constructor(size: number, hashFunction?: HashFunction | DoubleHashFunction, resize?: boolean) {
+  constructor({
+    size,
+    hashFunction,
+    resize,
+  }: {
+    size: number
+    hashFunction?: HashFunction | DoubleHashFunction
+    resize?: boolean
+  }) {
     this.mapKeys = new Array(size).fill(null) as (number | null)[]
     this.mapValues = new Array(size).fill(null) as (string | null)[]
     this.size = size
     if (hashFunction) {
-      if (hashFunction.length === 1) {
+      if (hashFunction.length === 2) {
         this.hashFunction = hashFunction as HashFunction
         this.doubleHashing = false
-      } else if (hashFunction.length === 2) {
+      } else if (hashFunction.length === 3) {
         this.doubleHashFunction = hashFunction as DoubleHashFunction
         this.doubleHashing = true
       } else {
@@ -124,7 +131,8 @@ export class HashMapLinProbing {
     this.mapValues[hashKey] = null
     this.amount--
     // rehash the following keys
-    hashKey = (hashKey + 1) % this.size
+    let count = 1
+    hashKey = this.doubleHashing ? this.getHashValue(key, count) : (hashKey + 1) % this.size
     while (this.mapKeys[hashKey] !== null) {
       const keyToRehash = this.mapKeys[hashKey] as number
       const valueToRehash = this.mapValues[hashKey] as string
@@ -132,7 +140,8 @@ export class HashMapLinProbing {
       this.mapValues[hashKey] = null
       this.amount--
       this.insert(keyToRehash, valueToRehash)
-      hashKey = (hashKey + 1) % this.size
+      count++
+      hashKey = this.doubleHashing ? this.getHashValue(key, count) : (hashKey + 1) % this.size
     }
     if (this.amount <= this.size / 8) {
       this.resizeMap(false)
@@ -176,6 +185,13 @@ export class HashMapLinProbing {
   }
 
   /**
+   * Returns the keys of the map
+   */
+  keysList(): (number | null)[] {
+    return this.mapKeys
+  }
+
+  /**
    * Returns an array of all the values in the map
    */
   values(): string[] {
@@ -207,6 +223,10 @@ export class HashMapLinProbing {
    */
   getAmount(): number {
     return this.amount
+  }
+
+  getSize(): number {
+    return this.size
   }
 
   /**
@@ -245,15 +265,10 @@ export class HashMapLinProbing {
    * @throws Error if no prime number is found (then the use case of this function is wrong)
    */
   private getNextPrime(value: number): number {
-    // Read the primes.json file
-    const primes: number[] = JSON.parse(
-      fs.readFileSync(path.resolve(__dirname, "primes.json"), "utf-8"),
-    ) as number[]
-
     // get the next bigger prime number
-    for (let i = 0; i < primes.length; i++) {
-      if (primes[i] > value) {
-        return primes[i]
+    for (let i = 0; i < primesJSON.length; i++) {
+      if (primesJSON[i] > value) {
+        return primesJSON[i]
       }
     }
 
@@ -277,9 +292,11 @@ export class HashMapLinProbing {
       if (i === undefined) {
         throw new Error("Missing second number for double hashing")
       }
-      return this.doubleHashFunction(key, i) % this.size
+      return this.doubleHashFunction(key, i, this.size) % this.size
     }
-    return (this.hashFunction ? this.hashFunction(key) : this.defaultHashFunction(key)) % this.size
+    return (
+      (this.hashFunction ? this.hashFunction(key, this.size) : this.defaultHashFunction(key)) % this.size
+    )
   }
 
   toString() {

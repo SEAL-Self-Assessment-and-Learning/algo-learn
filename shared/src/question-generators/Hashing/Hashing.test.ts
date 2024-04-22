@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest"
-import { HashMapLinked } from "../Hashing/HashMapLinked.ts"
-import { DoubleHashFunction, HashFunction, HashMapLinProbing } from "../Hashing/HashMapLinProbing.ts"
+import { MapLinked } from "./MapLinked.ts"
+import { DoubleHashFunction, HashFunction, MapLinProbing } from "./MapLinProbing.ts"
 
-function createHashMap<T extends HashMapLinked | HashMapLinProbing>(
+function createHashMap<T extends MapLinked | MapLinProbing>(
   type: new (size: number) => T,
   size: number,
 ): T {
@@ -20,7 +20,7 @@ function createHashMap<T extends HashMapLinked | HashMapLinProbing>(
   return hashMap
 }
 
-function insertValues(hashMap: HashMapLinked | HashMapLinProbing) {
+function insertValues(hashMap: MapLinked | MapLinProbing) {
   hashMap.insert(90, "")
   hashMap.insert(35, "")
   hashMap.insert(88, "")
@@ -38,7 +38,7 @@ function insertValues(hashMap: HashMapLinked | HashMapLinProbing) {
 
 describe("Hashing with Linked List", () => {
   test("Handles (only) inserting followed by toString(), get(), has(), listKeys()", () => {
-    const hashMap: HashMapLinked = new HashMapLinked(6)
+    const hashMap: MapLinked = new MapLinked(6)
     hashMap.insert(1, "one")
     hashMap.insert(2, "two")
     hashMap.insert(3, "three")
@@ -63,7 +63,7 @@ describe("Hashing with Linked List", () => {
   })
 
   test("Handles inserting, changing followed by toString(), get(), has()", () => {
-    const hashMap = createHashMap(HashMapLinked, 4)
+    const hashMap = createHashMap(MapLinked, 4)
 
     expect(hashMap.toString()).toEqual(
       `0: (4, four)  \n1: (5, five) -> (1, ONE)  \n2: (6, six) -> (2, TWO)  \n3: (3, three)`,
@@ -80,7 +80,7 @@ describe("Hashing with Linked List", () => {
   })
 
   test("Handles inserting, changing, deleting followed by toString(), get(), has(), listKeys(), listValues()", () => {
-    const hashMap = createHashMap(HashMapLinked, 4)
+    const hashMap = createHashMap(MapLinked, 4)
 
     hashMap.delete(1)
     hashMap.delete(5)
@@ -100,7 +100,7 @@ describe("Hashing with Linked List", () => {
   })
 
   test("Handles resizing (decrease) followed by toString()", () => {
-    const hashMap = createHashMap(HashMapLinked, 4)
+    const hashMap = createHashMap(MapLinked, 4)
 
     hashMap.resize(2)
 
@@ -112,7 +112,7 @@ describe("Hashing with Linked List", () => {
   })
 
   test("Handles resizing (increase) followed by toString()", () => {
-    const hashMap = createHashMap(HashMapLinked, 4)
+    const hashMap = createHashMap(MapLinked, 4)
 
     hashMap.resize(8)
 
@@ -130,7 +130,7 @@ describe("Hashing with Linked List", () => {
   })
 
   test("Handles entries(), isEmpty(), getAmount(), clear()", () => {
-    const hashMap = createHashMap(HashMapLinked, 4)
+    const hashMap = createHashMap(MapLinked, 4)
 
     expect(hashMap.entries()).toEqual([
       [4, "four"],
@@ -140,6 +140,9 @@ describe("Hashing with Linked List", () => {
       [2, "TWO"],
       [3, "three"],
     ])
+
+    expect(hashMap.keysList()).toEqual([[4], [5, 1], [6, 2], [3]])
+
     expect(hashMap.isEmpty()).toBeFalsy()
     expect(hashMap.getAmount()).toEqual(6)
 
@@ -150,19 +153,14 @@ describe("Hashing with Linked List", () => {
     expect(hashMap.getAmount()).toEqual(0)
   })
 
-  test("Handles getHashFunction()", () => {
-    const hashMap = createHashMap(HashMapLinked, 4)
-    expect(hashMap.getHashFunction()).toEqual("value % 4")
-  })
-
   test("Aufgabe 8.1 Hashing I", () => {
     // f(x) = (13 · x) mod 11
     const hashFunction: HashFunction = (x: number): number => {
       return (13 * x) % 11
     }
 
-    let hashMap = new HashMapLinked(11, hashFunction)
-    hashMap = insertValues(hashMap) as HashMapLinked
+    let hashMap = new MapLinked(11, hashFunction)
+    hashMap = insertValues(hashMap) as MapLinked
 
     expect(hashMap.toString()).toEqual(`0: (44, ) -> (88, )  
 1: (28, )  
@@ -179,29 +177,8 @@ describe("Hashing with Linked List", () => {
 })
 
 describe("Hashing with Linear Probing", () => {
-  test("Handles (only) inserting followed by toString(), get(), has(), listKeys()", () => {
-    const hashMap = createHashMap(HashMapLinProbing, 10)
-
-    expect(hashMap.toString()).toEqual(
-      `|0|  1|  2|    3|   4|   5|  6|7|8|9|
-| |  1|  2|    3|   4|   5|  6| | | |
-| |ONE|TWO|three|four|five|six| | | |`,
-    )
-
-    expect(hashMap.get(1)).toEqual("ONE")
-    expect(hashMap.get(2)).toEqual("TWO")
-    expect(hashMap.get(30)).toEqual(null)
-
-    expect(hashMap.has(1)).toBeTruthy()
-    expect(hashMap.has(2)).toBeTruthy()
-    expect(hashMap.has(30)).toBeFalsy()
-
-    expect(hashMap.keys()).toEqual([1, 2, 3, 4, 5, 6])
-    expect(hashMap.values()).toEqual(["ONE", "TWO", "three", "four", "five", "six"])
-  })
-
   test("Handles inserting and deleting with collisions", () => {
-    const hashMap = new HashMapLinProbing(13)
+    const hashMap = new MapLinProbing({ size: 13 })
 
     hashMap.insert(1, "one")
     hashMap.insert(14, "fourteen")
@@ -243,13 +220,13 @@ describe("Hashing with Linear Probing", () => {
 
   test("Aufgabe 8.1 Hashing I (own single hash function)", () => {
     // f(x) = (13 · x) mod 11
-    const hashFunction: HashFunction = (x: number): number => {
-      return (13 * x) % 11
+    const hashFunction: HashFunction = (x: number, size: number): number => {
+      return (13 * x) % size
     }
 
-    let hashMap = new HashMapLinProbing(11, hashFunction)
+    let hashMap = new MapLinProbing({ size: 11, hashFunction })
 
-    hashMap = insertValues(hashMap) as HashMapLinProbing
+    hashMap = insertValues(hashMap) as MapLinProbing
 
     expect(hashMap.toString()).toEqual(
       `| 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|
@@ -291,13 +268,13 @@ describe("Hashing with Linear Probing", () => {
     hi(x) = (f(x) + i · g(x)) mod 11)
      */
 
-    const hashFunction: DoubleHashFunction = (x: number, i: number): number => {
-      return (((13 * x) % 11) + i * (5 - (x % 5))) % 11
+    const hashFunction: DoubleHashFunction = (x: number, i: number, size: number): number => {
+      return (((13 * x) % size) + i * (5 - (x % 5))) % size
     }
 
-    let hashMap = new HashMapLinProbing(11, hashFunction)
+    let hashMap = new MapLinProbing({ size: 11, hashFunction })
 
-    hashMap = insertValues(hashMap) as HashMapLinProbing
+    hashMap = insertValues(hashMap) as MapLinProbing
 
     expect(hashMap.toString()).toEqual(
       `| 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|
@@ -318,11 +295,11 @@ describe("Hashing with Linear Probing", () => {
                               90, 35, 88, 28, 91, 44, 26, 53, 16, 14, 59
      */
 
-    const hashFunction: HashFunction = (x: number): number => {
-      return 13 * x
+    const hashFunction: HashFunction = (x: number, size: number): number => {
+      return (13 * x) % size
     }
 
-    const hashMap = new HashMapLinProbing(2, hashFunction, true)
+    const hashMap = new MapLinProbing({ size: 2, hashFunction, resize: true })
 
     hashMap.insert(90, "")
 

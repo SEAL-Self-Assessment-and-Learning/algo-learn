@@ -1,4 +1,4 @@
-import { HashFunction } from "@shared/question-generators/Hashing/HashMapLinProbing.ts"
+import { HashFunction } from "@shared/question-generators/Hashing/MapLinProbing.ts"
 
 /**
  * This is a hash map implementation using linked list to handle collisions
@@ -6,7 +6,7 @@ import { HashFunction } from "@shared/question-generators/Hashing/HashMapLinProb
  *
  * If the same key is inserted twice, the value of the first insert is updated
  */
-export class HashMapLinked {
+export class MapLinked {
   private map: ListNode[] | null[]
   private size: number
   private amount: number = 0
@@ -24,7 +24,7 @@ export class HashMapLinked {
    * @param value
    */
   insert(key: number, value: string) {
-    const hashKey = this.hashFunction(key)
+    const hashKey = this.hashFunction(key, this.size)
     if (this.has(key)) {
       this.change(key, value)
       return
@@ -48,7 +48,7 @@ export class HashMapLinked {
    * @throws Error if the key is not found
    */
   change(key: number, value: string) {
-    const hashKey = this.hashFunction(key)
+    const hashKey = this.hashFunction(key, this.size)
     let node = this.map[hashKey]
     while (node) {
       if (node.key === key) {
@@ -65,7 +65,7 @@ export class HashMapLinked {
    * @param key
    */
   delete(key: number) {
-    const hashKey = this.hashFunction(key)
+    const hashKey = this.hashFunction(key, this.size)
     let node = this.map[hashKey]
     if (!node) {
       return
@@ -104,7 +104,7 @@ export class HashMapLinked {
    * @param key
    */
   get(key: number): string | null {
-    const hashKey = this.hashFunction(key)
+    const hashKey = this.hashFunction(key, this.size)
     let node = this.map[hashKey]
     while (node) {
       if (node.key === key) {
@@ -125,6 +125,24 @@ export class HashMapLinked {
         keys.push(node.key)
         node = node.next
       }
+    })
+    return keys
+  }
+
+  /**
+   * Returns an array of all the keys in the map as a list of lists
+   * Example:
+   *  [[1, 11, 21], [3, 13]]
+   */
+  keysList(): number[][] {
+    const keys: number[][] = []
+    this.map.forEach((node) => {
+      const keyList: number[] = []
+      while (node) {
+        keyList.push(node.key)
+        node = node.next
+      }
+      keys.push(keyList)
     })
     return keys
   }
@@ -171,6 +189,10 @@ export class HashMapLinked {
     return this.amount
   }
 
+  getSize(): number {
+    return this.size
+  }
+
   /**
    * Clears the map
    */
@@ -198,17 +220,11 @@ export class HashMapLinked {
   /**
    * Returns the hash value of the key
    * @param key
+   * @param size just this.size
    * @private
    */
-  private defaultHashFunction = (key: number): number => {
-    return key % this.size
-  }
-
-  /**
-   * Returns the hash function as a string for display purposes
-   */
-  getHashFunction(): string {
-    return `value % ${this.size}`
+  private defaultHashFunction = (key: number, size: number): number => {
+    return key % size
   }
 
   /**
