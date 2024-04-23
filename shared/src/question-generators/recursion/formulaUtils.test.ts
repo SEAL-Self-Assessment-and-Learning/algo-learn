@@ -6,8 +6,7 @@ describe("parseRecursiveFunction", () => {
   test("Handles T(n/3) + 7", () => {
     expect(parseRecursiveFunction("T(n/3) + 7")).toEqual({
       a: 1,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      T: "T",
+      t: "T",
       n: "n",
       b: 3,
       c: 7,
@@ -18,8 +17,7 @@ describe("parseRecursiveFunction", () => {
   test("Handles 7 T(n/9) + 5", () => {
     expect(parseRecursiveFunction("7 T(n/9) + 5")).toEqual({
       a: 7,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      T: "T",
+      t: "T",
       n: "n",
       b: 9,
       c: 5,
@@ -30,8 +28,7 @@ describe("parseRecursiveFunction", () => {
   test("Handles 4 * T(n) + 2", () => {
     expect(parseRecursiveFunction("4 * T(n) + 2")).toEqual({
       a: 4,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      T: "T",
+      t: "T",
       n: "n",
       b: 1,
       c: 2,
@@ -42,8 +39,7 @@ describe("parseRecursiveFunction", () => {
   test("Handles T(n/2)", () => {
     expect(parseRecursiveFunction("T(n/2)")).toEqual({
       a: 1,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      T: "T",
+      t: "T",
       n: "n",
       b: 2,
       c: 0,
@@ -54,8 +50,7 @@ describe("parseRecursiveFunction", () => {
   test("Handles A(m))", () => {
     expect(parseRecursiveFunction("A(m)")).toEqual({
       a: 1,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      T: "A",
+      t: "A",
       n: "m",
       b: 1,
       c: 0,
@@ -66,8 +61,7 @@ describe("parseRecursiveFunction", () => {
   test("Handles whitespaces", () => {
     expect(parseRecursiveFunction("7   *  A (  m /  2)  + 4")).toEqual({
       a: 7,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      T: "A",
+      t: "A",
       n: "m",
       b: 2,
       c: 4,
@@ -78,8 +72,7 @@ describe("parseRecursiveFunction", () => {
   test("Handles Subtraction  3 * T(n-2) + 6", () => {
     expect(parseRecursiveFunction("3 * T(n-2) + 6")).toEqual({
       a: 3,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      T: "T",
+      t: "T",
       n: "n",
       b: 2,
       c: 6,

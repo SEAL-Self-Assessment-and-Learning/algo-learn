@@ -39,7 +39,7 @@ const translations: Translations = {
   },
 }
 
-export const recursionFormula: QuestionGenerator = {
+export const RecursionFormula: QuestionGenerator = {
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -52,7 +52,7 @@ export const recursionFormula: QuestionGenerator = {
   ],
   generate(generatorPath, lang, parameters, seed) {
     const permalink = serializeGeneratorCall({
-      generator: recursionFormula,
+      generator: RecursionFormula,
       lang,
       parameters,
       seed,
@@ -61,9 +61,9 @@ export const recursionFormula: QuestionGenerator = {
     const random = new Random(seed)
     const { t } = tFunction(translations, lang)
 
-    if (!validateParameters(parameters, recursionFormula.expectedParameters)) {
+    if (!validateParameters(parameters, RecursionFormula.expectedParameters)) {
       throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${recursionFormula.expectedParameters.join(
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${RecursionFormula.expectedParameters.join(
           ", ",
         )}`,
       )
@@ -74,8 +74,7 @@ export const recursionFormula: QuestionGenerator = {
     const { functionText, functionName, n, b, a, d, c } = sampleRecursiveFunction(divOrSub, random)
 
     const T = random.choice("TABCDEFGHS".split(""))
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const answers = sampleRecurrenceAnswers({ random, divOrSub, T, n, a, b, c, d })
+    const answers = sampleRecurrenceAnswers({ random, divOrSub, t: T, n, a, b, c, d })
 
     let text = `
 ${format(t("text1"), [functionName, n])}
@@ -119,12 +118,12 @@ ${format(t("text2"), [`${T}(${n})`])}`
         if (text.trim() === "") return { valid: false }
         try {
           const parsed = parseRecursiveFunction(text)
-          if (parsed.T !== T || parsed.n !== n) {
+          if (parsed.t !== T || parsed.n !== n) {
             return { valid: false, message: t("invalidName", [T, n]) }
           }
           return {
             valid: true,
-            message: `${parsed.a} ${parsed.T}(${parsed.n}${parsed.divOrSub === "div" ? "/" : "-"}${parsed.b}) + ${parsed.c}`,
+            message: `${parsed.a} ${parsed.t}(${parsed.n}${parsed.divOrSub === "div" ? "/" : "-"}${parsed.b}) + ${parsed.c}`,
           }
         } catch (e) {
           return { valid: false, message: t("feedbackIncomplete") }
@@ -147,7 +146,7 @@ ${format(t("text2"), [`${T}(${n})`])}`
 
         return {
           correct:
-            p.a === a && p.b === b && p.c === c && p.T === T && p.n === n && p.divOrSub === divOrSub,
+            p.a === a && p.b === b && p.c === c && p.t === T && p.n === n && p.divOrSub === divOrSub,
           correctAnswer,
         }
       }

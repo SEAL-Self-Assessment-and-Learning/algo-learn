@@ -199,8 +199,7 @@ export function sampleRecursiveFunctionArithmetic({
  */
 export function recurrence({
   divOrSub,
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  T,
+  t,
   n,
   a,
   b,
@@ -208,16 +207,15 @@ export function recurrence({
   d,
 }: {
   divOrSub: "div" | "sub"
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  T: string
+  t: string
   n: string
   a: number
   b: number
   c: number
   d: number
 }): string {
-  const baseString = `${T}(1) = ${d}`
-  const recString = `${T}(${n}) = ${a != 1 ? `${a} ` : ""}${T}(${n}${
+  const baseString = `${t}(1) = ${d}`
+  const recString = `${t}(${n}) = ${a != 1 ? `${a} ` : ""}${t}(${n}${
     b != 1 ? ` ${divOrSub === "div" ? "/" : "-"} ${b}` : ""
   }) ${c != 0 ? ` + ${c}` : ""}`
   return `$${baseString}\\\\${recString}$`
@@ -229,7 +227,7 @@ export function recurrence({
  *
  * @param props
  * @param props.random - Random number generator
- * @param props.T - The correct name of the function
+ * @param props.t - The correct name of the function
  * @param props.n - The correct name of the variable
  * @param props.a - The correct coefficient of the recursive call
  * @param props.b - The correct divisor in the recursive call
@@ -241,8 +239,7 @@ export function recurrence({
 export function sampleRecurrenceAnswers({
   random,
   divOrSub,
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  T,
+  t,
   n,
   a,
   b,
@@ -251,8 +248,7 @@ export function sampleRecurrenceAnswers({
 }: {
   random: Random
   divOrSub: "div" | "sub"
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  T: string
+  t: string
   n: string
   a: number
   b: number
@@ -279,13 +275,11 @@ export function sampleRecurrenceAnswers({
   }) {
     const key = `${a}-${b}-${c}-${d}`
     if (answers.find((ans) => ans.key === key) === undefined) {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      const element = recurrence({ divOrSub, T, n, a, b, c, d })
+      const element = recurrence({ divOrSub, t: t, n, a, b, c, d })
       answers.push({ key, correct, element })
     }
   }
   tryAdding({ a, b, c, d, correct: true })
-  // tryAdding({ a: c, b, c: a, d })
 
   for (let trials = 0; trials < 100 && answers.length < 4; trials++) {
     const ca = a + random.choice(a === 1 ? [0, 1] : [-1, 0, 1])
@@ -306,8 +300,7 @@ export function sampleRecurrenceAnswers({
  */
 export function parseRecursiveFunction(input: string): {
   a: number
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  T: string
+  t: string
   n: string
   b: number
   c: number
@@ -330,13 +323,12 @@ export function parseRecursiveFunction(input: string): {
   }
 
   const a = match[1] ? parseInt(match[1], 10) : 1
-  const T = match[2]
+  const t = match[2]
   const n = match[3]
   const b = match[4] ? parseInt(match[4], 10) : 1
   const c = match[5] ? parseInt(match[5], 10) : 0
 
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  return { a, T, n, b, c, divOrSub }
+  return { a, t: t, n, b, c, divOrSub }
 }
 /**
  * Sample a recursive function T(n) = a T(n/b) + c, T(1) = d that the master
