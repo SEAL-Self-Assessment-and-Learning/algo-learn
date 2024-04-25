@@ -1,5 +1,7 @@
 /** This file contains functions to parse simple markdown */
 
+import { ListItem } from "@/components/DrawList.tsx"
+
 /** First, we define the relevant regexes */
 export const codeBlockRegex = /^```(.*?)\r?\n^((?:.*(\r?\n|$))*?)^```$/m
 export const quoteBlockRegex = /^((?:(?:> ).*(\r?\n|$))+)/m
@@ -9,7 +11,11 @@ export const dollarRegex = /\$([^$]+)\$/
 export const boldRegex = /\*\*([^*]+)\*\*/
 export const italicRegex = /\*([^*]+)\*/
 export const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/
-export const tableRegex = /^(\|(?:[^\r\n|]*\|)+\r?\n\|(?:(:?-+:?)\|)+\r?\n(\|(?:[^\r\n|]*\|)+\r?\n)*)/m
+export const tableRegex = /^(\|(?:[^\r\n|]*\|?)+(\r?\n\|(?:[^\r\n|]*\|?)+)*)/m
+export const inputRegex = /\{\{(.*?#.*?)\}\}/ // match at least on # to be an input
+export const listRegex = /^((?:\s*[-*][^*].*(\r?\n|$))+)/m
+
+// TODO check the regexes for the table and list again
 
 /**
  * The parser converts the markdown string to a ParseTree object defined as
@@ -27,6 +33,8 @@ export type ParseTreeNode =
       kind: "table"
       child: { header: string[]; content: string[][]; alignment: string[]; extraFeature: string }
     }
+  | { kind: "input"; child: string }
+  | { kind: "list"; child: ListItem[] }
 
 /**
  * The parseMarkdown function parses markdown-like text into a parse tree.
@@ -39,8 +47,10 @@ export function parseMarkdown(md: string): ParseTree {
 
   const regexes = [
     { regex: tableRegex, kind: "table", markdown: false },
+    { regex: listRegex, kind: "list", markdown: true },
     { regex: codeBlockRegex, kind: "```", markdown: false },
     { regex: quoteBlockRegex, kind: ">", markdown: true },
+    { regex: inputRegex, kind: "input", markdown: false },
     { regex: codeRegex, kind: "`", markdown: false },
     { regex: squareBracketRegex, kind: "$$", markdown: false },
     { regex: dollarRegex, kind: "$", markdown: false },
@@ -63,10 +73,28 @@ export function parseMarkdown(md: string): ParseTree {
           .map((line) => line.slice(2))
           .join("\n")
       }
+      if (kind === "list") {
+        const node = {
+          kind,
+          child: parseMarkdownList(match[0]),
+        } as ParseTreeNode
+        const before = md.slice(0, match.index)
+        const after = md.slice(match.index + match[0].length)
+        return [...parseMarkdown(before), node, ...parseMarkdown(after)]
+      }
       if (kind === "table") {
         const node = {
           kind,
           child: parseTable(match[0]),
+        } as ParseTreeNode
+        const before = md.slice(0, match.index)
+        const after = md.slice(match.index + match[0].length)
+        return [...parseMarkdown(before), node, ...parseMarkdown(after)]
+      }
+      if (kind === "input") {
+        const node = {
+          kind,
+          child: match[1],
         } as ParseTreeNode
         const before = md.slice(0, match.index)
         const after = md.slice(match.index + match[0].length)
@@ -108,6 +136,10 @@ export function parseTable(table: string) {
   It only needs to stand in the first column as well, but keep the table format.
   Currently possible extraFeatures:
    - #div_xxx# -> this creates a div around the table with the class=xxx
+   - #border_xxx# -> this adds a border around the table with the class=xxx
+   - #table_xxx# -> this adds a class=xxx to the table
+
+   Concatenation of the extraFeatures is possible, e.g., #div_xxx?border_yyy#
    */
 
   // regex expression for extra features
@@ -115,49 +147,55 @@ export function parseTable(table: string) {
     hashtag: /^#.*#$/,
   }
 
-  const separator = rows[1].split("|")
-  const headerPattern = /[ -]*-{3,}[ -]*/
-  let matchedHeader = true
-  for (let i = 0; i < separator.length; i++) {
-    if (separator[i] === "") {
-      if (i === 0 || i === separator.length - 1) {
-        continue
+  let matchedHeader = -1
+  let separator: string[] = []
+  for (let j = 1; j >= 0; j--) {
+    separator = rows[j].split("|")
+    const headerPattern = /[ -]*-{3,}[ -]*/
+
+    for (let i = 0; i < separator.length; i++) {
+      if (separator[i] === "") {
+        if (i === 0 || i === separator.length - 1) {
+          continue
+        }
+        break
       }
-      matchedHeader = false
+      if (separator[i].startsWith(":") && separator[i].endsWith(":")) {
+        if (headerPattern.test(separator[i].slice(1, separator[i].length - 1))) {
+          alignment.push("center")
+        } else {
+          matchedHeader = -1
+          break
+        }
+      } else if (separator[i].startsWith(":")) {
+        if (headerPattern.test(separator[i].slice(1))) {
+          alignment.push("left")
+        } else {
+          matchedHeader = -1
+          break
+        }
+      } else if (separator[i].endsWith(":")) {
+        if (headerPattern.test(separator[i].slice(0, separator[i].length - 1))) {
+          alignment.push("right")
+        } else {
+          matchedHeader = -1
+          break
+        }
+      } else {
+        if (headerPattern.test(separator[i])) {
+          alignment.push("left")
+        } else {
+          matchedHeader = -1
+          break
+        }
+      }
+      matchedHeader = j
       break
     }
-    if (separator[i].startsWith(":") && separator[i].endsWith(":")) {
-      if (headerPattern.test(separator[i].slice(1, separator[i].length - 1))) {
-        alignment.push("center")
-      } else {
-        matchedHeader = false
-        break
-      }
-    } else if (separator[i].startsWith(":")) {
-      if (headerPattern.test(separator[i].slice(1))) {
-        alignment.push("left")
-      } else {
-        matchedHeader = false
-        break
-      }
-    } else if (separator[i].endsWith(":")) {
-      if (headerPattern.test(separator[i].slice(0, separator[i].length - 1))) {
-        alignment.push("right")
-      } else {
-        matchedHeader = false
-        break
-      }
-    } else {
-      if (headerPattern.test(separator[i])) {
-        alignment.push("left")
-      } else {
-        matchedHeader = false
-        break
-      }
-    }
+    if (matchedHeader !== -1) break
   }
 
-  if (matchedHeader) {
+  if (matchedHeader === 1) {
     const headerLine = rows[0].split("|")
     if (headerLine.length !== separator.length) {
       throw new Error("Header and content have different length. It's not possible to create a table.")
@@ -176,7 +214,7 @@ export function parseTable(table: string) {
     }
   }
 
-  const startIndex = matchedHeader ? 2 : 0
+  const startIndex = matchedHeader + 1
   let maxLineLength = 0
   for (let i = startIndex; i < rows.length; i++) {
     const contentSplit = rows[i].split("|")
@@ -211,14 +249,14 @@ export function parseTable(table: string) {
         contentRow.push("")
       }
     } else if (contentRow.length > header.length) {
-      if (matchedHeader) contentRow = contentRow.slice(0, header.length)
+      if (matchedHeader === 1) contentRow = contentRow.slice(0, header.length)
     }
     if (contentRow.length > maxLineLength) maxLineLength = contentRow.length
     content.push(contentRow)
   }
 
   // if no matched header was found, all columns need to have the same length
-  if (!matchedHeader) {
+  if (matchedHeader !== -1) {
     for (let i = 0; i < content.length; i++) {
       while (content[i].length !== maxLineLength) {
         content[i].push("")
@@ -232,4 +270,19 @@ export function parseTable(table: string) {
     alignment,
     extraFeature,
   }
+}
+
+function parseMarkdownList(list: string): ListItem[] {
+  const pattern = /( *)- ([^:\n]+)(?:: ([^\n]*))?\n?/
+  const lines = list.split("\n")
+  const result: ListItem[] = []
+  for (let i = 0; i < lines.length; i++) {
+    const match = pattern.exec(lines[i])
+    if (match) {
+      const ident = match[1].length
+      const text = match[2]
+      result.push({ level: ident, text: text })
+    }
+  }
+  return result
 }

@@ -36,7 +36,9 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
           const { question } = ret
           expect(question.name).not.toBe("")
           expect(question.path).not.toBe("")
-          expect(question.type).toMatch(/^(MultipleChoiceQuestion|FreeTextQuestion)$/)
+          expect(question.type).toMatch(
+            /^(MultipleChoiceQuestion|FreeTextQuestion|MultiFreeTextQuestion)$/,
+          )
           expect(question.text).toBeDefined()
           expect(question.text).not.toBe("")
           expect(question.feedback).toBeDefined()

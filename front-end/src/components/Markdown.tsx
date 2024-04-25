@@ -2,8 +2,12 @@ import { Fragment, FunctionComponent, ReactNode } from "react"
 import { Link } from "react-router-dom"
 import SyntaxHighlighter from "react-syntax-highlighter"
 import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
+import { FreeTextFeedback } from "@shared/api/QuestionGenerator.ts"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
+import { CustomInput } from "@/components/CustomInput.tsx"
+import { DrawList } from "@/components/DrawList.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
+import { MODE } from "@/components/InteractWithQuestion.tsx"
 import { useTheme } from "../hooks/useTheme"
 import { Format } from "./Format"
 import TeX from "./TeX"
@@ -19,11 +23,21 @@ import TeX from "./TeX"
 export const Markdown: FunctionComponent<{
   md?: string
   children?: ReactNode[]
-}> = ({ md, children }) => {
+  setText?: (fieldID: string, value: string) => void
+  state?: {
+    mode: MODE
+    modeID: { [key: string]: MODE }
+    text: { [key: string]: string }
+    feedbackObject?: FreeTextFeedback
+    formatFeedback: { [key: string]: string }
+  }
+}> = ({ md, children, setText, state }) => {
   if (!md) {
     return <></>
   }
-  return <MarkdownTree parseTree={parseMarkdown(md)} parameters={children} />
+  return (
+    <MarkdownTree parseTree={parseMarkdown(md)} parameters={children} setText={setText} state={state} />
+  )
 }
 
 /**
@@ -36,13 +50,26 @@ export const Markdown: FunctionComponent<{
 export const MarkdownTree: FunctionComponent<{
   parseTree: ParseTree
   parameters?: ReactNode[]
-}> = ({ parseTree, parameters }) => {
+  setText?: (fieldID: string, value: string) => void
+  state?: {
+    mode: MODE
+    modeID: { [key: string]: MODE }
+    text: { [key: string]: string }
+    feedbackObject?: FreeTextFeedback
+    formatFeedback: { [key: string]: string }
+  }
+}> = ({ parseTree, parameters, setText, state }) => {
   // TODO: Implement this function
   return (
     <>
       {parseTree.map((node, index) => (
         <Fragment key={index}>
-          <MarkdownTreeNode parseTreeNode={node} parameters={parameters} />
+          <MarkdownTreeNode
+            parseTreeNode={node}
+            parameters={parameters}
+            setText={setText}
+            state={state}
+          />
         </Fragment>
       ))}
     </>
@@ -59,7 +86,15 @@ export const MarkdownTree: FunctionComponent<{
 export const MarkdownTreeNode: FunctionComponent<{
   parseTreeNode: ParseTreeNode
   parameters?: ReactNode[]
-}> = ({ parseTreeNode, parameters }) => {
+  setText?: (fieldID: string, value: string) => void
+  state?: {
+    mode: MODE
+    modeID: { [key: string]: MODE }
+    text: { [key: string]: string }
+    feedbackObject?: FreeTextFeedback
+    formatFeedback: { [key: string]: string }
+  }
+}> = ({ parseTreeNode, parameters, setText, state }) => {
   const { theme } = useTheme()
   if (typeof parseTreeNode === "string") {
     return <Format template={parseTreeNode} parameters={parameters} />
@@ -100,7 +135,13 @@ export const MarkdownTreeNode: FunctionComponent<{
     )
   }
   if (parseTreeNode.kind === "table") {
+    if (state && setText) {
+      return <DrawTable table={parseTreeNode.child} setText={setText} state={state} />
+    }
     return <DrawTable table={parseTreeNode.child} />
+  }
+  if (parseTreeNode.kind === "list") {
+    return <DrawList list={parseTreeNode.child} />
   }
   if (parseTreeNode.kind === "a") {
     return (
@@ -115,6 +156,11 @@ export const MarkdownTreeNode: FunctionComponent<{
         <MarkdownTree parseTree={parseTreeNode.child} />
       </blockquote>
     )
+  }
+  if (parseTreeNode.kind === "input") {
+    if (!state) throw new Error("State is required for input")
+    if (!setText) throw new Error("setText is required for input")
+    return <CustomInput id={parseTreeNode.child} state={state} setText={setText} />
   }
 
   // will never be reached:

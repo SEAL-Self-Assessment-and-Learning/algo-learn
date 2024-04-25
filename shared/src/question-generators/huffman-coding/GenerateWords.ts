@@ -75,7 +75,7 @@ function generateWordBasedOnFrequency(chosenFrequency: number[], random: Random)
  * @param random
  */
 export function generateWordArray(differentLetters: number, random: Random) {
-  const possibleChars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  const possibleChars: string = "ABCDEFGHJKLMNOPQRSTUVWXYZ"
   const chosenChars = random.subset(possibleChars.split(""), differentLetters)
   // create an array with values 1 to 100
   const amountCharsArray = random.shuffle([...Array(99).keys()]).slice(0, differentLetters)

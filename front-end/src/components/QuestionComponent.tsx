@@ -1,6 +1,7 @@
 import { FunctionComponent } from "react"
 import { Question } from "../../../shared/src/api/QuestionGenerator"
 import { ExerciseMultipleChoice } from "./ExerciseMultipleChoice"
+import { ExerciseMultiTextInput } from "./ExerciseMultiTextInput.tsx"
 import { ExerciseTextInput } from "./ExerciseTextInput"
 
 /** Props for the React Component */
@@ -39,6 +40,15 @@ export const QuestionComponent: FunctionComponent<QuestionComponentProps> = ({
   } else if (question.type === "FreeTextQuestion") {
     return (
       <ExerciseTextInput
+        question={question}
+        regenerate={regenerate}
+        onResult={onResult}
+        permalink={question.path}
+      />
+    )
+  } else if (question.type === "MultiFreeTextQuestion") {
+    return (
+      <ExerciseMultiTextInput
         question={question}
         regenerate={regenerate}
         onResult={onResult}
