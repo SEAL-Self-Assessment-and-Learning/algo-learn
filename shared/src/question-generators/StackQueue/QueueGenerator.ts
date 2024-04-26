@@ -16,13 +16,13 @@ import { t, tFunction, tFunctional, Translations } from "@shared/utils/translati
 const translations: Translations = {
   en: {
     name: "Queue-Implementation using an Array",
-    description: "Basic questions to test the understanding of Queue",
+    description: "Correctly use queue operations",
     solutionFreetext: `|Index|Question|Solution|\n{{0}}`,
     performOperations: `**We perform the following operations:**{{0}}`,
     checkFormat: "Please only enter a number.",
     checkFormatArray: "Please only enter numbers separated by commas.",
     getQueueInfo:
-      "**Note:** The method **getQueue()** returns the complete queue as it is as a string. If the queue is not full, the remaining elements are filled with -1.",
+      "**Note:** The method **getQueue()** returns the complete queue as it is as a string. If the queue is not full, the remaining elements are filled with **-1**.",
     toStringInfo:
       "**Note:** The method **toString()** only returns the part between rear and front. Every other value from the field is ignored.",
     queueEmpty: "Currently the queue is empty.",
@@ -30,48 +30,34 @@ const translations: Translations = {
     multipleChoiceText:
       `Consider having a **Queue "{{0}}"**, who can store at most` +
       " ${{1}}$ " +
-      `elements. 
-{{2}}
-       
-{{3}}
-    **What can we definitely say about the queue?**
-    `,
+      `elements. {{2}} {{3}} **What can we definitely say about the queue?**`,
     freeTextInput:
-      `
-    Consider having a **Queue "{{0}}"**, who can store at most` +
+      `Consider having a **Queue "{{0}}"**, who can store at most` +
       " ${{1}}$ " +
-      `elements. {{2}}
-    **We perform the following operations:**
-{{3}}
+      `elements. {{2}} **We perform the following operations:** {{3}}
     `,
   },
   de: {
     name: "Implementierung einer Queue mit einem Array",
-    description: "Basisfragen zum Testen des Verständnisses von Queues",
+    description: "Korrekt die Queue-Operationen anwenden",
     solutionFreetext: `|Index|Frage|Lösung|\n{{0}}`,
     performOperations: `**Wir führen nun folgende Operationen aus:**{{0}}`,
-    checkFormat: "Bitte geben Sie nur eine Zahl ein.",
-    checkFormatArray: "Bitte geben Sie nur Zahlen durch Kommas getrennt ein.",
+    checkFormat: "Bitte gib nur Zahlen ein.",
+    checkFormatArray: "Bitte gib nur Zahlen durch Komma getrennt ein.",
     getQueueInfo:
-      "**Hinweis:** Die Methode **getQueue()** gibt die komplette Queue unverändert als String zurück. Wenn die Queue nicht voll ist, sind die restlichen Elemente mit -1 gefüllt.",
+      "**Hinweis:** Die Methode **getQueue()** gibt die komplette Queue unverändert als String zurück. Wenn die Queue nicht voll ist, sind die restlichen Elemente mit **-1** gefüllt.",
     toStringInfo:
       "**Hinweis:** Die Methode **toString()** gibt nur den Teil zwischen Rear und Front zurück. Jeder andere Wert aus dem Feld wird ignoriert.",
     queueEmpty: "Die Queue ist aktuell leer.",
     queueContainsValues: `Die Queue enthält aktuell folgende Elemente:`,
     multipleChoiceText:
-      `Angenommen Sie haben einen **Queue "{{0}}"**, welche maximal` +
+      `Angenommen du hast eine **Queue "{{0}}"**, welche maximal` +
       " ${{1}}$ " +
-      `Elemente speichern kann. 
-{{2}} 
-{{3}}
-    **Welche Aussagen können wir nun über die Queue treffen?**`,
+      `Elemente speichern kann. {{2}} {{3}} **Welche Aussagen können wir nun über die Queue treffen?**`,
     freeTextInput:
-      `
-    Angenommen Sie haben eine **Queue "{{0}}"**, welche maximal` +
+      `Angenommen du hast eine **Queue "{{0}}"**, welche maximal` +
       " ${{1}}$ " +
-      `Elemente speichern kann. {{2}}
-    **Wir führen die folgenden Operationen aus:**
-{{3}}
+      `Elemente speichern kann. {{2}} **Wir führen die folgenden Operationen aus:** {{3}}
     `,
   },
 }
@@ -92,7 +78,7 @@ const answerOptionList: Translations = {
     queueEmptyV2: "There are currently no elements in the Queue {{0}}",
     queueEmptyV1N: "The Queue {{0}} is not empty",
     queueFrontV1: "The next element to dequeue in the Queue {{0}} is {{1}}",
-    queueFrontV2: "Up next for dequeuing in Queue {{0}} is {{1}}.",
+    queueFrontV2: "Up next for to dequeue in Queue {{0}} is {{1}}.",
     queueRearV1: "The latest enqueued element of the Queue {{0}} is {{1}}",
     queueDequeueV1: "Dequeue operation on Queue {{0}} returns {{1}}",
     queueEnqueueV1: "Enqueue {{0}} to Queue {{1}} results in {{2}}",
@@ -108,22 +94,22 @@ const answerOptionList: Translations = {
     overFlowErrorV2: "Wir fügen mehr Elemente in die Queue ein, als sie speichern kann",
     overFlowErrorV1N: "Wir bekommen keinen Overflow Fehler",
     queueFullV1: "Die Queue {{0}} ist voll",
-    queueFullV2: "Wir können keine weiteren Elemente in die Queue {{0}} speichern",
+    queueFullV2: "Wir können keine weiteren Elemente in der Queue {{0}} speichern",
     queueFullV1N: "Die Queue {{0}} ist nicht voll",
-    queueFullV2N: "Wir könnten noch mehr Elemente in die Queue {{0}} speichern",
+    queueFullV2N: "Wir könnten noch mehr Elemente in der Queue {{0}} speichern",
     queueEmptyV1: "Die Queue {{0}} ist leer",
     queueEmptyV2: "Aktuell sind keine Elemente in der Queue {{0}}",
     queueEmptyV1N: "Die Queue {{0}} ist nicht leer",
     queueFrontV1: "Das als nächstest zu dequeuende Element der Queue {{0}} ist {{1}}",
-    queueFrontV2: "Als nächstes zum Dequeue in der Queue {{0}} ist {{1}}.",
+    queueFrontV2: "Als nächstes zum Dequeuen in der Queue {{0}} ist {{1}}.",
     queueRearV1: "Das zuletzt hinzugefügte Element der Queue {{0}} ist {{1}}",
     queueDequeueV1: "Dequeue Operation auf Queue {{0}} gibt {{1}} zurück",
     queueEnqueueV1: "Enqueue {{0}} auf Queue {{1}} ergibt {{2}}",
-    currentNumberOfElements: "Die aktuelle Anzahl an Elementen in der Queue {{0}} beträgt {{1}}",
+    currentNumberOfElements: "Die aktuelle Anzahl an Elementen in der Queue {{0}} ist {{1}}",
     currentFreeElementS: "Es ist aktuell {{1}} Element frei in der Queue {{0}}",
     currentFreeElementP: "Es sind aktuell {{1}} Elemente frei in der Queue {{0}}",
     minFindV1: "Das Minimum-Element in der Queue {{0}} ist {{1}}",
-    getQueueV1: "Das Feld der Queue {{0}} sieht aktuell so aus: {{1}}",
+    getQueueV1: "Das Feld der Queue {{0}} sieht wie folgt aus: {{1}}",
     noTrans: "kein",
   },
 }
@@ -155,6 +141,7 @@ function generateOperationsQueue(
     for (let i = 0; i < amountOperations; i++) {
       operations.push(queueName + ".enqueue(" + random.int(1, 20) + ")")
     }
+    // subtracting 1 to be sure, that we don't dequeue enough elements to NOT get an overflow error
     for (let i = 0; i < amountOperations - missingElements - 1; i++) {
       operations.push(queueName + ".dequeue()")
     }
@@ -162,7 +149,7 @@ function generateOperationsQueue(
   } else {
     const amountOperations = random.int(4, 8)
     for (let i = 0; i < amountOperations; i++) {
-      // decide whether to enqueue or dequeue
+      // decide whether to en -> enqueue or de -> dequeue
       const enOrDe =
         queue.getCurrentNumberOfElements() === 0
           ? true
@@ -187,6 +174,12 @@ function generateOperationsQueue(
   }
 }
 
+/**
+ * Function to generate the operations for the queue (FREETEXT option)
+ * @param elements
+ * @param queueSize
+ * @param random
+ */
 function generateOperationsQueueFreetext(elements: number[], queueSize: number, random: Random) {
   const queue: Queue = new Queue(queueSize)
   for (const value of elements) {
@@ -210,7 +203,11 @@ function generateOperationsQueueFreetext(elements: number[], queueSize: number, 
       }
     }
     if (queueOrSize === "queue") {
-      let enOrDe = random.choice(["enqueue", "dequeue"])
+      // as in generateOperationsQueue | en -> enqueue or de -> dequeue
+      let enOrDe = random.weightedChoice([
+        ["enqueue", 0.7],
+        ["dequeue", 0.3],
+      ])
       if (queue.getCurrentNumberOfElements() === 0) {
         // only possible to enqueue
         enOrDe = "enqueue"
@@ -230,7 +227,10 @@ function generateOperationsQueueFreetext(elements: number[], queueSize: number, 
     }
     // use operation numberElements, getRear or getFront
     else {
-      const numOrRearOrFront = random.choice(queue.getCurrentNumberOfElements() > 0 ? ["numberElements", "getFront"] : ["numberElements"])
+      // only if more than 0 elements are in the queue, we can getFront (peekHead)
+      const numOrRearOrFront = random.choice(
+        queue.getCurrentNumberOfElements() > 0 ? ["numberElements", "getFront"] : ["numberElements"],
+      )
       if (numOrRearOrFront === "numberElements") {
         operations.push({ numberElements: queue.getCurrentNumberOfElements().toString() })
       } else if (numOrRearOrFront === "getFront") {
@@ -260,8 +260,10 @@ function generateCorrectAnswersQueue(
   random: Random,
   lang: Language,
 ) {
+  // storing in a set to avoid duplicates
   const answers: Set<string> = new Set<string>()
   if (queueOverFlowError) {
+    // only one possible answer
     answers.add(t(answerOptionList, lang, random.choice(["overFlowErrorV1", "overFlowErrorV2"])))
   } else {
     if (queue.getCurrentNumberOfElements() === queue.getSize()) {
@@ -341,6 +343,8 @@ function generateWrongAnswersQueue(
 ) {
   const answers: Set<string> = new Set<string>()
   if (queueOverFlowError) {
+    // if queueOverFlowError, this is true, but everything else is true too,
+    // because we can't say anything about the queue
     answers.add(t(answerOptionList, lang, "overFlowErrorV1N"))
   }
 
@@ -460,6 +464,23 @@ function generateWrongAnswersQueue(
     answers.add(t(answerOptionList, lang, "getQueueV1", [queueName, newQueue.join(",")]))
   }
 
+  // this happens rarely
+  // with test cases every 2500 test cases
+  if (answers.size < 5) {
+    answers.add(
+      t(answerOptionList, lang, "queueDequeueV1", [
+        queueName,
+        [random.int(1, 20).toString(), random.int(1, 20).toString()].toString(),
+      ]),
+    )
+    answers.add(
+      t(answerOptionList, lang, "getQueueV1", [
+        queueName,
+        [random.int(1, 20).toString(), random.int(1, 20).toString()].toString(),
+      ]),
+    )
+  }
+
   const answerList: string[] = random.shuffle([...answers])
   return { answers: answerList }
 }
@@ -501,11 +522,12 @@ export const queueQuestion: QuestionGenerator = {
     const queueName = random.choice("ABCQU".split(""))
     const queueSize = random.choice([4, 5, 6, 7, 8]) // Using only 8 values here, because it is not able to resize
 
+    // rare
     const queueOverFlowError =
       variant === "choice"
         ? random.weightedChoice([
-            [true, 0.1],
-            [false, 0.9],
+            [true, 0.05],
+            [false, 0.95],
           ])
         : false
 
@@ -517,7 +539,7 @@ export const queueQuestion: QuestionGenerator = {
       : random.int(0, queueSize - 1)
 
     const startElements: number[] = []
-    let queueInformationElements
+    let queueInformationElements: string
     if (startElementsAmount === 0) {
       queueInformationElements = t(translations, lang, "queueEmpty")
     } else {
@@ -533,8 +555,9 @@ export const queueQuestion: QuestionGenerator = {
 
     // variation between choice and input
     let question: Question
+    let testing
     if (variant === "choice") {
-      const generatedOperations = generateOperationsQueue(
+      const generatedOperations: { queue: Queue; operations: string[] } = generateOperationsQueue(
         startElements,
         queueSize,
         queueOverFlowError,
@@ -542,7 +565,7 @@ export const queueQuestion: QuestionGenerator = {
         random,
       )
 
-      const correctAnswers = generateCorrectAnswersQueue(
+      const correctAnswers: { answerList: string[] } = generateCorrectAnswersQueue(
         generatedOperations.queue,
         queueOverFlowError,
         queueName,
@@ -550,7 +573,7 @@ export const queueQuestion: QuestionGenerator = {
         lang,
       )
 
-      const wrongAnswers = generateWrongAnswersQueue(
+      const wrongAnswers: { answers: string[] } = generateWrongAnswersQueue(
         generatedOperations.queue,
         queueOverFlowError,
         queueName,
@@ -558,23 +581,26 @@ export const queueQuestion: QuestionGenerator = {
         lang,
       )
 
-      let i = 0
-      let j = 0
-      let allAnswers = []
+      let i: number = 0
+      let j: number = 0
+      let allAnswers: string[] = []
       allAnswers.push(correctAnswers.answerList[i])
       i++
+      // this loop will always terminate,
+      // because the sum of correct and wrong answers is at least 6
       while (
         allAnswers.length < 6 &&
         (i < correctAnswers.answerList.length || j < wrongAnswers.answers.length)
       ) {
-        let cOf = random.choice([true, false])
+        // decide if the next answer is correct or wrong
+        let correctOrFalse = random.choice([true, false])
         if (i >= correctAnswers.answerList.length) {
-          cOf = false
+          correctOrFalse = false
         }
         if (j >= wrongAnswers.answers.length) {
-          cOf = true
+          correctOrFalse = true
         }
-        if (cOf) {
+        if (correctOrFalse) {
           allAnswers.push(correctAnswers.answerList[i])
           i++
         } else {
@@ -582,18 +608,20 @@ export const queueQuestion: QuestionGenerator = {
           j++
         }
       }
-
       allAnswers = random.shuffle(allAnswers)
 
-      const correctAnswerIndices = []
+      const correctAnswerIndices: number[] = []
       for (let i = 0; i < correctAnswers.answerList.length; i++) {
-        correctAnswerIndices.push(allAnswers.indexOf(correctAnswers.answerList[i]))
+        const solutionIndex = allAnswers.indexOf(correctAnswers.answerList[i])
+        if (solutionIndex !== -1) {
+          correctAnswerIndices.push(solutionIndex)
+        }
       }
 
-      const operations = generatedOperations.operations
-      const operationsString =
+      const operations: string[] = generatedOperations.operations
+      const operationsString: string =
         operations.length > 0
-          ? t(translations, lang, "performOperations", ["\n- " + operations.join("\n- ")])
+          ? t(translations, lang, "performOperations", ["\n- " + operations.join("\n- ")]) + "\n"
           : ""
 
       question = {
@@ -612,6 +640,10 @@ export const queueQuestion: QuestionGenerator = {
           correctAnswerIndex: correctAnswerIndices,
         }),
       }
+      testing = {
+        allAnswers: allAnswers,
+        correctAnswerIndex: correctAnswerIndices,
+      }
     } else {
       const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
         if (fieldID.indexOf("toString") !== -1 || fieldID.indexOf("getQueue") !== -1) {
@@ -620,7 +652,6 @@ export const queueQuestion: QuestionGenerator = {
           // split to check if all elements are numbers
           const elements = text.split(",")
           for (let element of elements) {
-            element = element.trim()
             if (element.startsWith("-")) {
               element = element.slice(1)
             }
@@ -639,6 +670,7 @@ export const queueQuestion: QuestionGenerator = {
       }
 
       const feedback: FreeTextFeedbackFunction = ({ text }) => {
+        // expects a json dict
         let resultMap: { [key: string]: string } = {}
         try {
           resultMap = JSON.parse(text) as { [key: string]: string }
@@ -651,7 +683,21 @@ export const queueQuestion: QuestionGenerator = {
         }
 
         for (const key in resultMap) {
-          if (resultMap[key] !== correctAnswers[key].replace("[", "").replace("]", "")) {
+          if (key.startsWith("toString") || key.startsWith("getQueue")) {
+            resultMap[key] = parseArrayString(resultMap[key])
+            correctAnswers[key] = parseArrayString(correctAnswers[key])
+            const userArray = resultMap[key].split(",")
+            const correctArray = correctAnswers[key].split(",")
+            for (let i = 0; i < correctArray.length; i++) {
+              if (correctArray[i] !== userArray[i]) {
+                return {
+                  correct: false,
+                  message: tFunction(translations, lang).t("feedback.incomplete"),
+                  correctAnswer: t(translations, lang, "solutionFreetext", [solutionDisplay]),
+                }
+              }
+            }
+          } else if (resultMap[key].trim() !== correctAnswers[key].replace("[", "").replace("]", "")) {
             return {
               correct: false,
               message: tFunction(translations, lang).t("feedback.incomplete"),
@@ -668,7 +714,7 @@ export const queueQuestion: QuestionGenerator = {
 
       const operationsFreeText = generateOperationsQueueFreetext(startElements, queueSize, random)
 
-      let inputText = "| Operation | Result |\n| --- | --- |\n"
+      let inputText = "\n| Operation | Result |\n| --- | --- |\n"
       const correctAnswers: { [key: string]: string } = {}
       let solutionDisplay = ""
       let solutionIndex = 0
@@ -722,7 +768,6 @@ export const queueQuestion: QuestionGenerator = {
         inputText += "\n" + t(translations, lang, "toStringInfo")
       }
 
-
       question = {
         type: "MultiFreeTextQuestion",
         name: queueQuestion.name(lang),
@@ -737,8 +782,11 @@ export const queueQuestion: QuestionGenerator = {
         checkFormat,
         feedback,
       }
+      testing = {
+        correctAnswer: correctAnswers,
+      }
     }
 
-    return { question }
+    return { question, testing }
   },
 }

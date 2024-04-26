@@ -59,19 +59,19 @@ What could be a correct **Huffman-Coding** for each character?
   de: {
     name: "Berechne eine Hufmann-Codierung",
     description: "Bestimme die Huffman-Codierung eines gegebenen Strings",
-    text: 'Sei "*{{0}}*" ein {{1}}. Was ist eine korrekte **Huffman-Codierung** für diesen {{1}}? Bitte ignorieren Sie die Leerzeichen.',
+    text: 'Sei "*{{0}}*" ein {{1}}. Was ist eine korrekte **Huffman-Codierung** für diesen {{1}}? Bitte ignorieren die Leerzeichen.',
     prompt: "Was ist eine mögliche Huffman-Codierung?",
     textTable: `Angenommen wir habe die folgende Tabelle, welche angebibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:
 {{0}}
         Was wäre eine korrekte **Huffman-Codierung** für jeden Buchstaben?`,
-    feedbackInvalid: "Bitte verwenden Sie nur die Zeichen 0 und 1.",
+    feedbackInvalid: "Bitte verwende nur die Zeichen 0 und 1.",
     bottomtext:
-      "Hinweise zum Huffman-Code: Wenn Sie zwischen Knoten mit gleichem Gewicht wählen müssen, " +
-      "wählen Sie zuerst jenen, in dessen Teilbaum das alphabetisch kleinste Zeichen enthalten ist." +
+      "Hinweise zum Huffman-Code: Wenn du zwischen Knoten mit gleichem Gewicht wählen müssen, " +
+      "wähle zuerst jenen, in dessen Teilbaum das alphabetisch kleinste Zeichen enthalten ist." +
       " Wähle zudem als linken Knoten den mit dem kleineren Gewicht.",
-    multiInputText: `Suppose we have the following table, which represents how oftne a char appears in a string:
+    multiInputText: `Angenommen wir habe die folgende Tabelle, welche angebibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:
 {{0}}
-What could be a correct **Huffman-Coding** for each char?`,
+Was wäre eine korrekte **Huffman-Codierung** für jeden Buchstaben?`,
   },
 }
 
@@ -357,7 +357,7 @@ export const huffmanCoding: QuestionGenerator = {
       word = random.shuffle(word.split("")).join("")
 
       const correctAnswerList = huffmanCodingAlgorithm(word)
-      const correctAnswer = correctAnswerList.result
+      let correctAnswer = correctAnswerList.result
       const correctTree = correctAnswerList.mainNode
       // get a set of obvious wrong answers
       const answers = generateWrongAnswers(random, correctAnswer, correctTree, word)
@@ -375,6 +375,7 @@ export const huffmanCoding: QuestionGenerator = {
             message: tFunction(translations, lang).t("feedback.correct"),
           }
         }
+        correctAnswer = correctAnswer.match(/.{1,3}/g)?.join(" ") || word
         return {
           correct: false,
           message: tFunction(translations, lang).t("feedback.incomplete"),
@@ -413,7 +414,6 @@ export const huffmanCoding: QuestionGenerator = {
     } else {
       // this question is also MultipleChoice, but the user has to find the correct coding of the letters
       // he does not get the word, but instead the number of times a word appears
-
       const differentLetters = random.int(8, 11)
       const wordArray = generateWordArray(differentLetters, random)
       // only temporary displaying the word array
@@ -425,19 +425,18 @@ export const huffmanCoding: QuestionGenerator = {
         correctAnswerTreeNode,
         "",
       )
-      console.log(correctAnswerDict)
 
       if (variant === "choice2") {
         const possibleAnswersTableString: string[] = []
-        possibleAnswersTableString.push("\n" + convertDictToMdTable(correctAnswerDict, "#sd#") + "\n")
+        possibleAnswersTableString.push("\n" + convertDictToMdTable(correctAnswerDict) + "\n")
         generateWrongAnswersDict(random, wordArray, correctAnswerTreeNode).forEach((element) => {
-          possibleAnswersTableString.push("\n" + convertDictToMdTable(element, "#sd#") + "\n")
+          possibleAnswersTableString.push("\n" + convertDictToMdTable(element) + "\n")
         })
 
         // shuffle the answers and find the correct index
         random.shuffle(possibleAnswersTableString)
         const correctAnswerIndex = possibleAnswersTableString.indexOf(
-          "\n" + convertDictToMdTable(correctAnswerDict, "#sd#") + "\n",
+          "\n" + convertDictToMdTable(correctAnswerDict) + "\n",
         )
 
         question = {
@@ -461,7 +460,7 @@ export const huffmanCoding: QuestionGenerator = {
         // iterate through the wordArray
         let i = 0
         for (const key in wordArray) {
-          const fieldID = `index-${i}` // this is the unique ID for the input field
+          const fieldID = `index-${i}-${key}` // this is the unique ID for the input field
           fieldIDCharMap[fieldID] = key
           inputFields += "|{{" + fieldID + "#TL#" + key + ": ##overlay}}"
           if (i % 2 == 1) {
@@ -471,15 +470,18 @@ export const huffmanCoding: QuestionGenerator = {
         }
         inputFields += "|\n|#border_none?table_w-full#||"
 
-        console.log(inputFields)
+        let solutionDisplay = ""
+        for (const key in correctAnswerDict) {
+          solutionDisplay += `|**${key}**|$${correctAnswerDict[key]}$|\n`
+        }
+        solutionDisplay += "|#table_w-full?td?sd?ah_center?div_my-5#| |"
 
         const feedback: FreeTextFeedbackFunction = ({ text }) => {
-          // text is a provided using JSON.stringify, so we need to revert this
+          // text is provided using JSON.stringify, so we need to revert this
           let textDict: unknown
           try {
             textDict = JSON.parse(text)
           } catch (error) {
-            console.error("Invalid JSON:", text)
             return {
               correct: false,
               message: tFunction(translations, lang).t("feedback.incomplete"),
@@ -500,14 +502,19 @@ export const huffmanCoding: QuestionGenerator = {
             throw new Error("There has been a parse error, parsing text to {[key: string]: string}")
           }
 
+          // First rename the keys to the original keys format index-num-letter
+          const userAnswerDict: { [key: string]: string } = {}
           for (const key in textDict) {
-            const charKey = fieldIDCharMap[key]
-            if (textDict[key] !== correctAnswerDict[charKey]) {
-              return {
-                correct: false,
-                message: tFunction(translations, lang).t("feedback.incomplete"),
-                correctAnswer: "This would be the correct answer",
-              }
+            const keyArray = key.split("-")
+            const newKey = `${keyArray[2]}`
+            userAnswerDict[newKey] = textDict[key]
+          }
+
+          if (!checkProvidedCode(wordArray, correctAnswerDict, userAnswerDict)) {
+            return {
+              correct: false,
+              message: tFunction(translations, lang).t("feedback.incomplete"),
+              correctAnswer: solutionDisplay,
             }
           }
           return {

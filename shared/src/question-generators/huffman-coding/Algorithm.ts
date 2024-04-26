@@ -6,6 +6,7 @@
  * This function takes in a string and returns the Huffman Coding of the string
  * @param inputWord the word to be encoded
  * @param characters the characters and their frequency, if this is provided, the inputWord is ignored
+ * @param wrongAddition
  */
 export function huffmanCodingAlgorithm(
   inputWord: string,

@@ -131,17 +131,6 @@ export function parseTable(table: string) {
   const alignment: string[] = []
   let extraFeature: string = ""
 
-  /*
-  The extra feature should be in the last row of the table.
-  It only needs to stand in the first column as well, but keep the table format.
-  Currently possible extraFeatures:
-   - #div_xxx# -> this creates a div around the table with the class=xxx
-   - #border_xxx# -> this adds a border around the table with the class=xxx
-   - #table_xxx# -> this adds a class=xxx to the table
-
-   Concatenation of the extraFeatures is possible, e.g., #div_xxx?border_yyy#
-   */
-
   // regex expression for extra features
   const regexExtraFeatures: { [key: string]: RegExp } = {
     hashtag: /^#.*#$/,

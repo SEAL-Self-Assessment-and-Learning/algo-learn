@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { FreeTextFeedback } from "@shared/api/QuestionGenerator.ts"
 import { MODE } from "@/components/InteractWithQuestion.tsx"
 import { Markdown } from "@/components/Markdown.tsx"
@@ -40,12 +40,12 @@ export const CustomInput: React.FC<CustomInputProps> = ({
   const feedbackVariation: string = inputSplit[4]
 
   // To select the first created input field on the site
-  const firstInputRef = useRef<HTMLInputElement | null>(null);
+  const firstInputRef = useRef<HTMLInputElement | null>(null)
   useEffect(() => {
     if (firstInputRef.current) {
-      firstInputRef.current.focus();
+      firstInputRef.current.focus()
     }
-  }, []);
+  }, [])
 
   // check if inputID exists in state
   if (!state.text[inputID]) {

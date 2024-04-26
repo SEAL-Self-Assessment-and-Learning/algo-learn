@@ -51,7 +51,6 @@ export function ExerciseMultiTextInput({
   const { mode, text, feedbackObject } = state
 
   function checkOverallMode(currentModeIDs: { [x: string]: string }) {
-    // console.log("currentModeIDs", currentModeIDs)
     if (!question.fillOutAll) return "draft"
     // if every mode in modeID is draft, the overall mode is draft too
     for (const value of Object.values(currentModeIDs)) {

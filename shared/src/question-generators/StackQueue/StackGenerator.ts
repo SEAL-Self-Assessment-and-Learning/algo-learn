@@ -15,12 +15,12 @@ import { t, tFunction, tFunctional, Translations } from "@shared/utils/translati
 const translations: Translations = {
   en: {
     name: "Stack-Implementation using an Array",
-    description: "Basic questions to test the understanding of Stacks",
+    description: "Correctly use stack operations",
     solutionFreetext: "|Index|Question|Solution|\n{{0}}",
     performOperations: `**We perform the following operations:**{{0}}`,
-    checkFormat: "Please only enter a number.",
-    checkFormatArray: "Please only enter numbers separated by commas.",
-    checkFormatJSON: "Error! It has to be passed a valid JSON type.",
+    checkFormat: "Please only enter a number",
+    checkFormatArray: "Please only enter numbers separated by comma",
+    checkFormatJSON: "Error! It has to be passed a valid JSON type",
     dynamic: "dynamic",
     notDynamic: "not dynamic",
     stackEmpty: "Currently the stack is empty.",
@@ -28,40 +28,33 @@ const translations: Translations = {
     multipleChoiceText:
       `Consider having a **{{0}} Stack "{{1}}"**, who can store at most` +
       " ${{2}}$ " +
-      `elements. 
-{{3}}
-       **We perform the following operations:**
-{{4}}
-    **What can we definitely say about the stack?**
-    `,
+      `elements. {{3}} **We perform the following operations:** {{4}} **What can we definitely say about the stack?**`,
     freeTextInput:
       `Consider having a **{{0}} Stack "{{1}}"**, who can store at most` +
       " ${{2}}$ " +
-      `elements. {{3}}
-    **We perform the following operations:**
-{{4}}
-    `,
+      `elements. {{3}} **We perform the following operations:** {{4}}`,
   },
   de: {
     name: "Implementierung eines Stacks mit einem Array",
-    description: "Basisfragen zum Testen des Verständnisses von Stacks",
+    description: "Korrekte Verwendung von Stack-Operationen",
     solutionFreetext: "|Index|Frage|Lösung|\n{{0}}",
     performOperations: `**Wir führen nun folgende Operationen aus:**{{0}}`,
+    checkFormat: "Bitte gib nur Zahlen ein.",
+    checkFormatArray: "Bitte gib nur Zahlen getrennt durch Komma ein.",
+    checkFormatJSON: "Error! It has to be passed a valid JSON type.",
     dynamic: "dynamisch",
     notDynamic: "nicht dynamisch",
-    checkFormat: "Bitte gib nur Zahlen ein.",
-    checkFormatArray: "Bitte gib nur Zahlen getrennt durch Kommas ein.",
-    checkFormatJSON: "Error! It has to be passed a valid JSON type.",
     stackEmpty: "Der Stack ist aktuell leer.",
     stackContainsValues: `Der Stack enthält aktuell folgende Elemente:`,
     multipleChoiceText:
-      `Angenommen Sie haben einen **{{0}} Stack "{{1}}"**, welcher maximal` +
+      `Angenommen du hast einen **{{0}} Stack "{{1}}"**, welcher maximal` +
       " ${{2}}$ " +
-      `Elemente speichern kann. 
-{{3}}
-       **Wir führen nun folgende Operationen aus:** 
-{{4}}
-    **Welche Aussagen können wir nun über den Stack treffen?**`,
+      `Elemente speichern kann. {{3}} **Wir führen nun folgende Operationen aus:** {{4}} 
+      **Welche Aussagen können wir nun über den Stack treffen?**`,
+    freeTextInput:
+      `Angenommen du hast einen **{{0}} Stack "{{1}}"**, welcher maximal` +
+      " ${{2}}$ " +
+      `Elemente speichern kann. {{3}} **Wir führen die folgenden Operationen aus:** {{4}}`,
   },
 }
 
@@ -74,11 +67,11 @@ const answerOptionList: Translations = {
     stackFullV1N: "The Stack {{0}} is not full",
     stackEmptyV1: "The Stack {{0}} is empty",
     stackEmptyV1N: "The Stack {{0}} is not empty",
-    bottomElementV1: "In the Stack {{0}} the bottom element is {{1}}",
+    bottomElementV1: "The bottom element of Stack {{0}} is {{1}}",
     topElementV1: "The top element of the Stack {{0}} is {{1}}",
     couldStoreElementsV1: "The Stack {{0}} could store {{1}} elements",
     currentlyStoreElementsV1S: "The Stack {{0}} currently stores {{1}} element",
-    currentlyStoreElementsV1P: "The Stack {{0}} currently stores {{1}} element",
+    currentlyStoreElementsV1P: "The Stack {{0}} currently stores {{1}} elements",
     pushMoreCouldStoreV1S:
       "Pushing {{0}} value onto the Stack {{1}} will increase the number of elements stored by {{0}}",
     pushMoreCouldStoreV1P:
@@ -196,7 +189,7 @@ function generateOperationsStack(
     const numOfOperations = random.int(4, 8)
     for (let i = 0; i < numOfOperations; i++) {
       // if there are no elements in the stack, we can only push, or the stack is full
-      // and no resizing allowed then only pop, otherwise 50% for each push or pop
+      // and no resizing allowed then only pop
       const pushOrPop =
         stack.getCurrentPosition() === 0
           ? true
@@ -208,8 +201,8 @@ function generateOperationsStack(
                   [false, 0.3],
                 ])
               : random.weightedChoice([
-                  [true, 0.25],
-                  [false, 0.75],
+                  [true, 0.45],
+                  [false, 0.55],
                 ])
 
       if (pushOrPop) {
@@ -242,6 +235,7 @@ function generateOperationsFreetextStack(
   }
   stack.setSize(stackSize) // set size to stack size
 
+  // Function to decide whether to push/pop or use another operation
   function ppORsizeDecider(lastOperation: { [key: string]: string }, i: number): boolean {
     let ppORsize = random.weightedChoice([
       [true, 0.2],
@@ -260,7 +254,7 @@ function generateOperationsFreetextStack(
 
   const operations: { [key: string]: string }[] = []
 
-  const numOfOperations = random.int(4, 8)
+  const numOfOperations = random.int(5, 8)
   if (!resize) {
     for (let i = 0; i < numOfOperations; i++) {
       // decide if we want to ask for current number of elements or current size
@@ -276,15 +270,16 @@ function generateOperationsFreetextStack(
         }
       } else {
         // if there are no elements in the stack, we can only push, or the stack is full
-        // and no resizing allowed then only pop, otherwise 50% for each push or pop
+        // and no resizing allowed, then only pop
+        // higher prob for pushing
         const pushOrPop =
           stack.getCurrentPosition() === 0
             ? true
             : !resize && stack.getCurrentPosition() === stackSize - 1
               ? false
               : random.weightedChoice([
-                  [true, 0.5],
-                  [false, 0.5],
+                  [true, 0.6],
+                  [false, 0.4],
                 ])
 
         if (pushOrPop) {
@@ -324,6 +319,7 @@ function generateOperationsFreetextStack(
               [true, 0.25],
               [false, 0.75],
             ])
+        // only check if array empty, because we are in state of resizing possible
         if (stack.getCurrentPosition() === 0) pushOrPop = true
         if (pushOrPop) {
           const pushValue = random.int(1, 20)
@@ -365,14 +361,6 @@ function generateCorrectAnswersStack(
     answers.add(
       t(answerOptionList, lang, random.choice(["overFlowErrorV1", "overFlowErrorV2"]), [stackName]),
     )
-    /*
-    random.choice([true, false])
-      ? answers.push(
-          `If the Stack ${stackName} would have been dynamic, it could store ${stack.getSize()} now.`,
-        )
-      : null
-     */
-    // more correct answers here???
   } else {
     if (stack.getCurrentPosition() === stack.getSize()) {
       answers.add(t(answerOptionList, lang, "stackFullV1", [stackName]))
@@ -474,6 +462,13 @@ function generateWrongAnswerStack(
       stack.getCurrentPosition() + 1 === 1 ? "currentlyStoreElementsV1S" : "currentlyStoreElementsV1P",
       [stackName, (stack.getCurrentPosition() + 1).toString()],
     ),
+  )
+
+  wrongAnswers.add(
+    t(answerOptionList, lang, "toStringV1", [
+      stackName,
+      stack.getStack().push(random.int(1, 20)).toString(),
+    ]),
   )
 
   // check the stack size
@@ -588,12 +583,20 @@ function generateWrongAnswerStack(
     )
     // No question about decreasing here
   }
+
   const answerList = Array.from(wrongAnswers)
   return random.subset(answerList, amount > answerList.length ? answerList.length : amount)
 }
 
+/**
+ * This function parses the string (which is a stringified array)
+ * Removes all whitespaces and beginning as also ending square brackets
+ * @param text
+ */
 export function parseArrayString(text: string): string {
-  text = text.replace(/\s/g, "")
+  // remove all whitespaces
+  text = text.replaceAll(/\s/g, "")
+  // remove starting and ending square brackets
   if (text[0] === "[") {
     text = text.slice(1)
   }
@@ -697,13 +700,14 @@ export const stackQuestion: QuestionGenerator = {
         stackElementsString += `\n| ${i} | ${stackElementsValues[i]} |`
       }
       // add the new line to the table for the extra feature #div_my-5#
-      stackElementsString += `\n|#div_my-5?td#| |`
+      stackElementsString += `\n|#div_my-5?td#| |\n`
     }
 
     /*
     Variation between multiple choice and input
      */
     let question: Question
+    let testing
     if (variant === "choice") {
       const generation = generateOperationsStack(
         stackElementsValues,
@@ -764,13 +768,16 @@ export const stackQuestion: QuestionGenerator = {
 
       const correctAnswerIndex = []
       for (let i = 0; i < correctAnswers.length; i++) {
-        correctAnswerIndex.push(allAnswers.indexOf(correctAnswers[i]))
+        const solutionIndex = allAnswers.indexOf(correctAnswers[i])
+        if (solutionIndex !== -1) {
+          correctAnswerIndex.push(solutionIndex)
+        }
       }
 
       const operations = generation.operations
       const operationsString =
         operations.length > 0
-          ? t(translations, lang, "performOperations", ["\n- " + operations.join("\n- ")])
+          ? t(translations, lang, "performOperations", ["\n- " + operations.join("\n- ")]) + "\n"
           : ""
 
       question = {
@@ -789,6 +796,10 @@ export const stackQuestion: QuestionGenerator = {
         feedback: minimalMultipleChoiceFeedback({
           correctAnswerIndex: correctAnswerIndex,
         }),
+      }
+      testing = {
+        allAnswers,
+        correctAnswerIndex,
       }
     } else {
       const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
@@ -830,13 +841,12 @@ export const stackQuestion: QuestionGenerator = {
 
         for (const key in resultMap) {
           if (correctAnswers[key + "-format"] === "toString") {
+            resultMap[key] = parseArrayString(resultMap[key])
+            correctAnswers[key] = parseArrayString(correctAnswers[key])
             const userArray = resultMap[key].split(",")
             const resultArray = correctAnswers[key].split(",")
             for (let i = 0; i < userArray.length; i++) {
-              userArray[i] = userArray[i].trim()
-              resultArray[i] = resultArray[i].trim()
               if (userArray[i] !== resultArray[i]) {
-                console.log(userArray[i], resultArray[i])
                 return {
                   correct: false,
                   message: tFunction(translations, lang).t("feedback.incomplete"),
@@ -844,8 +854,7 @@ export const stackQuestion: QuestionGenerator = {
                 }
               }
             }
-          } else if (resultMap[key] !== correctAnswers[key]) {
-            console.log(resultMap[key], correctAnswers[key])
+          } else if (resultMap[key].trim() !== correctAnswers[key].trim()) {
             return {
               correct: false,
               message: tFunction(translations, lang).t("feedback.incomplete"),
@@ -869,7 +878,7 @@ export const stackQuestion: QuestionGenerator = {
       const stack = generatedOperations.stack
 
       // Example inputfield {{test#NL#**Char: **##overlay}}
-      let inputText = "| Operation | Result |\n| --- | --- |\n"
+      let inputText = "\n| Operation | Result |\n| --- | --- |\n"
       let solutionDisplay = ""
       let solutionIndex = 0
       const correctAnswers: { [key: string]: string } = {}
@@ -915,8 +924,6 @@ export const stackQuestion: QuestionGenerator = {
       // if push, we don't ask the user for input
       // last question is to write down the array
 
-      console.log(correctAnswers)
-
       question = {
         type: "MultiFreeTextQuestion",
         name: stackQuestion.name(lang),
@@ -932,8 +939,9 @@ export const stackQuestion: QuestionGenerator = {
         checkFormat,
         feedback,
       }
+      testing = { correctAnswer: correctAnswers }
     }
 
-    return { question }
+    return { question, testing }
   },
 }

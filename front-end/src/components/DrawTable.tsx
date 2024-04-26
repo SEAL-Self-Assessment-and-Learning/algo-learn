@@ -48,22 +48,21 @@ export function DrawTable({
   // TODO add the tf feature
   // transpose the table
   if (extraFeatureList.includes("td")) {
-    const newContent = transposeTable(parsedHeader, parsedContent).newContent
-    parsedContent = newContent
+    parsedContent = transposeTable(parsedHeader, parsedContent).newContent
     parsedHeader = []
   }
 
   // split the table into two tables
   if (extraFeatureList.includes("sd")) {
-    if (extraFeature.indexOf("?sd") !== -1) {
-      extraFeature = extraFeature.replace("?sd", "")
-    } else if (extraFeature.indexOf("sd?") !== -1) {
-      extraFeature = extraFeature.replace("sd?", "")
-    } else {
+    if (extraFeature.indexOf("sd") !== -1) {
       extraFeature = extraFeature.replace("sd", "")
     }
 
-    const half = Math.ceil(parsedHeader.length / 2)
+    if (extraFeature.includes("td")) {
+      extraFeature = extraFeature.replace("td", "")
+    }
+
+    const half = Math.ceil(parsedHeader.length > 0 ? parsedHeader.length : parsedContent[0].length / 2)
     const headerFirst = parsedHeader.slice(0, half)
     const headerSecond = parsedHeader.slice(half)
     // for every line in content split this line in half
@@ -74,6 +73,7 @@ export function DrawTable({
       contentFirst.push(line.slice(0, half))
       contentSecond.push(line.slice(half))
     }
+
     // draw the first table
     const tableFirst = {
       header: headerFirst,
@@ -99,28 +99,24 @@ export function DrawTable({
   }
 
   let borderStyle = "border"
+  let cellVerticalAlign = "align-"
+  let cellHorizontalAlign = "text-"
+
   extraFeatureList.map((feature) => {
     if (feature.startsWith("border_")) {
       borderStyle = feature.split("_")[1]
     }
-  })
-
-  let cellVerticalAlign = "align-"
-  extraFeatureList.map((feature) => {
     if (feature.startsWith("av")) {
       cellVerticalAlign = feature.split("_")[1]
     }
-  })
-  if (cellVerticalAlign === "align-") {
-    cellVerticalAlign = "align-top"
-  }
-
-  let cellHorizontalAlign = "text-"
-  extraFeatureList.map((feature) => {
     if (feature.startsWith("ah")) {
       cellHorizontalAlign += feature.split("_")[1]
     }
   })
+
+  if (cellVerticalAlign === "align-") {
+    cellVerticalAlign = "align-top"
+  }
 
   const tableHeader = []
   tableHeader.push(
@@ -169,7 +165,7 @@ export function DrawTable({
     }
   })
 
-  if (extraFeature.startsWith("div_")) {
+  if (extraFeature.includes("div_")) {
     return <div className={divClass}>{tableReturnValue}</div>
   } else {
     return tableReturnValue
