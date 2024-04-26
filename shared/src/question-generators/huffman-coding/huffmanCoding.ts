@@ -243,7 +243,7 @@ export function switchAllOneZeroString(correctWord: string) {
  * @param wordArray the word arrays with frequency of each letter
  * @param extraFeature
  */
-function convertDictToMdTable(wordArray: { [key: string]: any }, extraFeature: string = "none") {
+export function convertDictToMdTable(wordArray: { [key: string]: any }, extraFeature: string = "none") {
   const header = Object.keys(wordArray)
   const middleLine = header.map(() => "-------")
   const content = Object.values(wordArray)
@@ -352,6 +352,7 @@ export const huffmanCoding: QuestionGenerator = {
       variant = random.choice(["input", "input2"])
     }
     let question: Question
+    let testing
     if (variant === "choice" || variant === "input") {
       let word = generateString(wordlength, random)
       word = random.shuffle(word.split("")).join("")
@@ -395,6 +396,13 @@ export const huffmanCoding: QuestionGenerator = {
           answers: answers,
           feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
         }
+        testing = {
+          variant,
+          word: word,
+          correctAnswer: correctAnswer,
+          allAnswers: answers,
+          correctAnswerIndex: correctAnswerIndex,
+        }
       } else {
         question = {
           type: "FreeTextQuestion",
@@ -405,10 +413,16 @@ export const huffmanCoding: QuestionGenerator = {
           feedback,
           checkFormat,
         }
+        testing = {
+          variant,
+          word,
+          feedback,
+        }
       }
 
       return {
         question,
+        testing,
       }
       // else of choice2 or input2
     } else {
@@ -416,6 +430,8 @@ export const huffmanCoding: QuestionGenerator = {
       // he does not get the word, but instead the number of times a word appears
       const differentLetters = random.int(8, 11)
       const wordArray = generateWordArray(differentLetters, random)
+      // create a copy of wordArray
+      const wordArrayTest = { ...wordArray }
       // only temporary displaying the word array
       // add some spacing to table in the question text using extra feature div_my-5
       const displayTable = convertDictToMdTable(wordArray, "#div_my-5#")
@@ -427,11 +443,16 @@ export const huffmanCoding: QuestionGenerator = {
       )
 
       if (variant === "choice2") {
-        const possibleAnswersTableString: string[] = []
+        let possibleAnswersTableString: string[] = []
+        while (possibleAnswersTableString.length < 3) {
+          generateWrongAnswersDict(random, wordArray, correctAnswerTreeNode).forEach((element) => {
+            possibleAnswersTableString.push("\n" + convertDictToMdTable(element) + "\n")
+          })
+        }
+        if (possibleAnswersTableString.length > 3) {
+          possibleAnswersTableString = possibleAnswersTableString.slice(0, 3)
+        }
         possibleAnswersTableString.push("\n" + convertDictToMdTable(correctAnswerDict) + "\n")
-        generateWrongAnswersDict(random, wordArray, correctAnswerTreeNode).forEach((element) => {
-          possibleAnswersTableString.push("\n" + convertDictToMdTable(element) + "\n")
-        })
 
         // shuffle the answers and find the correct index
         random.shuffle(possibleAnswersTableString)
@@ -450,9 +471,15 @@ export const huffmanCoding: QuestionGenerator = {
             correctAnswerIndex: correctAnswerIndex,
           }),
         }
-
+        testing = {
+          variant: variant,
+          wordArray: wordArrayTest,
+          allAnswers: possibleAnswersTableString,
+          correctAnswerIndex: correctAnswerIndex,
+        }
         return {
-          question: question,
+          question,
+          testing,
         }
       } else {
         let inputFields = ""
@@ -532,9 +559,15 @@ export const huffmanCoding: QuestionGenerator = {
           feedback,
           checkFormat,
         }
+        testing = {
+          variant,
+          wordArray: wordArrayTest,
+          feedback,
+        }
 
         return {
-          question: question,
+          question,
+          testing,
         }
       }
     }
