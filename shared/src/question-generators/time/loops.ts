@@ -61,7 +61,7 @@ export const loops: QuestionGenerator = {
     {
       type: "string",
       name: "variant",
-      allowedValues: ["simpleExact", "ab-String"],
+      allowedValues: ["simpleExact"],
     },
   ],
   generate(generatorPath, lang, parameters, seed) {
@@ -138,7 +138,12 @@ ${t("text2", [`${T}(${n})`])}`
       feedback,
       prompt,
     }
-    return { question }
+    const testing = {
+      functionText,
+      functionName,
+      numStars,
+    }
+    return { question, testing }
   },
 }
 

@@ -2,7 +2,6 @@ import {
   createProductTerm,
   ProductTerm,
 } from "@shared/question-generators/asymptotics/asymptoticsUtils.ts"
-import { createForLine } from "@shared/question-generators/time/loopsUtils.ts"
 import Random from "@shared/utils/random.ts"
 
 /**
@@ -59,11 +58,14 @@ export function sampleBigO({
   const innerVar = random.choice(availableVarNames)
 
   if (loopType === "for") {
-
-    const { code: forCode, solution: forSolution } = createForLoop({ random, variable, innerVar, indent })
+    const { code: forCode, solution: forSolution } = createForLoop({
+      random,
+      variable,
+      innerVar,
+      indent,
+    })
     code += forCode
     solution = forSolution
-
   }
 
   if (solution === undefined) {
@@ -73,18 +75,17 @@ export function sampleBigO({
   return { code, solution }
 }
 
-function createForLoop ({
-    random,
-    variable,
-    innerVar,
-    indent
-  }: {
-  random: Random,
-  variable: string,
-  innerVar: string,
+function createForLoop({
+  random,
+  variable,
+  innerVar,
+  indent,
+}: {
+  random: Random
+  variable: string
+  innerVar: string
   indent: number
 }) {
-
   const asymptoticOptions = random.weightedChoice([
     ["1", 1],
     ["log(n)", 1],
@@ -95,8 +96,12 @@ function createForLoop ({
     ["n^3", 1],
     ["2^n", 1],
   ])
+  console.log(asymptoticOptions)
+  console.log(variable)
+  console.log(innerVar)
+  console.log(indent)
 
   const solution: ProductTerm = createProductTerm({ polyexponent: 1 })
 
-  return { code: "", solution: solution}
+  return { code: "", solution: solution }
 }

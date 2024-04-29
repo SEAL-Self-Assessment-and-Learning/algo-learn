@@ -230,11 +230,17 @@ export function createIfCondition({
   return code
 }
 
-export function createIfContinue({ con = true, indent = 0 }: { con?: boolean, indent?: number }): string {
+export function createIfContinue({
+  con = true,
+  indent = 0,
+}: {
+  con?: boolean
+  indent?: number
+}): string {
   return con ? " ".repeat(indent) + "continue\n" : ""
 }
 
-export function createIfBreak({ br = true, indent = 0 }: { br?: boolean, indent?: number }): string {
+export function createIfBreak({ br = true, indent = 0 }: { br?: boolean; indent?: number }): string {
   return br ? " ".repeat(indent) + "break\n" : ""
 }
 
