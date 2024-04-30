@@ -22,7 +22,7 @@ const translations: Translations = {
     checkFormat: "Please only enter a number.",
     checkFormatArray: "Please only enter numbers separated by commas.",
     getQueueInfo:
-      "**Note:** The method **getQueue()** returns the complete queue as it is as a string. If the queue is not full, the remaining elements are filled with **-1**.",
+      "**Note:** The method **getQueue()** returns the complete queue as it is as a string. If the queue is not full, the remaining elements are filled with -1.",
     toStringInfo:
       "**Note:** The method **toString()** only returns the part between rear and front. Every other value from the field is ignored.",
     queueEmpty: "Currently the queue is empty.",
@@ -45,7 +45,7 @@ const translations: Translations = {
     checkFormat: "Bitte gib nur Zahlen ein.",
     checkFormatArray: "Bitte gib nur Zahlen durch Komma getrennt ein.",
     getQueueInfo:
-      "**Hinweis:** Die Methode **getQueue()** gibt die komplette Queue unverändert als String zurück. Wenn die Queue nicht voll ist, sind die restlichen Elemente mit **-1** gefüllt.",
+      "**Hinweis:** Die Methode **getQueue()** gibt die komplette Queue unverändert als String zurück. Wenn die Queue nicht voll ist, sind die restlichen Elemente mit -1 gefüllt.",
     toStringInfo:
       "**Hinweis:** Die Methode **toString()** gibt nur den Teil zwischen Rear und Front zurück. Jeder andere Wert aus dem Feld wird ignoriert.",
     queueEmpty: "Die Queue ist aktuell leer.",
@@ -682,33 +682,45 @@ export const queueQuestion: QuestionGenerator = {
           }
         }
 
+        let correctAnswered = true
+        let count = 0
         for (const key in resultMap) {
+          const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
           if (key.startsWith("toString") || key.startsWith("getQueue")) {
             resultMap[key] = parseArrayString(resultMap[key])
             correctAnswers[key] = parseArrayString(correctAnswers[key])
             const userArray = resultMap[key].split(",")
             const correctArray = correctAnswers[key].split(",")
+            let solutionDisplayArray: string = "["
             for (let i = 0; i < correctArray.length; i++) {
               if (correctArray[i] !== userArray[i]) {
-                return {
-                  correct: false,
-                  message: tFunction(translations, lang).t("feedback.incomplete"),
-                  correctAnswer: t(translations, lang, "solutionFreetext", [solutionDisplay]),
-                }
+                correctAnswered = false
+                solutionDisplayArray += (i === 0 ? "" : ",") + `$\\textbf{\\underline{${correctArray[i]}}}$`
+              } else {
+                solutionDisplayArray += i === 0 ? correctArray[i] : "," + correctArray[i]
               }
             }
-          } else if (resultMap[key].trim() !== correctAnswers[key].replace("[", "").replace("]", "")) {
-            return {
-              correct: false,
-              message: tFunction(translations, lang).t("feedback.incomplete"),
-              correctAnswer: t(translations, lang, "solutionFreetext", [solutionDisplay]),
-            }
+            solutionDisplayArray += "]"
+            solutionDisplay[count] = firstSolutionPart + solutionDisplayArray + "|\n"
+          } else if (resultMap[key].trim() !== correctAnswers[key]) {
+            correctAnswered = false
+            const secondSolutionPart: string = "$\\textbf{\\underline{" + correctAnswers[key] + "}}$|\n"
+            solutionDisplay[count] = firstSolutionPart + secondSolutionPart
           }
+          count++
         }
 
+        if (correctAnswered) {
+          return {
+            correct: true,
+            message: tFunction(translations, lang).t("feedback.correct"),
+          }
+        }
+        console.log(solutionDisplay.join(""))
         return {
-          correct: true,
-          message: tFunction(translations, lang).t("feedback.correct"),
+          correct: false,
+          message: tFunction(translations, lang).t("feedback.incomplete"),
+          correctAnswer: t(translations, lang, "solutionFreetext", [solutionDisplay.join("")]),
         }
       }
 
@@ -716,7 +728,7 @@ export const queueQuestion: QuestionGenerator = {
 
       let inputText = "\n| Operation | Result |\n| --- | --- |\n"
       const correctAnswers: { [key: string]: string } = {}
-      let solutionDisplay = ""
+      const solutionDisplay: string[] = []
       let solutionIndex = 0
       let index = 0
       for (const operation of operationsFreeText.operations) {
@@ -726,19 +738,19 @@ export const queueQuestion: QuestionGenerator = {
         if (Object.prototype.hasOwnProperty.call(operation, "dequeue")) {
           inputText += `| ${queueName}.dequeue() | {{dequeue-${index}####}} |\n`
           solutionIndex++
-          solutionDisplay += `|${solutionIndex}|${queueName}.dequeue() | ${operation.dequeue} |\n`
+          solutionDisplay.push(`|${solutionIndex}|${queueName}.dequeue() | $${operation.dequeue}$ |\n`)
           correctAnswers[`dequeue-${index}`] = operation.dequeue
         }
         if (Object.prototype.hasOwnProperty.call(operation, "numberElements")) {
           inputText += `|${queueName}.numberElements() | {{numElements-${index}####}} |\n`
           solutionIndex++
-          solutionDisplay += `|${solutionIndex}|${queueName}.numberElements() | ${operation.numberElements} |\n`
+          solutionDisplay.push(`|${solutionIndex}|${queueName}.numberElements() | $${operation.numberElements}$ |\n`)
           correctAnswers[`numElements-${index}`] = operation.numberElements
         }
         if (Object.prototype.hasOwnProperty.call(operation, "getFront")) {
           inputText += `| ${queueName}.peekHead() | {{getFront-${index}####}} |\n`
           solutionIndex++
-          solutionDisplay += `|${solutionIndex}|${queueName}.peekHead() | ${operation.getFront} |\n`
+          solutionDisplay.push(`|${solutionIndex}|${queueName}.peekHead() | $${operation.getFront}$ |\n`)
           correctAnswers[`getFront-${index}`] = operation.getFront
         }
         index++
@@ -751,14 +763,14 @@ export const queueQuestion: QuestionGenerator = {
           : "full"
       if (fullOrPartQueue === "full") {
         inputText += `|${queueName}.getQueue()|{{getQueue-${index}####[2,-1,-1,1]}}|`
-        solutionDisplay += `|${solutionIndex}|${queueName}.getQueue()|[${operationsFreeText.queue.getQueue()}]|\n`
+        solutionDisplay.push(`|${solutionIndex}|${queueName}.getQueue()|[${operationsFreeText.queue.getQueue()}]|\n`)
         correctAnswers[`getQueue-${index}`] = operationsFreeText.queue.getQueue()
       } else {
         inputText += `|${queueName}.toString()|{{toString-${index}####[1,2,3,4]}}|`
-        solutionDisplay += `|${solutionIndex}|${queueName}.toString()|[${operationsFreeText.queue.toString()}]|\n`
+        solutionDisplay.push(`|${solutionIndex}|${queueName}.toString()|[${operationsFreeText.queue.toString()}]|\n`)
         correctAnswers[`toString-${index}`] = operationsFreeText.queue.toString()
       }
-      solutionDisplay += "|#div_my-5?table_w-full#| |"
+      solutionDisplay.push("|#div_my-5?table_w-full#| |")
       inputText += `|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |`
 
       // add the hint what toString and getQueue mean

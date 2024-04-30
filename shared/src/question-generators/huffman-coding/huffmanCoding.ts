@@ -428,7 +428,7 @@ export const huffmanCoding: QuestionGenerator = {
     } else {
       // this question is also MultipleChoice, but the user has to find the correct coding of the letters
       // he does not get the word, but instead the number of times a word appears
-      const differentLetters = random.int(8, 11)
+      const differentLetters = random.int(6, 9)
       const wordArray = generateWordArray(differentLetters, random)
       // create a copy of wordArray
       const wordArrayTest = { ...wordArray }

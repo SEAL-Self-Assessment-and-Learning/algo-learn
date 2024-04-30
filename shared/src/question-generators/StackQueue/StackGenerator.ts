@@ -839,27 +839,38 @@ export const stackQuestion: QuestionGenerator = {
           }
         }
 
+        let foundError = false
+        let count = 0
         for (const key in resultMap) {
+          const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
           if (correctAnswers[key + "-format"] === "toString") {
             resultMap[key] = parseArrayString(resultMap[key])
             correctAnswers[key] = parseArrayString(correctAnswers[key])
             const userArray = resultMap[key].split(",")
             const resultArray = correctAnswers[key].split(",")
+            let solutionDisplayArray: string = "["
             for (let i = 0; i < userArray.length; i++) {
               if (userArray[i] !== resultArray[i]) {
-                return {
-                  correct: false,
-                  message: tFunction(translations, lang).t("feedback.incomplete"),
-                  correctAnswer: t(translations, lang, "solutionFreetext", [solutionDisplay]),
-                }
+                foundError = true
+                solutionDisplayArray += (i === 0 ? "" : ",") + `$\\textbf{\\underline{${resultArray[i]}}}$`
+              } else {
+                solutionDisplayArray += i === 0 ? resultArray[i] : "," + resultArray[i]
               }
             }
+            solutionDisplayArray += "]"
+            solutionDisplay[count] = firstSolutionPart + solutionDisplayArray + "|\n"
           } else if (resultMap[key].trim() !== correctAnswers[key].trim()) {
-            return {
-              correct: false,
-              message: tFunction(translations, lang).t("feedback.incomplete"),
-              correctAnswer: solutionDisplay,
-            }
+            foundError = true
+            const secondSolutionPart: string = "$\\textbf{\\underline{" + resultMap[key] + "}}$|\n"
+            solutionDisplay[count] = firstSolutionPart + secondSolutionPart
+          }
+          count++
+        }
+        if (foundError) {
+          return {
+            correct: false,
+            message: tFunction(translations, lang).t("feedback.incomplete"),
+            correctAnswer: t(translations, lang, "solutionFreetext", [solutionDisplay.join("")]),
           }
         }
         return {
@@ -879,7 +890,7 @@ export const stackQuestion: QuestionGenerator = {
 
       // Example inputfield {{test#NL#**Char: **##overlay}}
       let inputText = "\n| Operation | Result |\n| --- | --- |\n"
-      let solutionDisplay = ""
+      const solutionDisplay: string[] = []
       let solutionIndex = 0
       const correctAnswers: { [key: string]: string } = {}
       let index = 0
@@ -892,19 +903,19 @@ export const stackQuestion: QuestionGenerator = {
             solutionIndex++
             correctAnswers[`input-${index}`] = operation.getTop
             correctAnswers[`input-${index}-format`] = "getTop"
-            solutionDisplay += `|${solutionIndex}|${stackName}.getTop() | ${operation.getTop} |\n`
+            solutionDisplay.push(`|${solutionIndex}|${stackName}.getTop() | ${operation.getTop} |\n`)
           } else if (Object.prototype.hasOwnProperty.call(operation, "size")) {
             inputText += `|${stackName}.getSize()|{{input-${index}#TL###overlay}}|\n`
             solutionIndex++
             correctAnswers[`input-${index}`] = operation.size
             correctAnswers[`input-${index}-format`] = "getSize"
-            solutionDisplay += `|${solutionIndex}|${stackName}.getSize() | ${operation.size} |\n`
+            solutionDisplay.push(`|${solutionIndex}|${stackName}.getSize() | ${operation.size} |\n`)
           } else if (Object.prototype.hasOwnProperty.call(operation, "amount")) {
             inputText += `|${stackName}.amountElements()|{{input-${index}#TL###overlay}}|\n`
             solutionIndex++
             correctAnswers[`input-${index}`] = operation.amount
             correctAnswers[`input-${index}-format`] = "getCurrentPosition"
-            solutionDisplay += `|${solutionIndex}|${stackName}.getCurrentPosition() | ${operation.amount} |\n`
+            solutionDisplay.push(`|${solutionIndex}|${stackName}.getCurrentPosition() | ${operation.amount} |\n`)
           }
         }
         index++
@@ -915,10 +926,10 @@ export const stackQuestion: QuestionGenerator = {
       correctAnswers[`input-${index}`] = stack.toString()
       correctAnswers[`input-${index}-format`] = "toString"
       solutionIndex++
-      solutionDisplay += `|${solutionIndex}|${stackName}.toString() | ${stack.toString()} |\n`
+      solutionDisplay.push(`|${solutionIndex}|${stackName}.toString() | ${stack.toString()} |\n`)
 
       // adding the extra feature for a div
-      solutionDisplay += "|#div_my-5?table_w-full#| |"
+      solutionDisplay.push("|#div_my-5?table_w-full#| |")
       inputText += `|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |`
       // generate the input fields for the operations (if either getTop, size or amount)
       // if push, we don't ask the user for input
