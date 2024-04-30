@@ -852,7 +852,8 @@ export const stackQuestion: QuestionGenerator = {
             for (let i = 0; i < userArray.length; i++) {
               if (userArray[i] !== resultArray[i]) {
                 foundError = true
-                solutionDisplayArray += (i === 0 ? "" : ",") + `$\\textbf{\\underline{${resultArray[i]}}}$`
+                solutionDisplayArray +=
+                  (i === 0 ? "" : ",") + `$\\textbf{\\underline{${resultArray[i]}}}$`
               } else {
                 solutionDisplayArray += i === 0 ? resultArray[i] : "," + resultArray[i]
               }
@@ -915,7 +916,9 @@ export const stackQuestion: QuestionGenerator = {
             solutionIndex++
             correctAnswers[`input-${index}`] = operation.amount
             correctAnswers[`input-${index}-format`] = "getCurrentPosition"
-            solutionDisplay.push(`|${solutionIndex}|${stackName}.getCurrentPosition() | ${operation.amount} |\n`)
+            solutionDisplay.push(
+              `|${solutionIndex}|${stackName}.getCurrentPosition() | ${operation.amount} |\n`,
+            )
           }
         }
         index++

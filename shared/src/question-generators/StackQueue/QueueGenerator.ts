@@ -695,7 +695,8 @@ export const queueQuestion: QuestionGenerator = {
             for (let i = 0; i < correctArray.length; i++) {
               if (correctArray[i] !== userArray[i]) {
                 correctAnswered = false
-                solutionDisplayArray += (i === 0 ? "" : ",") + `$\\textbf{\\underline{${correctArray[i]}}}$`
+                solutionDisplayArray +=
+                  (i === 0 ? "" : ",") + `$\\textbf{\\underline{${correctArray[i]}}}$`
               } else {
                 solutionDisplayArray += i === 0 ? correctArray[i] : "," + correctArray[i]
               }
@@ -744,7 +745,9 @@ export const queueQuestion: QuestionGenerator = {
         if (Object.prototype.hasOwnProperty.call(operation, "numberElements")) {
           inputText += `|${queueName}.numberElements() | {{numElements-${index}####}} |\n`
           solutionIndex++
-          solutionDisplay.push(`|${solutionIndex}|${queueName}.numberElements() | $${operation.numberElements}$ |\n`)
+          solutionDisplay.push(
+            `|${solutionIndex}|${queueName}.numberElements() | $${operation.numberElements}$ |\n`,
+          )
           correctAnswers[`numElements-${index}`] = operation.numberElements
         }
         if (Object.prototype.hasOwnProperty.call(operation, "getFront")) {
@@ -763,11 +766,15 @@ export const queueQuestion: QuestionGenerator = {
           : "full"
       if (fullOrPartQueue === "full") {
         inputText += `|${queueName}.getQueue()|{{getQueue-${index}####[2,-1,-1,1]}}|`
-        solutionDisplay.push(`|${solutionIndex}|${queueName}.getQueue()|[${operationsFreeText.queue.getQueue()}]|\n`)
+        solutionDisplay.push(
+          `|${solutionIndex}|${queueName}.getQueue()|[${operationsFreeText.queue.getQueue()}]|\n`,
+        )
         correctAnswers[`getQueue-${index}`] = operationsFreeText.queue.getQueue()
       } else {
         inputText += `|${queueName}.toString()|{{toString-${index}####[1,2,3,4]}}|`
-        solutionDisplay.push(`|${solutionIndex}|${queueName}.toString()|[${operationsFreeText.queue.toString()}]|\n`)
+        solutionDisplay.push(
+          `|${solutionIndex}|${queueName}.toString()|[${operationsFreeText.queue.toString()}]|\n`,
+        )
         correctAnswers[`toString-${index}`] = operationsFreeText.queue.toString()
       }
       solutionDisplay.push("|#div_my-5?table_w-full#| |")

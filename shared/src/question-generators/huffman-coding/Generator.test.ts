@@ -73,8 +73,8 @@ describe("HuffmanCodingGenerator - Correctness", () => {
 
         if (t.wordArray) {
           const wordArray = t.wordArray
-          expect(Object.keys(wordArray).length).toBeGreaterThanOrEqual(8)
-          expect(Object.keys(wordArray).length).toBeLessThanOrEqual(11)
+          expect(Object.keys(wordArray).length).toBeGreaterThanOrEqual(6)
+          expect(Object.keys(wordArray).length).toBeLessThanOrEqual(9)
 
           const correctNode = huffmanCodingAlgorithm("", wordArray).mainNode
           const correctAnswerDict: { [key: string]: string } = createHuffmanCoding({}, correctNode, "")
