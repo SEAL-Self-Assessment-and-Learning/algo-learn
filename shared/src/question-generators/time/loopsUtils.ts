@@ -19,6 +19,7 @@ export type StepOptions =
 
 export type BoundsOptions =
   | "none"
+  | AdditionOption
   | MultiplicationOption
   | SquareOption
   | CubeOption
@@ -89,6 +90,7 @@ export function createForLine({
   end,
   endManipulation = "none",
   step = "normal",
+  timeOrStars = "stars",
   indent = 0,
 }: {
   innerVar: string
@@ -97,6 +99,7 @@ export function createForLine({
   end: string
   endManipulation?: BoundsOptions
   step?: StepOptions
+  timeOrStars?: "time" | "stars"
   indent: number
 }): string {
   // check if the for loop can finish
@@ -106,15 +109,15 @@ export function createForLine({
   const _: string = " ".repeat(indent)
 
   // create start string via createBoundsString
-  const startString = createBoundsString(start, startManipulation)
+  const startString = createBoundsString(start, startManipulation, timeOrStars)
 
   // create the step string via createStepString
   const stepString = createStepString(step, innerVar, true)
 
   // create the end string via createBoundsString
-  const endString = createBoundsString(end, endManipulation)
+  const endString = createBoundsString(end, endManipulation, timeOrStars)
 
-  return `${_}for ${innerVar} from ${startString} to ${endString}${stepString}:\n`
+  return `${_}for ${innerVar} from ${startString} to ${endString}${stepString}\n`
 }
 
 export function createWhileLine({
@@ -123,6 +126,7 @@ export function createWhileLine({
   end,
   endManipulation = "none",
   compare,
+  timeOrStars = "stars",
   indent = 0,
 }: {
   start: string
@@ -130,6 +134,7 @@ export function createWhileLine({
   end: string
   endManipulation?: BoundsOptions
   compare: string
+  timeOrStars?: "time" | "stars"
   indent: number
 }): string {
   const _: string = " ".repeat(indent)
@@ -139,10 +144,10 @@ export function createWhileLine({
     return `${_}while ${start} ${compare} ${end}:\n`
   }
 
-  const startBounds = createBoundsString(start, startManipulation)
-  const endBounds = createBoundsString(end, endManipulation)
+  const startBounds = createBoundsString(start, startManipulation, timeOrStars)
+  const endBounds = createBoundsString(end, endManipulation, timeOrStars)
 
-  return `${_}while ${startBounds} ${compare} ${endBounds}:\n`
+  return `${_}while ${startBounds} ${compare} ${endBounds}\n`
 }
 
 export function createStepString(step: StepOptions, innerVar: string, forLoop: boolean = false) {
@@ -158,7 +163,11 @@ export function createStepString(step: StepOptions, innerVar: string, forLoop: b
   return stepString
 }
 
-export function createBoundsString(value: string, boundsManipulation: BoundsOptions) {
+export function createBoundsString(
+  value: string,
+  boundsManipulation: BoundsOptions,
+  timeOrStars?: "time" | "stars",
+) {
   // create the bounds string
   let endString: string = boundsManipulation === "none" ? value : ""
   if (boundsManipulation !== "none") {
@@ -166,22 +175,41 @@ export function createBoundsString(value: string, boundsManipulation: BoundsOpti
       endString = `${boundsManipulation.value}*${value}`
     }
     if (boundsManipulation.type === "square") {
-      endString = `abs(${value})*${value}`
+      if (timeOrStars === "stars") {
+        endString = `abs(${value})*${value}`
+      } else {
+        endString = `${value}*${value}`
+      }
     }
     if (boundsManipulation.type === "cube") {
       endString = `${value}*${value}*${value}`
     }
     if (boundsManipulation.type === "log") {
-      endString = `ceil(log${boundsManipulation.value}(${value}))`
+      if (timeOrStars === "stars") {
+        endString = `ceil(log${boundsManipulation.value}(${value}))`
+      } else {
+        endString = `log${boundsManipulation.value}(${value})`
+      }
     }
     if (boundsManipulation.type === "root") {
-      endString = `floor(root(${value}))`
+      if (timeOrStars === "stars") {
+        endString = `floor(root(${value}))`
+      } else {
+        endString = `root(${value})`
+      }
     }
     if (boundsManipulation.type === "div") {
-      endString = `floor(${value}/${boundsManipulation.value})`
+      if (timeOrStars === "stars") {
+        endString = `floor(${value}/${boundsManipulation.value})`
+      } else {
+        endString = `${value}/${boundsManipulation.value}`
+      }
     }
     if (boundsManipulation.type === "pow") {
       endString = `pow(${boundsManipulation.value === "self" ? value : boundsManipulation.value},${value})`
+    }
+    if (boundsManipulation.type === "add") {
+      endString = `${value}${boundsManipulation.value > 0 ? "+" : ""}${boundsManipulation.value}`
     }
   }
   return endString
@@ -209,10 +237,10 @@ export function createIfCondition({
   let code = ""
   const _ = " ".repeat(indent)
   if (condition === "same" || condition === ">" || condition === "<") {
-    code += `${_}if ${innerVar1} == ${innerVar2}:\n`
+    code += `${_}if ${innerVar1} ${condition === "same" ? "==" : condition} ${innerVar2}\n`
   } else {
     if (condition !== "none") {
-      code += `${_}if ${innerVar1} is ${condition}:\n`
+      code += `${_}if ${innerVar1} is ${condition}\n`
     }
   }
   if (numPrint > 0) {
@@ -223,7 +251,7 @@ export function createIfCondition({
   }
 
   if (elseStatement) {
-    code += `${_}else:\n`
+    code += `${_}else\n`
     code += printStars(numPrintElse, indent + 2)
   }
 

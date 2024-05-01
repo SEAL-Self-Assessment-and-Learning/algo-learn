@@ -158,8 +158,6 @@ export function sampleExactIfEven({
     numStars = firstWhileLoop.numStars
   }
 
-  console.log(`Numstars: ${numStars}`)
-
   return { code: code.trim(), numStars }
 }
 
@@ -558,7 +556,6 @@ function createForForLoop(
             : endSecond * endSecondManipulationValue
     for (; j <= endSecondValue; j += stepSecond) {
       numStars += calculateNumStars(condEnd, j, numPrint, numPrintElse, elseEnd, i)
-      console.log(numStars, i, j, condEnd)
       if (breakEnd) break
     }
   }
@@ -614,14 +611,14 @@ function createWhileLoop(
   function condition(i: number, j: number) {
     return vars === "xy"
       ? compareTwoValues(
-          toMpl !== "i" || endManipulation === "none"
+          varToManipulate !== "i" || endManipulation === "none"
             ? i
             : endManipulation.type === "square"
               ? Math.abs(i) * i
               : endManipulation.type === "mult"
                 ? i * endManipulationValue
                 : Math.floor(Math.log2(i)),
-          toMpl !== "j" || endManipulation === "none"
+          varToManipulate !== "j" || endManipulation === "none"
             ? j
             : endManipulation.type === "square"
               ? Math.abs(j) * j
@@ -632,14 +629,14 @@ function createWhileLoop(
         )
       : vars === "yx"
         ? compareTwoValues(
-            toMpl !== "j" || endManipulation === "none"
+            varToManipulate !== "j" || endManipulation === "none"
               ? j
               : endManipulation.type === "square"
                 ? Math.abs(j) * j
                 : endManipulation.type === "mult"
                   ? j * endManipulationValue
                   : Math.floor(Math.log2(j)),
-            toMpl !== "i" || endManipulation === "none"
+            varToManipulate !== "i" || endManipulation === "none"
               ? i
               : endManipulation.type === "square"
                 ? Math.abs(i) * i
@@ -650,14 +647,14 @@ function createWhileLoop(
           )
         : vars === "xn"
           ? compareTwoValues(
-              toMpl !== "i" || endManipulation === "none"
+              varToManipulate !== "i" || endManipulation === "none"
                 ? i
                 : endManipulation.type === "square"
                   ? Math.abs(i) * i
                   : endManipulation.type === "mult"
                     ? i * endManipulationValue
                     : Math.floor(Math.log2(i)),
-              toMpl !== "e" || endManipulation === "none"
+              varToManipulate !== "e" || endManipulation === "none"
                 ? endValue
                 : endManipulation.type === "square"
                   ? endValue * endValue
@@ -669,6 +666,176 @@ function createWhileLoop(
           : false
   }
 
+  const {
+    startVar1,
+    startVar2,
+    endValue,
+    vars,
+    compare,
+    endManipulationValue,
+    endManipulation,
+    cOption,
+  } = computeStartEndVarsWhile(random)
+
+  if (startVar1 === -10 && startVar2 === -10) {
+    throw new Error("Start values are not set" + cOption + vars + compare)
+  }
+
+  // Choose a condition
+  const condEnd: IfOptions = random.choice(["even", "odd", "square", "none"])
+  const elseAfter =
+    condEnd === "none"
+      ? false
+      : random.weightedChoice([
+          [true, 0.3],
+          [false, 0.7],
+        ])
+  const printAfter = random.weightedChoice([
+    [true, 0.25],
+    [false, 0.75],
+  ])
+
+  let compareVar = ""
+  if (
+    (cOption.toLowerCase().indexOf("x") !== -1 && cOption.toLowerCase().indexOf("y") !== -1) ||
+    (cOption.toLowerCase().indexOf("x") === -1 && cOption.toLowerCase().indexOf("y") === -1) ||
+    vars === "xy" ||
+    vars === "yx"
+  ) {
+    compareVar = random.choice(["var1", "var2"])
+    // introduce var1 and var2
+    code += createVariable({ variable: innerVar, value: startVar1.toString(), indent: 0 })
+    code += createVariable({ variable: innerVar2, value: startVar2.toString(), indent: 0 })
+  } else if (cOption.toLowerCase().indexOf("x") !== -1) {
+    code += createVariable({ variable: innerVar, value: startVar1.toString(), indent: 0 })
+    compareVar = "var1"
+  } else if (cOption.toLowerCase().indexOf("y") !== -1) {
+    compareVar = "var2"
+    code += createVariable({ variable: innerVar, value: startVar2.toString(), indent: 0 })
+  }
+
+  // while loop statement
+  // const vars = random.choice(["xy", "yx", "xn"])
+  // only manipulate the greater value
+  if (vars === "xy") {
+    code += createWhileLine({
+      start: innerVar,
+      startManipulation: startVar2 > startVar1 ? "none" : endManipulation,
+      end: innerVar2,
+      endManipulation: startVar2 > startVar1 ? endManipulation : "none",
+      compare,
+      indent: 0,
+    })
+  } else if (vars === "yx") {
+    code += createWhileLine({
+      start: innerVar2,
+      startManipulation: startVar1 > startVar2 ? "none" : endManipulation,
+      end: innerVar,
+      endManipulation: startVar1 > startVar2 ? endManipulation : "none",
+      compare,
+      indent: 0,
+    })
+  } else if (vars === "xn") {
+    code += createWhileLine({
+      start: innerVar,
+      startManipulation: startVar1 < endValue ? "none" : endManipulation,
+      end: endValue.toString(),
+      endManipulation: startVar1 < endValue ? endManipulation : "none",
+      compare,
+      indent: 0,
+    })
+  }
+
+  // create the if and else statement
+  code += createIfCondition({
+    innerVar1: compareVar === "var1" ? innerVar : innerVar2,
+    condition: condEnd,
+    elseStatement: elseAfter,
+    numPrint,
+    numPrintElse,
+    indent: 2,
+  })
+
+  let firstChangeValue = random.int(1, 3)
+  let secondChangeValue = random.int(1, 3)
+
+  const changedCode = createWhileChangeValues({
+    cOption,
+    firstChangeValue,
+    secondChangeValue,
+    innerVar,
+    innerVar2,
+    code,
+    _,
+    compare,
+    vars,
+    random,
+  })
+  code = changedCode.code
+  firstChangeValue = changedCode.firstChangeValue
+  secondChangeValue = changedCode.secondChangeValue
+
+  const varToManipulate = computeVariableToManipulateWhile(
+    startVar1,
+    startVar2,
+    endValue,
+    endManipulation,
+    vars,
+  )
+
+  // create the while loop
+  let i = startVar1
+  let j = startVar2
+
+  while (condition(i, j)) {
+    // calculate the stars
+    numStars += calculateNumStars(
+      condEnd,
+      compareVar === "var1" ? i : j,
+      numPrint,
+      numPrintElse,
+      elseAfter,
+    )
+
+    if (twoLoops) {
+      numStars += starsSecondLoop
+    }
+
+    const changedCode = createWhileChangeValues({
+      cOption,
+      firstChangeValue,
+      secondChangeValue,
+      compare,
+      vars,
+      changeCode: false,
+      changeI: i,
+      changeJ: j,
+      random,
+    })
+    i = changedCode.changeI
+    j = changedCode.changeJ
+  }
+
+  // add the code of the next loop
+  if (twoLoops) {
+    // insert two spaces in front of every line at "insertCode"
+    code +=
+      insertCode
+        .split("\n")
+        .map((line) => `  ${line}`)
+        .join("\n") + "\n"
+  }
+
+  // printAfter
+  if (printAfter) {
+    code += printStars(numPrintAfter, indent)
+    numStars += numPrintAfter
+  }
+
+  return { code: code.trim(), numStars }
+}
+
+function computeStartEndVarsWhile(random: Random) {
   const cOption = random.choice(allWhileCases)
 
   let startVar1: number = -10
@@ -1072,198 +1239,68 @@ function createWhileLoop(
     }
   }
 
-  if (startVar1 === -10 && startVar2 === -10) {
-    throw new Error("Start values are not set" + cOption + vars + compare)
-  }
-
-  // Choose a condition
-  const condEnd: IfOptions = random.choice(["even", "odd", "square", "none"])
-  const elseAfter =
-    condEnd === "none"
-      ? false
-      : random.weightedChoice([
-          [true, 0.3],
-          [false, 0.7],
-        ])
-  const printAfter = random.weightedChoice([
-    [true, 0.25],
-    [false, 0.75],
-  ])
-
-  let compareVar = ""
-  if (
-    (cOption.toLowerCase().indexOf("x") !== -1 && cOption.toLowerCase().indexOf("y") !== -1) ||
-    (cOption.toLowerCase().indexOf("x") === -1 && cOption.toLowerCase().indexOf("y") === -1) ||
-    vars === "xy" ||
-    vars === "yx"
-  ) {
-    compareVar = random.choice(["var1", "var2"])
-    // introduce var1 and var2
-    code += createVariable({ variable: innerVar, value: startVar1.toString(), indent: 0 })
-    code += createVariable({ variable: innerVar2, value: startVar2.toString(), indent: 0 })
-  } else if (cOption.toLowerCase().indexOf("x") !== -1) {
-    code += createVariable({ variable: innerVar, value: startVar1.toString(), indent: 0 })
-    compareVar = "var1"
-  } else if (cOption.toLowerCase().indexOf("y") !== -1) {
-    compareVar = "var2"
-    code += createVariable({ variable: innerVar, value: startVar2.toString(), indent: 0 })
-  }
-
-  // while loop statement
-  // const vars = random.choice(["xy", "yx", "xn"])
-  // only manipulate the greater value
-  if (vars === "xy") {
-    code += createWhileLine({
-      start: innerVar,
-      startManipulation: startVar2 > startVar1 ? "none" : endManipulation,
-      end: innerVar2,
-      endManipulation: startVar2 > startVar1 ? endManipulation : "none",
-      compare,
-      indent: 0,
-    })
-  } else if (vars === "yx") {
-    code += createWhileLine({
-      start: innerVar2,
-      startManipulation: startVar1 > startVar2 ? "none" : endManipulation,
-      end: innerVar,
-      endManipulation: startVar1 > startVar2 ? endManipulation : "none",
-      compare,
-      indent: 0,
-    })
-  } else if (vars === "xn") {
-    code += createWhileLine({
-      start: innerVar,
-      startManipulation: startVar1 < endValue ? "none" : endManipulation,
-      end: endValue.toString(),
-      endManipulation: startVar1 < endValue ? endManipulation : "none",
-      compare,
-      indent: 0,
-    })
-  }
-
-  // create the if and else statement
-  code += createIfCondition({
-    innerVar1: compareVar === "var1" ? innerVar : innerVar2,
-    condition: condEnd,
-    elseStatement: elseAfter,
-    numPrint,
-    numPrintElse,
-    indent: 2,
-  })
-
-  let firstChangeValue = random.int(1, 3)
-  let secondChangeValue = random.int(1, 3)
-
-  const changedCode = createWhileChangeValues({
-    cOption,
-    firstChangeValue,
-    secondChangeValue,
-    innerVar,
-    innerVar2,
-    code,
-    _,
-    compare,
+  return {
+    startVar1,
+    startVar2,
+    endValue,
     vars,
-    random,
-  })
-  code = changedCode.code
-  firstChangeValue = changedCode.firstChangeValue
-  secondChangeValue = changedCode.secondChangeValue
+    compare,
+    cOption,
+    endManipulation,
+    endManipulationValue,
+  }
+}
 
-  let toMpl = ""
+function computeVariableToManipulateWhile(
+  startVar1: number,
+  startVar2: number,
+  endValue: number,
+  endManipulation: BoundsOptions,
+  vars: "xy" | "yx" | "xn",
+) {
+  let varToManipulate = ""
   if (endManipulation !== "none") {
     if (vars === "xn") {
       if (endManipulation.type === "square") {
         if (endValue > startVar1) {
-          toMpl = "e"
+          varToManipulate = "e"
         } else if (startVar1 > endValue) {
-          toMpl = "i"
+          varToManipulate = "i"
         }
       } else if (endManipulation.type === "mult") {
         if (endValue > startVar1) {
-          toMpl = "e"
+          varToManipulate = "e"
         } else if (startVar1 > endValue) {
-          toMpl = "i"
+          varToManipulate = "i"
         }
       } else if (endManipulation.type === "log") {
         if (endValue > startVar1) {
-          toMpl = "e"
+          varToManipulate = "e"
         } else if (startVar1 > endValue) {
-          toMpl = "i"
+          varToManipulate = "i"
         }
       }
     } else if (vars === "xy" || vars === "yx") {
       if (endManipulation.type === "square") {
         if (startVar2 > startVar1) {
-          toMpl = "j"
+          varToManipulate = "j"
         } else if (startVar1 > startVar2) {
-          toMpl = "i"
+          varToManipulate = "i"
         }
       } else if (endManipulation.type === "mult") {
         if (startVar2 > startVar1) {
-          toMpl = "j"
+          varToManipulate = "j"
         } else if (startVar1 > startVar2) {
-          toMpl = "i"
+          varToManipulate = "i"
         }
       } else if (endManipulation.type === "log") {
         if (startVar2 > startVar1) {
-          toMpl = "j"
+          varToManipulate = "j"
         } else if (startVar1 > startVar2) {
-          toMpl = "i"
+          varToManipulate = "i"
         }
       }
     }
   }
-
-  // create the while loop
-  let i = startVar1
-  let j = startVar2
-
-  while (condition(i, j)) {
-    console.log(i, j, endValue, compare, vars, cOption)
-    // calculate the stars
-    numStars += calculateNumStars(
-      condEnd,
-      compareVar === "var1" ? i : j,
-      numPrint,
-      numPrintElse,
-      elseAfter,
-    )
-
-    if (twoLoops) {
-      numStars += starsSecondLoop
-    }
-
-    const changedCode = createWhileChangeValues({
-      cOption,
-      firstChangeValue,
-      secondChangeValue,
-      compare,
-      vars,
-      changeCode: false,
-      changeI: i,
-      changeJ: j,
-      random,
-    })
-    i = changedCode.changeI
-    j = changedCode.changeJ
-  }
-
-  // add the code of the next loop
-  if (twoLoops) {
-    // insert two spaces in front of every line at "insertCode"
-    code +=
-      insertCode
-        .split("\n")
-        .map((line) => `  ${line}`)
-        .join("\n") + "\n"
-  }
-
-  // printAfter
-  if (printAfter) {
-    code += printStars(numPrintAfter, indent)
-    numStars += numPrintAfter
-  }
-
-  return { code: code.trim(), numStars }
+  return varToManipulate
 }

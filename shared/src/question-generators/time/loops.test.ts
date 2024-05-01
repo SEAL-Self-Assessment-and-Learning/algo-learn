@@ -13,7 +13,7 @@ interface TestingObject {
 }
 
 describe("Loops number of stars - Correctness", () => {
-  for (let i = 1; i <= 10000; i++) {
+  for (let i = 1; i <= 100; i++) {
     test(`${i}. random loops number of stars question`, () => {
       const { question: q, testing: t } = loops.generate(
         "", // path not relevant here

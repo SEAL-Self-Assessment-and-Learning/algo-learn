@@ -22,12 +22,12 @@ const translations: Translations = {
   en: {
     name: "Loops",
     bigOname: "Loops O-Notation",
+    longTitle: "Loops",
+    bigOLongTitle: "Loops (Big O)",
     description: "Determine the number of iterations in a loop",
     bigOdescription: "Determine the time complexity of a code",
     text1: "Consider the following procedure `{{0}}` with integer input ${{1}}$:",
     text2: "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
-    longTitle: "Loops",
-    bigOLongTitle: "Loops (Big O)",
     simpleExactDescription: "Consider the following piece of code:",
     simpleExactPrompt: "Number of stars:",
     bigOPrompt: "$\\Theta$",
@@ -38,12 +38,12 @@ const translations: Translations = {
   de: {
     name: "Schleifen",
     bigOname: "Schleifen O-Notation",
+    longTitle: "Schleifen",
+    bigOLongTitle: "Loops (Big O)",
     description: "Bestimme die Anzahl der Iterationen in einer Schleife",
     bigOdescription: "Bestimme die Zeitkomplexität eines Codes",
     text1: "Betrachte die folgende Prozedur {{0}} mit ganzzahliger Eingabe {{1}}:",
     text2: "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
-    longTitle: "Schleifen",
-    bigOLongTitle: "Loops (Big O)",
     simpleExactDescription: "Betrachte den folgenden Code:",
     simpleExactPrompt: "Anzahl der Sterne:",
     bigOPrompt: "$\\Theta$",
@@ -190,7 +190,6 @@ ${t("bigOQuestion", [variable])}
 `
     const prompt = t("bigOPrompt")
 
-    // TODO: This checkFormat and RecurrenceMaster checkFormat are nearly the same (consider combining them)
     const checkFormat: FreeTextFormatFunction = ({ text }) => {
       if (text.trim() === "") return { valid: false }
       let mathNode: MathNode
