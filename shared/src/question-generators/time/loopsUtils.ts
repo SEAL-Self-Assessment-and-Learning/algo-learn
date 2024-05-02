@@ -83,6 +83,17 @@ export function getCompare(random: Random, com: "<" | ">" | "<<" | ">>"): WhileC
   return random.choice([">", ">="])
 }
 
+/**
+ * Creates a for loop line
+ * @param innerVar
+ * @param start
+ * @param startManipulation
+ * @param end
+ * @param endManipulation
+ * @param step
+ * @param timeOrStars
+ * @param indent
+ */
 export function createForLine({
   innerVar,
   start,
@@ -100,11 +111,8 @@ export function createForLine({
   endManipulation?: BoundsOptions
   step?: StepOptions
   timeOrStars?: "time" | "stars"
-  indent: number
+  indent?: number
 }): string {
-  // check if the for loop can finish
-  checkForLoopLogicError({ start, startManipulation, endManipulation, step })
-
   // create the spacing in front the for statement
   const _: string = " ".repeat(indent)
 
@@ -120,6 +128,16 @@ export function createForLine({
   return `${_}for ${innerVar} from ${startString} to ${endString}${stepString}\n`
 }
 
+/**
+ * Creates a while loop line
+ * @param start
+ * @param startManipulation
+ * @param end
+ * @param endManipulation
+ * @param compare
+ * @param timeOrStars
+ * @param indent
+ */
 export function createWhileLine({
   start,
   startManipulation = "none",
@@ -150,6 +168,12 @@ export function createWhileLine({
   return `${_}while ${startBounds} ${compare} ${endBounds}\n`
 }
 
+/**
+ * Creates a string (step statement) how to manipulate the step increment
+ * @param step
+ * @param innerVar
+ * @param forLoop
+ */
 export function createStepString(step: StepOptions, innerVar: string, forLoop: boolean = false) {
   // create the step string
   let stepString: string = ""
@@ -163,6 +187,12 @@ export function createStepString(step: StepOptions, innerVar: string, forLoop: b
   return stepString
 }
 
+/**
+ * Creates a string how to manipulate the bounds (of a for loop or while loop)
+ * @param value
+ * @param boundsManipulation
+ * @param timeOrStars
+ */
 export function createBoundsString(
   value: string,
   boundsManipulation: BoundsOptions,
@@ -188,7 +218,7 @@ export function createBoundsString(
       if (timeOrStars === "stars") {
         endString = `ceil(log${boundsManipulation.value}(${value}))`
       } else {
-        endString = `log${boundsManipulation.value}(${value})`
+        endString = `log${boundsManipulation.value == 0 ? "" : boundsManipulation.value}(${value})`
       }
     }
     if (boundsManipulation.type === "root") {
@@ -209,12 +239,23 @@ export function createBoundsString(
       endString = `pow(${boundsManipulation.value === "self" ? value : boundsManipulation.value},${value})`
     }
     if (boundsManipulation.type === "add") {
-      endString = `${value}${boundsManipulation.value > 0 ? "+" : ""}${boundsManipulation.value}`
+      endString = `${value}${boundsManipulation.value > 0 ? "+" : "-"}${boundsManipulation.value}`
     }
   }
   return endString
 }
 
+/**
+ * Creates an if condition
+ * @param innerVar1
+ * @param innerVar2
+ * @param condition
+ * @param elseStatement
+ * @param numPrint
+ * @param numPrintElse
+ * @param writeCode if other code should be written inside the if statement
+ * @param indent
+ */
 export function createIfCondition({
   innerVar1,
   innerVar2 = "none",
@@ -258,6 +299,11 @@ export function createIfCondition({
   return code
 }
 
+/**
+ * Creates a continue statement
+ * @param con
+ * @param indent
+ */
 export function createIfContinue({
   con = true,
   indent = 0,
@@ -268,10 +314,21 @@ export function createIfContinue({
   return con ? " ".repeat(indent) + "continue\n" : ""
 }
 
+/**
+ * Creates a break statement
+ * @param br
+ * @param indent
+ */
 export function createIfBreak({ br = true, indent = 0 }: { br?: boolean; indent?: number }): string {
   return br ? " ".repeat(indent) + "break\n" : ""
 }
 
+/**
+ * Creates a new variable (string)
+ * @param variable
+ * @param value
+ * @param indent
+ */
 export function createVariable({
   variable,
   value,
@@ -284,6 +341,24 @@ export function createVariable({
   return `${" ".repeat(indent)}${variable} = ${value}\n`
 }
 
+/**
+ * Creates the comparing of while loops
+ * - Either creates code
+ * - Or returns the new values of the inner variables (changeI, changeJ)
+ * @param cOption
+ * @param firstChangeValue
+ * @param secondChangeValue
+ * @param innerVar
+ * @param innerVar2
+ * @param code
+ * @param _
+ * @param compare
+ * @param vars
+ * @param changeCode
+ * @param changeI
+ * @param changeJ
+ * @param random
+ */
 export function createWhileChangeValues({
   cOption,
   firstChangeValue,
@@ -315,7 +390,6 @@ export function createWhileChangeValues({
 }) {
   // changeI -> innerVar
   // changeJ -> innerVar2
-
   if (cOption === "xPlus") {
     changeCode ? (code += `${_}  ${innerVar} += ${firstChangeValue}\n`) : ""
     changeI += firstChangeValue
@@ -498,54 +572,4 @@ export function createWhileChangeValues({
     changeI,
     changeJ,
   }
-}
-
-function checkForLoopLogicError({
-  start,
-  startManipulation,
-  endManipulation,
-  step,
-}: {
-  start: string
-  startManipulation: BoundsOptions
-  endManipulation: BoundsOptions
-  step: StepOptions
-}) {
-  // TODO add more logic errors
-
-  function checkManipulation(manipulation: BoundsOptions) {
-    // Log value has to be greater than 1
-    if (manipulation !== "none" && manipulation.type === "log" && manipulation.value <= 1) {
-      throw new Error("Log value has to be greater than 1")
-    }
-
-    if (
-      manipulation !== "none" &&
-      manipulation.type === "pow" &&
-      typeof manipulation.value === "number" &&
-      manipulation.value < 0
-    ) {
-      throw new Error("Pow value has to be greater or equal to 0")
-    }
-  }
-
-  // this is only not possible if *var and start="1"
-  if (typeof step !== "string" && step.type === "square" && Number.parseInt(start) <= 1) {
-    throw new Error("Cannot finish loop, because the step is *var and the start is 1")
-  }
-
-  // Multiplication step should be bigger than 1
-  if (typeof step !== "string" && step.type === "mult" && Math.abs(step.value) <= 1) {
-    throw new Error("Multiplication step should be bigger than 1")
-  }
-
-  // Addition needs to have at least a value of Math.abs(x) >= 1
-  if (typeof step !== "string" && step.type === "add" && Math.abs(step.value) < 1) {
-    throw new Error("Addition step should be bigger than 1")
-  }
-
-  // check if the start manipulation is valid
-  checkManipulation(startManipulation)
-  // check if the end manipulation is valid
-  checkManipulation(endManipulation)
 }

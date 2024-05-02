@@ -12,7 +12,7 @@ import { SortTerms } from "../shared/src/question-generators/asymptotics/sort"
 import { SimplifySum } from "../shared/src/question-generators/asymptotics/sum"
 import { RecursionFormula } from "../shared/src/question-generators/recursion/formula"
 import { RecurrenceMaster } from "../shared/src/question-generators/recursion/recurrenceMaster"
-import { loops, loopsBigO } from "../shared/src/question-generators/time/loops"
+import { Loops, LoopsBigO } from "../shared/src/question-generators/time/loops"
 
 /** List of all question routes */
 export const allQuestionGeneratorRoutes: QuestionRoutes = [
@@ -50,11 +50,11 @@ export const allQuestionGeneratorRoutes: QuestionRoutes = [
   },
   {
     path: "time/loops",
-    generator: loops,
+    generator: Loops,
   },
   {
     path: "time/loopsBigO",
-    generator: loopsBigO,
+    generator: LoopsBigO,
   },
   {
     path: "huffmancoding/huffmanCoding",

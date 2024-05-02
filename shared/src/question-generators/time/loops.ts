@@ -53,7 +53,7 @@ const translations: Translations = {
   },
 }
 
-export const loops: QuestionGenerator = {
+export const Loops: QuestionGenerator = {
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -67,15 +67,15 @@ export const loops: QuestionGenerator = {
   generate(generatorPath, lang, parameters, seed) {
     const { t } = tFunction(translations, lang)
 
-    if (!validateParameters(parameters, loops.expectedParameters)) {
+    if (!validateParameters(parameters, Loops.expectedParameters)) {
       throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${loops.expectedParameters.join(
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${Loops.expectedParameters.join(
           ",",
         )}`,
       )
     }
     const permalink = serializeGeneratorCall({
-      generator: loops,
+      generator: Loops,
       lang,
       parameters,
       seed,
@@ -147,7 +147,7 @@ ${t("text2", [`${T}(${n})`])}`
   },
 }
 
-export const loopsBigO: QuestionGenerator = {
+export const LoopsBigO: QuestionGenerator = {
   name: tFunctional(translations, "bigOname"),
   description: tFunctional(translations, "bigOdescription"),
   languages: ["en", "de"],
@@ -155,21 +155,21 @@ export const loopsBigO: QuestionGenerator = {
     {
       type: "string",
       name: "variant",
-      allowedValues: ["simpleExact"],
+      allowedValues: ["O-Notation"],
     },
   ],
   generate(generatorPath, lang, parameters, seed) {
     const { t } = tFunction(translations, lang)
 
-    if (!validateParameters(parameters, loopsBigO.expectedParameters)) {
+    if (!validateParameters(parameters, LoopsBigO.expectedParameters)) {
       throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${loopsBigO.expectedParameters.join(
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${LoopsBigO.expectedParameters.join(
           ",",
         )}`,
       )
     }
     const permalink = serializeGeneratorCall({
-      generator: loopsBigO,
+      generator: LoopsBigO,
       lang,
       parameters,
       seed,

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
-import { loops } from "@shared/question-generators/time/loops.ts"
+import { Loops } from "@shared/question-generators/time/loops.ts"
 import { sampleRandomSeed } from "@shared/utils/random.ts"
 
 interface TestingObject {
@@ -15,14 +15,12 @@ interface TestingObject {
 describe("Loops number of stars - Correctness", () => {
   for (let i = 1; i <= 100; i++) {
     test(`${i}. random loops number of stars question`, () => {
-      const { question: q, testing: t } = loops.generate(
+      const { question: q, testing: t } = Loops.generate(
         "", // path not relevant here
         "en", // language not relevant
         { variant: "simpleExact" }, // generator does not support parameters
         sampleRandomSeed(),
       ) as TestingObject
-
-      console.log(t.functionText)
 
       expect(q.type).toEqual("FreeTextQuestion")
       expect(q.checkFormat).toBeDefined()

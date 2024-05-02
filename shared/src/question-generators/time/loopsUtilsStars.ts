@@ -17,9 +17,9 @@ import Random from "../../utils/random"
 import { printStars } from "../recursion/formulaUtils"
 
 /**
- * Sample the source code of a simple loop that prints stars
+ * Sample the source code of a loop that prints stars
  *
- * @param random - Random number generator
+ * @param random
  * @returns - Object containing the source code, the name of the function, the
  *   name of the variable, the number of stars printed in the base case and in
  *   the recursive case, as well as the number of recursive calls and the number
@@ -29,7 +29,7 @@ export function sampleLoopStars(random: Random) {
   const functionName = random.choice("fghPp".split(""))
   const variable = random.choice("nmNMxyztk".split(""))
   const availableVarNames = "nmNMxyztk".split("").filter((c) => c !== variable)
-  const { code, numStars } = sampleExactIfEven({
+  const { code, numStars } = sampleExact({
     random,
     availableVarNames,
   })
@@ -50,7 +50,7 @@ export function sampleLoopStars(random: Random) {
  * @param props.indent - Indentation level
  * @returns Source code
  */
-export function sampleExactIfEven({
+export function sampleExact({
   random,
   availableVarNames = "nmNMxyztk".split(""),
   indent = 0,
@@ -68,6 +68,9 @@ export function sampleExactIfEven({
   )
   let code = ""
   let numStars = 0
+
+  // All possible numPrint values, which could occur inside a loop
+  // numPrintMiddle... currently only necessary for "forfor" loops
   const numPrint = random.int(1, 4)
   const numPrintElse = random.choice([1, 2, 3, 4].filter((n) => n !== numPrint))
   const numPrintMiddle = random.choice([1, 2, 3, 4])
@@ -82,12 +85,15 @@ export function sampleExactIfEven({
   - while -> simple while loop (one or two Params)
   - whilewhileBlock -> nested while loop (the second is independent of the first)
    */
-  // const loopType = random.choice(["for", "forfor", "while", "whilewhileBlock"])
-  const loopType = random.choice(["for", "forfor", "while"])
+  const loopType: "for" | "forfor" | "while" | "whilewhileBlock" = random.choice([
+    "for",
+    "forfor",
+    "while",
+    "whilewhileBlock"
+  ])
 
   if (loopType === "for") {
     const forResult = createForLoop(innerVar, numPrint, numPrintElse, code, _, indent, numStars, random)
-
     code = forResult.code
     numStars = forResult.numStars
   } else if (loopType === "forfor") {
@@ -106,7 +112,6 @@ export function sampleExactIfEven({
       numStars,
       random,
     )
-
     code = forForResult.code
     numStars = forForResult.numStars
   } else if (loopType === "while") {
@@ -156,6 +161,8 @@ export function sampleExactIfEven({
 
     code = firstWhileLoop.code
     numStars = firstWhileLoop.numStars
+  } else {
+    throw new Error("Unknown loop type")
   }
 
   return { code: code.trim(), numStars }
@@ -164,6 +171,7 @@ export function sampleExactIfEven({
 /**
  * This function compare two values for var1 and var2 inside a while loop
  * it returns true if the condition is met, so the loop can continue
+ * otherwise false
  * @param i
  * @param j
  * @param compare
@@ -206,12 +214,29 @@ function calculateNumStars(
   else if (cond === "square" && Number.isInteger(Math.sqrt(i))) numStars += numPrint
   else if (cond === "square" && !Number.isInteger(Math.sqrt(i)) && elseStatement)
     numStars += numPrintElse
-  else if (cond === "none") numStars += numPrint
   else if (cond === "same" && i === j) numStars += numPrint
   else if (cond === "same" && elseStatement && i !== j) numStars += numPrintElse
+  else if (cond === "none") numStars += numPrint
   return numStars
 }
 
+/**
+ * This function generates code for a for loop
+ *
+ * Example:
+ * for t from 1 to 9
+ *   if t is odd
+ *     print("***")
+ *
+ * @param innerVar
+ * @param numPrint
+ * @param numPrintElse
+ * @param code
+ * @param _
+ * @param indent
+ * @param numStars
+ * @param random
+ */
 function createForLoop(
   innerVar: string,
   numPrint: number,
@@ -222,6 +247,7 @@ function createForLoop(
   numStars: number,
   random: Random,
 ) {
+  // calculates the condition for the loop
   function condition(i: number) {
     return (
       i <=
@@ -299,9 +325,7 @@ function createForLoop(
  *     else:
  *       print("**")
  *
- * Result: 483 -> \sum_{i=11}^{20}(2i)+\sum_{i=12}^{21}(i)+8
- *
- * Just for fun: Also the options for a "continue" (never exit the second for loop)
+ * Just for fun: Also the options for a "continue" (never enter the second for loop)
  * and a "break" (exit the second for loop after the first iteration)
  *
  * @param innerVar the name of the first variable
@@ -336,8 +360,8 @@ function createForForLoop(
   // at first, we randomly choose all the possible options inside both loops
   const startFirst = random.int(0, 3)
   const stepFirst = random.weightedChoice([
-    [1, 0.725],
-    [2, 0.2],
+    [1, 0.775],
+    [2, 0.15],
     [3, 0.075],
   ])
   let endFirst = random.int(6, 10)
@@ -347,7 +371,7 @@ function createForForLoop(
     { type: "square" },
     { type: "log", value: 2 },
   ]
-  const endFirstManipulation = random.weightedChoice([
+  const endFirstManipulation: BoundsOptions = random.weightedChoice([
     [endManipulationOptions[0], 0.7],
     [endManipulationOptions[1], 0.125],
     [endManipulationOptions[2], 0.125],
@@ -362,7 +386,7 @@ function createForForLoop(
   // no square, no same
   const options: IfOptions[] = ["even", "odd", "none"]
   const condMiddle: IfOptions = random.choice(options)
-  const elseMiddle =
+  const elseMiddle: boolean =
     condMiddle === "none"
       ? false
       : random.weightedChoice([
@@ -401,8 +425,9 @@ function createForForLoop(
       : startSecondManipulation === "var-mult"
         ? endFirst * startSecondManipulationValue
         : endFirst * endFirst
-  let endSecond =
+  const endSecond =
     startSecondManipulation === "none" ? random.int(6, 10) : additionalValue + random.int(0, 2) // here the additional value is added
+  // no log option, to avoid: for y from 2*m to ceil(log2(262144)) with y += 1
   const endSecondManipulation: BoundsOptions =
     endFirstManipulation !== "none"
       ? "none"
@@ -410,15 +435,13 @@ function createForForLoop(
           [endManipulationOptions[0], 0.7],
           [endManipulationOptions[1], 0.125],
           [endManipulationOptions[2], 0.125],
-          [endManipulationOptions[3], 0.05],
         ])
-  // case we log the value, we first calc 2^endValue, so the log results are still sensible
-  if (endSecondManipulation !== "none" && endSecondManipulation.type === "log") {
-    endSecond = Math.pow(2, endSecond)
-  }
+
   const endSecondManipulationValue = random.int(2, 3)
   // definitely print stars at the end
   const condEnd: IfOptions = random.choice(["even", "odd", "same", "square", "none"])
+  // if I want to ask inside the second if statement for a condition
+  // based on the variable inside the first for loop
   const askFirstVar = random.weightedChoice([
     [true, 0.2],
     [false, 0.8],
@@ -527,8 +550,8 @@ function createForForLoop(
 
   // first loop
   for (let i = startFirst; i <= endFirstValue; i += stepFirst) {
-    if (printStarsMiddle) numStars += numPrintMiddle
 
+    if (printStarsMiddle) numStars += numPrintMiddle
     if (printStarsMiddle) {
       numPrint += numPrintMiddle
     }
@@ -555,7 +578,7 @@ function createForForLoop(
             ? Math.ceil(Math.log(endSecond))
             : endSecond * endSecondManipulationValue
     for (; j <= endSecondValue; j += stepSecond) {
-      numStars += calculateNumStars(condEnd, j, numPrint, numPrintElse, elseEnd, i)
+      numStars += calculateNumStars(condEnd, askFirstVar ? i : j, numPrint, numPrintElse, elseEnd, i)
       if (breakEnd) break
     }
   }
