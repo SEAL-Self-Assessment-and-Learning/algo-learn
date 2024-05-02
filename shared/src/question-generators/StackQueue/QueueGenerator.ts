@@ -28,11 +28,11 @@ const translations: Translations = {
     queueEmpty: "Currently the queue is empty.",
     queueContainsValues: `The queue currently contains the following elements:`,
     multipleChoiceText:
-      `Consider having a **Queue "{{0}}"**, who can store at most` +
+      `Consider having a **Queue "{{0}}"**, which can store at most` +
       " ${{1}}$ " +
       `elements. {{2}} {{3}} **What can we definitely say about the queue?**`,
     freeTextInput:
-      `Consider having a **Queue "{{0}}"**, who can store at most` +
+      `Consider having a **Queue "{{0}}"**, which can store at most` +
       " ${{1}}$ " +
       `elements. {{2}} **We perform the following operations:** {{3}}
     `,

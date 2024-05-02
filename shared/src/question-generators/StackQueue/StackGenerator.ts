@@ -22,17 +22,17 @@ const translations: Translations = {
     checkFormatArray: "Please only enter numbers separated by comma",
     checkFormatJSON: "Error! It has to be passed a valid JSON type",
     dynamic: "dynamic",
-    notDynamic: "not dynamic",
+    notDynamic: "non dynamic",
     stackEmpty: "Currently the stack is empty.",
     stackContainsValues: `The stack currently contains the following elements:`,
     multipleChoiceText:
-      `Consider having a **{{0}} Stack "{{1}}"**, who can store at most` +
+      `Consider having a **{{0}} Stack "{{1}}"**, which can store at most` +
       " ${{2}}$ " +
-      `elements. {{3}} **We perform the following operations:** {{4}} **What can we definitely say about the stack?**`,
+      `elements. {{3}} {{4}} **What can we definitely say about the stack?**`,
     freeTextInput:
-      `Consider having a **{{0}} Stack "{{1}}"**, who can store at most` +
+      `Consider having a **{{0}} Stack "{{1}}"**, which can store at most` +
       " ${{2}}$ " +
-      `elements. {{3}} **We perform the following operations:** {{4}}`,
+      `elements. {{3}} **We perform the following operations:**{{0}} {{4}}`,
   },
   de: {
     name: "Implementierung eines Stacks mit einem Array",
@@ -49,12 +49,12 @@ const translations: Translations = {
     multipleChoiceText:
       `Angenommen du hast einen **{{0}} Stack "{{1}}"**, welcher maximal` +
       " ${{2}}$ " +
-      `Elemente speichern kann. {{3}} **Wir führen nun folgende Operationen aus:** {{4}} 
+      `Elemente speichern kann. {{3}} {{4}} 
       **Welche Aussagen können wir nun über den Stack treffen?**`,
     freeTextInput:
       `Angenommen du hast einen **{{0}} Stack "{{1}}"**, welcher maximal` +
       " ${{2}}$ " +
-      `Elemente speichern kann. {{3}} **Wir führen die folgenden Operationen aus:** {{4}}`,
+      `Elemente speichern kann. {{3}} **Wir führen nun folgende Operationen aus:** {{4}}`,
   },
 }
 
@@ -170,7 +170,7 @@ function generateOperationsStack(
         [false, 0.85],
       ])
         ? operations.push(stackName + ".push(" + random.int(1, 20) + ")")
-        : operations.push(stackName + ".getTop()")
+        : operations.push(stackName + ".pop()")
     }
     operations = random.shuffle(operations)
     // do those operations until we get an overflow error
@@ -210,7 +210,7 @@ function generateOperationsStack(
         operations.push(stackName + ".push(" + pushValue + ")")
         stack.push(pushValue)
       } else {
-        operations.push(stackName + ".getTop()")
+        operations.push(stackName + ".pop()")
         stack.getTop()
       }
     }
@@ -288,7 +288,7 @@ function generateOperationsFreetextStack(
           stack.push(pushValue)
         } else {
           const topValue = stack.getTop()
-          operations.push({ getTop: topValue.toString() })
+          operations.push({ pop: topValue.toString() })
         }
       }
     }
@@ -327,7 +327,7 @@ function generateOperationsFreetextStack(
           stack.push(pushValue)
         } else {
           const topValue = stack.getTop()
-          operations.push({ getTop: topValue.toString() })
+          operations.push({ pop: topValue.toString() })
         }
       }
     }
@@ -778,7 +778,7 @@ export const stackQuestion: QuestionGenerator = {
       const operationsString =
         operations.length > 0
           ? t(translations, lang, "performOperations", ["\n- " + operations.join("\n- ")]) + "\n"
-          : ""
+          : "\n"
 
       question = {
         type: "MultipleChoiceQuestion",
@@ -849,7 +849,7 @@ export const stackQuestion: QuestionGenerator = {
             const userArray = resultMap[key].split(",")
             const resultArray = correctAnswers[key].split(",")
             let solutionDisplayArray: string = "["
-            for (let i = 0; i < userArray.length; i++) {
+            for (let i = 0; i < resultArray.length; i++) {
               if (userArray[i] !== resultArray[i]) {
                 foundError = true
                 solutionDisplayArray +=
@@ -862,7 +862,7 @@ export const stackQuestion: QuestionGenerator = {
             solutionDisplay[count] = firstSolutionPart + solutionDisplayArray + "|\n"
           } else if (resultMap[key].trim() !== correctAnswers[key].trim()) {
             foundError = true
-            const secondSolutionPart: string = "$\\textbf{\\underline{" + resultMap[key] + "}}$|\n"
+            const secondSolutionPart: string = "$\\textbf{\\underline{" + correctAnswers[key] + "}}$|\n"
             solutionDisplay[count] = firstSolutionPart + secondSolutionPart
           }
           count++
@@ -899,12 +899,12 @@ export const stackQuestion: QuestionGenerator = {
         if (Object.prototype.hasOwnProperty.call(operation, "push")) {
           inputText += `|${stackName}.push(${operation.push})|(void function)|\n`
         } else {
-          if (Object.prototype.hasOwnProperty.call(operation, "getTop")) {
-            inputText += `|${stackName}.getTop()|{{input-${index}#TL###overlay}}|\n`
+          if (Object.prototype.hasOwnProperty.call(operation, "pop")) {
+            inputText += `|${stackName}.pop()|{{input-${index}#TL###overlay}}|\n`
             solutionIndex++
-            correctAnswers[`input-${index}`] = operation.getTop
-            correctAnswers[`input-${index}-format`] = "getTop"
-            solutionDisplay.push(`|${solutionIndex}|${stackName}.getTop() | ${operation.getTop} |\n`)
+            correctAnswers[`input-${index}`] = operation.pop
+            correctAnswers[`input-${index}-format`] = "pop"
+            solutionDisplay.push(`|${solutionIndex}|${stackName}.pop() | ${operation.pop} |\n`)
           } else if (Object.prototype.hasOwnProperty.call(operation, "size")) {
             inputText += `|${stackName}.getSize()|{{input-${index}#TL###overlay}}|\n`
             solutionIndex++
@@ -934,7 +934,7 @@ export const stackQuestion: QuestionGenerator = {
       // adding the extra feature for a div
       solutionDisplay.push("|#div_my-5?table_w-full#| |")
       inputText += `|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |`
-      // generate the input fields for the operations (if either getTop, size or amount)
+      // generate the input fields for the operations (if either pop, size or amount)
       // if push, we don't ask the user for input
       // last question is to write down the array
 
