@@ -89,7 +89,7 @@ export function sampleExact({
     "for",
     "forfor",
     "while",
-    "whilewhileBlock"
+    "whilewhileBlock",
   ])
 
   if (loopType === "for") {
@@ -404,7 +404,7 @@ function createForForLoop(
       ? random.weightedChoice([
           ["none", 0.7],
           ["var-normal", 0.2],
-          ["var-mult", 1000.05],
+          ["var-mult", 0.05],
           ["var-square", 0.05],
         ])
       : "none"
@@ -550,7 +550,6 @@ function createForForLoop(
 
   // first loop
   for (let i = startFirst; i <= endFirstValue; i += stepFirst) {
-
     if (printStarsMiddle) numStars += numPrintMiddle
     if (printStarsMiddle) {
       numPrint += numPrintMiddle
