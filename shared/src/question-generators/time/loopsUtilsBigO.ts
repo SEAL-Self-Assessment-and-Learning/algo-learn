@@ -174,6 +174,15 @@ function createFunctionTextAndSolution({
         `${forLine(manipulationLinear(random), { type: "mult", value: random.int(2, 5) })}`,
         `${space4}iterate over ${variable} elements`,
       ],
+      solution: createProductTerm({ polyexponent: 1, logexponent: 1 }),
+      explanation: "",
+    },
+    {
+      code: [
+        `${functionSpelled} ${functionName}(${variable})\n`,
+        `${forLine(manipulationLinear(random), { type: "add", value: random.int(2, 5) })}`,
+        `${space4}iterate over ${variable} elements`,
+      ],
       solution: createProductTerm({ polyexponent: 2 }),
       explanation: "",
     },
