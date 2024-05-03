@@ -813,6 +813,9 @@ export const stackQuestion: QuestionGenerator = {
             stackArray[i] = stackArray[i].trim()
             if (stackArray[i].startsWith("-")) {
               stackArray[i] = stackArray[i].slice(1)
+              if (stackArray[i].length === 0) {
+                return { valid: false, message: t(translations, lang, "checkFormatArray") }
+              }
             }
             if (!/^\d+$/.test(stackArray[i]) && stackArray[i] !== "") {
               return { valid: false, message: t(translations, lang, "checkFormatArray") }
@@ -848,6 +851,9 @@ export const stackQuestion: QuestionGenerator = {
             correctAnswers[key] = parseArrayString(correctAnswers[key])
             const userArray = resultMap[key].split(",")
             const resultArray = correctAnswers[key].split(",")
+            if (Object.keys(userArray).length !== Object.keys(resultArray).length) {
+              foundError = true
+            }
             let solutionDisplayArray: string = "["
             for (let i = 0; i < resultArray.length; i++) {
               if (userArray[i] !== resultArray[i]) {

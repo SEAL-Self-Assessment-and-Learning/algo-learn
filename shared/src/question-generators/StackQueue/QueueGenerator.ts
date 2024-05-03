@@ -654,6 +654,9 @@ export const queueQuestion: QuestionGenerator = {
           for (let element of elements) {
             if (element.startsWith("-")) {
               element = element.slice(1)
+              if (element.length == 0) {
+                return { valid: false, message: t(translations, lang, "checkFormatArray") }
+              }
             }
             if (!/^\d+$/.test(element) && element !== "") {
               return { valid: false, message: t(translations, lang, "checkFormatArray") }
@@ -691,6 +694,9 @@ export const queueQuestion: QuestionGenerator = {
             correctAnswers[key] = parseArrayString(correctAnswers[key])
             const userArray = resultMap[key].split(",")
             const correctArray = correctAnswers[key].split(",")
+            if (Object.keys(userArray).length !== Object.keys(correctArray).length) {
+              correctAnswered = false
+            }
             let solutionDisplayArray: string = "["
             for (let i = 0; i < correctArray.length; i++) {
               if (correctArray[i] !== userArray[i]) {
