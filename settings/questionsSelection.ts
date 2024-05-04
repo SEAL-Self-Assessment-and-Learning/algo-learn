@@ -11,7 +11,7 @@ import { AsymptoticsPreciseLanguage } from "../shared/src/question-generators/as
 import { SortTerms } from "../shared/src/question-generators/asymptotics/sort"
 import { SimplifySum } from "../shared/src/question-generators/asymptotics/sum"
 import { RecursionFormula } from "../shared/src/question-generators/recursion/formula"
-import { recurrenceMaster } from "../shared/src/question-generators/recursion/recurrenceMaster"
+import { RecurrenceMaster } from "../shared/src/question-generators/recursion/recurrenceMaster"
 import { Loops } from "../shared/src/question-generators/time/loops"
 
 /** List of all question routes */
@@ -46,7 +46,7 @@ export const allQuestionGeneratorRoutes: QuestionRoutes = [
   },
   {
     path: "recursion/master",
-    generator: recurrenceMaster,
+    generator: RecurrenceMaster,
   },
   {
     path: "time/loops",

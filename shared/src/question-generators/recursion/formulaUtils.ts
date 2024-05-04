@@ -112,6 +112,7 @@ export function sampleRecursiveFunctionStars({
     a: numRecCalls,
     d: preStars + baseStars + postStars,
     c: preStars + recStars + postStars,
+    type: "Stars",
   }
 }
 
@@ -188,6 +189,7 @@ export function sampleRecursiveFunctionArithmetic({
     a: numRecCalls,
     d: preStars + baseStars,
     c: preStars + recStars + numRecCalls * 2,
+    type: "Arithmetic",
   }
 }
 

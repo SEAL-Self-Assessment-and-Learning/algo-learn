@@ -51,7 +51,7 @@ const translations: Translations = {
   },
 }
 
-export const recurrenceMaster: QuestionGenerator = {
+export const RecurrenceMaster: QuestionGenerator = {
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -64,7 +64,7 @@ export const recurrenceMaster: QuestionGenerator = {
   ],
   generate(generatorPath, lang, parameters, seed) {
     const permalink = serializeGeneratorCall({
-      generator: recurrenceMaster,
+      generator: RecurrenceMaster,
       lang,
       parameters,
       seed,
@@ -73,11 +73,11 @@ export const recurrenceMaster: QuestionGenerator = {
     const random = new Random(seed)
     const { t } = tFunction(translations, lang)
 
-    if (!validateParameters(parameters, recurrenceMaster.expectedParameters)) {
+    if (!validateParameters(parameters, RecurrenceMaster.expectedParameters)) {
       throw new Error(
         `Unknown variant ${
           parameters.variant
-        }. Valid variants are: ${recurrenceMaster.expectedParameters.join(", ")}`,
+        }. Valid variants are: ${RecurrenceMaster.expectedParameters.join(", ")}`,
       )
     }
 

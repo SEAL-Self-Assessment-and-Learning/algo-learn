@@ -16,7 +16,8 @@ const translations: Translations = {
   en: {
     basecase: "The base case is",
     text1: "Consider the following recursive procedure `{{0}}` with integer input ${{1}}$:",
-    text2: "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
+    text2Stars: "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
+    text2Arithmetic: "Let ${{0}}$ be the number of arithmetic operations (+, -, $*$, /).",
     longName: "Recurrence Relation",
     question: "What is the recurrence relation of",
     name: "Recurrence",
@@ -28,7 +29,8 @@ const translations: Translations = {
   de: {
     basecase: "Der Basisfall ist",
     text1: "Betrachte die folgende rekursive Prozedur `{{0}}` mit ganzzahliger Eingabe ${{1}}$:",
-    text2: "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
+    text2Stars: "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
+    text2Arithmetic: "Sei ${{0}}$ die Anzahl der arithmetischen Operationen (+, -, $*$, /).",
     longName: "Rekurrenzrelation",
     question: "Was ist die Rekurrenzrelation von",
     name: "Rekurrenz",
@@ -71,7 +73,7 @@ export const RecursionFormula: QuestionGenerator = {
 
     const variant = parameters.variant as "choice" | "input"
     const divOrSub: "div" | "sub" = random.choice(["div", "sub"])
-    const { functionText, functionName, n, b, a, d, c } = sampleRecursiveFunction(divOrSub, random)
+    const { functionText, functionName, n, b, a, d, c, type } = sampleRecursiveFunction(divOrSub, random)
 
     const T = random.choice("TABCDEFGHS".split(""))
     const answers = sampleRecurrenceAnswers({ random, divOrSub, t: T, n, a, b, c, d })
@@ -83,7 +85,7 @@ ${format(t("text1"), [functionName, n])}
 ${functionText.trim()}
 \`\`\`
 
-${format(t("text2"), [`${T}(${n})`])}`
+${format(t("text2" + type), [`${T}(${n})`])}`
 
     if (variant !== "choice") {
       text += ` ${t("basecase")} $${T}(1)=${d}$.`
