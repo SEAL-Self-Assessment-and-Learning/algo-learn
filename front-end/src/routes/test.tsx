@@ -16,8 +16,8 @@ import { useTranslation } from "../hooks/useTranslation"
 export function TestSimpleMC() {
   const { lang } = useTranslation()
   const [seed] = useState(new Random(Math.random()).base36string(7))
-  const [format, setFormat] = useState("react" as "react" | "latex" | "json")
-  const [{ question }, setQuestion] = useState({} as { question: Question | undefined })
+  const [format, setFormat] = useState<"react" | "latex" | "json">("react")
+  const [{ question }, setQuestion] = useState<{ question?: Question }>({})
 
   if (!question) {
     void Promise.resolve(ExampleQuestion.generate("example/example", lang, {}, seed)).then(setQuestion)

@@ -58,12 +58,12 @@ function byDescendingTimestamp(a: LogEntryV1, b: LogEntryV1) {
 
 /** Upgrade the log if necessary and return the most recent version of the log. */
 export function useLog() {
-  const [logV0, setLogV0] = useLocalStorageState("log", {
-    defaultValue: [] as Array<LogEntryV0>,
+  const [logV0, setLogV0] = useLocalStorageState<Array<LogEntryV0>>("log", {
+    defaultValue: [],
     storageSync: false,
   })
-  const [logV1, setLogV1] = useLocalStorageState("log-v1", {
-    defaultValue: [] as Array<LogEntryV1>,
+  const [logV1, setLogV1] = useLocalStorageState<Array<LogEntryV1>>("log-v1", {
+    defaultValue: [],
     storageSync: true,
   })
 

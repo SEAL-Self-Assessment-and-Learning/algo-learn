@@ -143,7 +143,8 @@ export function QuizSession({
   const navigate = useNavigate()
   useGlobalDOMEvents({
     keydown(e: Event) {
-      const key = (e as KeyboardEvent).key
+      if (!(e instanceof KeyboardEvent)) return
+      const key = e.key
       if (key === "Enter" && status !== "running") {
         e.preventDefault()
         navigate(`/${lang}`)
