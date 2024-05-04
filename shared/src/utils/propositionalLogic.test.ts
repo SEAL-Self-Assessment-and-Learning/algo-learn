@@ -248,6 +248,7 @@ describe("parser", () => {
   test("literals", () => {
     ;[
       ["A", "A"],
+      ["x_7", "x_7"],
       ["\\not A", "\\not A"],
       ["(A)", "A"],
       ["\\not(A)", "\\not A"],
