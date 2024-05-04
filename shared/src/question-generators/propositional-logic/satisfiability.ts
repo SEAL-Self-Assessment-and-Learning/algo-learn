@@ -23,7 +23,7 @@ const translations: Translations = {
     answer_tautology: "The expression is a **tautology**",
     answer_verifiable: "The expression is **verifiable**",
     answer_falsifiable: "The expression is **falsifiable**",
-    answer_contradiction: "The expression is  a **contradiction**",
+    answer_contradiction: "The expression is a **contradiction**",
     feedback_contradiction: "The expression evaluates to false for all variable assignments.",
     feedback_tautology: "The expression evaluates to true for all variable assignments.",
     feedback_examples:
@@ -34,11 +34,11 @@ const translations: Translations = {
     description:
       "Wähle die richtigen Erfüllbarkeitseigenschaften eines aussagenlogischen Ausdrucks aus.",
     size: "Die Größe des erzeugten Ausdrucks.",
-    text: "Betrachten Sie den folgenden aussagenlogischen Ausdruck \\[{{0}}\\] Welche der folgenden Aussagen treffen auf den Ausdruck zu?",
-    answer_tautology: "Die Aussage is eine **Tautologie**",
-    answer_verifiable: "Die Aussage is **erfüllbar**",
-    answer_falsifiable: "Die Aussage is **falsifizierbar**",
-    answer_contradiction: "Die Aussage is ein **Widerspruch**",
+    text: "Betrachte den folgenden aussagenlogischen Ausdruck: \\[{{0}}\\] Welche der folgenden Aussagen treffen auf den Ausdruck zu?",
+    answer_tautology: "Die Aussage ist eine **Tautologie**",
+    answer_verifiable: "Die Aussage ist **erfüllbar**",
+    answer_falsifiable: "Die Aussage ist **falsifizierbar**",
+    answer_contradiction: "Die Aussage ist ein **Widerspruch**",
     feedback_contradiction: "Die Aussage ist für alle Variablenbelegungen falsifiziert",
     feedback_tautology: "Die Aussage ist für alle Variablenbelegungen erfüllt",
     feedback_examples:
