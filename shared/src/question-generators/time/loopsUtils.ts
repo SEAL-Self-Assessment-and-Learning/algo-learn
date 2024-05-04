@@ -239,7 +239,7 @@ export function createBoundsString(
       endString = `pow(${boundsManipulation.value === "self" ? value : boundsManipulation.value},${value})`
     }
     if (boundsManipulation.type === "add") {
-      endString = `${value}${boundsManipulation.value > 0 ? "+" : "-"}${boundsManipulation.value}`
+      endString = `${value}${boundsManipulation.value > 0 ? "+" : ""}${boundsManipulation.value}`
     }
   }
   return endString
