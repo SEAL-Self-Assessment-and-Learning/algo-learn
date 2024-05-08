@@ -39,6 +39,7 @@ export function ExerciseMultiTextInput({
 
   // clear the modeID of state
   useEffect(() => {
+    window.scrollTo(0, 0)
     // This function runs when the component mounts
     setState({
       mode: !question.fillOutAll ? "draft" : "invalid",
@@ -46,6 +47,7 @@ export function ExerciseMultiTextInput({
       text: {},
       formatFeedback: {},
     })
+
   }, [question.fillOutAll])
 
   const { mode, text, feedbackObject } = state

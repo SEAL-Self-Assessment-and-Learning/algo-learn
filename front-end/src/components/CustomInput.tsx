@@ -4,6 +4,8 @@ import { MODE } from "@/components/InteractWithQuestion.tsx"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Input } from "@/components/ui/input"
 
+import { useTranslation } from "../hooks/useTranslation"
+
 interface CustomInputProps {
   id: string
   state: {
@@ -31,12 +33,13 @@ export const CustomInput: React.FC<CustomInputProps> = ({
   }
   setText: (fieldID: string, value: string) => void
 }) => {
+
   const inputSplit = id.split("#")
   const inputID = inputSplit[0]
   const inputAlign = inputSplit[1]
   const inputPrompt = inputSplit[2]
   const inputPlaceholder = inputSplit[3]
-  // case over -> overlay | overlay-perm -> overlay but permanently | below -> no overlay, move other stuff down
+  // case over -> overlay | below -> no overlay, move other stuff down
   const feedbackVariation: string = inputSplit[4]
 
   // To select the first created input field on the site
@@ -45,7 +48,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
     if (firstInputRef.current) {
       firstInputRef.current.focus()
     }
-  }, [])
+  }, [inputID])
 
   // check if inputID exists in state
   if (!state.text[inputID]) {
@@ -72,6 +75,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
   const [isInputFocused, setIsInputFocused] = useState(false)
 
   let inputElement
+  // constantly below the input field
   if (feedbackVariation === "below") {
     inputElement = (
       <div>
@@ -95,14 +99,12 @@ export const CustomInput: React.FC<CustomInputProps> = ({
               />
             </div>
           </div>
-          {state.text[inputID] && state.formatFeedback[inputID] && (
-            <FeedbackComponent
-              inputID={inputID}
-              formatFeedback={state.formatFeedback}
-              mode={state.modeID}
-              type={"below"}
-            />
-          )}
+          <FeedbackComponent
+            inputID={inputID}
+            formatFeedback={state.formatFeedback}
+            mode={state.modeID}
+            type={"below"}
+          />
         </div>
         {spacing}
       </div>
@@ -124,7 +126,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
                 setText(inputID, e.target.value)
               }}
               onFocus={() => setIsInputFocused(true)}
-              onBlur={() => setIsInputFocused(feedbackVariation === "overlay-perm")}
+              onBlur={() => setIsInputFocused(false)}
               type="text"
               className={`${inputBorderColor} mb-1 w-full focus:outline-none`}
               placeholder={inputPlaceholder || ""}
@@ -158,6 +160,9 @@ const FeedbackComponent = ({
   mode: { [key: string]: string }
   type: "overlay" | "below" // overlay means shown below the input field over other components
 }) => {
+
+  const { t } = useTranslation()
+
   let feedbackBackgroundColor: string
   let className
   if (type === "below") {
@@ -165,8 +170,14 @@ const FeedbackComponent = ({
       ? mode[inputID] === "draft"
         ? "border-l-4 border-green-400"
         : "border-l-4 border-red-400"
-      : ""
+      : "border-l-4 border-blue-400"
     className = `mt-2 p-2 ${feedbackBackgroundColor} `
+    // remove text-left to make the feedback align center
+  return (
+    <div className={`${className} text-left`}>
+      <span>{formatFeedback[inputID] ? formatFeedback[inputID] : t("provideFeedbackCheckFormat")}</span>
+    </div>
+  )
   } else {
     feedbackBackgroundColor = formatFeedback[inputID]
       ? mode[inputID] === "draft"
@@ -174,12 +185,16 @@ const FeedbackComponent = ({
         : "bg-red-400"
       : ""
     className = `absolute left-0 top-full z-10 ${feedbackBackgroundColor} border border-gray-300 dark:border-gray-700 shadow-md p-2 mt-1 rounded-md`
+    // remove text-left to make the feedback align center
+    return (
+      <div className={`${className} text-left`}>
+        {formatFeedback[inputID] && <span>{formatFeedback[inputID]}</span>}
+      </div>
+    )
   }
 
-  // remove text-left to make the feedback align center
-  return (
-    <div className={`${className} text-left`}>
-      {formatFeedback[inputID] && <span>{formatFeedback[inputID]}</span>}
-    </div>
-  )
 }
+
+/*
+"We will provide feedback to the format of your answer"
+*/

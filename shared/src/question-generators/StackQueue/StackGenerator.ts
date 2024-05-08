@@ -1,8 +1,8 @@
 import { Language } from "@shared/api/Language.ts"
 import { validateParameters } from "@shared/api/Parameters.ts"
 import {
-  FreeTextFeedbackFunction,
   minimalMultipleChoiceFeedback,
+  MultiFreeTextFeedbackFunction,
   MultiFreeTextFormatFunction,
   Question,
   QuestionGenerator,
@@ -27,7 +27,7 @@ const translations: Translations = {
     stackContainsValues: `The stack currently contains the following elements:`,
     multipleChoiceText:
       `Consider having a **{{0}} Stack "{{1}}"**, which can store at most` +
-      " ${{2}}$ " +
+      " {{2}} " +
       `elements. {{3}} {{4}} **What can we definitely say about the stack?**`,
     freeTextInput:
       `Consider having a **{{0}} Stack "{{1}}"**, which can store at most` +
@@ -48,7 +48,7 @@ const translations: Translations = {
     stackContainsValues: `Der Stack enthält aktuell folgende Elemente:`,
     multipleChoiceText:
       `Angenommen du hast einen **{{0}} Stack "{{1}}"**, welcher maximal` +
-      " ${{2}}$ " +
+      " {{2}} " +
       `Elemente speichern kann. {{3}} {{4}} 
       **Welche Aussagen können wir nun über den Stack treffen?**`,
     freeTextInput:
@@ -91,7 +91,7 @@ const answerOptionList: Translations = {
     popForQuaterV1S: "Popping {{0}} value from the Stack {{1}} will divide the size by 4",
     popForQuaterV1P: "Popping {{0}} values from the Stack {{1}} will divide the size by 4",
     minElementV1: "The minimum element in the Stack {{0}} is {{1}}",
-    toStringV1: "The Stack {{0}} is currently {{1}}",
+    toStringV1: "The Stack {{0}} is currently [{{1}}]",
   },
   de: {
     overFlowErrorV1: "Wir bekommen einen Overflow Fehler",
@@ -125,7 +125,7 @@ const answerOptionList: Translations = {
     popForQuaterV1S: "Das poppen von einem Element vom Stack {{1}} wird die Größe um 4 teilen",
     popForQuaterV1P: "Das poppen von {{0}} Elementen vom Stack {{1}} wird die Größe um 4 teilen",
     minElementV1: "Das kleinste Element im Stack {{0}} ist {{1}}",
-    toStringV1: "Der Stack {{0}} ist aktuell {{1}}",
+    toStringV1: "Der Stack {{0}} ist aktuell [{{1}}]",
   },
 }
 
@@ -415,7 +415,12 @@ function generateCorrectAnswersStack(
       }
     }
 
-    answers.add(t(answerOptionList, lang, "toStringV1", [stackName, stack.getStack().toString()]))
+    answers.add(
+      t(answerOptionList, lang, "toStringV1", [
+        stackName,
+        stack.getStack().toString().replace(/,/g, ", "),
+      ]),
+    )
   }
   const answerList: string[] = Array.from(answers)
   // Only Shuffle the answers
@@ -467,7 +472,7 @@ function generateWrongAnswerStack(
   wrongAnswers.add(
     t(answerOptionList, lang, "toStringV1", [
       stackName,
-      stack.getStack().push(random.int(1, 20)).toString(),
+      stack.getStack().push(random.int(1, 20)).toString().replace(/,/g, ", "),
     ]),
   )
 
@@ -490,7 +495,9 @@ function generateWrongAnswerStack(
 
     const stackToString = stack.getStack()
     stackToString.pop()
-    wrongAnswers.add(t(answerOptionList, lang, "toStringV1", [stackName, stackToString.toString()]))
+    wrongAnswers.add(
+      t(answerOptionList, lang, "toStringV1", [stackName, stackToString.toString().replace(/,/g, ", ")]),
+    )
 
     random.uniform() > 0.8
       ? wrongAnswers.add(
@@ -530,7 +537,12 @@ function generateWrongAnswerStack(
     }
     ;[stackToString[index1], stackToString[index2]] = [stackToString[index2], stackToString[index1]]
     if (stack.getStack().toString() !== stackToString.toString()) {
-      wrongAnswers.add(t(answerOptionList, lang, "toStringV1", [stackName, stackToString.toString()]))
+      wrongAnswers.add(
+        t(answerOptionList, lang, "toStringV1", [
+          stackName,
+          stackToString.toString().replace(/,/g, ", "),
+        ]),
+      )
     }
   }
 
@@ -744,7 +756,7 @@ export const stackQuestion: QuestionGenerator = {
       let j = 0
       allAnswers.push(correctAnswers[i])
       i++
-      while (allAnswers.length < 6 && (i < correctAnswers.length || j < wrongAnswers.length)) {
+      while (allAnswers.length < 4 && (i < correctAnswers.length || j < wrongAnswers.length)) {
         let wOt = random.choice([true, false])
         if (i > correctAnswers.length - 1) {
           wOt = false
@@ -830,17 +842,9 @@ export const stackQuestion: QuestionGenerator = {
         return { valid: true, message: "" }
       }
 
-      const feedback: FreeTextFeedbackFunction = ({ text }) => {
-        let resultMap: { [key: string]: string } = {}
-        try {
-          resultMap = JSON.parse(text) as { [key: string]: string }
-        } catch (e) {
-          return {
-            correct: false,
-            message: tFunction(translations, lang).t("feedback.incomplete"),
-            correctAnswer: t(translations, lang, "checkFormatJSON"),
-          }
-        }
+      const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
+        // renaming for better understanding
+        const resultMap: { [key: string]: string } = text
 
         let foundError = false
         let count = 0

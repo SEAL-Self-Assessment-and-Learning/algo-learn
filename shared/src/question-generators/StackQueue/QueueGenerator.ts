@@ -1,8 +1,10 @@
+// TODO: replace the latex "-" with html "-"
+
 import { Language } from "@shared/api/Language.ts"
 import { validateParameters } from "@shared/api/Parameters.ts"
 import {
-  FreeTextFeedbackFunction,
   minimalMultipleChoiceFeedback,
+  MultiFreeTextFeedbackFunction,
   MultiFreeTextFormatFunction,
   Question,
   QuestionGenerator,
@@ -29,7 +31,7 @@ const translations: Translations = {
     queueContainsValues: `The queue currently contains the following elements:`,
     multipleChoiceText:
       `Consider having a **Queue "{{0}}"**, which can store at most` +
-      " ${{1}}$ " +
+      " {{1}} " +
       `elements. {{2}} {{3}} **What can we definitely say about the queue?**`,
     freeTextInput:
       `Consider having a **Queue "{{0}}"**, which can store at most` +
@@ -52,7 +54,7 @@ const translations: Translations = {
     queueContainsValues: `Die Queue enthält aktuell folgende Elemente:`,
     multipleChoiceText:
       `Angenommen du hast eine **Queue "{{0}}"**, welche maximal` +
-      " ${{1}}$ " +
+      " {{1}} " +
       `Elemente speichern kann. {{2}} {{3}} **Welche Aussagen können wir nun über die Queue treffen?**`,
     freeTextInput:
       `Angenommen du hast eine **Queue "{{0}}"**, welche maximal` +
@@ -61,9 +63,6 @@ const translations: Translations = {
     `,
   },
 }
-
-// Minimum element in queue idea from here: (page 90 task 48)
-// https://ae.cs.uni-frankfurt.de/teaching/20ss/+algo1/skript_ds.pdf
 
 const answerOptionList: Translations = {
   en: {
@@ -86,7 +85,7 @@ const answerOptionList: Translations = {
     currentFreeElementS: "There is currently {{1}} element free in the Queue {{0}}",
     currentFreeElementP: "There are currently {{1}} elements free in the Queue {{0}}",
     minFindV1: "The minimum element in the Queue {{0}} is {{1}}",
-    getQueueV1: "The field of the Queue {{0}} currently looks like: {{1}}",
+    getQueueV1: "The field of the Queue {{0}} currently looks like: [{{1}}]",
     noTrans: "no",
   },
   de: {
@@ -109,7 +108,7 @@ const answerOptionList: Translations = {
     currentFreeElementS: "Es ist aktuell {{1}} Element frei in der Queue {{0}}",
     currentFreeElementP: "Es sind aktuell {{1}} Elemente frei in der Queue {{0}}",
     minFindV1: "Das Minimum-Element in der Queue {{0}} ist {{1}}",
-    getQueueV1: "Das Feld der Queue {{0}} sieht wie folgt aus: {{1}}",
+    getQueueV1: "Das Feld der Queue {{0}} sieht wie folgt aus: [{{1}}]",
     noTrans: "kein",
   },
 }
@@ -319,7 +318,12 @@ function generateCorrectAnswersQueue(
       ]),
     )
 
-    answers.add(t(answerOptionList, lang, "getQueueV1", [queueName, queue.getQueue()]))
+    answers.add(
+      t(answerOptionList, lang, "getQueueV1", [
+        queueName,
+        queue.getQueue().replace(/,/g, ", ").replaceAll("-", "$-$"),
+      ]),
+    )
   }
 
   const answerList: string[] = random.shuffle([...answers])
@@ -432,10 +436,20 @@ function generateWrongAnswersQueue(
   if (queue.getCurrentNumberOfElements() <= 1) {
     const newQueue: string[] = queue.getQueue().split(",") // getQueue -> [-1,-1,-1,x,-1] => pop possible
     newQueue.pop()
-    answers.add(t(answerOptionList, lang, "getQueueV1", [queueName, newQueue.join(",")]))
+    answers.add(
+      t(answerOptionList, lang, "getQueueV1", [
+        queueName,
+        newQueue.join(",").replace(/,/g, ", ").replaceAll("-", "$-$"),
+      ]),
+    )
     const newValue = random.int(1, 20).toString()
     newQueue.push(newValue)
-    answers.add(t(answerOptionList, lang, "getQueueV1", [queueName, newQueue.join(",")]))
+    answers.add(
+      t(answerOptionList, lang, "getQueueV1", [
+        queueName,
+        newQueue.join(",").replace(/,/g, ", ").replaceAll("-", "$-$"),
+      ]),
+    )
     if (queue.getCurrentNumberOfElements() === 0) {
       answers.add(t(answerOptionList, lang, "minFindV1", [queueName, random.int(1, 20).toString()]))
       // next to dequeue is -1
@@ -461,7 +475,12 @@ function generateWrongAnswersQueue(
   )
   ;[newQueue[swapIndex[0]], newQueue[swapIndex[1]]] = [newQueue[swapIndex[1]], newQueue[swapIndex[0]]]
   if (newQueue.join(",") !== getQueue) {
-    answers.add(t(answerOptionList, lang, "getQueueV1", [queueName, newQueue.join(",")]))
+    answers.add(
+      t(answerOptionList, lang, "getQueueV1", [
+        queueName,
+        newQueue.join(",").replace(/,/g, ", ").replaceAll("-", "$-$"),
+      ]),
+    )
   }
 
   // this happens rarely
@@ -476,7 +495,10 @@ function generateWrongAnswersQueue(
     answers.add(
       t(answerOptionList, lang, "getQueueV1", [
         queueName,
-        [random.int(1, 20).toString(), random.int(1, 20).toString()].toString(),
+        [random.int(1, 20).toString(), random.int(1, 20).toString()]
+          .toString()
+          .replace(/,/g, ", ")
+          .replaceAll("-", "$-$"),
       ]),
     )
   }
@@ -589,7 +611,7 @@ export const queueQuestion: QuestionGenerator = {
       // this loop will always terminate,
       // because the sum of correct and wrong answers is at least 6
       while (
-        allAnswers.length < 6 &&
+        allAnswers.length < 4 &&
         (i < correctAnswers.answerList.length || j < wrongAnswers.answers.length)
       ) {
         // decide if the next answer is correct or wrong
@@ -672,18 +694,9 @@ export const queueQuestion: QuestionGenerator = {
         return { valid: true, message: "" }
       }
 
-      const feedback: FreeTextFeedbackFunction = ({ text }) => {
-        // expects a json dict
-        let resultMap: { [key: string]: string } = {}
-        try {
-          resultMap = JSON.parse(text) as { [key: string]: string }
-        } catch (e) {
-          return {
-            correct: false,
-            message: tFunction(translations, lang).t("feedback.incomplete"),
-            correctAnswer: t(translations, lang, "checkFormatJSON"),
-          }
-        }
+      const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
+        // renaming for better understanding
+        const resultMap: { [key: string]: string } = text
 
         let correctAnswered = true
         let count = 0

@@ -1,6 +1,7 @@
 import { min } from "mathjs"
 import {
   FreeTextFeedbackFunction,
+  MultiFreeTextFeedbackFunction,
   FreeTextFormatFunction,
   minimalMultipleChoiceFeedback,
   Question,
@@ -71,7 +72,8 @@ What could be a correct **Huffman-Coding** for each character?
       " Wähle zudem als linken Knoten den mit dem kleineren Gewicht.",
     multiInputText: `Angenommen wir habe die folgende Tabelle, welche angebibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:
 {{0}}
-Was wäre eine korrekte **Huffman-Codierung** für jeden Buchstaben?`,
+Was wäre eine korrekte **Huffman-Codierung** für jeden Buchstaben?
+{{1}}`,
   },
 }
 
@@ -306,7 +308,7 @@ export const huffmanCoding: QuestionGenerator = {
     }
 
     const checkFormat: FreeTextFormatFunction = ({ text }) => {
-      if (text.trim() === "") return { valid: false }
+      if (text.trim() === "") return { valid: false, message: "" }
       try {
         // iterate over each letter to check if either 0 or 1
         for (let i = 0; i < text.length; i++) {
@@ -327,6 +329,7 @@ export const huffmanCoding: QuestionGenerator = {
       // no format error
       return {
         valid: true,
+        message: "",
       }
     }
 
@@ -345,7 +348,7 @@ export const huffmanCoding: QuestionGenerator = {
     const wordlength = random.weightedChoice(wordLengths)
 
     const variantParameter = parameters.variant as "choice" | "input"
-    let variant: string
+    let variant: "choice" | "choice2" | "input" | "input2"
     if (variantParameter === "choice") {
       variant = random.choice(["choice", "choice2"])
     } else {
@@ -503,38 +506,13 @@ export const huffmanCoding: QuestionGenerator = {
         }
         solutionDisplay += "|#table_w-full?td?sd?ah_center?div_my-5#| |"
 
-        const feedback: FreeTextFeedbackFunction = ({ text }) => {
-          // text is provided using JSON.stringify, so we need to revert this
-          let textDict: unknown
-          try {
-            textDict = JSON.parse(text)
-          } catch (error) {
-            return {
-              correct: false,
-              message: tFunction(translations, lang).t("feedback.incomplete"),
-              correctAnswer: "The answer is not a valid JSON",
-            }
-          }
-          function isStringDict(obj: unknown): obj is { [key: string]: string } {
-            if (typeof obj !== "object" || obj === null) return false
-            for (const key in obj) {
-              if (typeof (obj as any)[key] !== "string") {
-                return false
-              }
-            }
-            return true
-          }
-
-          if (!isStringDict(textDict)) {
-            throw new Error("There has been a parse error, parsing text to {[key: string]: string}")
-          }
-
+        const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
           // First rename the keys to the original keys format index-num-letter
           const userAnswerDict: { [key: string]: string } = {}
-          for (const key in textDict) {
+          for (const key in text) {
             const keyArray = key.split("-")
             const newKey = `${keyArray[2]}`
-            userAnswerDict[newKey] = textDict[key]
+            userAnswerDict[newKey] = text[key]
           }
 
           if (!checkProvidedCode(wordArray, correctAnswerDict, userAnswerDict)) {

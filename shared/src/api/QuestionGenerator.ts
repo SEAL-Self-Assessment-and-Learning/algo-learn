@@ -194,11 +194,25 @@ export type MultiFreeTextFormatFunction = (
   fieldID: string,
 ) => { valid: boolean; message?: string } | Promise<{ valid: boolean; message?: string }>
 
+/**
+ * After the user enters an answer, this answer is stored as a dictionary of
+ * strings.
+ */
+export interface MultiFreeTextAnswer {
+  /** The text entered by the user */
+  text: { [key: string]: string }
+}
+
+/** The signature of the feedback function for multi-free-text questions */
+export type MultiFreeTextFeedbackFunction = (
+  answer: MultiFreeTextAnswer,
+) => FreeTextFeedback | Promise<FreeTextFeedback>
+
 export interface MultiFreeTextQuestion extends QuestionBase {
   type: "MultiFreeTextQuestion"
 
   /** The feedback function for this question; defaults to undefined */
-  feedback?: FreeTextFeedbackFunction
+  feedback?: MultiFreeTextFeedbackFunction
 
   /** If all input fields need to be filled out. Defaults to false */
   fillOutAll?: boolean
