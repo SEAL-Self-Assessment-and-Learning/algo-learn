@@ -3,7 +3,6 @@ import { FreeTextFeedback } from "@shared/api/QuestionGenerator.ts"
 import { MODE } from "@/components/InteractWithQuestion.tsx"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Input } from "@/components/ui/input"
-
 import { useTranslation } from "../hooks/useTranslation"
 
 interface CustomInputProps {
@@ -33,7 +32,6 @@ export const CustomInput: React.FC<CustomInputProps> = ({
   }
   setText: (fieldID: string, value: string) => void
 }) => {
-
   const inputSplit = id.split("#")
   const inputID = inputSplit[0]
   const inputAlign = inputSplit[1]
@@ -160,7 +158,6 @@ const FeedbackComponent = ({
   mode: { [key: string]: string }
   type: "overlay" | "below" // overlay means shown below the input field over other components
 }) => {
-
   const { t } = useTranslation()
 
   let feedbackBackgroundColor: string
@@ -173,11 +170,13 @@ const FeedbackComponent = ({
       : "border-l-4 border-blue-400"
     className = `mt-2 p-2 ${feedbackBackgroundColor} `
     // remove text-left to make the feedback align center
-  return (
-    <div className={`${className} text-left`}>
-      <span>{formatFeedback[inputID] ? formatFeedback[inputID] : t("provideFeedbackCheckFormat")}</span>
-    </div>
-  )
+    return (
+      <div className={`${className} text-left`}>
+        <span>
+          {formatFeedback[inputID] ? formatFeedback[inputID] : t("provideFeedbackCheckFormat")}
+        </span>
+      </div>
+    )
   } else {
     feedbackBackgroundColor = formatFeedback[inputID]
       ? mode[inputID] === "draft"
@@ -192,7 +191,6 @@ const FeedbackComponent = ({
       </div>
     )
   }
-
 }
 
 /*

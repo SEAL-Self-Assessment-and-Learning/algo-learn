@@ -774,7 +774,7 @@ export const stackQuestion: QuestionGenerator = {
       }
       allAnswers = random.shuffle(allAnswers)
 
-      if (allAnswers.length < 6) {
+      if (allAnswers.length < 4) {
         throw new Error("Not enough answers")
       }
 
@@ -818,9 +818,9 @@ export const stackQuestion: QuestionGenerator = {
         // check if the text provided is for the toString question
         if (correctAnswers[fieldID + "-format"] === "toString") {
           // remove all whitespaces and "[", "]"
-          text = parseArrayString(text)
+          text[fieldID] = parseArrayString(text[fieldID])
           // split text to get the array
-          const stackArray = text.split(",")
+          const stackArray = text[fieldID].split(",")
           for (let i = 0; i < stackArray.length; i++) {
             stackArray[i] = stackArray[i].trim()
             if (stackArray[i].startsWith("-")) {
@@ -836,7 +836,7 @@ export const stackQuestion: QuestionGenerator = {
           return { valid: true, message: "" }
         }
         // else check if the text only contains numbers
-        if (!/^\d+$/.test(text)) {
+        if (!/^\d+$/.test(text[fieldID])) {
           return { valid: false, message: t(translations, lang, "checkFormat") }
         }
         return { valid: true, message: "" }

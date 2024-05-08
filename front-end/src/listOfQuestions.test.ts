@@ -44,7 +44,7 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
           expect(question.feedback).toBeDefined()
           if (question.type === "MultipleChoiceQuestion") {
             expect(() => question.feedback!({ choice: [0] })).not.toThrow()
-          } else {
+          } else if (question.type === "FreeTextQuestion") {
             const f = question.feedback!({ text: "some random wrong answer" })
             expect(!(f instanceof Promise)).toBe(true)
             if (f instanceof Promise) return

@@ -1,9 +1,10 @@
 import { min } from "mathjs"
 import {
   FreeTextFeedbackFunction,
-  MultiFreeTextFeedbackFunction,
   FreeTextFormatFunction,
   minimalMultipleChoiceFeedback,
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
   Question,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
@@ -307,32 +308,6 @@ export const huffmanCoding: QuestionGenerator = {
       )
     }
 
-    const checkFormat: FreeTextFormatFunction = ({ text }) => {
-      if (text.trim() === "") return { valid: false, message: "" }
-      try {
-        // iterate over each letter to check if either 0 or 1
-        for (let i = 0; i < text.length; i++) {
-          if (text[i] !== "0" && text[i] !== "1") {
-            return {
-              valid: false,
-              message: tFunction(translations, lang).t("feedbackInvalid"),
-            }
-          }
-        }
-      } catch (e) {
-        return {
-          valid: false,
-          message: tFunction(translations, lang).t("feedbackInvalid"),
-        }
-      }
-
-      // no format error
-      return {
-        valid: true,
-        message: "",
-      }
-    }
-
     /*
     Generate the random word and get the correct answer
     */
@@ -357,6 +332,32 @@ export const huffmanCoding: QuestionGenerator = {
     let question: Question
     let testing
     if (variant === "choice" || variant === "input") {
+      const checkFormat: FreeTextFormatFunction = ({ text }: { text: string }) => {
+        if (text.trim() === "") return { valid: false, message: "" }
+        try {
+          // iterate over each letter to check if either 0 or 1
+          for (let i = 0; i < text.length; i++) {
+            if (text[i] !== "0" && text[i] !== "1") {
+              return {
+                valid: false,
+                message: tFunction(translations, lang).t("feedbackInvalid"),
+              }
+            }
+          }
+        } catch (e) {
+          return {
+            valid: false,
+            message: tFunction(translations, lang).t("feedbackInvalid"),
+          }
+        }
+
+        // no format error
+        return {
+          valid: true,
+          message: "",
+        }
+      }
+
       let word = generateString(wordlength, random)
       word = random.shuffle(word.split("")).join("")
 
@@ -485,6 +486,32 @@ export const huffmanCoding: QuestionGenerator = {
           testing,
         }
       } else {
+        const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
+          if (text[fieldID].trim() === "") return { valid: false, message: "" }
+          try {
+            // iterate over each letter to check if either 0 or 1
+            for (let i = 0; i < text[fieldID].length; i++) {
+              if (text[i] !== "0" && text[fieldID][i] !== "1") {
+                return {
+                  valid: false,
+                  message: tFunction(translations, lang).t("feedbackInvalid"),
+                }
+              }
+            }
+          } catch (e) {
+            return {
+              valid: false,
+              message: tFunction(translations, lang).t("feedbackInvalid"),
+            }
+          }
+
+          // no format error
+          return {
+            valid: true,
+            message: "",
+          }
+        }
+
         let inputFields = ""
         const fieldIDCharMap: { [key: string]: string } = {}
         // iterate through the wordArray

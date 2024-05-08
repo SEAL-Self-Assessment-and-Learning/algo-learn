@@ -47,7 +47,6 @@ export function ExerciseMultiTextInput({
       text: {},
       formatFeedback: {},
     })
-
   }, [question.fillOutAll])
 
   const { mode, text, feedbackObject } = state
@@ -66,7 +65,9 @@ export function ExerciseMultiTextInput({
   function setText(fieldID: string, value: string) {
     setState((state) => ({ ...state, text: { ...state.text, [fieldID]: value } }))
     if (question.checkFormat) {
-      void Promise.resolve(question.checkFormat({ text: value }, fieldID)).then(({ valid, message }) => {
+      void Promise.resolve(
+        question.checkFormat({ text: { ...state.text, [fieldID]: value } }, fieldID),
+      ).then(({ valid, message }) => {
         setState({
           ...state,
           text: { ...state.text, [fieldID]: value },
@@ -91,8 +92,7 @@ export function ExerciseMultiTextInput({
   function handleClick() {
     if (mode === "draft") {
       if (question.feedback !== undefined) {
-        const userAnswer = JSON.stringify(text)
-        void Promise.resolve(question.feedback({ text: userAnswer })).then((feedbackObject) => {
+        void Promise.resolve(question.feedback({ text })).then((feedbackObject) => {
           let mode: MODE = "draft"
           if (feedbackObject.correct === true) {
             playSound("pass")

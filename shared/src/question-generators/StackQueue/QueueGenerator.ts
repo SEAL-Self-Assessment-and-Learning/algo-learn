@@ -670,9 +670,9 @@ export const queueQuestion: QuestionGenerator = {
       const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
         if (fieldID.indexOf("toString") !== -1 || fieldID.indexOf("getQueue") !== -1) {
           // remove all whitespaces, starting "[" and ending "]"
-          text = parseArrayString(text)
+          text[fieldID] = parseArrayString(text[fieldID])
           // split to check if all elements are numbers
-          const elements = text.split(",")
+          const elements = text[fieldID].split(",")
           for (let element of elements) {
             if (element.startsWith("-")) {
               element = element.slice(1)
@@ -688,7 +688,7 @@ export const queueQuestion: QuestionGenerator = {
         }
 
         // check if is a number
-        if (!/^\d+$/.test(text)) {
+        if (!/^\d+$/.test(text[fieldID])) {
           return { valid: false, message: t(translations, lang, "checkFormat") }
         }
         return { valid: true, message: "" }

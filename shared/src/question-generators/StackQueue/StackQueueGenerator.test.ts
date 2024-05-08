@@ -182,9 +182,9 @@ function correctnessTestingObjectMultiple(
   t: { allAnswers?: string[]; correctAnswerIndex: any },
 ) {
   expect(q.type).toEqual("MultipleChoiceQuestion")
-  expect(t.allAnswers).toHaveLength(6)
+  expect(t.allAnswers).toHaveLength(4)
   if (q.type === "MultipleChoiceQuestion") {
-    expect(q.answers).toHaveLength(6)
+    expect(q.answers).toHaveLength(4)
     expect(t.correctAnswerIndex.length).toBeLessThanOrEqual(q.answers.length)
     expect(t.correctAnswerIndex.length).toBeGreaterThanOrEqual(0)
   }

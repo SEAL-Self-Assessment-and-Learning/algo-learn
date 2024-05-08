@@ -190,7 +190,7 @@ export type FreeTextFormatFunction = (
 
 /** The signature of the function that checks the syntax or basic format. */
 export type MultiFreeTextFormatFunction = (
-  answer: FreeTextAnswer,
+  answer: MultiFreeTextAnswer,
   fieldID: string,
 ) => { valid: boolean; message?: string } | Promise<{ valid: boolean; message?: string }>
 

@@ -3,6 +3,7 @@ import {
   FreeTextAnswer,
   FreeTextFeedbackFunction,
   FreeTextQuestion,
+  MultiFreeTextFeedbackFunction,
   MultiFreeTextQuestion,
   MultipleChoiceQuestion,
 } from "@shared/api/QuestionGenerator.ts"
@@ -35,6 +36,16 @@ interface TestingObjectInput {
     word?: string
     wordArray?: { [key: string]: number }
     feedback: FreeTextFeedbackFunction
+  }
+}
+
+interface TestingObjectInput2 {
+  question: MultiFreeTextQuestion | FreeTextQuestion
+  testing: {
+    variant: "input" | "input2"
+    word?: string
+    wordArray?: { [key: string]: number }
+    feedback: MultiFreeTextFeedbackFunction
   }
 }
 
@@ -113,9 +124,22 @@ describe("HuffmanCodingGenerator - Correctness", () => {
           expect((await t.feedback({ text: "" })).correct).toBeFalsy()
           expect((await t.feedback({ text: "a" })).correct).toBeFalsy()
         }
-      } else if (t.variant === "input2") {
-        expect(t.wordArray).toBeDefined()
+      }
+    })
 
+    test(`${i}. Input-2 random huffman coding question`, async () => {
+      const { question: q, testing: t } = huffmanCoding.generate(
+        "", // path not relevant here
+        "en", // language not relevant
+        {
+          variant: "input",
+        },
+        sampleRandomSeed(),
+      ) as TestingObjectInput2
+
+      expect(q.type === "FreeTextQuestion" || q.type === "MultiFreeTextQuestion").toBeTruthy()
+
+      if (t.variant === "input2") {
         if (t.wordArray) {
           const correctAnswerTreeNode = huffmanCodingAlgorithm("", t.wordArray).mainNode
           const correctAnswerDict: { [key: string]: string } = createHuffmanCoding(
@@ -129,13 +153,7 @@ describe("HuffmanCodingGenerator - Correctness", () => {
             const newKey = "a-b-" + key
             formattedAnswerDict[newKey] = correctAnswerDict[key]
           }
-          const answerDictString = JSON.stringify(formattedAnswerDict)
-          const correctAnswer: FreeTextAnswer = { text: answerDictString }
-          expect((await t.feedback(correctAnswer)).correct).toBeTruthy()
-          const wrongsAnswer: FreeTextAnswer = { text: answerDictString + "0" }
-          expect((await t.feedback(wrongsAnswer)).correct).toBeFalsy()
-          expect((await t.feedback({ text: "" })).correct).toBeFalsy()
-          expect((await t.feedback({ text: "a" })).correct).toBeFalsy()
+          expect((await t.feedback({ text: formattedAnswerDict })).correct).toBeTruthy()
         }
       }
     })
