@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactElement, useState } from "react"
 import { IoColorPaletteOutline } from "react-icons/io5"
 import { MdContentCopy } from "react-icons/md"
 import { TbListNumbers } from "react-icons/tb"
@@ -9,7 +9,23 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useToast } from "@/components/ui/use-toast"
 
 export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
+  // fist filter all the empty lines
+  lines = lines.filter((line) => line.trim() !== "")
+  const codeLines = lines.length
+
   const { toast } = useToast()
+
+  const [toggleStateLines, setToggleStateLines] = useState(true)
+
+  const [isTextVisible, setIsTextVisible] = useState(true)
+
+  const handleToggleClickLines = () => {
+    setToggleStateLines(!toggleStateLines)
+    setIsTextVisible(false)
+    setTimeout(() => {
+      setIsTextVisible(true)
+    }, 70)
+  }
 
   const handleClickCopyIcon: () => void = () => {
     ;(async () => {
@@ -36,58 +52,70 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
   return (
     <div className="my-5">
       <div className="relative">
-        <div className="absolute right-0 top-0 flex flex-col items-center space-y-1">
+        <div className="overflow-hidden rounded-lg border border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+          <div style={{ whiteSpace: "nowrap", overflowX: "auto" }}>
+            <pre className="overflow-x-auto whitespace-pre py-3 pl-5 pr-10 font-mono leading-relaxed text-gray-900 dark:text-gray-100">
+              {lines.map((line, index) => (
+                <div key={index}>
+                  <Markdown
+                    md={
+                      isTextVisible
+                        ? `${toggleStateLines ? createLineNumbers({ index, codeLines }) : ""} ${" ".repeat(getAmountLeadingWhiteSpaces(line))}$${line}$`
+                        : " "
+                    }
+                  />
+                </div>
+              ))}
+            </pre>
+          </div>
+        </div>
+        <div className="absolute right-1 top-1 flex flex-col items-center space-y-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
           <Toaster />
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger>
-                <Toggle size="sm" className="mr-1">
-                  <TbListNumbers />
-                </Toggle>
+              <TooltipTrigger asChild>
+                <div>
+                  <Toggle size="sm" pressed={toggleStateLines} onPressedChange={handleToggleClickLines}>
+                    <TbListNumbers />
+                  </Toggle>
+                </div>
               </TooltipTrigger>
               <TooltipContent>Show line numbers</TooltipContent>
             </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger>
-                <Toggle size="sm" className="mr-1">
-                  <IoColorPaletteOutline />
-                </Toggle>
+              <TooltipTrigger asChild>
+                <div>
+                  <Toggle size="sm">
+                    <IoColorPaletteOutline />
+                  </Toggle>
+                </div>
               </TooltipTrigger>
               <TooltipContent>Add syntax highlighting</TooltipContent>
             </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger>
-                <button
+              <TooltipTrigger asChild>
+                <div
                   onClick={handleClickCopyIcon}
                   className={`inline-flex h-8 items-center justify-center rounded-md px-2.5 text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground`}
                 >
                   <MdContentCopy className="h-4 w-4" />
-                </button>
+                </div>
               </TooltipTrigger>
               <TooltipContent>Copy code as LaTeX</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className="overflow-hidden rounded-lg border border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
-          <pre className="whitespace-pre-wrap break-words py-3 pl-5 pr-10 font-mono leading-relaxed text-gray-900 dark:text-gray-100">
-            {lines
-              .filter((line) => line.trim() !== "")
-              .map((line, index) => (
-                <div key={index}>
-                  <Markdown
-                    md={`$${index + 1}:$ ${" ".repeat(getAmountLeadingWhiteSpaces(line)) + "$" + line + " $"}`}
-                  />
-                </div>
-              ))}
-          </pre>
-        </div>
       </div>
     </div>
   )
+}
+
+function createLineNumbers({ index, codeLines }: { index: number; codeLines: number }) {
+  let codeLine = ""
+  if (codeLines > 0) {
+    codeLine = `${index + 1 >= 10 ? "" : " "}$${index + 1}:$ `
+  }
+  return `${codeLine}`
 }
 
 function getAmountLeadingWhiteSpaces(text: string): number {
