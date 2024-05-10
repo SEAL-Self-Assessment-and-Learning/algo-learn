@@ -2,6 +2,19 @@ import Fraction from "fraction.js"
 import { log } from "mathjs"
 import Random from "../../utils/random"
 import { createProductTerm, ProductTerm } from "../asymptotics/asymptoticsUtils"
+import {
+  PseudoCode,
+  PseudoCodeAssignment,
+  PseudoCodeBlock,
+  PseudoCodeCall,
+  PseudoCodeFunction,
+  PseudoCodeIf,
+  PseudoCodePrint,
+  PseudoCodeReturn,
+  pseudoCodeToString,
+} from "../time/pseudoCodeUtils"
+
+const arithmeticOperations = ["+", "-", "*", "/"]
 
 /**
  * Produce a string of the form " print(***)"
@@ -93,19 +106,67 @@ export function sampleRecursiveFunctionStars({
   numRecCalls: number
   divideOrSubtractBy: number
 }) {
-  let functionText = ""
-  functionText += `def ${functionName}(${variable}):\n`
-  functionText += printStars(preStars, 2)
-  functionText += `  if (${variable} <= 1):\n`
-  functionText += printStars(baseStars, 4)
-  functionText += `  else:\n`
-  functionText += printStars(recStars, 4)
-  for (let i = 0; i < numRecCalls; i++) {
-    functionText += `    ${functionName}(${variable}${divOrSub === "div" ? "/" : "-"}${divideOrSubtractBy})\n`
+  const completeCode: PseudoCode = []
+  const functionBodyBlock: PseudoCodeBlock = {
+    block: [],
   }
-  functionText += printStars(postStars, 2)
+
+  if (preStars > 0) {
+    const functionTextPre: PseudoCodePrint = {
+      print: `\\texttt{${"*".repeat(preStars)}}`,
+    }
+    functionBodyBlock.block.push({ state: functionTextPre })
+  }
+
+  const functionTextBase: PseudoCodePrint = {
+    print: `\\texttt{${"*".repeat(baseStars)}}`,
+  }
+
+  const functionRecCallsBlock: PseudoCodeBlock = {
+    block: [],
+  }
+
+  if (recStars > 0) {
+    const functionTextRec: PseudoCodePrint = {
+      print: `\\texttt{${"*".repeat(recStars)}}`,
+    }
+    functionRecCallsBlock.block.push({ state: functionTextRec })
+  }
+
+  for (let i = 0; i < numRecCalls; i++) {
+    const functionCall: PseudoCodeCall = {
+      functionName: functionName,
+      args: [`${variable}${divOrSub === "div" ? "/" : "-"}${divideOrSubtractBy}`],
+    }
+    functionRecCallsBlock.block.push({ state: functionCall })
+  }
+
+  const functionTextIf: PseudoCodeIf = {
+    if: {
+      condition: `${variable} \\leq 1`,
+      then: { state: functionTextBase },
+      else: functionRecCallsBlock,
+    },
+  }
+  functionBodyBlock.block.push(functionTextIf)
+
+  if (postStars > 0) {
+    const functionTextPost: PseudoCodePrint = {
+      print: `\\texttt{${"*".repeat(postStars)}}`,
+    }
+    functionBodyBlock.block.push({ state: functionTextPost })
+  }
+
+  const functionDeclaration: PseudoCodeFunction = {
+    name: functionName,
+    args: [variable],
+    body: functionBodyBlock,
+  }
+
+  completeCode.push(functionDeclaration)
+
   return {
-    functionText,
+    functionText: pseudoCodeToString(completeCode),
     functionName,
     n: variable,
     b: divideOrSubtractBy,
@@ -152,37 +213,65 @@ export function sampleRecursiveFunctionArithmetic({
   numRecCalls: number
   divideOrSubtractBy: number
 }) {
-  const arithmeticOperations = ["+", "-", "*", "/"]
+  const completeCode: PseudoCode = []
 
-  let functionText = ""
-  functionText += `def ${functionName}(${variable}):\n`
-  // we need to create as many arithmetic operations as the number of pre-stars
-  let preOperations = random.int(1, 10).toString() + " "
-  for (let i = 0; i < preStars; i++) {
-    preOperations += `${random.choice(arithmeticOperations)} ${random.int(1, 10)} `
+  const functionDeclaration: PseudoCodeFunction = {
+    name: functionName,
+    args: [variable],
+    body: null,
   }
-  functionText += `  let ${sumVariable} = ${preOperations}\n`
-  functionText += `  if (${variable} <= 1):\n`
-  let baseOperations = " "
-  for (let i = 0; i < baseStars; i++) {
-    baseOperations += `${random.choice(arithmeticOperations)} ${random.int(1, 10)} `
+  const functionBodyBlock: PseudoCodeBlock = {
+    block: [],
   }
-  functionText += `    return ${sumVariable}${baseOperations}\n`
-  functionText += `  else:\n`
+  functionDeclaration.body = functionBodyBlock
+  completeCode.push(functionDeclaration)
+
+  const functionAssignmentPre: PseudoCodeAssignment = {
+    variable: sumVariable,
+    value: generateOperationsArithmetic(preStars, random),
+  }
+  functionBodyBlock.block.push({ state: functionAssignmentPre })
+
+  const functionTextIf: PseudoCodeIf = {
+    if: {
+      condition: `${variable} \\leq 1`,
+      then: null,
+      else: null,
+    },
+  }
+  functionBodyBlock.block.push(functionTextIf)
+
+  const functionReturn1: PseudoCodeReturn = {
+    returnValue: generateOperationsArithmetic(baseStars, random),
+  }
+  functionTextIf.if.then = { state: functionReturn1 }
+
+  const functionRecCallsBlock: PseudoCodeBlock = {
+    block: [],
+  }
+  functionTextIf.if.else = functionRecCallsBlock
   if (recStars > 0) {
-    let recOperations = " "
-    for (let i = 0; i < recStars; i++) {
-      recOperations += `${random.choice(arithmeticOperations)} ${random.int(1, 10)} `
+    const functionAssignmentRec: PseudoCodeAssignment = {
+      variable: sumVariable,
+      value: generateOperationsArithmetic(recStars, random),
     }
-    functionText += `    ${sumVariable} = ${sumVariable}${recOperations}\n`
+    functionRecCallsBlock.block.push({ state: functionAssignmentRec })
   }
-  functionText += `    return `
-  for (let i = 0; i < numRecCalls; i++) {
-    functionText += `${functionName}(${variable}${divOrSub === "div" ? "/" : "-"}${divideOrSubtractBy})${i === numRecCalls - 1 ? "" : " " + random.choice(arithmeticOperations) + " "}`
+
+  const functionReturn2: PseudoCodeReturn = {
+    returnValue: generateRecursiveReturnArithmetic({
+      numRecCalls,
+      functionName,
+      variable,
+      divOrSub,
+      divideOrSubtractBy,
+      random,
+    }),
   }
-  functionText += ` + ${sumVariable}\n`
+  functionRecCallsBlock.block.push({ state: functionReturn2 })
+
   return {
-    functionText,
+    functionText: pseudoCodeToString(completeCode),
     functionName,
     n: variable,
     b: divideOrSubtractBy,
@@ -478,4 +567,67 @@ export function sampleMasterRecursionAnswers({
     element: `\\Theta(${secondTerm === "1" ? "" : secondTerm} \\log(n))`,
   })
   return random.shuffle(answers)
+}
+
+function generateOperationsArithmetic(stars: number, random: Random) {
+  // we need to create as many arithmetic operations as the number of stars
+  const firstNumberValue = random.int(1, 10)
+  let equationString = firstNumberValue.toString()
+  let lastOperationWasFraction = false
+  for (let i = 0; i < stars; i++) {
+    let operation = random.choice(arithmeticOperations)
+    if (lastOperationWasFraction) {
+      lastOperationWasFraction = false
+      operation = random.choice(arithmeticOperations.filter((op) => op !== "/"))
+    }
+    const currentNumber = random.int(1, 10)
+    if (operation === "*") {
+      operation = "\\cdot"
+    } else if (operation === "/") {
+      lastOperationWasFraction = true
+      equationString = equationString.trim()
+      equationString =
+        equationString.slice(0, equationString.length - 1) +
+        `\\frac{${equationString[equationString.length - 1]}}{${currentNumber}} `
+      continue
+    }
+    equationString += `${operation} ${currentNumber} `
+  }
+  /*
+  if (equationString.length > 1) {
+    return "\\left(" + equationString + "\\right)"
+  }
+  */
+  return equationString
+}
+
+function generateRecursiveReturnArithmetic({
+  numRecCalls,
+  functionName,
+  variable,
+  divOrSub,
+  divideOrSubtractBy,
+  random,
+}: {
+  numRecCalls: number
+  functionName: string
+  variable: string
+  divOrSub: "div" | "sub"
+  divideOrSubtractBy: number
+  random: Random
+}) {
+  let returnString: string = ""
+  for (let i = 0; i < numRecCalls; i++) {
+    returnString += `\\textit{${functionName} }(`
+    if (divOrSub === "sub") {
+      returnString += `${variable} - ${divideOrSubtractBy})`
+    } else {
+      returnString += `\\frac{${variable}}{${divideOrSubtractBy}})`
+    }
+    if (i < numRecCalls - 1) {
+      const chooseOperation = random.choice(arithmeticOperations.filter((op) => op !== "/"))
+      returnString += `${chooseOperation === "*" ? "\\cdot" : chooseOperation} `
+    }
+  }
+  return returnString
 }

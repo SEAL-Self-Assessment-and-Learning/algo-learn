@@ -208,7 +208,7 @@ export function createBoundsString(
       if (timeOrStars === "stars") {
         endString = `abs(${value})*${value}`
       } else {
-        endString = `${value}*${value}`
+        endString = `$${value}^2$`
       }
     }
     if (boundsManipulation.type === "cube") {
