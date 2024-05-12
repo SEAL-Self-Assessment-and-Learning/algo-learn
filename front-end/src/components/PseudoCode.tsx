@@ -11,16 +11,42 @@ import { useToast } from "@/components/ui/use-toast"
 export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
   // fist filter all the empty lines
   lines = lines.filter((line) => line.trim() !== "")
-  const codeLines = lines.length
+
+  // split the lines into two arrays of lines code[...] color[...] (for coloring)
+  // separator is ## ## ## ## ##
+  const code = []
+  const color = []
+  let codeBool = true
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].trim() === "## ## ## ## ##") {
+      codeBool = false
+      continue
+    }
+    if (codeBool) {
+      code.push(lines[i])
+    } else {
+      color.push(lines[i])
+    }
+  }
+  const codeLines = code.length
 
   const { toast } = useToast()
 
   const [toggleStateLines, setToggleStateLines] = useState(true)
+  const [toggleStateColor, setToggleStateColor] = useState(true)
 
   const [isTextVisible, setIsTextVisible] = useState(true)
 
   const handleToggleClickLines = () => {
     setToggleStateLines(!toggleStateLines)
+    setIsTextVisible(false)
+    setTimeout(() => {
+      setIsTextVisible(true)
+    }, 70)
+  }
+
+  const handleToggleClickColor = () => {
+    setToggleStateColor(!toggleStateColor)
     setIsTextVisible(false)
     setTimeout(() => {
       setIsTextVisible(true)
@@ -54,13 +80,13 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
       <div className="relative">
         <div className="overflow-hidden rounded-lg border border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
           <div style={{ whiteSpace: "nowrap", overflowX: "auto" }}>
-            <pre className="overflow-x-auto whitespace-pre py-3 pl-5 pr-10 font-mono leading-relaxed text-gray-900 dark:text-gray-100">
-              {lines.map((line, index) => (
+            <pre className="overflow-x-auto whitespace-pre py-3 pl-5 pr-10 font-mono leading-7 text-gray-900 dark:text-gray-100">
+              {(toggleStateColor ? color : code).map((cd, index) => (
                 <div key={index}>
                   <Markdown
                     md={
                       isTextVisible
-                        ? `${toggleStateLines ? createLineNumbers({ index, codeLines }) : ""} ${" ".repeat(getAmountLeadingWhiteSpaces(line))}$${line}$`
+                        ? `${toggleStateLines ? createLineNumbers({ index, codeLines }) : ""} ${" ".repeat(getAmountLeadingWhiteSpaces(cd))}$${cd}$`
                         : " "
                     }
                   />
@@ -85,7 +111,7 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div>
-                  <Toggle size="sm">
+                  <Toggle size="sm" pressed={toggleStateColor} onPressedChange={handleToggleClickColor}>
                     <IoColorPaletteOutline />
                   </Toggle>
                 </div>
