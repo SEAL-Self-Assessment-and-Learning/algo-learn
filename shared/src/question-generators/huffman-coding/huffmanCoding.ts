@@ -491,7 +491,7 @@ export const huffmanCoding: QuestionGenerator = {
           try {
             // iterate over each letter to check if either 0 or 1
             for (let i = 0; i < text[fieldID].length; i++) {
-              if (text[i] !== "0" && text[fieldID][i] !== "1") {
+              if (text[fieldID][i] !== "0" && text[fieldID][i] !== "1") {
                 return {
                   valid: false,
                   message: tFunction(translations, lang).t("feedbackInvalid"),
