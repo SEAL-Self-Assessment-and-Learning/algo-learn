@@ -1,20 +1,26 @@
-import {ReactElement, useEffect, useRef, useState} from "react"
+import { ReactElement, useEffect, useRef, useState } from "react"
 import { IoColorPaletteOutline } from "react-icons/io5"
 import { MdContentCopy } from "react-icons/md"
-import {TbListNumbers, TbSquareRoundedLetterN, TbSquareRoundedLetterL, TbSquareRoundedLetterR } from "react-icons/tb"
+import {
+  TbListNumbers,
+  TbSquareRoundedLetterL,
+  TbSquareRoundedLetterN,
+  TbSquareRoundedLetterR,
+} from "react-icons/tb"
 import { Markdown } from "@/components/Markdown.tsx"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Toaster } from "@/components/ui/toaster"
 import { Toggle } from "@/components/ui/toggle.tsx"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/components/ui/use-toast"
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
 export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
   // fist filter all the empty lines
@@ -41,29 +47,28 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
   const { toast } = useToast()
 
   const preHeight = useRef<HTMLPreElement | null>(null)
-  const [maxHeight, setMaxHeight] = useState(0);
+  const [maxHeight, setMaxHeight] = useState(0)
   const [toggleStateLines, setToggleStateLines] = useState(true)
   const [toggleStateColor, setToggleStateColor] = useState(true)
   const [positionLineHeight, setPositionLineHeight] = useState("normal")
-
 
   const [isTextVisible, setIsTextVisible] = useState(true)
 
   useEffect(() => {
     if (preHeight.current && preHeight.current.offsetHeight) {
-      preHeight.current.style.minHeight = `${preHeight.current.offsetHeight}px`;
+      preHeight.current.style.minHeight = `${preHeight.current.offsetHeight}px`
     }
-  }, [toggleStateLines, toggleStateColor]);
+  }, [toggleStateLines, toggleStateColor])
 
   useEffect(() => {
     if (preHeight.current) {
-      const newHeight = preHeight.current.offsetHeight;
+      const newHeight = preHeight.current.offsetHeight
       if (newHeight > maxHeight) {
-        setMaxHeight(newHeight);
+        setMaxHeight(newHeight)
       }
-      preHeight.current.style.minHeight = `${maxHeight}px`;
+      preHeight.current.style.minHeight = `${maxHeight}px`
     }
-  }, [toggleStateLines, toggleStateColor, maxHeight]);
+  }, [toggleStateLines, toggleStateColor, maxHeight])
 
   const handleToggleClickLines = () => {
     setToggleStateLines(!toggleStateLines)
@@ -107,9 +112,8 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
     <div className="my-5">
       <div className="relative">
         <div className="overflow-hidden rounded-lg border border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
-          <div style={{whiteSpace: "nowrap", overflowX: "auto"}}>
+          <div style={{ whiteSpace: "nowrap", overflowX: "auto" }}>
             <pre
-
               className={`overflow-x-auto whitespace-pre py-3 pl-5 pr-10 font-mono leading-${positionLineHeight} text-gray-900 dark:text-gray-100`}
             >
               {(toggleStateColor ? color : code).map((cd, index) => (
@@ -117,10 +121,14 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
                   <Markdown
                     md={
                       isTextVisible
-                        ? `${toggleStateLines ? createLineNumbers({
-                          index,
-                          codeLines
-                        }) : ""} ${" ".repeat(getAmountLeadingWhiteSpaces(cd))}$${cd}$`
+                        ? `${
+                            toggleStateLines
+                              ? createLineNumbers({
+                                  index,
+                                  codeLines,
+                                })
+                              : ""
+                          } ${" ".repeat(getAmountLeadingWhiteSpaces(cd))}$${cd}$`
                         : " "
                     }
                   />
@@ -129,15 +137,14 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
             </pre>
           </div>
         </div>
-        <div
-          className="absolute right-1 top-1 flex flex-col items-center space-y-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
-          <Toaster/>
+        <div className="absolute right-1 top-1 flex flex-col items-center space-y-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
+          <Toaster />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div>
                   <Toggle size="sm" pressed={toggleStateLines} onPressedChange={handleToggleClickLines}>
-                    <TbListNumbers/>
+                    <TbListNumbers />
                   </Toggle>
                 </div>
               </TooltipTrigger>
@@ -153,24 +160,30 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
               </TooltipTrigger>
               <TooltipContent>Add syntax highlighting</TooltipContent>
             </Tooltip>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div
-                    className={`inline-flex h-8 items-center justify-center rounded-md px-2.5 text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground`}
-                  >
-                    {positionLineHeight === "normal" ? <TbSquareRoundedLetterN className="h-4 w-4" /> : positionLineHeight === "relaxed" ? <TbSquareRoundedLetterR className="h-4 w-4" /> : <TbSquareRoundedLetterL className="h-4 w-4" />}
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  <DropdownMenuLabel>Change line height</DropdownMenuLabel>
-                  <DropdownMenuSeparator/>
-                  <DropdownMenuRadioGroup value={positionLineHeight} onValueChange={setPositionLineHeight}>
-                    <DropdownMenuRadioItem value="normal">Normal</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="relaxed">Relaxed</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="loose">Loose</DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div
+                  className={`inline-flex h-8 items-center justify-center rounded-md px-2.5 text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground`}
+                >
+                  {positionLineHeight === "normal" ? (
+                    <TbSquareRoundedLetterN className="h-4 w-4" />
+                  ) : positionLineHeight === "relaxed" ? (
+                    <TbSquareRoundedLetterR className="h-4 w-4" />
+                  ) : (
+                    <TbSquareRoundedLetterL className="h-4 w-4" />
+                  )}
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuLabel>Change line height</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup value={positionLineHeight} onValueChange={setPositionLineHeight}>
+                  <DropdownMenuRadioItem value="normal">Normal</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="relaxed">Relaxed</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="loose">Loose</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div
