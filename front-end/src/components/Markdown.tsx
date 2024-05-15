@@ -1,8 +1,11 @@
 import { Fragment, FunctionComponent, ReactNode } from "react"
 import { Link } from "react-router-dom"
+import SyntaxHighlighter from "react-syntax-highlighter"
+import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
+import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
-import { PseudoCode } from "@/components/PseudoCode.tsx"
+import { useTheme } from "@/hooks/useTheme.ts"
 import { Format } from "./Format"
 import TeX from "./TeX"
 
@@ -58,6 +61,7 @@ export const MarkdownTreeNode: FunctionComponent<{
   parseTreeNode: ParseTreeNode
   parameters?: ReactNode[]
 }> = ({ parseTreeNode, parameters }) => {
+  const { theme } = useTheme()
   if (typeof parseTreeNode === "string") {
     return <Format template={parseTreeNode} parameters={parameters} />
   }
@@ -85,8 +89,19 @@ export const MarkdownTreeNode: FunctionComponent<{
     return <span className="font-mono">{format(parseTreeNode.child, parameters)}</span>
   }
   if (parseTreeNode.kind === "```") {
-    const lines = parseTreeNode.child.split("\n")
-    return <PseudoCode lines={lines} />
+    if (parseTreeNode.language === "pseudoCode") {
+      return <DrawPseudoCode displayCode={parseTreeNode.child} />
+    }
+    return (
+      <div className="my-5">
+        <SyntaxHighlighter
+          language={parseTreeNode.language}
+          style={theme === "light" ? solarizedLight : solarizedDark}
+        >
+          {parseTreeNode.child}
+        </SyntaxHighlighter>
+      </div>
+    )
   }
   if (parseTreeNode.kind === "table") {
     return <DrawTable table={parseTreeNode.child} />

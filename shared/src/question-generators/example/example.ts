@@ -20,9 +20,7 @@ import {
   PseudoCodePrint,
   PseudoCodeReturn,
   PseudoCodeState,
-  pseudoCodeToString,
   PseudoCodeWhile,
-  variableColor,
 } from "../time/pseudoCodeUtils"
 
 /**
@@ -34,13 +32,9 @@ const translations: Translations = {
     name: "Compute a sum",
     description: `Compute the sum of two integers`,
     text: `Let {{0}} and {{1}} be two - natural numbers. What is the **sum** {{0}}+{{1}}?
-
-    
-\`\`\`python3
+\`\`\`pseudoCode
 {{2}}
 \`\`\`
-        
-        
     `,
   },
   de: {
@@ -104,31 +98,36 @@ export const ExampleQuestion: QuestionGenerator = {
 
     // create a Pseudo-Object for testing
     const printLine1: PseudoCodePrint = {
-      print: `a + b`,
-      printColor: `{\\color{${variableColor}}a} + {\\color{${variableColor}}b}`,
+      print: [{ printString: "a + b" }],
     }
 
     const returnLine1: PseudoCodeReturn = {
-      returnValue: `a + b`,
-      returnValueColor: `{\\color{${variableColor}}a} + {\\color{${variableColor}}b}`,
+      returnValue: ["(", { variable: "a" }, ", ", { variable: "b" }, ")"],
     }
 
     const stateLine1: PseudoCodeState = {
-      state: `a = a`,
-      stateColor: `{\\color{${variableColor}}a} = {\\color{${variableColor}}a}`,
+      state: [{ variable: "a" }, ` = `, { variable: "a" }],
     }
     const stateLine2: PseudoCodeState = {
-      state: `a = b`,
-      stateColor: `{\\color{${variableColor}}a} = {\\color{${variableColor}}b}`,
+      state: [{ variable: "a" }, ` = `, { variable: "b" }],
     }
     const stateLine3: PseudoCodeState = { state: printLine1 }
     const stateLine4: PseudoCodeState = { state: returnLine1 }
 
     const ifLine1: PseudoCodeIf = {
       if: {
-        condition: `a > a`,
-        conditionColor: `{\\color{${variableColor}}a} > {\\color{${variableColor}}a}`,
+        condition: [{ variable: "a" }, ` > `, { variable: "x" }],
         then: stateLine1,
+        elseif: [
+          {
+            condition: [{ variable: "a" }, ` < `, { variable: "y" }],
+            then: stateLine2,
+          },
+          {
+            condition: [{ variable: "a" }, ` == `, { variable: "z" }],
+            then: stateLine2,
+          },
+        ],
         else: stateLine2,
       },
     }
@@ -136,10 +135,9 @@ export const ExampleQuestion: QuestionGenerator = {
     const forLine1: PseudoCodeFor = {
       for: {
         variable: `i`,
-        from: `1`,
-        to: `\\sum_{i=0}^{n} \\left( \\frac{1}{i} \\right)`,
-        toColor: `\\sum_{{\\color{${variableColor}}i}=0}^{{\\color{${variableColor}}n}} \\left( \\frac{1}{{\\color{${variableColor}}i}} \\right)`,
-        step: ``,
+        from: [`1`],
+        to: [`\\sum_{i=0}^{n} \\left( \\frac{1}{i} \\right)`],
+        step: [{ variable: "i" }, ` \\mathrel{+}= 1`],
         do: stateLine1,
       },
     }
@@ -161,28 +159,37 @@ export const ExampleQuestion: QuestionGenerator = {
 
     const callLine1: PseudoCodeCall = {
       functionName: `sum`,
-      args: [`a`, `b`],
-      colorArgs: [`{\\color{${variableColor}}a}`, `{\\color{${variableColor}}b}`],
+      args: [[{ variable: "a" }], [{ variable: "b" }]],
     }
     newBlock.block.push({ state: callLine1 })
 
     const AssignmentLine1: PseudoCodeAssignment = {
       variable: `a`,
-      value: `10^2`,
+      value: [
+        ` 10^2 \\text{ \\&\\& } `,
+        { functionName: "fork" },
+        "(",
+        { variable: "a" },
+        "\\cdot 10,",
+        { variable: "b" },
+        ")",
+      ],
     }
     newBlock.block.push({ state: AssignmentLine1 })
 
     const printStatement: PseudoCodePrint = {
-      print: `\\begin{bmatrix} \\sum_{i=0}^{n} \\left( \\frac{1}{i} \\right) & b \\\\ c & d \\end{bmatrix}`,
-      printColor: `\\begin{bmatrix} \\sum_{{\\color{${variableColor}}i}=0}^{{\\color{${variableColor}}a}} \\left( \\frac{1}{{\\color{${variableColor}}i}} \\right) & {\\color{${variableColor}}b} \\\\ {\\color{${variableColor}}c} & {\\color{${variableColor}}d} \\end{bmatrix}`,
+      print: [
+        `\\begin{bmatrix} \\sum_{i=0}^{n} \\left( \\frac{1}{i} \\right) & b \\\\ c & d \\end{bmatrix}`,
+      ],
     }
     newBlock.block.push({ state: printStatement })
 
     const forAllLine1: PseudoCodeForAll = {
       forAll: {
         variable: `i`,
-        set: `\\{1,\\dots,n (\\text{this is just a very long superfluous sentence to test scrolling})\\}`,
-        setColor: `\\{1,\\dots,{\\color{${variableColor}}n} (\\text{this is just a very long superfluous sentence to test scrolling})\\}`,
+        set: [
+          `\\{1,\\dots,n (\\text{this is just a very long superfluous sentence to test scrolling})\\}`,
+        ],
         do: newBlock,
       },
     }
@@ -193,8 +200,7 @@ export const ExampleQuestion: QuestionGenerator = {
 
     const whileLine1: PseudoCodeWhile = {
       while: {
-        condition: `a > b`,
-        conditionColor: `{\\color{${variableColor}}a} > {\\color{${variableColor}}b}`,
+        condition: [{ functionName: "f" }, "(", { variable: "a" }, ")", ` < `, { variable: "y" }],
         do: blockLine1,
       },
     }
@@ -216,7 +222,7 @@ export const ExampleQuestion: QuestionGenerator = {
         seed,
         generatorPath,
       }),
-      text: t(translations, lang, "text", [`${a}`, `${b}`, pseudoCodeToString(completeCode)]),
+      text: t(translations, lang, "text", [`${a}`, `${b}`, JSON.stringify(completeCode)]),
       answers,
       feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
     }

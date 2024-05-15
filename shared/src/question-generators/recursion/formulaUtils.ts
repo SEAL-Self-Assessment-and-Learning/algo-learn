@@ -3,7 +3,6 @@ import { log } from "mathjs"
 import Random from "../../utils/random"
 import { createProductTerm, ProductTerm } from "../asymptotics/asymptoticsUtils"
 import {
-  functionColor,
   printStarsNew,
   PseudoCode,
   PseudoCodeAssignment,
@@ -13,8 +12,6 @@ import {
   PseudoCodeIf,
   PseudoCodeReturn,
   PseudoCodeState,
-  pseudoCodeToString,
-  variableColor,
 } from "../time/pseudoCodeUtils"
 
 const arithmeticOperations = ["+", "-", "*", "/"]
@@ -129,27 +126,22 @@ export function sampleRecursiveFunctionStars({
   }
 
   let recCallString: string
-  let recCallStringColor: string
   if (divOrSub === "div") {
     recCallString = `\\frac{${variable}}{${divideOrSubtractBy}}`
-    recCallStringColor = `\\frac{{\\color{${variableColor}}${variable}}}{${divideOrSubtractBy}}`
   } else {
     recCallString = `${variable} - ${divideOrSubtractBy}`
-    recCallStringColor = `{\\color{${variableColor}}${variable}} - ${divideOrSubtractBy}`
   }
   for (let i = 0; i < numRecCalls; i++) {
     const functionCall: PseudoCodeCall = {
       functionName: functionName,
-      args: [recCallString],
-      colorArgs: [recCallStringColor],
+      args: [[recCallString]],
     }
     functionRecCallsBlock.block.push({ state: functionCall })
   }
 
   const functionTextIf: PseudoCodeIf = {
     if: {
-      condition: `${variable} \\leq 1`,
-      conditionColor: `{\\color{${variableColor}}${variable}} \\leq 1`,
+      condition: [`${variable} \\leq 1`],
       then: functionTextBase,
       else: functionRecCallsBlock,
     },
@@ -169,7 +161,7 @@ export function sampleRecursiveFunctionStars({
   completeCode.push(functionDeclaration)
 
   return {
-    functionText: pseudoCodeToString(completeCode),
+    functionText: completeCode,
     functionName,
     n: variable,
     b: divideOrSubtractBy,
@@ -231,14 +223,13 @@ export function sampleRecursiveFunctionArithmetic({
 
   const functionAssignmentPre: PseudoCodeAssignment = {
     variable: sumVariable,
-    value: generateOperationsArithmetic(preStars, random),
+    value: [generateOperationsArithmetic(preStars, random)],
   }
   functionBodyBlock.block.push({ state: functionAssignmentPre })
 
   const functionTextIf: PseudoCodeIf = {
     if: {
-      condition: `${variable} \\leq 1`,
-      conditionColor: `{\\color{${variableColor}}${variable}} \\leq 1`,
+      condition: [`${variable} \\leq 1`],
       then: null,
       else: null,
     },
@@ -246,7 +237,7 @@ export function sampleRecursiveFunctionArithmetic({
   functionBodyBlock.block.push(functionTextIf)
 
   const functionReturn1: PseudoCodeReturn = {
-    returnValue: generateOperationsArithmetic(baseStars, random),
+    returnValue: [generateOperationsArithmetic(baseStars, random)],
   }
   functionTextIf.if.then = { state: functionReturn1 }
 
@@ -257,12 +248,12 @@ export function sampleRecursiveFunctionArithmetic({
   if (recStars > 0) {
     const functionAssignmentRec: PseudoCodeAssignment = {
       variable: sumVariable,
-      value: generateOperationsArithmetic(recStars, random),
+      value: [generateOperationsArithmetic(recStars, random)],
     }
     functionRecCallsBlock.block.push({ state: functionAssignmentRec })
   }
 
-  const { returnString, returnStringColor } = generateRecursiveReturnArithmetic({
+  const { returnString } = generateRecursiveReturnArithmetic({
     numRecCalls,
     functionName,
     variable,
@@ -271,13 +262,12 @@ export function sampleRecursiveFunctionArithmetic({
     random,
   })
   const functionReturn2: PseudoCodeReturn = {
-    returnValue: returnString,
-    returnValueColor: returnStringColor,
+    returnValue: [returnString],
   }
   functionRecCallsBlock.block.push({ state: functionReturn2 })
 
   return {
-    functionText: pseudoCodeToString(completeCode),
+    functionText: completeCode,
     functionName,
     n: variable,
     b: divideOrSubtractBy,
@@ -623,22 +613,17 @@ function generateRecursiveReturnArithmetic({
   random: Random
 }) {
   let returnString: string = ""
-  let returnStringColor: string = ""
   for (let i = 0; i < numRecCalls; i++) {
     returnString += `\\textit{${functionName} }(`
-    returnStringColor += `{\\color{${functionColor}}\\textit{${functionName}} }(`
     if (divOrSub === "sub") {
       returnString += `${variable} - ${divideOrSubtractBy})`
-      returnStringColor += `{\\color{${variableColor}}${variable}} - ${divideOrSubtractBy})`
     } else {
       returnString += `\\frac{${variable}}{${divideOrSubtractBy}})`
-      returnStringColor += `\\frac{{\\color{${variableColor}}${variable}}}{${divideOrSubtractBy}})`
     }
     if (i < numRecCalls - 1) {
       const chooseOperation = random.choice(arithmeticOperations.filter((op) => op !== "/"))
       returnString += `${chooseOperation === "*" ? "\\cdot" : chooseOperation} `
-      returnStringColor += `${chooseOperation === "*" ? "\\cdot" : chooseOperation} `
     }
   }
-  return { returnString, returnStringColor }
+  return { returnString }
 }

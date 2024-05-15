@@ -1,48 +1,31 @@
 import { ReactElement, useEffect, useRef, useState } from "react"
 import { IoColorPaletteOutline } from "react-icons/io5"
 import { MdContentCopy } from "react-icons/md"
-import {
-  TbListNumbers,
-  TbSquareRoundedLetterL,
-  TbSquareRoundedLetterN,
-  TbSquareRoundedLetterR,
-} from "react-icons/tb"
+import { TbListNumbers } from "react-icons/tb"
+import { PseudoCode } from "@shared/question-generators/time/pseudoCodeUtils.ts"
+import { pseudoCodeToString } from "@shared/utils/parsePseudoCode.ts"
 import { Markdown } from "@/components/Markdown.tsx"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Toaster } from "@/components/ui/toaster"
 import { Toggle } from "@/components/ui/toggle.tsx"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/components/ui/use-toast"
 
-export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
-  // fist filter all the empty lines
-  lines = lines.filter((line) => line.trim() !== "")
+export const keyWordsColor = "DarkOrchid"
+export const functionColor = "DarkCyan"
+export const variableColor = "IndianRed"
+export const controlFlowColor = "SeaGreen"
+export const printStatementColor = "Orange"
 
-  // split the lines into two arrays of lines code[...] color[...] (for coloring)
-  // separator is ## ## ## ## ##
-  const code = []
-  const color = []
-  let codeBool = true
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].trim() === "## ## ## ## ##") {
-      codeBool = false
-      continue
-    }
-    if (codeBool) {
-      code.push(lines[i])
-    } else {
-      color.push(lines[i])
-    }
-  }
-  const codeLines = code.length
+export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactElement {
+  const pseudoCodeStringParse: PseudoCode = JSON.parse(displayCode) as PseudoCode
+
+  const { pseudoCodeString, pseudoCodeStringColor, pseudoCodeStringLatex } =
+    pseudoCodeToString(pseudoCodeStringParse)
+  const codeNormal = pseudoCodeString.split("\n")
+  const codeColor = pseudoCodeStringColor.split("\n")
+  const codeLatex = pseudoCodeStringLatex.split("\n")
+
+  const numCodeLines = codeNormal.length
 
   const { toast } = useToast()
 
@@ -50,15 +33,8 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
   const [maxHeight, setMaxHeight] = useState(0)
   const [toggleStateLines, setToggleStateLines] = useState(true)
   const [toggleStateColor, setToggleStateColor] = useState(true)
-  const [positionLineHeight, setPositionLineHeight] = useState("normal")
 
   const [isTextVisible, setIsTextVisible] = useState(true)
-
-  useEffect(() => {
-    if (preHeight.current && preHeight.current.offsetHeight) {
-      preHeight.current.style.minHeight = `${preHeight.current.offsetHeight}px`
-    }
-  }, [toggleStateLines, toggleStateColor])
 
   useEffect(() => {
     if (preHeight.current) {
@@ -89,12 +65,7 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
   const handleClickCopyIcon: () => void = () => {
     ;(async () => {
       await navigator.clipboard.writeText(
-        lines
-          .filter((line) => line.trim() !== "")
-          .map((line, index) => {
-            return `${index + 1}: ${" ".repeat(getAmountLeadingWhiteSpaces(line)) + line}`
-          })
-          .join("\n"),
+        codeLatex.filter((codeLine) => codeLine.trim() !== "").join("\n"),
       )
       toast({
         description: "Copied code as LaTeX to clipboard.",
@@ -114,26 +85,14 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
         <div className="overflow-hidden rounded-lg border border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
           <div style={{ whiteSpace: "nowrap", overflowX: "auto" }}>
             <pre
-              className={`overflow-x-auto whitespace-pre py-3 pl-5 pr-10 font-mono leading-${positionLineHeight} text-gray-900 dark:text-gray-100`}
+              className={`overflow-x-auto whitespace-pre py-3 pl-5 pr-10 font-mono leading-normal text-gray-900 dark:text-gray-100 ${toggleStateColor ? "hidden" : ""}`}
             >
-              {(toggleStateColor ? color : code).map((cd, index) => (
-                <div key={index}>
-                  <Markdown
-                    md={
-                      isTextVisible
-                        ? `${
-                            toggleStateLines
-                              ? createLineNumbers({
-                                  index,
-                                  codeLines,
-                                })
-                              : ""
-                          } ${" ".repeat(getAmountLeadingWhiteSpaces(cd))}$${cd}$`
-                        : " "
-                    }
-                  />
-                </div>
-              ))}
+              {createCodeJSX(codeNormal, isTextVisible, toggleStateLines, numCodeLines)}
+            </pre>
+            <pre
+              className={`overflow-x-auto whitespace-pre py-3 pl-5 pr-10 font-mono leading-normal text-gray-900 dark:text-gray-100 ${toggleStateColor ? "" : "hidden"}`}
+            >
+              {createCodeJSX(codeColor, isTextVisible, toggleStateLines, numCodeLines)}
             </pre>
           </div>
         </div>
@@ -160,30 +119,6 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
               </TooltipTrigger>
               <TooltipContent>Add syntax highlighting</TooltipContent>
             </Tooltip>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div
-                  className={`inline-flex h-8 items-center justify-center rounded-md px-2.5 text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground`}
-                >
-                  {positionLineHeight === "normal" ? (
-                    <TbSquareRoundedLetterN className="h-4 w-4" />
-                  ) : positionLineHeight === "relaxed" ? (
-                    <TbSquareRoundedLetterR className="h-4 w-4" />
-                  ) : (
-                    <TbSquareRoundedLetterL className="h-4 w-4" />
-                  )}
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>Change line height</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuRadioGroup value={positionLineHeight} onValueChange={setPositionLineHeight}>
-                  <DropdownMenuRadioItem value="normal">Normal</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="relaxed">Relaxed</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="loose">Loose</DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div
@@ -202,12 +137,28 @@ export function PseudoCode({ lines }: { lines: string[] }): ReactElement {
   )
 }
 
-function createLineNumbers({ index, codeLines }: { index: number; codeLines: number }) {
-  let codeLine = ""
-  if (codeLines > 0) {
-    codeLine = `${index + 1 >= 10 ? "" : " "}$${index + 1}:$ `
-  }
-  return `${codeLine}`
+function createCodeJSX(
+  currentCode: string[],
+  isTextVisible: boolean,
+  toggleStateLines: boolean,
+  numCodeLines: number,
+) {
+  return (
+    <>
+      {currentCode.map((cd, index) => (
+        <div key={index}>
+          {toggleStateLines && (
+            <span
+              className={`select-none text-right ${numCodeLines > 9 ? "min-w-10" : "min-w-8"} inline-block pr-1`}
+            >
+              {index + 1}:
+            </span>
+          )}
+          <Markdown md={isTextVisible ? `${" ".repeat(getAmountLeadingWhiteSpaces(cd))}$${cd}$` : " "} />
+        </div>
+      ))}
+    </>
+  )
 }
 
 function getAmountLeadingWhiteSpaces(text: string): number {

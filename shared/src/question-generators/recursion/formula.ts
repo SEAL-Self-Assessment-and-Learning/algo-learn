@@ -81,8 +81,8 @@ export const RecursionFormula: QuestionGenerator = {
     let text = `
 ${format(t("text1"), [functionName, n])}
 
-\`\`\`python
-${functionText.trim()}
+\`\`\`pseudoCode
+${JSON.stringify(functionText)}
 \`\`\`
 
 ${format(t("text2" + type), [`${T}(${n})`])}`
