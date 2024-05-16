@@ -10,7 +10,7 @@ import { Toggle } from "@/components/ui/toggle.tsx"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/components/ui/use-toast"
 
-export const keyWordsColor = "DarkOrchid"
+export const keyWordsColor = "MediumOrchid"
 export const functionColor = "DarkCyan"
 export const variableColor = "IndianRed"
 export const controlFlowColor = "SeaGreen"
@@ -29,7 +29,7 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
 
   const { toast } = useToast()
 
-  const preHeight = useRef<HTMLPreElement | null>(null)
+  const preHeight = useRef<HTMLDivElement>(null)
   const [maxHeight, setMaxHeight] = useState(0)
   const [toggleStateLines, setToggleStateLines] = useState(true)
   const [toggleStateColor, setToggleStateColor] = useState(true)
@@ -82,8 +82,11 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
   return (
     <div className="my-5">
       <div className="relative">
-        <div className="overflow-hidden rounded-lg border border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
-          <div style={{ whiteSpace: "nowrap", overflowX: "auto" }}>
+        <div
+          ref={preHeight}
+          className="overflow-hidden rounded-lg border border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+        >
+          <div className="whitespace-nowrap">
             <pre
               className={`overflow-x-auto whitespace-pre py-3 pl-5 pr-10 font-mono leading-normal text-gray-900 dark:text-gray-100 ${toggleStateColor ? "hidden" : ""}`}
             >
