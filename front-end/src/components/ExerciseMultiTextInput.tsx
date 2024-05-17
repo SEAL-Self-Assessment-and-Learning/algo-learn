@@ -141,7 +141,6 @@ export function ExerciseMultiTextInput({
 
   const textFieldStateValues: { [id: string]: TextFieldState } = {}
   for (let i = 0; i < fieldValues.inputIds.length; i++) {
-
     // first initialize every field in state
     if (!state.text[fieldValues.inputIds[i]]) {
       state.text[fieldValues.inputIds[i]] = ""
