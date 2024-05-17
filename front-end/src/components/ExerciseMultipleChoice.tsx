@@ -194,7 +194,7 @@ export function ExerciseMultipleChoice({
         <>
           <b className="text-lg">{t("feedback.thats-ok")}</b>
           <br />
-          {t("feedback.correct-order")}
+          <Markdown md={t("feedback.correct-order", [`${state.feedbackObject?.correctChoice?.map((i) => "\n|" + question.answers[i] + "|").join('')}\n|#div_my-5#|\n`])} />
         </>
       ) : null
     const items: BaseItem[] = []
