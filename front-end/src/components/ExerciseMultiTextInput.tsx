@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
 import { FreeTextFeedback, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
+import { inputRegex } from "@shared/utils/parseMarkdown.ts"
 import { InteractWithQuestion, MODE } from "@/components/InteractWithQuestion.tsx"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Result } from "@/components/QuestionComponent.tsx"
+import { formContext, TextFieldState } from "@/hooks/useFormContext.ts"
 // import { Input } from "@/components/ui/input"
 import useGlobalDOMEvents from "@/hooks/useGlobalDOMEvents.ts"
 import { useSound } from "@/hooks/useSound.ts"
@@ -42,12 +44,10 @@ export function ExerciseMultiTextInput({
     window.scrollTo(0, 0)
     // This function runs when the component mounts
     setState({
+      ...state,
       mode: !question.fillOutAll ? "draft" : "invalid",
-      modeID: {},
-      text: {},
-      formatFeedback: {},
     })
-  }, [question.fillOutAll])
+  }, [question.fillOutAll, state])
 
   const { mode, text, feedbackObject } = state
 
@@ -137,6 +137,31 @@ export function ExerciseMultiTextInput({
       )
     ) : null
 
+  const fieldValues = getInputFields(question.text ? question.text : "")
+
+  const textFieldStateValues: { [id: string]: TextFieldState } = {}
+  for (let i = 0; i < fieldValues.inputIds.length; i++) {
+
+    // first initialize every field in state
+    if (!state.text[fieldValues.inputIds[i]]) {
+      state.text[fieldValues.inputIds[i]] = ""
+      state.modeID[fieldValues.inputIds[i]] = "initial"
+      state.formatFeedback[fieldValues.inputIds[i]] = ""
+    }
+
+    textFieldStateValues[fieldValues.inputIds[i]] = {
+      text: state.text[fieldValues.inputIds[i]],
+      align: fieldValues.inputAligns[i],
+      prompt: fieldValues.inputPrompts[i],
+      feedbackVariation: fieldValues.inputFeedbackVariations[i],
+      setText: (text: string) => setText(fieldValues.inputIds[i], text),
+      placeholder: fieldValues.inputPlaceholders[i],
+      modeID: state.modeID[fieldValues.inputIds[i]],
+      feedback: state.formatFeedback[fieldValues.inputIds[i]],
+      first: i === 0,
+    }
+  }
+
   return (
     <InteractWithQuestion
       permalink={permalink}
@@ -146,7 +171,74 @@ export function ExerciseMultiTextInput({
       footerMessage={message}
       handleFooterClick={handleClick}
     >
-      <Markdown md={question.text} setText={setText} state={state} />
+      <formContext.Provider value={textFieldStateValues}>
+        <Markdown md={question.text} />
+      </formContext.Provider>
     </InteractWithQuestion>
   )
+}
+
+/**
+ * Extracts the input fields from the text.
+ * @param text The text to extract the input fields from
+ *             Likely to be question.text
+ */
+function getInputFields(text: string): {
+  inputIds: string[]
+  inputAligns: string[]
+  inputPrompts: string[]
+  inputPlaceholders: string[]
+  inputFeedbackVariations: string[]
+} {
+  // add the g flag, because String.prototype.matchAll argument must not be a non-global regular expression
+  const regex = new RegExp(inputRegex.source, "g")
+
+  const matches = Array.from(text.matchAll(regex))
+
+  const inputFields: string[] = []
+
+  if (matches.length === 0) {
+    return {
+      inputIds: [],
+      inputAligns: [],
+      inputPrompts: [],
+      inputPlaceholders: [],
+      inputFeedbackVariations: [],
+    }
+  }
+
+  for (let i = 0; i < matches.length; i++) {
+    inputFields.push(matches[i][1])
+  }
+
+  return getInputFieldValues(inputFields)
+}
+
+/**
+ * Extracts the values from the input fields.
+ * @param inputFields
+ */
+function getInputFieldValues(inputFields: string[]): {
+  inputIds: string[]
+  inputAligns: string[]
+  inputPrompts: string[]
+  inputPlaceholders: string[]
+  inputFeedbackVariations: string[]
+} {
+  const inputIds: string[] = []
+  const inputAligns: string[] = []
+  const inputPrompts: string[] = []
+  const inputPlaceholders: string[] = []
+  const inputFeedbackVariations: string[] = []
+
+  for (const inputField of inputFields) {
+    const inputFieldSplit = inputField.split("#")
+    inputIds.push(inputFieldSplit[0])
+    inputAligns.push(inputFieldSplit[1])
+    inputPrompts.push(inputFieldSplit[2])
+    inputPlaceholders.push(inputFieldSplit[3])
+    inputFeedbackVariations.push(inputFieldSplit[4])
+  }
+
+  return { inputIds, inputAligns, inputPrompts, inputPlaceholders, inputFeedbackVariations }
 }

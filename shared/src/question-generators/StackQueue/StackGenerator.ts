@@ -32,7 +32,7 @@ const translations: Translations = {
     freeTextInput:
       `Consider having a **{{0}} Stack "{{1}}"**, which can store at most` +
       " ${{2}}$ " +
-      `elements. {{3}} **We perform the following operations:**{{0}} {{4}}`,
+      `elements. {{3}} **We perform the following operations:** {{4}}`,
   },
   de: {
     name: "Implementierung eines Stacks mit einem Array",
