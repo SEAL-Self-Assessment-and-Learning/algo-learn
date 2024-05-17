@@ -11,15 +11,9 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
   const inputID = inputSplit[0]
 
   // case over -> overlay | below -> no overlay, move other stuff down
-  const feedbackVariation = useInputContext[inputID].feedbackVariation
-  const firstInputField = useInputContext[inputID].first
-  const formatFeedback = useInputContext[inputID].feedback
-  const inputAlign = useInputContext[inputID].align
-  const inputPlaceholder = useInputContext[inputID].placeholder
-  const inputPrompt = useInputContext[inputID].prompt
-  const modeID = useInputContext[inputID].modeID
-  const setText = useInputContext[inputID].setText
-  const fieldText = useInputContext[inputID].text
+
+  const { feedbackVariation, first, feedback, align, placeholder, prompt, modeID, setText, text } =
+    useInputContext[inputID]
 
   // To select the first created input field on the site
   const firstInputRef = useRef<HTMLInputElement | null>(null)
@@ -31,15 +25,15 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
 
   const inputBorderColor = modeID === "invalid" ? "border-red-500 focus:border-red-500" : ""
 
-  const align: string = "w-full h-full"
+  const alignDiv: string = "w-full h-full"
 
   let promptElement
-  if (inputPrompt) {
-    promptElement = <Markdown md={inputPrompt} />
+  if (prompt) {
+    promptElement = <Markdown md={prompt} />
   }
 
   let spacing
-  if (inputAlign === "NL") {
+  if (align === "NL") {
     spacing = <br />
   }
 
@@ -54,24 +48,24 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
         <div className="flex flex-col">
           <div className="flex flex-row items-center">
             <div className="mr-2">{promptElement}</div>
-            <div className={`${align} relative`}>
+            <div className={`${alignDiv} relative`}>
               <Input
-                ref={firstInputField ? firstInputRef : null}
+                ref={first ? firstInputRef : null}
                 key={`newline-input-${inputID}`}
                 autoFocus
                 disabled={modeID === "correct" || modeID === "incorrect"}
-                value={fieldText || ""}
+                value={text || ""}
                 onChange={(e) => {
                   setText ? setText(e.target.value) : ""
                 }}
                 type="text"
                 className={`${inputBorderColor} focus:outline-none`}
-                placeholder={inputPlaceholder || ""}
+                placeholder={placeholder || ""}
               />
             </div>
           </div>
           <FeedbackComponent
-            formatFeedback={formatFeedback ? formatFeedback : ""}
+            formatFeedback={feedback ? feedback : ""}
             mode={modeID ? modeID : "draft"}
             type={"below"}
           />
@@ -85,13 +79,13 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
         {spacing}
         <div className="flex flex-row items-center">
           <div className="mr-2">{promptElement}</div>
-          <div className={`${align} relative`}>
+          <div className={`${alignDiv} relative`}>
             <Input
-              ref={firstInputField ? firstInputRef : null}
+              ref={first ? firstInputRef : null}
               key={`newline-input-${inputID}`}
               autoFocus
               disabled={modeID === "correct" || modeID === "incorrect"}
-              value={fieldText || ""}
+              value={text || ""}
               onChange={(e) => {
                 setText ? setText(e.target.value) : ""
               }}
@@ -99,11 +93,11 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
               onBlur={() => setIsInputFocused(false)}
               type="text"
               className={`${inputBorderColor} mb-1 w-full focus:outline-none`}
-              placeholder={inputPlaceholder || ""}
+              placeholder={placeholder || ""}
             />
-            {isInputFocused && fieldText && formatFeedback && (
+            {isInputFocused && text && feedback && (
               <FeedbackComponent
-                formatFeedback={formatFeedback ? formatFeedback : ""}
+                formatFeedback={feedback ? feedback : ""}
                 mode={modeID ? modeID : "draft"}
                 type={"overlay"}
               />

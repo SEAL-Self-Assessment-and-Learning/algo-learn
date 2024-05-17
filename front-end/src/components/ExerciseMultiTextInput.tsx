@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { FreeTextFeedback, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
 import { inputRegex } from "@shared/utils/parseMarkdown.ts"
 import { InteractWithQuestion, MODE } from "@/components/InteractWithQuestion.tsx"
@@ -38,16 +38,6 @@ export function ExerciseMultiTextInput({
     text: {},
     formatFeedback: {},
   })
-
-  // clear the modeID of state
-  useEffect(() => {
-    window.scrollTo(0, 0)
-    // This function runs when the component mounts
-    setState({
-      ...state,
-      mode: !question.fillOutAll ? "draft" : "invalid",
-    })
-  }, [question.fillOutAll, state])
 
   const { mode, text, feedbackObject } = state
 

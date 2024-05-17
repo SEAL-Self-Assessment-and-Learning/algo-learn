@@ -1,6 +1,4 @@
 import { ReactElement } from "react"
-import { FreeTextFeedback } from "@shared/api/QuestionGenerator.ts"
-import { MODE } from "@/components/InteractWithQuestion.tsx"
 import { Markdown } from "@/components/Markdown.tsx"
 
 /**
@@ -25,18 +23,8 @@ import { Markdown } from "@/components/Markdown.tsx"
  */
 export function DrawTable({
   table,
-  setText,
-  state,
 }: {
   table: { header: string[]; content: string[][]; alignment: string[]; extraFeature: string }
-  setText?: (fieldID: string, value: string) => void
-  state?: {
-    mode: MODE
-    modeID: { [key: string]: MODE }
-    text: { [key: string]: string }
-    feedbackObject?: FreeTextFeedback
-    formatFeedback: { [key: string]: string }
-  }
 }): ReactElement {
   let parsedHeader = table.header
   let parsedContent = table.content
@@ -81,7 +69,7 @@ export function DrawTable({
       alignment: parsedAlignment,
       extraFeature,
     }
-    const firstTable = DrawTable({ table: tableFirst, setText, state })
+    const firstTable = DrawTable({ table: tableFirst })
     // draw the second table
     const tableSecond = {
       header: headerSecond,
@@ -89,7 +77,7 @@ export function DrawTable({
       alignment: parsedAlignment,
       extraFeature,
     }
-    const secondTable = DrawTable({ table: tableSecond, setText, state })
+    const secondTable = DrawTable({ table: tableSecond })
     return (
       <div>
         <div className={`mb-2`}>{firstTable}</div>
@@ -123,7 +111,7 @@ export function DrawTable({
     <tr key={`row-0`}>
       {parsedHeader.map((md, j) => (
         <th key={`cell-${0}-${j}`} className={`${borderStyle} p-2`}>
-          <Markdown md={md} state={state} setText={setText} />
+          <Markdown md={md} />
         </th>
       ))}
     </tr>,
@@ -138,7 +126,7 @@ export function DrawTable({
             key={`cell-${i}-${j}`}
             className={`${borderStyle} p-2 text-${parsedAlignment[j]} ${cellVerticalAlign} ${cellHorizontalAlign}`}
           >
-            <Markdown md={md} state={state} setText={setText} />
+            <Markdown md={md} />
           </td>
         ))}
       </tr>,
