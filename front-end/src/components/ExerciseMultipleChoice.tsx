@@ -1,7 +1,7 @@
 import { CheckCheck, XCircle } from "lucide-react"
 import { useState } from "react"
-import { Tooltip } from "react-tooltip"
 import { MultipleChoiceFeedback, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
@@ -165,7 +165,6 @@ export function ExerciseMultipleChoice({
                   isCorrectAnswer={isCorrectAnswer}
                   userGaveCorrectAnswer={isCorrectAnswer === choice.includes(index)}
                   hidden={!disabled}
-                  id={id}
                 />
                 <Checkbox
                   id={id}
@@ -230,31 +229,29 @@ function FeedbackIconAndTooltip({
   isCorrectAnswer,
   userGaveCorrectAnswer,
   hidden,
-  id = "",
 }: {
   isCorrectAnswer: boolean
   userGaveCorrectAnswer: boolean
   hidden: boolean
-  id?: string
 }) {
   const { t } = useTranslation()
   const correctnessMsg = isCorrectAnswer ? t("answer.correct") : t("answer.wrong")
   const choiceMsg = userGaveCorrectAnswer ? t("choice.correct") : t("choice.wrong")
   return (
-    <>
-      <a id={`myid-${id}`}>
+    <Tooltip placement="left">
+      <TooltipTrigger>
         <FeedbackIcon correct={isCorrectAnswer} hidden={hidden} />
-      </a>
-      <Tooltip anchorSelect={`#myid-${id}`} place="left" className="z-10" hidden={hidden}>
+      </TooltipTrigger>
+      <TooltipContent hidden={hidden}>
         {correctnessMsg}
         <br />
         {choiceMsg}
-      </Tooltip>
-    </>
+      </TooltipContent>
+    </Tooltip>
   )
 }
 
-function FeedbackIcon({ correct, hidden }: { correct: boolean; hidden: boolean }) {
+function FeedbackIcon({ correct, hidden }: { correct: boolean; hidden?: boolean }) {
   const cn = hidden ? " invisible" : ""
   if (correct) {
     return <CheckCheck className={"h-4 w-4 text-green-700" + cn} />

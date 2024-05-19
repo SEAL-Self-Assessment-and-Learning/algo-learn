@@ -15,7 +15,6 @@ import { Legal } from "./routes/legal"
 import Root from "./routes/root"
 import { TestSimpleMC } from "./routes/test"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
-import "react-tooltip/dist/react-tooltip.css"
 import "./tailwind.css"
 
 const routes = []
