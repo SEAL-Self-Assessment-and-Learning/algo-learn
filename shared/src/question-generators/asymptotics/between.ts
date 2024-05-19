@@ -180,7 +180,9 @@ ${t("feedback.expected")}: $${variable}$.`,
 
       if (variant === "nifty") {
         // create a solution for Theta(1)
-        const solution = new ProductTerm()
+        const solution = new ProductTerm({
+          coefficient: 1,
+        })
         return {
           correct: solution.Theta(sumProductTerm.dominantTerm()),
           feedbackText:
@@ -261,20 +263,12 @@ export function generateBaseFunction(variant: string, random: Random): ProductTe
           maxDenominator: 3,
           random,
         }),
-        logexponent: random.choice([
-          sampleFraction({
-            fractionProbability: 0,
-            minInt: -17,
-            maxInt: -1,
-            random,
-          }),
-          sampleFraction({
-            fractionProbability: 0,
-            minInt: 1,
-            maxInt: 17,
-            random,
-          }),
-        ]),
+        logexponent: sampleFraction({
+          fractionProbability: 0,
+          minInt: 1,
+          maxInt: 17,
+          random,
+        }).mul(random.choice([-1, 1])),
       })
       const b = createProductTerm({
         coefficient: sampleFraction({
@@ -287,20 +281,12 @@ export function generateBaseFunction(variant: string, random: Random): ProductTe
           maxDenominator: 3,
           random,
         }),
-        logexponent: random.choice([
-          sampleFraction({
-            fractionProbability: 0,
-            minInt: -17,
-            maxInt: -1,
-            random,
-          }),
-          sampleFraction({
-            fractionProbability: 0,
-            minInt: 1,
-            maxInt: 17,
-            random,
-          }),
-        ]),
+        logexponent: sampleFraction({
+          fractionProbability: 0,
+          minInt: 1,
+          maxInt: 17,
+          random,
+        }).mul(random.choice([-1, 1])),
       })
       a.logarithmExponents.get(1).n = 0
       b.logarithmExponents.get(0).n = a.logarithmExponents.get(0).n
