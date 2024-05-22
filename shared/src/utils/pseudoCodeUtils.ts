@@ -1,8 +1,3 @@
-/*
-This package works, so we could use this for coloring the pseudocode
-https://www.w3schools.com/tags/ref_colornames.asp
-*/
-
 export type PseudoCodeString = Array<
   string | PseudoCodeVariable | PseudoCodeFunctionName | PseudoCodePrintString
 >
@@ -23,6 +18,8 @@ export type PseudoCodeContinue = { continueState: true }
 
 export type PseudoCodeAssignment = { variable: string; value: PseudoCodeString }
 
+// then should not be null
+// only provided for straight forward creation of pseudoCode
 export type PseudoCodeIf = {
   if: {
     condition: PseudoCodeString
@@ -73,9 +70,7 @@ export type PseudoCodeState = {
     | PseudoCodeAssignment
 }
 export type PseudoCodeBlock = {
-  block: Array<
-    PseudoCodeState | PseudoCodeBlock | PseudoCodeIf | PseudoCodeWhile | PseudoCodeFor | PseudoCodeForAll
-  >
+  block: Array<PseudoCodeState | PseudoCodeIf | PseudoCodeWhile | PseudoCodeFor | PseudoCodeForAll>
 }
 
 export type PseudoCodeFunction = {
@@ -88,7 +83,14 @@ export type PseudoCode = Array<PseudoCodeFunction | PseudoCodeBlock | PseudoCode
 
 export function printStarsNew(stars: number): PseudoCodeState {
   const printStarsString: PseudoCodePrint = {
-    print: [`\\texttt{${"*".repeat(stars)}}`],
+    print: [{ printString: `\\texttt{${"*".repeat(stars)}}` }],
   }
   return { state: printStarsString }
+}
+
+export function stringifyPseudoCode(pseudoCode: PseudoCode): string {
+  let result = "```pseudoCode\n"
+  result += JSON.stringify(pseudoCode)
+  result += "\n```\n"
+  return result
 }

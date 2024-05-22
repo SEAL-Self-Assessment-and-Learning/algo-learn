@@ -2,15 +2,19 @@ import { ReactElement, useEffect, useRef, useState } from "react"
 import { IoColorPaletteOutline } from "react-icons/io5"
 import { MdContentCopy } from "react-icons/md"
 import { TbListNumbers } from "react-icons/tb"
-import { PseudoCode } from "@shared/question-generators/time/pseudoCodeUtils.ts"
-import { pseudoCodeToString } from "@shared/utils/parsePseudoCode.ts"
+import { PseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Toaster } from "@/components/ui/toaster"
 import { Toggle } from "@/components/ui/toggle.tsx"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/components/ui/use-toast"
+import { pseudoCodeToString } from "@/utils/parsePseudoCode.ts"
 
-export const keyWordsColor = "MediumOrchid"
+/*
+Could use this for coloring the pseudocode
+https://www.w3schools.com/tags/ref_colornames.asp
+*/
+export const keyWordsColor = "DodgerBlue"
 export const functionColor = "DarkCyan"
 export const variableColor = "IndianRed"
 export const controlFlowColor = "SeaGreen"
@@ -21,11 +25,8 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
 
   const { pseudoCodeString, pseudoCodeStringColor, pseudoCodeStringLatex } =
     pseudoCodeToString(pseudoCodeStringParse)
-  const codeNormal = pseudoCodeString.split("\n")
-  const codeColor = pseudoCodeStringColor.split("\n")
-  const codeLatex = pseudoCodeStringLatex.split("\n")
 
-  const numCodeLines = codeNormal.length
+  const numCodeLines = pseudoCodeString.length
 
   const { toast } = useToast()
 
@@ -65,7 +66,7 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
   const handleClickCopyIcon: () => void = () => {
     ;(async () => {
       await navigator.clipboard.writeText(
-        codeLatex.filter((codeLine) => codeLine.trim() !== "").join("\n"),
+        pseudoCodeStringLatex.filter((codeLine) => codeLine.trim() !== "").join("\n"),
       )
       toast({
         description: "Copied code as LaTeX to clipboard.",
@@ -90,12 +91,12 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
             <pre
               className={`overflow-x-auto whitespace-pre py-3 pl-5 pr-10 font-mono leading-normal text-gray-900 dark:text-gray-100 ${toggleStateColor ? "hidden" : ""}`}
             >
-              {createCodeJSX(codeNormal, isTextVisible, toggleStateLines, numCodeLines)}
+              {createCodeJSX(pseudoCodeString, isTextVisible, toggleStateLines, numCodeLines)}
             </pre>
             <pre
               className={`overflow-x-auto whitespace-pre py-3 pl-5 pr-10 font-mono leading-normal text-gray-900 dark:text-gray-100 ${toggleStateColor ? "" : "hidden"}`}
             >
-              {createCodeJSX(codeColor, isTextVisible, toggleStateLines, numCodeLines)}
+              {createCodeJSX(pseudoCodeStringColor, isTextVisible, toggleStateLines, numCodeLines)}
             </pre>
           </div>
         </div>
@@ -152,16 +153,35 @@ function createCodeJSX(
         <div key={index}>
           {toggleStateLines && (
             <span
-              className={`select-none text-right ${numCodeLines > 9 ? "min-w-10" : "min-w-8"} inline-block pr-1`}
+              className={`select-none text-right ${numCodeLines > 9 ? "min-w-10" : "min-w-8"} inline-block pr-1 ${isTextVisible ? "" : "hidden"}`}
             >
               {index + 1}:
             </span>
           )}
-          <Markdown md={isTextVisible ? `${" ".repeat(getAmountLeadingWhiteSpaces(cd))}$${cd}$` : " "} />
+          <Markdown
+            md={
+              isTextVisible ? `${" ".repeat(getAmountLeadingWhiteSpaces(cd))}$${adding015EM(cd)}$` : " "
+            }
+          />
         </div>
       ))}
     </>
   )
+}
+
+/**
+ * Adds 0.15em to each line
+ *
+ * Otherwise the lines are too close to each other
+ * For example:
+ * 1: \\frac{m}{5}
+ * 2: \\frac{m}{5}
+ * Those nearly touch
+ *
+ * @param code
+ */
+function adding015EM(code: string): string {
+  return `${code} \\\\[0.15em]`
 }
 
 function getAmountLeadingWhiteSpaces(text: string): number {

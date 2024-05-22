@@ -15,7 +15,7 @@ import {
   PseudoCodeString,
   PseudoCodeVariable,
   PseudoCodeWhile,
-} from "@shared/question-generators/time/pseudoCodeUtils.ts"
+} from "@shared/utils/pseudoCodeUtils.ts"
 import {
   controlFlowColor,
   functionColor,
@@ -25,46 +25,39 @@ import {
 } from "@/components/DrawPseudoCode.tsx"
 
 export function pseudoCodeToString(pseudoCode: PseudoCode): {
-  pseudoCodeString: string
-  pseudoCodeStringColor: string
-  pseudoCodeStringLatex: string
+  pseudoCodeString: string[]
+  pseudoCodeStringColor: string[]
+  pseudoCodeStringLatex: string[]
 } {
-  let pseudoCodeString: string = ""
-  let pseudoCodeStringColor: string = ""
-  let pseudoCodeStringLatex: string =
-    "\\begin{algorithm}[h]\n\\caption{NAME?}\n\\begin{algorithmic}[1]\n"
+  const pseudoCodeString: string[] = []
+  const pseudoCodeStringColor: string[] = []
+  const pseudoCodeStringLatex: string[] = [
+    "\\begin{algorithm}[h]",
+    "\\caption{NAME?}",
+    "\\begin{algorithmic}[1]",
+  ]
   for (const code of pseudoCode) {
     if ("state" in code) {
       const { stateString, stateStringColor, stateStringLatex } = pseudoCodeStateToString(code)
-      pseudoCodeString += stateString + "\n"
-      pseudoCodeStringColor += stateStringColor + "\n"
-      pseudoCodeStringLatex += stateStringLatex + "\n"
+      pseudoCodeString.push(stateString)
+      pseudoCodeStringColor.push(stateStringColor)
+      pseudoCodeStringLatex.push(stateStringLatex)
     } else if ("block" in code) {
       const { blockString, blockStringColor, blockStringLatex } = pseudoCodeBlockToString(code, 0)
-      pseudoCodeString += blockString + "\n"
-      pseudoCodeStringColor += blockStringColor + "\n"
-      pseudoCodeStringLatex += blockStringLatex + "\n"
+      pseudoCodeString.push(...blockString)
+      pseudoCodeStringColor.push(...blockStringColor)
+      pseudoCodeStringLatex.push(...blockStringLatex)
     } else if ("name" in code) {
       const { functionString, functionStringColor, functionStringLatex } = pseudoCodeFunctionToString(
         code,
         0,
       )
-      pseudoCodeString += functionString + "\n"
-      pseudoCodeStringColor += functionStringColor + "\n"
-      pseudoCodeStringLatex += functionStringLatex + "\n"
+      pseudoCodeString.push(...functionString)
+      pseudoCodeStringColor.push(...functionStringColor)
+      pseudoCodeStringLatex.push(...functionStringLatex)
     }
   }
-  pseudoCodeStringLatex += "\\end{algorithmic}\n\\end{algorithm}"
-
-  pseudoCodeString = pseudoCodeString
-    .split("\n")
-    .filter((line) => line.trim() !== "")
-    .join("\n")
-
-  pseudoCodeStringColor = pseudoCodeStringColor
-    .split("\n")
-    .filter((line) => line.trim() !== "")
-    .join("\n")
+  pseudoCodeStringLatex.push(...["\\end{algorithmic}", "\\end{algorithm}"])
 
   return { pseudoCodeString, pseudoCodeStringColor, pseudoCodeStringLatex }
 }
@@ -72,82 +65,81 @@ export function pseudoCodeToString(pseudoCode: PseudoCode): {
 function pseudoCodeFunctionToString(
   func: PseudoCodeFunction,
   indent: number,
-): { functionString: string; functionStringColor: string; functionStringLatex: string } {
-  let functionString =
+): { functionString: string[]; functionStringColor: string[]; functionStringLatex: string[] } {
+  const functionString: string[] = [
     leadingWhitespace(indent) +
-    `\\textbf{function}\\text{ }\\textit{${func.name}}\\text{ }(${func.args.join(",\\text{ }")}):\n`
-  let functionStringColor =
+      `\\textbf{function}\\text{ }\\textit{${func.name}}\\left(${func.args.join(",\\text{ }")}\\right):`,
+  ]
+  const functionStringColor: string[] = []
+  let funcStringColorTmp: string =
     leadingWhitespace(indent) +
-    `{\\color{${keyWordsColor}} \\textbf{function}}\\text{ }{\\color{${functionColor}} \\textit{${func.name}}}\\text{ }(`
+    `{\\color{${keyWordsColor}} \\textbf{function}}\\text{ }{\\color{${functionColor}} \\textit{${func.name}}}\\left(`
   for (let i = 0; i < func.args.length; i++) {
-    functionStringColor += `{\\color{${variableColor}} ${func.args[i]} }`
+    funcStringColorTmp += `{\\color{${variableColor}} ${func.args[i]}}`
     if (i < func.args.length - 1) {
-      functionStringColor += ",  "
+      funcStringColorTmp += ",  "
     }
   }
-  functionStringColor += "):\n"
-  let functionStringLatex = `\\Function{${func.name}}{${func.args.join(", ")}}\n`
+  funcStringColorTmp += "\\right):"
+  functionStringColor.push(funcStringColorTmp)
+
+  const functionStringLatex: string[] = [`\\Function{${func.name}}{${func.args.join(", ")}}`]
   if (func.body) {
     if ("state" in func.body) {
       const { stateString, stateStringColor, stateStringLatex } = pseudoCodeStateToString(func.body)
-      functionString += stateString + "\n"
-      functionStringColor += stateStringColor + "\n"
-      functionStringLatex += stateStringLatex + "\n"
+      functionString.push(leadingWhitespace(indent + 2) + stateString)
+      functionStringColor.push(leadingWhitespace(indent + 2) + stateStringColor)
+      functionStringLatex.push(stateStringLatex)
     } else if ("block" in func.body) {
       const { blockString, blockStringColor, blockStringLatex } = pseudoCodeBlockToString(
         func.body,
         indent + 2,
       )
-      functionString += blockString + "\n"
-      functionStringColor += blockStringColor + "\n"
-      functionStringLatex += blockStringLatex + "\n"
+      functionString.push(...blockString)
+      functionStringColor.push(...blockStringColor)
+      functionStringLatex.push(...blockStringLatex)
     }
   }
-  functionStringLatex += "\\EndFunction\n"
+  functionStringLatex.push("\\EndFunction")
   return { functionString, functionStringColor, functionStringLatex }
 }
 
 function pseudoCodeBlockToString(
   block: PseudoCodeBlock,
   indent: number,
-): { blockString: string; blockStringColor: string; blockStringLatex: string } {
-  let blockStringAdd = ""
-  let blockStringAddColor = ""
-  let blockStringAddLatex = ""
+): { blockString: string[]; blockStringColor: string[]; blockStringLatex: string[] } {
+  const blockStringAdd: string[] = []
+  const blockStringAddColor: string[] = []
+  const blockStringAddLatex: string[] = []
   for (const state of block.block) {
     if ("state" in state) {
       const { stateString, stateStringColor, stateStringLatex } = pseudoCodeStateToString(state)
-      blockStringAdd += leadingWhitespace(indent) + stateString + "\n"
-      blockStringAddColor += leadingWhitespace(indent) + stateStringColor + "\n"
-      blockStringAddLatex += leadingWhitespace(indent) + stateStringLatex + "\n"
-    } else if ("block" in state) {
-      const { blockString, blockStringColor, blockStringLatex } = pseudoCodeBlockToString(state, indent)
-      blockStringAdd += blockString + "\n"
-      blockStringAddColor += blockStringColor + "\n"
-      blockStringAddLatex += blockStringLatex + "\n"
+      blockStringAdd.push(leadingWhitespace(indent) + stateString)
+      blockStringAddColor.push(leadingWhitespace(indent) + stateStringColor)
+      blockStringAddLatex.push(stateStringLatex)
     } else if ("if" in state) {
       const { ifString, ifStringColor, ifStringLatex } = pseudoCodeIfToString(state, indent)
-      blockStringAdd += ifString + "\n"
-      blockStringAddColor += ifStringColor + "\n"
-      blockStringAddLatex += ifStringLatex + "\n"
+      blockStringAdd.push(...ifString)
+      blockStringAddColor.push(...ifStringColor)
+      blockStringAddLatex.push(...ifStringLatex)
     } else if ("while" in state) {
       const { whileString, whileStringColor, whileStringLatex } = pseudoCodeWhileToString(state, indent)
-      blockStringAdd += whileString + "\n"
-      blockStringAddColor += whileStringColor + "\n"
-      blockStringAddLatex += whileStringLatex + "\n"
+      blockStringAdd.push(...whileString)
+      blockStringAddColor.push(...whileStringColor)
+      blockStringAddLatex.push(...whileStringLatex)
     } else if ("for" in state) {
       const { forString, forStringColor, forStringLatex } = pseudoCodeForToString(state, indent)
-      blockStringAdd += forString + "\n"
-      blockStringAddColor += forStringColor + "\n"
-      blockStringAddLatex += forStringLatex + "\n"
+      blockStringAdd.push(...forString)
+      blockStringAddColor.push(...forStringColor)
+      blockStringAddLatex.push(...forStringLatex)
     } else if ("forAll" in state) {
       const { forAllString, forAllStringColor, forAllStringLatex } = pseudocodeForAllToString(
         state,
         indent,
       )
-      blockStringAdd += forAllString + "\n"
-      blockStringAddColor += forAllStringColor + "\n"
-      blockStringAddLatex += forAllStringLatex + "\n"
+      blockStringAdd.push(...forAllString)
+      blockStringAddColor.push(...forAllStringColor)
+      blockStringAddLatex.push(...forAllStringLatex)
     }
   }
   return {
@@ -160,29 +152,32 @@ function pseudoCodeBlockToString(
 function pseudoCodeIfToString(
   ifState: PseudoCodeIf,
   indent: number,
-): { ifString: string; ifStringColor: string; ifStringLatex: string } {
+): { ifString: string[]; ifStringColor: string[]; ifStringLatex: string[] } {
   const { psString, psStringColor, psStringLatex } = pseudoCodeStringToString(ifState.if.condition)
-  let ifString = leadingWhitespace(indent) + `\\textbf{if }\\text{ }${psString}\\text{ }\\textbf{then}\n`
-  let ifStringColor =
+  const ifString: string[] = [
+    leadingWhitespace(indent) + `\\textbf{if }\\text{ }${psString}\\text{ }\\textbf{then}`,
+  ]
+  const ifStringColor: string[] = [
     leadingWhitespace(indent) +
-    `{\\color{${keyWordsColor}} \\textbf{if }}\\text{ }${psStringColor}\\text{ }{\\color{${keyWordsColor}} \\textbf{then}}\n`
-  let ifStringLatex = leadingWhitespace(indent) + `\\If{$${psStringLatex}$}\n`
+      `{\\color{${keyWordsColor}} \\textbf{if }}\\text{ }${psStringColor}\\text{ }{\\color{${keyWordsColor}} \\textbf{then}}`,
+  ]
+  const ifStringLatex: string[] = [`\\If{$${psStringLatex}$}`]
   if (ifState.if.then) {
     if ("state" in ifState.if.then) {
       const { stateString, stateStringColor, stateStringLatex } = pseudoCodeStateToString(
         ifState.if.then,
       )
-      ifString += leadingWhitespace(indent + 2) + stateString + "\n"
-      ifStringColor += leadingWhitespace(indent + 2) + stateStringColor + "\n"
-      ifStringLatex += leadingWhitespace(indent + 2) + stateStringLatex + "\n"
+      ifString.push(leadingWhitespace(indent + 2) + stateString)
+      ifStringColor.push(leadingWhitespace(indent + 2) + stateStringColor)
+      ifStringLatex.push(stateStringLatex)
     } else if ("block" in ifState.if.then) {
       const { blockString, blockStringColor, blockStringLatex } = pseudoCodeBlockToString(
         ifState.if.then,
         indent + 2,
       )
-      ifString += blockString + "\n"
-      ifStringColor += blockStringColor + "\n"
-      ifStringLatex += blockStringLatex + "\n"
+      ifString.push(...blockString)
+      ifStringColor.push(...blockStringColor)
+      ifStringLatex.push(...blockStringLatex)
     }
   }
 
@@ -191,92 +186,95 @@ function pseudoCodeIfToString(
       const { psString, psStringColor, psStringLatex } = pseudoCodeStringToString(
         ifState.if.elseif[i].condition,
       )
-      ifString += leadingWhitespace(indent) + `\\textbf{else if } ${psString}\n`
-      ifStringColor +=
-        leadingWhitespace(indent) + `{\\color{${keyWordsColor}} \\textbf{else if }} ${psStringColor}\n`
-      ifStringLatex += leadingWhitespace(indent) + `\\ElsIf{$${psStringLatex}$}\n`
+      ifString.push(leadingWhitespace(indent) + `\\textbf{else if } ${psString}`)
+      ifStringColor.push(
+        leadingWhitespace(indent) + `{\\color{${keyWordsColor}} \\textbf{else if }} ${psStringColor}`,
+      )
+      ifStringLatex.push(`\\ElsIf{$${psStringLatex}$}`)
 
       if ("state" in ifState.if.elseif[i].then) {
         const { stateString, stateStringColor, stateStringLatex } = pseudoCodeStateToString(
           ifState.if.elseif[i].then as PseudoCodeState,
         )
-        ifString += leadingWhitespace(indent + 2) + stateString + "\n"
-        ifStringColor += leadingWhitespace(indent + 2) + stateStringColor + "\n"
-        ifStringLatex += leadingWhitespace(indent + 2) + stateStringLatex + "\n"
+        ifString.push(leadingWhitespace(indent + 2) + stateString)
+        ifStringColor.push(leadingWhitespace(indent + 2) + stateStringColor)
+        ifStringLatex.push(stateStringLatex)
       } else if (ifState.if.elseif[i].then !== null && "block" in ifState.if.elseif[i].then) {
         const { blockString, blockStringColor, blockStringLatex } = pseudoCodeBlockToString(
           ifState.if.elseif[i].then as PseudoCodeBlock,
           indent + 2,
         )
-        ifString += blockString + "\n"
-        ifStringColor += blockStringColor + "\n"
-        ifStringLatex += blockStringLatex + "\n"
+        ifString.push(...blockString)
+        ifStringColor.push(...blockStringColor)
+        ifStringLatex.push(...blockStringLatex)
       }
     }
   }
 
   if (ifState.if.else) {
-    ifString += leadingWhitespace(indent) + `\\textbf{else}\n`
-    ifStringColor += leadingWhitespace(indent) + `{\\color{${keyWordsColor}} \\textbf{else }}\n`
-    ifStringLatex += leadingWhitespace(indent) + `\\Else\n`
+    ifString.push(leadingWhitespace(indent) + `\\textbf{else}`)
+    ifStringColor.push(leadingWhitespace(indent) + `{\\color{${keyWordsColor}} \\textbf{else }}`)
+    ifStringLatex.push(`\\Else`)
     if (ifState.if.else !== undefined && "state" in ifState.if.else) {
       const { stateString, stateStringColor, stateStringLatex } = pseudoCodeStateToString(
         ifState.if.else,
       )
-      ifString += leadingWhitespace(indent + 2) + stateString + "\n"
-      ifStringColor += leadingWhitespace(indent + 2) + stateStringColor + "\n"
-      ifStringLatex += leadingWhitespace(indent + 2) + stateStringLatex + "\n"
+      ifString.push(leadingWhitespace(indent + 2) + stateString)
+      ifStringColor.push(leadingWhitespace(indent + 2) + stateStringColor)
+      ifStringLatex.push(stateStringLatex)
     } else if (ifState.if.else !== undefined && "block" in ifState.if.else) {
       const { blockString, blockStringColor, blockStringLatex } = pseudoCodeBlockToString(
         ifState.if.else,
         indent + 2,
       )
-      ifString += blockString + "\n"
-      ifStringColor += blockStringColor + "\n"
-      ifStringLatex += blockStringLatex + "\n"
+      ifString.push(...blockString)
+      ifStringColor.push(...blockStringColor)
+      ifStringLatex.push(...blockStringLatex)
     }
   }
-  ifStringLatex += leadingWhitespace(indent) + "\\EndIf\n"
+  ifStringLatex.push("\\EndIf")
   return { ifString, ifStringColor, ifStringLatex }
 }
 
 function pseudoCodeWhileToString(
   whileState: PseudoCodeWhile,
   indent: number,
-): { whileString: string; whileStringColor: string; whileStringLatex: string } {
+): { whileString: string[]; whileStringColor: string[]; whileStringLatex: string[] } {
   const { psString, psStringColor, psStringLatex } = pseudoCodeStringToString(whileState.while.condition)
-  let whileString =
-    leadingWhitespace(indent) + `\\textbf{while}\\text{ }${psString}\\text{ }\\textbf{do}\n`
-  let whileStringColor =
+  const whileString: string[] = [
+    leadingWhitespace(indent) + `\\textbf{while}\\text{ }${psString}\\text{ }\\textbf{do}`,
+  ]
+  const whileStringColor: string[] = [
     leadingWhitespace(indent) +
-    `{\\color{${keyWordsColor}}\\textbf{while}}\\text{ }${psStringColor}\\text{ }{\\color{${keyWordsColor}} \\textbf{do}}\n`
-  let whileStringLatex = leadingWhitespace(indent) + `\\While{$${psStringLatex}$}\n`
+      `{\\color{${keyWordsColor}}\\textbf{while}}\\text{ }${psStringColor}\\text{ }{\\color{${keyWordsColor}} \\textbf{do}}`,
+  ]
+  const whileStringLatex: string[] = [`\\While{$${psStringLatex}$}`]
   if (whileState.while.do) {
     if ("state" in whileState.while.do) {
       const { stateString, stateStringColor, stateStringLatex } = pseudoCodeStateToString(
         whileState.while.do,
       )
-      whileString += leadingWhitespace(indent + 2) + stateString + "\n"
-      whileStringColor += leadingWhitespace(indent + 2) + stateStringColor + "\n"
-      whileStringLatex += leadingWhitespace(indent + 2) + stateStringLatex + "\n"
+      whileString.push(leadingWhitespace(indent + 2) + stateString)
+      whileStringColor.push(leadingWhitespace(indent + 2) + stateStringColor)
+      whileStringLatex.push(stateStringLatex)
     } else if ("block" in whileState.while.do) {
       const { blockString, blockStringColor, blockStringLatex } = pseudoCodeBlockToString(
         whileState.while.do,
         indent + 2,
       )
-      whileString += blockString + "\n"
-      whileStringColor += blockStringColor + "\n"
-      whileStringLatex += blockStringLatex + "\n"
+      whileString.push(...blockString)
+      whileStringColor.push(...blockStringColor)
+      whileStringLatex.push(...blockStringLatex)
     }
   }
-  whileStringLatex += leadingWhitespace(indent) + "\\EndWhile\n"
+  whileStringLatex.push("\\EndWhile")
   return { whileString, whileStringColor, whileStringLatex }
 }
 
 function pseudoCodeForToString(
   forState: PseudoCodeFor,
   indent: number,
-): { forString: string; forStringColor: string; forStringLatex: string } {
+): { forString: string[]; forStringColor: string[]; forStringLatex: string[] } {
   const {
     psString: psStringFrom,
     psStringColor: psStringColorFrom,
@@ -287,83 +285,88 @@ function pseudoCodeForToString(
     psStringColor: psStringColorTo,
     psStringLatex: psStringLatexTo,
   } = pseudoCodeStringToString(forState.for.to)
-  let forString =
+  const forString: string[] = [
     leadingWhitespace(indent) +
-    `\\textbf{for}\\text{ }${forState.for.variable}\\text{ }\\textbf{from}\\text{ }${psStringFrom}\\text{ }\\textbf{to}\\text{ }${psStringTo}`
-  let forStringColor =
+      `\\textbf{for}\\text{ }${forState.for.variable}\\text{ }\\textbf{from}\\text{ }${psStringFrom}\\text{ }\\textbf{to}\\text{ }${psStringTo}`,
+  ]
+  const forStringColor: string[] = [
     leadingWhitespace(indent) +
-    `{\\color{${keyWordsColor}} \\textbf{for}}\\text{ }{\\color{${variableColor}}${forState.for.variable}}\\text{ }{\\color{${keyWordsColor}} \\textbf{from}}\\text{ }${psStringColorFrom}\\text{ }{\\color{${keyWordsColor}} \\textbf{to}}\\text{ }${psStringColorTo}`
-  let forStringLatex =
-    leadingWhitespace(indent) +
-    `\\For{$${forState.for.variable} \\gets ${psStringLatexFrom} \\text{ to } ${psStringLatexTo}`
+      `{\\color{${keyWordsColor}} \\textbf{for}}\\text{ }{\\color{${variableColor}}${forState.for.variable}}\\text{ }{\\color{${keyWordsColor}} \\textbf{from}}\\text{ }${psStringColorFrom}\\text{ }{\\color{${keyWordsColor}} \\textbf{to}}\\text{ }${psStringColorTo}`,
+  ]
+  const forStringLatex: string[] = [
+    `\\For{$${forState.for.variable} \\gets ${psStringLatexFrom} \\text{ to } ${psStringLatexTo}`,
+  ]
   if (forState.for.step) {
     const {
       psString: psStringStep,
       psStringColor: psStringColorStep,
       psStringLatex: psStringLatexStep,
     } = pseudoCodeStringToString(forState.for.step)
-    forString += `\\text{ }\\textbf{with step}\\text{ }${psStringStep}\\text{ }\\textbf{do}\n`
-    forStringColor += `\\text{ }{\\color{${keyWordsColor}}\\textbf{with step}}\\text{ }${psStringColorStep}\\text{ }{\\color{${keyWordsColor}} \\textbf{do}}\n`
-    forStringLatex += `\\text{ with step }${psStringLatexStep}$}\n`
+    forString[0] += `\\text{ }\\textbf{with step}\\text{ }${psStringStep}\\text{ }\\textbf{do}`
+    forStringColor[0] += `\\text{ }{\\color{${keyWordsColor}}\\textbf{with step}}\\text{ }${psStringColorStep}\\text{ }{\\color{${keyWordsColor}} \\textbf{do}}`
+    forStringLatex[0] += `\\text{ with step }${psStringLatexStep}$}`
   } else {
-    forString += `\\text{ }\\textbf{do}\n`
-    forStringColor += `\\text{ }{\\color{${keyWordsColor}} \\textbf{do}}\n`
-    forStringLatex += "$}\n"
+    forString[0] += `\\text{ }\\textbf{do}`
+    forStringColor[0] += `\\text{ }{\\color{${keyWordsColor}} \\textbf{do}}`
+    forStringLatex[0] += "$}"
   }
   if (forState.for.do) {
     if ("state" in forState.for.do) {
       const { stateString, stateStringColor, stateStringLatex } = pseudoCodeStateToString(
         forState.for.do,
       )
-      forString += leadingWhitespace(indent + 2) + stateString + "\n"
-      forStringColor += leadingWhitespace(indent + 2) + stateStringColor + "\n"
-      forStringLatex += leadingWhitespace(indent + 2) + stateStringLatex + "\n"
+      forString.push(leadingWhitespace(indent + 2) + stateString)
+      forStringColor.push(leadingWhitespace(indent + 2) + stateStringColor)
+      forStringLatex.push(stateStringLatex)
     } else if ("block" in forState.for.do) {
       const { blockString, blockStringColor, blockStringLatex } = pseudoCodeBlockToString(
         forState.for.do,
         indent + 2,
       )
-      forString += blockString + "\n"
-      forStringColor += blockStringColor + "\n"
-      forStringLatex += blockStringLatex + "\n"
+      forString.push(...blockString)
+      forStringColor.push(...blockStringColor)
+      forStringLatex.push(...blockStringLatex)
     }
   }
-  forStringLatex += leadingWhitespace(indent) + "\\EndFor\n"
+  forStringLatex.push("\\EndFor")
   return { forString, forStringColor, forStringLatex }
 }
 
 function pseudocodeForAllToString(
   forAllState: PseudoCodeForAll,
   indent: number,
-): { forAllString: string; forAllStringColor: string; forAllStringLatex: string } {
+): { forAllString: string[]; forAllStringColor: string[]; forAllStringLatex: string[] } {
   const { psString, psStringColor, psStringLatex } = pseudoCodeStringToString(forAllState.forAll.set)
-  let forAllString =
+  const forAllString: string[] = [
     leadingWhitespace(indent) +
-    `\\textbf{for}\\text{ }${forAllState.forAll.variable} \\in ${psString}\\text{ }\\textbf{then}\n`
-  let forAllStringColor =
+      `\\textbf{for}\\text{ }${forAllState.forAll.variable} \\in ${psString}\\text{ }\\textbf{then}`,
+  ]
+  const forAllStringColor: string[] = [
     leadingWhitespace(indent) +
-    `{\\color{${keyWordsColor}}\\textbf{for}}\\text{ }{\\color{${variableColor}} ${forAllState.forAll.variable}} \\in ${psStringColor}\\text{ }{\\color{${keyWordsColor}}\\textbf{do}}\n`
-  let forAllStringLatex =
-    leadingWhitespace(indent) + `\\ForAll{$${forAllState.forAll.variable} \\in ${psStringLatex}$}\n`
+      `{\\color{${keyWordsColor}}\\textbf{for}}\\text{ }{\\color{${variableColor}} ${forAllState.forAll.variable}} \\in ${psStringColor}\\text{ }{\\color{${keyWordsColor}}\\textbf{do}}`,
+  ]
+  const forAllStringLatex: string[] = [
+    `\\ForAll{$${forAllState.forAll.variable} \\in ${psStringLatex}$}`,
+  ]
   if (forAllState.forAll.do) {
     if ("state" in forAllState.forAll.do) {
       const { stateString, stateStringColor, stateStringLatex } = pseudoCodeStateToString(
         forAllState.forAll.do,
       )
-      forAllString += leadingWhitespace(indent + 2) + stateString + "\n"
-      forAllStringColor += leadingWhitespace(indent + 2) + stateStringColor + "\n"
-      forAllStringLatex += leadingWhitespace(indent + 2) + stateStringLatex + "\n"
+      forAllString.push(leadingWhitespace(indent + 2) + stateString)
+      forAllStringColor.push(leadingWhitespace(indent + 2) + stateStringColor)
+      forAllStringLatex.push(stateStringLatex)
     } else if ("block" in forAllState.forAll.do) {
       const { blockString, blockStringColor, blockStringLatex } = pseudoCodeBlockToString(
         forAllState.forAll.do,
         indent + 2,
       )
-      forAllString += blockString + "\n"
-      forAllStringColor += blockStringColor + "\n"
-      forAllStringLatex += blockStringLatex + "\n"
+      forAllString.push(...blockString)
+      forAllStringColor.push(...blockStringColor)
+      forAllStringLatex.push(...blockStringLatex)
     }
   }
-  forAllStringLatex += leadingWhitespace(indent) + "\\EndFor\n"
+  forAllStringLatex.push("\\EndFor")
   return { forAllString, forAllStringColor, forAllStringLatex }
 }
 
@@ -434,9 +437,9 @@ function pseudoCodePrintToString(print: PseudoCodePrint): {
   printLatex: string
 } {
   const { psString, psStringColor, psStringLatex } = pseudoCodeStringToString(print.print)
-  const printNormal = `\\text{print}(${psString})`
-  const printColor = `\\text{print}(${psStringColor})`
-  const printLatex = `print($${psStringLatex}$)`
+  const printNormal = `\\text{print}\\left(${psString}\\right)`
+  const printColor = `\\text{print}\\left(${psStringColor}\\right)`
+  const printLatex = `print$\\left(${psStringLatex}\\right)$`
   return { printNormal, printColor, printLatex }
 }
 
@@ -475,8 +478,8 @@ function pseudoCodeCallToString(call: PseudoCodeCall): {
   callColor: string
   callLatex: string
 } {
-  let callNormal = `\\textit{${call.functionName} }(`
-  let callColor = `{\\color{${functionColor}} \\textit{${call.functionName} }}(`
+  let callNormal = `\\textit{${call.functionName}}\\left(`
+  let callColor = `{\\color{${functionColor}} \\textit{${call.functionName}}}\\left(`
   let callLatex = `\\Call{${call.functionName}}{`
 
   for (let i = 0; i < call.args.length; i++) {
@@ -491,8 +494,8 @@ function pseudoCodeCallToString(call: PseudoCodeCall): {
     }
   }
 
-  callNormal += ")"
-  callColor += ")"
+  callNormal += "\\right)"
+  callColor += "\\right)"
   callLatex += "}"
 
   return { callNormal, callColor, callLatex }

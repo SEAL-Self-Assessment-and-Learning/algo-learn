@@ -26,8 +26,8 @@ const translations: Translations = {
     bigOLongTitle: "Loops (Big O)",
     description: "Determine the number of iterations in a loop",
     bigOdescription: "Determine the time complexity of a code",
-    text1: "Consider the following procedure `{{0}}` with integer input ${{1}}$:",
-    text2: "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
+    text1: "Consider the following procedure `{{0}}`:",
+    text2: "How many stars (`*`) does the procedure output?",
     simpleExactDescription: "Consider the following piece of code:",
     simpleExactPrompt: "Number of stars:",
     bigOPrompt: "$\\Theta$",
@@ -42,8 +42,8 @@ const translations: Translations = {
     bigOLongTitle: "Loops (Big O)",
     description: "Bestimme die Anzahl der Iterationen in einer Schleife",
     bigOdescription: "Bestimme die Zeitkomplexität eines Codes",
-    text1: "Betrachte die folgende Prozedur {{0}} mit ganzzahliger Eingabe {{1}}:",
-    text2: "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
+    text1: "Betrachte die folgende Prozedur {{0}}:",
+    text2: "Wie viele Sterne (`*`) gibt die Prozedur aus?",
     simpleExactDescription: "Betrachte den folgenden Code:",
     simpleExactPrompt: "Anzahl der Sterne:",
     bigOPrompt: "$\\Theta$",
@@ -85,7 +85,6 @@ export const Loops: QuestionGenerator = {
     const random = new Random(seed)
     const { functionText, functionName, n, numStars } = sampleLoopStars(random)
 
-    const T = random.choice("TABCDEFGHS".split(""))
     const description = `
 ${t("text1", [functionName, n])}
 
@@ -93,8 +92,7 @@ ${t("text1", [functionName, n])}
 ${functionText}
 \`\`\`
 
-${t("text2", [`${T}(${n})`])}`
-    const prompt = t("simpleExactPrompt")
+${t("text2")}`
     const checkFormat: FreeTextFormatFunction = ({ text }) => {
       text = text.replace(/\s/g, "")
       if (text === "") {
@@ -136,7 +134,6 @@ ${t("text2", [`${T}(${n})`])}`
       path: permalink,
       checkFormat,
       feedback,
-      prompt,
     }
     const testing = {
       functionText,

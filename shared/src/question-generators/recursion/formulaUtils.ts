@@ -1,7 +1,5 @@
 import Fraction from "fraction.js"
 import { log } from "mathjs"
-import Random from "../../utils/random"
-import { createProductTerm, ProductTerm } from "../asymptotics/asymptoticsUtils"
 import {
   printStarsNew,
   PseudoCode,
@@ -12,7 +10,10 @@ import {
   PseudoCodeIf,
   PseudoCodeReturn,
   PseudoCodeState,
-} from "../time/pseudoCodeUtils"
+  PseudoCodeString,
+} from "../../utils/pseudoCodeUtils.ts"
+import Random from "../../utils/random"
+import { createProductTerm, ProductTerm } from "../asymptotics/asymptoticsUtils"
 
 const arithmeticOperations = ["+", "-", "*", "/"]
 
@@ -125,23 +126,23 @@ export function sampleRecursiveFunctionStars({
     functionRecCallsBlock.block.push(printStarsNew(recStars))
   }
 
-  let recCallString: string
+  let recCallString: PseudoCodeString
   if (divOrSub === "div") {
-    recCallString = `\\frac{${variable}}{${divideOrSubtractBy}}`
+    recCallString = [`\\frac{`, { variable: variable }, `}{${divideOrSubtractBy}}`]
   } else {
-    recCallString = `${variable} - ${divideOrSubtractBy}`
+    recCallString = [{ variable: variable }, ` - ${divideOrSubtractBy}`]
   }
   for (let i = 0; i < numRecCalls; i++) {
     const functionCall: PseudoCodeCall = {
       functionName: functionName,
-      args: [[recCallString]],
+      args: [recCallString],
     }
     functionRecCallsBlock.block.push({ state: functionCall })
   }
 
   const functionTextIf: PseudoCodeIf = {
     if: {
-      condition: [`${variable} \\leq 1`],
+      condition: [{ variable: variable }, ` \\leq 1`],
       then: functionTextBase,
       else: functionRecCallsBlock,
     },
@@ -229,7 +230,7 @@ export function sampleRecursiveFunctionArithmetic({
 
   const functionTextIf: PseudoCodeIf = {
     if: {
-      condition: [`${variable} \\leq 1`],
+      condition: [{ variable: variable }, ` \\leq 1`],
       then: null,
       else: null,
     },
@@ -262,7 +263,7 @@ export function sampleRecursiveFunctionArithmetic({
     random,
   })
   const functionReturn2: PseudoCodeReturn = {
-    returnValue: [returnString],
+    returnValue: returnString,
   }
   functionRecCallsBlock.block.push({ state: functionReturn2 })
 
@@ -567,7 +568,7 @@ export function sampleMasterRecursionAnswers({
 
 function generateOperationsArithmetic(stars: number, random: Random) {
   // we need to create as many arithmetic operations as the number of stars
-  const firstNumberValue = random.int(1, 10)
+  const firstNumberValue = random.int(1, 9)
   let equationString = firstNumberValue.toString()
   let lastOperationWasFraction = false
   for (let i = 0; i < stars; i++) {
@@ -576,7 +577,7 @@ function generateOperationsArithmetic(stars: number, random: Random) {
       lastOperationWasFraction = false
       operation = random.choice(arithmeticOperations.filter((op) => op !== "/"))
     }
-    const currentNumber = random.int(1, 10)
+    const currentNumber = random.int(1, 9)
     if (operation === "*") {
       operation = "\\cdot"
     } else if (operation === "/") {
@@ -612,17 +613,17 @@ function generateRecursiveReturnArithmetic({
   divideOrSubtractBy: number
   random: Random
 }) {
-  let returnString: string = ""
+  const returnString: PseudoCodeString = []
   for (let i = 0; i < numRecCalls; i++) {
-    returnString += `\\textit{${functionName} }(`
+    returnString.push({ functionName: functionName }, `(`)
     if (divOrSub === "sub") {
-      returnString += `${variable} - ${divideOrSubtractBy})`
+      returnString.push(...[{ variable: variable }, ` - ${divideOrSubtractBy})`])
     } else {
-      returnString += `\\frac{${variable}}{${divideOrSubtractBy}})`
+      returnString.push(...[`\\frac{`, { variable: variable }, `}{${divideOrSubtractBy}})`])
     }
     if (i < numRecCalls - 1) {
       const chooseOperation = random.choice(arithmeticOperations.filter((op) => op !== "/"))
-      returnString += `${chooseOperation === "*" ? "\\cdot" : chooseOperation} `
+      returnString.push(`${chooseOperation === "*" ? "\\cdot" : chooseOperation} `)
     }
   }
   return { returnString }
