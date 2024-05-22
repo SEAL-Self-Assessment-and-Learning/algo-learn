@@ -1,3 +1,4 @@
+import { stringifyPseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
 import { validateParameters } from "../../api/Parameters"
 import {
   FreeTextFeedbackFunction,
@@ -81,9 +82,7 @@ export const RecursionFormula: QuestionGenerator = {
     let text = `
 ${format(t("text1"), [functionName, n])}
 
-\`\`\`pseudoCode
-${JSON.stringify(functionText)}
-\`\`\`
+${stringifyPseudoCode(functionText)}
 
 ${format(t("text2" + type), [`${T}(${n})`])}`
 
