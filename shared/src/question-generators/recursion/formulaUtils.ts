@@ -590,11 +590,7 @@ function generateOperationsArithmetic(stars: number, random: Random) {
     }
     equationString += `${operation} ${currentNumber} `
   }
-  /*
-  if (equationString.length > 1) {
-    return "\\left(" + equationString + "\\right)"
-  }
-  */
+
   return equationString
 }
 

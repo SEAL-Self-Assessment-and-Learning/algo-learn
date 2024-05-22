@@ -135,14 +135,3 @@ function format(text: string, parameters?: ReactNode[]): string {
   }
   return text
 }
-
-/*
-<div className="my-5">
-  <SyntaxHighlighter
-    language={parseTreeNode.language}
-    style={theme === "light" ? solarizedLight : solarizedDark}
-  >
-    {parseTreeNode.child}
-  </SyntaxHighlighter>
-</div>
-*/
