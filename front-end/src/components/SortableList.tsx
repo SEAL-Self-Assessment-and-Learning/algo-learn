@@ -1,5 +1,6 @@
 import { GripHorizontal } from "lucide-react"
-import { ReactNode } from "react"
+import { memo, ReactNode } from "react"
+import { FaArrowDown, FaArrowUp } from "react-icons/fa"
 import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { cn } from "@/lib/utils"
@@ -30,6 +31,8 @@ export interface Props {
  * @param props.children Children of the list.
  */
 export function SortableList({ items, onChange, className = "", disabled = false, ...props }: Props) {
+  const MemoizedButton = memo(Button)
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -61,14 +64,34 @@ export function SortableList({ items, onChange, className = "", disabled = false
           className={cn("mx-auto flex max-w-max list-none flex-col gap-2", className)}
           role="application"
         >
-          {itemsWithIds.map((item) => (
-            <SortableList.Item key={item.id} id={item.id} disabled={disabled}>
-              <GripHorizontal />
-              <Button variant="outline" asChild>
-                <div>{item.element}</div>
-              </Button>
-              <div></div>
-            </SortableList.Item>
+          {itemsWithIds.map((item, index) => (
+            <li key={item.id} className="flex items-center">
+              <div className={`inline-block items-center justify-center sm:hidden`}>
+                <MemoizedButton
+                  variant="ghost"
+                  size="sm"
+                  className={`${index === 0 ? "invisible" : "visible"} mr-0.5`}
+                  onClick={() => onChange(arrayMove(items, index, index - 1))}
+                >
+                  <FaArrowUp />
+                </MemoizedButton>
+                <MemoizedButton
+                  variant="ghost"
+                  size="sm"
+                  className={`${index === itemsWithIds.length - 1 ? "invisible" : "visible"} mr-0.5`}
+                  onClick={() => onChange(arrayMove(items, index, index + 1))}
+                >
+                  <FaArrowDown />
+                </MemoizedButton>
+              </div>
+              <SortableList.Item id={item.id} disabled={disabled}>
+                <GripHorizontal className="hidden sm:flex" />
+                <Button variant="outline" asChild className="flex-grow text-center">
+                  <div>{item.element}</div>
+                </Button>
+                <div></div>
+              </SortableList.Item>
+            </li>
           ))}
         </ul>
       </SortableContext>
