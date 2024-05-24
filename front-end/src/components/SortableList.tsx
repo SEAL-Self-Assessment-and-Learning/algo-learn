@@ -1,7 +1,7 @@
 import { GripHorizontal } from "lucide-react"
 import { memo, ReactNode } from "react"
 import { FaArrowDown, FaArrowUp } from "react-icons/fa"
-import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
+import { DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { cn } from "@/lib/utils"
 import { SortableItem } from "./SortableItem"
@@ -38,6 +38,13 @@ export function SortableList({ items, onChange, className = "", disabled = false
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
+    useSensor(TouchSensor, {
+      // Press delay of 250ms, with tolerance of 5px of movement
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    })
   )
   if (new Set(items.map(({ position }) => position)).size !== items.length) {
     throw new Error("Duplicate positions in SortableList!")
@@ -65,7 +72,7 @@ export function SortableList({ items, onChange, className = "", disabled = false
           role="application"
         >
           {itemsWithIds.map((item, index) => (
-            <li key={item.id} className="flex items-center">
+            <div key={item.id} className="flex items-center">
               <div className={`inline-block items-center justify-center sm:hidden`}>
                 <MemoizedButton
                   variant="ghost"
@@ -91,7 +98,7 @@ export function SortableList({ items, onChange, className = "", disabled = false
                 </Button>
                 <div></div>
               </SortableList.Item>
-            </li>
+            </div>
           ))}
         </ul>
       </SortableContext>
