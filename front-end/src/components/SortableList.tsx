@@ -1,7 +1,14 @@
 import { GripHorizontal } from "lucide-react"
 import { memo, ReactNode } from "react"
 import { FaArrowDown, FaArrowUp } from "react-icons/fa"
-import { DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core"
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 import { cn } from "@/lib/utils"
 import { SortableItem } from "./SortableItem"
@@ -44,7 +51,7 @@ export function SortableList({ items, onChange, className = "", disabled = false
         delay: 250,
         tolerance: 5,
       },
-    })
+    }),
   )
   if (new Set(items.map(({ position }) => position)).size !== items.length) {
     throw new Error("Duplicate positions in SortableList!")
