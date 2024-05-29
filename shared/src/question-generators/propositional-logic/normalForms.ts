@@ -11,6 +11,7 @@ import { _ } from "../../utils/generics.ts"
 import {
   ExpressionProperties,
   generateRandomExpression,
+  numToVariableValues,
   ParserError,
   PropositionalLogicParser,
   SyntaxTreeNodeType,
@@ -237,24 +238,31 @@ function getFreeTextFeedbackFunction(
       }
     }
 
-    if (isDNF ? answer.isDNF() : answer.isCNF)
+    if (isDNF ? !answer.isDNF() : !answer.isCNF())
       return {
         correct: false,
         correctAnswer: getCorrectNormalFormStr(expression, isDNF),
-        feedbackText: t(translations, lang, "freetext_feedback_no_normal_form"),
+        feedbackText: t(translations, lang, "freetext_feedback_no_normal_form", [
+          t(translations, lang, isDNF ? "dnf" : "cnf"),
+        ]),
       }
 
     const { variableNames: exprVars, truthTable: exprTruthTable } = expression.getTruthTable()
-    const { variableNames: answerVars, truthTable: answerTruthTable } = answer.getTruthTable()
+    const answerVars = answer.getVariableNames()
 
-    if (_.isEqual(exprVars, answerVars))
+    // check if the answer contains variables that do not exist in the expression
+    if (_.difference(answerVars, exprVars).length > 0)
       return {
         correct: false,
         correctAnswer: getCorrectNormalFormStr(expression, isDNF),
         feedbackText: t(translations, lang, "freetext_feedback_unknown_variables"),
       }
 
-    if (_.isEqual(exprTruthTable, answerTruthTable))
+    if (
+      exprTruthTable.some(
+        (expResult, index) => answer.eval(numToVariableValues(index, exprVars)) !== expResult,
+      )
+    )
       return {
         correct: false,
         correctAnswer: getCorrectNormalFormStr(expression, isDNF),

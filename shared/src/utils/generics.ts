@@ -29,4 +29,8 @@ export const _ = {
 
     return false
   },
+
+  difference: <T>(array: T[], values: T[]): T[] => {
+    return array.filter((e) => !values.includes(e))
+  },
 }

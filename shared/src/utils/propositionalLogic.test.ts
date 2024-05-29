@@ -245,7 +245,7 @@ describe("parser", () => {
     }
   })
 
-  const inputTester = ([expr, expectedStr] : string[]) => {
+  const inputTester = ([expr, expectedStr]: string[]) => {
     const parseResult = PropositionalLogicParser.parse(expr)
     if (parseResult instanceof ParserError) {
       // expect() does not narrow down the type, so "if" is used here
@@ -268,8 +268,9 @@ describe("parser", () => {
   })
 
   test("complex", () => {
-    ;[["\\not A \\and B", "\\not A \\and B"],
-      ["\\not(A \\and B)","\\not(A \\and B)"],
+    ;[
+      ["\\not A \\and B", "\\not A \\and B"],
+      ["\\not(A \\and B)", "\\not(A \\and B)"],
       ["\\not A \\and (B \\or C)", "\\not A \\and (B \\or C)"],
       ["(\\not A \\or B) \\and (B \\or C)", "(\\not A \\or B) \\and (B \\or C)"],
       ["((\\notA\\orB)\\and(B\\xorC))=>(D<=>E)", "((\\not A \\or B) \\and (B \\xor C)) => (D <=> E)"],
