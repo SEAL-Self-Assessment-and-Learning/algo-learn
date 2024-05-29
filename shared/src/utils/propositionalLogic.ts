@@ -671,12 +671,14 @@ export class PropositionalLogicParser {
   private static parseRec(str: string): SyntaxTreeNodeType {
     str = str.trim()
 
+    // A valid string starts with a possible negated operand.
+    // An operand is either a variable or a group starting with a parenthesis.
     // strBeginning[0] is the whole matched string
     // strBeginning[1] = "\\not" | undefined
     // strBeginning[2] = "(" | string (without whitespace)
-    const strBeginning = /^(\\not)?\s*(\(|[^\s()])/.exec(str)
+    const strBeginning = /^(\\not)?\s*(\(|[^\s()\\=<]+)/.exec(str)
     if (strBeginning === null) throw new ParserError("Empty expression")
-    else if (strBeginning[2] in binaryOperatorTypes)
+    else if (binaryOperatorTypes.includes(strBeginning[2] as BinaryOperatorType))
       throw new ParserError(
         "Unexpected token",
         str,
@@ -685,6 +687,7 @@ export class PropositionalLogicParser {
 
     let leftOperand
     let nextTokenStartIndex
+    // if the first operand is a group, find where the group ends and parse that part recursively
     if (strBeginning[2] === "(") {
       nextTokenStartIndex =
         PropositionalLogicParser.findClosingParenthesisPos(str, strBeginning[0].length - 1) + 1
@@ -702,19 +705,18 @@ export class PropositionalLogicParser {
     // nothing else in the string
     if (nextTokenStartIndex === str.length) return leftOperand
 
-    // operator
-    const nextTokenRegEx = /\s*(\S*)/g
-    nextTokenRegEx.lastIndex = nextTokenStartIndex
+    // if the string is not fully parsed yet, the next token has to be an operator
+    const nextTokenRegEx = /^\s*(\\or|\\and|\\xor|=>|<=>)/g
+    str = str.substring(nextTokenStartIndex)
     const operator = nextTokenRegEx.exec(str)
     if (operator === null || !binaryOperatorTypes.includes(operator[1] as BinaryOperatorType)) {
       throw new ParserError("Missing operator", str, nextTokenStartIndex)
     }
-    const nextTokenEndIndex = nextTokenStartIndex + operator[0].length
 
     return new Operator(
       operator[1] as BinaryOperatorType,
       leftOperand,
-      PropositionalLogicParser.parseRec(str.slice(nextTokenEndIndex)),
+      PropositionalLogicParser.parseRec(str.slice(operator[0].length)),
     )
   }
 

@@ -245,6 +245,17 @@ describe("parser", () => {
     }
   })
 
+  const inputTester = ([expr, expectedStr] : string[]) => {
+    const parseResult = PropositionalLogicParser.parse(expr)
+    if (parseResult instanceof ParserError) {
+      // expect() does not narrow down the type, so "if" is used here
+      console.log(parseResult.infoToStr())
+      expect(parseResult).not.toBeInstanceOf(ParserError)
+    } else {
+      expect(parseResult.toString()).toEqual(expectedStr)
+    }
+  }
+
   test("literals", () => {
     ;[
       ["A", "A"],
@@ -253,31 +264,15 @@ describe("parser", () => {
       ["(A)", "A"],
       ["\\not(A)", "\\not A"],
       ["(\\not A)", "\\not A"],
-    ].forEach(([expr, expectedStr]) => {
-      const parseResult = PropositionalLogicParser.parse(expr)
-      if (parseResult instanceof ParserError) {
-        // expect() does not narrow down the type, so if is used here
-        expect(parseResult).not.toBeInstanceOf(ParserError)
-      } else {
-        expect(parseResult.toString()).toEqual(expectedStr)
-      }
-    })
+    ].forEach(inputTester)
   })
 
   test("complex", () => {
-    for (const expr of [
-      "\\not A \\and B",
-      "\\not(A \\and B)",
-      "\\not A \\and (B \\or C)",
-      "(\\not A \\or B) \\and (B \\or C)",
-    ]) {
-      const parseResult = PropositionalLogicParser.parse(expr)
-      if (parseResult instanceof ParserError) {
-        // expect() does not narrow down the type, so if is used here
-        expect(parseResult).not.toBeInstanceOf(ParserError)
-      } else {
-        expect(parseResult.toString()).toEqual(expr)
-      }
-    }
+    ;[["\\not A \\and B", "\\not A \\and B"],
+      ["\\not(A \\and B)","\\not(A \\and B)"],
+      ["\\not A \\and (B \\or C)", "\\not A \\and (B \\or C)"],
+      ["(\\not A \\or B) \\and (B \\or C)", "(\\not A \\or B) \\and (B \\or C)"],
+      ["((\\notA\\orB)\\and(B\\xorC))=>(D<=>E)", "((\\not A \\or B) \\and (B \\xor C)) => (D <=> E)"],
+    ].forEach(inputTester)
   })
 })
