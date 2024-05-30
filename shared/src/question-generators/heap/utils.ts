@@ -1,0 +1,183 @@
+import { MaxHeap } from "@shared/question-generators/heap/maxHeap.ts"
+import { MinHeap } from "@shared/question-generators/heap/minHeap.ts"
+import Random from "@shared/utils/random.ts"
+
+export function generateOperationSequence(
+  heapType: "Min" | "Max",
+  random: Random,
+): { sequence: string; heap: MinHeap | MaxHeap } {
+  const sequenceLength = random.int(7, 11)
+  const heap = heapType === "Min" ? new MinHeap() : new MaxHeap()
+
+  let amountInserts = 0
+  let amountExtracts = 0
+
+  const operationSequence = []
+
+  for (let i = 0; i < sequenceLength; i++) {
+    const canExtract = amountInserts - amountExtracts >= 3
+    const operation = canExtract
+      ? random.weightedChoice([
+          ["insert", 0.75],
+          ["extract", 0.25],
+        ])
+      : "insert"
+
+    if (operation === "insert") {
+      const newValue = random.int(1, 20)
+      operationSequence.push(newValue.toString())
+      heap.insert(newValue)
+      amountInserts++
+    } else {
+      operationSequence.push("*")
+      if (heap instanceof MinHeap) {
+        heap.extractMin()
+      } else {
+        heap.extractMax()
+      }
+      amountExtracts++
+    }
+  }
+
+  return { sequence: operationSequence.join(", "), heap }
+}
+
+export function generateHeapsForQuestion(
+  heapType: "Max" | "Min",
+  random: Random,
+): { heapStringTable: string[]; correctAnswerIndex: number[] } {
+  const wrongRandomHeaps = generateRandomWrongHeaps(heapType, random)
+
+  const amountOfCorrectHeaps = random.int(
+    4 - wrongRandomHeaps.length > 0 ? 4 - wrongRandomHeaps.length : 1,
+    4,
+  )
+
+  const correctRandomHeaps = generateRandomHeaps(heapType, amountOfCorrectHeaps, random)
+  const correctRandomHeapsString = correctRandomHeaps.map((heap) => heap.toTableString())
+
+  const wrongRandomHeapsString = random.subset(
+    wrongRandomHeaps.map((heap) => convertNumberArrayToTable(heap)),
+    4 - correctRandomHeaps.length,
+  )
+
+  const heapStringTable = random.shuffle(correctRandomHeapsString.concat(wrongRandomHeapsString))
+
+  const correctAnswerIndex = correctRandomHeapsString.map((heapString) =>
+    heapStringTable.indexOf(heapString),
+  )
+
+  return {
+    heapStringTable,
+    correctAnswerIndex,
+  }
+}
+
+export function generateRandomHeaps(
+  heapType: "Max" | "Min",
+  count: number,
+  random: Random,
+): (MaxHeap | MinHeap)[] {
+  const heaps: (MaxHeap | MinHeap)[] = []
+  const heapSet: Set<string> = new Set()
+
+  while (heaps.length < count) {
+    const heap = heapType === "Max" ? new MaxHeap() : new MinHeap()
+    const size = random.int(6, 10)
+    for (let j = 0; j < size; j++) {
+      heap.insert(random.int(1, 20))
+    }
+
+    const heapString = heap.toString()
+    if (!heapSet.has(heapString)) {
+      heapSet.add(heapString)
+      heaps.push(heap)
+    }
+  }
+
+  return heaps
+}
+
+export function generateRandomWrongHeaps(heapType: "Max" | "Min", random: Random): number[][] {
+  const heaps: number[][] = []
+
+  const heap1 = generateRandomHeaps(heapType === "Min" ? "Max" : "Min", 1, random)[0]
+  // very unlikely that this will result in a correct heap, but it could
+  if (checkCorrectHeap(heap1.getHeap(), heapType)) {
+    heaps.push(heap1.getHeap())
+  }
+
+  const heap2 = generateRandomHeaps(heapType, 1, random)[0].getHeap()
+  const wrongHeap2 = swapParentChild(heap2, random)
+  // this could still result in a correct heap
+  if (!checkCorrectHeap(wrongHeap2, heapType)) {
+    heaps.push(wrongHeap2)
+  }
+
+  const heap3 = generateRandomHeaps(heapType, 1, random)[0].getHeap()
+  const wrongHeap3 = replaceValueWithNaN(heap3, random)
+  heaps.push(wrongHeap3)
+
+  const heap4 = generateRandomHeaps(heapType, 1, random)[0].getHeap()
+  const wrongHeap4 = increaseChildValue(heap4, heapType, random)
+  if (!checkCorrectHeap(wrongHeap4, heapType)) {
+    heaps.push(wrongHeap4)
+  }
+
+  return heaps
+}
+
+export function swapParentChild(heap: number[], random: Random): number[] {
+  const newHeap = [...heap]
+  const index = random.int(1, newHeap.length - 1)
+  let neighbour = -1
+  do {
+    neighbour = random.choice([index * 2 + 1, index * 2 + 2, Math.floor((index - 1) / 2)])
+  } while (neighbour < 0 || neighbour >= newHeap.length)
+  ;[newHeap[index], newHeap[neighbour]] = [newHeap[neighbour], newHeap[index]]
+  return newHeap
+}
+
+export function replaceValueWithNaN(heap: number[], random: Random): number[] {
+  const newHeap = [...heap]
+  // replace a random leaf node with NaN
+  const index = random.int(Math.floor(newHeap.length / 2), newHeap.length)
+  if (index < newHeap.length) {
+    newHeap[index] = Number.NaN
+  } else {
+    newHeap.push(Number.NaN)
+  }
+  return newHeap
+}
+
+export function increaseChildValue(heap: number[], heapType: "Min" | "Max", random: Random): number[] {
+  const newHeap = [...heap]
+  const child = random.int(1, newHeap.length - 1)
+  const parent = Math.floor((child - 1) / 2)
+  const diffValue = random.int(1, 3)
+  newHeap[child] = newHeap[parent] + (heapType === "Min" ? -1 : 1) * diffValue
+  return newHeap
+}
+
+export function checkCorrectHeap(heap: number[], type: "Max" | "Min"): boolean {
+  // check if every child is smaller than its parent
+  for (let i = 1; i < heap.length; i++) {
+    const parent = Math.floor((i - 1) / 2)
+    if (type === "Max" && heap[parent] < heap[i]) {
+      return false
+    } else if (type === "Min" && heap[parent] > heap[i]) {
+      return false
+    }
+  }
+  return true
+}
+
+export function convertNumberArrayToTable(array: number[]): string {
+  let arrayTable = "\n|"
+  array.forEach((element) => {
+    arrayTable += (Number.isNaN(element) ? " " : element) + "|"
+  })
+  arrayTable += "\n" + "|---".repeat(array.length) + "|\n"
+  console.log(arrayTable)
+  return arrayTable
+}

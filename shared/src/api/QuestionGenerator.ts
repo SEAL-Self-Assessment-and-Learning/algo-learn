@@ -51,6 +51,9 @@ export interface MultipleChoiceQuestion extends QuestionBase {
 
   /** The feedback function for this question; defaults to undefined */
   feedback?: MultipleChoiceFeedbackFunction
+
+  /** If the answer should be displayed as cards or as a list, only if sorting is false */
+  card?: boolean
 }
 
 /**

@@ -95,6 +95,14 @@ export class MinHeap {
     }
   }
 
+  getField(i: number) {
+    return this.heap[i]
+  }
+
+  getSize() {
+    return this.heap.length
+  }
+
   getHeap() {
     return this.heap.slice()
   }

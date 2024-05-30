@@ -1,6 +1,7 @@
 import { CheckCheck, XCircle } from "lucide-react"
 import { useState } from "react"
 import { MultipleChoiceFeedback, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator"
+import { Card, CardContent, CardHeader } from "@/components/ui/card.tsx"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
@@ -159,28 +160,54 @@ export function ExerciseMultipleChoice({
           {question.answers.map((answer, index) => {
             const isCorrectAnswer = true === feedbackObject?.correctChoice?.includes(index)
             const id = `${index}`
-            return (
-              <div key={index} className="flex items-center space-x-2">
-                <FeedbackIconAndTooltip
-                  isCorrectAnswer={isCorrectAnswer}
-                  userGaveCorrectAnswer={isCorrectAnswer === choice.includes(index)}
-                  hidden={!disabled}
-                />
-                <Checkbox
-                  id={id}
-                  checked={choice.includes(index)}
-                  disabled={disabled}
-                  onCheckedChange={() => {
-                    setChoiceEntry(index, !choice.includes(index))
+            if (question.card) {
+              return (
+                <Card
+                  key={index}
+                  onClick={() => {
+                    if (!disabled) setChoiceEntry(index, !choice.includes(index))
                   }}
-                />
-                <div className="grid gap-1.5 leading-none">
-                  <Label htmlFor={id}>
+                  className={`relative ${choice.includes(index) ? "border-black shadow-lg dark:border-white" : ""} ${disabled ? "hover:cursor-not-allowed" : "hover:cursor-pointer"}`}
+                >
+                  <div className={`absolute right-2 top-2`}>
+                    <FeedbackIconAndTooltip
+                      isCorrectAnswer={isCorrectAnswer}
+                      userGaveCorrectAnswer={isCorrectAnswer === choice.includes(index)}
+                      hidden={!disabled}
+                    />
+                  </div>
+                  <CardHeader>
+                    <b>Option {index + 1}</b>
+                  </CardHeader>
+                  <CardContent className={`text-justify`}>
                     <Markdown md={answer} />
-                  </Label>
+                  </CardContent>
+                </Card>
+              )
+            } else {
+              return (
+                <div key={index} className="flex items-center space-x-2">
+                  <FeedbackIconAndTooltip
+                    isCorrectAnswer={isCorrectAnswer}
+                    userGaveCorrectAnswer={isCorrectAnswer === choice.includes(index)}
+                    hidden={!disabled}
+                  />
+                  <Checkbox
+                    id={id}
+                    checked={choice.includes(index)}
+                    disabled={disabled}
+                    onCheckedChange={() => {
+                      setChoiceEntry(index, !choice.includes(index))
+                    }}
+                  />
+                  <div className="grid gap-1.5 leading-none">
+                    <Label htmlFor={id}>
+                      <Markdown md={answer} />
+                    </Label>
+                  </div>
                 </div>
-              </div>
-            )
+              )
+            }
           })}
         </div>
       </InteractWithQuestion>

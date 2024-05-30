@@ -2,14 +2,22 @@ import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
+  minimalMultipleChoiceFeedback,
+  MultipleChoiceQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { MaxHeap } from "@shared/question-generators/heap/maxHeap.ts"
 import { MinHeap } from "@shared/question-generators/heap/minHeap.ts"
+import {
+  generateHeapsForQuestion,
+  generateOperationSequence,
+} from "@shared/question-generators/heap/utils.ts"
+import { permutation } from "@shared/utils/math.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+import heapProofsJSON from "./heapProof.json"
 
-const translation: Translations = {
+const translationHeapOperations: Translations = {
   en: {
     name: "Heap-Operations",
     description: "Determine the state of a heap after operations",
@@ -17,8 +25,9 @@ const translation: Translations = {
       "Consider having a **{{0}}-Heap**. You insert the following elements in the given order: {{1}} What is the state of the Heap after the insertions?",
     taskExtract:
       "Consider having the following **{{0}}-Heap**: {{1}} You extract the {{2}} element **{{3}}** times. What is the state of the Heap after the extractions?",
-    taskBuild:
-      "Consider having the following Array: {{0}} What is the result of **Build-{{1}}-Heap**?",
+    taskBuild: "Consider having the following Array: {{0}} What is the result of **Build-{{1}}-Heap**?",
+    taskCombine:
+      "Let **{{0}}** be a sequence of operations, where a **number** represents **inserting** this number into the heap and $*$ represents an **Extract-{{2}}** Operation. \\[{{0}}={{1}}\\] What is the state of the Heap after all operations? Initially the heap is empty.",
     checkFormat: "Please only enter Integer seperated by commas.",
   },
   de: {
@@ -28,9 +37,35 @@ const translation: Translations = {
       "Betrachte einen **{{0}}-Heap**. Du fügst die folgenden Elemente in gegebener Reihenfolge ein: {{1}} Wie sieht der Heap nach den Einfügungen aus?",
     taskExtract:
       "Betrachte den folgenden **{{0}}-Heap**: {{1}} Du extrahierst das {{2}} Element **{{3}}** mal. Wie sieht der Heap nach den Extraktionen aus?",
-    taskBuild:
-      "Betrachte das folgende Array: {{0}} Was ist das Ergebnis von **Build-{{1}}-Heap**?",
+    taskBuild: "Betrachte das folgende Array: {{0}} Was ist das Ergebnis von **Build-{{1}}-Heap**?",
+    taskCombine:
+      "Sei **{{0}}** eine Sequenz von Operationen, wobei eine **Zahl** das **Einfügen** dieser Zahl in den Heap repräsentiert und $*$ eine **Extract-{{2}}** Operation. \\[{{0}}={{1}}\\] Wie sieht der Heap nach allen Operationen aus? Der Heap ist anfangs leer.",
     checkFormat: "Bitte nur Integer durch Kommata getrennt eingeben.",
+  },
+}
+
+const translationsHeapUnderstanding: Translations = {
+  en: {
+    name: "Heap-Understanding",
+    description: "Understand the properties of heaps",
+    taskPermutations:
+      "Consider the following {{0}}-Heap. How many different Insert-Operations can lead to this Heap? {{1}} Number of different Insert-Operations:",
+    taskCorrectness:
+      "Which of the following arrays satisfy all **Heap-Properties** for a **{{0}}-Heap**?",
+    taskProofs:
+      "Welcher der folgenden Beweise zeigt die Korrektheit oder widerlegt diese, der folgenden Aussage? {{0}}",
+    checkFormatPermutations: "Please only enter an Integer.",
+  },
+  de: {
+    name: "Heap-Verständnis",
+    description: "Verstehe die Eigenschaften von Heaps",
+    taskPermutations:
+      "Betrachte den folgenden {{0}}-Heap. Wie viele verschiedene Einfüge-Operationen können zu diesem Heap führen? {{1}} Anzahl der verschiedenen Einfüge-Operationen:",
+    taskCorrectness:
+      "Welche der folgenden Arrays erfüllen alle **Heap-Eigenschaften** für einen **{{0}}-Heap**?",
+    taskProofs:
+      "Welche der folgenden Beweise zeigt die Korrektheit oder widerlegt diese, der folgenden Aussage? {{0}}",
+    checkFormatPermutations: "Bitte etwas ganzzahliges eingeben.",
   },
 }
 
@@ -45,16 +80,43 @@ const wordTranslations: Translations = {
   },
 }
 
-export const HeapQuestion: QuestionGenerator = {
-  name: tFunctional(translation, "name"),
-  description: tFunctional(translation, "description"),
+interface HeapProofs {
+  [key: string]: {
+    task: string
+    true1: string
+    falsch1: string
+    falsch2: string
+    falsch3: string
+  }
+}
+
+function heapGetPermutationElements(heap: MinHeap | MaxHeap, heapElements: number[]): number {
+  let numberPossiblePermutations: number = 0
+
+  const elementsPermutations: number[][] = permutation(heapElements)
+  for (const permutation of elementsPermutations) {
+    const testHeap = heap instanceof MinHeap ? new MinHeap() : new MaxHeap()
+    for (const element of permutation) {
+      testHeap.insert(element)
+    }
+    if (testHeap.toString() === heap.toString()) {
+      numberPossiblePermutations += 1
+    }
+  }
+
+  return numberPossiblePermutations
+}
+
+export const HeapOperations: QuestionGenerator = {
+  name: tFunctional(translationHeapOperations, "name"),
+  description: tFunctional(translationHeapOperations, "description"),
   tags: ["heap", "priority-queue"],
   languages: ["en", "de"],
   expectedParameters: [
     {
       type: "string",
       name: "variant",
-      allowedValues: ["insert", "extract", "build"],
+      allowedValues: ["insert", "extract", "build", "combine"],
     },
   ],
 
@@ -85,7 +147,7 @@ export const HeapQuestion: QuestionGenerator = {
         if (!/^\d+$/.test(element) && element.trim() !== "") {
           return {
             valid: false,
-            message: t(translation, lang, "checkFormat"),
+            message: t(translationHeapOperations, lang, "checkFormat"),
           }
         }
         heapInputTable += "|" + element
@@ -144,16 +206,15 @@ export const HeapQuestion: QuestionGenerator = {
 
       const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
-        name: HeapQuestion.name(lang),
+        name: HeapOperations.name(lang),
         path: generatorPath,
-        text: t(translation, lang, "taskInsert", [heapType, elementsTable]),
+        text: t(translationHeapOperations, lang, "taskInsert", [heapType, elementsTable]),
         checkFormat,
         feedback,
       }
 
       return { question }
     } else if (variant === "extract") {
-
       for (const element of heapElements) {
         solutionHeap.insert(element)
       }
@@ -171,9 +232,9 @@ export const HeapQuestion: QuestionGenerator = {
 
       const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
-        name: HeapQuestion.name(lang),
+        name: HeapOperations.name(lang),
         path: generatorPath,
-        text: t(translation, lang, "taskExtract", [
+        text: t(translationHeapOperations, lang, "taskExtract", [
           heapType,
           elementsTable,
           t(wordTranslations, lang, heapType === "Min" ? "minimal" : "maximal"),
@@ -184,27 +245,152 @@ export const HeapQuestion: QuestionGenerator = {
       }
 
       return { question }
-    } else {
-
-      const elementsTable = "\n|" + heapElements.join("|") + "|\n" + "|---".repeat(heapSize) + "|\n|#div_my-5#||\n"
+    } else if (variant === "build") {
+      const elementsTable =
+        "\n|" + heapElements.join("|") + "|\n" + "|---".repeat(heapSize) + "|\n|#div_my-5#||\n"
 
       solutionHeap.build(heapElements)
 
       const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
-        name: HeapQuestion.name(lang),
+        name: HeapOperations.name(lang),
         path: generatorPath,
-        text: t(translation, lang, "taskBuild", [
-          elementsTable,
+        text: t(translationHeapOperations, lang, "taskBuild", [elementsTable, heapType]),
+        checkFormat,
+        feedback,
+      }
+
+      return { question }
+    } else {
+      const variableName = random.choice(["A", "B", "C", "D", "E"])
+
+      const { sequence, heap } = generateOperationSequence(heapType, random)
+      solutionHeap = heap
+
+      const question: FreeTextQuestion = {
+        type: "FreeTextQuestion",
+        name: HeapOperations.name(lang),
+        path: generatorPath,
+        text: t(translationHeapOperations, lang, "taskCombine", [variableName, sequence, heapType]),
+        checkFormat,
+        feedback,
+      }
+
+      return { question }
+    }
+  },
+}
+
+export const HeapUnderstanding: QuestionGenerator = {
+  name: tFunctional(translationsHeapUnderstanding, "name"),
+  description: tFunctional(translationsHeapUnderstanding, "description"),
+  tags: ["heap", "priority-queue", "proofs"],
+  languages: ["en", "de"],
+  expectedParameters: [
+    {
+      type: "string",
+      name: "variant",
+      allowedValues: ["correctness", "permutations", "proofs"],
+    },
+  ],
+
+  generate: (generatorPath, lang = "en", parameters, seed) => {
+    const random = new Random(seed)
+
+    const variant: "correctness" | "permutations" | "proofs" = parameters.variant as
+      | "correctness"
+      | "permutations"
+      | "proofs"
+
+    const heapType: "Max" | "Min" = random.choice(["Max", "Min"])
+    const solutionHeap: MaxHeap | MinHeap = heapType === "Min" ? new MinHeap() : new MaxHeap()
+
+    if (variant === "permutations") {
+      const heapSize = random.int(3, 5)
+      // select n different numbers
+      const heapElements = random.shuffle([...Array(10).keys()]).slice(1, 1 + heapSize)
+      solutionHeap.build(heapElements)
+
+      const numberPossiblePermutations = heapGetPermutationElements(solutionHeap, heapElements)
+
+      const checkFormat: FreeTextFormatFunction = ({ text }) => {
+        // check if the input is an integer
+        text = text.trim()
+
+        if (!/^\d+$/.test(text)) {
+          return {
+            valid: false,
+            message: t(translationsHeapUnderstanding, lang, "checkFormatPermutations"),
+          }
+        }
+        return { valid: true }
+      }
+
+      const feedback: FreeTextFeedbackFunction = ({ text }) => {
+        const cleanedText = text.trim()
+
+        if (parseInt(cleanedText) !== numberPossiblePermutations) {
+          return {
+            correct: false,
+            correctAnswer: numberPossiblePermutations.toString(),
+          }
+        }
+
+        return { correct: true }
+      }
+
+      const question: FreeTextQuestion = {
+        type: "FreeTextQuestion",
+        name: HeapUnderstanding.name(lang),
+        path: generatorPath,
+        text: t(translationsHeapUnderstanding, lang, "taskPermutations", [
           heapType,
+          solutionHeap.toTableString() + "|#div_my-5#||\n",
         ]),
         checkFormat,
         feedback,
       }
 
       return { question }
+    } else if (variant === "proofs") {
+      const heapProofs: HeapProofs = heapProofsJSON
 
+      const heapProofNumber = random.int(0, Object.keys(heapProofs).length)
+
+      const task = heapProofs[heapProofNumber.toString()].task
+      const possibleAnswers = random.shuffle([
+        heapProofs[heapProofNumber.toString()].true1,
+        heapProofs[heapProofNumber.toString()].falsch1,
+        heapProofs[heapProofNumber.toString()].falsch2,
+        heapProofs[heapProofNumber.toString()].falsch3,
+      ])
+      const correctAnswerIndex = possibleAnswers.indexOf(heapProofs[heapProofNumber.toString()].true1)
+
+      const question: MultipleChoiceQuestion = {
+        type: "MultipleChoiceQuestion",
+        name: HeapUnderstanding.name(lang),
+        path: generatorPath,
+        text: t(translationsHeapUnderstanding, lang, "taskProofs", ["\n> " + task]),
+        answers: possibleAnswers,
+        feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
+        card: true,
+      }
+
+      return { question }
+    } else {
+      const { heapStringTable, correctAnswerIndex } = generateHeapsForQuestion(heapType, random)
+
+      const question: MultipleChoiceQuestion = {
+        type: "MultipleChoiceQuestion",
+        name: HeapUnderstanding.name(lang),
+        path: generatorPath,
+        text: t(translationsHeapUnderstanding, lang, "taskCorrectness", [heapType]),
+        answers: heapStringTable,
+        feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
+        allowMultiple: true,
+      }
+
+      return { question }
     }
-
   },
 }
