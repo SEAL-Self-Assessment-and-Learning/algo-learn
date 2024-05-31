@@ -1,3 +1,4 @@
+import { validateParameters } from "@shared/api/Parameters.ts"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -6,8 +7,7 @@ import {
   MultipleChoiceQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
-import { MaxHeap } from "@shared/question-generators/heap/maxHeap.ts"
-import { MinHeap } from "@shared/question-generators/heap/minHeap.ts"
+import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax.ts"
 import {
   generateHeapsForQuestion,
   generateOperationSequence,
@@ -15,7 +15,8 @@ import {
 import { permutation } from "@shared/utils/math.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
-import heapProofsJSON from "./heapProof.json"
+import { basicMultipleChoiceMetaGenerator } from "../../api/BasicMultipleChoiceQuestion"
+import { heapProofList } from "./proofList.ts"
 
 const translationHeapOperations: Translations = {
   en: {
@@ -63,9 +64,18 @@ const translationsHeapUnderstanding: Translations = {
       "Betrachte den folgenden {{0}}-Heap. Wie viele verschiedene Einfüge-Operationen können zu diesem Heap führen? {{1}} Anzahl der verschiedenen Einfüge-Operationen:",
     taskCorrectness:
       "Welche der folgenden Arrays erfüllen alle **Heap-Eigenschaften** für einen **{{0}}-Heap**?",
-    taskProofs:
-      "Welche der folgenden Beweise zeigt die Korrektheit oder widerlegt diese, der folgenden Aussage? {{0}}",
     checkFormatPermutations: "Bitte etwas ganzzahliges eingeben.",
+  },
+}
+
+const translationsHeapProofs: Translations = {
+  en: {
+    name: "Heap-Proofs",
+    description: "Prove properties of heaps",
+  },
+  de: {
+    name: "Heap-Beweise",
+    description: "Beweise Eigenschaften von Heaps",
   },
 }
 
@@ -78,16 +88,6 @@ const wordTranslations: Translations = {
     maximal: "maximale",
     minimal: "minimale",
   },
-}
-
-interface HeapProofs {
-  [key: string]: {
-    task: string
-    true1: string
-    falsch1: string
-    falsch2: string
-    falsch3: string
-  }
 }
 
 function heapGetPermutationElements(heap: MinHeap | MaxHeap, heapElements: number[]): number {
@@ -121,6 +121,14 @@ export const HeapOperations: QuestionGenerator = {
   ],
 
   generate: (generatorPath, lang = "en", parameters, seed) => {
+    if (!validateParameters(parameters, HeapOperations.expectedParameters)) {
+      throw new Error(
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${HeapOperations.expectedParameters.join(
+          ", ",
+        )}`,
+      )
+    }
+
     const random = new Random(seed)
 
     const variant = parameters.variant as "insert" | "extract" | "build"
@@ -290,11 +298,19 @@ export const HeapUnderstanding: QuestionGenerator = {
     {
       type: "string",
       name: "variant",
-      allowedValues: ["correctness", "permutations", "proofs"],
+      allowedValues: ["correctness", "permutations"],
     },
   ],
 
   generate: (generatorPath, lang = "en", parameters, seed) => {
+    if (!validateParameters(parameters, HeapUnderstanding.expectedParameters)) {
+      throw new Error(
+        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${HeapUnderstanding.expectedParameters.join(
+          ", ",
+        )}`,
+      )
+    }
+
     const random = new Random(seed)
 
     const variant: "correctness" | "permutations" | "proofs" = parameters.variant as
@@ -352,31 +368,6 @@ export const HeapUnderstanding: QuestionGenerator = {
       }
 
       return { question }
-    } else if (variant === "proofs") {
-      const heapProofs: HeapProofs = heapProofsJSON
-
-      const heapProofNumber = random.int(0, Object.keys(heapProofs).length)
-
-      const task = heapProofs[heapProofNumber.toString()].task
-      const possibleAnswers = random.shuffle([
-        heapProofs[heapProofNumber.toString()].true1,
-        heapProofs[heapProofNumber.toString()].falsch1,
-        heapProofs[heapProofNumber.toString()].falsch2,
-        heapProofs[heapProofNumber.toString()].falsch3,
-      ])
-      const correctAnswerIndex = possibleAnswers.indexOf(heapProofs[heapProofNumber.toString()].true1)
-
-      const question: MultipleChoiceQuestion = {
-        type: "MultipleChoiceQuestion",
-        name: HeapUnderstanding.name(lang),
-        path: generatorPath,
-        text: t(translationsHeapUnderstanding, lang, "taskProofs", ["\n> " + task]),
-        answers: possibleAnswers,
-        feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
-        card: true,
-      }
-
-      return { question }
     } else {
       const { heapStringTable, correctAnswerIndex } = generateHeapsForQuestion(heapType, random)
 
@@ -394,3 +385,10 @@ export const HeapUnderstanding: QuestionGenerator = {
     }
   },
 }
+
+export const HeapProofs: QuestionGenerator = basicMultipleChoiceMetaGenerator(
+  tFunctional(translationsHeapProofs, "name"),
+  heapProofList,
+  tFunctional(translationsHeapProofs, "description"),
+  true,
+)

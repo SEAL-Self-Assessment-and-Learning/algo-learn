@@ -1,9 +1,0 @@
-{
-  "0": {
-    "task": "Die kleinste Priorität wird in einem beliebigen Max-Heap stets von einem Blatt gespeichert.",
-    "true1": "Die Aussage ist wahr. Sei v der Knoten mit der kleinsten Priorität. Da die Prioritäten aller Knoten im Teilbaum von v höchsten so groß sein dürfen wie die von v selbst und v die kleinste Priorität hat folgt, dass alle Knoten im Teilbaum von v die gleiche Priorität haben. Das trifft insbesondere auf die Blätter in diesem Teilbaum zu und wenn der v keine Kindknoten hat, ist v selbst das Blatt.",
-    "falsch1": "Der Max-Heap ist so definiert, dass höhere Prioritäten stets weiter oben stehen, als kleinere Prioritäten. Daraus folgt, dass wir über einen beliebigen Knoten $v$ und dessen Elternknoten $v'$ wissen, dass $v'$ eine größere Priorität hat als $v$. Dies können wir induktiv bis bis auf die letzte Ebene des Heap fortsetzen, da nur hier Blätter sein können. Dies zeigt, dass die Aussage korrekt ist und die kleinste Priorität in einem Max-Heap von einem Blatt auf der letzten Ebene gespeichert wird.",
-    "falsch2": "Die Behauptung ist falsch. Mit dem folgenden Gegenbeispiel können wir zeigen, dass die kleinste Priorität auch in der Wurzel stehen könnte: \n|$5$|$5$|$5$|\n|---|---|---|\n|#div_my-5#| |\n",
-    "falsch3": "Die Aussage ist korrekt. In einem Hax-Heap muss die kleinste Priorität stets ganz unten im Heap sein. Da das letzte Element in jedem Heap in einem Blatt ist, folgt, dass die kleinste Priorität in einem Blatt sein muss."
-  }
-}

@@ -1,5 +1,4 @@
-import { MaxHeap } from "@shared/question-generators/heap/maxHeap.ts"
-import { MinHeap } from "@shared/question-generators/heap/minHeap.ts"
+import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax.ts"
 import Random from "@shared/utils/random.ts"
 
 export function generateOperationSequence(

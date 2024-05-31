@@ -64,6 +64,7 @@ export function basicMultipleChoiceMetaGenerator(
   name: (lang: Language) => string,
   questions: BasicMultipleChoiceQuestion[],
   description?: (lang: Language) => string,
+  cardDisplay?: boolean,
 ): QuestionGenerator {
   const variants = questions.map((_, i) => i)
   const languages = Object.keys(questions[0].translations) as Language[]
@@ -146,6 +147,7 @@ export function basicMultipleChoiceMetaGenerator(
           .filter((x) => x.correct)
           .map((x) => x.i),
       }),
+      card: cardDisplay,
     }
     return { question }
   }
