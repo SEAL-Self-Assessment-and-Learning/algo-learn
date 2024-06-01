@@ -10,6 +10,7 @@ import {
 import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax.ts"
 import {
   generateHeapsForQuestion,
+  generateNeighbourOptions,
   generateOperationSequence,
 } from "@shared/question-generators/heap/utils.ts"
 import { permutation } from "@shared/utils/math.ts"
@@ -53,8 +54,8 @@ const translationsHeapUnderstanding: Translations = {
       "Consider the following {{0}}-Heap. How many different Insert-Operations can lead to this Heap? {{1}} Number of different Insert-Operations:",
     taskCorrectness:
       "Which of the following arrays satisfy all **Heap-Properties** for a **{{0}}-Heap**?",
-    taskProofs:
-      "Welcher der folgenden Beweise zeigt die Korrektheit oder widerlegt diese, der folgenden Aussage? {{0}}",
+    taskNeighbours:
+      "Consider having a random Heap with $n$ elements, where $n >> 1000$. The value at index $0$ is *null*.  What is the index of the **{{0}}** of the element at **index {{1}}** in a *Heap*?",
     checkFormatPermutations: "Please only enter an Integer.",
   },
   de: {
@@ -64,6 +65,8 @@ const translationsHeapUnderstanding: Translations = {
       "Betrachte den folgenden {{0}}-Heap. Wie viele verschiedene Einfüge-Operationen können zu diesem Heap führen? {{1}} Anzahl der verschiedenen Einfüge-Operationen:",
     taskCorrectness:
       "Welche der folgenden Arrays erfüllen alle **Heap-Eigenschaften** für einen **{{0}}-Heap**?",
+    taskNeighbours:
+      "Angenommen du hast einen beliebigen Heap mit $n$ Element, mit $n >> 1000$. Der Wert an index $0$ ist *null*, Was ist der Index des **{{0}}** des Elements an **Index {{1}}* in einem *Heap*?",
     checkFormatPermutations: "Bitte etwas ganzzahliges eingeben.",
   },
 }
@@ -83,10 +86,20 @@ const wordTranslations: Translations = {
   en: {
     maximal: "maximal",
     minimal: "minimal",
+    grandParent: "grandparent",
+    parent: "parent",
+    rightChild: "right child",
+    leftChild: "left child",
+    ofThe: "of the",
   },
   de: {
     maximal: "maximale",
     minimal: "minimale",
+    grandParent: "Großelternknoten",
+    parent: "Elternknoten",
+    rightChild: "rechten Kindes",
+    leftChild: "linken Kindes",
+    ofThe: "des",
   },
 }
 
@@ -298,7 +311,7 @@ export const HeapUnderstanding: QuestionGenerator = {
     {
       type: "string",
       name: "variant",
-      allowedValues: ["correctness", "permutations"],
+      allowedValues: ["correctness", "permutations", "neighbours"],
     },
   ],
 
@@ -321,39 +334,42 @@ export const HeapUnderstanding: QuestionGenerator = {
     const heapType: "Max" | "Min" = random.choice(["Max", "Min"])
     const solutionHeap: MaxHeap | MinHeap = heapType === "Min" ? new MinHeap() : new MaxHeap()
 
+    const checkFormat: FreeTextFormatFunction = ({ text }) => {
+      // check if the input is an integer
+      text = text.trim()
+
+      if (text === "") return { valid: false }
+
+      if (!/^\d+$/.test(text)) {
+        return {
+          valid: false,
+          message: t(translationsHeapUnderstanding, lang, "checkFormatPermutations"),
+        }
+      }
+      return { valid: true }
+    }
+
+    let solution = -1
+    const feedback: FreeTextFeedbackFunction = ({ text }) => {
+      const cleanedText = text.trim()
+
+      if (parseInt(cleanedText) !== solution) {
+        return {
+          correct: false,
+          correctAnswer: solution.toString(),
+        }
+      }
+
+      return { correct: true }
+    }
+
     if (variant === "permutations") {
       const heapSize = random.int(3, 5)
       // select n different numbers
       const heapElements = random.shuffle([...Array(10).keys()]).slice(1, 1 + heapSize)
       solutionHeap.build(heapElements)
 
-      const numberPossiblePermutations = heapGetPermutationElements(solutionHeap, heapElements)
-
-      const checkFormat: FreeTextFormatFunction = ({ text }) => {
-        // check if the input is an integer
-        text = text.trim()
-
-        if (!/^\d+$/.test(text)) {
-          return {
-            valid: false,
-            message: t(translationsHeapUnderstanding, lang, "checkFormatPermutations"),
-          }
-        }
-        return { valid: true }
-      }
-
-      const feedback: FreeTextFeedbackFunction = ({ text }) => {
-        const cleanedText = text.trim()
-
-        if (parseInt(cleanedText) !== numberPossiblePermutations) {
-          return {
-            correct: false,
-            correctAnswer: numberPossiblePermutations.toString(),
-          }
-        }
-
-        return { correct: true }
-      }
+      solution = heapGetPermutationElements(solutionHeap, heapElements)
 
       const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
@@ -368,7 +384,7 @@ export const HeapUnderstanding: QuestionGenerator = {
       }
 
       return { question }
-    } else {
+    } else if (variant === "correctness") {
       const { heapStringTable, correctAnswerIndex } = generateHeapsForQuestion(heapType, random)
 
       const question: MultipleChoiceQuestion = {
@@ -379,6 +395,26 @@ export const HeapUnderstanding: QuestionGenerator = {
         answers: heapStringTable,
         feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
         allowMultiple: true,
+      }
+
+      return { question }
+    } else {
+      const { formula, text } = generateNeighbourOptions(random)
+
+      const randomIndex = random.int(2, 50)
+      solution = formula(randomIndex)
+      const neighbourText = text.map((word) => t(wordTranslations, lang, word)).join(" ")
+
+      const question: FreeTextQuestion = {
+        type: "FreeTextQuestion",
+        name: HeapUnderstanding.name(lang),
+        path: generatorPath,
+        text: t(translationsHeapUnderstanding, lang, "taskNeighbours", [
+          neighbourText,
+          randomIndex.toString(),
+        ]),
+        checkFormat,
+        feedback,
       }
 
       return { question }

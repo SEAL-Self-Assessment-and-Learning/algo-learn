@@ -41,6 +41,67 @@ export function generateOperationSequence(
   return { sequence: operationSequence.join(", "), heap }
 }
 
+export function generateNeighbourOptions(random: Random) {
+  const neighbourOption:
+    | "grandParent"
+    | "parent"
+    | "leftChild"
+    | "rightChild"
+    | "leftLeftChild"
+    | "leftRightChild"
+    | "rightRightChild"
+    | "rightLeftChild" = random.choice([
+    "grandParent",
+    "parent",
+    "leftChild",
+    "rightChild",
+    "leftLeftChild",
+    "leftRightChild",
+    "rightRightChild",
+    "rightLeftChild",
+  ])
+
+  const neighbourMap = {
+    grandParent: {
+      formula: (index: number) => Math.floor(Math.floor(index / 2) / 2),
+      text: ["grandParent"],
+    },
+    parent: {
+      formula: (index: number) => Math.floor(index / 2),
+      text: ["parent"],
+    },
+    leftChild: {
+      formula: (index: number) => index * 2,
+      text: ["leftChild"],
+    },
+    rightChild: {
+      formula: (index: number) => index * 2 + 1,
+      text: ["rightChild"],
+    },
+    leftLeftChild: {
+      formula: (index: number) => index * 2 * 2,
+      text: ["leftChild", "ofThe", "leftChild"],
+    },
+    leftRightChild: {
+      formula: (index: number) => index * 2 * 2 + 1,
+      text: ["rightChild", "ofThe", "leftChild"],
+    },
+    rightRightChild: {
+      formula: (index: number) => (index * 2 + 1) * 2 + 1,
+      text: ["rightChild", "ofThe", "rightChild"],
+    },
+    rightLeftChild: {
+      formula: (index: number) => (index * 2 + 2) * 2,
+      text: ["leftChild", "ofThe", "rightChild"],
+    },
+  }
+
+  return {
+    formula: neighbourMap[neighbourOption].formula,
+    text: neighbourMap[neighbourOption].text,
+  }
+}
+
 export function generateHeapsForQuestion(
   heapType: "Max" | "Min",
   random: Random,
