@@ -9,7 +9,6 @@ module.exports = {
       padding: "2rem",
       screens: {
         "2xl": "1400px",
-        touch: {'raw': 'hover: none'},
       },
     },
     extend: {
@@ -72,6 +71,9 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
+  },
+  future: {
+    hoverOnlyWhenSupported: true
   },
   plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
 }
