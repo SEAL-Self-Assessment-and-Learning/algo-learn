@@ -6,7 +6,7 @@ import { PseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Toaster } from "@/components/ui/toaster"
 import { Toggle } from "@/components/ui/toggle.tsx"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useToast } from "@/components/ui/use-toast"
 import { pseudoCodeToString } from "@/utils/parsePseudoCode.ts"
 
@@ -102,8 +102,7 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
         </div>
         <div className="absolute right-1 top-1 flex flex-col items-center space-y-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
           <Toaster />
-          <TooltipProvider>
-            <Tooltip>
+            <Tooltip placement={`right`}>
               <TooltipTrigger asChild>
                 <div>
                   <Toggle size="sm" pressed={toggleStateLines} onPressedChange={handleToggleClickLines}>
@@ -113,7 +112,7 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
               </TooltipTrigger>
               <TooltipContent>Show line numbers</TooltipContent>
             </Tooltip>
-            <Tooltip>
+            <Tooltip placement={`right`}>
               <TooltipTrigger asChild>
                 <div>
                   <Toggle size="sm" pressed={toggleStateColor} onPressedChange={handleToggleClickColor}>
@@ -123,7 +122,7 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
               </TooltipTrigger>
               <TooltipContent>Add syntax highlighting</TooltipContent>
             </Tooltip>
-            <Tooltip>
+            <Tooltip placement={`right`}>
               <TooltipTrigger asChild>
                 <div
                   onClick={handleClickCopyIcon}
@@ -134,7 +133,6 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
               </TooltipTrigger>
               <TooltipContent>Copy code as LaTeX</TooltipContent>
             </Tooltip>
-          </TooltipProvider>
         </div>
       </div>
     </div>
