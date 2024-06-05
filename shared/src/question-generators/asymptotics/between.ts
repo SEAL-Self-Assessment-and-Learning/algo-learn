@@ -85,7 +85,7 @@ export const Between: QuestionGenerator = {
     let text: string
     const functionDeclaration = `${functionName}\\colon\\mathbb N\\to\\mathbb R`
     if (variant === "nifty") {
-      const condTheta = `${functionName}(${variable}) \\in ${`${"\\Theta"}(${functionName}(${variable})^c) \\quad \\forall c \\in \\mathbb{R}`}`
+      const condTheta = `${functionName}(${variable}) \\in ${`${"\\Theta"}(${functionName}(${variable})^${random.int(2, 9)})`}`
       text = t("Theta.text", [functionDeclaration, condTheta])
     } else {
       const aTeX = `${aLandau}(${a.toLatex(variable)})`
