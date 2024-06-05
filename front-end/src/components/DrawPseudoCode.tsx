@@ -102,37 +102,37 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
         </div>
         <div className="absolute right-1 top-1 flex flex-col items-center space-y-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
           <Toaster />
-            <Tooltip placement={`right`}>
-              <TooltipTrigger asChild>
-                <div>
-                  <Toggle size="sm" pressed={toggleStateLines} onPressedChange={handleToggleClickLines}>
-                    <TbListNumbers />
-                  </Toggle>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>Show line numbers</TooltipContent>
-            </Tooltip>
-            <Tooltip placement={`right`}>
-              <TooltipTrigger asChild>
-                <div>
-                  <Toggle size="sm" pressed={toggleStateColor} onPressedChange={handleToggleClickColor}>
-                    <IoColorPaletteOutline />
-                  </Toggle>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>Add syntax highlighting</TooltipContent>
-            </Tooltip>
-            <Tooltip placement={`right`}>
-              <TooltipTrigger asChild>
-                <div
-                  onClick={handleClickCopyIcon}
-                  className={`inline-flex h-8 items-center justify-center rounded-md px-2.5 text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground`}
-                >
-                  <MdContentCopy className="h-4 w-4" />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>Copy code as LaTeX</TooltipContent>
-            </Tooltip>
+          <Tooltip placement={`right`}>
+            <TooltipTrigger asChild>
+              <div>
+                <Toggle size="sm" pressed={toggleStateLines} onPressedChange={handleToggleClickLines}>
+                  <TbListNumbers />
+                </Toggle>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Show line numbers</TooltipContent>
+          </Tooltip>
+          <Tooltip placement={`right`}>
+            <TooltipTrigger asChild>
+              <div>
+                <Toggle size="sm" pressed={toggleStateColor} onPressedChange={handleToggleClickColor}>
+                  <IoColorPaletteOutline />
+                </Toggle>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Add syntax highlighting</TooltipContent>
+          </Tooltip>
+          <Tooltip placement={`right`}>
+            <TooltipTrigger asChild>
+              <div
+                onClick={handleClickCopyIcon}
+                className={`inline-flex h-8 items-center justify-center rounded-md px-2.5 text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground`}
+              >
+                <MdContentCopy className="h-4 w-4" />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Copy code as LaTeX</TooltipContent>
+          </Tooltip>
         </div>
       </div>
     </div>
