@@ -12,8 +12,18 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
 
   // case over -> overlay | below -> no overlay, move other stuff down
 
-  const { feedbackVariation, first, feedback, align, placeholder, prompt, modeID, setText, text } =
-    useInputContext[inputID]
+  const {
+    feedbackVariation,
+    first,
+    feedback,
+    align,
+    placeholder,
+    prompt,
+    modeID,
+    questionMode,
+    setText,
+    text,
+  } = useInputContext[inputID]
 
   // To select the first created input field on the site
   const firstInputRef = useRef<HTMLInputElement | null>(null)
@@ -38,7 +48,6 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
   }
 
   const [isInputFocused, setIsInputFocused] = useState(false)
-
   let inputElement
   // constantly below the input field
   if (feedbackVariation === "below") {
@@ -53,7 +62,7 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
                 ref={first ? firstInputRef : null}
                 key={`newline-input-${inputID}`}
                 autoFocus
-                disabled={modeID === "correct" || modeID === "incorrect"}
+                disabled={questionMode === "correct" || questionMode === "incorrect"}
                 value={text || ""}
                 onChange={(e) => {
                   setText ? setText(e.target.value) : ""
@@ -84,7 +93,7 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
               ref={first ? firstInputRef : null}
               key={`newline-input-${inputID}`}
               autoFocus
-              disabled={modeID === "correct" || modeID === "incorrect"}
+              disabled={questionMode === "correct" || questionMode === "incorrect"}
               value={text || ""}
               onChange={(e) => {
                 setText ? setText(e.target.value) : ""

@@ -146,6 +146,7 @@ export function ExerciseMultiTextInput({
       setText: (text: string) => setText(fieldValues.inputIds[i], text),
       placeholder: fieldValues.inputPlaceholders[i],
       modeID: state.modeID[fieldValues.inputIds[i]],
+      questionMode: mode,
       feedback: state.formatFeedback[fieldValues.inputIds[i]],
       first: i === 0,
     }

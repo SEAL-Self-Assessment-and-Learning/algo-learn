@@ -64,6 +64,17 @@ const translations: Translations = {
   },
 }
 
+const wordTranslations: Translations = {
+  en: {
+    value: "Value",
+    result: "Return value",
+  },
+  de: {
+    value: "Wert",
+    result: "Rückgabewert",
+  },
+}
+
 const answerOptionList: Translations = {
   en: {
     overFlowErrorV1: "We get an overflow error",
@@ -190,22 +201,19 @@ function generateOperationsQueueFreetext(elements: number[], queueSize: number, 
 
   for (let i = 0; i < numOperations; i++) {
     let queueOrSize = random.weightedChoice([
-      ["queue", 0.75],
-      ["get", 0.25],
+      ["queue", 0.85],
+      ["get", 0.15],
     ])
     if (i > 0) {
-      if (
-        Object.prototype.hasOwnProperty.call(operations[i - 1], "numberElements") ||
-        Object.prototype.hasOwnProperty.call(operations[i - 1], "getFront")
-      ) {
+      if (Object.prototype.hasOwnProperty.call(operations[i - 1], "numberElements")) {
         queueOrSize = "queue"
       }
     }
     if (queueOrSize === "queue") {
       // as in generateOperationsQueue | en -> enqueue or de -> dequeue
       let enOrDe = random.weightedChoice([
-        ["enqueue", 0.7],
-        ["dequeue", 0.3],
+        ["enqueue", 0.65],
+        ["dequeue", 0.35],
       ])
       if (queue.getCurrentNumberOfElements() === 0) {
         // only possible to enqueue
@@ -226,15 +234,7 @@ function generateOperationsQueueFreetext(elements: number[], queueSize: number, 
     }
     // use operation numberElements, getRear or getFront
     else {
-      // only if more than 0 elements are in the queue, we can getFront (peekHead)
-      const numOrRearOrFront = random.choice(
-        queue.getCurrentNumberOfElements() > 0 ? ["numberElements", "getFront"] : ["numberElements"],
-      )
-      if (numOrRearOrFront === "numberElements") {
-        operations.push({ numberElements: queue.getCurrentNumberOfElements().toString() })
-      } else if (numOrRearOrFront === "getFront") {
-        operations.push({ getFront: queue.getFront().toString() })
-      }
+      operations.push({ numberElements: queue.getCurrentNumberOfElements().toString() })
     }
   }
 
@@ -566,7 +566,7 @@ export const queueQuestion: QuestionGenerator = {
       queueInformationElements = t(translations, lang, "queueEmpty")
     } else {
       queueInformationElements = t(translations, lang, "queueContainsValues")
-      queueInformationElements += "\n\n|Index|Value|\n|---|---|\n"
+      queueInformationElements += `\n\n|Index|${t(wordTranslations, lang, "value")}|\n|---|---|\n`
       for (let i = 0; i < startElementsAmount; i++) {
         const newValue = random.int(1, 20)
         startElements.push(newValue)
@@ -703,9 +703,8 @@ export const queueQuestion: QuestionGenerator = {
         for (const key in resultMap) {
           const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
           if (key.startsWith("toString") || key.startsWith("getQueue")) {
-            resultMap[key] = parseArrayString(resultMap[key])
             correctAnswers[key] = parseArrayString(correctAnswers[key])
-            const userArray = resultMap[key].split(",")
+            const userArray = parseArrayString(resultMap[key]).split(",")
             const correctArray = correctAnswers[key].split(",")
             if (Object.keys(userArray).length !== Object.keys(correctArray).length) {
               correctAnswered = false
@@ -736,7 +735,6 @@ export const queueQuestion: QuestionGenerator = {
             message: tFunction(translations, lang).t("feedback.correct"),
           }
         }
-        console.log(solutionDisplay.join(""))
         return {
           correct: false,
           message: tFunction(translations, lang).t("feedback.incomplete"),
@@ -746,7 +744,7 @@ export const queueQuestion: QuestionGenerator = {
 
       const operationsFreeText = generateOperationsQueueFreetext(startElements, queueSize, random)
 
-      let inputText = "\n| Operation | Result |\n| --- | --- |\n"
+      let inputText = `\n| Operation | ${t(wordTranslations, lang, "result")} |\n| --- | --- |\n`
       const correctAnswers: { [key: string]: string } = {}
       const solutionDisplay: string[] = []
       let solutionIndex = 0
@@ -769,6 +767,7 @@ export const queueQuestion: QuestionGenerator = {
           )
           correctAnswers[`numElements-${index}`] = operation.numberElements
         }
+        // currently not used, because we cannot explain different function names
         if (Object.prototype.hasOwnProperty.call(operation, "getFront")) {
           inputText += `| ${queueName}.peekHead() | {{getFront-${index}####}} |\n`
           solutionIndex++

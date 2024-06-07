@@ -13,8 +13,7 @@ export const italicRegex = /\*([^*]+)\*/
 export const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/
 export const tableRegex = /^(\|(?:[^\r\n|]*\|?)+(\r?\n\|(?:[^\r\n|]*\|?)+)*)/m
 export const inputRegex = /\{\{(.*?#.*?)\}\}/ // match at least on # to be an input
-export const listRegex = /^((?:\s*[-*][^*].*(\r?\n|$))+)/m
-
+export const listRegex = /^((?:\s*-\s[^*].*(\r?\n|$))+)/m
 // TODO check the regexes for the table and list again
 
 /**

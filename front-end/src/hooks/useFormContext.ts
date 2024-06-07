@@ -12,6 +12,7 @@ export type TextFieldState = {
   setText?: (text: string) => void // callback when the user changes the value
   placeholder: string // the placeholder text of the input (usually in gray)
   modeID?: MODE // the mode of the input field
+  questionMode?: MODE // the mode of the question
   feedback?: string // immediate feedback on the value of this field
   first?: boolean // true if this is the first input field in the form
 }

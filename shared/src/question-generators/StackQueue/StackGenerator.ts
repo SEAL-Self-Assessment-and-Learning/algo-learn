@@ -23,6 +23,9 @@ const translations: Translations = {
     checkFormatJSON: "Error! It has to be passed a valid JSON type",
     dynamic: "dynamic",
     notDynamic: "non dynamic",
+    amountElementsExplanation:
+      "> **amountElements()** returns the current number of elements in the stack.",
+    getSizeExplanation: "> **getSize()** returns the current size of the stack.",
     stackEmpty: "Currently the stack is empty.",
     stackContainsValues: `The stack currently contains the following elements:`,
     multipleChoiceText:
@@ -32,7 +35,7 @@ const translations: Translations = {
     freeTextInput:
       `Consider having a **{{0}} Stack "{{1}}"**, which can store at most` +
       " ${{2}}$ " +
-      `elements. {{3}} **We perform the following operations:** {{4}}`,
+      `elements. {{3}} **We perform the following operations:** {{4}} \n{{5}} \n{{6}}`,
   },
   de: {
     name: "Implementierung eines Stacks mit einem Array",
@@ -44,6 +47,9 @@ const translations: Translations = {
     checkFormatJSON: "Error! It has to be passed a valid JSON type.",
     dynamic: "dynamisch",
     notDynamic: "nicht dynamisch",
+    amountElementsExplanation:
+      "> **amountElements()** gibt die aktuelle Anzahl der Elemente im Stack zurück.",
+    getSizeExplanation: "> **getSize()** gibt die aktuelle Größe des Stacks zurück.",
     stackEmpty: "Der Stack ist aktuell leer.",
     stackContainsValues: `Der Stack enthält aktuell folgende Elemente:`,
     multipleChoiceText:
@@ -54,7 +60,18 @@ const translations: Translations = {
     freeTextInput:
       `Angenommen du hast einen **{{0}} Stack "{{1}}"**, welcher maximal` +
       " ${{2}}$ " +
-      `Elemente speichern kann. {{3}} **Wir führen nun folgende Operationen aus:** {{4}}`,
+      `Elemente speichern kann. {{3}} **Wir führen nun folgende Operationen aus:** {{4}} \n{{5}} \n{{6}}`,
+  },
+}
+
+const wordTranslations: Translations = {
+  en: {
+    value: "Value",
+    result: "Return value",
+  },
+  de: {
+    value: "Wert",
+    result: "Rückgabewert",
   },
 }
 
@@ -707,7 +724,7 @@ export const stackQuestion: QuestionGenerator = {
       for (let i = 0; i < stackElementsAmount; i++) {
         stackElementsValues.push(random.int(1, 20))
       }
-      stackElementsString += "\n\n| Index | Value |\n| --- | --- |"
+      stackElementsString += `\n\n| Index | ${t(wordTranslations, lang, "value")} |\n| --- | --- |`
       for (let i = 0; i < stackElementsAmount; i++) {
         stackElementsString += `\n| ${i} | ${stackElementsValues[i]} |`
       }
@@ -851,9 +868,8 @@ export const stackQuestion: QuestionGenerator = {
         for (const key in resultMap) {
           const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
           if (correctAnswers[key + "-format"] === "toString") {
-            resultMap[key] = parseArrayString(resultMap[key])
             correctAnswers[key] = parseArrayString(correctAnswers[key])
-            const userArray = resultMap[key].split(",")
+            const userArray = parseArrayString(resultMap[key]).split(",")
             const resultArray = correctAnswers[key].split(",")
             if (Object.keys(userArray).length !== Object.keys(resultArray).length) {
               foundError = true
@@ -900,7 +916,7 @@ export const stackQuestion: QuestionGenerator = {
       const stack = generatedOperations.stack
 
       // Example inputfield {{test#NL#**Char: **##overlay}}
-      let inputText = "\n| Operation | Result |\n| --- | --- |\n"
+      let inputText = `\n| Operation | ${t(wordTranslations, lang, "result")} |\n| --- | --- |\n`
       const solutionDisplay: string[] = []
       let solutionIndex = 0
       const correctAnswers: { [key: string]: string } = {}
@@ -925,9 +941,9 @@ export const stackQuestion: QuestionGenerator = {
             inputText += `|${stackName}.amountElements()|{{input-${index}#TL###overlay}}|\n`
             solutionIndex++
             correctAnswers[`input-${index}`] = operation.amount
-            correctAnswers[`input-${index}-format`] = "getCurrentPosition"
+            correctAnswers[`input-${index}-format`] = "amountElements"
             solutionDisplay.push(
-              `|${solutionIndex}|${stackName}.getCurrentPosition() | ${operation.amount} |\n`,
+              `|${solutionIndex}|${stackName}.amountElements() | ${operation.amount} |\n`,
             )
           }
         }
@@ -959,6 +975,8 @@ export const stackQuestion: QuestionGenerator = {
           stackSize.toString(),
           stackElementsString,
           inputText,
+          t(translations, lang, "amountElementsExplanation"),
+          t(translations, lang, "getSizeExplanation"),
         ]),
         checkFormat,
         feedback,
