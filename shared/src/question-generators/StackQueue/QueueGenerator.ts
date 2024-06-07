@@ -40,7 +40,7 @@ const translations: Translations = {
     `,
   },
   de: {
-    name: "Implementierung einer Queue mit einem Array",
+    name: "Queue-Implementierung mit einem Array",
     description: "Korrekt die Queue-Operationen anwenden",
     solutionFreetext: `|Index|Frage|Lösung|\n{{0}}`,
     performOperations: `**Wir führen nun folgende Operationen aus:**{{0}}`,

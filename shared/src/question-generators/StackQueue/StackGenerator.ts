@@ -38,7 +38,7 @@ const translations: Translations = {
       `elements. {{3}} **We perform the following operations:** {{4}} \n{{5}} \n{{6}}`,
   },
   de: {
-    name: "Implementierung eines Stacks mit einem Array",
+    name: "Stack-Implementierung mit einem Array",
     description: "Korrekte Verwendung von Stack-Operationen",
     solutionFreetext: "|Index|Frage|Lösung|\n{{0}}",
     performOperations: `**Wir führen nun folgende Operationen aus:**{{0}}`,
