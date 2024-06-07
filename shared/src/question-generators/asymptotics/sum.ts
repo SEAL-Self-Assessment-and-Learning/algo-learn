@@ -28,6 +28,7 @@ const translations: Translations = {
  * @returns Output
  */
 export const SimplifySum: QuestionGenerator = {
+  id: "asum",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],

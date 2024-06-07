@@ -56,11 +56,13 @@ export interface BasicMultipleChoiceQuestion {
  * Given a name function and a set of BasicMultipleChoiceQuestions,
  * the function returns a QuestionGenerator for the set of questions.
  *
+ * @param id Unique and stable id of the question generator
  * @param name The title of the question
  * @param questions The questions to ask
  * @returns The question as a QuestionGenerator object
  */
 export function basicMultipleChoiceMetaGenerator(
+  id: string,
   name: (lang: Language) => string,
   questions: BasicMultipleChoiceQuestion[],
   description?: (lang: Language) => string,
@@ -151,6 +153,7 @@ export function basicMultipleChoiceMetaGenerator(
   }
 
   const generator: QuestionGenerator = {
+    id,
     name,
     description,
     languages,

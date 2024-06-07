@@ -52,6 +52,7 @@ const translations: Translations = {
 }
 
 export const RecurrenceMaster: QuestionGenerator = {
+  id: "master",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],

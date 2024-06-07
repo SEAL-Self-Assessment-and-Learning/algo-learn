@@ -254,6 +254,7 @@ function convertDictToMdTable(wordArray: { [key: string]: any }, extraFeature: s
 }
 
 export const huffmanCoding: QuestionGenerator = {
+  id: "huffman",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],

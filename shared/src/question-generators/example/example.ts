@@ -41,6 +41,7 @@ function generateWrongAnswers(random: Random, correctAnswer: number): Array<stri
  * This question generator generates a simple multiple choice question.
  */
 export const ExampleQuestion: QuestionGenerator = {
+  id: "example",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["calculus", "sum"],

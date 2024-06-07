@@ -2,6 +2,25 @@ import { describe, expect, test } from "vitest"
 import { allParameterCombinations } from "../../shared/src/api/Parameters"
 import { allQuestionGeneratorRoutes } from "./listOfQuestions"
 
+describe(`IDs of question generators`, () => {
+  const ids = new Set<string>()
+  for (const { path, generator } of allQuestionGeneratorRoutes) {
+    test(`id of ${path} is non-empty`, () => {
+      expect(generator.id.length).toBeTruthy()
+      expect(generator.id.length).toBeGreaterThan(0)
+    })
+    test(`id of ${path} contains only lower case letters`, () => {
+      expect(generator.id).toMatch(/^[a-z]+$/)
+    })
+    test(`id of ${path} has length at most 10`, () => {
+      expect(generator.id.length).toBeLessThanOrEqual(10)
+    })
+    ids.add(generator.id)
+  }
+  test("All IDs are unique", () => {
+    expect(ids.size).toBe(allQuestionGeneratorRoutes.length)
+  })
+})
 for (const { path, generator } of allQuestionGeneratorRoutes) {
   describe(`Sanity-checks for question generator "${path}"`, () => {
     test("Meta-data is present", () => {

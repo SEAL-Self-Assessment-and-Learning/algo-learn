@@ -195,6 +195,9 @@ export type FreeTextFormatFunction = (
  * example MultipleChoiceQuestion, etc.
  */
 export interface QuestionGenerator {
+  /** Unique and stable identifier of the question generator. */
+  id: string
+
   /** List of supported languages. */
   languages: Language[]
 

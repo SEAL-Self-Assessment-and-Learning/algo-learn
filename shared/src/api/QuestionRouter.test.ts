@@ -3,6 +3,7 @@ import { QuestionGenerator } from "./QuestionGenerator"
 import { deserializePath, isSubPath, QuestionRoutes, serializeGeneratorCall } from "./QuestionRouter"
 
 const testQuestion: QuestionGenerator = {
+  id: "test",
   name: () => "Test Question",
   languages: ["en", "de"],
   expectedParameters: [

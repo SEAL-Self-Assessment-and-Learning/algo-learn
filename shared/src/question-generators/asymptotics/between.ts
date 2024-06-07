@@ -46,6 +46,7 @@ const translation: Translations = {
 
 /** Generate and render a question about O/Omega/o/omega */
 export const Between: QuestionGenerator = {
+  id: "between",
   name: tFunctional(translation, "name"),
   description: tFunctional(translation, "description"),
   languages: ["en", "de"],

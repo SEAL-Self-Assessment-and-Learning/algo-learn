@@ -40,6 +40,7 @@ const translations: Translations = {
  * @returns Output
  */
 export const SortTerms: QuestionGenerator = {
+  id: "asort",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],

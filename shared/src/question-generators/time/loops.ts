@@ -34,6 +34,7 @@ const translations: Translations = {
 }
 
 export const Loops: QuestionGenerator = {
+  id: "loops",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],

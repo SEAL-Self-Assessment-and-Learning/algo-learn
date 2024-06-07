@@ -42,6 +42,7 @@ const translations: Translations = {
 }
 
 export const RecursionFormula: QuestionGenerator = {
+  id: "recurrence",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
