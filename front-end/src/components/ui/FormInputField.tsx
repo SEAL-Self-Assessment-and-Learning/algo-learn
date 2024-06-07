@@ -1,29 +1,27 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Markdown } from "@/components/Markdown.tsx"
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/input.tsx"
 import { useFormContext } from "@/hooks/useFormContext.ts"
-import { useTranslation } from "../hooks/useTranslation"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
-export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) => {
-  const useInputContext = useFormContext()
+export const FormInputField: React.FC<{ id: string }> = ({ id }: { id: string }) => {
+  const formContext = useFormContext()
 
   const inputSplit = id.split("#")
   const inputID = inputSplit[0]
 
-  // case over -> overlay | below -> no overlay, move other stuff down
-
   const {
     feedbackVariation,
-    first,
+    focus,
     feedback,
     align,
     placeholder,
     prompt,
-    modeID,
-    questionMode,
+    invalid,
+    disabled,
     setText,
     text,
-  } = useInputContext[inputID]
+  } = formContext[inputID]
 
   // To select the first created input field on the site
   const firstInputRef = useRef<HTMLInputElement | null>(null)
@@ -33,9 +31,7 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
     }
   }, [inputID])
 
-  const inputBorderColor = modeID === "invalid" ? "border-red-500 focus:border-red-500" : ""
-
-  const alignDiv: string = "w-full h-full"
+  const inputBorderColor = invalid ? "border-red-500 focus:border-red-500" : ""
 
   let promptElement
   if (prompt) {
@@ -57,12 +53,12 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
         <div className="flex flex-col">
           <div className="flex flex-row items-center">
             <div className="mr-2">{promptElement}</div>
-            <div className={`${alignDiv} relative`}>
+            <div className={`relative h-full w-full`}>
               <Input
-                ref={first ? firstInputRef : null}
+                ref={focus ? firstInputRef : null}
                 key={`newline-input-${inputID}`}
                 autoFocus
-                disabled={questionMode === "correct" || questionMode === "incorrect"}
+                disabled={disabled}
                 value={text || ""}
                 onChange={(e) => {
                   setText ? setText(e.target.value) : ""
@@ -75,7 +71,7 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
           </div>
           <FeedbackComponent
             formatFeedback={feedback ? feedback : ""}
-            mode={modeID ? modeID : "draft"}
+            invalid={invalid}
             type={"below"}
           />
         </div>
@@ -88,12 +84,12 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
         {spacing}
         <div className="flex flex-row items-center">
           <div className="mr-2">{promptElement}</div>
-          <div className={`${alignDiv} relative`}>
+          <div className={`relative h-full w-full`}>
             <Input
-              ref={first ? firstInputRef : null}
+              ref={focus ? firstInputRef : null}
               key={`newline-input-${inputID}`}
               autoFocus
-              disabled={questionMode === "correct" || questionMode === "incorrect"}
+              disabled={disabled}
               value={text || ""}
               onChange={(e) => {
                 setText ? setText(e.target.value) : ""
@@ -104,10 +100,10 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
               className={`${inputBorderColor} mb-1 w-full focus:outline-none`}
               placeholder={placeholder || ""}
             />
-            {isInputFocused && text && feedback && (
+            {isInputFocused && feedback && (
               <FeedbackComponent
                 formatFeedback={feedback ? feedback : ""}
-                mode={modeID ? modeID : "draft"}
+                invalid={invalid}
                 type={"overlay"}
               />
             )}
@@ -118,17 +114,17 @@ export const CustomInput: React.FC<{ id: string }> = ({ id }: { id: string }) =>
     )
   }
 
-  return <>{inputElement}</>
+  return inputElement
 }
 
 const FeedbackComponent = ({
   formatFeedback,
-  mode,
+  invalid,
   type,
 }: {
   formatFeedback: string
-  mode: string
-  type: "overlay" | "below" // overlay means shown below the input field over other components
+  invalid: boolean
+  type: "overlay" | "below" // overlay means: feedback shown below the input field over other components
 }) => {
   const { t } = useTranslation()
 
@@ -136,7 +132,7 @@ const FeedbackComponent = ({
   let className
   if (type === "below") {
     feedbackBackgroundColor = formatFeedback
-      ? mode === "draft"
+      ? !invalid
         ? "border-l-4 border-green-400"
         : "border-l-4 border-red-400"
       : "border-l-4 border-blue-400"
@@ -148,7 +144,7 @@ const FeedbackComponent = ({
       </div>
     )
   } else {
-    feedbackBackgroundColor = formatFeedback ? (mode === "draft" ? "bg-green-400" : "bg-red-400") : ""
+    feedbackBackgroundColor = formatFeedback ? (!invalid ? "bg-green-400" : "bg-red-400") : ""
     className = `absolute left-0 top-full z-10 ${feedbackBackgroundColor} border border-gray-300 dark:border-gray-700 shadow-md p-2 mt-1 rounded-md`
     // remove text-left to make the feedback align center
     return (
@@ -156,7 +152,3 @@ const FeedbackComponent = ({
     )
   }
 }
-
-/*
-"We will provide feedback to the format of your answer"
-*/

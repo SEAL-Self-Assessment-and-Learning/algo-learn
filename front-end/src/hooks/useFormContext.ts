@@ -1,5 +1,4 @@
 import { createContext, useContext } from "react"
-import { MODE } from "@/components/InteractWithQuestion.tsx"
 
 /**
  * TextFieldState is the state of a single text input field.
@@ -11,10 +10,10 @@ export type TextFieldState = {
   feedbackVariation: string // the feedback variation of the input field
   setText?: (text: string) => void // callback when the user changes the value
   placeholder: string // the placeholder text of the input (usually in gray)
-  modeID?: MODE // the mode of the input field
-  questionMode?: MODE // the mode of the question
+  invalid: boolean // the mode of the input field
+  disabled?: boolean // the mode of the question
   feedback?: string // immediate feedback on the value of this field
-  first?: boolean // true if this is the first input field in the form
+  focus?: boolean // true if this is the first input field in the form
 }
 
 /**

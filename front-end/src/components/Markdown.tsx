@@ -3,9 +3,9 @@ import { Link } from "react-router-dom"
 import SyntaxHighlighter from "react-syntax-highlighter"
 import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
-import { CustomInput } from "@/components/CustomInput.tsx"
 import { DrawList } from "@/components/DrawList.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
+import { FormInputField } from "@/components/ui/FormInputField.tsx"
 import { useTheme } from "../hooks/useTheme"
 import { Format } from "./Format"
 import TeX from "./TeX"
@@ -122,7 +122,7 @@ export const MarkdownTreeNode: FunctionComponent<{
     )
   }
   if (parseTreeNode.kind === "input") {
-    return <CustomInput id={parseTreeNode.child} />
+    return <FormInputField id={parseTreeNode.child} />
   }
 
   // will never be reached:

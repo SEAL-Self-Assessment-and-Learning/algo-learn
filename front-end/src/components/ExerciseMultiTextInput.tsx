@@ -145,10 +145,10 @@ export function ExerciseMultiTextInput({
       feedbackVariation: fieldValues.inputFeedbackVariations[i],
       setText: (text: string) => setText(fieldValues.inputIds[i], text),
       placeholder: fieldValues.inputPlaceholders[i],
-      modeID: state.modeID[fieldValues.inputIds[i]],
-      questionMode: mode,
+      invalid: state.modeID[fieldValues.inputIds[i]] === "invalid",
+      disabled: mode === "correct" || mode === "incorrect",
       feedback: state.formatFeedback[fieldValues.inputIds[i]],
-      first: i === 0,
+      focus: i === 0,
     }
   }
 
