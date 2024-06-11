@@ -148,7 +148,7 @@ function QuestionGeneratorCard({
             const params = serializeParameters(parameters, generator.expectedParameters)
             if (!params) return null
             return (
-              <Link key={path} to={path} className={badgeVariants({ variant: "secondary" })}>
+              <Link key={path} to={`/${path}`} className={badgeVariants({ variant: "secondary" })}>
                 {" "}
                 {params}
               </Link>
