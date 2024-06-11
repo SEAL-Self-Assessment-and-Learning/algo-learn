@@ -26,9 +26,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["front-end/src/*"],
-      "@shared/*": ["shared/src/*"]
+      "@shared/*": ["shared/src/*"],
+      "@settings/*": ["settings/*"]
     }
   },
-  "include": ["shared/src", "front-end/src"],
+  "include": ["shared/src", "front-end/src", "settings"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

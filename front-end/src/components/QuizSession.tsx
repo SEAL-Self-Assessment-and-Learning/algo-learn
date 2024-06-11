@@ -7,7 +7,7 @@ import Random, { sampleRandomSeed } from "@shared/utils/random"
 import { Button } from "@/components/ui/button"
 import { generatorsById } from "@/listOfQuestions"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
-import { sortByStrength, useSkills } from "../hooks/useSkills"
+import { sortByStrength, useLearningAnalytics } from "../hooks/useLearningAnalytics"
 import { useTranslation } from "../hooks/useTranslation"
 import { ViewSingleQuestion } from "../routes/ViewSingleQuestion"
 import { ScreenCenteredDiv } from "./CenteredDivs"
@@ -116,7 +116,7 @@ export function QuizSession({
   targetNum?: number
   mode: "practice" | "exam"
 }): ReactElement {
-  const { featureMap: fM, appendLogEntry } = useSkills()
+  const { featureMap: fM, appendLogEntry } = useLearningAnalytics()
   const [{ sessionSeed, featureMap }] = useState({
     sessionSeed: sampleRandomSeed(),
     featureMap: fM, // store in state to prevent re-rendering

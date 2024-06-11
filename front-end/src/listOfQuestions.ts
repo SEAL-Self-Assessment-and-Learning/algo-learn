@@ -1,5 +1,5 @@
+import { collection } from "@settings/questionsSelection"
 import { QuestionGenerator } from "@shared/api/QuestionGenerator"
-import { collection } from "../../settings/questionsSelection"
 
 export { collection }
 
