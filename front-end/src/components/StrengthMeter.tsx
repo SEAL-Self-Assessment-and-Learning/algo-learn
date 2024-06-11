@@ -1,5 +1,7 @@
 import { CircularProgressbarWithChildren } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
+import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa"
+import { min } from "@shared/utils/math"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useTranslation } from "../hooks/useTranslation"
 
@@ -32,21 +34,26 @@ export function StrengthMeterCircular({ strength }: { strength: number }) {
  */
 export function StrengthMeter({
   strength,
-  steps = 4,
-  tooltip,
+  steps = 3,
+  children,
 }: {
   strength: number
   steps?: number
-  tooltip?: string
+  children?: React.ReactNode
 }) {
-  const strengthRounded = strength < 0.01 ? 0 : Math.ceil(strength * steps)
+  let strengthRounded = Math.round(strength * steps)
+  if (strength < 0.05) strengthRounded = 0
+  if (strength > 0.95) strengthRounded = steps
+  if (strength <= 0.95) strengthRounded = min(strengthRounded, steps - 1)
   const bar = <ProgressBar done={strengthRounded} total={steps} />
-  if (tooltip) {
+  if (children) {
     return (
-      <Tooltip placement="right">
-        <TooltipTrigger>{bar}</TooltipTrigger>
-        <TooltipContent>{tooltip}</TooltipContent>
-      </Tooltip>
+      <div>
+        <Tooltip placement="right">
+          <TooltipTrigger>{bar}</TooltipTrigger>
+          <TooltipContent>{children}</TooltipContent>
+        </Tooltip>
+      </div>
     )
   } else {
     return bar
@@ -63,17 +70,12 @@ export function ProgressBar({
   total?: number
 }) {
   total ??= done + doing
-  const doneDiv = <div className={`inline-block h-4 w-4 bg-green-500`}></div>
-  const doingDiv = <div className={`inline-block h-4 w-4 bg-orange-500`}></div>
-  const restDiv = <div className={`inline-block h-4 w-4 bg-slate-500`}></div>
-  let bar = <></>
+  const doneDiv = <FaStar />
+  const doingDiv = <FaStarHalfAlt />
+  const restDiv = <FaRegStar />
+  const bar = []
   for (let i = 0; i < total; i++) {
-    bar = (
-      <>
-        {bar}
-        {i < done ? doneDiv : i < done + doing ? doingDiv : restDiv}
-      </>
-    )
+    bar.push(<>{i < done ? doneDiv : i < done + doing ? doingDiv : restDiv}</>)
   }
-  return <div className="flex h-4 gap-2 text-left">{bar}</div>
+  return <div className="flex">{bar}</div>
 }

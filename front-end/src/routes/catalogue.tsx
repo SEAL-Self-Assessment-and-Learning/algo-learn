@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 import { allParameterCombinations, serializeParameters } from "@shared/api/Parameters"
 import { QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { StrengthMeter } from "@/components/StrengthMeter"
 import { badgeVariants } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,6 +18,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { useHistoryState } from "@/hooks/useHistoryState"
+import { useLearningAnalytics } from "@/hooks/useLearningAnalytics"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "../hooks/useTranslation"
 import { collection } from "../listOfQuestions"
@@ -128,33 +130,41 @@ function QuestionGeneratorCard({
   className?: string
 }) {
   const { t, lang } = useTranslation()
+  const { summaryStrength } = useLearningAnalytics()
   return (
-    <Card className={cn("border-4", className)}>
-      <CardHeader className="m-0 p-3">
-        <CardTitle className="text-base">{generator.name(lang)}</CardTitle>
-        {showDescription && generator.description && (
-          <CardDescription>{generator.description(lang)}</CardDescription>
-        )}
-      </CardHeader>
-      <CardFooter className="m-0 flex flex-wrap items-center gap-2 p-3">
-        <Button asChild variant="secondary" size="sm">
-          <Link to={`/${lang}/practice/${generator.id}`}>
-            {t("Catalogue.practice")} <ChevronRight className="ml-1 h-4 w-4" />
-          </Link>
-        </Button>
-        {showAllVariants &&
-          allParameterCombinations(generator.expectedParameters).map((parameters) => {
-            const path = serializeGeneratorCall({ lang, generator, parameters })
-            const params = serializeParameters(parameters, generator.expectedParameters)
-            if (!params) return null
-            return (
-              <Link key={path} to={`/${path}`} className={badgeVariants({ variant: "secondary" })}>
-                {" "}
-                {params}
-              </Link>
-            )
-          })}
-      </CardFooter>
+    <Card className={cn("flex border-4 ", className)}>
+      <div className="flex-1">
+        <CardHeader className="m-0 p-3">
+          <CardTitle className="text-base">{generator.name(lang)}</CardTitle>
+          {showDescription && generator.description && (
+            <CardDescription>{generator.description(lang)}</CardDescription>
+          )}
+        </CardHeader>
+        <CardFooter className="m-0 flex flex-wrap items-center gap-2 p-3">
+          <Button asChild variant="secondary" size="sm">
+            <Link to={`/${lang}/practice/${generator.id}`}>
+              {t("Catalogue.practice")} <ChevronRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
+          {showAllVariants &&
+            allParameterCombinations(generator.expectedParameters).map((parameters) => {
+              const path = serializeGeneratorCall({ lang, generator, parameters })
+              const params = serializeParameters(parameters, generator.expectedParameters)
+              if (!params) return null
+              return (
+                <Link key={path} to={`/${path}`} className={badgeVariants({ variant: "secondary" })}>
+                  {" "}
+                  {params}
+                </Link>
+              )
+            })}
+        </CardFooter>
+      </div>
+      <div className="flex p-3 text-primary">
+        <StrengthMeter strength={summaryStrength[generator.id]}>
+          {t("learningProgress")}: <b>{Math.round(100 * summaryStrength[generator.id])}%</b>
+        </StrengthMeter>
+      </div>
     </Card>
   )
 }

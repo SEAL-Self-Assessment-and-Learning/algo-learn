@@ -11,16 +11,11 @@ import { LogEntryV2, useLearningLog } from "./useLearningLog"
 /** Return the progress of the user */
 export function useLearningAnalytics() {
   const { log, ...logRest } = useLearningLog()
-
-  /* Compute the basic features of each skill (e.g., how often pass/fail?) */
   const basicFeatureMap = useMemo(() => accumulateLearningLog(log), [log])
-
-  /* Compute the strength of each skill (number between 0 and 1) */
   const featureMap = useMemo(() => computeFeatureMap(basicFeatureMap), [basicFeatureMap])
-
   const unlockedSkills = useMemo(() => computeUnlockedSkills(featureMap), [featureMap])
-
-  return { featureMap, unlockedSkills, log, ...logRest }
+  const summaryStrength = useMemo(() => summaryStrengthOfGenerators(featureMap), [featureMap])
+  return { featureMap, summaryStrength, unlockedSkills, log, ...logRest }
 }
 
 /**
@@ -32,16 +27,17 @@ export function useLearningAnalytics() {
 function accumulateLearningLog(log: Array<LogEntryV2>) {
   const featureMap: Record<string, BasicSkillFeatures> = {}
   for (const e of log) {
-    if (!(e.path in featureMap)) {
-      featureMap[e.path] = {
+    const path = e.path.split("/").slice(0, -1).join("/")
+    if (!(path in featureMap)) {
+      featureMap[path] = {
         numPassed: 0,
         numFailed: 0,
         lag: Infinity,
       }
     }
-    if (e.result === "pass") featureMap[e.path].numPassed += 1
-    else featureMap[e.path].numFailed += 1
-    featureMap[e.path].lag = min(featureMap[e.path].lag, (Date.now() - e.timestamp) / 3600 / 24 / 1000)
+    if (e.result === "pass") featureMap[path].numPassed += 1
+    else featureMap[path].numFailed += 1
+    featureMap[path].lag = min(featureMap[path].lag, (Date.now() - e.timestamp) / 3600 / 24 / 1000)
   }
   return featureMap
 }
@@ -61,6 +57,26 @@ function computeFeatureMap(basicFeatureMap: Record<string, BasicSkillFeatures>) 
 }
 
 /**
+ * Computes the summary strength for each question generator in the collection
+ *
+ * @param featureMap The feature vector
+ * @returns The average strength of all variants for each question generator
+ */
+function summaryStrengthOfGenerators(featureMap: Record<string, SkillFeaturesAndPredictions>) {
+  const rec: Record<string, number> = {}
+  for (const generator of collection.flatMap((x) => x.contents)) {
+    rec[generator.id] = averageStrengthOfSet(
+      featureMap,
+      allParameterCombinations(generator.expectedParameters).map((parameters) => ({
+        generator,
+        parameters,
+      })),
+    )
+  }
+  return rec
+}
+
+/**
  * Given a strengthMap and a path, compute the average strength of all question
  * variants that exist within that path.
  *
@@ -69,18 +85,18 @@ function computeFeatureMap(basicFeatureMap: Record<string, BasicSkillFeatures>) 
  *   average over
  * @returns The average strength of all variants in the set
  */
-// export function averageStrength(
-//   strengthMap: Record<string, { p: number; h: number }>,
-//   set: Array<{ generator: QuestionGenerator; parameters: Parameters }>,
-// ) {
-//   if (set.length === 0) return 0
+export function averageStrengthOfSet(
+  strengthMap: Record<string, { p: number; h: number }>,
+  set: Array<{ generator: QuestionGenerator; parameters: Parameters }>,
+) {
+  if (set.length === 0) return 0
 
-//   let avg = 0
-//   for (const { generator, parameters } of set) {
-//     avg += strengthMap[serializeGeneratorCall({ generator, parameters })].p
-//   }
-//   return avg / set.length
-// }
+  let avg = 0
+  for (const { generator, parameters } of set) {
+    avg += strengthMap[serializeGeneratorCall({ generator, parameters })]?.p ?? 0
+  }
+  return avg / set.length
+}
 
 /**
  * Return a list of question variants sorted by strength from lowest to highest

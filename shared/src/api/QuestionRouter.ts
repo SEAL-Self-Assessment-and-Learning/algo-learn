@@ -52,41 +52,9 @@ export function serializeGeneratorCall({
 }
 
 /**
- * Checks whether the first path is a sub-path of the second path. The paths can
- * be given as path strings (e.g., "path/to/something") or as arrays of strings
- * (e.g., ["path", "to", "something"]).
- *
- * @param pathA The first path
- * @param pathB The second path
- * @returns Whether the first path is a sub-path of the second path
- */
-// export function isSubPath(pathA: string, pathB: string): boolean
-// export function isSubPath(partsA: string[], partsB: string[]): boolean
-// export function isSubPath(a: string | string[], b: string | string[]): boolean {
-//   if (typeof a === "string") a = a.split("/")
-//   if (typeof b === "string") b = b.split("/")
-//   a = a.filter((part) => part !== "")
-//   b = b.filter((part) => part !== "")
-//   if (a.length > b.length) return false
-//   for (let i = 0; i < a.length; i++) {
-//     if (a[i] !== b[i]) return false
-//   }
-//   return true
-// }
-
-/**
  * Deserializes a generator and parameters from a URL path.
  *
- * @example
- *   deserializePath(routes, "de/arithmetic/addition/2/myFancySeed")
- *   // => {
- *   //   lang: "de",
- *   //   generator: ArithmeticAdditionQuestionGenerator,
- *   //   parameters: { difficulty: 2 },
- *   //   seed: "myFancySeed",
- *   // }
- *
- * @param routes The routes to all available question generators
+ * @param collection A given QuestionCollection
  * @param path The URL path
  * @param expectLang Whether the first segment in the path indicated the
  *   language (optional; if undefined, we will attempt to detect this
@@ -138,10 +106,5 @@ export function deserializePath({
       ? rest.at(-1)
       : undefined
 
-  return {
-    lang,
-    generator,
-    parameters,
-    seed,
-  }
+  return { lang, generator, parameters, seed }
 }
