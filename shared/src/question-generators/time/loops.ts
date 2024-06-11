@@ -45,7 +45,7 @@ export const Loops: QuestionGenerator = {
       allowedValues: ["simpleExact"],
     },
   ],
-  generate(generatorPath, lang, parameters, seed) {
+  generate(lang, parameters, seed) {
     const { t } = tFunction(translations, lang)
 
     if (!validateParameters(parameters, Loops.expectedParameters)) {
@@ -60,7 +60,6 @@ export const Loops: QuestionGenerator = {
       lang,
       parameters,
       seed,
-      generatorPath,
     })
 
     const random = new Random(seed)

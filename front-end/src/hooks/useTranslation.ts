@@ -1,7 +1,5 @@
 import { useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import deQuestionGroupJSON from "../../../settings/question-group-locales/de.json"
-import enQuestionGroupJSON from "../../../settings/question-group-locales/en.json"
 import { Language } from "../../../shared/src/api/Language"
 import { tFunction, Translations } from "../../../shared/src/utils/translations"
 import deJSON from "../locales/de.json"
@@ -15,8 +13,8 @@ export const NATIVE_NAME: Readonly<Record<Language, string>> = {
 }
 
 const globalTranslations: Translations = {
-  en: { ...enJSON, ...enQuestionGroupJSON },
-  de: { ...deJSON, ...deQuestionGroupJSON },
+  en: { ...enJSON },
+  de: { ...deJSON },
 }
 
 /**

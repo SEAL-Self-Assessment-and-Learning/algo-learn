@@ -17,7 +17,6 @@ describe("ExampleQuestion - Correctness", () => {
   for (let i = 1; i <= 10; i++) {
     test(`${i}. random example question`, () => {
       const { question: q, testing: t } = ExampleQuestion.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {}, // generator does not support parameters
         sampleRandomSeed(),
@@ -48,7 +47,6 @@ describe("ExampleQuestion - Reproducible", () => {
   const seed = sampleRandomSeed()
   // generate question the first time
   const { question: q1, testing: t1 } = ExampleQuestion.generate(
-    "", // path not relevant here
     "en", // language not relevant
     {}, // generator does not support parameters
     seed, // the random seed
@@ -56,7 +54,6 @@ describe("ExampleQuestion - Reproducible", () => {
 
   // generate question a second time with the same seed (just different language)
   const { question: q2, testing: t2 } = ExampleQuestion.generate(
-    "", // path not relevant here
     "de", // language not relevant
     {}, // generator does not support parameters
     seed, // the random seed

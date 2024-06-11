@@ -20,7 +20,7 @@ export function TestSimpleMC() {
   const [{ question }, setQuestion] = useState<{ question?: Question }>({})
 
   if (!question) {
-    void Promise.resolve(ExampleQuestion.generate("example/example", lang, {}, seed)).then(setQuestion)
+    void Promise.resolve(ExampleQuestion.generate(lang, {}, seed)).then(setQuestion)
     return <></>
   }
   return (

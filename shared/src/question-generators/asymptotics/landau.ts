@@ -37,7 +37,7 @@ export const LandauNotation: QuestionGenerator = {
     // },
   ],
   languages: ["en", "de"],
-  generate: (generatorPath, lang, parameters, seed) => {
+  generate: (lang, parameters, seed) => {
     const random = new Random(seed)
     const { t } = tFunction(translations, lang)
 
@@ -83,7 +83,6 @@ export const LandauNotation: QuestionGenerator = {
         lang,
         parameters,
         seed,
-        generatorPath,
       }),
       name: t("name"),
       text: t("text"),

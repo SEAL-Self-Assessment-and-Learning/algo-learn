@@ -195,7 +195,11 @@ export type FreeTextFormatFunction = (
  * example MultipleChoiceQuestion, etc.
  */
 export interface QuestionGenerator {
-  /** Unique and stable identifier of the question generator. */
+  /**
+   * Unique and stable identifier of the question generator.
+   * The id may be used as part of URI paths, should only
+   * contain lowercase letters, and at most ten characters.
+   */
   id: string
 
   /** List of supported languages. */
@@ -238,7 +242,6 @@ export interface QuestionGenerator {
    * as well as the feedback function for this question. The function must be
    * implemented by each QuestionGenerator object.
    *
-   * @param generatorPath The path the generator is available at (defined under settings/questionSelection.ts)
    * @param lang The language to use when generating the question
    * @param parameters The parameters to use when generating the question
    * @param seed The seed used to generate the question
@@ -247,7 +250,6 @@ export interface QuestionGenerator {
    *   provide unit tests.
    */
   generate: (
-    generatorPath: string,
     lang: Language,
     parameters: Parameters,
     seed: string,

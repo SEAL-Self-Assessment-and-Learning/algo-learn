@@ -57,7 +57,7 @@ export const Between: QuestionGenerator = {
       allowedValues: ["start", "log", "loglog", "nifty"],
     },
   ],
-  generate: (generatorPath, lang, parameters, seed) => {
+  generate: (lang, parameters, seed) => {
     const { t } = tFunction(translation, lang)
 
     if (!validateParameters(parameters, Between.expectedParameters)) {
@@ -216,7 +216,6 @@ ${t("feedback.expected")}: $${variable}$.`,
         lang,
         parameters,
         seed,
-        generatorPath,
       }),
       text,
       prompt,

@@ -1,17 +1,17 @@
 import { useMemo } from "react"
 import useLocalStorageState from "use-local-storage-state"
-import { Parameters } from "../../../shared/src/api/Parameters"
-import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
-import { deserializePath, serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
-import { min } from "../../../shared/src/utils/math"
-import Random from "../../../shared/src/utils/random"
-import { allQuestionGeneratorRoutes, generatorSetBelowPath } from "../listOfQuestions"
+import { allParameterCombinations, Parameters } from "@shared/api/Parameters"
+import { QuestionGenerator } from "@shared/api/QuestionGenerator"
+import { deserializePath, serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { min } from "@shared/utils/math"
+import Random from "@shared/utils/random"
+import { collection, oldpathToGenerator } from "../../../settings/questionsSelection"
 import {
   SkillFeatures as BasicSkillFeatures,
   computeStrength,
   SkillFeaturesAndPredictions as SkillFeatures,
   SkillFeaturesAndPredictions,
-} from "../utils/memoryModel.ts"
+} from "../utils/memoryModel"
 
 /** Old format for log entries */
 type LogEntryV0 = {
@@ -39,6 +39,13 @@ export type LogEntryV1 = {
 }
 
 /**
+ * V2 format for log entries is the same,
+ * but the path is now supposed to use the unique ID of the generator,
+ * so it is of the form "sum/pure/myseed" instead of "asymptotics/sum/pure/myseed".
+ */
+export type LogEntryV2 = LogEntryV1
+
+/**
  * Upgrade a log entry from V0 to V1
  *
  * @param e Log entry in V0 format
@@ -52,7 +59,23 @@ function upgradeV0ToV1(e: LogEntryV0): LogEntryV1 {
   }
 }
 
-function byDescendingTimestamp(a: LogEntryV1, b: LogEntryV1) {
+/**
+ * Upgrade a log entry from V0 to V1
+ *
+ * @param e Log entry in V1 format
+ * @returns Log entry in V2 format
+ */
+function upgradeV1ToV2(e: LogEntryV1): LogEntryV2 | undefined {
+  const { path, result, timestamp } = e
+  const [skill, question, ...rest] = path.split("/")
+  const tmp = skill + "/" + question
+  if (tmp in oldpathToGenerator) {
+    const id = oldpathToGenerator[tmp as keyof typeof oldpathToGenerator].id
+    return { path: [id, ...rest].join("/"), result, timestamp }
+  }
+}
+
+function byDescendingTimestamp(a: LogEntryV2, b: LogEntryV2) {
   return b.timestamp - a.timestamp
 }
 
@@ -64,6 +87,10 @@ export function useLog() {
   })
   const [logV1, setLogV1] = useLocalStorageState<Array<LogEntryV1>>("log-v1", {
     defaultValue: [],
+    storageSync: false,
+  })
+  const [logV2, setLogV2] = useLocalStorageState<Array<LogEntryV2>>("log-v2", {
+    defaultValue: [],
     storageSync: true,
   })
 
@@ -73,11 +100,21 @@ export function useLog() {
     setLogV0([])
   }
 
-  const log: Array<LogEntryV1> = logV1.sort(byDescendingTimestamp)
+  if (logV1.length > 0) {
+    console.log("The log in storage will now be upgraded from v1 to v2...")
+    for (const x of logV1) {
+      const y = upgradeV1ToV2(x)
+      if (y !== undefined) logV2.push(y)
+    }
+    setLogV2(logV2.sort(byDescendingTimestamp))
+    setLogV1([])
+  }
+
+  const log: Array<LogEntryV2> = logV2.sort(byDescendingTimestamp)
   for (let i = 0; i < log.length; i++) {
-    if (logV1[i].timestamp !== log[i].timestamp) {
+    if (logV2[i].timestamp !== log[i].timestamp) {
       console.log("Warning: The log in storage was not sorted... fixing it!")
-      setLogV1(log)
+      setLogV2(log)
       break
     }
   }
@@ -87,7 +124,7 @@ export function useLog() {
       "Invariant failed: Each timestamp in the log must be unique!",
     )
   }
-  return { log, setLog: setLogV1 }
+  return { log, setLog: setLogV2 }
 }
 
 /** Return the progress of the user */
@@ -102,7 +139,7 @@ export function useSkills() {
 
   const unlockedSkills = useMemo(() => computeUnlockedSkills({ featureMap }), [featureMap])
 
-  function appendLogEntry(entry: LogEntryV1) {
+  function appendLogEntry(entry: LogEntryV2) {
     const newLog = log.slice()
     newLog.push(entry)
     setLog(newLog)
@@ -128,30 +165,30 @@ export function useSkills() {
  * @param props.log A user's full history
  * @returns The feature vector
  */
-function computeBasicFeatureMap({ log }: { log: Array<LogEntryV1> }): {
+function computeBasicFeatureMap({ log }: { log: Array<LogEntryV2> }): {
   [path: string]: BasicSkillFeatures
 } {
   const qualifyingPasses: { [path: string]: number } = {}
   const featureMap: { [path: string]: BasicSkillFeatures } = {}
-  for (const { generator, generatorPath, parameters } of generatorSetBelowPath("")) {
-    const path = serializeGeneratorCall({
-      generator,
-      parameters,
-      generatorPath,
-    })
-    qualifyingPasses[path] = 0
-    featureMap[path] = {
-      mastered: false,
-      numPassed: 0,
-      numFailed: 0,
-      lag: Infinity,
+  for (const generator of collection.flatMap((x) => x.contents)) {
+    for (const parameters of allParameterCombinations(generator.expectedParameters)) {
+      const path = serializeGeneratorCall({
+        generator,
+        parameters,
+      })
+      qualifyingPasses[path] = 0
+      featureMap[path] = {
+        mastered: false,
+        numPassed: 0,
+        numFailed: 0,
+        lag: Infinity,
+      }
     }
   }
 
   const now = Date.now()
   for (const e of log.slice().reverse()) {
     const generatorCall = deserializePath({
-      routes: allQuestionGeneratorRoutes,
       path: e.path,
     })
     if (generatorCall === undefined) {
@@ -160,11 +197,10 @@ function computeBasicFeatureMap({ log }: { log: Array<LogEntryV1> }): {
       // )
       continue
     }
-    const { generator, parameters, generatorPath } = generatorCall
+    const { generator, parameters } = generatorCall
     const path = serializeGeneratorCall({
       generator,
       parameters,
-      generatorPath,
     })
     featureMap[path].lag = min(featureMap[path].lag, (now - e.timestamp) / 3600 / 24 / 1000)
 
@@ -244,15 +280,14 @@ export function averageStrength({
   }
   set: Array<{
     generator: QuestionGenerator
-    generatorPath: string
     parameters: Parameters
   }>
 }): number {
   if (set.length === 0) return 0
 
   let avg = 0
-  for (const { generator, generatorPath, parameters } of set) {
-    avg += strengthMap[serializeGeneratorCall({ generator, parameters, generatorPath })].p
+  for (const { generator, parameters } of set) {
+    avg += strengthMap[serializeGeneratorCall({ generator, parameters })].p
   }
   return avg / set.length
 }
@@ -278,12 +313,10 @@ export function sortByStrength({
   }
   generatorCalls: Array<{
     generator: QuestionGenerator
-    generatorPath: string
     parameters: Parameters
   }>
 }): Array<{
   generator: QuestionGenerator
-  generatorPath: string
   parameters: Parameters
 }> {
   random?.shuffle(generatorCalls) // If random was provided, shuffle to break ties
@@ -314,13 +347,9 @@ export function computeUnlockedSkills({
 }): string[] {
   // for now, we assume all question generators are independent and all variants strictly build on each other.
   const unlockedPaths = []
-  for (const { path } of allQuestionGeneratorRoutes) {
-    for (const { generator, generatorPath, parameters } of generatorSetBelowPath(path)) {
-      const newPath = serializeGeneratorCall({
-        generator,
-        parameters,
-        generatorPath,
-      })
+  for (const generator of collection.flatMap((x) => x.contents)) {
+    for (const parameters of allParameterCombinations(generator.expectedParameters)) {
+      const newPath = serializeGeneratorCall({ generator, parameters })
       unlockedPaths.push(newPath)
       if (featureMap[newPath].p < thresholdStrength || !featureMap[newPath].mastered) break
     }

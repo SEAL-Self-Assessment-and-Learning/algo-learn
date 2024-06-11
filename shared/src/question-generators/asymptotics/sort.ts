@@ -51,7 +51,7 @@ export const SortTerms: QuestionGenerator = {
       allowedValues: ["start", "pure", "polylog", "polylogexp"],
     },
   ],
-  generate: (generatorPath, lang, parameters, seed) => {
+  generate: (lang, parameters, seed) => {
     const { t } = tFunction(translations, lang)
 
     if (!validateParameters(parameters, SortTerms.expectedParameters)) {
@@ -99,7 +99,6 @@ export const SortTerms: QuestionGenerator = {
         lang,
         parameters,
         seed,
-        generatorPath,
       }),
       text: t("text"),
       answers: answers.map((a) => a.text),

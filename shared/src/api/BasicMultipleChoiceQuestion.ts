@@ -81,7 +81,7 @@ export function basicMultipleChoiceMetaGenerator(
         ]
       : []
 
-  function generate(generatorPath: string, lang: Language, parameters: Parameters, seed: string) {
+  function generate(lang: Language, parameters: Parameters, seed: string) {
     if (!validateParameters(parameters, expectedParameters)) {
       throw new Error(
         `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${variants.join(", ")}`,
@@ -137,7 +137,6 @@ export function basicMultipleChoiceMetaGenerator(
         lang,
         parameters,
         seed,
-        generatorPath,
       }),
       answers: answers.map(({ element }) => element),
       text: format(markdown, p),

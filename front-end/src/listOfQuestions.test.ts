@@ -1,33 +1,33 @@
 import { describe, expect, test } from "vitest"
 import { allParameterCombinations } from "../../shared/src/api/Parameters"
-import { allQuestionGeneratorRoutes } from "./listOfQuestions"
+import { collection } from "./listOfQuestions"
+
+const generators = collection.flatMap((x) => x.contents)
 
 describe(`IDs of question generators`, () => {
   const ids = new Set<string>()
-  for (const { path, generator } of allQuestionGeneratorRoutes) {
-    test(`id of ${path} is non-empty`, () => {
+  for (const generator of generators) {
+    test(`id is non-empty`, () => {
       expect(generator.id.length).toBeTruthy()
       expect(generator.id.length).toBeGreaterThan(0)
     })
-    test(`id of ${path} contains only lower case letters`, () => {
+    test(`id ${generator.id} contains only lower case letters`, () => {
       expect(generator.id).toMatch(/^[a-z]+$/)
     })
-    test(`id of ${path} has length at most 10`, () => {
+    test(`id ${generator.id} has length at most 10`, () => {
       expect(generator.id.length).toBeLessThanOrEqual(10)
     })
     ids.add(generator.id)
   }
   test("All IDs are unique", () => {
-    expect(ids.size).toBe(allQuestionGeneratorRoutes.length)
+    expect(ids.size).toBe(generators.length)
   })
 })
-for (const { path, generator } of allQuestionGeneratorRoutes) {
-  describe(`Sanity-checks for question generator "${path}"`, () => {
+for (const generator of generators) {
+  describe(`Sanity-checks for question generator "${generator.id}"`, () => {
     test("Meta-data is present", () => {
-      expect(path).not.toBe("")
       expect(generator.expectedParameters.length).toBeGreaterThanOrEqual(0)
       expect(generator.languages.length).toBeGreaterThan(0)
-
       for (const lang of generator.languages) {
         expect(generator.name(lang)).not.toBe("name")
       }
@@ -49,7 +49,7 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
     for (const lang of generator.languages) {
       for (const parameters of allCombinations) {
         test(`Generate with language ${lang} and parameters ${JSON.stringify(parameters)}`, () => {
-          const ret = generator.generate(path, lang, parameters, "myFancySeed")
+          const ret = generator.generate(lang, parameters, "myFancySeed")
           expect(!(ret instanceof Promise)).toBe(true)
           if (ret instanceof Promise) return
           const { question } = ret
@@ -77,15 +77,14 @@ for (const { path, generator } of allQuestionGeneratorRoutes) {
       test(`Testing parameter ${JSON.stringify(p)}`, () => {
         if (p.type === "integer") {
           expect(() =>
-            generator.generate(path, lang, { ...parameters, [p.name]: p.min - 1 }, "myFancySeed"),
+            generator.generate(lang, { ...parameters, [p.name]: p.min - 1 }, "myFancySeed"),
           ).toThrow()
           expect(() =>
-            generator.generate(path, lang, { ...parameters, [p.name]: p.max + 1 }, "myFancySeed"),
+            generator.generate(lang, { ...parameters, [p.name]: p.max + 1 }, "myFancySeed"),
           ).toThrow()
         } else if (p.type === "string") {
           expect(() =>
             generator.generate(
-              path,
               lang,
               { ...parameters, [p.name]: "non-existent-kjfewjokfwjiofw" },
               "myFancySeed",

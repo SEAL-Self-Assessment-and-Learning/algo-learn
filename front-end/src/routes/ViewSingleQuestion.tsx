@@ -16,13 +16,11 @@ import { Debug } from "./debug"
 
 export function ViewSingleQuestion({
   generator,
-  generatorPath,
   parameters,
   seed,
   onResult,
 }: {
   generator: QuestionGenerator
-  generatorPath: string
   parameters: Parameters
   seed: string
   onResult?: (result: Result) => void
@@ -32,7 +30,7 @@ export function ViewSingleQuestion({
   const { debug, format } = useFormat()
   const { theme } = useTheme()
 
-  const q = useQuestion(generator, generatorPath, lang, parameters, seed)
+  const q = useQuestion(generator, lang, parameters, seed)
 
   if (!validateParameters(parameters, generator.expectedParameters)) {
     throw new Error("Invalid parameters: " + JSON.stringify(parameters))
@@ -46,7 +44,6 @@ export function ViewSingleQuestion({
           generator,
           parameters,
           seed,
-          generatorPath,
         })}
         question={q.question}
         onResult={onResult ?? (() => navigate("/"))}
