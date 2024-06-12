@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { Language } from "../../../shared/src/api/Language"
-import { tFunction, Translations } from "../../../shared/src/utils/translations"
+import { Language } from "@shared/api/Language"
+import { tFunction, Translations } from "@shared/utils/translations"
 import deJSON from "../locales/de.json"
 import enJSON from "../locales/en.json"
 

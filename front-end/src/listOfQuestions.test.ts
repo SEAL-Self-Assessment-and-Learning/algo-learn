@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { allParameterCombinations } from "../../shared/src/api/Parameters"
+import { allParameterCombinations } from "@shared/api/Parameters"
 import { collection } from "./listOfQuestions"
 
 const generators = collection.flatMap((x) => x.contents)
