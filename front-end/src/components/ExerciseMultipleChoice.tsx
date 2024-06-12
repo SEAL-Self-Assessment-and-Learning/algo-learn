@@ -140,6 +140,7 @@ export function ExerciseMultipleChoice({
             <b className="text-xl">{t("correct.solution")}:</b>
             <br />
             {t("see.above")}
+            <br />
           </>
         ) : (
           t("incorrect")
