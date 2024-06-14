@@ -254,6 +254,7 @@ function convertDictToMdTable(wordArray: { [key: string]: any }, extraFeature: s
 }
 
 export const huffmanCoding: QuestionGenerator = {
+  id: "huffman",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -268,7 +269,6 @@ export const huffmanCoding: QuestionGenerator = {
 
   /**
    * Generates a new question (currently only MultipleChoiceQuestion)
-   * @param generatorPath
    * @param lang provided language
    * @param parameters the following options are possible
    *                      - choice-1: this displays are "real" word maximum length of 13 chars, it has a unique coding
@@ -281,14 +281,13 @@ export const huffmanCoding: QuestionGenerator = {
    *                                  those
    * @param seed
    */
-  generate: (generatorPath, lang, parameters, seed) => {
+  generate: (lang, parameters, seed) => {
     // first create a permalink for the question
     const permalink = serializeGeneratorCall({
       generator: huffmanCoding,
       lang,
       parameters,
       seed,
-      generatorPath,
     })
 
     // throw an error if the variant is unknown

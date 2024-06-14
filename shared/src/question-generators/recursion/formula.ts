@@ -42,6 +42,7 @@ const translations: Translations = {
 }
 
 export const RecursionFormula: QuestionGenerator = {
+  id: "recurrence",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -52,13 +53,12 @@ export const RecursionFormula: QuestionGenerator = {
       allowedValues: ["choice", "input"],
     },
   ],
-  generate(generatorPath, lang, parameters, seed) {
+  generate(lang, parameters, seed) {
     const permalink = serializeGeneratorCall({
       generator: RecursionFormula,
       lang,
       parameters,
       seed,
-      generatorPath,
     })
     const random = new Random(seed)
     const { t } = tFunction(translations, lang)

@@ -14,14 +14,13 @@ import { Question, QuestionGenerator } from "@shared/api/QuestionGenerator"
  */
 export function useQuestion(
   generator: QuestionGenerator,
-  generatorPath: string,
   lang: Language,
   parameters: Parameters,
   seed: string,
 ): { isLoading: true } | { isLoading: false; question: Question } {
   const questionPromise = useMemo(
-    () => generator.generate(generatorPath, lang, parameters, seed),
-    [generator, generatorPath, lang, parameters, seed],
+    () => generator.generate(lang, parameters, seed),
+    [generator, lang, parameters, seed],
   )
   const [question, setQuestion] = useState<Question | undefined>(
     questionPromise instanceof Promise ? undefined : questionPromise.question,

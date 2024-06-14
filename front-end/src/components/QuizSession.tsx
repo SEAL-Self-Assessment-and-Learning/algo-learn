@@ -1,12 +1,14 @@
-import { ReactElement, useMemo, useState } from "react"
+import { ReactElement, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
+import { allParameterCombinations, deserializeParameters, Parameters } from "@shared/api/Parameters"
+import { QuestionGenerator } from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import Random, { sampleRandomSeed } from "@shared/utils/random"
 import { Button } from "@/components/ui/button"
-import { serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
-import Random, { sampleRandomSeed } from "../../../shared/src/utils/random"
+import { generatorsById } from "@/listOfQuestions"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { sortByStrength, useSkills } from "../hooks/useSkills"
 import { useTranslation } from "../hooks/useTranslation"
-import { generatorSetBelowPath } from "../listOfQuestions"
 import { ViewSingleQuestion } from "../routes/ViewSingleQuestion"
 import { ScreenCenteredDiv } from "./CenteredDivs"
 import { Result } from "./QuestionComponent"
@@ -104,11 +106,11 @@ const meh = {
  * difficult questions for each question type (simulating part of an exam)
  *
  * @param param
- * @param param.targetNum The number of questions in the session. (default: 10)
+ * @param param.targetNum The number of questions in the session. (default: 3)
  * @param param.mode Determines the mode of the session.
  */
 export function QuizSession({
-  targetNum = 10,
+  targetNum = 3,
   mode,
 }: {
   targetNum?: number
@@ -120,18 +122,44 @@ export function QuizSession({
     featureMap: fM, // store in state to prevent re-rendering
   })
   const params = useParams()
-  const partialPath = params["*"] ?? ""
-  const questionVariants = useMemo(() => {
-    if (mode === "exam") {
-      throw new Error("exam mode not implemented yet")
-    }
-    // TODO: if mode === "exam", use the most difficult questions instead
-    return sortByStrength({
-      random: new Random(sessionSeed),
-      featureMap,
-      generatorCalls: generatorSetBelowPath(partialPath),
-    }).slice(0, targetNum)
-  }, [sessionSeed, partialPath, targetNum, mode, featureMap])
+  const generatorId = params["id"]
+
+  if (!generatorId) {
+    throw new Error(`No generatorId provided at URL.`)
+  }
+
+  const generator = generatorsById(generatorId)
+  if (!generator) {
+    throw new Error(`Unknown generator ID: ${generatorId}`)
+  }
+
+  const parametersPath = params["*"]
+  const generatorCalls: {
+    generator: QuestionGenerator
+    parameters: Parameters
+  }[] = []
+  if (parametersPath) {
+    const parameters = deserializeParameters(parametersPath, generator.expectedParameters)
+    generatorCalls.push({
+      generator,
+      parameters,
+    })
+  } else {
+    allParameterCombinations(generator.expectedParameters).map((parameters) => {
+      generatorCalls.push({
+        generator,
+        parameters,
+      })
+    })
+  }
+  if (mode === "exam") {
+    throw new Error("exam mode not implemented yet")
+  }
+  const questionVariants = sortByStrength({
+    random: new Random(sessionSeed),
+    featureMap,
+    generatorCalls,
+  }).slice(0, targetNum)
 
   const { t, lang } = useTranslation()
   const [state, setState] = useState({
@@ -173,12 +201,11 @@ export function QuizSession({
     )
   } else if (status === "running") {
     const obj = questionVariants[num]
-    const { generator, generatorPath, parameters } = obj
+    const { generator, parameters } = obj
     const nextPath = serializeGeneratorCall({
       generator,
       parameters,
       seed: questionSeed,
-      generatorPath: generatorPath,
     })
 
     const handleResult = (result: Result) => {
@@ -204,7 +231,6 @@ export function QuizSession({
     return (
       <ViewSingleQuestion
         generator={generator}
-        generatorPath={generatorPath}
         parameters={parameters}
         seed={questionSeed}
         onResult={handleResult}

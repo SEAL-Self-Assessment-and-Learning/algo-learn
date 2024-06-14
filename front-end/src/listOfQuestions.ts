@@ -1,57 +1,21 @@
-import { allQuestionGeneratorRoutes } from "../../settings/questionsSelection"
-import {
-  allParameterCombinations,
-  deserializeParameters,
-  Parameters,
-} from "../../shared/src/api/Parameters"
-import { QuestionGenerator } from "../../shared/src/api/QuestionGenerator"
-import { isSubPath } from "../../shared/src/api/QuestionRouter"
+import { QuestionGenerator } from "@shared/api/QuestionGenerator"
+import { collection } from "../../settings/questionsSelection"
 
-export { allQuestionGeneratorRoutes }
+export { collection }
 
 /** List of all skill groups. Will be the first part of the questions' routes. */
-export const skillGroups: string[] = []
-for (const { path: route } of allQuestionGeneratorRoutes) {
-  const [group] = route.split("/")
-  if (!skillGroups.includes(group)) skillGroups.push(group)
+export const skillGroups: string[] = collection.map(({ slug }) => slug)
+
+/**
+ * Return all generators in the given group
+ */
+export function generatorsByGroup(slug: string): QuestionGenerator[] | undefined {
+  return collection.find((x) => x.slug === slug)?.contents
 }
 
 /**
- * Return all generator/parameter combinations below the given path
- *
- * @param path Partial path to the question variant(s)
- * @param generatorRoutes List of all question generator routes to consider
- * @returns List of generator/parameter combinations below the given path
+ * Return the generator with the given id
  */
-export function generatorSetBelowPath(
-  path: string,
-  generatorRoutes = allQuestionGeneratorRoutes,
-): Array<{
-  generator: QuestionGenerator
-  generatorPath: string
-  parameters: Parameters
-}> {
-  const set = []
-  for (const { path: generatorPath, generator } of generatorRoutes) {
-    if (isSubPath(path, generatorPath)) {
-      for (const parameters of allParameterCombinations(generator.expectedParameters)) {
-        set.push({ generator, generatorPath, parameters })
-      }
-    } else if (isSubPath(generatorPath, path)) {
-      const parameters = deserializeParameters(
-        path.slice(generatorPath.length + 1),
-        generator.expectedParameters,
-      )
-      for (const paramExtensions of allParameterCombinations(
-        generator.expectedParameters.filter((p) => !(p.name in parameters)),
-      )) {
-        set.push({
-          generator,
-          generatorPath,
-          parameters: { ...parameters, ...paramExtensions },
-        })
-      }
-    }
-  }
-  return set
+export function generatorsById(id: string): QuestionGenerator | undefined {
+  return collection.flatMap((x) => x.contents).find((x) => x.id === id)
 }

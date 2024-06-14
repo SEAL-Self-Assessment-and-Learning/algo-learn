@@ -1,6 +1,6 @@
 import { useState } from "react"
+import { FreeTextFeedback, FreeTextQuestion } from "@shared/api/QuestionGenerator"
 import { Input } from "@/components/ui/input"
-import { FreeTextFeedback, FreeTextQuestion } from "../../../shared/src/api/QuestionGenerator"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
