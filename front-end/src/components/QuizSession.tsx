@@ -1,13 +1,15 @@
-import { ReactElement, useState } from "react"
+import { useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { allParameterCombinations, deserializeParameters, Parameters } from "@shared/api/Parameters"
-import { QuestionGenerator } from "@shared/api/QuestionGenerator"
-import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { gcByPath, serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import Random, { sampleRandomSeed } from "@shared/utils/random"
 import { Button } from "@/components/ui/button"
-import { generatorsById } from "@/listOfQuestions"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
-import { comparePhase, masteryThreshold, useLearningAnalytics } from "../hooks/useLearningAnalytics"
+import {
+  comparePhase,
+  LearningAnalytics,
+  masteryThreshold,
+  useLearningAnalytics,
+} from "../hooks/useLearningAnalytics"
 import { useTranslation } from "../hooks/useTranslation"
 import { ViewSingleQuestion } from "../routes/ViewSingleQuestion"
 import { ScreenCenteredDiv } from "./CenteredDivs"
@@ -106,67 +108,26 @@ const meh = {
  * difficult questions for each question type (simulating part of an exam)
  *
  * @param param
- * @param param.targetNum The number of questions in the session. (default: 3)
+ * @param param.numQuestions The number of questions in the session. (default: 3)
  * @param param.mode Determines the mode of the session.
  */
-export function QuizSession({
-  targetNum = masteryThreshold,
-  mode,
-}: {
-  targetNum?: number
-  mode: "practice" | "exam"
-}): ReactElement {
+export function QuizSession({ numQuestions = masteryThreshold }: { numQuestions?: number }) {
   const { featureMap: fM, appendLogEntry } = useLearningAnalytics()
   const [{ sessionSeed, featureMap }] = useState({
     sessionSeed: sampleRandomSeed(),
     featureMap: fM, // store in state to prevent re-rendering
   })
   const params = useParams()
-  const generatorId = params["id"]
-
-  if (!generatorId) {
-    throw new Error(`No generatorId provided at URL.`)
-  }
-
-  const generator = generatorsById(generatorId)
-  if (!generator) {
-    throw new Error(`Unknown generator ID: ${generatorId}`)
-  }
-
-  const parametersPath = params["*"]
-  const generatorCalls: {
-    generator: QuestionGenerator
-    parameters: Parameters
-  }[] = []
-  if (parametersPath) {
-    const parameters = deserializeParameters(parametersPath, generator.expectedParameters)
-    generatorCalls.push({ generator, parameters })
-  } else {
-    allParameterCombinations(generator).map((parameters) => {
-      generatorCalls.push({ generator, parameters })
-    })
-  }
-  if (mode === "exam") {
-    throw new Error("exam mode not implemented yet")
-  }
-
-  const unlockedQuestionVariants = generatorCalls.filter((gc) => {
-    const path = serializeGeneratorCall(gc)
-    return path in featureMap && featureMap[path].phase !== "locked"
-  })
-  unlockedQuestionVariants.sort((gc1, gc2) => {
-    const path1 = serializeGeneratorCall(gc1)
-    const path2 = serializeGeneratorCall(gc2)
-    return comparePhase(featureMap[path1].phase, featureMap[path2].phase)
-  })
-  if (unlockedQuestionVariants.length === 0) {
-    throw new Error("No unlocked question variants found.")
-  }
-
-  const quizSession: typeof generatorCalls = []
-  for (let i = 0; i < targetNum; i++) {
-    quizSession.push(unlockedQuestionVariants[0])
-  }
+  const quizSession = useMemo(
+    () =>
+      createQuizSession({
+        featureMap,
+        numQuestions,
+        generatorId: params["id"],
+        parametersPath: params["*"],
+      }),
+    [featureMap, numQuestions, params],
+  )
 
   const { t, lang } = useTranslation()
   const [state, setState] = useState({
@@ -190,19 +151,17 @@ export function QuizSession({
   const num = numCorrect + numIncorrect
   const random = new Random(`${sessionSeed}${numCorrect + numIncorrect}`)
   const questionSeed = random.base36string(7)
+  const status = aborted ? "aborted" : num < quizSession.length ? "running" : "finished"
 
-  const status: "running" | "finished" | "aborted" = aborted
-    ? "aborted"
-    : num < quizSession.length
-      ? "running"
-      : "finished"
+  // const group = collectionContaining(quizSession[0].generator.id)
+  const LinkToHome = <Link to={`/${lang}`}> {t("Continue")}</Link>
 
   if (status === "aborted") {
     return (
       <ScreenCenteredDiv>
         {t("quiz-session-aborted")}
         <Button asChild variant="rightAnswer">
-          <Link to={"/"}>{t("Continue")}</Link>
+          {LinkToHome}
         </Button>
       </ScreenCenteredDiv>
     )
@@ -215,7 +174,7 @@ export function QuizSession({
         <div className="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
           <div className="font-serif italic">{msg}</div>
           <Button asChild variant="rightAnswer" className="ml-auto mt-12 block max-w-max">
-            <Link to="/">{t("Continue")}</Link>
+            {LinkToHome}
           </Button>
         </div>
       </ScreenCenteredDiv>
@@ -224,10 +183,13 @@ export function QuizSession({
 
   console.assert(status === "running", 'status was expected to be "running"')
   const obj = quizSession[num]
-  if (!obj) {
+  if (obj === undefined) {
     throw new Error(`No question found for index ${num}`)
   }
   const { generator: g, parameters: p } = obj
+  if (p === undefined) {
+    throw new Error(`No parameters found for index ${num}`)
+  }
   const nextPath = serializeGeneratorCall({
     generator: g,
     parameters: p,
@@ -254,4 +216,46 @@ export function QuizSession({
     }
   }
   return <ViewSingleQuestion generator={g} parameters={p} seed={questionSeed} onResult={handleResult} />
+}
+
+/**
+ * Create a quiz session.
+ *
+ * @param featureMap The feature map
+ * @param numQuestions The number of questions
+ * @param generatorId The ID of the generator
+ * @param parametersPath The path of the parameters
+ * @returns A list of generator calls
+ */
+export function createQuizSession({
+  featureMap,
+  numQuestions,
+  generatorId,
+  parametersPath,
+}: {
+  featureMap: Record<string, LearningAnalytics>
+  numQuestions: number
+  generatorId?: string
+  parametersPath?: string
+}) {
+  const generatorCalls = gcByPath({ generatorId, parametersPath })
+  const unlockedGeneratorCalls = generatorCalls.filter((gc) => {
+    const path = serializeGeneratorCall(gc)
+    return path in featureMap && featureMap[path].phase !== "locked"
+  })
+  unlockedGeneratorCalls.sort((gc1, gc2) => {
+    const path1 = serializeGeneratorCall(gc1)
+    const path2 = serializeGeneratorCall(gc2)
+    return comparePhase(featureMap[path1].phase, featureMap[path2].phase)
+  })
+  if (unlockedGeneratorCalls.length === 0) {
+    console.log(generatorCalls)
+    throw new Error(`No unlocked question variants found for ${generatorId}/${parametersPath}.`)
+  }
+
+  const quizSession: typeof generatorCalls = []
+  for (let i = 0; i < numQuestions; i++) {
+    quizSession.push(unlockedGeneratorCalls[0])
+  }
+  return quizSession
 }

@@ -63,7 +63,10 @@ function accumulateLearningLog(log: Array<LogEntryV2>) {
   for (const e of log) {
     // remove the seed from the path:
     const path = e.path.split("/").slice(0, -1).join("/")
-    console.assert(path in D, `Unknown question variant path found in log: ${path}`)
+    if (path in D === false) {
+      console.log(`Info: Unknown question variant path found in learning log: '${path}'`)
+      continue
+    }
     if (D[path].log.length < masteryThreshold) D[path].log.push(e)
     D[path].lastInteraction = D[path].lastInteraction ?? e.timestamp
   }

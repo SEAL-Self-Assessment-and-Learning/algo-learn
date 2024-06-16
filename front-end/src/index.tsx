@@ -59,11 +59,7 @@ routes.push({
 })
 routes.push({
   path: `:lang/practice/:id/*`,
-  element: <QuizSession mode="practice" />,
-})
-routes.push({
-  path: `:lang/exam/:id/*`,
-  element: <QuizSession mode="exam" />,
+  element: <QuizSession />,
 })
 routes.push({
   index: true,

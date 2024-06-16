@@ -23,7 +23,7 @@ import { useTranslation } from "../hooks/useTranslation"
 import { collection } from "../listOfQuestions"
 
 export function Catalogue() {
-  const [selectedGroup, setSelectedGroup] = useHistoryState<string | null>("selectedGroup", null)
+  const [selectedGroup, setSelectedGroup] = useHistoryState("selectedGroup", collection[0].slug)
   // const [showAllVariants, setShowAllVariants] = useHistoryState("showAllVariants", false)
 
   return (
@@ -164,25 +164,27 @@ function QuestionGeneratorCard({
             locked: <FaLock />,
           }[featureMap[path].phase]
           return (
-            <Link key={path} to={`/${lang}/practice/${path}`}>
-              <HoverCard openDelay={0} closeDelay={100}>
-                <HoverCardTrigger>{Icon}</HoverCardTrigger>
-                <HoverCardContent className="flex w-fit flex-col border-none bg-secondary text-secondary-foreground">
-                  <div>
-                    <b>{generator.name(lang)}</b>
-                  </div>
-                  <div>
-                    {t("question-variant")}: <b>{params}</b>
-                  </div>
-                  <div>
-                    {t("Status")}: {t("phase-" + featureMap[path].phase)}
-                  </div>
-                  <div>
-                    {t("last-attempt")}: {howLongSince(featureMap[path].lastInteraction, lang)}
-                  </div>
-                </HoverCardContent>
-              </HoverCard>
-            </Link>
+            <HoverCard key={path} openDelay={100} closeDelay={100}>
+              <HoverCardTrigger asChild>
+                <div>
+                  <Link to={`/${lang}/practice/${path}`}>{Icon}</Link>
+                </div>
+              </HoverCardTrigger>
+              <HoverCardContent className="flex w-fit flex-col border-none bg-secondary text-secondary-foreground">
+                <div>
+                  <b>{generator.name(lang)}</b>
+                </div>
+                <div>
+                  {t("question-variant")}: <b>{params}</b>
+                </div>
+                <div>
+                  {t("Status")}: {t("phase-" + featureMap[path].phase)}
+                </div>
+                <div>
+                  {t("last-attempt")}: {howLongSince(featureMap[path].lastInteraction, lang)}
+                </div>
+              </HoverCardContent>
+            </HoverCard>
           )
         })}
         {/* <StrengthMeter strength={summaryStrength[generator.id]}>

@@ -1,7 +1,16 @@
 import { SingleTranslation } from "@shared/utils/translations"
-import { collection as globalCollection } from "@/listOfQuestions"
+import {
+  allQuestionVariantPaths,
+  generatorsById,
+  collection as globalCollection,
+} from "@/listOfQuestions"
 import { Language } from "./Language"
-import { deserializeParameters, missingParameters, Parameters } from "./Parameters"
+import {
+  allParameterCombinations,
+  deserializeParameters,
+  missingParameters,
+  Parameters,
+} from "./Parameters"
 import { QuestionGenerator } from "./QuestionGenerator"
 
 /**
@@ -15,29 +24,32 @@ export type QuestionCollection = Array<{
 }>
 
 /**
+ * A generator call is a specific request to generate a question.
+ */
+export type GeneratorCall = {
+  /* The language to use when generating the question (optional) */
+  lang?: Language
+
+  /* The question generator */
+  generator: QuestionGenerator
+
+  /* The parameters for a question (optional) */
+  parameters?: Parameters
+
+  /* The seed for a question (optional; can only be used if parameters are given) */
+  seed?: string
+}
+
+/**
  * Serialize a generator call to a URL path.
  *
- * @param lang The language to use when generating the question (optional)
- * @param generator The question generator
- * @param parameters The parameters for a question (optional)
- * @param seed The seed for a question (optional; can only be used if parameters
- *   are given)
+ * @param gc The generator call
  * @returns The URL path describing the question generator with the given
  *   settings. For example, "/de/asymptotics/sum/2/myFancySeed" if generator,
  *   parameters, seed, and lang are given, or "asymptotics/sum" if only the
  *   generator is given.
  */
-export function serializeGeneratorCall({
-  lang,
-  generator,
-  parameters,
-  seed,
-}: {
-  lang?: Language
-  generator: QuestionGenerator
-  parameters?: Parameters
-  seed?: string
-}): string {
+export function serializeGeneratorCall({ lang, generator, parameters, seed }: GeneratorCall): string {
   const path: string[] = []
   if (lang !== undefined) path.push(lang)
   path.push(generator.id)
@@ -70,14 +82,7 @@ export function deserializePath({
   collection?: QuestionCollection
   path: string
   expectLang?: boolean
-}):
-  | {
-      lang?: Language
-      generator: QuestionGenerator
-      parameters?: Parameters
-      seed?: string
-    }
-  | undefined {
+}): GeneratorCall | undefined {
   let parts = path.split("/")
 
   if (expectLang === undefined) {
@@ -107,4 +112,38 @@ export function deserializePath({
       : undefined
 
   return { lang, generator, parameters, seed }
+}
+
+/**
+ * Generate a list of generator calls from a given path.
+ *
+ * @param generatorId The ID of the generator
+ * @param parametersPath The path of the parameters
+ * @returns A list of generator calls
+ */
+export function gcByPath({
+  generatorId,
+  parametersPath,
+}: {
+  generatorId?: string
+  parametersPath?: string
+}) {
+  if (!generatorId)
+    return allQuestionVariantPaths
+      .map((path) => deserializePath({ path }))
+      .filter((gc) => gc) as GeneratorCall[]
+
+  const generator = generatorsById(generatorId)
+  if (!generator) throw new Error(`Unknown generator ID: ${generatorId}`)
+
+  const generatorCalls: Array<GeneratorCall> = []
+  if (parametersPath) {
+    const parameters = deserializeParameters(parametersPath, generator.expectedParameters)
+    generatorCalls.push({ generator, parameters })
+  } else {
+    allParameterCombinations(generator).map((parameters) => {
+      generatorCalls.push({ generator, parameters })
+    })
+  }
+  return generatorCalls
 }

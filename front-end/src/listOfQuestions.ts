@@ -30,3 +30,10 @@ export function generatorsByGroup(slug: string): QuestionGenerator[] | undefined
 export function generatorsById(id: string): QuestionGenerator | undefined {
   return collection.flatMap((x) => x.contents).find((x) => x.id === id)
 }
+
+/**
+ * Return the collection slug containing the generator with the given id
+ */
+export function collectionContaining(id: string): string | undefined {
+  return collection.find((x) => x.contents.some((y) => y.id === id))?.slug
+}
