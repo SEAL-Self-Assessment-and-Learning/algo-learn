@@ -1,4 +1,5 @@
 import { Language } from "./Language"
+import { QuestionGenerator } from "./QuestionGenerator"
 
 /** Utility type to enforce a non-empty string */
 // export type NonEmptyString
@@ -94,11 +95,16 @@ export function missingParameters(parameters: Parameters, allowedParameters: Exp
 
 /**
  * Returns all possible combinations of parameters.
- *
- * @param expectedParameters The allowed parameters
+ * @param expectedParameters The expected parameters or a question generator
  * @returns All possible combinations of parameters
  */
-export function allParameterCombinations(expectedParameters: ExpectedParameters): Array<Parameters> {
+export function allParameterCombinations(expectedParameters: ExpectedParameters): Array<Parameters>
+export function allParameterCombinations(generator: QuestionGenerator): Array<Parameters>
+export function allParameterCombinations(
+  expectedParameters: ExpectedParameters | QuestionGenerator,
+): Array<Parameters> {
+  if ("expectedParameters" in expectedParameters)
+    expectedParameters = expectedParameters.expectedParameters
   if (expectedParameters.length === 0) return [{}]
 
   const p = expectedParameters[0]
@@ -118,7 +124,6 @@ export function allParameterCombinations(expectedParameters: ExpectedParameters)
       }
     }
   }
-
   return newCombinations
 }
 

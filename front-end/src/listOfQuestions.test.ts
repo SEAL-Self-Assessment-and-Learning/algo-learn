@@ -22,6 +22,14 @@ describe(`IDs of question generators`, () => {
   test("All IDs are unique", () => {
     expect(ids.size).toBe(generators.length)
   })
+  test("IDs do not contain forbidden words", () => {
+    const forbiddenWords = ["en", "de"]
+    for (const id of ids) {
+      for (const word of forbiddenWords) {
+        expect(id).not.toBe(word)
+      }
+    }
+  })
 })
 for (const generator of generators) {
   describe(`Sanity-checks for question generator "${generator.id}"`, () => {

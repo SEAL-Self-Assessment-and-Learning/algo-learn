@@ -15,8 +15,6 @@ export function DrawTable({
   const parsedAlignment = table.alignment
   const extraFeature = table.extraFeature
 
-  console.log(extraFeature)
-
   // create the value for the header
   const tableHeader = []
 
@@ -42,8 +40,6 @@ export function DrawTable({
       </tr>,
     )
   }
-  console.log(parsedContent)
-  console.log(extraFeature)
   const tableReturnValue = (
     <table>
       <thead>{tableHeader}</thead>

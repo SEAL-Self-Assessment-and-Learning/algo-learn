@@ -1,11 +1,10 @@
 import { ChevronRight } from "lucide-react"
 import { HTMLAttributes } from "react"
+import { FaLock, FaRegStar, FaStar } from "react-icons/fa"
 import { Link } from "react-router-dom"
 import { allParameterCombinations, serializeParameters } from "@shared/api/Parameters"
 import { QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { StrengthMeter } from "@/components/StrengthMeter"
-import { badgeVariants } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -15,25 +14,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { useHistoryState } from "@/hooks/useHistoryState"
 import { useLearningAnalytics } from "@/hooks/useLearningAnalytics"
 import { cn } from "@/lib/utils"
+import { howLongSince } from "@/utils/howLongSince"
 import { useTranslation } from "../hooks/useTranslation"
 import { collection } from "../listOfQuestions"
 
 export function Catalogue() {
   const [selectedGroup, setSelectedGroup] = useHistoryState<string | null>("selectedGroup", null)
-  const [showAllVariants, setShowAllVariants] = useHistoryState("showAllVariants", false)
+  // const [showAllVariants, setShowAllVariants] = useHistoryState("showAllVariants", false)
 
   return (
     <div className="mx-auto flex w-full max-w-screen-md flex-col items-start justify-center gap-6 p-6 sm:flex-row">
       <TopicSelectorSidebar
         selectedGroup={selectedGroup}
         setSelectedGroup={setSelectedGroup}
-        showAllVariants={showAllVariants}
-        setShowAllVariants={setShowAllVariants}
+        // showAllVariants={showAllVariants}
+        // setShowAllVariants={setShowAllVariants}
         className="mx-auto sm:mx-0"
       />
       <div className="w-full">
@@ -42,15 +41,7 @@ export function Catalogue() {
             {collection
               .find((e) => e.slug === selectedGroup)
               ?.contents.map(
-                (x) =>
-                  x && (
-                    <QuestionGeneratorCard
-                      key={x.id}
-                      generator={x}
-                      showAllVariants={showAllVariants}
-                      className="w-full"
-                    />
-                  ),
+                (x) => x && <QuestionGeneratorCard key={x.id} generator={x} className="w-full" />,
               )}
           </div>
         )}
@@ -62,8 +53,8 @@ export function Catalogue() {
 interface TopicSelectorProps extends HTMLAttributes<HTMLDivElement> {
   selectedGroup: string | null
   setSelectedGroup: (s: string) => void
-  showAllVariants: boolean
-  setShowAllVariants: (b: boolean) => void
+  showAllVariants?: boolean
+  setShowAllVariants?: (b: boolean) => void
 }
 
 /**
@@ -77,8 +68,8 @@ function TopicSelectorSidebar({
   className,
   selectedGroup,
   setSelectedGroup,
-  showAllVariants,
-  setShowAllVariants,
+  // showAllVariants,
+  // setShowAllVariants,
 }: TopicSelectorProps) {
   const { t, lang } = useTranslation()
   return (
@@ -98,16 +89,16 @@ function TopicSelectorSidebar({
             {g.name[lang]}
           </Button>
         ))}
-        {selectedGroup && (
+        {/* {selectedGroup && (
           <div className="ml-2 mt-4 flex gap-2">
             <Checkbox
               id="terms1"
               checked={showAllVariants}
-              onCheckedChange={(b) => setShowAllVariants(b === true)}
+              onCheckedChange={(b) => setShowAllVariants && setShowAllVariants(b === true)}
             />
             <Label htmlFor="terms1">{t("Catalogue.showVariants")}</Label>
           </div>
-        )}
+        )} */}
       </CardContent>
     </Card>
   )
@@ -120,17 +111,15 @@ function TopicSelectorSidebar({
  */
 function QuestionGeneratorCard({
   generator,
-  showAllVariants,
   showDescription = true,
   className,
 }: {
   generator: QuestionGenerator
-  showAllVariants: boolean
   showDescription?: boolean
   className?: string
 }) {
   const { t, lang } = useTranslation()
-  const { summaryStrength } = useLearningAnalytics()
+  const { featureMap } = useLearningAnalytics()
   return (
     <Card className={cn("flex border-4 ", className)}>
       <div className="flex-1">
@@ -146,8 +135,8 @@ function QuestionGeneratorCard({
               {t("Catalogue.practice")} <ChevronRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
-          {showAllVariants &&
-            allParameterCombinations(generator.expectedParameters).map((parameters) => {
+          {/* {showAllVariants &&
+            allParameterCombinations(generator).map((parameters) => {
               const path = serializeGeneratorCall({ lang, generator, parameters })
               const params = serializeParameters(parameters, generator.expectedParameters)
               if (!params) return null
@@ -157,13 +146,48 @@ function QuestionGeneratorCard({
                   {params}
                 </Link>
               )
-            })}
+            })} */}
         </CardFooter>
       </div>
       <div className="flex p-3 text-primary">
-        <StrengthMeter strength={summaryStrength[generator.id]}>
+        {allParameterCombinations(generator).map((parameters) => {
+          const path = serializeGeneratorCall({ generator, parameters })
+          const params = serializeParameters(parameters, generator.expectedParameters)
+          const Icon = {
+            mastered: <FaStar />,
+            decaying: (
+              <div className="text-opacity-70">
+                <FaStar />
+              </div>
+            ),
+            learning: <FaRegStar />,
+            locked: <FaLock />,
+          }[featureMap[path].phase]
+          return (
+            <Link key={path} to={`/${lang}/practice/${path}`}>
+              <HoverCard openDelay={0} closeDelay={100}>
+                <HoverCardTrigger>{Icon}</HoverCardTrigger>
+                <HoverCardContent className="flex w-fit flex-col border-none bg-secondary text-secondary-foreground">
+                  <div>
+                    <b>{generator.name(lang)}</b>
+                  </div>
+                  <div>
+                    {t("question-variant")}: <b>{params}</b>
+                  </div>
+                  <div>
+                    {t("Status")}: {t("phase-" + featureMap[path].phase)}
+                  </div>
+                  <div>
+                    {t("last-attempt")}: {howLongSince(featureMap[path].lastInteraction, lang)}
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+            </Link>
+          )
+        })}
+        {/* <StrengthMeter strength={summaryStrength[generator.id]}>
           {t("learningProgress")}: <b>{Math.round(100 * summaryStrength[generator.id])}%</b>
-        </StrengthMeter>
+        </StrengthMeter> */}
       </div>
     </Card>
   )

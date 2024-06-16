@@ -7,7 +7,7 @@ import Random, { sampleRandomSeed } from "@shared/utils/random"
 import { Button } from "@/components/ui/button"
 import { generatorsById } from "@/listOfQuestions"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
-import { sortByStrength, useLearningAnalytics } from "../hooks/useLearningAnalytics"
+import { comparePhase, masteryThreshold, useLearningAnalytics } from "../hooks/useLearningAnalytics"
 import { useTranslation } from "../hooks/useTranslation"
 import { ViewSingleQuestion } from "../routes/ViewSingleQuestion"
 import { ScreenCenteredDiv } from "./CenteredDivs"
@@ -110,7 +110,7 @@ const meh = {
  * @param param.mode Determines the mode of the session.
  */
 export function QuizSession({
-  targetNum = 3,
+  targetNum = masteryThreshold,
   mode,
 }: {
   targetNum?: number
@@ -140,26 +140,33 @@ export function QuizSession({
   }[] = []
   if (parametersPath) {
     const parameters = deserializeParameters(parametersPath, generator.expectedParameters)
-    generatorCalls.push({
-      generator,
-      parameters,
-    })
+    generatorCalls.push({ generator, parameters })
   } else {
-    allParameterCombinations(generator.expectedParameters).map((parameters) => {
-      generatorCalls.push({
-        generator,
-        parameters,
-      })
+    allParameterCombinations(generator).map((parameters) => {
+      generatorCalls.push({ generator, parameters })
     })
   }
   if (mode === "exam") {
     throw new Error("exam mode not implemented yet")
   }
-  const questionVariants = sortByStrength({
-    random: new Random(sessionSeed),
-    featureMap,
-    generatorCalls,
-  }).slice(0, targetNum)
+
+  const unlockedQuestionVariants = generatorCalls.filter((gc) => {
+    const path = serializeGeneratorCall(gc)
+    return path in featureMap && featureMap[path].phase !== "locked"
+  })
+  unlockedQuestionVariants.sort((gc1, gc2) => {
+    const path1 = serializeGeneratorCall(gc1)
+    const path2 = serializeGeneratorCall(gc2)
+    return comparePhase(featureMap[path1].phase, featureMap[path2].phase)
+  })
+  if (unlockedQuestionVariants.length === 0) {
+    throw new Error("No unlocked question variants found.")
+  }
+
+  const quizSession: typeof generatorCalls = []
+  for (let i = 0; i < targetNum; i++) {
+    quizSession.push(unlockedQuestionVariants[0])
+  }
 
   const { t, lang } = useTranslation()
   const [state, setState] = useState({
@@ -186,7 +193,7 @@ export function QuizSession({
 
   const status: "running" | "finished" | "aborted" = aborted
     ? "aborted"
-    : num < questionVariants.length
+    : num < quizSession.length
       ? "running"
       : "finished"
 
@@ -199,57 +206,52 @@ export function QuizSession({
         </Button>
       </ScreenCenteredDiv>
     )
-  } else if (status === "running") {
-    const obj = questionVariants[num]
-    const { generator, parameters } = obj
-    const nextPath = serializeGeneratorCall({
-      generator,
-      parameters,
-      seed: questionSeed,
-    })
-
-    const handleResult = (result: Result) => {
-      if (result === "correct") {
-        appendLogEntry({
-          path: nextPath,
-          result: "pass",
-          timestamp: Date.now(),
-        })
-        setState({ ...state, numCorrect: numCorrect + 1 })
-      } else if (result === "incorrect") {
-        appendLogEntry({
-          path: nextPath,
-          result: "fail",
-          timestamp: Date.now(),
-        })
-        setState({ ...state, numIncorrect: numIncorrect + 1 })
-      } else if (result === "abort" || result === "timeout") {
-        setState({ ...state, aborted: true })
-      }
-    }
-
+  } else if (status === "finished") {
+    const msgList =
+      numIncorrect == 0 ? great : numCorrect / (numCorrect + numIncorrect) >= 0.75 ? good : meh
+    const msg = random.choice(msgList[lang])
     return (
-      <ViewSingleQuestion
-        generator={generator}
-        parameters={parameters}
-        seed={questionSeed}
-        onResult={handleResult}
-      />
+      <ScreenCenteredDiv>
+        <div className="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
+          <div className="font-serif italic">{msg}</div>
+          <Button asChild variant="rightAnswer" className="ml-auto mt-12 block max-w-max">
+            <Link to="/">{t("Continue")}</Link>
+          </Button>
+        </div>
+      </ScreenCenteredDiv>
     )
   }
 
-  // now we have status === "finished"
-  const msgList =
-    numIncorrect == 0 ? great : numCorrect / (numCorrect + numIncorrect) >= 0.75 ? good : meh
-  const msg = random.choice(msgList[lang])
-  return (
-    <ScreenCenteredDiv>
-      <div className="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
-        <div className="font-serif italic">{msg}</div>
-        <Button asChild variant="rightAnswer" className="ml-auto mt-12 block max-w-max">
-          <Link to="/">{t("Continue")}</Link>
-        </Button>
-      </div>
-    </ScreenCenteredDiv>
-  )
+  console.assert(status === "running", 'status was expected to be "running"')
+  const obj = quizSession[num]
+  if (!obj) {
+    throw new Error(`No question found for index ${num}`)
+  }
+  const { generator: g, parameters: p } = obj
+  const nextPath = serializeGeneratorCall({
+    generator: g,
+    parameters: p,
+    seed: questionSeed,
+  })
+
+  const handleResult = (result: Result) => {
+    if (result === "correct") {
+      appendLogEntry({
+        path: nextPath,
+        result: "pass",
+        timestamp: Date.now(),
+      })
+      setState({ ...state, numCorrect: numCorrect + 1 })
+    } else if (result === "incorrect") {
+      appendLogEntry({
+        path: nextPath,
+        result: "fail",
+        timestamp: Date.now(),
+      })
+      setState({ ...state, numIncorrect: numIncorrect + 1 })
+    } else if (result === "abort" || result === "timeout") {
+      setState({ ...state, aborted: true })
+    }
+  }
+  return <ViewSingleQuestion generator={g} parameters={p} seed={questionSeed} onResult={handleResult} />
 }

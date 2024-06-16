@@ -111,6 +111,7 @@ export function useLearningLog() {
 
   const log = logV2
   const setLog = setLogV2
+  log.sort(byDescendingTimestamp)
 
   for (let i = 0; i < log.length - 1; i++) {
     console.assert(

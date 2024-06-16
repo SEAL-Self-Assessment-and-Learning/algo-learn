@@ -18,6 +18,7 @@ const translations: Translations = {
     months: "{{0}} months ago",
     year: "last year",
     years: "{{0}} years ago",
+    never: "never",
   },
   de: {
     future: "in der Zukunft",
@@ -35,6 +36,7 @@ const translations: Translations = {
     months: "vor {{0}} Monaten",
     year: "letztes Jahr",
     years: "vor {{0}} Jahren",
+    never: "nie",
   },
 }
 
@@ -54,16 +56,15 @@ export function printAgo(
 /**
  * Return a human-readable string of how long ago the given timestamp was
  *
- * @param timestamp Timestamp in milliseconds
+ * @param timestamp Timestamp in milliseconds (or undefined = never)
  * @param lang Language to use (default: en)
  * @returns Human-readable string
  */
-export function howLongSince(timestamp: number, lang: Language = "en"): string {
+export function howLongSince(timestamp?: number, lang: Language = "en"): string {
   const { t } = tFunction(translations, lang)
   const now = Date.now()
-  if (timestamp > now) {
-    return t("future")
-  }
+  if (timestamp === undefined) return t("never")
+  if (timestamp > now) return t("future")
   const duration = now - timestamp
   const seconds = Math.floor(duration / 1000)
   if (seconds < 60) {
