@@ -2,13 +2,38 @@ import { describe, expect, test } from "vitest"
 import { allParameterCombinations } from "@shared/api/Parameters"
 import { collection } from "./listOfQuestions"
 
-const generators = collection.flatMap((x) => x.contents)
+const forbiddenWords = ["en", "de", "practice"]
+const slugIDs = new Set<string>()
+describe(`slugs of all groups in collection`, () => {
+  for (const g of collection) {
+    slugIDs.add(g.slug)
+    test(`slug is non-empty`, () => {
+      expect(g.slug.length).toBeGreaterThan(0)
+    })
+    test(`slug ${g.slug} contains only lower case letters`, () => {
+      expect(g.slug).toMatch(/^[a-z]+$/)
+    })
+    test(`slug ${g.slug} has length at most 16`, () => {
+      expect(g.slug.length).toBeLessThanOrEqual(16)
+    })
+  }
+  test("All slugs are unique", () => {
+    expect(slugIDs.size).toBe(collection.length)
+  })
+  test("slugs do not contain forbidden words", () => {
+    for (const id of gIDs) {
+      for (const word of forbiddenWords) {
+        expect(id).not.toBe(word)
+      }
+    }
+  })
+})
 
+const generators = collection.flatMap((x) => x.contents)
+const gIDs = new Set<string>()
 describe(`IDs of question generators`, () => {
-  const ids = new Set<string>()
   for (const generator of generators) {
     test(`id is non-empty`, () => {
-      expect(generator.id.length).toBeTruthy()
       expect(generator.id.length).toBeGreaterThan(0)
     })
     test(`id ${generator.id} contains only lower case letters`, () => {
@@ -17,20 +42,25 @@ describe(`IDs of question generators`, () => {
     test(`id ${generator.id} has length at most 10`, () => {
       expect(generator.id.length).toBeLessThanOrEqual(10)
     })
-    ids.add(generator.id)
+    gIDs.add(generator.id)
   }
   test("All IDs are unique", () => {
-    expect(ids.size).toBe(generators.length)
+    expect(gIDs.size).toBe(generators.length)
   })
   test("IDs do not contain forbidden words", () => {
-    const forbiddenWords = ["en", "de"]
-    for (const id of ids) {
+    for (const id of gIDs) {
       for (const word of forbiddenWords) {
         expect(id).not.toBe(word)
       }
     }
   })
+  test("IDs and slugs are disjoint", () => {
+    for (const id of gIDs) {
+      expect(slugIDs.has(id)).toBe(false)
+    }
+  })
 })
+
 for (const generator of generators) {
   describe(`Sanity-checks for question generator "${generator.id}"`, () => {
     test("Meta-data is present", () => {
