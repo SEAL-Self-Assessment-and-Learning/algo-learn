@@ -166,7 +166,7 @@ function QuestionGeneratorCard({
           return (
             <HoverCard key={path} openDelay={100} closeDelay={100}>
               <HoverCardTrigger asChild>
-                <div>
+                <div className="max-h-fit">
                   <Link to={`/${lang}/practice/${path}`}>{Icon}</Link>
                 </div>
               </HoverCardTrigger>
