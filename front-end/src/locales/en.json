@@ -70,7 +70,7 @@
   "detailed-learning-progress-text": "Probably more details than you want to know.",
   "even": "even",
   "feedback.correct": "Correct!",
-  "feedback.correct-order": "You'll get better over time.",
+  "feedback.correct-order": "You'll get better over time. \n|Correct order:|\n|---|{{0}}",
   "feedback.enter-an-expression": "Enter a formula",
   "feedback.expected": "Expected",
   "feedback.incomplete": "Incomplete or too complex",

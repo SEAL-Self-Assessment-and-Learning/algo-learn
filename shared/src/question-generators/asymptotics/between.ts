@@ -85,7 +85,7 @@ export const Between: QuestionGenerator = {
     let text: string
     const functionDeclaration = `${functionName}\\colon\\mathbb N\\to\\mathbb R`
     if (variant === "nifty") {
-      const condTheta = `${functionName}(${variable}) \\in ${`${"\\Theta"}(${functionName}(${variable})^2)`}`
+      const condTheta = `${functionName}(${variable}) \\in ${`${"\\Theta"}(${functionName}(${variable})^${random.int(2, 9)})`}`
       text = t("Theta.text", [functionDeclaration, condTheta])
     } else {
       const aTeX = `${aLandau}(${a.toLatex(variable)})`
@@ -179,11 +179,12 @@ ${t("feedback.expected")}: $${variable}$.`,
       }
 
       if (variant === "nifty") {
+        // create a solution for Theta(1)
+        const solution = new ProductTerm({
+          coefficient: 1,
+        })
         return {
-          correct:
-            sumProductTerm.getTerms()[0].exponentialBase.n === 1 &&
-            sumProductTerm.getTerms()[0].exponentialBase.d === 1 &&
-            sumProductTerm.getTerms()[0].logarithmExponents.size === 0,
+          correct: solution.Theta(sumProductTerm.dominantTerm()),
           feedbackText:
             "$" +
             mathNode.toTex({
@@ -264,10 +265,10 @@ export function generateBaseFunction(variant: string, random: Random): ProductTe
         }),
         logexponent: sampleFraction({
           fractionProbability: 0,
-          minInt: -17,
+          minInt: 1,
           maxInt: 17,
           random,
-        }),
+        }).mul(random.choice([-1, 1])),
       })
       const b = createProductTerm({
         coefficient: sampleFraction({
@@ -282,10 +283,10 @@ export function generateBaseFunction(variant: string, random: Random): ProductTe
         }),
         logexponent: sampleFraction({
           fractionProbability: 0,
-          minInt: -17,
+          minInt: 1,
           maxInt: 17,
           random,
-        }),
+        }).mul(random.choice([-1, 1])),
       })
       a.logarithmExponents.get(1).n = 0
       b.logarithmExponents.get(0).n = a.logarithmExponents.get(0).n

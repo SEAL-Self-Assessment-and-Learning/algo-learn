@@ -42,10 +42,12 @@ function GlobalHeader() {
 
   return (
     <header className="flex flex-none flex-wrap place-items-center justify-between gap-1 border-b-2 bg-goethe p-2 text-goethe-foreground">
-      <div className="flex-grow text-2xl">
-        <Link to="/">
-          algo learn <span className="font-mono text-sm text-yellow-200">alpha</span>
-        </Link>
+      <div className="flex-grow">
+        <Button asChild variant="link" className="inline text-2xl text-inherit">
+          <Link to="/">
+            algo learn <span className="font-mono text-sm text-yellow-200">alpha</span>
+          </Link>
+        </Button>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

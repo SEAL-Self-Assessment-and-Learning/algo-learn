@@ -1,8 +1,7 @@
 import { BsFillCheckSquareFill, BsFillXSquareFill } from "react-icons/bs"
 import { TiLockClosed, TiLockOpen } from "react-icons/ti"
 import { Link } from "react-router-dom"
-import { Tooltip } from "react-tooltip"
-import "react-tooltip/dist/react-tooltip.css"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { Parameters, serializeParameters } from "../../../shared/src/api/Parameters"
 import { QuestionGenerator } from "../../../shared/src/api/QuestionGenerator"
@@ -179,32 +178,31 @@ function SkillGroupCard({
   const total = generatorCalls.length
   const skillName = t("skill." + partialPath)
   return (
-    <>
-      <Link
-        id={`skill-group-card-${partialPath}`}
-        to={`practice/${partialPath}`}
-        className="hover:bg-shading group rounded-lg p-2 text-center hover:cursor-pointer"
-      >
-        <div className="relative">
-          <div
-            className={`m-2 aspect-square w-28 transform items-center gap-3 overflow-hidden rounded-full text-center duration-200 group-hover:scale-110 group-hover:ease-in`}
-            style={{
-              backgroundSize: "cover",
-              backgroundImage: `url("${getImageURL(partialPath) ?? ""}")`,
-            }}
-          ></div>
-        </div>
-        <div className="mx-auto flex w-max items-center justify-center text-xs font-bold">
-          <div>
-            {done}/{total} XP
+    <Tooltip placement="bottom">
+      <TooltipTrigger asChild>
+        <Link
+          to={`practice/${partialPath}`}
+          className="hover:bg-shading group rounded-lg p-2 text-center hover:cursor-pointer"
+        >
+          <div className="relative">
+            <div
+              className={`m-2 aspect-square w-28 transform items-center gap-3 overflow-hidden rounded-full text-center duration-200 group-hover:scale-110 group-hover:ease-in`}
+              style={{
+                backgroundSize: "cover",
+                backgroundImage: `url("${getImageURL(partialPath) ?? ""}")`,
+              }}
+            ></div>
           </div>
-        </div>
-        <div className="flex items-start justify-center group-hover:font-bold">{skillName}</div>
-      </Link>
-      <Tooltip anchorSelect={`#skill-group-card-${partialPath}`} place="bottom">
-        {t("Click to practice")}
-      </Tooltip>
-    </>
+          <div className="mx-auto flex w-max items-center justify-center text-xs font-bold">
+            <div>
+              {done}/{total} XP
+            </div>
+          </div>
+          <div className="flex items-start justify-center group-hover:font-bold">{skillName}</div>
+        </Link>
+      </TooltipTrigger>
+      <TooltipContent>{t("Click to practice")}</TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -247,7 +245,6 @@ function QuestionTableRow({
     generatorPath,
     parameters,
   })
-  const id = generatorCallPath.replaceAll("/", "-") + (parameters === undefined ? "-coarse" : "")
   const percentage = Math.round(strength * 100)
   const strengthTooltip = `Estimated strength: ${percentage}%. Decays over time, so practice regularly!${
     halflife ? ` (Estimated halflife: ~${Math.round(halflife * 10) / 10} days.)` : ""
@@ -271,7 +268,7 @@ function QuestionTableRow({
             <TiLockOpen className="mb-[0.3ex] inline" /> (practicing...)
           </span>
         ) : (
-          <StrengthMeter id={id} strength={strength} tooltip={strengthTooltip} />
+          <StrengthMeter strength={strength} tooltip={strengthTooltip} />
         )}
       </td>
     </tr>
