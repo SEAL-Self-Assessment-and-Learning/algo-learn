@@ -49,7 +49,7 @@ export const allQuestionGeneratorRoutes: QuestionRoutes = [
     generator: RecurrenceMaster,
   },
   {
-    path: "time/loops",
+    path: "time/loopsStars",
     generator: Loops,
   },
   {

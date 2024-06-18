@@ -1,21 +1,24 @@
-import { printStars } from "@shared/question-generators/recursion/formulaUtils.ts"
+import {
+  printStarsNew,
+  PseudoCodeAssignment,
+  PseudoCodeBlock,
+  PseudoCodeFor,
+  PseudoCodeForAll,
+  PseudoCodeIf,
+  PseudoCodeString,
+  PseudoCodeVariable,
+  PseudoCodeWhile,
+} from "@shared/utils/pseudoCodeUtils.ts"
 import Random from "@shared/utils/random.ts"
 
 export type AdditionOption = { type: "add"; value: number }
 export type MultiplicationOption = { type: "mult"; value: number }
 export type DivisionOption = { type: "div"; value: number }
-export type SquareOption = { type: "square" }
+export type SquareOption = { type: "square"; abs: boolean }
 export type CubeOption = { type: "cube" }
 export type LogOption = { type: "log"; value: number }
 export type RootOption = { type: "root" } // can we display the fifth root of n in pseudocode?
 export type PowOption = { type: "pow"; value: number | "self" }
-
-export type StepOptions =
-  | "normal"
-  | AdditionOption
-  | MultiplicationOption
-  | SquareOption
-  | DivisionOption
 
 export type BoundsOptions =
   | "none"
@@ -90,9 +93,8 @@ export function getCompare(random: Random, com: "<" | ">" | "<<" | ">>"): WhileC
  * @param startManipulation
  * @param end
  * @param endManipulation
- * @param step
- * @param timeOrStars
- * @param indent
+ * @param stepSet
+ * @param timeOrStars (if used to print stars or to determine the runtime of code)
  */
 export function createForLine({
   innerVar,
@@ -100,32 +102,43 @@ export function createForLine({
   startManipulation = "none",
   end,
   endManipulation = "none",
-  step = "normal",
+  stepSet,
   timeOrStars = "stars",
-  indent = 0,
 }: {
   innerVar: string
-  start: string
+  start?: string | PseudoCodeVariable
   startManipulation?: BoundsOptions
-  end: string
+  end?: string
   endManipulation?: BoundsOptions
-  step?: StepOptions
+  stepSet?: string
   timeOrStars?: "time" | "stars"
-  indent?: number
-}): string {
-  // create the spacing in front the for statement
-  const _: string = " ".repeat(indent)
+}): PseudoCodeFor | PseudoCodeForAll {
+  if (stepSet === undefined) {
+    if (start === undefined || end === undefined)
+      throw new Error("Either start, end or step should be defined.")
 
-  // create start string via createBoundsString
-  const startString = createBoundsString(start, startManipulation, timeOrStars)
+    // create start string via createBoundsString
+    const startString = createBoundsString(start, startManipulation, timeOrStars)
+    // create the end string via createBoundsString
+    const endString = createBoundsString(end, endManipulation, timeOrStars)
 
-  // create the step string via createStepString
-  const stepString = createStepString(step, innerVar, true)
+    return {
+      for: {
+        variable: innerVar,
+        from: startString,
+        to: endString,
+        do: null,
+      },
+    }
+  }
 
-  // create the end string via createBoundsString
-  const endString = createBoundsString(end, endManipulation, timeOrStars)
-
-  return `${_}for ${innerVar} from ${startString} to ${endString}${stepString}\n`
+  return {
+    forAll: {
+      variable: innerVar,
+      set: [stepSet],
+      do: null,
+    },
+  }
 }
 
 /**
@@ -145,46 +158,33 @@ export function createWhileLine({
   endManipulation = "none",
   compare,
   timeOrStars = "stars",
-  indent = 0,
 }: {
-  start: string
+  start: string | PseudoCodeVariable
   startManipulation?: BoundsOptions
-  end: string
+  end: string | PseudoCodeVariable
   endManipulation?: BoundsOptions
   compare: string
   timeOrStars?: "time" | "stars"
-  indent: number
-}): string {
-  const _: string = " ".repeat(indent)
-
+}): PseudoCodeWhile {
   // if compare = "==", we just return start compare end without manipulation
   if (compare === "==") {
-    return `${_}while ${start} ${compare} ${end}:\n`
+    return {
+      while: {
+        condition: [start, compare, end],
+        do: null,
+      },
+    }
   }
 
   const startBounds = createBoundsString(start, startManipulation, timeOrStars)
   const endBounds = createBoundsString(end, endManipulation, timeOrStars)
 
-  return `${_}while ${startBounds} ${compare} ${endBounds}\n`
-}
-
-/**
- * Creates a string (step statement) how to manipulate the step increment
- * @param step
- * @param innerVar
- * @param forLoop
- */
-export function createStepString(step: StepOptions, innerVar: string, forLoop: boolean = false) {
-  // create the step string
-  let stepString: string = ""
-  if (typeof step !== "string") {
-    const addOrMult: "+" | "*" | "/" | "-" =
-      step.type === "add" ? (step.value < 0 ? "-" : "+") : step.type === "div" ? "/" : "*"
-    const stepValue = step.type === "square" ? "square" : Math.abs(step.value).toString()
-    const prompt = `${forLoop ? " with" : ""}`
-    stepString = `${prompt} ${innerVar} ${addOrMult}= ${stepValue === "square" ? innerVar : stepValue}`
+  return {
+    while: {
+      condition: [...startBounds, compare, ...endBounds],
+      do: null,
+    },
   }
-  return stepString
 }
 
 /**
@@ -194,55 +194,67 @@ export function createStepString(step: StepOptions, innerVar: string, forLoop: b
  * @param timeOrStars
  */
 export function createBoundsString(
-  value: string,
+  value: string | PseudoCodeVariable,
   boundsManipulation: BoundsOptions,
   timeOrStars?: "time" | "stars",
 ) {
   // create the bounds string
-  let endString: string = boundsManipulation === "none" ? value : ""
+  let endPseudoCodeString: PseudoCodeString = [value]
   if (boundsManipulation !== "none") {
     if (boundsManipulation.type === "mult") {
-      endString = `${boundsManipulation.value}*${value}`
+      endPseudoCodeString = [`${boundsManipulation.value} \\cdot`, value]
     }
     if (boundsManipulation.type === "square") {
-      if (timeOrStars === "stars") {
-        endString = `abs(${value})*${value}`
+      if (timeOrStars === "stars" && boundsManipulation.abs) {
+        endPseudoCodeString = [value, " \\cdot ", value]
       } else {
-        endString = `$${value}^2$`
+        endPseudoCodeString = [value, "^2"]
       }
     }
     if (boundsManipulation.type === "cube") {
-      endString = `${value}*${value}*${value}`
+      endPseudoCodeString = [value, "^3"]
     }
     if (boundsManipulation.type === "log") {
       if (timeOrStars === "stars") {
-        endString = `ceil(log${boundsManipulation.value}(${value}))`
+        endPseudoCodeString = [`\\lceil log_${boundsManipulation.value}(`, value, `) \\rceil`]
       } else {
-        endString = `log${boundsManipulation.value == 0 ? "" : boundsManipulation.value}(${value})`
+        endPseudoCodeString = [
+          `log_${boundsManipulation.value === 0 ? "" : boundsManipulation.value}(`,
+          value,
+          `)`,
+        ]
       }
     }
     if (boundsManipulation.type === "root") {
       if (timeOrStars === "stars") {
-        endString = `floor(root(${value}))`
+        endPseudoCodeString = [`\\lfloor \\sqrt{`, value, `} \\rfloor`]
       } else {
-        endString = `root(${value})`
+        endPseudoCodeString = [`\\sqrt{`, value, `}`]
       }
     }
     if (boundsManipulation.type === "div") {
       if (timeOrStars === "stars") {
-        endString = `floor(${value}/${boundsManipulation.value})`
+        endPseudoCodeString = [`\\lfloor \\frac{`, value, `}{${boundsManipulation.value}} \\rfloor`]
       } else {
-        endString = `${value}/${boundsManipulation.value}`
+        endPseudoCodeString = [`\\frac{`, value, `}{${boundsManipulation.value}}`]
       }
     }
     if (boundsManipulation.type === "pow") {
-      endString = `pow(${boundsManipulation.value === "self" ? value : boundsManipulation.value},${value})`
+      endPseudoCodeString = [
+        boundsManipulation.value === "self" ? value : boundsManipulation.value.toString(),
+        "^",
+        value,
+      ]
     }
     if (boundsManipulation.type === "add") {
-      endString = `${value}${boundsManipulation.value > 0 ? "+" : ""}${boundsManipulation.value}`
+      endPseudoCodeString = [
+        value,
+        boundsManipulation.value > 0 ? "+" : "",
+        boundsManipulation.value.toString(),
+      ]
     }
   }
-  return endString
+  return endPseudoCodeString
 }
 
 /**
@@ -264,7 +276,6 @@ export function createIfCondition({
   numPrint = 0,
   numPrintElse = 0,
   writeCode = "",
-  indent = 0,
 }: {
   innerVar1: string
   innerVar2?: string
@@ -273,72 +284,48 @@ export function createIfCondition({
   numPrint?: number
   numPrintElse?: number
   writeCode?: string
-  indent?: number
-}): string {
-  let code = ""
-  const _ = " ".repeat(indent)
+}): PseudoCodeIf {
+  if (condition === "none") {
+    throw new Error("There should not be an if condition with none.")
+  }
+
+  let formattedCondition: PseudoCodeString
   if (condition === "same" || condition === ">" || condition === "<") {
-    code += `${_}if ${innerVar1} ${condition === "same" ? "==" : condition} ${innerVar2}\n`
+    formattedCondition = [
+      { variable: innerVar1 },
+      `${condition === "same" ? "==" : condition}`,
+      { variable: innerVar2 },
+    ]
   } else {
-    if (condition !== "none") {
-      code += `${_}if ${innerVar1} is ${condition}\n`
-    }
+    formattedCondition = [{ variable: innerVar1 }, `\\text{ is ${condition}}`]
+  }
+
+  const thenStatement: PseudoCodeBlock = {
+    block: [],
   }
   if (numPrint > 0) {
-    code += printStars(numPrint, indent + (condition !== "none" ? 2 : 0))
+    thenStatement.block.push(printStarsNew(numPrint))
   }
   if (writeCode !== "") {
-    code += `${_}  ${writeCode}`
+    thenStatement.block.push({
+      state: [writeCode],
+    })
+  }
+
+  const ifStatement: PseudoCodeIf = {
+    if: {
+      condition: formattedCondition,
+      then: thenStatement,
+    },
   }
 
   if (elseStatement) {
-    code += `${_}else\n`
-    code += printStars(numPrintElse, indent + 2)
+    ifStatement.if.else = {
+      block: [printStarsNew(numPrintElse)],
+    }
   }
 
-  return code
-}
-
-/**
- * Creates a continue statement
- * @param con
- * @param indent
- */
-export function createIfContinue({
-  con = true,
-  indent = 0,
-}: {
-  con?: boolean
-  indent?: number
-}): string {
-  return con ? " ".repeat(indent) + "continue\n" : ""
-}
-
-/**
- * Creates a break statement
- * @param br
- * @param indent
- */
-export function createIfBreak({ br = true, indent = 0 }: { br?: boolean; indent?: number }): string {
-  return br ? " ".repeat(indent) + "break\n" : ""
-}
-
-/**
- * Creates a new variable (string)
- * @param variable
- * @param value
- * @param indent
- */
-export function createVariable({
-  variable,
-  value,
-  indent = 0,
-}: {
-  variable: string
-  value: string
-  indent?: number
-}): string {
-  return `${" ".repeat(indent)}${variable} = ${value}\n`
+  return ifStatement
 }
 
 /**
@@ -351,7 +338,6 @@ export function createVariable({
  * @param innerVar
  * @param innerVar2
  * @param code
- * @param _
  * @param compare
  * @param vars
  * @param changeCode
@@ -363,10 +349,8 @@ export function createWhileChangeValues({
   cOption,
   firstChangeValue,
   secondChangeValue,
-  innerVar = "na",
-  innerVar2 = "na",
-  code = "",
-  _ = "",
+  innerVar = "nan",
+  innerVar2 = "nan",
   compare,
   vars,
   changeCode = true,
@@ -379,8 +363,6 @@ export function createWhileChangeValues({
   secondChangeValue: number
   innerVar?: string
   innerVar2?: string
-  code?: string
-  _?: string
   compare: WhileCompareOptions
   vars: WhileOrderOptions
   changeCode?: boolean
@@ -390,134 +372,152 @@ export function createWhileChangeValues({
 }) {
   // changeI -> innerVar
   // changeJ -> innerVar2
+  const assignments: PseudoCodeAssignment[] = []
   if (cOption === "xPlus") {
-    changeCode ? (code += `${_}  ${innerVar} += ${firstChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "+", firstChangeValue.toString()],
+    })
     changeI += firstChangeValue
-  } else if (cOption === "yPlus") {
-    changeCode ? (code += `${_}  ${innerVar2} += ${secondChangeValue}\n`) : ""
-    changeJ += secondChangeValue
   } else if (cOption === "xMult") {
     changeCode ? (firstChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar} *= ${firstChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "*", firstChangeValue.toString()],
+    })
     changeI *= firstChangeValue
-  } else if (cOption === "yMult") {
-    changeCode ? (secondChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar2} *= ${secondChangeValue}\n`) : ""
-    changeJ *= secondChangeValue
   } else if (cOption === "xSquare") {
-    changeCode ? (code += `${_}  ${innerVar} *= ${innerVar}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "^2"],
+    })
     changeI *= changeI
-  } else if (cOption === "ySquare") {
-    changeCode ? (code += `${_}  ${innerVar2} *= ${innerVar2}\n`) : ""
-    changeJ *= changeJ
   } else if (cOption === "xPlusX") {
-    changeCode ? (code += `${_}  ${innerVar} += ${innerVar}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "+", { variable: innerVar }],
+    })
     changeI += changeI
-  } else if (cOption === "yPlusY") {
-    changeCode ? (code += `${_}  ${innerVar2} += ${innerVar2}\n`) : ""
-    changeJ += changeJ
   } else if (cOption === "xMinus") {
-    changeCode ? (code += `${_}  ${innerVar} -= ${firstChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "-", firstChangeValue.toString()],
+    })
     changeI -= firstChangeValue
-  } else if (cOption === "yMinus") {
-    changeCode ? (code += `${_}  ${innerVar2} -= ${secondChangeValue}\n`) : ""
-    changeJ -= secondChangeValue
   } else if (cOption === "xDiv") {
     changeCode ? (firstChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar} = floor(${innerVar} / ${firstChangeValue})\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [
+        "\\lfloor \\frac{",
+        { variable: innerVar },
+        "}{",
+        firstChangeValue.toString(),
+        "} \\rfloor",
+      ],
+    })
     changeI = Math.floor(changeI / firstChangeValue)
-  } else if (cOption === "yDiv") {
-    changeCode ? (secondChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar2} = floor(${innerVar2} / ${secondChangeValue})\n`) : ""
-    changeJ = Math.floor(changeJ / secondChangeValue)
   } else if (cOption === "xLog") {
-    changeCode ? (code += `${_}  ${innerVar} = floor(log2(${innerVar}))\n`) : ""
-    changeI = Math.floor(Math.log2(changeI))
-  } else if (cOption === "yLog") {
-    changeCode ? (code += `${_}  ${innerVar2} = floor(log2(${innerVar2}))\n`) : ""
-    changeJ = Math.floor(Math.log2(changeJ))
+    assignments.push({
+      assignment: innerVar,
+      value: ["\\lceil ", "log_2(", innerVar, ")", "\\rceil"],
+    })
+    changeI = Math.ceil(Math.log2(changeI))
   } else if (cOption === "xMinusY") {
-    changeCode ? (code += `${_}  ${innerVar} -= ${innerVar2}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "-", { variable: innerVar2 }],
+    })
     changeI -= changeJ
-  } else if (cOption === "yMinusX") {
-    changeCode ? (code += `${_}  ${innerVar2} -= ${innerVar}\n`) : ""
-    changeJ -= changeI
   } else if (cOption === "xDivY") {
-    changeCode ? (code += `${_}  ${innerVar} = floor(${innerVar} / ${innerVar2})\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: ["\\lfloor \\frac{", { variable: innerVar }, "}{", { variable: innerVar2 }, "} \\rfloor"],
+    })
     changeI = Math.floor(changeI / changeJ)
-  } else if (cOption === "yDivX") {
-    changeCode ? (code += `${_}  ${innerVar2} = floor(${innerVar2} / ${innerVar})\n`) : ""
-    changeJ = Math.floor(changeJ / changeI)
   } else if (cOption === "xPlusY") {
-    changeCode ? (code += `${_}  ${innerVar} += ${innerVar2}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "+", { variable: innerVar2 }],
+    })
     changeI += changeJ
-  } else if (cOption === "yPlusX") {
-    changeCode ? (code += `${_}  ${innerVar2} += ${innerVar}\n`) : ""
-    changeJ += changeI
   } else if (cOption === "xMultY") {
-    changeCode ? (code += `${_}  ${innerVar} *= ${innerVar2}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "*", { variable: innerVar2 }],
+    })
     changeI *= changeJ
-  } else if (cOption === "yMultX") {
-    changeCode ? (code += `${_}  ${innerVar2} *= ${innerVar}\n`) : ""
-    changeJ *= changeI
   } else if (cOption === "xMinusYPlus") {
-    changeCode ? (code += `${_}  ${innerVar} -= ${firstChangeValue}\n`) : ""
-    changeCode ? (code += `${_}  ${innerVar2} += ${secondChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "-", firstChangeValue.toString()],
+    })
+    assignments.push({
+      assignment: innerVar2,
+      value: [{ variable: innerVar2 }, "+", secondChangeValue.toString()],
+    })
     changeI -= firstChangeValue
     changeJ += secondChangeValue
   } else if (cOption === "xDivYPlus") {
     changeCode ? (firstChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar} = floor(${innerVar} / ${firstChangeValue})\n`) : ""
-    changeCode ? (code += `${_}  ${innerVar2} += ${secondChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [
+        "\\lfloor \\frac{",
+        { variable: innerVar },
+        "}{",
+        firstChangeValue.toString(),
+        "} \\rfloor",
+      ],
+    })
+    assignments.push({
+      assignment: innerVar2,
+      value: [{ variable: innerVar2 }, "+", secondChangeValue.toString()],
+    })
     changeI = Math.floor(changeI / firstChangeValue)
     changeJ += secondChangeValue
   } else if (cOption === "xMinusYMult") {
-    changeCode ? (code += `${_}  ${innerVar} -= ${firstChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "-", firstChangeValue.toString()],
+    })
     changeCode ? (secondChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar2} *= ${secondChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar2,
+      value: [{ variable: innerVar2 }, " \\cdot ", secondChangeValue.toString()],
+    })
     changeI -= firstChangeValue
     changeJ *= secondChangeValue
   } else if (cOption === "xDivYMult") {
     changeCode ? (firstChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar} = floor(${innerVar} / ${firstChangeValue})\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [
+        "\\lfloor \\frac{",
+        { variable: innerVar },
+        "}{",
+        firstChangeValue.toString(),
+        "} \\rfloor",
+      ],
+    })
     changeCode ? (secondChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar2} *= ${secondChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar2,
+      value: [{ variable: innerVar2 }, "*", secondChangeValue.toString()],
+    })
     changeI = Math.floor(changeI / firstChangeValue)
     changeJ *= secondChangeValue
   } else if (cOption === "xMinusYYPlus") {
-    changeCode ? (code += `${_}  ${innerVar} -= ${innerVar2}\n`) : ""
-    changeCode ? (code += `${_}  ${innerVar2} += ${secondChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "-", { variable: innerVar2 }],
+    })
+    assignments.push({
+      assignment: innerVar2,
+      value: [{ variable: innerVar2 }, "+", secondChangeValue.toString()],
+    })
     changeI -= changeJ
     changeJ += secondChangeValue
-  } else if (cOption === "yMinusXPlus") {
-    changeCode ? (code += `${_}  ${innerVar2} -= ${secondChangeValue}\n`) : ""
-    changeCode ? (code += `${_}  ${innerVar} += ${firstChangeValue}\n`) : ""
-    changeJ -= secondChangeValue
-    changeI += firstChangeValue
-  } else if (cOption === "yDivXPlus") {
-    changeCode ? (secondChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar2} = floor(${innerVar2} / ${secondChangeValue})\n`) : ""
-    changeCode ? (code += `${_}  ${innerVar} += ${firstChangeValue}\n`) : ""
-    changeJ = Math.floor(changeJ / secondChangeValue)
-    changeI += firstChangeValue
-  } else if (cOption === "yMinusXMult") {
-    changeCode ? (code += `${_}  ${innerVar2} -= ${secondChangeValue}\n`) : ""
-    changeCode ? (firstChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar} *= ${firstChangeValue}\n`) : ""
-    changeJ -= secondChangeValue
-    changeI *= firstChangeValue
-  } else if (cOption === "yDivXMult") {
-    changeCode ? (secondChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar2} = floor(${innerVar2} / ${secondChangeValue})\n`) : ""
-    changeCode ? (firstChangeValue = random.int(2, 3)) : ""
-    changeCode ? (code += `${_}  ${innerVar} *= ${firstChangeValue}\n`) : ""
-    changeJ = Math.floor(changeJ / secondChangeValue)
-    changeI *= firstChangeValue
-  } else if (cOption === "yMinusXXPlus") {
-    changeCode ? (code += `${_}  ${innerVar2} -= ${innerVar}\n`) : ""
-    changeCode ? (code += `${_}  ${innerVar} += ${firstChangeValue}\n`) : ""
-    changeJ -= changeI
-    changeI += firstChangeValue
   } else if (cOption === "bothMinus") {
     if (
       (vars === "xy" && (compare === ">" || compare === ">=")) ||
@@ -529,8 +529,14 @@ export function createWhileChangeValues({
       changeCode ? (secondChangeValue = random.int(3, 4)) : ""
       changeCode ? (firstChangeValue = secondChangeValue - random.int(1, 2)) : ""
     }
-    changeCode ? (code += `${_}  ${innerVar} -= ${firstChangeValue}\n`) : ""
-    changeCode ? (code += `${_}  ${innerVar2} -= ${secondChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "-", firstChangeValue.toString()],
+    })
+    assignments.push({
+      assignment: innerVar2,
+      value: [{ variable: innerVar2 }, "-", secondChangeValue.toString()],
+    })
     changeI -= firstChangeValue
     changeJ -= secondChangeValue
   } else if (cOption === "bothPlus") {
@@ -544,8 +550,14 @@ export function createWhileChangeValues({
       changeCode ? (secondChangeValue = random.int(1, 3)) : ""
       changeCode ? (firstChangeValue = secondChangeValue + random.int(1, 2)) : ""
     }
-    changeCode ? (code += `${_}  ${innerVar} += ${firstChangeValue}\n`) : ""
-    changeCode ? (code += `${_}  ${innerVar2} += ${secondChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "+", firstChangeValue.toString()],
+    })
+    assignments.push({
+      assignment: innerVar2,
+      value: [{ variable: innerVar2 }, "+", secondChangeValue.toString()],
+    })
     changeI += firstChangeValue
     changeJ += secondChangeValue
   } else if (cOption === "bothMult") {
@@ -559,14 +571,20 @@ export function createWhileChangeValues({
       changeCode ? (secondChangeValue = random.int(2, 3)) : ""
       changeCode ? (firstChangeValue = secondChangeValue + 1) : ""
     }
-    changeCode ? (code += `${_}  ${innerVar} *= ${firstChangeValue}\n`) : ""
-    changeCode ? (code += `${_}  ${innerVar2} *= ${secondChangeValue}\n`) : ""
+    assignments.push({
+      assignment: innerVar,
+      value: [{ variable: innerVar }, "*", firstChangeValue.toString()],
+    })
+    assignments.push({
+      assignment: innerVar2,
+      value: [{ variable: innerVar2 }, "*", secondChangeValue.toString()],
+    })
     changeI *= firstChangeValue
     changeJ *= secondChangeValue
   }
 
   return {
-    code,
+    assignments,
     firstChangeValue,
     secondChangeValue,
     changeI,

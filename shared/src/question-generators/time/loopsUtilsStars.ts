@@ -2,10 +2,7 @@ import {
   allWhileCases,
   BoundsOptions,
   createForLine,
-  createIfBreak,
   createIfCondition,
-  createIfContinue,
-  createVariable,
   createWhileChangeValues,
   createWhileLine,
   getCompare,
@@ -13,8 +10,17 @@ import {
   WhileCompareOptions,
   WhileOrderOptions,
 } from "@shared/question-generators/time/loopsUtils.ts"
-import Random from "../../utils/random"
-import { printStars } from "../recursion/formulaUtils"
+import { createForForLoop } from "@shared/question-generators/time/loopsUtilsStarsForFor.ts"
+import {
+  printStarsNew,
+  PseudoCode,
+  PseudoCodeBlock,
+  PseudoCodeFor,
+  PseudoCodeForAll,
+  PseudoCodeIf,
+  PseudoCodeWhile,
+} from "@shared/utils/pseudoCodeUtils.ts"
+import Random from "@shared/utils/random"
 
 /**
  * Sample the source code of a loop that prints stars
@@ -25,7 +31,12 @@ import { printStars } from "../recursion/formulaUtils"
  *   the recursive case, as well as the number of recursive calls and the number
  *   to divide by.
  */
-export function sampleLoopStars(random: Random) {
+export function sampleLoopStars(random: Random): {
+  functionText: PseudoCode
+  functionName: string
+  n: string
+  numStars: number
+} {
   const functionName = random.choice("fghPp".split(""))
   const variable = random.choice("nmNMxyztk".split(""))
   const availableVarNames = "nmNMxyztk".split("").filter((c) => c !== variable)
@@ -47,27 +58,17 @@ export function sampleLoopStars(random: Random) {
  * @param props
  * @param props.random - Random number generator
  * @param props.availableVarNames - Variable names that can be used
- * @param props.indent - Indentation level
  * @returns Source code
  */
 export function sampleExact({
   random,
   availableVarNames = "nmNMxyztk".split(""),
-  indent = 0,
 }: {
   random: Random
   availableVarNames?: string[]
-  indent?: number
-}) {
-  const _ = " ".repeat(indent)
+}): { code: PseudoCode; numStars: number } {
   const innerVar = random.choice(availableVarNames)
   const innerVar2 = random.choice(availableVarNames.filter((v) => v !== innerVar))
-  const innerVar3 = random.choice(availableVarNames.filter((v) => v !== innerVar && v !== innerVar2))
-  const innerVar4 = random.choice(
-    availableVarNames.filter((v) => v !== innerVar && v !== innerVar2 && v !== innerVar3),
-  )
-  let code = ""
-  let numStars = 0
 
   // All possible numPrint values, which could occur inside a loop
   // numPrintMiddle... currently only necessary for "forfor" loops
@@ -83,19 +84,15 @@ export function sampleExact({
   - for -> simple for loop
   - forfor -> nested for loop (the second loop can be dependent on the first)
   - while -> simple while loop (one or two Params)
-  - whilewhileBlock -> nested while loop (the second is independent of the first)
    */
-  const loopType: "for" | "forfor" | "while" | "whilewhileBlock" = random.choice([
-    "for",
-    "forfor",
-    "while",
-    "whilewhileBlock",
-  ])
+  const loopType: "for" | "forfor" | "while" = random.choice(["for", "forfor", "while"])
 
   if (loopType === "for") {
-    const forResult = createForLoop(innerVar, numPrint, numPrintElse, code, _, indent, numStars, random)
-    code = forResult.code
-    numStars = forResult.numStars
+    const forResult = createForLoop(innerVar, numPrint, numPrintElse, 0, random)
+    return {
+      numStars: forResult.numStars,
+      code: forResult.code,
+    }
   } else if (loopType === "forfor") {
     const forForResult = createForForLoop(
       innerVar,
@@ -106,66 +103,30 @@ export function sampleExact({
       numPrintMiddleIf,
       numPrintMiddleElse,
       numPrintAfter,
-      code,
-      indent,
-      _,
-      numStars,
+      0,
       random,
     )
-    code = forForResult.code
-    numStars = forForResult.numStars
+    return {
+      numStars: forForResult.numStars,
+      code: forForResult.code,
+    }
   } else if (loopType === "while") {
-    const whileLoop = createWhileLoop(
-      code,
-      _,
-      indent,
+    const whileLoopResult = createWhileLoop(
       innerVar,
       innerVar2,
-      numStars,
+      0,
       numPrint,
       numPrintElse,
       numPrintAfter,
       random,
     )
-    code = whileLoop.code
-    numStars = whileLoop.numStars
-  } else if (loopType === "whilewhileBlock") {
-    const secondWhileLoop = createWhileLoop(
-      code,
-      _,
-      indent,
-      innerVar,
-      innerVar2,
-      numStars,
-      numPrint,
-      numPrintElse,
-      numPrintAfter,
-      random,
-    )
-
-    const firstWhileLoop = createWhileLoop(
-      code,
-      _,
-      indent,
-      innerVar3,
-      innerVar4,
-      numStars,
-      numPrint,
-      numPrintElse,
-      numPrintAfter,
-      random,
-      true,
-      secondWhileLoop.numStars,
-      secondWhileLoop.code,
-    )
-
-    code = firstWhileLoop.code
-    numStars = firstWhileLoop.numStars
+    return {
+      numStars: whileLoopResult.numStars,
+      code: whileLoopResult.code,
+    }
   } else {
     throw new Error("Unknown loop type")
   }
-
-  return { code: code.trim(), numStars }
 }
 
 /**
@@ -198,7 +159,7 @@ function compareTwoValues(i: number, j: number, compare: string) {
  * @param elseStatement if an else statement should be printed
  * @param j the second value of the loop (only if two loops) (default NaN)
  */
-function calculateNumStars(
+export function calculateNumStars(
   cond: string,
   i: number,
   numPrint: number,
@@ -231,9 +192,6 @@ function calculateNumStars(
  * @param innerVar
  * @param numPrint
  * @param numPrintElse
- * @param code
- * @param _
- * @param indent
  * @param numStars
  * @param random
  */
@@ -241,9 +199,6 @@ function createForLoop(
   innerVar: string,
   numPrint: number,
   numPrintElse: number,
-  code: string,
-  _: string,
-  indent: number,
   numStars: number,
   random: Random,
 ) {
@@ -267,7 +222,7 @@ function createForLoop(
   const endManipulationOptions: BoundsOptions[] = [
     "none",
     { type: "mult", value: random.int(2, 3) },
-    { type: "square" },
+    { type: "square", abs: false },
     { type: "log", value: 2 },
   ]
 
@@ -278,13 +233,19 @@ function createForLoop(
     [endManipulationOptions[3], 0.05],
   ])
 
-  code += createForLine({
+  const completeCode: PseudoCode = []
+  const bodyBlock: PseudoCodeBlock = {
+    block: [],
+  }
+  completeCode.push(bodyBlock)
+
+  const forStatement: PseudoCodeFor | PseudoCodeForAll = createForLine({
     innerVar,
     start: low.toString(),
     end: high.toString(),
     endManipulation,
-    indent,
   })
+  bodyBlock.block.push(forStatement)
 
   const cond: IfOptions = random.choice(["none", "even", "odd", "square"])
   const elseStatement =
@@ -295,301 +256,45 @@ function createForLoop(
         ])
       : false
 
-  code += createIfCondition({
-    innerVar1: innerVar,
-    condition: cond,
-    elseStatement,
-    numPrint,
-    numPrintElse,
-    indent: indent + 2,
-  })
+  if (cond === "none") {
+    if ("forAll" in forStatement) {
+      forStatement.forAll.do = {
+        block: [printStarsNew(numPrint)],
+      }
+    } else {
+      forStatement.for.do = {
+        block: [printStarsNew(numPrint)],
+      }
+    }
+  } else {
+    const ifStatement: PseudoCodeIf = createIfCondition({
+      innerVar1: innerVar,
+      condition: cond,
+      elseStatement,
+      numPrint,
+      numPrintElse,
+    })
+    if ("forAll" in forStatement) {
+      forStatement.forAll.do = {
+        block: [ifStatement],
+      }
+    } else {
+      forStatement.for.do = {
+        block: [ifStatement],
+      }
+    }
+  }
 
   for (let i = low; condition(i); i++) {
     numStars += calculateNumStars(cond, i, numPrint, numPrintElse, elseStatement)
   }
 
-  return { numStars, code: code.trim() }
+  return { numStars, code: completeCode }
 }
 
 /**
- * This function generates code for a double for loop
- * We don't use blocks here we can use the same variables for both loops
  *
- * Example:
- * for y from 0 to 9:
- *   if y is square
- *     print("**")
- *   for x from y*2 to 20*2:
- *     if x is even
- *       print("*")
- *     else:
- *       print("**")
- *
- * Just for fun: Also the options for a "continue" (never enter the second for loop)
- * and a "break" (exit the second for loop after the first iteration)
- *
- * @param innerVar the name of the first variable
- * @param innerVar2
- * @param numPrint number of stars to print in the if condition
- * @param numPrintElse number of stars to print in the else condition
- * @param numPrintMiddle number of stars to print in between the two loops
- * @param numPrintMiddleIf number of stars to print in the if condition in the first loop
- * @param numPrintMiddleElse
- * @param numPrintAfter print stars after both loops
- * @param code the code to append to
- * @param indent
- * @param _
- * @param numStars total number of stars calculated
- * @param random
- */
-function createForForLoop(
-  innerVar: string,
-  innerVar2: string,
-  numPrint: number,
-  numPrintElse: number,
-  numPrintMiddle: number,
-  numPrintMiddleIf: number,
-  numPrintMiddleElse: number,
-  numPrintAfter: number,
-  code: string,
-  indent: number,
-  _: string,
-  numStars: number,
-  random: Random,
-) {
-  // at first, we randomly choose all the possible options inside both loops
-  const startFirst = random.int(0, 3)
-  const stepFirst = random.weightedChoice([
-    [1, 0.775],
-    [2, 0.15],
-    [3, 0.075],
-  ])
-  let endFirst = random.int(6, 10)
-  const endManipulationOptions: BoundsOptions[] = [
-    "none",
-    { type: "mult", value: random.int(2, 3) },
-    { type: "square" },
-    { type: "log", value: 2 },
-  ]
-  const endFirstManipulation: BoundsOptions = random.weightedChoice([
-    [endManipulationOptions[0], 0.7],
-    [endManipulationOptions[1], 0.125],
-    [endManipulationOptions[2], 0.125],
-    [endManipulationOptions[3], 0.05],
-  ])
-  if (endFirstManipulation !== "none" && endFirstManipulation.type === "log") endFirst += 2 // add 2 to get at least one iteration
-  const endFirstManipulationValue = random.int(2, 3)
-  const printStarsMiddle = random.weightedChoice([
-    [true, 0.15],
-    [false, 0.85],
-  ])
-  // no square, no same
-  const options: IfOptions[] = ["even", "odd", "none"]
-  const condMiddle: IfOptions = random.choice(options)
-  const elseMiddle: boolean =
-    condMiddle === "none"
-      ? false
-      : random.weightedChoice([
-          [true, 0.25],
-          [false, 0.75],
-        ])
-
-  const continueMiddle = random.weightedChoice([
-    [true, 0.05],
-    [false, 0.95],
-  ])
-  const startSecond = random.int(0, 3)
-  const startSecondManipulation =
-    endFirstManipulation === "none"
-      ? random.weightedChoice([
-          ["none", 0.7],
-          ["var-normal", 0.2],
-          ["var-mult", 0.05],
-          ["var-square", 0.05],
-        ])
-      : "none"
-  const startSecondManipulationValue = random.int(2, 3)
-  const stepSecond =
-    stepFirst !== 1
-      ? 1
-      : random.weightedChoice([
-          [1, 0.6],
-          [2, 0.3],
-          [3, 0.1],
-        ])
-  // if we have a manipulation to the start value of the second for based on the first for loop, we may need to increase
-  // the endValue of the second for loop for better results
-  const additionalValue =
-    startSecondManipulation === "var-normal" || startSecondManipulation === "none"
-      ? 0
-      : startSecondManipulation === "var-mult"
-        ? endFirst * startSecondManipulationValue
-        : endFirst * endFirst
-  const endSecond =
-    startSecondManipulation === "none" ? random.int(6, 10) : additionalValue + random.int(0, 2) // here the additional value is added
-  // no log option, to avoid: for y from 2*m to ceil(log2(262144)) with y += 1
-  const endSecondManipulation: BoundsOptions =
-    endFirstManipulation !== "none"
-      ? "none"
-      : random.weightedChoice([
-          [endManipulationOptions[0], 0.7],
-          [endManipulationOptions[1], 0.125],
-          [endManipulationOptions[2], 0.125],
-        ])
-
-  const endSecondManipulationValue = random.int(2, 3)
-  // definitely print stars at the end
-  const condEnd: IfOptions = random.choice(["even", "odd", "same", "square", "none"])
-  // if I want to ask inside the second if statement for a condition
-  // based on the variable inside the first for loop
-  const askFirstVar = random.weightedChoice([
-    [true, 0.2],
-    [false, 0.8],
-  ])
-  const elseEnd =
-    condEnd === "none" || elseMiddle
-      ? false
-      : random.weightedChoice([
-          [true, 0.5],
-          [false, 0.5],
-        ])
-
-  const breakEnd = random.weightedChoice([
-    [true, 0.05],
-    [false, 0.95],
-  ])
-  const printStarsAfter =
-    condEnd !== "none" && condMiddle !== "none"
-      ? false
-      : random.weightedChoice([
-          [true, 0.25],
-          [false, 0.75],
-        ])
-
-  // Generate the pseudocode
-  code += createForLine({
-    innerVar,
-    start: startFirst.toString(),
-    startManipulation: "none",
-    end: endFirst.toString(),
-    endManipulation: endFirstManipulation,
-    step: { type: "add", value: stepFirst },
-    indent,
-  })
-
-  // printsStarsMiddle
-  if (printStarsMiddle) {
-    code += printStars(numPrintMiddle, indent + 2)
-  }
-
-  // if middle
-  code += createIfCondition({
-    innerVar1: innerVar,
-    condition: condMiddle,
-    elseStatement: elseMiddle,
-    numPrint: numPrintMiddleIf,
-    numPrintElse: numPrintMiddleElse,
-    indent: indent + 2,
-  })
-
-  // continue middle
-  code += createIfContinue({ con: continueMiddle, indent: 2 })
-
-  let startManipulation: BoundsOptions = "none"
-  let startValue = startSecond.toString()
-  if (startSecondManipulation === "var-normal") {
-    startValue = innerVar
-  } else if (startSecondManipulation === "var-mult") {
-    startValue = innerVar
-    startManipulation = { type: "mult", value: startSecondManipulationValue }
-  } else if (startSecondManipulation === "var-square") {
-    startValue = innerVar
-    startManipulation = { type: "square" }
-  }
-  code += createForLine({
-    innerVar: innerVar2,
-    start: startValue,
-    startManipulation,
-    end: endSecond.toString(),
-    endManipulation: endSecondManipulation,
-    step: { type: "add", value: stepSecond },
-    indent: indent + 2,
-  })
-
-  // if end
-  let askVar = `${innerVar2}`
-  if (askFirstVar) {
-    askVar = `${innerVar}`
-  }
-  code += createIfCondition({
-    innerVar1: askVar,
-    innerVar2: askVar === innerVar ? innerVar2 : innerVar,
-    condition: condEnd,
-    elseStatement: elseEnd,
-    numPrint,
-    numPrintElse,
-    indent: indent + 4,
-  })
-
-  // break end
-  code += createIfBreak({ br: breakEnd, indent: 4 })
-
-  // print stars after
-  if (printStarsAfter) {
-    code += printStars(numPrintAfter, indent)
-  }
-
-  const endFirstValue =
-    endFirstManipulation === "none"
-      ? endFirst
-      : endFirstManipulation.type === "mult"
-        ? endFirst * endFirstManipulationValue
-        : endFirstManipulation.type === "square"
-          ? endFirst * endFirst
-          : Math.ceil(Math.log(endFirst))
-
-  // first loop
-  for (let i = startFirst; i <= endFirstValue; i += stepFirst) {
-    if (printStarsMiddle) numStars += numPrintMiddle
-    if (printStarsMiddle) {
-      numPrint += numPrintMiddle
-    }
-
-    numStars += calculateNumStars(condMiddle, i, numPrintMiddleIf, numPrintMiddleElse, elseMiddle)
-
-    if (continueMiddle) continue
-
-    // second loop
-    let j =
-      startSecondManipulation === "var-normal"
-        ? i
-        : startSecondManipulation === "var-mult"
-          ? i * startSecondManipulationValue
-          : startSecondManipulation === "var-square"
-            ? i * i
-            : startSecond
-    const endSecondValue =
-      endSecondManipulation === "none"
-        ? endSecond
-        : endSecondManipulation.type === "square"
-          ? endSecond * endSecond
-          : endSecondManipulation.type === "log"
-            ? Math.ceil(Math.log(endSecond))
-            : endSecond * endSecondManipulationValue
-    for (; j <= endSecondValue; j += stepSecond) {
-      numStars += calculateNumStars(condEnd, askFirstVar ? i : j, numPrint, numPrintElse, elseEnd, i)
-      if (breakEnd) break
-    }
-  }
-
-  if (printStarsAfter) numStars += numPrintAfter
-
-  return { code: code.trim(), numStars }
-}
-
-/**
- * This code creates a block of a while loop
- * You have many different cases how the loop is constructed with quite much manipulation
+ * You have many different cases how the loop is constructed
  *
  * The options are listed below
  *
@@ -601,9 +306,6 @@ function createForForLoop(
  *   t = floor(t / 2)
  *   n += 3
  *
- * @param code the code to append to
- * @param _
- * @param indent
  * @param innerVar the name of the first variable
  * @param innerVar2 second variable
  * @param numStars total number of stars calculated
@@ -611,14 +313,8 @@ function createForForLoop(
  * @param numPrintElse number of stars to print in the else condition
  * @param numPrintAfter number of stars to print after the loop
  * @param random
- * @param twoLoops if there is going to be a second loop inside this
- * @param starsSecondLoop number of stars the second loop will print
- * @param insertCode code of the second loop to insert inside this loop
  */
 function createWhileLoop(
-  code: string,
-  _: string,
-  indent: number,
   innerVar: string,
   innerVar2: string,
   numStars: number,
@@ -626,9 +322,6 @@ function createWhileLoop(
   numPrintElse: number,
   numPrintAfter: number,
   random: Random,
-  twoLoops: boolean = false,
-  starsSecondLoop: number = 0,
-  insertCode: string = "",
 ) {
   function condition(i: number, j: number) {
     return vars === "xy"
@@ -638,15 +331,15 @@ function createWhileLoop(
             : endManipulation.type === "square"
               ? Math.abs(i) * i
               : endManipulation.type === "mult"
-                ? i * endManipulationValue
-                : Math.floor(Math.log2(i)),
+                ? i * endManipulation.value
+                : Math.ceil(Math.log2(i)),
           varToManipulate !== "j" || endManipulation === "none"
             ? j
             : endManipulation.type === "square"
               ? Math.abs(j) * j
               : endManipulation.type === "mult"
-                ? j * endManipulationValue
-                : Math.floor(Math.log2(j)),
+                ? j * endManipulation.value
+                : Math.ceil(Math.log2(j)),
           compare,
         )
       : vars === "yx"
@@ -656,15 +349,15 @@ function createWhileLoop(
               : endManipulation.type === "square"
                 ? Math.abs(j) * j
                 : endManipulation.type === "mult"
-                  ? j * endManipulationValue
-                  : Math.floor(Math.log2(j)),
+                  ? j * endManipulation.value
+                  : Math.ceil(Math.log2(j)),
             varToManipulate !== "i" || endManipulation === "none"
               ? i
               : endManipulation.type === "square"
                 ? Math.abs(i) * i
                 : endManipulation.type === "mult"
-                  ? i * endManipulationValue
-                  : Math.floor(Math.log2(i)),
+                  ? i * endManipulation.value
+                  : Math.ceil(Math.log2(i)),
             compare,
           )
         : vars === "xn"
@@ -674,30 +367,22 @@ function createWhileLoop(
                 : endManipulation.type === "square"
                   ? Math.abs(i) * i
                   : endManipulation.type === "mult"
-                    ? i * endManipulationValue
-                    : Math.floor(Math.log2(i)),
+                    ? i * endManipulation.value
+                    : Math.ceil(Math.log2(i)),
               varToManipulate !== "e" || endManipulation === "none"
                 ? endValue
                 : endManipulation.type === "square"
                   ? endValue * endValue
                   : endManipulation.type === "mult"
-                    ? endValue * endManipulationValue
-                    : Math.floor(Math.log2(endValue)),
+                    ? endValue * endManipulation.value
+                    : Math.ceil(Math.log2(endValue)),
               compare,
             )
           : false
   }
 
-  const {
-    startVar1,
-    startVar2,
-    endValue,
-    vars,
-    compare,
-    endManipulationValue,
-    endManipulation,
-    cOption,
-  } = computeStartEndVarsWhile(random)
+  const { startVar1, startVar2, endValue, vars, compare, endManipulation, cOption } =
+    computeStartEndVarsWhile(random)
 
   if (startVar1 === -10 && startVar2 === -10) {
     throw new Error("Start values are not set" + cOption + vars + compare)
@@ -717,6 +402,12 @@ function createWhileLoop(
     [false, 0.75],
   ])
 
+  const pseudoCode: PseudoCode = []
+  const pseudoCodeBlock: PseudoCodeBlock = {
+    block: [],
+  }
+  pseudoCode.push(pseudoCodeBlock)
+
   let compareVar = ""
   if (
     (cOption.toLowerCase().indexOf("x") !== -1 && cOption.toLowerCase().indexOf("y") !== -1) ||
@@ -726,57 +417,88 @@ function createWhileLoop(
   ) {
     compareVar = random.choice(["var1", "var2"])
     // introduce var1 and var2
-    code += createVariable({ variable: innerVar, value: startVar1.toString(), indent: 0 })
-    code += createVariable({ variable: innerVar2, value: startVar2.toString(), indent: 0 })
+    pseudoCodeBlock.block.push({
+      state: {
+        assignment: innerVar,
+        value: [startVar1.toString()],
+      },
+    })
+    pseudoCodeBlock.block.push({
+      state: {
+        assignment: innerVar2,
+        value: [startVar2.toString()],
+      },
+    })
   } else if (cOption.toLowerCase().indexOf("x") !== -1) {
-    code += createVariable({ variable: innerVar, value: startVar1.toString(), indent: 0 })
+    pseudoCodeBlock.block.push({
+      state: {
+        assignment: innerVar,
+        value: [startVar1.toString()],
+      },
+    })
     compareVar = "var1"
   } else if (cOption.toLowerCase().indexOf("y") !== -1) {
     compareVar = "var2"
-    code += createVariable({ variable: innerVar, value: startVar2.toString(), indent: 0 })
+    pseudoCodeBlock.block.push({
+      state: {
+        assignment: innerVar,
+        value: [startVar2.toString()],
+      },
+    })
   }
 
   // while loop statement
   // const vars = random.choice(["xy", "yx", "xn"])
   // only manipulate the greater value
+  let whilePseudoCode: PseudoCodeWhile
   if (vars === "xy") {
-    code += createWhileLine({
-      start: innerVar,
+    whilePseudoCode = createWhileLine({
+      start: { variable: innerVar },
       startManipulation: startVar2 > startVar1 ? "none" : endManipulation,
-      end: innerVar2,
+      end: { variable: innerVar2 },
       endManipulation: startVar2 > startVar1 ? endManipulation : "none",
       compare,
-      indent: 0,
     })
   } else if (vars === "yx") {
-    code += createWhileLine({
-      start: innerVar2,
+    whilePseudoCode = createWhileLine({
+      start: { variable: innerVar2 },
       startManipulation: startVar1 > startVar2 ? "none" : endManipulation,
-      end: innerVar,
+      end: { variable: innerVar },
       endManipulation: startVar1 > startVar2 ? endManipulation : "none",
       compare,
-      indent: 0,
     })
   } else if (vars === "xn") {
-    code += createWhileLine({
-      start: innerVar,
+    whilePseudoCode = createWhileLine({
+      start: { variable: innerVar },
       startManipulation: startVar1 < endValue ? "none" : endManipulation,
       end: endValue.toString(),
       endManipulation: startVar1 < endValue ? endManipulation : "none",
       compare,
-      indent: 0,
     })
+  } else {
+    throw new Error("Only vars options allowed are xy, yx, xn")
   }
 
+  pseudoCodeBlock.block.push(whilePseudoCode)
+  const whilePseudoBlock: PseudoCodeBlock = {
+    block: [],
+  }
+  whilePseudoCode.while.do = whilePseudoBlock
+
   // create the if and else statement
-  code += createIfCondition({
-    innerVar1: compareVar === "var1" ? innerVar : innerVar2,
-    condition: condEnd,
-    elseStatement: elseAfter,
-    numPrint,
-    numPrintElse,
-    indent: 2,
-  })
+  if (condEnd === "none") {
+    whilePseudoBlock.block.push(printStarsNew(numPrint))
+  } else {
+    whilePseudoBlock.block.push(
+      createIfCondition({
+        innerVar1: compareVar === "var1" ? innerVar : innerVar2,
+        condition: condEnd,
+        elseStatement: elseAfter,
+        numPrint,
+        numPrintElse,
+      }),
+    )
+  }
 
   let firstChangeValue = random.int(1, 3)
   let secondChangeValue = random.int(1, 3)
@@ -787,13 +509,11 @@ function createWhileLoop(
     secondChangeValue,
     innerVar,
     innerVar2,
-    code,
-    _,
     compare,
     vars,
     random,
   })
-  code = changedCode.code
+  changedCode.assignments.forEach((assignment) => whilePseudoBlock.block.push({ state: assignment }))
   firstChangeValue = changedCode.firstChangeValue
   secondChangeValue = changedCode.secondChangeValue
 
@@ -809,6 +529,25 @@ function createWhileLoop(
   let i = startVar1
   let j = startVar2
 
+  /*
+  console.log(
+    "startvar1",
+    startVar1,
+    "startVar2",
+    startVar2,
+    "endValue",
+    endValue,
+    "endManipulation",
+    endManipulation,
+    "vars",
+    vars,
+    "compare",
+    compare,
+    "compareVar",
+    compareVar,
+  )
+   */
+
   while (condition(i, j)) {
     // calculate the stars
     numStars += calculateNumStars(
@@ -819,9 +558,7 @@ function createWhileLoop(
       elseAfter,
     )
 
-    if (twoLoops) {
-      numStars += starsSecondLoop
-    }
+    // console.log(numStars)
 
     const changedCode = createWhileChangeValues({
       cOption,
@@ -838,23 +575,15 @@ function createWhileLoop(
     j = changedCode.changeJ
   }
 
-  // add the code of the next loop
-  if (twoLoops) {
-    // insert two spaces in front of every line at "insertCode"
-    code +=
-      insertCode
-        .split("\n")
-        .map((line) => `  ${line}`)
-        .join("\n") + "\n"
-  }
-
   // printAfter
   if (printAfter) {
-    code += printStars(numPrintAfter, indent)
+    pseudoCodeBlock.block.push(printStarsNew(numPrintAfter))
     numStars += numPrintAfter
   }
 
-  return { code: code.trim(), numStars }
+  console.log(numStars)
+
+  return { code: pseudoCode, numStars }
 }
 
 function computeStartEndVarsWhile(random: Random) {
@@ -869,18 +598,17 @@ function computeStartEndVarsWhile(random: Random) {
   const endManipulationOptions: BoundsOptions[] = [
     "none",
     { type: "mult", value: random.int(2, 3) },
-    { type: "square" },
+    { type: "square", abs: true },
     { type: "log", value: 2 },
   ]
 
   let endManipulation: BoundsOptions = random.weightedChoice([
-    [endManipulationOptions[0], 0.7],
-    [endManipulationOptions[1], 0.125],
-    [endManipulationOptions[2], 0.125],
-    [endManipulationOptions[3], 0.05],
+    [endManipulationOptions[0], 0.6],
+    [endManipulationOptions[1], 0.15],
+    [endManipulationOptions[2], 0.15],
+    [endManipulationOptions[3], 0.1],
   ])
   // if manipulation is square we calculate abs(x)*x, so we keep the negative number
-  const endManipulationValue = random.int(2, 3)
 
   if (cOption === "xPlus") {
     vars = random.choice(["xy", "yx", "xn"])
@@ -1269,7 +997,6 @@ function computeStartEndVarsWhile(random: Random) {
     compare,
     cOption,
     endManipulation,
-    endManipulationValue,
   }
 }
 

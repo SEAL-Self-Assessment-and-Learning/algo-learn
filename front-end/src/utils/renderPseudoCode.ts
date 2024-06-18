@@ -296,20 +296,11 @@ function pseudoCodeForToString(
   const forStringLatex: string[] = [
     `\\For{$${forState.for.variable} \\gets ${psStringLatexFrom} \\text{ to } ${psStringLatexTo}`,
   ]
-  if (forState.for.step) {
-    const {
-      psString: psStringStep,
-      psStringColor: psStringColorStep,
-      psStringLatex: psStringLatexStep,
-    } = pseudoCodeStringToString(forState.for.step)
-    forString[0] += `\\text{ }\\textbf{with step}\\text{ }${psStringStep}\\text{ }\\textbf{do}`
-    forStringColor[0] += `\\text{ }{\\color{${keyWordsColor}}\\textbf{with step}}\\text{ }${psStringColorStep}\\text{ }{\\color{${keyWordsColor}} \\textbf{do}}`
-    forStringLatex[0] += `\\text{ with step }${psStringLatexStep}$}`
-  } else {
-    forString[0] += `\\text{ }\\textbf{do}`
-    forStringColor[0] += `\\text{ }{\\color{${keyWordsColor}} \\textbf{do}}`
-    forStringLatex[0] += "$}"
-  }
+
+  forString[0] += `\\text{ }\\textbf{do}`
+  forStringColor[0] += `\\text{ }{\\color{${keyWordsColor}} \\textbf{do}}`
+  forStringLatex[0] += "$}"
+
   if (forState.for.do) {
     if ("state" in forState.for.do) {
       const { stateString, stateStringColor, stateStringLatex } = pseudoCodeStateToString(
@@ -408,7 +399,7 @@ function pseudoCodeStateToString(state: PseudoCodeState): {
     stateString += callNormal
     stateStringColor += callColor
     stateStringLatex += callLatex
-  } else if ("variable" in state.state) {
+  } else if ("assignment" in state.state) {
     const { assignmentNormal, assignmentColor, assignmentLatex } = pseudoCodeAssignmentToString(
       state.state,
     )
@@ -425,9 +416,9 @@ function pseudoCodeAssignmentToString(assignment: PseudoCodeAssignment): {
   assignmentLatex: string
 } {
   const { psString, psStringColor, psStringLatex } = pseudoCodeStringToString(assignment.value)
-  const assignmentNormal = `${assignment.variable}\\longleftarrow${psString}`
-  const assignmentColor = `{\\color{${variableColor}}${assignment.variable}}\\longleftarrow${psStringColor}`
-  const assignmentLatex = `$${assignment.variable} \\gets ${psStringLatex}$`
+  const assignmentNormal = `${assignment.assignment} \\longleftarrow ${psString}`
+  const assignmentColor = `{\\color{${variableColor}}${assignment.assignment}} \\longleftarrow ${psStringColor}`
+  const assignmentLatex = `$${assignment.assignment} \\gets ${psStringLatex}$`
   return { assignmentNormal, assignmentColor, assignmentLatex }
 }
 

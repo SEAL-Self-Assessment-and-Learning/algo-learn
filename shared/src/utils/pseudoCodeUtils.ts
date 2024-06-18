@@ -8,7 +8,7 @@ export type PseudoCodePrintString = { printString: string }
 
 export type PseudoCodePrint = { print: PseudoCodeString }
 export type PseudoCodeCall = { functionName: string; args: Array<PseudoCodeString> }
-// return as it is a keyword in TS
+// return as it, is a keyword in TS
 export type PseudoCodeReturn = { returnValue: PseudoCodeString }
 
 export type PseudoCodeBreak = { breakState: true }
@@ -16,7 +16,7 @@ export type PseudoCodeContinue = { continueState: true }
 // export type PseudoCodeTrue = { true: true }
 // export type PseudoCodeFalse = { false: true }
 
-export type PseudoCodeAssignment = { variable: string; value: PseudoCodeString }
+export type PseudoCodeAssignment = { assignment: string; value: PseudoCodeString }
 
 // then should not be null
 // only provided for straight forward creation of pseudoCode
@@ -44,7 +44,6 @@ export type PseudoCodeFor = {
     variable: string
     from: PseudoCodeString
     to: PseudoCodeString
-    step: PseudoCodeString
     do: PseudoCodeState | PseudoCodeBlock | null
   }
 }

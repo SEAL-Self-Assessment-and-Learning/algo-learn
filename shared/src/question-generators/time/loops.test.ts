@@ -1,12 +1,13 @@
 import { describe, expect, test } from "vitest"
 import { FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops.ts"
+import { PseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
 import { sampleRandomSeed } from "@shared/utils/random.ts"
 
 interface TestingObject {
   question: FreeTextQuestion
   testing: {
-    functionText: string
+    functionText: PseudoCode
     functionName: string
     numStars: number
   }

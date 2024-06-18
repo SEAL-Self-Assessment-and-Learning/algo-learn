@@ -223,7 +223,7 @@ export function sampleRecursiveFunctionArithmetic({
   completeCode.push(functionDeclaration)
 
   const functionAssignmentPre: PseudoCodeAssignment = {
-    variable: sumVariable,
+    assignment: sumVariable,
     value: [generateOperationsArithmetic(preStars, random)],
   }
   functionBodyBlock.block.push({ state: functionAssignmentPre })
@@ -248,7 +248,7 @@ export function sampleRecursiveFunctionArithmetic({
   functionTextIf.if.else = functionRecCallsBlock
   if (recStars > 0) {
     const functionAssignmentRec: PseudoCodeAssignment = {
-      variable: sumVariable,
+      assignment: sumVariable,
       value: [generateOperationsArithmetic(recStars, random)],
     }
     functionRecCallsBlock.block.push({ state: functionAssignmentRec })
