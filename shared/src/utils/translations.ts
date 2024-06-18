@@ -4,10 +4,34 @@ import { format } from "./format"
 /** Type for keys in translations objects */
 export type TKey = string
 
-/** Translation objects are not nested */
+/**
+ * SingleTranslation stores the translations of an individual term
+ *
+ * Example:
+ * const translation: SingleTranslation = { de: "translation1", en: "translation2" }
+ */
+export type SingleTranslation = Readonly<Partial<Record<Language, string>>>
+
+/**
+ * Translations store the translations for each language and key.
+ *
+ * Example:
+ * const translations: Translations = {
+ *  de: { key1: "translation1", key2: "translation2" },
+ *  en: { key1: "translation1", key2: "translation2" },
+ * }
+ */
 export type Translations = Readonly<Partial<Record<Language, Readonly<Record<TKey, string>>>>>
 
-/** DeepTranslation objects may contain strings or lists of strings */
+/**
+ * DeepTranslation objects may contain strings or lists of strings
+ *
+ * Example:
+ * const deepTranslations: DeepTranslations = {
+ *   de: { key1: "translation1", key2: ["translation2", "translation3"] },
+ *   en: { key1: "translation1", key2: ["translation2", "translation3"] },
+ * }
+ */
 export type DeepTranslations = Readonly<
   Partial<Record<Language, Readonly<Record<TKey, string | string[]>>>>
 >

@@ -1,12 +1,12 @@
 import { useState } from "react"
 import SyntaxHighlighter from "react-syntax-highlighter"
 import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
+import { Question, questionToJSON } from "@shared/api/QuestionGenerator"
+import { ExampleQuestion } from "@shared/question-generators/example/example"
+import Random from "@shared/utils/random"
+import { questionToTex } from "@shared/utils/toLatex"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Question, questionToJSON } from "../../../shared/src/api/QuestionGenerator"
-import { ExampleQuestion } from "../../../shared/src/question-generators/example/example"
-import Random from "../../../shared/src/utils/random"
-import { questionToTex } from "../../../shared/src/utils/toLatex"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { QuestionComponent } from "../components/QuestionComponent"
 import { LIGHT, useTheme } from "../hooks/useTheme"
@@ -20,7 +20,7 @@ export function TestSimpleMC() {
   const [{ question }, setQuestion] = useState<{ question?: Question }>({})
 
   if (!question) {
-    void Promise.resolve(ExampleQuestion.generate("example/example", lang, {}, seed)).then(setQuestion)
+    void Promise.resolve(ExampleQuestion.generate(lang, {}, seed)).then(setQuestion)
     return <></>
   }
   return (

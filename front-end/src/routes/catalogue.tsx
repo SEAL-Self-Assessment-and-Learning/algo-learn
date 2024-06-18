@@ -1,7 +1,9 @@
 import { ChevronRight } from "lucide-react"
 import { HTMLAttributes } from "react"
 import { Link } from "react-router-dom"
+import { allParameterCombinations, serializeParameters } from "@shared/api/Parameters"
 import { QuestionGenerator } from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { badgeVariants } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,13 +18,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { useHistoryState } from "@/hooks/useHistoryState"
 import { cn } from "@/lib/utils"
-import { deserializePath, serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
 import { useTranslation } from "../hooks/useTranslation"
-import {
-  allQuestionGeneratorRoutes,
-  generatorSetBelowPath as generatorCallsBelowPath,
-  skillGroups,
-} from "../listOfQuestions"
+import { collection } from "../listOfQuestions"
 
 export function Catalogue() {
   const [selectedGroup, setSelectedGroup] = useHistoryState<string | null>("selectedGroup", null)
@@ -40,18 +37,19 @@ export function Catalogue() {
       <div className="w-full">
         {selectedGroup && (
           <div className="flex flex-col gap-6">
-            {generatorsInGroup(selectedGroup).map(
-              (x) =>
-                x && (
-                  <QuestionGeneratorCard
-                    key={x.generatorPath}
-                    generatorPath={x.generatorPath}
-                    generator={x.generator}
-                    showAllVariants={showAllVariants}
-                    className="w-full"
-                  />
-                ),
-            )}
+            {collection
+              .find((e) => e.slug === selectedGroup)
+              ?.contents.map(
+                (x) =>
+                  x && (
+                    <QuestionGeneratorCard
+                      key={x.id}
+                      generator={x}
+                      showAllVariants={showAllVariants}
+                      className="w-full"
+                    />
+                  ),
+              )}
           </div>
         )}
       </div>
@@ -80,7 +78,7 @@ function TopicSelectorSidebar({
   showAllVariants,
   setShowAllVariants,
 }: TopicSelectorProps) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   return (
     <Card className={cn("border-0 bg-secondary text-secondary-foreground", className)}>
       <CardHeader>
@@ -88,14 +86,14 @@ function TopicSelectorSidebar({
         <CardDescription>{t("Catalogue.choose.desc")}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col flex-wrap gap-1">
-        {skillGroups.map((g) => (
+        {collection.map((g) => (
           <Button
-            key={g}
-            onClick={() => setSelectedGroup(g)}
-            variant={selectedGroup === g ? "default" : "ghost"}
+            key={g.slug}
+            onClick={() => setSelectedGroup(g.slug)}
+            variant={selectedGroup === g.slug ? "default" : "ghost"}
             className="justify-start"
           >
-            {t("skill." + g)}
+            {g.name[lang]}
           </Button>
         ))}
         {selectedGroup && (
@@ -115,18 +113,15 @@ function TopicSelectorSidebar({
 
 /**
  * A card that displays a question generator as well as buttons to practice it and its variants
- * @param generatorPath The path of the generator
  * @param generator The generator
  * @param showAllVariants Whether to show all variants of a question generator
  */
 function QuestionGeneratorCard({
-  generatorPath,
   generator,
   showAllVariants,
   showDescription = true,
   className,
 }: {
-  generatorPath: string
   generator: QuestionGenerator
   showAllVariants: boolean
   showDescription?: boolean
@@ -143,41 +138,23 @@ function QuestionGeneratorCard({
       </CardHeader>
       <CardFooter className="m-0 flex flex-wrap items-center gap-2 p-3">
         <Button asChild variant="secondary" size="sm">
-          <Link to={`/${lang}/practice/${generatorPath}`}>
+          <Link to={`/${lang}/practice/${generator.id}`}>
             {t("Catalogue.practice")} <ChevronRight className="ml-1 h-4 w-4" />
           </Link>
         </Button>
         {showAllVariants &&
-          variantsOfGenerator(generatorPath).map((y) => (
-            <Link
-              key={y.path}
-              to={`/${lang}/practice/${y.path}`}
-              className={badgeVariants({ variant: "secondary" })}
-            >
-              {y.subPath}
-            </Link>
-          ))}
+          allParameterCombinations(generator.expectedParameters).map((parameters) => {
+            const path = serializeGeneratorCall({ lang, generator, parameters })
+            const params = serializeParameters(parameters, generator.expectedParameters)
+            if (!params) return null
+            return (
+              <Link key={path} to={`/${path}`} className={badgeVariants({ variant: "secondary" })}>
+                {" "}
+                {params}
+              </Link>
+            )
+          })}
       </CardFooter>
     </Card>
   )
-}
-
-function generatorsInGroup(group: string) {
-  return removeDuplicates(
-    generatorCallsBelowPath(group).map((x) => serializeGeneratorCall({ ...x, parameters: undefined })),
-  ).map((x) => deserializePath({ routes: allQuestionGeneratorRoutes, path: x }))
-}
-
-function variantsOfGenerator(generatorPath: string) {
-  return generatorCallsBelowPath(generatorPath).map((x) => {
-    const path = serializeGeneratorCall(x)
-    return {
-      path,
-      subPath: path.slice(generatorPath.length + 1),
-    }
-  })
-}
-
-function removeDuplicates(arr: string[]): string[] {
-  return [...new Set(arr)]
 }

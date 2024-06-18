@@ -41,6 +41,7 @@ function generateWrongAnswers(random: Random, correctAnswer: number): Array<stri
  * This question generator generates a simple multiple choice question.
  */
 export const ExampleQuestion: QuestionGenerator = {
+  id: "example",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["calculus", "sum"],
@@ -53,13 +54,12 @@ export const ExampleQuestion: QuestionGenerator = {
   /**
    * Generates a new MultipleChoiceQuestion question.
    *
-   * @generatorPath The path the generator is located on the page. Defined in settings/questionSelection.ts
    * @param lang The language of the question
    * @param parameters The parameters for the question. In this case none are used.
    * @param seed The seed for the random number generator
    * @returns A new MultipleChoiceQuestion question
    */
-  generate: (generatorPath, lang = "en", parameters, seed) => {
+  generate: (lang = "en", parameters, seed) => {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
 
@@ -85,7 +85,6 @@ export const ExampleQuestion: QuestionGenerator = {
         lang,
         parameters,
         seed,
-        generatorPath,
       }),
       text: t(translations, lang, "text", [`${a}`, `${b}`]),
       answers,

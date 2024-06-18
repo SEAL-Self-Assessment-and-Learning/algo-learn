@@ -1,13 +1,12 @@
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import { createBrowserRouter, redirect, RouterProvider, useParams } from "react-router-dom"
-import { allParameterCombinations, serializeParameters } from "../../shared/src/api/Parameters"
-import { sampleRandomSeed } from "../../shared/src/utils/random"
+import { allParameterCombinations } from "@shared/api/Parameters"
+import { sampleRandomSeed } from "@shared/utils/random"
 import ErrorPage from "./components/ErrorPage"
 import { QuizSession } from "./components/QuizSession"
 import { BASENAME } from "./config"
 import { DEFAULT_LANGUAGE } from "./hooks/useTranslation"
-import { allQuestionGeneratorRoutes } from "./listOfQuestions"
 import { About } from "./routes/about"
 import { Catalogue } from "./routes/catalogue"
 import { Debug } from "./routes/debug"
@@ -16,22 +15,16 @@ import Root from "./routes/root"
 import { TestSimpleMC } from "./routes/test"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
 import "./tailwind.css"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { collection } from "./listOfQuestions"
 
 const routes = []
-for (const { path, generator } of allQuestionGeneratorRoutes) {
+for (const generator of collection.flatMap((x) => x.contents)) {
   for (const parameters of allParameterCombinations(generator.expectedParameters)) {
-    const parametersPath = serializeParameters(parameters, generator.expectedParameters)
-    const route = path + (parametersPath ? "/" + parametersPath : "")
+    const route = serializeGeneratorCall({ generator, parameters })
     const Element = () => {
       const { seed } = useParams()
-      return (
-        <ViewSingleQuestion
-          generator={generator}
-          generatorPath={path}
-          parameters={parameters}
-          seed={seed ?? ""}
-        />
-      )
+      return <ViewSingleQuestion generator={generator} parameters={parameters} seed={seed ?? ""} />
     }
     routes.push({
       path: ":lang/" + route,
@@ -65,11 +58,11 @@ routes.push({
   element: <TestSimpleMC />,
 })
 routes.push({
-  path: `:lang/practice/*`,
+  path: `:lang/practice/:id/*`,
   element: <QuizSession mode="practice" />,
 })
 routes.push({
-  path: `:lang/exam/*`,
+  path: `:lang/exam/:id/*`,
   element: <QuizSession mode="exam" />,
 })
 routes.push({

@@ -1,8 +1,10 @@
 import { expect, test } from "vitest"
+import { ExampleQuestion } from "@shared/question-generators/example/example"
 import { QuestionGenerator } from "./QuestionGenerator"
-import { deserializePath, isSubPath, QuestionRoutes, serializeGeneratorCall } from "./QuestionRouter"
+import { deserializePath, QuestionCollection, serializeGeneratorCall } from "./QuestionRouter"
 
 const testQuestion: QuestionGenerator = {
+  id: "test",
   name: () => "Test Question",
   languages: ["en", "de"],
   expectedParameters: [
@@ -18,7 +20,7 @@ const testQuestion: QuestionGenerator = {
       allowedValues: ["addition", "subtraction"],
     },
   ],
-  generate: (generatorPath, lang, parameters, seed) => {
+  generate: (lang, parameters, seed) => {
     return {
       question: {
         path: serializeGeneratorCall({
@@ -26,7 +28,6 @@ const testQuestion: QuestionGenerator = {
           parameters,
           seed,
           lang,
-          generatorPath,
         }),
         type: "MultipleChoiceQuestion",
         name: "Test Question",
@@ -37,71 +38,69 @@ const testQuestion: QuestionGenerator = {
   },
 }
 
-const exampleRoutes: QuestionRoutes = [
-  {
-    path: "test/test",
-    generator: testQuestion,
-  },
-  {
-    path: "asymptotics/sum",
-    generator: testQuestion,
-  },
-]
-
 test("serializeGeneratorCall", () => {
-  const generatorPath = exampleRoutes[0].path
-
   expect(
     serializeGeneratorCall({
       generator: testQuestion,
-      generatorPath,
     }),
-  ).toBe("test/test")
+  ).toBe(testQuestion.id)
   expect(
     serializeGeneratorCall({
       generator: testQuestion,
-      generatorPath,
       parameters: { difficulty: 1, focus: "addition" },
     }),
-  ).toBe("test/test/1/addition")
+  ).toBe(testQuestion.id + "/1/addition")
   expect(
     serializeGeneratorCall({
       generator: testQuestion,
-      generatorPath,
       parameters: { difficulty: 1, focus: "addition" },
       seed: "myFancySeed",
     }),
-  ).toBe("test/test/1/addition/myFancySeed")
+  ).toBe(testQuestion.id + "/1/addition/myFancySeed")
   expect(
     serializeGeneratorCall({
       generator: testQuestion,
-      generatorPath,
       parameters: { difficulty: 1, focus: "addition" },
       seed: "myFancySeed",
       lang: "de",
     }),
-  ).toBe("de/test/test/1/addition/myFancySeed")
+  ).toBe(`de/${testQuestion.id}/1/addition/myFancySeed`)
 })
 
-test("deserializePath", () => {
-  expect(deserializePath({ routes: exampleRoutes, path: "test/dqopijjifwejipfw" })).toBeUndefined()
-  expect(deserializePath({ routes: exampleRoutes, path: "dkdkd/test/test" })).toBeUndefined()
+const exampleCollection: QuestionCollection = [
+  {
+    slug: "test",
+    name: { en: "Test", de: "Test" },
+    contents: [testQuestion],
+  },
+  {
+    slug: "test2",
+    name: { en: "Test2", de: "Test2" },
+    contents: [ExampleQuestion],
+  },
+]
 
-  let ret = deserializePath({ routes: exampleRoutes, path: "test/test" })
+test("deserializePath", () => {
+  expect(
+    deserializePath({ collection: exampleCollection, path: "testdqopijjifwejipfw" }),
+  ).toBeUndefined()
+  expect(deserializePath({ collection: exampleCollection, path: "dkdkd/test/test" })).toBeUndefined()
+
+  let ret = deserializePath({ collection: exampleCollection, path: "test" })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBeUndefined()
   expect(ret!.generator).toBe(testQuestion)
   expect(ret!.parameters).toBeUndefined()
   expect(ret!.seed).toBeUndefined()
 
-  ret = deserializePath({ routes: exampleRoutes, path: "de/test/test" })
+  ret = deserializePath({ collection: exampleCollection, path: "de/example" })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBe("de")
-  expect(ret!.generator).toBe(testQuestion)
+  expect(ret!.generator).toBe(ExampleQuestion)
   expect(ret!.parameters).toBeUndefined()
   expect(ret!.seed).toBeUndefined()
 
-  ret = deserializePath({ routes: exampleRoutes, path: "test/test/1/addition" })
+  ret = deserializePath({ collection: exampleCollection, path: "test/1/addition" })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBeUndefined()
   expect(ret!.generator).toBe(testQuestion)
@@ -109,8 +108,8 @@ test("deserializePath", () => {
   expect(ret!.seed).toBeUndefined()
 
   ret = deserializePath({
-    routes: exampleRoutes,
-    path: "test/test/1/addition/myFancySeed",
+    collection: exampleCollection,
+    path: "test/1/addition/myFancySeed",
   })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBeUndefined()
@@ -119,8 +118,8 @@ test("deserializePath", () => {
   expect(ret!.seed).toBe("myFancySeed")
 
   ret = deserializePath({
-    routes: exampleRoutes,
-    path: "de/test/test/1/addition/myFancySeed",
+    collection: exampleCollection,
+    path: "de/test/1/addition/myFancySeed",
   })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBe("de")
@@ -128,32 +127,11 @@ test("deserializePath", () => {
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
 
   ret = deserializePath({
-    routes: exampleRoutes,
-    path: "en/test/test/1/addition/myFancySeed",
+    collection: exampleCollection,
+    path: "en/test/1/addition/myFancySeed",
   })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBe("en")
   expect(ret!.generator).toBe(testQuestion)
   expect(ret!.parameters).toEqual({ difficulty: 1, focus: "addition" })
-})
-
-test("isSubPath", () => {
-  expect(isSubPath("a/b/c", "a/b/c")).toBe(true)
-  expect(isSubPath("a/b/c", "a/b/c/d")).toBe(true)
-  expect(isSubPath("a/////b/c", "a/b/c/d/e")).toBe(true)
-  expect(isSubPath("/a/", "a")).toBe(true)
-  expect(isSubPath("", "")).toBe(true)
-  expect(isSubPath("", "a")).toBe(true)
-  expect(isSubPath("", "a/b")).toBe(true)
-  expect(isSubPath("a/b/c", "a/b")).toBe(false)
-  expect(isSubPath("a/b/c", "b/c/d/e/f")).toBe(false)
-  expect(isSubPath("a", "b")).toBe(false)
-  expect(isSubPath("a", "")).toBe(false)
-
-  expect(isSubPath([], [])).toBe(true)
-  expect(isSubPath([], ["a"])).toBe(true)
-  expect(isSubPath(["a"], ["a"])).toBe(true)
-  expect(isSubPath(["a"], ["a", "b"])).toBe(true)
-  expect(isSubPath(["b"], ["a", "b"])).toBe(false)
-  expect(isSubPath(["b", "a"], ["a", "b"])).toBe(false)
 })
