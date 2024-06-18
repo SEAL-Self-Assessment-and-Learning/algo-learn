@@ -73,28 +73,28 @@ export function parseMarkdown(md: string): ParseTree {
           .join("\n")
       }
       if (kind === "list") {
-        const node = {
+        const node: ParseTreeNode = {
           kind,
           child: parseMarkdownList(match[0]),
-        } as ParseTreeNode
+        }
         const before = md.slice(0, match.index)
         const after = md.slice(match.index + match[0].length)
         return [...parseMarkdown(before), node, ...parseMarkdown(after)]
       }
       if (kind === "table") {
-        const node = {
+        const node: ParseTreeNode = {
           kind,
           child: parseTable(match[0]),
-        } as ParseTreeNode
+        }
         const before = md.slice(0, match.index)
         const after = md.slice(match.index + match[0].length)
         return [...parseMarkdown(before), node, ...parseMarkdown(after)]
       }
       if (kind === "input") {
-        const node = {
+        const node: ParseTreeNode = {
           kind,
           child: match[1],
-        } as ParseTreeNode
+        }
         const before = md.slice(0, match.index)
         const after = md.slice(match.index + match[0].length)
         return [...parseMarkdown(before), node, ...parseMarkdown(after)]

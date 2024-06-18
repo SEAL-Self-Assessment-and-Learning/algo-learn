@@ -4,11 +4,8 @@ import { Input } from "@/components/ui/input.tsx"
 import { useFormContext } from "@/hooks/useFormContext.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
 
-export const FormInputField: React.FC<{ id: string }> = ({ id }: { id: string }) => {
+export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
   const formContext = useFormContext()
-
-  const inputSplit = id.split("#")
-  const inputID = inputSplit[0]
 
   const {
     feedbackVariation,
@@ -21,7 +18,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }: { id: string })
     disabled,
     setText,
     text,
-  } = formContext[inputID]
+  } = formContext[id]
 
   // To select the first created input field on the site
   const firstInputRef = useRef<HTMLInputElement | null>(null)
@@ -29,7 +26,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }: { id: string })
     if (firstInputRef.current) {
       firstInputRef.current.focus()
     }
-  }, [inputID])
+  }, [id])
 
   const inputBorderColor = invalid ? "border-red-500 focus:border-red-500" : ""
 
@@ -56,7 +53,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }: { id: string })
             <div className={`relative h-full w-full`}>
               <Input
                 ref={focus ? firstInputRef : null}
-                key={`newline-input-${inputID}`}
+                key={`newline-input-${id}`}
                 autoFocus
                 disabled={disabled}
                 value={text || ""}
@@ -87,7 +84,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }: { id: string })
           <div className={`relative h-full w-full`}>
             <Input
               ref={focus ? firstInputRef : null}
-              key={`newline-input-${inputID}`}
+              key={`newline-input-${id}`}
               autoFocus
               disabled={disabled}
               value={text || ""}

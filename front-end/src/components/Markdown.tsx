@@ -122,7 +122,11 @@ export const MarkdownTreeNode: FunctionComponent<{
     )
   }
   if (parseTreeNode.kind === "input") {
-    return <FormInputField id={parseTreeNode.child} />
+    // only provide the id of the input field
+    const inputSplit = parseTreeNode.child.split("#")
+    const id = inputSplit[0]
+
+    return <FormInputField id={id} />
   }
 
   // will never be reached:
