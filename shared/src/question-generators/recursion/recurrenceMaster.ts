@@ -51,6 +51,7 @@ const translations: Translations = {
 }
 
 export const RecurrenceMaster: QuestionGenerator = {
+  id: "master",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -61,13 +62,12 @@ export const RecurrenceMaster: QuestionGenerator = {
       allowedValues: ["choice", "input"],
     },
   ],
-  generate(generatorPath, lang, parameters, seed) {
+  generate(lang, parameters, seed) {
     const permalink = serializeGeneratorCall({
       generator: RecurrenceMaster,
       lang,
       parameters,
       seed,
-      generatorPath,
     })
     const random = new Random(seed)
     const { t } = tFunction(translations, lang)

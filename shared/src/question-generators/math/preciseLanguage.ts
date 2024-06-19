@@ -201,6 +201,7 @@ const titleTranslations = {
 }
 
 export const MathPreciseLanguage: QuestionGenerator = basicMultipleChoiceMetaGenerator(
+  "mpl",
   tFunctional(titleTranslations, "title"),
   questions,
 )

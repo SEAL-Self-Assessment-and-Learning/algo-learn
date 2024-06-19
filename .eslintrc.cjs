@@ -12,6 +12,7 @@ module.exports = {
         map: [
           ["@", "./front-end/src"],
           ["@shared", "./shared/src"],
+          ["@settings", "./settings"],
         ],
         extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
       },

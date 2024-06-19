@@ -15,25 +15,84 @@ export function printStars(stars: number, indent: number): string {
   else return `${" ".repeat(indent)}print("${"*".repeat(stars)}")\n`
 }
 
-/**
- * Sample the source code of a simple recursive procedure that prints stars
- *
- * @param random - Random number generator
- * @returns - Object containing the source code, the name of the function, the
- *   name of the variable, the number of stars printed in the base case and in
- *   the recursive case, as well as the number of recursive callsand the number
- *   to divide by.
- */
-export function sampleRecursiveFunction(random: Random) {
+export function sampleRecursiveFunction(divOrSub: "div" | "sub", random: Random) {
   const functionName = random.choice("fghPp".split(""))
   const variable = random.choice("nmNMxyztk".split(""))
+  const sumVariable = random.choice("nmNMxyztk".split("").filter((x) => x !== variable))
   const preStars = random.int(0, 3)
   const baseStars = random.int(1, 4)
   const recStars = random.int(0, 3)
   const postStars = random.int(0, 3)
   const numRecCalls = random.int(1, 3)
-  const divideBy = random.int(2, 7)
+  const divideOrSubtractBy = random.int(2, 7)
 
+  const stars = random.choice([true, false])
+
+  if (stars) {
+    return sampleRecursiveFunctionStars({
+      divOrSub,
+      functionName,
+      variable,
+      preStars,
+      baseStars,
+      recStars,
+      postStars,
+      numRecCalls,
+      divideOrSubtractBy,
+    })
+  }
+  return sampleRecursiveFunctionArithmetic({
+    divOrSub,
+    random,
+    functionName,
+    variable,
+    sumVariable,
+    preStars,
+    baseStars,
+    recStars,
+    numRecCalls,
+    divideOrSubtractBy,
+  })
+}
+
+/**
+ * Sample the source code of a simple recursive procedure that prints stars
+ *
+ * @param divOrSub
+ * @param functionName
+ * @param variable
+ * @param preStars
+ * @param baseStars
+ * @param recStars
+ * @param postStars
+ * @param numRecCalls
+ * @param divideBy
+ * @returns - Object containing the source code, the name of the function, the
+ *   name of the variable, the number of stars printed in the base case and in
+ *   the recursive case, as well as the number of recursive callsand the number
+ *   to divide by.
+ */
+export function sampleRecursiveFunctionStars({
+  divOrSub,
+  functionName,
+  variable,
+  preStars,
+  baseStars,
+  recStars,
+  postStars,
+  numRecCalls,
+  divideOrSubtractBy,
+}: {
+  divOrSub: "div" | "sub"
+  functionName: string
+  variable: string
+  preStars: number
+  baseStars: number
+  recStars: number
+  postStars: number
+  numRecCalls: number
+  divideOrSubtractBy: number
+}) {
   let functionText = ""
   functionText += `def ${functionName}(${variable}):\n`
   functionText += printStars(preStars, 2)
@@ -42,17 +101,95 @@ export function sampleRecursiveFunction(random: Random) {
   functionText += `  else:\n`
   functionText += printStars(recStars, 4)
   for (let i = 0; i < numRecCalls; i++) {
-    functionText += `    ${functionName}(${variable}/${divideBy})\n`
+    functionText += `    ${functionName}(${variable}${divOrSub === "div" ? "/" : "-"}${divideOrSubtractBy})\n`
   }
   functionText += printStars(postStars, 2)
   return {
     functionText,
     functionName,
     n: variable,
-    b: divideBy,
+    b: divideOrSubtractBy,
     a: numRecCalls,
     d: preStars + baseStars + postStars,
     c: preStars + recStars + postStars,
+    type: "Stars",
+  }
+}
+
+/**
+ * Sample the source code of a simple recursive procedure that calculates some arithmetic operations
+ *
+ * Either T(n) = a T(n/b) + c; T(1) = d
+ *     or T(n) = a T(n-b) + c; T(1) = d
+ *
+ * @param div - Whether to divide or subtract
+ * @param random - Random number generator
+ * @returns - Object containing the source code, the name of the function, the
+ *   name of the variable, the number of arithmetic operations in the base case and in
+ *   the recursive case, as well as the number of recursive calls and the number
+ *   to divide by.
+ */
+export function sampleRecursiveFunctionArithmetic({
+  divOrSub,
+  random,
+  functionName,
+  variable,
+  sumVariable,
+  preStars,
+  baseStars,
+  recStars,
+  numRecCalls,
+  divideOrSubtractBy,
+}: {
+  divOrSub: "div" | "sub"
+  random: Random
+  functionName: string
+  variable: string
+  sumVariable: string
+  preStars: number
+  baseStars: number
+  recStars: number
+  numRecCalls: number
+  divideOrSubtractBy: number
+}) {
+  const arithmeticOperations = ["+", "-", "*", "/"]
+
+  let functionText = ""
+  functionText += `def ${functionName}(${variable}):\n`
+  // we need to create as many arithmetic operations as the number of pre-stars
+  let preOperations = random.int(1, 10).toString() + " "
+  for (let i = 0; i < preStars; i++) {
+    preOperations += `${random.choice(arithmeticOperations)} ${random.int(1, 10)} `
+  }
+  functionText += `  let ${sumVariable} = ${preOperations}\n`
+  functionText += `  if (${variable} <= 1):\n`
+  let baseOperations = " "
+  for (let i = 0; i < baseStars; i++) {
+    baseOperations += `${random.choice(arithmeticOperations)} ${random.int(1, 10)} `
+  }
+  functionText += `    return ${sumVariable}${baseOperations}\n`
+  functionText += `  else:\n`
+  if (recStars > 0) {
+    let recOperations = " "
+    for (let i = 0; i < recStars; i++) {
+      recOperations += `${random.choice(arithmeticOperations)} ${random.int(1, 10)} `
+    }
+    functionText += `    ${sumVariable} = ${sumVariable}${recOperations}\n`
+  }
+  functionText += `    return `
+  for (let i = 0; i < numRecCalls; i++) {
+    functionText += `${functionName}(${variable}${divOrSub === "div" ? "/" : "-"}${divideOrSubtractBy})${i === numRecCalls - 1 ? "" : " " + random.choice(arithmeticOperations) + " "}`
+  }
+  functionText += ` + ${sumVariable}\n`
+  return {
+    functionText,
+    functionName,
+    n: variable,
+    b: divideOrSubtractBy,
+    a: numRecCalls,
+    d: preStars + baseStars,
+    c: preStars + recStars + numRecCalls * 2,
+    type: "Arithmetic",
   }
 }
 
@@ -62,24 +199,26 @@ export function sampleRecursiveFunction(random: Random) {
  *
  * @returns Output
  */
-export function Recurrence({
-  T,
+export function recurrence({
+  divOrSub,
+  t,
   n,
   a,
   b,
   c,
   d,
 }: {
-  T: string
+  divOrSub: "div" | "sub"
+  t: string
   n: string
   a: number
   b: number
   c: number
   d: number
 }): string {
-  const baseString = `${T}(1) = ${d}`
-  const recString = `${T}(${n}) = ${a != 1 ? `${a} ` : ""}${T}(${n}${
-    b != 1 ? ` / ${b}` : ""
+  const baseString = `${t}(1) = ${d}`
+  const recString = `${t}(${n}) = ${a != 1 ? `${a} ` : ""}${t}(${n}${
+    b != 1 ? ` ${divOrSub === "div" ? "/" : "-"} ${b}` : ""
   }) ${c != 0 ? ` + ${c}` : ""}`
   return `$${baseString}\\\\${recString}$`
 }
@@ -90,7 +229,7 @@ export function Recurrence({
  *
  * @param props
  * @param props.random - Random number generator
- * @param props.T - The correct name of the function
+ * @param props.t - The correct name of the function
  * @param props.n - The correct name of the variable
  * @param props.a - The correct coefficient of the recursive call
  * @param props.b - The correct divisor in the recursive call
@@ -101,7 +240,8 @@ export function Recurrence({
  */
 export function sampleRecurrenceAnswers({
   random,
-  T,
+  divOrSub,
+  t,
   n,
   a,
   b,
@@ -109,7 +249,8 @@ export function sampleRecurrenceAnswers({
   d,
 }: {
   random: Random
-  T: string
+  divOrSub: "div" | "sub"
+  t: string
   n: string
   a: number
   b: number
@@ -136,19 +277,18 @@ export function sampleRecurrenceAnswers({
   }) {
     const key = `${a}-${b}-${c}-${d}`
     if (answers.find((ans) => ans.key === key) === undefined) {
-      const element = Recurrence({ T, n, a, b, c, d })
+      const element = recurrence({ divOrSub, t: t, n, a, b, c, d })
       answers.push({ key, correct, element })
     }
   }
   tryAdding({ a, b, c, d, correct: true })
-  tryAdding({ a: c, b, c: a, d })
 
   for (let trials = 0; trials < 100 && answers.length < 4; trials++) {
-    a = random.int(1, 3)
-    b = random.int(1, 3)
-    c = random.int(0, 3)
-    d = random.int(1, 3)
-    tryAdding({ a, b, c, d })
+    const ca = a + random.choice(a === 1 ? [0, 1] : [-1, 0, 1])
+    const cb = b + random.choice(b === 1 ? [0, 1] : [-1, 0, 1])
+    const cc = c + random.choice(c === 1 ? [0, 1] : [-1, 0, 1])
+    const cd = d + random.choice(d === 1 ? [0, 1] : [-1, 0, 1])
+    tryAdding({ a: ca, b: cb, c: cc, d: cd })
   }
   return random.shuffle(answers)
 }
@@ -162,26 +302,35 @@ export function sampleRecurrenceAnswers({
  */
 export function parseRecursiveFunction(input: string): {
   a: number
-  T: string
+  t: string
   n: string
   b: number
   c: number
+  divOrSub: "div" | "sub"
 } {
-  const regex =
+  let divOrSub: "div" | "sub" = "div"
+  const regexDiv =
     /^\s*(\d*)\s*\*?\s*([A-Za-z]+)\s*\(\s*([A-Za-z]+)\s*(?:\/\s*(\d+)\s*)?\)\s*(?:\+\s*(\d+)\s*)?$/
-  const match = input.match(regex)
+  const regexSub =
+    /^\s*(\d*)\s*\*?\s*([A-Za-z]+)\s*\(\s*([A-Za-z]+)\s*(?:-\s*(\d+)\s*)?\)\s*(?:\+\s*(\d+)\s*)?$/
+  let match = input.match(regexDiv)
+
+  if (!match) {
+    match = input.match(regexSub)
+    divOrSub = "sub"
+  }
 
   if (!match) {
     throw new Error("Invalid input format")
   }
 
   const a = match[1] ? parseInt(match[1], 10) : 1
-  const T = match[2]
+  const t = match[2]
   const n = match[3]
   const b = match[4] ? parseInt(match[4], 10) : 1
   const c = match[5] ? parseInt(match[5], 10) : 0
 
-  return { a, T, n, b, c }
+  return { a, t: t, n, b, c, divOrSub }
 }
 /**
  * Sample a recursive function T(n) = a T(n/b) + c, T(1) = d that the master

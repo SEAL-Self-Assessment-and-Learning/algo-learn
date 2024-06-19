@@ -33,6 +33,7 @@ const translations: Translations = {
 }
 
 export const Loops: QuestionGenerator = {
+  id: "loops",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -43,7 +44,7 @@ export const Loops: QuestionGenerator = {
       allowedValues: ["simpleExact"],
     },
   ],
-  generate(generatorPath, lang, parameters, seed) {
+  generate(lang, parameters, seed) {
     const { t } = tFunction(translations, lang)
 
     const permalink = serializeGeneratorCall({
@@ -51,7 +52,6 @@ export const Loops: QuestionGenerator = {
       lang,
       parameters,
       seed,
-      generatorPath,
     })
 
     const random = new Random(seed)
