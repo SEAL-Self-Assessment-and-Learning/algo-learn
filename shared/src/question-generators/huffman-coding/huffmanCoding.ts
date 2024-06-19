@@ -39,13 +39,13 @@ import { t, tFunction, tFunctional, Translations } from "@shared/utils/translati
  */
 const translations: Translations = {
   en: {
-    name: "Compute a Huffman-Coding",
-    description: "Compute the Huffman-Coding of a given string",
-    text: 'Let "*{{0}}*" be {{1}}. What is a correct **Huffman-Coding** of this {{1}}? Please do not consider the spaces.',
-    prompt: "What is a possible Huffman-Coding?",
+    name: "Huffman-Coding",
+    description: "Compute the Huffman-Code of a given string",
+    text: 'Let "*{{0}}*" be {{1}}. What is a correct **Huffman-Code** of this {{1}}? Please do not consider the spaces.',
+    prompt: "What is a possible Huffman-Code?",
     textTable: `Suppose we have the following table, which represents how often each character appears in a given string:
 {{0}}
-What could be a correct **Huffman-Coding** for each char?`,
+What could be a correct **Huffman-Code**?`,
     feedbackInvalid: "Please only use the characters 0 and 1.",
     bottomtext:
       "Hints for the Huffman-Code: If you have to choose between nodes with the same weight, " +
@@ -53,18 +53,18 @@ What could be a correct **Huffman-Coding** for each char?`,
       " Also choose as the left node, the node with the smaller weight.",
     multiInputText: `Suppose we have the following table, which represents how often each character appears in a given string:
 {{0}}
-What could be a correct **Huffman-Coding** for each character?
+Construct a correct **Huffman-Code** for the given string.
 {{1}}`,
   },
 
   de: {
-    name: "Berechne eine Hufmann-Codierung",
-    description: "Bestimme die Huffman-Codierung eines gegebenen Strings",
-    text: 'Sei "*{{0}}*" ein {{1}}. Was ist eine korrekte **Huffman-Codierung** für diesen {{1}}? Bitte ignorieren die Leerzeichen.',
-    prompt: "Was ist eine mögliche Huffman-Codierung?",
+    name: "Hufman-Kodierung",
+    description: "Bestimme den Huffman-Code eines gegebenen Strings",
+    text: 'Sei "*{{0}}*" ein {{1}}. Was ist ein korrekter **Huffman-Code** für diesen {{1}}? Bitte ignoriere die Leerzeichen.',
+    prompt: "Was ist ein möglicher Huffman-Code?",
     textTable: `Angenommen wir habe die folgende Tabelle, welche angebibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:
 {{0}}
-        Was wäre eine korrekte **Huffman-Codierung** für jeden Buchstaben?`,
+        Was wäre ein korrekter **Huffman-Code**?`,
     feedbackInvalid: "Bitte verwende nur die Zeichen 0 und 1.",
     bottomtext:
       "Hinweise zum Huffman-Code: Wenn du zwischen Knoten mit gleichem Gewicht wählen müssen, " +
@@ -72,7 +72,7 @@ What could be a correct **Huffman-Coding** for each character?
       " Wähle zudem als linken Knoten den mit dem kleineren Gewicht.",
     multiInputText: `Angenommen wir habe die folgende Tabelle, welche angebibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:
 {{0}}
-Was wäre eine korrekte **Huffman-Codierung** für jeden Buchstaben?
+Konstruiere einen korrekten **Huffman-Code** für den gegebenen String.
 {{1}}`,
   },
 }

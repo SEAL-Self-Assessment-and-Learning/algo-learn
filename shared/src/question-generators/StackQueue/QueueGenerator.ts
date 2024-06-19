@@ -14,8 +14,8 @@ import { t, tFunction, tFunctional, Translations } from "@shared/utils/translati
 
 const translations: Translations = {
   en: {
-    name: "Queue-Implementation using an Array",
-    description: "Correctly use queue operations",
+    name: "Queues",
+    description: "Perform queue operations",
     solutionFreetext: `|Index|Question|Solution|\n{{0}}`,
     performOperations: `**We perform the following operations:**{{0}}`,
     checkFormat: "Please only enter a number.",
@@ -27,18 +27,18 @@ const translations: Translations = {
     queueEmpty: "Currently the queue is empty.",
     queueContainsValues: `The queue currently contains the following elements:`,
     multipleChoiceText:
-      `Consider having a **Queue "{{0}}"**, which can store at most` +
-      " {{1}} " +
-      `elements. {{2}} {{3}} **What can we definitely say about the queue?**`,
+      `Consider a **Queue "{{0}}"** implemented as a fixed array of size` +
+      " {{1}}. " +
+      `{{2}} {{3}} **What can we definitely say about the queue?**`,
     freeTextInput:
-      `Consider having a **Queue "{{0}}"**, which can store at most` +
-      " ${{1}}$ " +
-      `elements. {{2}} **We perform the following operations:** {{3}}
+      `Consider a **Queue "{{0}}"** implemented as a fixed array of size` +
+      " {{1}}. " +
+      `{{2}} **We perform the following operations:** {{3}}
     `,
   },
   de: {
-    name: "Queue-Implementierung mit einem Array",
-    description: "Korrekt die Queue-Operationen anwenden",
+    name: "Queues",
+    description: "Queue-Operationen ausführen",
     solutionFreetext: `|Index|Frage|Lösung|\n{{0}}`,
     performOperations: `**Wir führen nun folgende Operationen aus:**{{0}}`,
     checkFormat: "Bitte gib nur Zahlen ein.",
@@ -50,13 +50,13 @@ const translations: Translations = {
     queueEmpty: "Die Queue ist aktuell leer.",
     queueContainsValues: `Die Queue enthält aktuell folgende Elemente:`,
     multipleChoiceText:
-      `Angenommen du hast eine **Queue "{{0}}"**, welche maximal` +
-      " {{1}} " +
-      `Elemente speichern kann. {{2}} {{3}} **Welche Aussagen können wir nun über die Queue treffen?**`,
+      `Angnommen du hast eine **Queue "{{0}}"** implementiert als fixer Array der Größe` +
+      " {{1}}. " +
+      `{{2}} {{3}} **Welche Aussagen können wir nun über die Queue treffen?**`,
     freeTextInput:
-      `Angenommen du hast eine **Queue "{{0}}"**, welche maximal` +
-      " ${{1}}$ " +
-      `Elemente speichern kann. {{2}} **Wir führen die folgenden Operationen aus:** {{3}}
+      `Angnommen du hast eine **Queue "{{0}}"** implementiert als fixer Array der Größe` +
+      " {{1}}. " +
+      `{{2}} **Wir führen die folgenden Operationen aus:** {{3}}
     `,
   },
 }

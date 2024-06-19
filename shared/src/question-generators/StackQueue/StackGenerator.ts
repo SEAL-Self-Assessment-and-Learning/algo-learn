@@ -13,53 +13,51 @@ import { t, tFunction, tFunctional, Translations } from "@shared/utils/translati
 
 const translations: Translations = {
   en: {
-    name: "Stack-Implementation using an Array",
-    description: "Correctly use stack operations",
+    name: "Stack",
+    description: "Perform queue operations",
     solutionFreetext: "|Index|Question|Solution|\n{{0}}",
     performOperations: `**We perform the following operations:**{{0}}`,
     checkFormat: "Please only enter a number",
     checkFormatArray: "Please only enter numbers separated by comma",
-    checkFormatJSON: "Error! It has to be passed a valid JSON type",
     dynamic: "dynamic",
-    notDynamic: "non dynamic",
+    notDynamic: "fixed",
     amountElementsExplanation:
       "> **amountElements()** returns the current number of elements in the stack.",
     getSizeExplanation: "> **getSize()** returns the current size of the stack.",
     stackEmpty: "Currently the stack is empty.",
     stackContainsValues: `The stack currently contains the following elements:`,
     multipleChoiceText:
-      `Consider having a **{{0}} Stack "{{1}}"**, which can store at most` +
-      " {{2}} " +
-      `elements. {{3}} {{4}} **What can we definitely say about the stack?**`,
+      `Consider a **Stack "{{1}}"** implemented as a {{0}} array of size` +
+      " {{2}}. " +
+      `{{3}} {{4}} **What can we definitely say about the stack?**`,
     freeTextInput:
-      `Consider having a **{{0}} Stack "{{1}}"**, which can store at most` +
-      " ${{2}}$ " +
-      `elements. {{3}} **We perform the following operations:** {{4}} \n{{5}} \n{{6}}`,
+      `Consider a **Stack "{{1}}"** implemented as a {{0}} array of size` +
+      " {{2}}. " +
+      `{{3}} **We perform the following operations:** {{4}} \n{{5}} \n{{6}}`,
   },
   de: {
-    name: "Stack-Implementierung mit einem Array",
-    description: "Korrekte Verwendung von Stack-Operationen",
+    name: "Stack",
+    description: "Stack-Operationen ausführen",
     solutionFreetext: "|Index|Frage|Lösung|\n{{0}}",
-    performOperations: `**Wir führen nun folgende Operationen aus:**{{0}}`,
+    performOperations: `**Wir führen folgende Operationen aus:**{{0}}`,
     checkFormat: "Bitte gib nur Zahlen ein.",
     checkFormatArray: "Bitte gib nur Zahlen getrennt durch Komma ein.",
-    checkFormatJSON: "Error! It has to be passed a valid JSON type.",
-    dynamic: "dynamisch",
-    notDynamic: "nicht dynamisch",
+    dynamic: "dynamischen",
+    notDynamic: "fixen",
     amountElementsExplanation:
       "> **amountElements()** gibt die aktuelle Anzahl der Elemente im Stack zurück.",
     getSizeExplanation: "> **getSize()** gibt die aktuelle Größe des Stacks zurück.",
     stackEmpty: "Der Stack ist aktuell leer.",
     stackContainsValues: `Der Stack enthält aktuell folgende Elemente:`,
     multipleChoiceText:
-      `Angenommen du hast einen **{{0}} Stack "{{1}}"**, welcher maximal` +
-      " {{2}} " +
-      `Elemente speichern kann. {{3}} {{4}} 
+      `Angenommen du hast einen **Stack "{{1}}"** implementiert als {{0}} Array der Größe` +
+      " {{2}}. " +
+      `{{3}} {{4}} 
       **Welche Aussagen können wir nun über den Stack treffen?**`,
     freeTextInput:
-      `Angenommen du hast einen **{{0}} Stack "{{1}}"**, welcher maximal` +
-      " ${{2}}$ " +
-      `Elemente speichern kann. {{3}} **Wir führen nun folgende Operationen aus:** {{4}} \n{{5}} \n{{6}}`,
+      `Angenommen du hast einen **Stack "{{1}}"** implementiert als {{0}} Array der Größe` +
+      " {{2}}. " +
+      `{{3}} **Wir führen nun folgende Operationen aus:** {{4}} \n{{5}} \n{{6}}`,
   },
 }
 
