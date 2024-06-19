@@ -298,9 +298,7 @@ export const huffmanCoding: QuestionGenerator = {
       seed,
     })
 
-    /*
-    Generate the random word and get the correct answer
-    */
+    // Generate the random word and get the correct answer
     const random = new Random(seed)
     const wordLengths: Array<[number, number]> = [
       [13, 0.25],

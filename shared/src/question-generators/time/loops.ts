@@ -1,4 +1,3 @@
-import { validateParameters } from "../../api/Parameters"
 import {
   FreeTextFeedbackFunction,
   FreeTextQuestion,
@@ -48,13 +47,6 @@ export const Loops: QuestionGenerator = {
   generate(lang, parameters, seed) {
     const { t } = tFunction(translations, lang)
 
-    if (!validateParameters(parameters, Loops.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${Loops.expectedParameters.join(
-          ",",
-        )}`,
-      )
-    }
     const permalink = serializeGeneratorCall({
       generator: RecursionFormula,
       lang,

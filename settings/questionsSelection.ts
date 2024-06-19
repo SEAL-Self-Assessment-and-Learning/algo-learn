@@ -15,6 +15,8 @@ import { RecurrenceMaster } from "@shared/question-generators/recursion/recurren
 import { queueQuestion } from "@shared/question-generators/StackQueue/QueueGenerator.ts"
 import { stackQuestion } from "@shared/question-generators/StackQueue/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
+import { NormalForms } from "../shared/src/question-generators/propositional-logic/normalForms.ts"
+import { Satisfiability } from "../shared/src/question-generators/propositional-logic/satisfiability"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
@@ -51,6 +53,11 @@ export const collection: QuestionCollection = [
     slug: "stackqueue",
     name: { de: "Stack und Queue", en: "Stack and Queue" },
     contents: [stackQuestion, queueQuestion],
+  },
+  {
+    slug: "propositional-logic",
+    name: { de: "Aussagenlogik", en: "Propositional Logic" },
+    contents: [Satisfiability, NormalForms],
   },
 ]
 
