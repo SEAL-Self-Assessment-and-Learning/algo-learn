@@ -1,14 +1,13 @@
 import { stringifyPseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
-import { validateParameters } from "../../api/Parameters"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
   QuestionGenerator,
-} from "../../api/QuestionGenerator"
-import { serializeGeneratorCall } from "../../api/QuestionRouter"
-import Random from "../../utils/random"
-import { tFunction, tFunctional, Translations } from "../../utils/translations"
+} from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import Random from "@shared/utils/random"
+import { tFunction, tFunctional, Translations } from "@shared/utils/translations"
 import { sampleLoopStars } from "./loopsUtilsStars.ts"
 
 const translations: Translations = {
@@ -29,6 +28,7 @@ const translations: Translations = {
 }
 
 export const Loops: QuestionGenerator = {
+  id: "loops",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -39,22 +39,14 @@ export const Loops: QuestionGenerator = {
       allowedValues: ["simpleExact"],
     },
   ],
-  generate(generatorPath, lang, parameters, seed) {
+  generate(lang, parameters, seed) {
     const { t } = tFunction(translations, lang)
 
-    if (!validateParameters(parameters, Loops.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${Loops.expectedParameters.join(
-          ",",
-        )}`,
-      )
-    }
     const permalink = serializeGeneratorCall({
       generator: Loops,
       lang,
       parameters,
       seed,
-      generatorPath,
     })
 
     const random = new Random(seed)

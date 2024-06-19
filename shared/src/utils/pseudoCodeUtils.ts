@@ -82,7 +82,7 @@ export type PseudoCode = Array<PseudoCodeFunction | PseudoCodeBlock | PseudoCode
 
 export function printStarsNew(stars: number): PseudoCodeState {
   const printStarsString: PseudoCodePrint = {
-    print: [{ printString: `\\texttt{${"*".repeat(stars)}}` }],
+    print: [{ printString: `\\texttt{"${"*".repeat(stars)}"}` }],
   }
   return { state: printStarsString }
 }
