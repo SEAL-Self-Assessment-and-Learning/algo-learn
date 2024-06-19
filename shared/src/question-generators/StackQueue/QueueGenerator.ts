@@ -1,5 +1,3 @@
-// TODO: replace the latex "-" with html "-"
-
 import { Language } from "@shared/api/Language.ts"
 import { validateParameters } from "@shared/api/Parameters.ts"
 import {
@@ -508,6 +506,7 @@ function generateWrongAnswersQueue(
 }
 
 export const queueQuestion: QuestionGenerator = {
+  id: "queue",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["queue"],
@@ -520,7 +519,7 @@ export const queueQuestion: QuestionGenerator = {
     },
   ],
 
-  generate: (generatorPath, lang = "en", parameters, seed) => {
+  generate: (lang = "en", parameters, seed) => {
     const random = new Random(seed)
 
     const permalink = serializeGeneratorCall({
@@ -528,7 +527,6 @@ export const queueQuestion: QuestionGenerator = {
       lang,
       parameters,
       seed,
-      generatorPath,
     })
 
     // throw an error if the variant is unknown

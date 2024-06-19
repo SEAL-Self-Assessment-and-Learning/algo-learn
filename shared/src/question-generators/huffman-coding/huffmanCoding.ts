@@ -1,4 +1,5 @@
 import { min } from "mathjs"
+import { validateParameters } from "@shared/api/Parameters.ts"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -32,7 +33,6 @@ import {
 } from "@shared/question-generators/huffman-coding/GenerateWrongAnswers.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunction, tFunctional, Translations } from "@shared/utils/translations.ts"
-import { validateParameters } from "../../api/Parameters.ts"
 
 /**
  * All text displayed text goes into the translation object.

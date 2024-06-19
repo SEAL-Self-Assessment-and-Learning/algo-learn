@@ -23,7 +23,6 @@ describe("StackQueueGenerator - Correctness", () => {
   for (let i = 1; i <= 100; i++) {
     test(`${i}. Choice - random Stack-Generator question`, () => {
       const { question: q, testing: t } = stackQuestion.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {
           variant: "choice",
@@ -36,7 +35,6 @@ describe("StackQueueGenerator - Correctness", () => {
 
     test(`${i}. FreeText - random Stack-Generator question`, () => {
       const { question: q, testing: t } = stackQuestion.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {
           variant: "input",
@@ -50,7 +48,6 @@ describe("StackQueueGenerator - Correctness", () => {
 
     test(`${i}. Choice - random Queue-Generator question`, () => {
       const { question: q, testing: t } = queueQuestion.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {
           variant: "choice",
@@ -63,7 +60,6 @@ describe("StackQueueGenerator - Correctness", () => {
 
     test(`${i}. FreeText - random Queue-Generator question`, () => {
       const { question: q, testing: t } = queueQuestion.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {
           variant: "input",
@@ -83,7 +79,6 @@ describe("StackQueueGenerator - Reproducible", () => {
 
     test(`${i}. Choice - Stack-Generator question`, () => {
       const { question: q1, testing: t1 } = stackQuestion.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {
           variant: "choice",
@@ -91,7 +86,6 @@ describe("StackQueueGenerator - Reproducible", () => {
         seed,
       ) as TestingObjectMultiple
       const { question: q2, testing: t2 } = stackQuestion.generate(
-        "", // path not relevant here
         "de", // language not relevant
         {
           variant: "choice",
@@ -104,7 +98,6 @@ describe("StackQueueGenerator - Reproducible", () => {
 
     test(`${i}. FreeText - Stack-Generator question`, () => {
       const { question: q1, testing: t1 } = stackQuestion.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {
           variant: "input",
@@ -112,7 +105,6 @@ describe("StackQueueGenerator - Reproducible", () => {
         seed,
       ) as TestingObjectFreetext
       const { question: q2, testing: t2 } = stackQuestion.generate(
-        "", // path not relevant here
         "de", // language not relevant
         {
           variant: "input",
@@ -130,7 +122,6 @@ describe("StackQueueGenerator - Reproducible", () => {
 
     test(`${i}. Choice - Queue-Generator question`, () => {
       const { question: q1, testing: t1 } = queueQuestion.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {
           variant: "choice",
@@ -138,7 +129,6 @@ describe("StackQueueGenerator - Reproducible", () => {
         seed,
       ) as TestingObjectMultiple
       const { question: q2, testing: t2 } = queueQuestion.generate(
-        "", // path not relevant here
         "de", // language not relevant
         {
           variant: "choice",
@@ -151,7 +141,6 @@ describe("StackQueueGenerator - Reproducible", () => {
 
     test(`${i}. FreeText - Queue-Generator question`, () => {
       const { question: q1, testing: t1 } = queueQuestion.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {
           variant: "input",
@@ -159,7 +148,6 @@ describe("StackQueueGenerator - Reproducible", () => {
         seed,
       ) as TestingObjectFreetext
       const { question: q2, testing: t2 } = queueQuestion.generate(
-        "", // path not relevant here
         "de", // language not relevant
         {
           variant: "input",

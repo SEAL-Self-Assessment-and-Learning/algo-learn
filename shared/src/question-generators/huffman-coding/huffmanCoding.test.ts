@@ -53,7 +53,6 @@ describe("HuffmanCodingGenerator - Correctness", () => {
   for (let i = 1; i <= 100; i++) {
     test(`${i}. random huffman coding question`, () => {
       const { question: q, testing: t } = huffmanCoding.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {
           variant: "choice",
@@ -98,7 +97,6 @@ describe("HuffmanCodingGenerator - Correctness", () => {
 
     test(`${i}. Input random huffman coding question`, async () => {
       const { question: q, testing: t } = huffmanCoding.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {
           variant: "input",
@@ -129,7 +127,6 @@ describe("HuffmanCodingGenerator - Correctness", () => {
 
     test(`${i}. Input-2 random huffman coding question`, async () => {
       const { question: q, testing: t } = huffmanCoding.generate(
-        "", // path not relevant here
         "en", // language not relevant
         {
           variant: "input",

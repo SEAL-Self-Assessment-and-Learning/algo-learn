@@ -636,6 +636,7 @@ export function parseArrayString(text: string): string {
 }
 
 export const stackQuestion: QuestionGenerator = {
+  id: "stack",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["stack"],
@@ -651,13 +652,12 @@ export const stackQuestion: QuestionGenerator = {
   /**
    * Generates a new Stack question
    *
-   * @param generatorPath The path the generator is located. Defined in settings/questionSelection
    * @param lang The language of the question
    * @param parameters The parameters for the question. In this case, none are used.
    * @param seed The seed for the random number generator
    * @returns A new MultipleChoiceQuestion question
    */
-  generate: (generatorPath, lang = "en", parameters, seed) => {
+  generate: (lang = "en", parameters, seed) => {
     const random = new Random(seed)
 
     const permalink = serializeGeneratorCall({
@@ -665,7 +665,6 @@ export const stackQuestion: QuestionGenerator = {
       lang,
       parameters,
       seed,
-      generatorPath,
     })
 
     // throw an error if the variant is unknown

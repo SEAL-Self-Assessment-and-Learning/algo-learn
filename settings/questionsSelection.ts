@@ -12,6 +12,8 @@ import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
+import { queueQuestion } from "@shared/question-generators/StackQueue/QueueGenerator.ts"
+import { stackQuestion } from "@shared/question-generators/StackQueue/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
@@ -45,6 +47,11 @@ export const collection: QuestionCollection = [
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     contents: [huffmanCoding],
   },
+  {
+    slug: "stackqueue",
+    name: { de: "Stack und Queue", en: "Stack and Queue" },
+    contents: [stackQuestion, queueQuestion],
+  },
 ]
 
 export const oldpathToGenerator = {
@@ -57,4 +64,6 @@ export const oldpathToGenerator = {
   "recursion/master": RecurrenceMaster,
   "time/loops": Loops,
   "huffmancoding/huffmanCoding": huffmanCoding,
+  "stackqueue/stack": stackQuestion,
+  "stackqueue/queue": queueQuestion,
 }
