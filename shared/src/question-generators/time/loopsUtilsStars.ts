@@ -292,6 +292,8 @@ function createForLoop(
   return { numStars, code: completeCode }
 }
 
+// TODO move this into a separate file
+
 /**
  *
  * You have many different cases how the loop is constructed
