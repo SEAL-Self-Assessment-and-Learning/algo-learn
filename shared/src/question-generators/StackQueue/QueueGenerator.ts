@@ -1,5 +1,4 @@
 import { Language } from "@shared/api/Language.ts"
-import { validateParameters } from "@shared/api/Parameters.ts"
 import {
   minimalMultipleChoiceFeedback,
   MultiFreeTextFeedbackFunction,
@@ -528,14 +527,6 @@ export const queueQuestion: QuestionGenerator = {
       parameters,
       seed,
     })
-
-    // throw an error if the variant is unknown
-    if (!validateParameters(parameters, queueQuestion.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. 
-                Valid variants are: ${queueQuestion.expectedParameters.join(", ")}`,
-      )
-    }
 
     const variant = parameters.variant as "choice" | "input"
 

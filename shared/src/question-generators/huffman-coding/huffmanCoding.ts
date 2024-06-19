@@ -1,5 +1,4 @@
 import { min } from "mathjs"
-import { validateParameters } from "@shared/api/Parameters.ts"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -298,14 +297,6 @@ export const huffmanCoding: QuestionGenerator = {
       parameters,
       seed,
     })
-
-    // throw an error if the variant is unknown
-    if (!validateParameters(parameters, huffmanCoding.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. 
-                Valid variants are: ${huffmanCoding.expectedParameters.join(", ")}`,
-      )
-    }
 
     /*
     Generate the random word and get the correct answer
