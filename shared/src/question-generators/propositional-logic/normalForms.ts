@@ -123,11 +123,11 @@ export const NormalForms: QuestionGenerator = {
     const random = new Random(seed)
 
     // casting necessary since Typescript cannot deduce the type of the parameter object
-    const parSize = parameters.size as number ?? 2
+    const parSize = (parameters.size as number) ?? 2
     const parVariant = (parameters.variant ?? "choice") as string
 
     const varNames = random.choice(variableNames).slice(0, parSize)
-    const numLeaves = (parSize) * 3
+    const numLeaves = parSize * 3
 
     let expression: SyntaxTreeNodeType
     let satisfiabilityProperties: ExpressionProperties
@@ -219,8 +219,6 @@ function makeMultipleChoiceQuestion(
     allowMultiple: true,
     feedback: minimalMultipleChoiceFeedback({
       correctAnswerIndex,
-      // todo add feedback depending on selection? how?
-      // feedbackText: getAdditionalFeedbackText(satisfiable, falsifiable, lang),
     }),
   }
 }
