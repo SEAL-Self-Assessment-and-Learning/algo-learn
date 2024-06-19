@@ -60,7 +60,9 @@ module.exports = {
       },
       {
         selector: 'variable',
-        format: ['camelCase', 'UPPER_CASE'],
+        // use UPPER_CASE for global constants, PascalCase for class-like objects (e.g. generators),
+        // and camelCase for everything else
+        format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
         leadingUnderscore: 'allow',
         trailingUnderscore: 'allow',
       },
