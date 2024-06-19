@@ -265,6 +265,14 @@ const operatorToLatex: Record<BinaryOperatorType | NegationOperatorType, string>
   "<=>": "\\Leftrightarrow",
 }
 
+export function tokenToLatex(str: string) {
+  for (const t in operatorToLatex) {
+    str = str.replace(t, `${operatorToLatex[t as keyof typeof operatorToLatex]} `)
+  }
+
+  return str
+}
+
 export class Operator extends SyntaxTreeNode {
   public type: BinaryOperatorType
   private leftOperand: SyntaxTreeNodeType

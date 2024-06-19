@@ -1,6 +1,8 @@
 import { Language } from "../../api/Language.ts"
 import {
+  FreeTextAnswer,
   FreeTextFeedbackFunction,
+  FreeTextFormatFunction,
   FreeTextQuestion,
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
@@ -15,6 +17,7 @@ import {
   ParserError,
   PropositionalLogicParser,
   SyntaxTreeNodeType,
+  tokenToLatex,
 } from "../../utils/propositionalLogic.ts"
 import Random from "../../utils/random.ts"
 import { t, tFunctional, Translations } from "../../utils/translations.ts"
@@ -281,6 +284,16 @@ function makeFreeTextQuestion(
   expression: SyntaxTreeNodeType,
   isDNF: boolean,
 ): FreeTextQuestion {
+  const vars = expression.getVariableNames()
+  const checkFormat: FreeTextFormatFunction = (answer: FreeTextAnswer) => {
+    const res = PropositionalLogicParser.parse(answer.text)
+
+    return {
+      valid: !(res instanceof ParserError || _.difference(res.getVariableNames(), vars).length > 0),
+      message: `$ ${tokenToLatex(answer.text)}$`,
+    }
+  }
+
   return {
     type: "FreeTextQuestion",
     name: NormalForms.name(lang),
@@ -293,7 +306,7 @@ function makeFreeTextQuestion(
     // placeholder: t(translations, lang, "freetext_placeholder"),
     bottomText: t(translations, lang, "freetext_bottom_text"),
     feedback: getFreeTextFeedbackFunction(lang, expression, isDNF),
-    // checkFormat:,
+    checkFormat,
     typingAid: [
       { text: "$($", input: "(", label: t(translations, lang, "aria.left-parenthesis") },
       { text: "$)$", input: ")", label: t(translations, lang, "aria.right-parenthesis") },
@@ -301,7 +314,7 @@ function makeFreeTextQuestion(
       { text: "$\\wedge$", input: "\\and", label: t(translations, lang, "aria.and") },
       { text: "$\\neg$", input: "\\not", label: t(translations, lang, "aria.not") },
     ].concat(
-      expression.getVariableNames().map((v) => {
+      vars.map((v) => {
         return { text: `$${v}$`, input: ` ${v}`, label: t(translations, lang, "aria.variable", [v]) }
       }),
     ),
