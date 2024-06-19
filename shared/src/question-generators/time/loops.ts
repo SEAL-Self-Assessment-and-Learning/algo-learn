@@ -1,4 +1,3 @@
-import { stringifyPseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -6,6 +5,7 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { stringifyPseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
 import Random from "@shared/utils/random"
 import { tFunction, tFunctional, Translations } from "@shared/utils/translations"
 import { sampleLoopStars } from "./loopsUtilsStars.ts"

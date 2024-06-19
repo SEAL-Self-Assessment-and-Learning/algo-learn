@@ -17,7 +17,6 @@ describe("Loops number of stars - Correctness", () => {
   for (let i = 1; i <= 100; i++) {
     test(`${i}. random loops number of stars question`, () => {
       const { question: q, testing: t } = Loops.generate(
-        "", // path not relevant here
         "en", // language not relevant
         { variant: "simpleExact" }, // generator does not support parameters
         sampleRandomSeed(),
