@@ -46,6 +46,7 @@ module.exports = {
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",
+    "@typescript-eslint/unbound-method": ["error", { ignoreStatic: true }],
     "@typescript-eslint/naming-convention": ["error",
       {
         selector: 'default',
@@ -59,7 +60,9 @@ module.exports = {
       },
       {
         selector: 'variable',
-        format: ['camelCase', 'UPPER_CASE'],
+        // use UPPER_CASE for global constants, PascalCase for class-like objects (e.g. generators),
+        // and camelCase for everything else
+        format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
         leadingUnderscore: 'allow',
         trailingUnderscore: 'allow',
       },
@@ -71,6 +74,10 @@ module.exports = {
         selector: 'typeLike',
         format: ['PascalCase'],
       },
+      {
+        selector: "objectLiteralProperty",
+        format: null
+      }
     ]
   },
   overrides: [
@@ -102,6 +109,10 @@ module.exports = {
             selector: 'typeLike',
             format: ['PascalCase'],
           },
+          {
+            selector: "objectLiteralProperty",
+            format: null
+          }
         ]
       }
     }

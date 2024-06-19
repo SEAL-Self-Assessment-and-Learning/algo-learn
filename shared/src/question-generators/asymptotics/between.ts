@@ -1,5 +1,4 @@
 import { MathNode } from "mathjs"
-import { validateParameters } from "../../api/Parameters"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -59,14 +58,6 @@ export const Between: QuestionGenerator = {
   ],
   generate: (lang, parameters, seed) => {
     const { t } = tFunction(translation, lang)
-
-    if (!validateParameters(parameters, Between.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${Between.expectedParameters.join(
-          ",",
-        )}`,
-      )
-    }
     const variant = parameters.variant as "start" | "log" | "loglog" | "nifty"
 
     const random = new Random(seed)

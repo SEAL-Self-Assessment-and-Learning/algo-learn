@@ -70,28 +70,5 @@ for (const generator of generators) {
         })
       }
     }
-
-    const lang = generator.languages[0]
-    const parameters = allCombinations[0]
-    for (const p of generator.expectedParameters) {
-      test(`Testing parameter ${JSON.stringify(p)}`, () => {
-        if (p.type === "integer") {
-          expect(() =>
-            generator.generate(lang, { ...parameters, [p.name]: p.min - 1 }, "myFancySeed"),
-          ).toThrow()
-          expect(() =>
-            generator.generate(lang, { ...parameters, [p.name]: p.max + 1 }, "myFancySeed"),
-          ).toThrow()
-        } else if (p.type === "string") {
-          expect(() =>
-            generator.generate(
-              lang,
-              { ...parameters, [p.name]: "non-existent-kjfewjokfwjiofw" },
-              "myFancySeed",
-            ),
-          ).toThrow()
-        }
-      })
-    }
   })
 }

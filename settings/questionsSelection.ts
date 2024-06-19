@@ -13,6 +13,8 @@ import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffma
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
 import { Loops } from "@shared/question-generators/time/loops"
+import { NormalForms } from "../shared/src/question-generators/propositional-logic/normalForms.ts"
+import { Satisfiability } from "../shared/src/question-generators/propositional-logic/satisfiability"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
@@ -44,6 +46,11 @@ export const collection: QuestionCollection = [
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     contents: [huffmanCoding],
+  },
+  {
+    slug: "propositional-logic",
+    name: { de: "Aussagenlogik", en: "Propositional Logic" },
+    contents: [Satisfiability, NormalForms],
   },
 ]
 

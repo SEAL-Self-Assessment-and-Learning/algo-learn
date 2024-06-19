@@ -1,7 +1,6 @@
 // TODO: check if the table could be to wide to be represented as possible answer
 
 import { min } from "mathjs"
-import { validateParameters } from "@shared/api/Parameters.ts"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -290,17 +289,7 @@ export const huffmanCoding: QuestionGenerator = {
       seed,
     })
 
-    // throw an error if the variant is unknown
-    if (!validateParameters(parameters, huffmanCoding.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. 
-                Valid variants are: ${huffmanCoding.expectedParameters.join(", ")}`,
-      )
-    }
-
-    /*
-        Generate the random word and get the correct answer
-         */
+    // Generate the random word and get the correct answer
     const random = new Random(seed)
     const wordLengths: Array<[number, number]> = [
       [13, 0.25],

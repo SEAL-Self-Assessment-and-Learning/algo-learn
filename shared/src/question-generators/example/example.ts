@@ -8,7 +8,7 @@ import Random from "../../utils/random"
 import { t, tFunctional, Translations } from "../../utils/translations"
 
 /**
- * All text displayed text goes into the translations object.
+ * All displayed text goes into the translations object.
  * Include at least english and german.
  */
 const translations: Translations = {
@@ -25,7 +25,7 @@ const translations: Translations = {
 }
 
 function generateWrongAnswers(random: Random, correctAnswer: number): Array<string> {
-  let wrongAnswers = [
+  const wrongAnswers = [
     `$${correctAnswer + 3}$`,
     `$${correctAnswer + 2}$`,
     `$${correctAnswer + 1}$`,
