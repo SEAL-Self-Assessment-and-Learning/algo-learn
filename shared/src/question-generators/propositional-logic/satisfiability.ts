@@ -99,7 +99,7 @@ export const Satisfiability: QuestionGenerator = {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
 
-    const numLeaves = (<number>parameters.size ?? 2) * 2
+    const numLeaves = (parameters.size ?? 2) as number * 2
     const varNames = random.choice(variableNames).slice(0, numLeaves)
     let expression
     switch (random.int(0, 3)) {

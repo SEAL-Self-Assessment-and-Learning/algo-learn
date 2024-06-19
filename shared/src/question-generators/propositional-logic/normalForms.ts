@@ -122,8 +122,12 @@ export const NormalForms: QuestionGenerator = {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
 
-    const varNames = random.choice(variableNames).slice(0, <number>parameters.size)
-    const numLeaves = (<number>parameters.size ?? 2) * 3
+    // casting necessary since Typescript cannot deduce the type of the parameter object
+    const parSize = parameters.size as number ?? 2
+    const parVariant = (parameters.variant ?? "choice") as string
+
+    const varNames = random.choice(variableNames).slice(0, parSize)
+    const numLeaves = (parSize) * 3
 
     let expression: SyntaxTreeNodeType
     let satisfiabilityProperties: ExpressionProperties
@@ -137,7 +141,7 @@ export const NormalForms: QuestionGenerator = {
     const normalForm = dnf ? expression.toDNF() : expression.toCNF()
 
     const question =
-      parameters["variant"] === undefined || <string>parameters["variant"] === "choice"
+      parVariant === "choice"
         ? makeMultipleChoiceQuestion(lang, path, random, expression, normalForm, dnf)
         : makeFreeTextQuestion(lang, path, expression, dnf)
 
