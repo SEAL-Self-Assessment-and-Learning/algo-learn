@@ -1,7 +1,6 @@
 // TODO: check if the table could be to wide to be represented as possible answer
 
 import { min } from "mathjs"
-import { validateParameters } from "@shared/api/Parameters.ts"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -254,6 +253,7 @@ function convertDictToMdTable(wordArray: { [key: string]: any }, extraFeature: s
 }
 
 export const huffmanCoding: QuestionGenerator = {
+  id: "huffman",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -268,7 +268,6 @@ export const huffmanCoding: QuestionGenerator = {
 
   /**
    * Generates a new question (currently only MultipleChoiceQuestion)
-   * @param generatorPath
    * @param lang provided language
    * @param parameters the following options are possible
    *                      - choice-1: this displays are "real" word maximum length of 13 chars, it has a unique coding
@@ -281,27 +280,16 @@ export const huffmanCoding: QuestionGenerator = {
    *                                  those
    * @param seed
    */
-  generate: (generatorPath, lang, parameters, seed) => {
+  generate: (lang, parameters, seed) => {
     // first create a permalink for the question
     const permalink = serializeGeneratorCall({
       generator: huffmanCoding,
       lang,
       parameters,
       seed,
-      generatorPath,
     })
 
-    // throw an error if the variant is unknown
-    if (!validateParameters(parameters, huffmanCoding.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. 
-                Valid variants are: ${huffmanCoding.expectedParameters.join(", ")}`,
-      )
-    }
-
-    /*
-        Generate the random word and get the correct answer
-         */
+    // Generate the random word and get the correct answer
     const random = new Random(seed)
     const wordLengths: Array<[number, number]> = [
       [13, 0.25],

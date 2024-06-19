@@ -1,5 +1,4 @@
 import { MathNode } from "mathjs"
-import { validateParameters } from "../../api/Parameters"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -46,6 +45,7 @@ const translation: Translations = {
 
 /** Generate and render a question about O/Omega/o/omega */
 export const Between: QuestionGenerator = {
+  id: "between",
   name: tFunctional(translation, "name"),
   description: tFunctional(translation, "description"),
   languages: ["en", "de"],
@@ -56,16 +56,8 @@ export const Between: QuestionGenerator = {
       allowedValues: ["start", "log", "loglog", "nifty"],
     },
   ],
-  generate: (generatorPath, lang, parameters, seed) => {
+  generate: (lang, parameters, seed) => {
     const { t } = tFunction(translation, lang)
-
-    if (!validateParameters(parameters, Between.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${Between.expectedParameters.join(
-          ",",
-        )}`,
-      )
-    }
     const variant = parameters.variant as "start" | "log" | "loglog" | "nifty"
 
     const random = new Random(seed)
@@ -215,7 +207,6 @@ ${t("feedback.expected")}: $${variable}$.`,
         lang,
         parameters,
         seed,
-        generatorPath,
       }),
       text,
       prompt,

@@ -108,19 +108,22 @@ export type MultipleChoiceFeedbackFunction = (
  * @param correctAnswerIndex The index or indices of the correct answer(s)
  * @param sorting Whether the order of the answers is relevant; defaults to
  *   false, in which case the order of the answers is ignored by sorting them
+ * @param feedbackText An optional feedback text
  * @returns
  */
 export function minimalMultipleChoiceFeedback({
   correctAnswerIndex,
   sorting = false,
+  feedbackText = undefined,
 }: {
   correctAnswerIndex: number | number[]
   sorting?: boolean
+  feedbackText?: string
 }): MultipleChoiceFeedbackFunction {
   const correctChoice =
     typeof correctAnswerIndex === "number" ? [correctAnswerIndex] : correctAnswerIndex.slice()
   if (!sorting) correctChoice.sort()
-  const feedback: MultipleChoiceFeedbackFunction = ({ choice }) => {
+  return ({ choice }) => {
     const sameLength = choice.length === correctChoice.length
     if (!sorting) choice = choice.slice().sort()
     let sameAnswer = true
@@ -128,9 +131,8 @@ export function minimalMultipleChoiceFeedback({
       if (c !== correctChoice[i]) sameAnswer = false
     })
     const correct = sameLength && sameAnswer
-    return { correct, correctChoice }
+    return { correct, correctChoice, feedbackText }
   }
-  return feedback
 }
 
 /**
@@ -161,6 +163,11 @@ export interface FreeTextQuestion extends QuestionBase {
    * the given answer is correct and to provide feedback on the syntax.
    */
   checkFormat?: FreeTextFormatFunction
+
+  /**
+   * If provided, the data can be used to provide buttons to add specific text to the input field.
+   */
+  typingAid?: { text: string; input: string; label: string }[]
 }
 
 /**
@@ -195,6 +202,13 @@ export type FreeTextFormatFunction = (
  * example MultipleChoiceQuestion, etc.
  */
 export interface QuestionGenerator {
+  /**
+   * Unique and stable identifier of the question generator.
+   * The id may be used as part of URI paths, should only
+   * contain lowercase letters, and at most ten characters.
+   */
+  id: string
+
   /** List of supported languages. */
   languages: Language[]
 
@@ -235,7 +249,6 @@ export interface QuestionGenerator {
    * as well as the feedback function for this question. The function must be
    * implemented by each QuestionGenerator object.
    *
-   * @param generatorPath The path the generator is available at (defined under settings/questionSelection.ts)
    * @param lang The language to use when generating the question
    * @param parameters The parameters to use when generating the question
    * @param seed The seed used to generate the question
@@ -244,7 +257,6 @@ export interface QuestionGenerator {
    *   provide unit tests.
    */
   generate: (
-    generatorPath: string,
     lang: Language,
     parameters: Parameters,
     seed: string,
