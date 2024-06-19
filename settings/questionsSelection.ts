@@ -49,9 +49,9 @@ export const collection: QuestionCollection = [
   },
   {
     slug: "propositional-logic",
-    name: {de: "Aussagenlogik", en: "Propositional Logic"},
-    contents: [Satisfiability, NormalForms]
-  }
+    name: { de: "Aussagenlogik", en: "Propositional Logic" },
+    contents: [Satisfiability, NormalForms],
+  },
 ]
 
 export const oldpathToGenerator = {

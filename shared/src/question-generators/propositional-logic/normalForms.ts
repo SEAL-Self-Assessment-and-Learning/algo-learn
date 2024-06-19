@@ -80,6 +80,7 @@ const variableNames = [
 ]
 
 export const NormalForms: QuestionGenerator = {
+  id: "plnf",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["boolean logic", "propositional logic", "propositional calculus", "normal forms", "CNF", "DNF"],
@@ -104,19 +105,17 @@ export const NormalForms: QuestionGenerator = {
   /**
    * Generates a new MultipleChoiceQuestion question.
    *
-   * @param generatorPath The path the generator is located on the page. Defined in settings/questionSelection.ts
    * @param lang The language of the question
    * @param parameters The parameters for the question.
    * @param seed The seed for the random number generator
    * @returns A new MultipleChoiceQuestion question
    */
-  generate: (generatorPath, lang = "en", parameters, seed) => {
+  generate: (lang = "en", parameters, seed) => {
     const path = serializeGeneratorCall({
       generator: NormalForms,
       lang,
       parameters,
       seed,
-      generatorPath,
     })
 
     // initialize the RNG so the question can be generated again

@@ -2,7 +2,7 @@ import { format } from "../utils/format"
 import Random from "../utils/random"
 import { DeepTranslations, getValidLanguage } from "../utils/translations"
 import { Language } from "./Language"
-import { ExpectedParameters, Parameters, validateParameters} from "./Parameters"
+import { ExpectedParameters, Parameters, validateParameters } from "./Parameters"
 import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,

@@ -3,7 +3,7 @@ import { FreeTextFeedback, FreeTextQuestion } from "@shared/api/QuestionGenerato
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 
 test("Normal forms with a single literal as answer", () => {
-  const { question } = NormalForms.generate("", "en", { variant: "input", size: 2 }, "xrahebo") as {
+  const { question } = NormalForms.generate("en", { variant: "input", size: 2 }, "xrahebo") as {
     question: FreeTextQuestion
   }
   expect(question.type).toStrictEqual("FreeTextQuestion")
