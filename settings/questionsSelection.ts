@@ -9,6 +9,7 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { HeapOperations, HeapUnderstanding } from "@shared/question-generators/heap/heapGenerator.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
@@ -51,6 +52,11 @@ export const collection: QuestionCollection = [
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
     contents: [Satisfiability, NormalForms],
+  },
+  {
+    slug: "heap",
+    name: { de: "Heap", en: "Heap" },
+    contents: [HeapOperations, HeapUnderstanding],
   },
 ]
 

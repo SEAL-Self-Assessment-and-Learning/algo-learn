@@ -1,4 +1,3 @@
-import { validateParameters } from "@shared/api/Parameters.ts"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -7,6 +6,7 @@ import {
   MultipleChoiceQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax.ts"
 import {
   generateHeapsForQuestion,
@@ -16,8 +16,6 @@ import {
 import { permutation } from "@shared/utils/math.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
-import { basicMultipleChoiceMetaGenerator } from "../../api/BasicMultipleChoiceQuestion"
-import { heapProofList } from "./proofList.ts"
 
 const translationHeapOperations: Translations = {
   en: {
@@ -71,17 +69,6 @@ const translationsHeapUnderstanding: Translations = {
   },
 }
 
-const translationsHeapProofs: Translations = {
-  en: {
-    name: "Heap-Proofs",
-    description: "Prove properties of heaps",
-  },
-  de: {
-    name: "Heap-Beweise",
-    description: "Beweise Eigenschaften von Heaps",
-  },
-}
-
 const wordTranslations: Translations = {
   en: {
     maximal: "maximal",
@@ -121,6 +108,7 @@ function heapGetPermutationElements(heap: MinHeap | MaxHeap, heapElements: numbe
 }
 
 export const HeapOperations: QuestionGenerator = {
+  id: "heapops",
   name: tFunctional(translationHeapOperations, "name"),
   description: tFunctional(translationHeapOperations, "description"),
   tags: ["heap", "priority-queue"],
@@ -133,14 +121,13 @@ export const HeapOperations: QuestionGenerator = {
     },
   ],
 
-  generate: (generatorPath, lang = "en", parameters, seed) => {
-    if (!validateParameters(parameters, HeapOperations.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${HeapOperations.expectedParameters.join(
-          ", ",
-        )}`,
-      )
-    }
+  generate: (lang = "en", parameters, seed) => {
+    const permaLink = serializeGeneratorCall({
+      generator: HeapOperations,
+      lang,
+      parameters,
+      seed,
+    })
 
     const random = new Random(seed)
 
@@ -228,7 +215,7 @@ export const HeapOperations: QuestionGenerator = {
       const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
         name: HeapOperations.name(lang),
-        path: generatorPath,
+        path: permaLink,
         text: t(translationHeapOperations, lang, "taskInsert", [heapType, elementsTable]),
         checkFormat,
         feedback,
@@ -254,7 +241,7 @@ export const HeapOperations: QuestionGenerator = {
       const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
         name: HeapOperations.name(lang),
-        path: generatorPath,
+        path: permaLink,
         text: t(translationHeapOperations, lang, "taskExtract", [
           heapType,
           elementsTable,
@@ -275,7 +262,7 @@ export const HeapOperations: QuestionGenerator = {
       const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
         name: HeapOperations.name(lang),
-        path: generatorPath,
+        path: permaLink,
         text: t(translationHeapOperations, lang, "taskBuild", [elementsTable, heapType]),
         checkFormat,
         feedback,
@@ -291,7 +278,7 @@ export const HeapOperations: QuestionGenerator = {
       const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
         name: HeapOperations.name(lang),
-        path: generatorPath,
+        path: permaLink,
         text: t(translationHeapOperations, lang, "taskCombine", [variableName, sequence, heapType]),
         checkFormat,
         feedback,
@@ -303,6 +290,7 @@ export const HeapOperations: QuestionGenerator = {
 }
 
 export const HeapUnderstanding: QuestionGenerator = {
+  id: "heapund",
   name: tFunctional(translationsHeapUnderstanding, "name"),
   description: tFunctional(translationsHeapUnderstanding, "description"),
   tags: ["heap", "priority-queue", "proofs"],
@@ -315,14 +303,13 @@ export const HeapUnderstanding: QuestionGenerator = {
     },
   ],
 
-  generate: (generatorPath, lang = "en", parameters, seed) => {
-    if (!validateParameters(parameters, HeapUnderstanding.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${HeapUnderstanding.expectedParameters.join(
-          ", ",
-        )}`,
-      )
-    }
+  generate: (lang = "en", parameters, seed) => {
+    const permaLink = serializeGeneratorCall({
+      generator: HeapUnderstanding,
+      lang,
+      parameters,
+      seed,
+    })
 
     const random = new Random(seed)
 
@@ -374,7 +361,7 @@ export const HeapUnderstanding: QuestionGenerator = {
       const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
         name: HeapUnderstanding.name(lang),
-        path: generatorPath,
+        path: permaLink,
         text: t(translationsHeapUnderstanding, lang, "taskPermutations", [
           heapType,
           solutionHeap.toTableString() + "|#div_my-5#||\n",
@@ -390,7 +377,7 @@ export const HeapUnderstanding: QuestionGenerator = {
       const question: MultipleChoiceQuestion = {
         type: "MultipleChoiceQuestion",
         name: HeapUnderstanding.name(lang),
-        path: generatorPath,
+        path: permaLink,
         text: t(translationsHeapUnderstanding, lang, "taskCorrectness", [heapType]),
         answers: heapStringTable,
         feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
@@ -408,7 +395,7 @@ export const HeapUnderstanding: QuestionGenerator = {
       const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
         name: HeapUnderstanding.name(lang),
-        path: generatorPath,
+        path: permaLink,
         text: t(translationsHeapUnderstanding, lang, "taskNeighbours", [
           neighbourText,
           randomIndex.toString(),
@@ -421,10 +408,3 @@ export const HeapUnderstanding: QuestionGenerator = {
     }
   },
 }
-
-export const HeapProofs: QuestionGenerator = basicMultipleChoiceMetaGenerator(
-  tFunctional(translationsHeapProofs, "name"),
-  heapProofList,
-  tFunctional(translationsHeapProofs, "description"),
-  true,
-)
