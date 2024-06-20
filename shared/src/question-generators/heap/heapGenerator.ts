@@ -19,27 +19,29 @@ import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
 const translationHeapOperations: Translations = {
   en: {
     name: "Heap-Operations",
-    description: "Determine the state of a heap after operations",
+    description: "Determine the state of a Heap after operations",
     taskInsert:
-      "Consider having a **{{0}}-Heap**. You insert the following elements in the given order: {{1}} What is the state of the Heap after the insertions?",
+      "Consider a **{{0}}-Heap**. Initally the Heap is empty. You insert the following elements in the given order: {{1}} Enter the state of the Heap after the insertions.",
     taskExtract:
-      "Consider having the following **{{0}}-Heap**: {{1}} You extract the {{2}} element **{{3}}** times. What is the state of the Heap after the extractions?",
-    taskBuild: "Consider having the following Array: {{0}} What is the result of **Build-{{1}}-Heap**?",
+      "Consider the following **{{0}}-Heap**: {{1}} You extract the {{2}} element **{{3}}** times. Enter the state of the Heap after the extractions.",
+    taskBuild:
+      "Consider the following Array: {{0}} Enter the state of the Heap after **Build-{{1}}-Heap** on the above array.",
     taskCombine:
-      "Let **{{0}}** be a sequence of operations, where a **number** represents **inserting** this number into the heap and $*$ represents an **Extract-{{2}}** Operation. \\[{{0}}={{1}}\\] What is the state of the Heap after all operations? Initially the heap is empty.",
+      "Let **{{0}}** be a sequence of operations, where a **number** represents **inserting** this number into the **{{2}}-Heap** and $*$ represents an **Extract-{{2}}** operation. \\[{{0}}={{1}}\\] Enter the state of the Heap after all operations. Initially the Heap is empty.",
     checkFormat: "Please only enter Integer seperated by commas.",
   },
   de: {
     name: "Heap-Operationen",
     description: "Bestimme den Zustand eines Heaps nach Operationen",
     taskInsert:
-      "Betrachte einen **{{0}}-Heap**. Du fügst die folgenden Elemente in gegebener Reihenfolge ein: {{1}} Wie sieht der Heap nach den Einfügungen aus?",
+      "Betrachte einen **{{0}}-Heap**. Anfänglich ist der Heap leer. Du fügst die folgenden Elemente in gegebener Reihenfolge ein: {{1}} Gib den Heap nach den Einfügungen an.",
     taskExtract:
-      "Betrachte den folgenden **{{0}}-Heap**: {{1}} Du extrahierst das {{2}} Element **{{3}}** mal. Wie sieht der Heap nach den Extraktionen aus?",
-    taskBuild: "Betrachte das folgende Array: {{0}} Was ist das Ergebnis von **Build-{{1}}-Heap**?",
+      "Betrachte den folgenden **{{0}}-Heap**: {{1}} Du extrahierst das {{2}} Element **{{3}}** mal. Gib den Heap nach den Extraktionen an.",
+    taskBuild:
+      "Betrachte das folgende Array: {{0}} Gib den Heap nach **Build-{{1}}-Heap** auf dem obigen Array an.",
     taskCombine:
-      "Sei **{{0}}** eine Sequenz von Operationen, wobei eine **Zahl** das **Einfügen** dieser Zahl in den Heap repräsentiert und $*$ eine **Extract-{{2}}** Operation. \\[{{0}}={{1}}\\] Wie sieht der Heap nach allen Operationen aus? Der Heap ist anfangs leer.",
-    checkFormat: "Bitte nur Integer durch Kommata getrennt eingeben.",
+      "Sei **{{0}}** eine Sequenz von Operationen, wobei eine **Zahl** das **Einfügen** dieser Zahl in den **{{2}}-Heap** repräsentiert und $*$ eine **Extract-{{2}}** Operation. \\[{{0}}={{1}}\\] Gib den Heap nach allen Operationen an. Der Heap ist anfangs leer.",
+    checkFormat: "Bitte nur ganze Zahlen durch Komma getrennt eingeben.",
   },
 }
 
@@ -47,27 +49,24 @@ const translationsHeapUnderstanding: Translations = {
   en: {
     name: "Heap-Understanding",
     description: "Understand the properties of heaps",
-    taskPermutations:
-      "Consider the following {{0}}-Heap. How many different Insert-Operations can lead to this Heap? {{1}} Number of different Insert-Operations:",
     taskCorrectness:
       "Which of the following arrays satisfy all **Heap-Properties** for a **{{0}}-Heap**?",
     taskNeighbours:
-      "Consider having a random Heap with $n$ elements, where $n >> 1000$. The value at index $0$ is *null*.  What is the index of the **{{0}}** of the element at **index {{1}}** in a *Heap*?",
+      "Consider a random Heap with $n$ elements. The value at index $0$ is *null*. What is the index of the **{{0}}** of the element at **index {{1}}** in a *Heap*?",
     checkFormatPermutations: "Please only enter an Integer.",
   },
   de: {
     name: "Heap-Verständnis",
-    description: "Verstehe die Eigenschaften von Heaps",
-    taskPermutations:
-      "Betrachte den folgenden {{0}}-Heap. Wie viele verschiedene Einfüge-Operationen können zu diesem Heap führen? {{1}} Anzahl der verschiedenen Einfüge-Operationen:",
+    description: "Verstehe die Eigenschaften von Heaps", // Improve this description
     taskCorrectness:
       "Welche der folgenden Arrays erfüllen alle **Heap-Eigenschaften** für einen **{{0}}-Heap**?",
     taskNeighbours:
-      "Angenommen du hast einen beliebigen Heap mit $n$ Element, mit $n >> 1000$. Der Wert an index $0$ ist *null*, Was ist der Index des **{{0}}** des Elements an **Index {{1}}* in einem *Heap*?",
+      "Betrachte einen beliebigen Heap mit $n$ Element. Der Wert an index $0$ ist *null*. Was ist der Index des **{{0}}** des Elements an **Index {{1}}* in einem *Heap*?",
     checkFormatPermutations: "Bitte etwas ganzzahliges eingeben.",
   },
 }
 
+// passen diese Beschreibungen für Knoten?
 const wordTranslations: Translations = {
   en: {
     maximal: "maximal",
@@ -127,8 +126,10 @@ export const HeapOperations: QuestionGenerator = {
 
       // 1 trim
       let cleanedText = text.trim()
-      // 2 remove beginning and ending brackets
+      // remove brackets
       cleanedText = cleanedText.replace(/^\[/, "").replace(/\]$/, "")
+      // remove all whitespaces
+      cleanedText = cleanedText.replace(/\s/g, "")
 
       let heapInputTable = "\n"
 
@@ -159,21 +160,21 @@ export const HeapOperations: QuestionGenerator = {
     }
     const feedback: FreeTextFeedbackFunction = ({ text }) => {
       let cleanedText = text.trim()
+      // remove brackets
       cleanedText = cleanedText.replace(/^\[/, "").replace(/\]$/, "")
+      // remove every whitespace
+      cleanedText = cleanedText.replace(/\s/g, "")
 
-      const userHeap = cleanedText.split(",").map(Number)
-
-      if (userHeap.length !== heapSize) {
-        return {
-          correct: false,
-          correctAnswer: solutionHeap.toTableString() + "|#div_my-5#||\n",
-        }
-      }
+      // remove every empty entry
+      const userHeap = cleanedText
+        .split(",")
+        .filter((element) => element.trim() !== "")
+        .map(Number)
 
       if (userHeap.toString() !== solutionHeap.toString()) {
         return {
           correct: false,
-          correctAnswer: solutionHeap.toTableString(),
+          correctAnswer: solutionHeap.toTableString() + "|#div_my-5#||\n",
         }
       }
 
