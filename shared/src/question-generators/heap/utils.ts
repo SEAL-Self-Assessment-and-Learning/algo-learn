@@ -1,6 +1,16 @@
 import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax.ts"
 import Random from "@shared/utils/random.ts"
 
+/**
+ * Generates a random operations sequence for heap operations combine variation
+ *
+ * Sample:
+ *  7,3,2,4,2,*,*,4,*
+ * A number means, inserting this number into the heap and * for extracting min or max
+ *
+ * @param heapType
+ * @param random
+ */
 export function generateOperationSequence(
   heapType: "Min" | "Max",
   random: Random,
@@ -17,8 +27,8 @@ export function generateOperationSequence(
     const canExtract = amountInserts - amountExtracts >= 3
     const operation = canExtract
       ? random.weightedChoice([
-          ["insert", 0.75],
-          ["extract", 0.25],
+          ["insert", 0.7],
+          ["extract", 0.3],
         ])
       : "insert"
 
@@ -41,6 +51,10 @@ export function generateOperationSequence(
   return { sequence: operationSequence.join(", "), heap }
 }
 
+/**
+ * Generates a random question part, to test the understanding about (where children and parents are inside a heap)
+ * @param random
+ */
 export function generateNeighbourOptions(random: Random) {
   const neighbourOption:
     | "grandParent"
@@ -102,6 +116,12 @@ export function generateNeighbourOptions(random: Random) {
   }
 }
 
+/**
+ * Generates random correct and wrong heaps for the heap understanding question
+ * Also the solution index will be generated
+ * @param heapType
+ * @param random
+ */
 export function generateHeapsForQuestion(
   heapType: "Max" | "Min",
   random: Random,
@@ -122,7 +142,6 @@ export function generateHeapsForQuestion(
   )
 
   const heapStringTable = random.shuffle(correctRandomHeapsString.concat(wrongRandomHeapsString))
-
   const correctAnswerIndex = correctRandomHeapsString.map((heapString) =>
     heapStringTable.indexOf(heapString),
   )
@@ -133,6 +152,12 @@ export function generateHeapsForQuestion(
   }
 }
 
+/**
+ * Generates $n$ random heaps (either Min or MaxHeaps)
+ * @param heapType
+ * @param count
+ * @param random
+ */
 export function generateRandomHeaps(
   heapType: "Max" | "Min",
   count: number,
@@ -158,6 +183,12 @@ export function generateRandomHeaps(
   return heaps
 }
 
+/**
+ * This function generates a set of wrong heaps (as number[][]) for the heap understanding question
+ * Currently only four different variations how wrong heaps are generated
+ * @param heapType
+ * @param random
+ */
 export function generateRandomWrongHeaps(heapType: "Max" | "Min", random: Random): number[][] {
   const heaps: number[][] = []
 
@@ -219,6 +250,11 @@ export function increaseChildValue(heap: number[], heapType: "Min" | "Max", rand
   return newHeap
 }
 
+/**
+ * Checks if a number array is a correct heap
+ * @param heap
+ * @param type need to provide if either "Max" or "Min" heap to check
+ */
 export function checkCorrectHeap(heap: number[], type: "Max" | "Min"): boolean {
   // check if every child is smaller than its parent
   for (let i = 1; i < heap.length; i++) {
@@ -232,12 +268,23 @@ export function checkCorrectHeap(heap: number[], type: "Max" | "Min"): boolean {
   return true
 }
 
+/**
+ * Converts number[] to a table string
+ *
+ * Sample:
+ *  [1,2,3,4]
+ *  converts into
+ *  | 1 | 2 | 3 | 4 |
+ *  |---|---|---|---|
+ *
+ *
+ * @param array
+ */
 export function convertNumberArrayToTable(array: number[]): string {
   let arrayTable = "\n|"
   array.forEach((element) => {
     arrayTable += (Number.isNaN(element) ? " " : element) + "|"
   })
   arrayTable += "\n" + "|---".repeat(array.length) + "|\n"
-  console.log(arrayTable)
   return arrayTable
 }
