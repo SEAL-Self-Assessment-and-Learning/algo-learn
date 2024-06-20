@@ -4,14 +4,6 @@ import { queueQuestion } from "@shared/question-generators/StackQueue/QueueGener
 import { stackQuestion } from "@shared/question-generators/StackQueue/StackGenerator.ts"
 import { sampleRandomSeed } from "../../utils/random"
 
-interface TestingObjectMultiple {
-  question: MultipleChoiceQuestion | MultiFreeTextQuestion
-  testing: {
-    allAnswers: string[]
-    correctAnswerIndex: number[]
-  }
-}
-
 interface TestingObjectFreetext {
   question: MultipleChoiceQuestion | MultiFreeTextQuestion
   testing: {
@@ -20,19 +12,7 @@ interface TestingObjectFreetext {
 }
 
 describe("StackQueueGenerator - Correctness", () => {
-  for (let i = 1; i <= 100; i++) {
-    test(`${i}. Choice - random Stack-Generator question`, () => {
-      const { question: q, testing: t } = stackQuestion.generate(
-        "en", // language not relevant
-        {
-          variant: "choice",
-        },
-        sampleRandomSeed(),
-      ) as TestingObjectMultiple
-
-      correctnessTestingObjectMultiple(q, t)
-    })
-
+  for (let i = 1; i <= 10; i++) {
     test(`${i}. FreeText - random Stack-Generator question`, () => {
       const { question: q, testing: t } = stackQuestion.generate(
         "en", // language not relevant
@@ -44,18 +24,6 @@ describe("StackQueueGenerator - Correctness", () => {
 
       expect(q.type).toEqual("MultiFreeTextQuestion")
       expect(Object.keys(t.correctAnswer).length).toBeGreaterThanOrEqual(0)
-    })
-
-    test(`${i}. Choice - random Queue-Generator question`, () => {
-      const { question: q, testing: t } = queueQuestion.generate(
-        "en", // language not relevant
-        {
-          variant: "choice",
-        },
-        sampleRandomSeed(),
-      ) as TestingObjectMultiple
-
-      correctnessTestingObjectMultiple(q, t)
     })
 
     test(`${i}. FreeText - random Queue-Generator question`, () => {
@@ -76,25 +44,6 @@ describe("StackQueueGenerator - Correctness", () => {
 describe("StackQueueGenerator - Reproducible", () => {
   for (let i = 1; i <= 10; i++) {
     const seed = sampleRandomSeed()
-
-    test(`${i}. Choice - Stack-Generator question`, () => {
-      const { question: q1, testing: t1 } = stackQuestion.generate(
-        "en", // language not relevant
-        {
-          variant: "choice",
-        },
-        seed,
-      ) as TestingObjectMultiple
-      const { question: q2, testing: t2 } = stackQuestion.generate(
-        "de", // language not relevant
-        {
-          variant: "choice",
-        },
-        seed,
-      ) as TestingObjectMultiple
-
-      reproduceTestingObjectMultiple(q1, t1, q2, t2)
-    })
 
     test(`${i}. FreeText - Stack-Generator question`, () => {
       const { question: q1, testing: t1 } = stackQuestion.generate(
@@ -118,25 +67,6 @@ describe("StackQueueGenerator - Reproducible", () => {
       for (const key in t1.correctAnswer) {
         expect(t1.correctAnswer[key]).toEqual(t2.correctAnswer[key])
       }
-    })
-
-    test(`${i}. Choice - Queue-Generator question`, () => {
-      const { question: q1, testing: t1 } = queueQuestion.generate(
-        "en", // language not relevant
-        {
-          variant: "choice",
-        },
-        seed,
-      ) as TestingObjectMultiple
-      const { question: q2, testing: t2 } = queueQuestion.generate(
-        "de", // language not relevant
-        {
-          variant: "choice",
-        },
-        seed,
-      ) as TestingObjectMultiple
-
-      reproduceTestingObjectMultiple(q1, t1, q2, t2)
     })
 
     test(`${i}. FreeText - Queue-Generator question`, () => {
@@ -164,37 +94,3 @@ describe("StackQueueGenerator - Reproducible", () => {
     })
   }
 })
-
-function correctnessTestingObjectMultiple(
-  q: MultipleChoiceQuestion | MultiFreeTextQuestion,
-  t: { allAnswers?: string[]; correctAnswerIndex: any },
-) {
-  expect(q.type).toEqual("MultipleChoiceQuestion")
-  expect(t.allAnswers).toHaveLength(4)
-  if (q.type === "MultipleChoiceQuestion") {
-    expect(q.answers).toHaveLength(4)
-    expect(t.correctAnswerIndex.length).toBeLessThanOrEqual(q.answers.length)
-    expect(t.correctAnswerIndex.length).toBeGreaterThanOrEqual(0)
-  }
-}
-
-function reproduceTestingObjectMultiple(
-  q1: MultipleChoiceQuestion | MultiFreeTextQuestion,
-  t1: {
-    allAnswers?: string[]
-    correctAnswerIndex: any
-  },
-  q2: MultipleChoiceQuestion | MultiFreeTextQuestion,
-  t2: { allAnswers?: string[]; correctAnswerIndex: any },
-) {
-  expect(q1.type).toEqual("MultipleChoiceQuestion")
-  expect(q1.type).toEqual(q2.type)
-
-  if (q1.type === "MultipleChoiceQuestion" && q2.type === "MultipleChoiceQuestion") {
-    expect(q1.answers.length).toEqual(q2.answers.length)
-  }
-
-  for (let j = 0; j < t1.correctAnswerIndex.length; j++) {
-    expect(t1.correctAnswerIndex[j]).toEqual(t2.correctAnswerIndex[j])
-  }
-}

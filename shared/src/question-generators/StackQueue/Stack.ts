@@ -107,6 +107,10 @@ export class Stack {
     return this.size
   }
 
+  isEmpty(): boolean {
+    return this.currentPosition === -1
+  }
+
   /**
    * This method resizes the stack and copies the elements to the new stack
    */

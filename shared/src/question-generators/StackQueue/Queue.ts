@@ -156,6 +156,10 @@ export class Queue {
     return this.numberOfElements
   }
 
+  isEmpty(): boolean {
+    return this.numberOfElements === 0
+  }
+
   /**
    * This method returns the current queue as a string
    * @returns The current queue as a string

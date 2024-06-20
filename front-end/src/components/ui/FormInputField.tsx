@@ -137,7 +137,9 @@ const FeedbackComponent = ({
     // remove text-left to make the feedback align center
     return (
       <div className={`${className} text-left`}>
-        <span>{formatFeedback ? formatFeedback : t("provideFeedbackCheckFormat")}</span>
+        <span>
+          <Markdown md={formatFeedback ? formatFeedback : t("provideFeedbackCheckFormat")} />
+        </span>
       </div>
     )
   } else {
@@ -145,7 +147,13 @@ const FeedbackComponent = ({
     className = `absolute left-0 top-full z-10 ${feedbackBackgroundColor} border border-gray-300 dark:border-gray-700 shadow-md p-2 mt-1 rounded-md`
     // remove text-left to make the feedback align center
     return (
-      <div className={`${className} text-left`}>{formatFeedback && <span>{formatFeedback}</span>}</div>
+      <div className={`${className} text-left`}>
+        {formatFeedback && (
+          <span>
+            <Markdown md={formatFeedback} />
+          </span>
+        )}
+      </div>
     )
   }
 }
