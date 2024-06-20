@@ -1,59 +1,53 @@
+import { SingleTranslation } from "@shared/utils/translations"
+import { collection as globalCollection } from "@/listOfQuestions"
 import { Language } from "./Language"
 import { deserializeParameters, missingParameters, Parameters } from "./Parameters"
 import { QuestionGenerator } from "./QuestionGenerator"
 
 /**
- * Objects of the following type describes the routes to all available question
- * generators.
+ * Objects of the following type describe a sequence of question collections.
  */
-export type QuestionRoutes = Array<{
-  path: string
-  generator: QuestionGenerator
+export type QuestionCollection = Array<{
+  slug: string
+  name: SingleTranslation
+  contents: Array<QuestionGenerator>
+  image?: URL
 }>
 
 /**
  * Serialize a generator call to a URL path.
  *
+ * @param lang The language to use when generating the question (optional)
  * @param generator The question generator
  * @param parameters The parameters for a question (optional)
  * @param seed The seed for a question (optional; can only be used if parameters
  *   are given)
- * @param lang The language to use when generating the question (optional)
  * @returns The URL path describing the question generator with the given
  *   settings. For example, "/de/asymptotics/sum/2/myFancySeed" if generator,
  *   parameters, seed, and lang are given, or "asymptotics/sum" if only the
  *   generator is given.
  */
 export function serializeGeneratorCall({
+  lang,
   generator,
   parameters,
   seed,
-  lang,
-  generatorPath,
 }: {
+  lang?: Language
   generator: QuestionGenerator
   parameters?: Parameters
   seed?: string
-  lang?: Language
-  generatorPath: string
 }): string {
   const path: string[] = []
-  if (lang !== undefined) {
-    const langURL = lang === "de" ? "de" : lang === "en" ? "en" : lang
-    path.push(langURL)
+  if (lang !== undefined) path.push(lang)
+  path.push(generator.id)
+  if (parameters !== undefined) {
+    for (const { name } of generator.expectedParameters) {
+      if (parameters[name] === undefined) throw new Error(`Missing parameter: ${name}`)
+      path.push(parameters[name].toString())
+    }
   }
-
-  path.push(generatorPath)
-  if (parameters === undefined) return path.join("/")
-
-  for (const { name } of generator.expectedParameters) {
-    if (parameters[name] === undefined) return path.join("/")
-    path.push(parameters[name].toString())
-  }
-
-  if (seed === undefined) return path.join("/")
-
-  path.push(seed)
+  if (seed !== undefined) path.push(seed)
   return path.join("/")
 }
 
@@ -66,19 +60,19 @@ export function serializeGeneratorCall({
  * @param pathB The second path
  * @returns Whether the first path is a sub-path of the second path
  */
-export function isSubPath(pathA: string, pathB: string): boolean
-export function isSubPath(partsA: string[], partsB: string[]): boolean
-export function isSubPath(a: string | string[], b: string | string[]): boolean {
-  if (typeof a === "string") a = a.split("/")
-  if (typeof b === "string") b = b.split("/")
-  a = a.filter((part) => part !== "")
-  b = b.filter((part) => part !== "")
-  if (a.length > b.length) return false
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false
-  }
-  return true
-}
+// export function isSubPath(pathA: string, pathB: string): boolean
+// export function isSubPath(partsA: string[], partsB: string[]): boolean
+// export function isSubPath(a: string | string[], b: string | string[]): boolean {
+//   if (typeof a === "string") a = a.split("/")
+//   if (typeof b === "string") b = b.split("/")
+//   a = a.filter((part) => part !== "")
+//   b = b.filter((part) => part !== "")
+//   if (a.length > b.length) return false
+//   for (let i = 0; i < a.length; i++) {
+//     if (a[i] !== b[i]) return false
+//   }
+//   return true
+// }
 
 /**
  * Deserializes a generator and parameters from a URL path.
@@ -101,18 +95,17 @@ export function isSubPath(a: string | string[], b: string | string[]): boolean {
  *   found
  */
 export function deserializePath({
-  routes,
+  collection = globalCollection,
   path,
   expectLang,
 }: {
-  routes: QuestionRoutes
+  collection?: QuestionCollection
   path: string
   expectLang?: boolean
 }):
   | {
       lang?: Language
       generator: QuestionGenerator
-      generatorPath: string
       parameters?: Parameters
       seed?: string
     }
@@ -130,19 +123,25 @@ export function deserializePath({
     path = parts.join("/")
   }
 
-  for (const { path: generatorPath, generator } of routes) {
-    if (!isSubPath(generatorPath, path)) continue
+  const [generatorID, ...rest] = parts
+  const generator = collection.flatMap((x) => x.contents).find((g) => g.id === generatorID)
 
-    parts = parts.slice(generatorPath.split("/").length)
-    if (parts.length === 0) return { lang, generator, generatorPath }
+  if (generator === undefined) return
 
-    const parameters = deserializeParameters(parts.join("/"), generator.expectedParameters)
+  if (rest.length === 0) return { lang, generator }
 
-    const missing = missingParameters(parameters, generator.expectedParameters)
-    const seed =
-      missing.length === 0 && parts.length === generator.expectedParameters.length + 1
-        ? parts.at(-1)
-        : undefined
-    return { lang, generator, generatorPath, parameters, seed }
+  const restPath = rest.join("/")
+  const parameters = deserializeParameters(restPath, generator.expectedParameters)
+  const missing = missingParameters(parameters, generator.expectedParameters)
+  const seed =
+    missing.length === 0 && rest.length === generator.expectedParameters.length + 1
+      ? rest.at(-1)
+      : undefined
+
+  return {
+    lang,
+    generator,
+    parameters,
+    seed,
   }
 }

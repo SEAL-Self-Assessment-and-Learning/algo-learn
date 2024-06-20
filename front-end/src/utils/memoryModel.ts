@@ -12,15 +12,14 @@
  * - https://blog.duolingo.com/how-we-learn-how-you-learn/
  */
 
-export type SkillFeatures = {
-  mastered: boolean // whether we think this skill has been mastered at least once
+export type BasicSkillFeatures = {
   numPassed: number // number of times the user passed the question
   numFailed: number // number of times the user failed the question
   lag: number // time since the last interaction in days
   n0?: number // inherent difficulty of the question
 }
 
-export interface SkillFeaturesAndPredictions extends SkillFeatures {
+export interface SkillFeaturesAndPredictions extends BasicSkillFeatures {
   h: number // half-life of the skill in days
   p: number // probability of remembering the skill
 }
@@ -66,7 +65,7 @@ export function halflife(numPassed: number, numFailed: number, n0: number = 0): 
  * @param f - The features from which we compute the strength
  * @returns The features and the strength
  */
-export function computeStrength(f: SkillFeatures): SkillFeaturesAndPredictions {
+export function computeStrength(f: BasicSkillFeatures): SkillFeaturesAndPredictions {
   const h = halflife(f.numPassed, f.numFailed, f.n0)
   const p = pclip(2 ** (-f.lag / h))
   return { h, p, ...f }

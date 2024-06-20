@@ -8,7 +8,7 @@ import Random from "../../utils/random"
 import { t, tFunctional, Translations } from "../../utils/translations"
 
 /**
- * All text displayed text goes into the translations object.
+ * All displayed text goes into the translations object.
  * Include at least english and german.
  */
 const translations: Translations = {
@@ -25,7 +25,7 @@ const translations: Translations = {
 }
 
 function generateWrongAnswers(random: Random, correctAnswer: number): Array<string> {
-  let wrongAnswers = [
+  const wrongAnswers = [
     `$${correctAnswer + 3}$`,
     `$${correctAnswer + 2}$`,
     `$${correctAnswer + 1}$`,
@@ -41,6 +41,7 @@ function generateWrongAnswers(random: Random, correctAnswer: number): Array<stri
  * This question generator generates a simple multiple choice question.
  */
 export const ExampleQuestion: QuestionGenerator = {
+  id: "example",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["calculus", "sum"],
@@ -53,13 +54,12 @@ export const ExampleQuestion: QuestionGenerator = {
   /**
    * Generates a new MultipleChoiceQuestion question.
    *
-   * @generatorPath The path the generator is located on the page. Defined in settings/questionSelection.ts
    * @param lang The language of the question
    * @param parameters The parameters for the question. In this case none are used.
    * @param seed The seed for the random number generator
    * @returns A new MultipleChoiceQuestion question
    */
-  generate: (generatorPath, lang = "en", parameters, seed) => {
+  generate: (lang = "en", parameters, seed) => {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
 
@@ -85,7 +85,6 @@ export const ExampleQuestion: QuestionGenerator = {
         lang,
         parameters,
         seed,
-        generatorPath,
       }),
       text: t(translations, lang, "text", [`${a}`, `${b}`]),
       answers,

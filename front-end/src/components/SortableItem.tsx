@@ -46,7 +46,7 @@ export function SortableItem({ children, id, disabled = false }: PropsWithChildr
       <li
         className={`flex flex-grow select-none list-none items-center justify-between gap-5 ${
           disabled ? "cursor-default" : ""
-        }  ${isDragging ? "z-10" : ""}`}
+        } ${isDragging ? "z-10" : ""}`}
         ref={disabled ? null : setNodeRef}
         style={{ transform: CSS.Translate.toString(transform), transition }}
         {...attributes}

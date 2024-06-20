@@ -2,7 +2,7 @@ import useLocalStorageState from "use-local-storage-state"
 
 const sounds = {
   pass: new URL("../../assets/sounds/573381__ammaro__ding.mp3", import.meta.url),
-  fail: new URL("../../assets/sounds/566446__johnny97__break03.mp3", import.meta.url),
+  fail: new URL("../../assets/sounds/incorrect/wrong.mp3", import.meta.url),
 }
 
 // Asynchronously prefetch audio files

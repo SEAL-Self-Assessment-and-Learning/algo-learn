@@ -1,4 +1,3 @@
-import { validateParameters } from "../../api/Parameters"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -42,6 +41,7 @@ const translations: Translations = {
 }
 
 export const RecursionFormula: QuestionGenerator = {
+  id: "recurrence",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -52,24 +52,15 @@ export const RecursionFormula: QuestionGenerator = {
       allowedValues: ["choice", "input"],
     },
   ],
-  generate(generatorPath, lang, parameters, seed) {
+  generate(lang, parameters, seed) {
     const permalink = serializeGeneratorCall({
       generator: RecursionFormula,
       lang,
       parameters,
       seed,
-      generatorPath,
     })
     const random = new Random(seed)
     const { t } = tFunction(translations, lang)
-
-    if (!validateParameters(parameters, RecursionFormula.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${RecursionFormula.expectedParameters.join(
-          ", ",
-        )}`,
-      )
-    }
 
     const variant = parameters.variant as "choice" | "input"
     const divOrSub: "div" | "sub" = random.choice(["div", "sub"])

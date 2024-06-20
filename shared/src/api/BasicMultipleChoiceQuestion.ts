@@ -2,7 +2,7 @@ import { format } from "../utils/format"
 import Random from "../utils/random"
 import { DeepTranslations, getValidLanguage } from "../utils/translations"
 import { Language } from "./Language"
-import { ExpectedParameters, Parameters, validateParameters } from "./Parameters"
+import { ExpectedParameters, Parameters } from "./Parameters"
 import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
@@ -56,11 +56,13 @@ export interface BasicMultipleChoiceQuestion {
  * Given a name function and a set of BasicMultipleChoiceQuestions,
  * the function returns a QuestionGenerator for the set of questions.
  *
+ * @param id Unique and stable id of the question generator
  * @param name The title of the question
  * @param questions The questions to ask
  * @returns The question as a QuestionGenerator object
  */
 export function basicMultipleChoiceMetaGenerator(
+  id: string,
   name: (lang: Language) => string,
   questions: BasicMultipleChoiceQuestion[],
   description?: (lang: Language) => string,
@@ -80,12 +82,7 @@ export function basicMultipleChoiceMetaGenerator(
         ]
       : []
 
-  function generate(generatorPath: string, lang: Language, parameters: Parameters, seed: string) {
-    if (!validateParameters(parameters, expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${variants.join(", ")}`,
-      )
-    }
+  function generate(lang: Language, parameters: Parameters, seed: string) {
     const i = parameters.number as number
 
     const random = new Random(seed)
@@ -136,7 +133,6 @@ export function basicMultipleChoiceMetaGenerator(
         lang,
         parameters,
         seed,
-        generatorPath,
       }),
       answers: answers.map(({ element }) => element),
       text: format(markdown, p),
@@ -153,6 +149,7 @@ export function basicMultipleChoiceMetaGenerator(
   }
 
   const generator: QuestionGenerator = {
+    id,
     name,
     description,
     languages,

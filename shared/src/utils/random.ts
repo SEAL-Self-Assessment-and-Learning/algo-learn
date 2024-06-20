@@ -37,6 +37,14 @@ export default class Random {
   }
 
   /**
+   * Returns a random boolean
+   * @param chanceToBeTrue - The chance that the result is true
+   */
+  bool(chanceToBeTrue: number = 0.5): boolean {
+    return this.uniform() < chanceToBeTrue
+  }
+
+  /**
    * Returns a random integer.
    *
    * @param min - The minimum number.
@@ -44,7 +52,58 @@ export default class Random {
    * @returns A random integer between min (inclusive) and max (inclusive).
    */
   int(min: number, max: number): number {
+    if (min > max) throw new Error("Value Error: min > max")
+    if (min === max) return min
     return Math.floor(this.float(min, max + 1))
+  }
+
+  /**
+   * Generates a uniform random integer partition of input into numParts parts
+   * where each part is at least minPartSize big.
+   * @param input the number to partition
+   * @param numParts the number of parts in the partition
+   * @param minPartSize the minimal value a random split must have
+   */
+  partition(input: number, numParts: number, minPartSize: number = 0): number[] {
+    if (numParts < 1) throw new Error("Value Error: numSplits needs to be positive")
+    if (minPartSize < 0) throw new Error("Value Error: min needs to be non-negative")
+    if (numParts * minPartSize > input)
+      throw new Error(
+        "Value Error: input cannot be partitioned into numSplits values that are at least min big",
+      )
+
+    // handle trivial case
+    if (numParts === 1) return [input]
+
+    const maxBoundaryPosition = input - minPartSize * numParts + numParts - 1
+
+    // draw random subset of {1,2,...,maxBoundaryPosition}
+    let boundaries: number[] = []
+    if (maxBoundaryPosition < 2 * numParts) {
+      // optimize for small input / big numParts => generate full list and get random subset
+      const tmp = Array.from({ length: maxBoundaryPosition }, (_, i) => i + 1)
+      boundaries = this.subset(tmp, numParts - 1)
+    } else {
+      // optimize for big input / small numParts => rejection sampling
+      let boundary
+      for (let i = 0; i < numParts - 1; i++) {
+        do {
+          boundary = this.int(1, maxBoundaryPosition)
+        } while (boundaries.includes(boundary))
+        boundaries.push(boundary)
+      }
+    }
+
+    boundaries.sort()
+
+    // turn boundaries into partition
+    const partition: number[] = [boundaries[0] - 1 + minPartSize]
+    for (let i = 1; i < boundaries.length; i++) {
+      partition.push(boundaries[i] - boundaries[i - 1] - 1 + minPartSize)
+    }
+    partition.push(maxBoundaryPosition - boundaries[boundaries.length - 1] + minPartSize)
+
+    return partition
   }
 
   /**
@@ -53,7 +112,7 @@ export default class Random {
    * @param array - An array of elements.
    * @returns A random element from the array.
    */
-  choice<T>(array: Array<T>): T {
+  choice<T>(array: ReadonlyArray<T>): T {
     return array[this.int(0, array.length - 1)]
   }
 
@@ -64,7 +123,7 @@ export default class Random {
    * @param size - The size of the subset.
    * @returns A list of size distinct elements from the array.
    */
-  subset<T>(array: Array<T>, size: number): Array<T> {
+  subset<T>(array: ReadonlyArray<T>, size: number): Array<T> {
     if (size > array.length) {
       throw new Error("Subset size cannot be larger than the array size")
     }
@@ -74,13 +133,29 @@ export default class Random {
   }
 
   /**
+   * Splits an array into two random disjoint subsets of arrays such that their union is the full array
+   * @param array
+   * @param size Size of the first array. If not provided a random number is chosen.
+   */
+  splitArray<T>(array: ReadonlyArray<T>, size: number): Array<T>[] {
+    if (size <= 0 || size > array.length) {
+      throw new Error("Subset size has to be in [0, array.length-1]")
+    }
+
+    const copy = array.slice()
+    this.shuffle(copy)
+
+    return [copy.slice(0, size), copy.slice(size, array.length)]
+  }
+
+  /**
    * Chooses a random index from an array of weights that is interpreted as a
    * probability distribution.
    *
    * @param weights - An array of weights.
    * @returns A random index from the array.
    */
-  weightedIndex(weights: number[]): number {
+  weightedIndex(weights: readonly number[]): number {
     const sumOfWeights = weights.reduce((acc, weight) => acc + weight, 0)
     const randomValue = this.float(0, sumOfWeights)
     let accumulatedWeight = 0
@@ -97,14 +172,42 @@ export default class Random {
 
   /**
    * Chooses a random element from an array of weighted elements.
-   *
-   * @param array - An array of tuples of the form [element, weight]
+   * @param elements
+   * @param weights
    * @returns A random element from the array.
    */
-  weightedChoice<T>(array: Array<[element: T, weight: number]>): T {
-    const elements = array.map((w) => w[0])
-    const weigths = array.map((w) => w[1])
-    return elements[this.weightedIndex(weigths)]
+  weightedChoice<T>(elements: ReadonlyArray<T>, weights: number[]): T
+  /**
+   * Chooses a random element from an array of weighted elements.
+   * @param choicesAndWeights An array of element-weight tuples
+   * @returns A random element from the array.
+   */
+  weightedChoice<T>(choicesAndWeights: ReadonlyArray<[element: T, weight: number]>): T
+  weightedChoice<T>(
+    data: ReadonlyArray<[element: T, weight: number]> | ReadonlyArray<T>,
+    weights?: number[],
+  ): T {
+    if (data.length === 0) throw new Error("Value Error: no elements to choose from.")
+
+    let elements: readonly T[]
+    let tmpWeights: readonly number[]
+
+    function isSingleValueCall(_: any, weights: any): _ is ReadonlyArray<[element: T, weight: number]> {
+      return weights === undefined
+    }
+
+    if (isSingleValueCall(data, weights)) {
+      elements = data.map((w) => w[0])
+      tmpWeights = data.map((w) => w[1])
+    } else {
+      elements = data
+      tmpWeights = weights ?? []
+    }
+
+    if (tmpWeights === undefined || elements.length !== tmpWeights.length)
+      throw new Error("Value Error: number of elements and number of weights are not equal.")
+
+    return elements[this.weightedIndex(tmpWeights)]
   }
 
   /**

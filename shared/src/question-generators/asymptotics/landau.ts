@@ -21,6 +21,7 @@ const translations: Translations = {
 }
 /** Multiple-choice questions for asymptotic notation */
 export const LandauNotation: QuestionGenerator = {
+  id: "landau",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   expectedParameters: [
@@ -36,7 +37,7 @@ export const LandauNotation: QuestionGenerator = {
     // },
   ],
   languages: ["en", "de"],
-  generate: (generatorPath, lang, parameters, seed) => {
+  generate: (lang, parameters, seed) => {
     const random = new Random(seed)
     const { t } = tFunction(translations, lang)
 
@@ -82,7 +83,6 @@ export const LandauNotation: QuestionGenerator = {
         lang,
         parameters,
         seed,
-        generatorPath,
       }),
       name: t("name"),
       text: t("text"),

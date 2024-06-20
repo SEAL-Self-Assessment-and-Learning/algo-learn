@@ -3,6 +3,7 @@ import { BiLink, BiRefresh } from "react-icons/bi"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { prefixURL } from "../config"
 import { useTranslation } from "../hooks/useTranslation"
+import { Button } from "./ui/button"
 
 /**
  * QuestionHeader is a header for a question.
@@ -29,8 +30,10 @@ export function QuestionHeader({
       {permalink && (
         <Tooltip placement="right">
           <TooltipTrigger asChild>
-            <button
-              type="button"
+            <Button
+              className="inline text-2xl"
+              size={"icon"}
+              variant={"link"}
               onClick={() => {
                 void navigator.clipboard
                   .writeText(prefixURL + "/" + permalink)
@@ -41,7 +44,7 @@ export function QuestionHeader({
               }}
             >
               <BiLink className="inline" />
-            </button>
+            </Button>
           </TooltipTrigger>
           <TooltipContent>
             {(recentlyCopied ? t("copyLinkCopied") : t("copyLinkTooltip")) || ""}
