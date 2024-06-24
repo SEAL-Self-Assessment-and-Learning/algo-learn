@@ -61,7 +61,7 @@ export const collection: QuestionCollection = [
   },
 ]
 
-export const oldpathToGenerator = {
+export const oldPathToGenerator = {
   "asymptotics/precise-language": AsymptoticsPreciseLanguage,
   "asymptotics/sort": SortTerms,
   "asymptotics/landau": LandauNotation,

@@ -15,7 +15,7 @@ export interface QuestionComponentProps {
   /** Optional callback to regenerate the question */
   regenerate?: () => void
 
-  // viewOnly?: boolean // Determines whether the component should displayed interactively or non-interactively
+  // viewOnly?: boolean // Determines whether the component should be displayed interactively or non-interactively
   // source?: boolean // If true, display the LaTeX source code of the question
 }
 
