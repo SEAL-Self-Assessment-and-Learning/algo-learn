@@ -11,11 +11,11 @@ import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { HeapOperations, HeapUnderstanding } from "@shared/question-generators/heap/heapGenerator.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
+import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
 import { Loops } from "@shared/question-generators/time/loops"
-import { NormalForms } from "../shared/src/question-generators/propositional-logic/normalForms.ts"
-import { Satisfiability } from "../shared/src/question-generators/propositional-logic/satisfiability"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
@@ -60,7 +60,7 @@ export const collection: QuestionCollection = [
   },
 ]
 
-export const oldpathToGenerator = {
+export const oldPathToGenerator = {
   "asymptotics/precise-language": AsymptoticsPreciseLanguage,
   "asymptotics/sort": SortTerms,
   "asymptotics/landau": LandauNotation,

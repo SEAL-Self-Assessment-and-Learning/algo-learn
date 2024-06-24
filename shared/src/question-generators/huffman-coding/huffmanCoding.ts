@@ -1,6 +1,5 @@
 // TODO: check if the table could be to wide to be represented as possible answer
 
-import { min } from "mathjs"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -39,7 +38,7 @@ import { t, tFunction, tFunctional, Translations } from "@shared/utils/translati
  */
 const translations: Translations = {
   en: {
-    name: "Compute a Huffman-Coding",
+    name: "Huffman-Coding",
     description: "Compute the Huffman-Coding of a given string",
     text: 'Let "*{{0}}*" be {{1}}. What is a correct **Huffman-Coding** of this {{1}}?',
     prompt: "What is a possible Huffman-Coding?",
@@ -53,7 +52,7 @@ What could be a correct **Huffman-Coding** for each char?`,
       " Also choose as the left node, the node with the smaller weight.",
   },
   de: {
-    name: "Berechne eine Hufmann-Codierung",
+    name: "Hufmann-Codierung",
     description: "Bestimme die Huffman-Codierung eines gegebenen Strings",
     text: 'Sei "*{{0}}*" ein {{1}}. Was ist eine korrekte **Huffman-Codierung** für diesen {{1}}?',
     prompt: "Was ist eine mögliche Huffman-Codierung?",
@@ -175,7 +174,7 @@ function generateWrongAnswersDict(
   }
 
   const size = wrongAnswerList.length
-  const subSetSize = min(3, size)
+  const subSetSize = Math.min(3, size)
   return random.subset(wrongAnswerList, subSetSize)
 }
 

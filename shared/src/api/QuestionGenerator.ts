@@ -54,7 +54,7 @@ export interface MultipleChoiceQuestion extends QuestionBase {
 }
 
 /**
- * After the user selects answer(s), these answeres are stored as a
+ * After the user selects answer(s), these answers are stored as a
  * MultipleChoiceAnswer object.
  */
 export interface MultipleChoiceAnswer {

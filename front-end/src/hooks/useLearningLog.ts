@@ -1,5 +1,5 @@
 import useLocalStorageState from "use-local-storage-state"
-import { oldpathToGenerator } from "@settings/questionsSelection"
+import { oldPathToGenerator } from "@settings/questionsSelection"
 
 /** Old format for log entries */
 type LogEntryV0 = {
@@ -57,8 +57,8 @@ function upgradeV1ToV2(e: LogEntryV1): LogEntryV2 | undefined {
   const { path, result, timestamp } = e
   const [skill, question, ...rest] = path.split("/")
   const tmp = skill + "/" + question
-  if (tmp in oldpathToGenerator) {
-    const id = oldpathToGenerator[tmp as keyof typeof oldpathToGenerator].id
+  if (tmp in oldPathToGenerator) {
+    const id = oldPathToGenerator[tmp as keyof typeof oldPathToGenerator].id
     return { path: [id, ...rest].join("/"), result, timestamp }
   }
 }
