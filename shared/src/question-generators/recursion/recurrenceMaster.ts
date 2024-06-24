@@ -121,7 +121,7 @@ export const RecurrenceMaster: QuestionGenerator = {
               valid: false,
               message: `${t("feedback.unknown-variable")}: $${unknownVar}$. ${t(
                 "feedback.expected",
-              )}: $${"n"}$.`,
+              )}: $n$.`,
             }
           }
           try {

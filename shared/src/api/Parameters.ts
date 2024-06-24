@@ -17,7 +17,7 @@ export type ParameterBase = {
   description?: (lang: Language) => string
 }
 
-/** BooleanParameter are parameters that can be set to an boolean value. */
+/** BooleanParameter are parameters that can be set to a boolean value. */
 export type BooleanParameter = ParameterBase & {
   type: "boolean"
 }
