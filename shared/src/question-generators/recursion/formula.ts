@@ -80,7 +80,7 @@ ${format(t("text2" + type), [`${T}(${n})`])}`
     if (variant !== "choice") {
       text += ` ${t("basecase")} $${T}(1)=${d}$.`
     }
-    text += ` ${t("question") + " "} $${`${T}(${n})`}$`
+    text += ` ${t("question") + " "} $${T}(${n})$`
 
     if (variant !== "choice") {
       text += ` ${t("for")} $${n} \\geq 2$`

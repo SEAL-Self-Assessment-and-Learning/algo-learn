@@ -29,7 +29,7 @@ test("huffmanCodingAlgorithm", () => {
 })
 
 test("check if the user input is minimal prefix free code", () => {
-  const inputFrequncies = {
+  const inputFrequencies = {
     e: 44,
     g: 20,
     c: 39,
@@ -51,8 +51,8 @@ test("check if the user input is minimal prefix free code", () => {
   }
   expect(
     checkProvidedCode(
-      inputFrequncies,
-      createHuffmanCoding({}, huffmanCodingAlgorithm("", inputFrequncies).mainNode, ""),
+      inputFrequencies,
+      createHuffmanCoding({}, huffmanCodingAlgorithm("", inputFrequencies).mainNode, ""),
       providedCodeCorrect,
     ),
   ).toBe(true)
@@ -68,8 +68,8 @@ test("check if the user input is minimal prefix free code", () => {
   }
   expect(
     checkProvidedCode(
-      inputFrequncies,
-      createHuffmanCoding({}, huffmanCodingAlgorithm("", inputFrequncies).mainNode, ""),
+      inputFrequencies,
+      createHuffmanCoding({}, huffmanCodingAlgorithm("", inputFrequencies).mainNode, ""),
       providedCode1,
     ),
   ).toBe(false)
