@@ -26,7 +26,6 @@ export function generateRandomWrongAnswer(random: Random, correctAnswer: string)
       wrongAnswer[flipPositions[i]] = "0"
     }
   }
-  console.log(correctAnswer, wrongAnswer.join(""))
   return wrongAnswer.join("")
 }
 

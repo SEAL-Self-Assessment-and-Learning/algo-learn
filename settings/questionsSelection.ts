@@ -15,6 +15,7 @@ import { Satisfiability } from "@shared/question-generators/propositional-logic/
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
 import { Loops } from "@shared/question-generators/time/loops"
+import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF.ts"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
@@ -51,6 +52,11 @@ export const collection: QuestionCollection = [
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
     contents: [Satisfiability, NormalForms],
+  },
+  {
+    slug: "union-find",
+    name: { de: "Union-Find", en: "Union-Find" },
+    contents: [QuickFindGenerator],
   },
 ]
 
