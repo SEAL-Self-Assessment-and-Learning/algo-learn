@@ -25,6 +25,15 @@ export default class Random {
   /** Returns a random number between 0 (inclusive) and 1 (exclusive). */
   uniform: () => number
 
+  /** Returns a random number from a normal distribution. */
+  normal(): number {
+    let u = 0
+    let v = 0
+    while (u === 0) u = this.uniform()
+    while (v === 0) v = this.uniform()
+    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v)
+  }
+
   /**
    * Returns a random number.
    *
@@ -45,7 +54,7 @@ export default class Random {
   }
 
   /**
-   * Returns a random integer.
+   * Returns a random integer (uniformly).
    *
    * @param min - The minimum number.
    * @param max - The maximum number.
@@ -55,6 +64,28 @@ export default class Random {
     if (min > max) throw new Error("Value Error: min > max")
     if (min === max) return min
     return Math.floor(this.float(min, max + 1))
+  }
+
+  /**
+   * Returns a random integer (normal distribution)
+   *
+   * The function tries to generate a number within the range of min and max.
+   * If it fails to do so after 10 tries, it returns the mean value.
+   *
+   * @param min - The minimum number
+   * @param max - The maximum number
+   * @param mean - The expected value (average)
+   * @param stdev - The standard deviation
+   */
+  intNormal(min: number, max: number, mean = 0, stdev = 1): number {
+    for (let i = 0; i < 10; i++) {
+      const normal = this.normal()
+      const value = Math.round(normal * stdev + mean)
+      if (value >= min && value <= max) {
+        return value
+      }
+    }
+    return mean
   }
 
   /**
