@@ -31,20 +31,23 @@ function isAnyArray(text: string) {
  */
 function isIntArray(text: string) {
   // Split the text by comma and filter out any empty strings caused by trailing commas
-  const values = text.split(",").filter((value) => value.trim() !== "");
+  const values = text.split(",").filter((value) => value.trim() !== "")
 
   // Check if every value is an integer
   return values.every((value) => {
-    const trimmedValue = value.trim();
-    return Number.isInteger(parseFloat(trimmedValue)) && trimmedValue === parseInt(trimmedValue, 10).toString();
-  });
+    const trimmedValue = value.trim()
+    return (
+      Number.isInteger(parseFloat(trimmedValue)) &&
+      trimmedValue === parseInt(trimmedValue, 10).toString()
+    )
+  })
 }
 
 /**
  * Converts a string into an array (seperated by comma)
  * @param text
  */
-function parseStringToArray(text: string) {
+export function parseStringToArray(text: string) {
   return text.split(",").map((value) => value.trim())
 }
 
@@ -59,8 +62,8 @@ function parseStringToArray(text: string) {
  *
  * @param array - array with any values
  */
-function parseArrayTable(array: any[]) {
-  const table = array.map((value) => `|${value}`).join(" ") + "|"
+export function parseArrayTable(array: any[]) {
+  const table = array.map((value) => `|${value}`).join(" ") + " |"
 
   const separator = "|" + array.map(() => "---").join("|") + "|"
 

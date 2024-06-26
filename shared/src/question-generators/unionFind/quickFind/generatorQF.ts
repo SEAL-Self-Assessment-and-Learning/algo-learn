@@ -1,8 +1,4 @@
-import {
-  FreeTextFeedbackFunction,
-  FreeTextQuestion,
-  QuestionGenerator,
-} from "@shared/api/QuestionGenerator.ts"
+import { FreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm.ts"
 import {
@@ -13,6 +9,7 @@ import {
   unionTwoBlocksCombineSame,
 } from "@shared/question-generators/unionFind/quickFind/utils.ts"
 import { checkFormatArray } from "@shared/utils/checkFormatStandard.ts"
+import { feedbackArray } from "@shared/utils/feedbackStandard.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
 
@@ -55,17 +52,6 @@ export const QuickFindGenerator: QuestionGenerator = {
   ],
 
   generate(lang, parameters, seed) {
-    const feedback: FreeTextFeedbackFunction = ({ text }) => {
-      if (text.trim() === "") {
-        return {
-          correct: false,
-        }
-      }
-      return {
-        correct: true,
-      }
-    }
-
     const random = new Random(seed)
 
     // Test --> 7 124, 8 203, 9 266, 10 224, 11 131, 12 47, 13 5, 14 0
@@ -95,6 +81,8 @@ export const QuickFindGenerator: QuestionGenerator = {
       unionSize,
     })
 
+    console.log(union.getArray())
+
     const question: FreeTextQuestion = {
       type: "FreeTextQuestion",
       name: QuickFindGenerator.name(lang),
@@ -111,7 +99,7 @@ export const QuickFindGenerator: QuestionGenerator = {
       ]),
       bottomText: t(translations, lang, "explanationUnion"),
       checkFormat: checkFormatArray({ lang, values: "int" }).display,
-      feedback,
+      feedback: feedbackArray({ solution: union.getArray().map((x) => x.toString()) }).normal,
     }
 
     return {
