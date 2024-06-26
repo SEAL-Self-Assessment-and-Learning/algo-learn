@@ -22,6 +22,7 @@ function generateTwoBlocks({
   unionSize: number
   otherOperation?: true | false
 }) {
+  // Not using normal dist here, because both blocks are not big enough and it would not make sense
   const block1Size = random.int(Math.min(2, unionSize / 2 - 1), unionSize / 2 - 1)
   const block2Size = random.int(2, unionSize / 2 - 1)
 
@@ -83,7 +84,7 @@ function generateOneBlock({
   let amountElementsRemaining = unionSize
   const usedElements: number[] = []
 
-  const block1Size = random.int(3, unionSize - 4)
+  const block1Size = random.intNormal(3, unionSize - 2, Math.round((unionSize - 2) / 2) + 1, 1.5)
   amountElementsRemaining -= block1Size
 
   const block1Values: number[] = random.subset([...Array(unionSize).keys()], block1Size)

@@ -72,6 +72,8 @@ export default class Random {
    * The function tries to generate a number within the range of min and max.
    * If it fails to do so after 10 tries, it returns the mean value.
    *
+   * So not perfect, because usually normal distribution does not have a min and max.
+   *
    * @param min - The minimum number
    * @param max - The maximum number
    * @param mean - The expected value (average)

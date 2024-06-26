@@ -1,6 +1,5 @@
 import {
   FreeTextFeedbackFunction,
-  FreeTextFormatFunction,
   FreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
@@ -13,6 +12,7 @@ import {
   unionTwoBlocksCombineNone,
   unionTwoBlocksCombineSame,
 } from "@shared/question-generators/unionFind/quickFind/utils.ts"
+import { checkFormatArray } from "@shared/utils/checkFormatStandard.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
 
@@ -55,14 +55,6 @@ export const QuickFindGenerator: QuestionGenerator = {
   ],
 
   generate(lang, parameters, seed) {
-
-    const checkFormat: FreeTextFormatFunction = ({ text }) => {
-      if (text.trim().length === 0) {
-        return { valid: false }
-      }
-      return { valid: true }
-    }
-
     const feedback: FreeTextFeedbackFunction = ({ text }) => {
       if (text.trim() === "") {
         return {
@@ -76,7 +68,8 @@ export const QuickFindGenerator: QuestionGenerator = {
 
     const random = new Random(seed)
 
-    const unionSize = random.int(7, 11)
+    // Test --> 7 124, 8 203, 9 266, 10 224, 11 131, 12 47, 13 5, 14 0
+    const unionSize = random.intNormal(7, 14, 10, 1.5)
 
     const union = new QuickFind(unionSize)
 
@@ -85,7 +78,7 @@ export const QuickFindGenerator: QuestionGenerator = {
       ["oneOrTwoBlocksCombineOne", 0.5],
       ["twoBlocksCombineNone", 0.1],
       ["twoBlocksCombineSame", 0.05],
-      ["oneBlockCombineNone", 0.1],
+      ["oneBlockCombineNone", 10000000.1],
     ])
 
     const unionCaseFunctions = {
@@ -117,7 +110,7 @@ export const QuickFindGenerator: QuestionGenerator = {
         gapOperationValues[1].toString(),
       ]),
       bottomText: t(translations, lang, "explanationUnion"),
-      checkFormat,
+      checkFormat: checkFormatArray({ lang, values: "int" }).display,
       feedback,
     }
 
