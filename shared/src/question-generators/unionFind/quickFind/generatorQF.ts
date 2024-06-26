@@ -81,8 +81,6 @@ export const QuickFindGenerator: QuestionGenerator = {
       unionSize,
     })
 
-    console.log(union.getArray())
-
     const question: FreeTextQuestion = {
       type: "FreeTextQuestion",
       name: QuickFindGenerator.name(lang),
@@ -104,6 +102,11 @@ export const QuickFindGenerator: QuestionGenerator = {
 
     return {
       question,
+      testing: {
+        union,
+        gapField,
+        gapOperationValues,
+      },
     }
   },
 }
