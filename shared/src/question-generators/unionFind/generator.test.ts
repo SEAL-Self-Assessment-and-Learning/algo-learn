@@ -21,24 +21,25 @@ describe("QuickFindGenerator - Correctness", () => {
     test(`${i}. random quick find question`, () => {
       const { question: q, testing: t } = QuickFindGenerator.generate(
         "en", // language not relevant
-        { variant: "start" }, // generator does not support parameters
+        { variant: "start" }, // generator only supports one variant
         sampleRandomSeed(),
       ) as TestingObjectGeneratorQuickFind
 
-      // type and number of answers are correct
+      // type
       expect(q.type).toEqual("FreeTextQuestion")
       expect(q.feedback).toBeDefined
       if (q.feedback !== undefined) {
         expect(q.feedback({ text: "1" })).toBeFalsy
+        expect(q.feedback({ text: t.union.getArray().toString() })).toBeTruthy
       }
 
       // gapField and gapOperationValues are not empty
       expect(t.gapField).not.toEqual("")
+      // gapOperationValues are between 0 and 14
       expect(t.gapOperationValues[0]).toBeGreaterThanOrEqual(0)
       expect(t.gapOperationValues[1]).toBeGreaterThanOrEqual(0)
-
-      expect(t.gapOperationValues[0]).toBeLessThanOrEqual(20)
-      expect(t.gapOperationValues[1]).toBeLessThanOrEqual(20)
+      expect(t.gapOperationValues[0]).toBeLessThanOrEqual(14)
+      expect(t.gapOperationValues[1]).toBeLessThanOrEqual(14)
     })
   }
 })
@@ -48,7 +49,7 @@ describe("QuickFindGenerator - Reproducible", () => {
   // generate question the first time
   const { question: q1, testing: t1 } = QuickFindGenerator.generate(
     "en", // language not relevant
-    { variant: "start" }, // generator does not support parameters
+    { variant: "start" }, // generator only supports one variant
     seed, // the random seed
   ) as TestingObjectGeneratorQuickFind
 

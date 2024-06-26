@@ -133,8 +133,6 @@ export function unionTwoBlocksCombineBoth({
   const gapOperationValues: number[] = []
   gapOperationValues[0] = random.choice(block1Values)
   gapOperationValues[1] = random.choice(block2Values)
-  // shuffle the values, so that the first value is not always the first value of block1
-  random.shuffle(gapOperationValues)
 
   // compute the final union
   union.union(gapOperationValues[0], gapOperationValues[1])
@@ -187,8 +185,6 @@ export function unionOneOrTwoBlocksCombineOne({
   gapOperationValues[1] = random.choice(
     [...Array(unionSize).keys()].filter((value) => !block1Values.includes(value)),
   )
-  // shuffle the values, so that the first value is not always the first value of block1
-  random.shuffle(gapOperationValues)
 
   // compute the final union
   union.union(gapOperationValues[0], gapOperationValues[1])
@@ -290,7 +286,7 @@ export function unionTwoBlocksCombineSame({
  * @param union
  * @param unionSize
  */
-export function unionOneBlocksCombineNone({
+export function unionOneBlockCombineNone({
   random,
   union,
   unionSize,

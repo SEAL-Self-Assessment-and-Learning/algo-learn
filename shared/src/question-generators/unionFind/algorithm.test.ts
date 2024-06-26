@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest"
 import { QuickFind } from "./quickFind/quickFindAlgorithm.ts"
 
 describe("UnionFind via QuickFind", () => {
-  test("1. Test union operation", () => {
+  test("Test union operation", () => {
     const uf = new QuickFind(10)
 
     uf.union(1, 2)
