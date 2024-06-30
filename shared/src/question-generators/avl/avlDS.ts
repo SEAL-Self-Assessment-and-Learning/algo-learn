@@ -1,7 +1,10 @@
 // https://www.javaguides.net/2023/09/typescript-implement-avl-tree.html
+// https://files.tcs.uni-frankfurt.de/algo1/binarysearchtrees.pdf
 // Do we write sources for the code we use? I'm not sure if this is necessary since it's a common algorithm
 
-// Node class to represent a node in the AVL Tree
+/**
+ * AVL Node structure
+ */
 type AVLNode = {
   data: number
   left: AVLNode | null
@@ -16,19 +19,34 @@ type AVLNode = {
 export class AVLTree {
   root: AVLNode | null = null
 
-  // Utility function to get the height of a node
+  /**
+   * Utility function to get the height of a node
+   * @param node - The node whose height is to be calculated
+   * @private
+   */
   private getHeight(node: AVLNode | null): number {
     if (!node) return 0
     return node.height
   }
 
-  // Utility function to get the balance factor of a node
+  /**
+   * Utility function to get the balance factor of a node
+   *
+   * Math: balance = height(left subtree) - height(right subtree)
+   *
+   * @param node
+   * @private
+   */
   private getBalance(node: AVLNode | null): number {
     if (!node) return 0
     return this.getHeight(node.left) - this.getHeight(node.right)
   }
 
-  // Right Rotate to balance the AVL Tree
+  /**
+   * Right Rotate to balance the AVL Tree
+   * @param y
+   * @private
+   */
   private rightRotate(y: AVLNode): AVLNode {
     const x = y.left!
     const T3 = x.right
@@ -44,7 +62,11 @@ export class AVLTree {
     return x // Return new root
   }
 
-  // Left Rotate to balance the AVL Tree
+  /**
+   * Left Rotate to balance the AVL Tree
+   * @param x - The node to be rotated
+   * @private
+   */
   private leftRotate(x: AVLNode): AVLNode {
     const y = x.right!
     const T2 = y.left
@@ -60,9 +82,14 @@ export class AVLTree {
     return y // Return new root
   }
 
-  // Insert a node in the AVL Tree and balance the tree
-  private insert(node: AVLNode | null, data: number): AVLNode {
-    // 1. Standard BST Insertion
+  /**
+   * Insert Helper function to insert a new node in the AVL Tree (recursive)
+   * @param node - The current node
+   * @param data - The data to be inserted
+   * @private
+   */
+  private insertHelper(node: AVLNode | null, data: number): AVLNode {
+    // 1. Perform the normal BST insertion
     if (!node) {
       return {
         data: data,
@@ -73,43 +100,102 @@ export class AVLTree {
     }
 
     if (data < node.data) {
-      node.left = this.insert(node.left, data)
+      node.left = this.insertHelper(node.left, data)
     } else if (data > node.data) {
-      node.right = this.insert(node.right, data)
+      node.right = this.insertHelper(node.right, data)
     } else {
       return node // Duplicate values are not allowed
     }
 
-    // 2. Update height of the current node
+    // 2. Update height of this ancestor node
     node.height = 1 + Math.max(this.getHeight(node.left), this.getHeight(node.right))
 
-    // 3. Get the balance factor to check if it's unbalanced
+    // 3. Get the balance factor of this ancestor node
     const balance = this.getBalance(node)
 
-    // 4. Balance the node if it's unbalanced
-    // Left Left Case
-    if (balance > 1 && data < node.left!.data) {
+    // 4. Balance the node if it has become unbalanced
+    // Left Cases (Left-Left and Left-Right)
+    if (balance > 1) {
+      if (this.getBalance(node.left) < 0) {
+        node.left = this.leftRotate(node.left!)
+      }
       return this.rightRotate(node)
     }
-    // Right Right Case
-    if (balance < -1 && data > node.right!.data) {
-      return this.leftRotate(node)
-    }
-    // Left Right Case
-    if (balance > 1 && data > node.left!.data) {
-      node.left = this.leftRotate(node.left!)
-      return this.rightRotate(node)
-    }
-    // Right Left Case
-    if (balance < -1 && data < node.right!.data) {
-      node.right = this.rightRotate(node.right!)
+    // Right Cases (Right-Right and Right-Left)
+    if (balance < -1) {
+      if (this.getBalance(node.right) > 0) {
+        node.right = this.rightRotate(node.right!)
+      }
       return this.leftRotate(node)
     }
 
     return node
   }
 
-  // Recursive in-order traversal to display the AVL Tree
+  /**
+   * Delete Helper function to delete a node from the AVL Tree (recursive)
+   * @param node - The current node
+   * @param data - The data to be deleted
+   * @private
+   */
+  private deleteHelper(node: AVLNode | null, data: number): AVLNode | null {
+    if (!node) return node
+
+    // Perform standard BST delete
+    if (data < node.data) {
+      node.left = this.deleteHelper(node.left, data)
+    } else if (data > node.data) {
+      node.right = this.deleteHelper(node.right, data)
+    } else {
+      // Node with only one child or no child
+      if (!node.left || !node.right) {
+        const temp = node.left ? node.left : node.right
+        if (!temp) {
+          node = null
+        } else {
+          node = temp
+        }
+      } else {
+        // Node with two children: Get the inorder predecessor (largest in the left subtree)
+        const temp = this.findMax(node.left)
+        node.data = temp.data
+        node.left = this.deleteHelper(node.left, temp.data)
+      }
+    }
+
+    if (!node) return node
+
+    // Update height of the current node
+    node.height = 1 + Math.max(this.getHeight(node.left), this.getHeight(node.right))
+
+    // Get the balance factor of this node
+    const balance = this.getBalance(node)
+
+    // Balance the node if it has become unbalanced
+
+    // Left Cases (Left-Left and Left-Right)
+    if (balance > 1) {
+      if (this.getBalance(node.left) < 0) {
+        node.left = this.leftRotate(node.left!)
+      }
+      return this.rightRotate(node)
+    }
+
+    // Right Cases (Right-Right and Right-Left)
+    if (balance < -1) {
+      if (this.getBalance(node.right) > 0) {
+        node.right = this.rightRotate(node.right!)
+      }
+      return this.leftRotate(node)
+    }
+
+    return node
+  }
+
+  /**
+   * In-order traversal of the AVL Tree
+   * @param node
+   */
   inOrder(node: AVLNode | null): number[] {
     const result: number[] = []
     function inOrderHelper(node: AVLNode | null): void {
@@ -164,8 +250,71 @@ export class AVLTree {
     return result
   }
 
-  // Insert data into the AVL Tree
-  add(data: number): void {
-    this.root = this.insert(this.root, data)
+  /**
+   * Find the maximum node an AVL Tree
+   * @param node - The root node (of the tree or subtree)
+   * @private
+   */
+  private findMax(node: AVLNode): AVLNode {
+    while (node.right) {
+      node = node.right
+    }
+    return node
+  }
+
+  /**
+   * Find the predecessor of given data in an AVL Tree
+   * @param data - The data whose predecessor is to be found
+   */
+  predecessor(data: number): number | null {
+    let node = this.root
+    let predecessor: AVLNode | null = null
+
+    while (node) {
+      if (data > node.data) {
+        predecessor = node
+        node = node.right
+      } else {
+        node = node.left
+      }
+    }
+
+    return predecessor ? predecessor.data : null
+  }
+
+  /**
+   * Find the successor of given data in an AVL Tree
+   * @param data - The data whose successor is to be found
+   */
+  successor(data: number): number | null {
+    let node = this.root
+    let successor: AVLNode | null = null
+
+    while (node) {
+      if (data < node.data) {
+        successor = node
+        node = node.left
+      } else {
+        node = node.right
+      }
+    }
+
+    return successor ? successor.data : null
+  }
+
+  /**
+   * Insert a new node in the AVL Tree
+   * @param data - The data to be inserted
+   */
+  insert(data: number): void {
+    this.root = this.insertHelper(this.root, data)
+  }
+
+  /**
+   * Delete a node from the AVL Tree
+   * @param data - The data to be deleted
+   */
+  delete(data: number): void {
+    this.root = this.deleteHelper(this.root, data)
   }
 }
