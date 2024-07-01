@@ -9,6 +9,7 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { AVLGenerator } from "@shared/question-generators/avl/basicsGenerator.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
@@ -51,6 +52,11 @@ export const collection: QuestionCollection = [
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
     contents: [Satisfiability, NormalForms],
+  },
+  {
+    slug: "avl-tree",
+    name: { de: "AVL-Baum", en: "AVL-Tree" },
+    contents: [AVLGenerator],
   },
 ]
 
