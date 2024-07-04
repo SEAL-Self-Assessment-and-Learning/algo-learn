@@ -53,7 +53,7 @@ export const AVLGenerator: QuestionGenerator = {
     const { avlTree, askValue } = generateAVLTreeInsert({
       random,
       avlTreeSize,
-      avlRotation: "right",
+      avlRotation: "none",
     })
 
     let avlTreeString = "\n|Index:|"
