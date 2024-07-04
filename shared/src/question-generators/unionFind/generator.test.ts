@@ -25,7 +25,6 @@ describe("QuickFindGenerator - Correctness", () => {
         sampleRandomSeed(),
       ) as TestingObjectGeneratorQuickFind
 
-      // type
       expect(q.type).toEqual("FreeTextQuestion")
       expect(q.feedback).toBeDefined
       if (q.feedback !== undefined) {

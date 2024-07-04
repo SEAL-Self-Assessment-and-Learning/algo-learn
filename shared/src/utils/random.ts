@@ -25,7 +25,7 @@ export default class Random {
   /** Returns a random number between 0 (inclusive) and 1 (exclusive). */
   uniform: () => number
 
-  /** Returns a random number from a normal distribution. */
+  /** Returns a random number from the standard normal distribution. */
   normal(): number {
     let u = 0
     let v = 0
@@ -54,7 +54,7 @@ export default class Random {
   }
 
   /**
-   * Returns a random integer (uniformly).
+   * From the uniform distribution on [min, max].
    *
    * @param min - The minimum number.
    * @param max - The maximum number.
@@ -79,15 +79,20 @@ export default class Random {
    * @param mean - The expected value (average)
    * @param stdev - The standard deviation
    */
-  intNormal(min: number, max: number, mean = 0, stdev = 1): number {
+  intNormal(min: number, max: number, mean = Math.round((min + max) / 2), stdev = 1): number {
+    let value = 0
+    // try 10 times to generate a value within min and max
+    // so the probability of failing gets smaller
+    // otherwise return either min or max
     for (let i = 0; i < 10; i++) {
       const normal = this.normal()
-      const value = Math.round(normal * stdev + mean)
+      value = Math.round(normal * stdev + mean)
       if (value >= min && value <= max) {
         return value
       }
     }
-    return mean
+    // return min if value close to min, max if value close to max
+    return Math.abs(value - min) < Math.abs(value - max) ? min : max
   }
 
   /**

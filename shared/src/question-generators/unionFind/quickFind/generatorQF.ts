@@ -1,42 +1,35 @@
-import { FreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
-import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm.ts"
+import { FreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm"
 import {
   unionOneBlockCombineNone,
-  unionOneOrTwoBlocksCombineOne,
+  unionOneBlockCombineOne,
   unionTwoBlocksCombineBoth,
   unionTwoBlocksCombineNone,
+  unionTwoBlocksCombineOne,
   unionTwoBlocksCombineSame,
-} from "@shared/question-generators/unionFind/quickFind/utils.ts"
-import { checkFormatArray } from "@shared/utils/checkFormatStandard.ts"
-import { feedbackArray } from "@shared/utils/feedbackStandard.ts"
-import Random from "@shared/utils/random.ts"
-import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+} from "@shared/question-generators/unionFind/quickFind/utils"
+import { checkFormatArray } from "@shared/utils/checkFormatStandard"
+import { feedbackArray } from "@shared/utils/feedbackStandard"
+import Random from "@shared/utils/random"
+import { t, tFunctional, Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {
     name: "QuickFind",
     description: "Determine QuickFind state after Union operation",
-    task: "Below is a state of the Quick-Find data structure. \n{{0}}\n We call **Union({{1}}, {{2}})**. Provide the state that results from this.",
+    task: "A state of the Quick-Find data structure is given as the following array **id[0...{{0}}]**: \n{{1}}\n We call Union({{2}}, {{3}}). Provide the resulting state.",
     explanationUnion:
       "We assume that the operation **Union(**$i$**,** $j$**)** always sets the value specified by **Find(**$i$**)** to the value specified by **Find(**$j$**)**.",
   },
   de: {
     name: "QuickFind",
     description: "Bestimme QuickFind-Zustand nach Union-Operation",
-    task: "Unten abgebildet ist ein Zustand der Quick-Find Datenstruktur.\n{{0}}\n Wir rufen **Union({{1}}, {{2}})** auf. Gib den Zustand, der dadurch entsteht, an.",
+    task: "Ein Zustand der Quick-Find Datenstruktur ist als folgendes Array **id[0...{{0}}]** gegeben: \n{{1}}\n Wir rufen **Union({{2}}, {{3}})** auf. Gib den Zustand an, der dadurch entsteht.",
     explanationUnion:
       "Wir nehmen an, dass die Operation **Union(**$i$**,** $j$**)** immer den durch **Find(**$i$**)** spezifizierten Wert auf den von **Find(**$j$**)** spezifierten Wert setzt.",
   },
 }
-
-// A block stands for a set of connected elements in the union-find data structure
-type UnionCases =
-  | "twoBlocksCombineBoth"
-  | "oneOrTwoBlocksCombineOne"
-  | "twoBlocksCombineNone"
-  | "twoBlocksCombineSame"
-  | "oneBlockCombineNone"
 
 export const QuickFindGenerator: QuestionGenerator = {
   id: "ufqf",
@@ -55,28 +48,20 @@ export const QuickFindGenerator: QuestionGenerator = {
   generate(lang, parameters, seed) {
     const random = new Random(seed)
 
-    // Test --> 7 124, 8 203, 9 266, 10 224, 11 131, 12 47, 13 5, 14 0
-    const unionSize = random.intNormal(7, 14, 10, 1.5)
+    const unionSize = random.int(6, 7)
 
     const union = new QuickFind(unionSize)
 
-    const unionCase: UnionCases = random.weightedChoice([
-      ["twoBlocksCombineBoth", 0.25],
-      ["oneOrTwoBlocksCombineOne", 0.5], // splits inside utils into two cases (50/50)
-      ["twoBlocksCombineNone", 0.1],
-      ["twoBlocksCombineSame", 0.05],
-      ["oneBlockCombineNone", 0.1],
+    const unionCaseGeneration = random.weightedChoice([
+      [unionTwoBlocksCombineBoth, 0.25],
+      [unionTwoBlocksCombineOne, 0.25],
+      [unionTwoBlocksCombineNone, 0.1],
+      [unionTwoBlocksCombineSame, 0.05],
+      [unionOneBlockCombineOne, 0.25],
+      [unionOneBlockCombineNone, 0.1],
     ])
 
-    const unionCaseFunctions = {
-      twoBlocksCombineBoth: unionTwoBlocksCombineBoth,
-      oneOrTwoBlocksCombineOne: unionOneOrTwoBlocksCombineOne,
-      twoBlocksCombineNone: unionTwoBlocksCombineNone,
-      twoBlocksCombineSame: unionTwoBlocksCombineSame,
-      oneBlockCombineNone: unionOneBlockCombineNone,
-    }
-
-    const { gapField, gapOperationValues } = unionCaseFunctions[unionCase]({
+    const { gapField, gapOperationValues } = unionCaseGeneration({
       random,
       union,
       unionSize,
@@ -92,6 +77,7 @@ export const QuickFindGenerator: QuestionGenerator = {
         seed,
       }),
       text: t(translations, lang, "task", [
+        (unionSize - 1).toString(),
         gapField,
         gapOperationValues[0].toString(),
         gapOperationValues[1].toString(),
