@@ -9,12 +9,6 @@ import {
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import {
-  checkProvidedCode,
-  getHuffmanCodeOfTable,
-  getHuffmanCodeOfWord,
-  HuffmanNode,
-} from "@shared/question-generators/huffman-coding/Huffman.ts"
-import {
   generateCharacterFrequencyTable,
   generateString,
 } from "@shared/question-generators/huffman-coding/GenerateWords.ts"
@@ -29,9 +23,15 @@ import {
   swapManyLetters,
   wrongAdditionTree,
 } from "@shared/question-generators/huffman-coding/GenerateWrongAnswers.ts"
+import {
+  checkProvidedCode,
+  getHuffmanCodeOfTable,
+  getHuffmanCodeOfWord,
+  HuffmanNode,
+} from "@shared/question-generators/huffman-coding/Huffman.ts"
+import { _ } from "@shared/utils/generics.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
-import {_} from "@shared/utils/generics.ts";
 
 /**
  * All text displayed text goes into the translation object.
@@ -308,7 +308,8 @@ export const huffmanCoding: QuestionGenerator = {
               }
             }
           }
-        } catch (e) { // todo what is this catching? nothing in the try block seems to be able to throw
+        } catch (e) {
+          // todo what is this catching? nothing in the try block seems to be able to throw
           return {
             valid: false,
             message: t(translations, lang, "feedbackInvalid"),
