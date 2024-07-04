@@ -85,7 +85,7 @@ export const MarkdownTreeNode: FunctionComponent<{
     )
   }
   if (parseTreeNode.kind === "`") {
-    return <span className="font-mono">{format(parseTreeNode.child, parameters)}</span>
+    return <span className="font-mono bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-sm">{format(parseTreeNode.child, parameters)}</span>
   }
   if (parseTreeNode.kind === "```") {
     return (
