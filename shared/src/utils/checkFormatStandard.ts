@@ -1,8 +1,8 @@
 /**
  * This file includes standard checkFormat functions which could be used in the question generators.
  */
-import { FreeTextFormatFunction } from "@shared/api/QuestionGenerator.ts"
-import { t, Translations } from "@shared/utils/translations.ts"
+import { FreeTextFormatFunction } from "@shared/api/QuestionGenerator"
+import { t, Translations } from "@shared/utils/translations"
 
 const checkFormatTranslations: Translations = {
   en: {

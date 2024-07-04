@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { QuickFind } from "./quickFind/quickFindAlgorithm.ts"
+import { QuickFind } from "./quickFind/quickFindAlgorithm"
 
 describe("UnionFind via QuickFind", () => {
   test("Test union operation", () => {

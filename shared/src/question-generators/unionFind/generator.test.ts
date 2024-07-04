@@ -2,10 +2,10 @@
  * Tests for all the union generators
  */
 import { describe, expect, test } from "vitest"
-import { FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
-import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF.ts"
-import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm.ts"
-import { sampleRandomSeed } from "@shared/utils/random.ts"
+import { FreeTextQuestion } from "@shared/api/QuestionGenerator"
+import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF"
+import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm"
+import { sampleRandomSeed } from "@shared/utils/random"
 
 interface TestingObjectGeneratorQuickFind {
   question: FreeTextQuestion
