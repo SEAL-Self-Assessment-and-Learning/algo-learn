@@ -12,12 +12,12 @@ import Random from "@shared/utils/random"
  *                          only till there are enough elements left
  */
 function performAdditionalUnionOperation({
-                                           random,
-                                           union,
-                                           unionSize,
-                                           usedElements,
-                                           otherOperations,
-                                         }: {
+  random,
+  union,
+  unionSize,
+  usedElements,
+  otherOperations,
+}: {
   random: Random
   union: QuickFind
   unionSize: number
@@ -313,10 +313,10 @@ export function unionTwoBlocksCombineSame({
  * @param unionSize - size of the union
  */
 export function unionOneBlockCombineOne({
-                                          random,
-                                          union,
-                                          unionSize,
-                                        }: {
+  random,
+  union,
+  unionSize,
+}: {
   random: Random
   union: QuickFind
   unionSize: number

@@ -33,10 +33,11 @@ const translations: Translations = {
 
 const wordTranslations: Translations = {
   en: {
-    Value: "Value"
-  }, de: {
-    Value: "Wert"
-  }
+    Value: "Value",
+  },
+  de: {
+    Value: "Wert",
+  },
 }
 
 export const QuickFindGenerator: QuestionGenerator = {

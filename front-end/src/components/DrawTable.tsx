@@ -1,5 +1,5 @@
-import { ReactElement } from "react"
-import { Markdown } from "@/components/Markdown.tsx"
+import { ReactElement, useEffect, useRef } from "react"
+import { Markdown } from "@/components/Markdown"
 
 /**
  * A component that returns a table
@@ -17,6 +17,29 @@ export function DrawTable({
 
   // create the value for the header
   const tableHeader = []
+
+  // this effect is used to add the copy event to the table
+  // it prevents copying the value with the default \t and instead with space
+  const tableRef = useRef<HTMLDivElement>(null) // Specify the type of element the ref will hold
+  useEffect(() => {
+    const tableElement = tableRef.current
+    if (!tableElement) return // Check if tableEl is not null
+
+    const handleCopy = (event: ClipboardEvent) => {
+      event.preventDefault()
+      const selection = document.getSelection()
+      if (!selection) return
+
+      const selectedText = selection.toString().replace(/\t/g, " ")
+      event.clipboardData!.setData("text/plain", selectedText)
+    }
+
+    // Type assertion to ensure tableEl is treated as an HTMLElement
+    tableElement.addEventListener("copy", handleCopy)
+    return () => {
+      tableElement.removeEventListener("copy", handleCopy)
+    }
+  }, [])
 
   tableHeader.push(
     <tr key={`row-0`}>
@@ -42,10 +65,12 @@ export function DrawTable({
   }
 
   const tableReturnValue = (
-    <table>
-      <thead>{tableHeader}</thead>
-      <tbody>{tableContent}</tbody>
-    </table>
+    <div ref={tableRef}>
+      <table>
+        <thead>{tableHeader}</thead>
+        <tbody>{tableContent}</tbody>
+      </table>
+    </div>
   )
   if (extraFeature.startsWith("div_")) {
     return <div className={extraFeature.split("_")[1]}>{tableReturnValue}</div>

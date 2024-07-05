@@ -4,6 +4,8 @@
 import { FreeTextFormatFunction } from "@shared/api/QuestionGenerator"
 import { t, Translations } from "@shared/utils/translations"
 
+export type ArraySeparator = "," | " " | ", "
+
 const checkFormatTranslations: Translations = {
   en: {
     empty: "The answer is empty.",
@@ -20,18 +22,24 @@ const checkFormatTranslations: Translations = {
 /**
  * Checks if the given text is an array
  * @param text
+ * @param sep
  */
-function isAnyArray(text: string) {
-  return text.split(",").length > 0
+function isAnyArray(text: string, sep: ArraySeparator) {
+  return parseStringToArray(text, sep).length > 0
 }
 
 /**
  * Checks if the given text is an array of integers
  * @param text
+ * @param sep
  */
-function isIntArray(text: string) {
+function isIntArray(text: string, sep: ArraySeparator) {
+  if (!isAnyArray(text, sep)) {
+    return false
+  }
+
   // Split the text by comma and filter out any empty strings caused by trailing commas
-  const values = text.split(",").filter((value) => value.trim() !== "")
+  const values = parseStringToArray(text, ", ")
 
   // Check if every value is an integer
   return values.every((value) => {
@@ -45,10 +53,23 @@ function isIntArray(text: string) {
 
 /**
  * Converts a string into an array (seperated by comma)
- * @param text
+ * @param text - string to be converted
+ * @param sep - separator used to split the string
  */
-export function parseStringToArray(text: string) {
-  return text.split(",").map((value) => value.trim())
+export function parseStringToArray(text: string, sep: ArraySeparator) {
+  let textSplit: string[]
+  if (sep === " " || sep === ",") {
+    textSplit = text.split(sep)
+  } else {
+    textSplit = text.split(/[ ,]+/)
+  }
+  textSplit = textSplit.map((value) => value.trim())
+  // if the last value is empty --> drop it
+  if (textSplit[textSplit.length - 1] === "") {
+    textSplit.pop()
+  }
+  console.log(textSplit)
+  return textSplit
 }
 
 /**
@@ -78,36 +99,30 @@ export function checkFormatArray({
   values: "any" | "int"
 }) {
   const normal: FreeTextFormatFunction = ({ text }) => {
-    // remove all whitespaces
-    text = text.replace(/\s/g, "")
-
     if (text === "") {
       return { valid: false }
     }
 
     return values === "any"
-      ? isAnyArray(text)
+      ? isAnyArray(text, ", ")
         ? { valid: true }
         : { valid: false, message: t(checkFormatTranslations, lang, "formatAnyArray") }
-      : isIntArray(text)
+      : isIntArray(text, ", ")
         ? { valid: true }
         : { valid: false, message: t(checkFormatTranslations, lang, "formatIntArray") }
   }
 
   const display: FreeTextFormatFunction = ({ text }) => {
-    // remove all whitespaces
-    text = text.replace(/\s/g, "")
-
     if (text === "") {
       return { valid: false }
     }
 
     return values === "any"
-      ? isAnyArray(text)
-        ? { valid: true, message: parseArrayTable(parseStringToArray(text)) }
+      ? isAnyArray(text, ", ")
+        ? { valid: true, message: parseArrayTable(parseStringToArray(text, ", ")) }
         : { valid: false, message: t(checkFormatTranslations, lang, "formatAnyArray") }
-      : isIntArray(text)
-        ? { valid: true, message: parseArrayTable(parseStringToArray(text)) }
+      : isIntArray(text, ", ")
+        ? { valid: true, message: parseArrayTable(parseStringToArray(text, ", ")) }
         : { valid: false, message: t(checkFormatTranslations, lang, "formatIntArray") }
   }
 

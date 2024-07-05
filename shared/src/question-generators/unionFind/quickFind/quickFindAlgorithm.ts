@@ -1,5 +1,4 @@
 export class QuickFind {
-
   private readonly id: number[]
 
   constructor(n: number) {
