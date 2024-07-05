@@ -68,7 +68,6 @@ export function parseStringToArray(text: string, sep: ArraySeparator) {
   if (textSplit[textSplit.length - 1] === "") {
     textSplit.pop()
   }
-  console.log(textSplit)
   return textSplit
 }
 

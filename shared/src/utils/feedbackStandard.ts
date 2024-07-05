@@ -16,7 +16,7 @@ export function feedbackArray({
     text = text.replace(/\s/g, "")
 
     // parse user input into an array to compare it with the solution
-    const inputArray: string[] = parseStringToArray(text)
+    const inputArray: string[] = parseStringToArray(text, ", ")
 
     // check if both lengths are the same
     if (inputArray.length !== solution.length) {
