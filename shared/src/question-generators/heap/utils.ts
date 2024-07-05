@@ -56,30 +56,13 @@ export function generateOperationSequence(
  * @param random
  */
 export function generateNeighbourOptions(random: Random) {
-  const neighbourOption:
-    | "grandParent"
-    | "parent"
-    | "leftChild"
-    | "rightChild"
-    | "leftLeftChild"
-    | "leftRightChild"
-    | "rightRightChild"
-    | "rightLeftChild" = random.choice([
-    "grandParent",
+  const neighbourOption: "parent" | "leftChild" | "rightChild" = random.choice([
     "parent",
     "leftChild",
     "rightChild",
-    "leftLeftChild",
-    "leftRightChild",
-    "rightRightChild",
-    "rightLeftChild",
   ])
 
   const neighbourMap = {
-    grandParent: {
-      formula: (index: number) => Math.floor(Math.floor(index / 2) / 2),
-      text: ["grandParent"],
-    },
     parent: {
       formula: (index: number) => Math.floor(index / 2),
       text: ["parent"],
@@ -91,22 +74,6 @@ export function generateNeighbourOptions(random: Random) {
     rightChild: {
       formula: (index: number) => index * 2 + 1,
       text: ["rightChild"],
-    },
-    leftLeftChild: {
-      formula: (index: number) => index * 2 * 2,
-      text: ["leftChild", "ofThe", "leftChild"],
-    },
-    leftRightChild: {
-      formula: (index: number) => index * 2 * 2 + 1,
-      text: ["rightChild", "ofThe", "leftChild"],
-    },
-    rightRightChild: {
-      formula: (index: number) => (index * 2 + 1) * 2 + 1,
-      text: ["rightChild", "ofThe", "rightChild"],
-    },
-    rightLeftChild: {
-      formula: (index: number) => (index * 2 + 2) * 2,
-      text: ["leftChild", "ofThe", "rightChild"],
     },
   }
 
@@ -210,7 +177,7 @@ export function generateRandomWrongHeaps(heapType: "Max" | "Min", random: Random
   heaps.push(wrongHeap3)
 
   const heap4 = generateRandomHeaps(heapType, 1, random)[0].getHeap()
-  const wrongHeap4 = increaseChildValue(heap4, heapType, random)
+  const wrongHeap4 = changeChildValue(heap4, heapType, random)
   if (!checkCorrectHeap(wrongHeap4, heapType)) {
     heaps.push(wrongHeap4)
   }
@@ -218,6 +185,11 @@ export function generateRandomWrongHeaps(heapType: "Max" | "Min", random: Random
   return heaps
 }
 
+/**
+ * This function swaps a parent with its corresponding child in a heap
+ * @param heap - the heap to swap parent with child
+ * @param random - random class object
+ */
 export function swapParentChild(heap: number[], random: Random): number[] {
   const newHeap = [...heap]
   const index = random.int(1, newHeap.length - 1)
@@ -229,6 +201,11 @@ export function swapParentChild(heap: number[], random: Random): number[] {
   return newHeap
 }
 
+/**
+ * This function replaces a random leaf node with NaN
+ * @param heap - the heap to replace a leaf node with NaN
+ * @param random - random class object
+ */
 export function replaceValueWithNaN(heap: number[], random: Random): number[] {
   const newHeap = [...heap]
   // replace a random leaf node with NaN
@@ -241,7 +218,13 @@ export function replaceValueWithNaN(heap: number[], random: Random): number[] {
   return newHeap
 }
 
-export function increaseChildValue(heap: number[], heapType: "Min" | "Max", random: Random): number[] {
+/**
+ * This function increases/decreases the value of a child node in a heap
+ * @param heap - the heap to increase/decreases the value of a child node
+ * @param heapType - the type of heap (either Min or Max)
+ * @param random - random class object
+ */
+export function changeChildValue(heap: number[], heapType: "Min" | "Max", random: Random): number[] {
   const newHeap = [...heap]
   const child = random.int(1, newHeap.length - 1)
   const parent = Math.floor((child - 1) / 2)
@@ -281,10 +264,13 @@ export function checkCorrectHeap(heap: number[], type: "Max" | "Min"): boolean {
  * @param array
  */
 export function convertNumberArrayToTable(array: number[]): string {
-  let arrayTable = "\n|"
+  let arrayTable = "\n|Index:|"
+  for (let i = 0; i < array.length; i++) {
+    arrayTable += (i + 1).toString() + "|"
+  }
+  arrayTable += "\n" + "|---".repeat(array.length + 1) + "|\n|Value:|"
   array.forEach((element) => {
     arrayTable += (Number.isNaN(element) ? " " : element) + "|"
   })
-  arrayTable += "\n" + "|---".repeat(array.length) + "|\n"
   return arrayTable
 }

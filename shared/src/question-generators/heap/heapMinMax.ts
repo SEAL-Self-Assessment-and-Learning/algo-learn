@@ -72,9 +72,13 @@ export abstract class Heap {
   }
 
   toTableString() {
-    let heapTable = "\n"
+    let heapTable = "\n|Index:"
+    for (let i = 0; i < this.heap.length; i++) {
+      heapTable += `|${i} `
+    }
+    heapTable += "|\n"
+    heapTable += "|---".repeat(this.heap.length + 1) + "|\n|Value:"
     heapTable += "|" + this.heap.join("|") + "|\n"
-    heapTable += "|---".repeat(this.heap.length) + "|\n"
     return heapTable
   }
 

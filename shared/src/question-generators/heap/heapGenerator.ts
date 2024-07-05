@@ -9,6 +9,7 @@ import {
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax.ts"
 import {
+  convertNumberArrayToTable,
   generateHeapsForQuestion,
   generateNeighbourOptions,
   generateOperationSequence,
@@ -26,7 +27,7 @@ const translationHeapOperations: Translations = {
     taskExtract:
       "Consider the following **{{0}}-Heap**: {{1}} You extract the {{2}} element **{{3}}** times. Enter the state of the Heap after the extractions.",
     taskBuild:
-      "Consider the following Array: {{0}} Enter the state of the Heap after **Build-{{1}}-Heap** on the above array.",
+      "Consider the following **Array**: {{0}} Enter the state of the Heap after **Build-{{1}}-Heap** on the above array.",
     taskCombine:
       "Let **{{0}}** be a sequence of operations, where a **number** represents **inserting** this number into the **{{2}}-Heap** and $*$ represents an **Extract-{{2}}** operation. \\[{{0}}={{1}}\\] Enter the state of the Heap after all operations. Initially the Heap is empty.",
     checkFormat: "Please only enter Integer seperated by commas.",
@@ -49,7 +50,7 @@ const translationHeapOperations: Translations = {
 const translationsHeapUnderstanding: Translations = {
   en: {
     name: "Heap-Understanding",
-    description: "Understand the properties of heaps",
+    description: "Verify basic heap properties",
     taskCorrectness:
       "Which of the following arrays satisfy all **Heap-Properties** for a **{{0}}-Heap**?",
     taskNeighbours:
@@ -58,7 +59,7 @@ const translationsHeapUnderstanding: Translations = {
   },
   de: {
     name: "Heap-Verständnis",
-    description: "Verstehe die Eigenschaften von Heaps",
+    description: "Überprüfe grundlegende Heap-Eigenschaften",
     taskCorrectness:
       "Welche der folgenden Arrays erfüllen alle **Heap-Eigenschaften** für einen **{{0}}-Heap**?",
     taskNeighbours:
@@ -67,10 +68,6 @@ const translationsHeapUnderstanding: Translations = {
   },
 }
 
-// passen diese Beschreibungen für Knoten?
-// das wäre bspw.:
-// ... is the index of the right child of the right child of the ele ...
-// oder wie könnte man es besser formulieren
 const wordTranslations: Translations = {
   en: {
     maximal: "maximal",
@@ -79,7 +76,6 @@ const wordTranslations: Translations = {
     parent: "parent",
     rightChild: "right child",
     leftChild: "left child",
-    ofThe: "of the",
   },
   de: {
     maximal: "maximale",
@@ -88,7 +84,6 @@ const wordTranslations: Translations = {
     parent: "Elternknoten",
     rightChild: "rechten Kindes",
     leftChild: "linken Kindes",
-    ofThe: "des",
   },
 }
 
@@ -186,9 +181,7 @@ export const HeapOperations: QuestionGenerator = {
 
     if (variant === "insert") {
       // build a table representing the index - value pair starting at 1
-      let elementsTable = "\n|" + Array.from({ length: heapSize }, (_, i) => i + 1).join("|") + "|\n"
-      elementsTable += "|---".repeat(heapSize) + "|\n"
-      elementsTable += "|" + heapElements.join("|") + "|\n"
+      let elementsTable = convertNumberArrayToTable(heapElements)
       elementsTable += "|#div_my-5#||\n"
 
       for (const element of heapElements) {
