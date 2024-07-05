@@ -1,4 +1,5 @@
 export class QuickFind {
+
   private readonly id: number[]
 
   constructor(n: number) {
@@ -36,18 +37,33 @@ export class QuickFind {
    * Converts the current union array field into a string-table
    *
    * example:
-   *  | 2 | 5 | 1 | ...
-   *  |---|---|---| ...
+   *  | Index | 0 | 1 | 2 | ...
+   *  |  ---  |---|---|---| ...
+   *  | Value | 2 | 5 | 1 | ...
    */
   toStringTable(div?: boolean) {
-    let stringTable = ""
+    let stringTable = "|Index:"
+
+    // create the header index line
+    for (let i = 0; i < this.id.length; i++) {
+      stringTable += "|" + i.toString()
+    }
+    stringTable += "|\n"
+
+    // create the separator line
+    stringTable += "|---".repeat(this.id.length + 1) + "|\n"
+
+    // create the values
+    // Translation of Value should be done inside the generator
+    stringTable += "|Value:"
     for (const id of this.id) {
       stringTable += "|" + id.toString()
     }
     stringTable += "|\n"
-    stringTable += "|---".repeat(this.id.length)
+
+    // add a div around the table
     if (div) {
-      stringTable += "|\n|#div_my-5#||\n"
+      stringTable += "|#div_my-5#||\n"
     }
     return stringTable
   }
