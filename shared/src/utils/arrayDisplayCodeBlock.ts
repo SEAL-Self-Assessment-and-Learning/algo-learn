@@ -1,24 +1,24 @@
-import { SingleTranslation } from "@shared/utils/translations.ts"
+import { SingleTranslation } from "@shared/utils/translations"
 
 export type ArrayDisplayProps<T> = {
   array: T[]
   startingIndex: number
-  fuckingNamesSecondRowDisplay: SingleTranslation
+  secondRowName: SingleTranslation
 }
 
 export function createArrayDisplayCodeBlock<T>({
   array,
   startingIndex = 0,
-  fuckingNamesSecondRowDisplay = { de: "Wert:", en: "Value" },
+  secondRowName = { de: "Wert:", en: "Value" },
 }: {
   array: T[]
   startingIndex?: number
-  fuckingNamesSecondRowDisplay?: SingleTranslation
+  secondRowName?: SingleTranslation
 }): string {
   const parseArrayBlock: ArrayDisplayProps<T> = {
     array,
     startingIndex,
-    fuckingNamesSecondRowDisplay,
+    secondRowName,
   }
 
   return JSON.stringify(parseArrayBlock)
