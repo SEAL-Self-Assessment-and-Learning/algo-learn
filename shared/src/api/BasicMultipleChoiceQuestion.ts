@@ -121,8 +121,7 @@ export function basicMultipleChoiceMetaGenerator(
 
     random.shuffle(answers)
 
-    const markdown =
-      questions[i].frame === undefined ? ownt["text"] : questions[i].frame!(l, ownt["text"])
+    const markdown = questions[i].frame!(l, ownt["text"])
 
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
