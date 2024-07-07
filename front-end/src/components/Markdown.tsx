@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import SyntaxHighlighter from "react-syntax-highlighter"
 import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
+import { ArrayDisplay } from "@/components/ArrayDisplay.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
 import { useTheme } from "../hooks/useTheme"
 import { Format } from "./Format"
@@ -92,6 +93,9 @@ export const MarkdownTreeNode: FunctionComponent<{
     )
   }
   if (parseTreeNode.kind === "```") {
+    if (parseTreeNode.language === "array") {
+      return <ArrayDisplay arrayObject={parseTreeNode.child} />
+    }
     return (
       <div className="my-5">
         <SyntaxHighlighter
