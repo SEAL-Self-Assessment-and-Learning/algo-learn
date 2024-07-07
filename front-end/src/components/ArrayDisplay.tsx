@@ -27,12 +27,12 @@ export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): React
         <table className="w-full border-collapse">
           <thead className="border-b">
             <tr>
-              <th className="relative px-4 py-2 text-left">
-                Index:
+              <th className="relative px-4 py-2 text-left text-gray-600 dark:text-gray-400">
+                <b>Index:</b>
                 <Separator orientation={`vertical`} className={`absolute inset-y-0 right-0`} />
               </th>
               {parsedArrayObject.array.map((_, index) => (
-                <th key={index} className="px-4 py-2 text-left">
+                <th key={index} className="text-gray-600 dark:text-gray-400">
                   {index + parsedArrayObject.startingIndex}
                 </th>
               ))}
@@ -41,7 +41,7 @@ export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): React
           <tbody>
             <tr>
               <th className="relative px-4 py-2 text-left">
-                {parsedArrayObject.secondRowName[lang]}
+                <b>{parsedArrayObject.secondRowName[lang]}:</b>
                 <Separator orientation={`vertical`} className={`absolute inset-y-0 right-0`} />
               </th>
               {parsedArrayObject.array.map((value, index) => (

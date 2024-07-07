@@ -36,7 +36,7 @@ export function createArrayDisplayCodeBlock<T>({
   }
 
   return `
-\`\`\`
+\`\`\`array
 ${JSON.stringify(parseArrayBlock)}
 \`\`\`
   `

@@ -17,12 +17,7 @@ const translations: Translations = {
     name: "Compute a sum",
     description: "Compute the sum of two integers",
     text:
-      "Let ${{0}}$ and ${{1}}$ be two natural numbers. What is the **sum** ${{0}}+{{1}}$?" +
-      `
-\`\`\`array
-{{2}}
-\`\`\`
-      `,
+      "Let ${{0}}$ and ${{1}}$ be two natural numbers. What is the **sum** ${{0}}+{{1}}$?{{2}}",
   },
   de: {
     name: "Summe berechnen",
