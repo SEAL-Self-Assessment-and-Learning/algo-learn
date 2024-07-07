@@ -16,8 +16,7 @@ const translations: Translations = {
   en: {
     name: "Compute a sum",
     description: "Compute the sum of two integers",
-    text:
-      "Let ${{0}}$ and ${{1}}$ be two natural numbers. What is the **sum** ${{0}}+{{1}}$?{{2}}",
+    text: "Let ${{0}}$ and ${{1}}$ be two natural numbers. What is the **sum** ${{0}}+{{1}}$?{{2}}",
   },
   de: {
     name: "Summe berechnen",
