@@ -4,6 +4,18 @@ import { Markdown } from "@/components/Markdown"
 import { Separator } from "@/components/ui/separator"
 import { useTranslation } from "@/hooks/useTranslation"
 
+/**
+ * This component displays an array in a table.
+ *
+ * Index: | 1 2 3 4 ...
+ * -------|-------------
+ * Value: | a b c d ...
+ *
+ * The string Value can be replaced by any string.
+ * But the Index is fixed.
+ *
+ * @param arrayObject - The stringified array object.
+ */
 export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): ReactElement {
   const parsedArrayObject: ArrayDisplayProps<T> = JSON.parse(arrayObject) as ArrayDisplayProps<T>
 
