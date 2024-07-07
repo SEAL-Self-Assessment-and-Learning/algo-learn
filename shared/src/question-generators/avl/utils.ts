@@ -1,16 +1,22 @@
-import { AVLTree } from "@shared/question-generators/avl/avlDS.ts"
-import Random from "@shared/utils/random.ts"
+import { AVLTree } from "@shared/question-generators/avl/avlDS"
+import Random from "@shared/utils/random"
 
-export type AVLTreeRotations = "none" | "left" | "right" | "left-right" | "right-left"
+/**
+ * All the possible avl tree rotations
+ */
+export type AVLTreeRotations = "none" | "left" | "right" | "leftRight" | "rightLeft"
 
 export const avlTreeWeightedRotations: [AVLTreeRotations, number][] = [
   ["none", 0.1],
   ["left", 0.2],
   ["right", 0.2],
-  ["left-right", 0.25],
-  ["right-left", 0.25],
+  ["leftRight", 0.25],
+  ["rightLeft", 0.25],
 ]
 
+/**
+ * This is like a BST, but we use it for generating different avl tree structures
+ */
 export type AVLTreeHelper = {
   root: string
   left: AVLTreeHelper | null
@@ -18,83 +24,116 @@ export type AVLTreeHelper = {
   nodes: number
 }
 
+/**
+ * This function generates an AVL and a value to insert into the tree
+ * Inserting this value will result in the desired rotation
+ *
+ * @param random - random class
+ * @param avlTreeSize - number of nodes the avl tree should have
+ * @param rotationOption - the desired rotation (type AVLTreeRotations)
+ */
 export function generateAVLTreeInsert({
   random,
   avlTreeSize,
-  avlRotation,
+  rotationOption,
 }: {
   random: Random
   avlTreeSize: number
-  avlRotation: AVLTreeRotations
-}) {
-  const avl = new AVLTree()
-  let askValue = ""
-
-  const tmpTrees: AVLTreeHelper[] = generateAllAVLTrees(5, 1, 13)
+  rotationOption: AVLTreeRotations
+}): { askValue: string; avlTree: AVLTree } {
+  // Generates all possible AVL tree structures of the given avlTreeSize
+  // TODO calculate maxHeight instead of fixed 5
+  const tmpTrees: AVLTreeHelper[] = generateAllAVLTrees(5, avlTreeSize, avlTreeSize)
+  // converting the avlTree structures in AVLTrees with numbers as value
   const avlTrees: AVLTree[] = convertAVLHelperToRandomAVLTree(random, tmpTrees)
-  allTreeInsertPairsForRightRotation(random, avlTrees)
 
-
-  if (avlRotation === "none") {
-  } else if (avlRotation === "left") {
-  } else if (avlRotation === "right") {
-  } else if (avlRotation === "left-right") {
-  } else if (avlRotation === "right-left") {
-  }
+  const { avlTree, askValue } = handleAVLRotation(random, avlTrees, rotationOption)
 
   return {
-    avlTree: avl,
+    askValue,
+    avlTree,
+  }
+}
+
+/**
+ * This function generates an AVL and a value to insert into the tree
+ * @param random
+ * @param avlTrees
+ * @param rotationOption
+ */
+function handleAVLRotation(
+  random: Random,
+  avlTrees: AVLTree[],
+  rotationOption: AVLTreeRotations,
+): { avlTree: AVLTree; askValue: string } {
+  const { insertValue, currentTree } = getRandomTreeInsertPair(random, avlTrees, rotationOption)
+  const askValue = insertValue.toString()
+  checkAVLNull(currentTree)
+
+  return {
+    avlTree: currentTree as AVLTree,
     askValue,
   }
 }
 
-function allTreeInsertPairsForRightRotation (random: Random, avlTrees: AVLTree[]) {
-
+// TODO refactor to be more clean
+function getRandomTreeInsertPair(random: Random, avlTrees: AVLTree[], rotationOption: AVLTreeRotations) {
+  avlTrees = random.shuffle(avlTrees)
 
   for (let i = 0; i < avlTrees.length; i++) {
-
     const inOrder = avlTrees[i].inOrder()
-    const lvlOrder = avlTrees[i].levelOrderAlternative()
 
-    let lastSeen = 0
-    let currentTree = avlTrees[i]
+    // the minimum node in the generated AVL trees will be 1
+    let lastSeen = -1
+    const currentTree = avlTrees[i]
+    const allPossibleValues: number[] = []
     for (let j = 0; j < inOrder.length; j++) {
-
-      const insertValue = random.float(lastSeen + 0.0000001, inOrder[j] - 0.0000001)
-
-      if (currentTree.insertWouldDoRotation(insertValue) === "none") {
-        console.log(lvlOrder, " insert: ", insertValue)
+      // in this case we can not generate a natrual number
+      if (lastSeen + 1 > inOrder[j] - 1) {
+        lastSeen = inOrder[j]
+        continue
       }
 
+      const insertValue = random.int(lastSeen + 1, inOrder[j] - 1)
+      const treeClone = currentTree.clone()
+      const treeCloneInsert = treeClone.insert(insertValue)
+      // check if it is the desired rotation
+      if (treeCloneInsert === rotationOption) {
+        allPossibleValues.push(insertValue)
+      }
       lastSeen = inOrder[j]
-      const newAVLTree = new AVLTree()
-      for (let h = 0; h < lvlOrder.length; h++) {
-        if (lvlOrder[h] !== null) {
-          newAVLTree.insert(lvlOrder[h]!)
-        }
-      }
-      currentTree = newAVLTree
-
     }
 
+    // We found a tree were an insert operation would result in the desired rotation
+    if (allPossibleValues.length > 0) {
+      return {
+        insertValue: random.choice(allPossibleValues),
+        currentTree,
+      }
+    }
   }
 
-  return []
-
+  // will never be reached
+  return { insertValue: 0, currentTree: null }
 }
 
+/**
+ * This function takes a tree with avl structure but no 'real' values
+ * and assigns a numbered value to each node
+ *
+ * @param random - random class object (for random node value)
+ * @param treeHelper - the trees with avl structure but currently as BST
+ */
 function convertAVLHelperToRandomAVLTree(random: Random, treeHelper: AVLTreeHelper[]): AVLTree[] {
-
   const avlTrees: AVLTree[] = []
 
   for (let i = 0; i < treeHelper.length; i++) {
-
     const newAVLTree: AVLTree = new AVLTree()
     avlTrees.push(newAVLTree)
 
-    // get the inorder order for the helper tree
+    // get the inorder for the helper tree
     const inOrder = inOrderHelper(treeHelper[i])
-    const inOrderToValues: {[key: string]: number} = {}
+    const inOrderToValues: { [key: string]: number } = {}
 
     // iterate through the inOrder
     // convert every entry into a dict and
@@ -106,7 +145,7 @@ function convertAVLHelperToRandomAVLTree(random: Random, treeHelper: AVLTreeHelp
       inOrderToValues[inOrder[j]] = newNumber
     }
 
-    // get the lvl order to convert to avl tree
+    // get the lvlOrder, to convert into an avl tree
     const lvlOrder = levelOrderAlternativeHelper(treeHelper[i])
 
     for (let j = 0; j < lvlOrder.length; j++) {
@@ -116,15 +155,13 @@ function convertAVLHelperToRandomAVLTree(random: Random, treeHelper: AVLTreeHelp
         newAVLTree.insert(insertValue)
       }
     }
-
   }
 
   return avlTrees
-
 }
 
+// TODO refactor this function
 function generateAllAVLTrees(maxHeight: number, minNodes: number, maxNodes: number) {
-
   // create the base cases
   const hTrees = [
     [{ root: "x-0-0-0", left: null, right: null, nodes: 1 } as AVLTreeHelper],
@@ -202,9 +239,12 @@ function generateAllAVLTrees(maxHeight: number, minNodes: number, maxNodes: numb
   }
 
   return resultTrees
-
 }
 
+/**
+ * Computes the inorder of a tree
+ * @param tree
+ */
 function inOrderHelper(tree: AVLTreeHelper) {
   const result: string[] = []
   function inOrderHelper(node: AVLTreeHelper | null): void {
@@ -217,6 +257,20 @@ function inOrderHelper(tree: AVLTreeHelper) {
   return result
 }
 
+/**
+ * The function performs a level-order traversal of an AVL tree and returns an array
+ * representing the complete binary tree structure. Each level of the tree is processed
+ * in turn, and null values are used to indicate missing nodes, ensuring that the
+ * structure of the tree is fully captured in the output array.
+ *
+ * Example:
+ * Tree:
+ *      5
+ *       \
+ *        4
+ * Result: [5, null, 4]
+ *
+ */
 function levelOrderAlternativeHelper(tree: AVLTreeHelper): (string | null)[] {
   if (!tree) return []
   let queue: (AVLTreeHelper | null)[] = [tree]
@@ -245,101 +299,11 @@ function levelOrderAlternativeHelper(tree: AVLTreeHelper): (string | null)[] {
   return result
 }
 
-function download(filename: string, text: string) {
-  const element = document.createElement("a")
-  element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text))
-  element.setAttribute("download", filename)
-
-  element.style.display = "none"
-  document.body.appendChild(element)
-
-  element.click()
-
-  document.body.removeChild(element)
+/**
+ * Just checking a value is a AVLTree or null
+ * @param tree - the value to check
+ */
+function checkAVLNull(tree: AVLTree | null) {
+  if (tree === null)
+    throw new Error("There has been a problem generating a AVL tree and a corresponding insert value")
 }
-
-/*
-
-// currently just a helper to generate permutations
-
-    const values = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-    // const values = [2, 4, 6, 8]
-    const permuations = permute(values)
-
-    const avlSet: Set<string> = new Set()
-    for (const perm of permuations) {
-      const newTree = new AVLTree()
-      for (const p of perm) {
-        newTree.insert(p)
-      }
-      avlSet.add(JSON.stringify(newTree.levelOrderAlternative()))
-    }
-
-    let downloadText = "["
-    for (const s of avlSet) {
-      const tmp = JSON.parse(s)as (number | null)[]
-      let tmpString = "["
-      for (const v of tmp) {
-        if (v === null) {
-          tmpString += '"",'
-        } else {
-          tmpString += v + ","
-        }
-      }
-      tmpString += "],"
-      downloadText += tmpString + '\n'
-    }
-    downloadText += "]"
-
-    download('/Users/fabianstiewe/Downloads/output.txt',  downloadText + '\n');
-
-
-    let downloadTextForPython = "["
-
-    for (let j = 0; j<hTrees.length; j++) {
-      for (let i = 0; i < hTrees[j].length; i++) {
-        const lvlOrder = levelOrderAlternative(hTrees[j][i])
-        let lvlText = "["
-        for (const lvl of lvlOrder) {
-          if (lvl === null) {
-            lvlText += '"",'
-          } else {
-            lvlText += '"' + lvl + '",'
-          }
-        }
-        lvlText += "],"
-        downloadTextForPython += lvlText + "\n"
-      }
-    }
-
-    downloadTextForPython += "]"
-
-    download("hTrees", downloadTextForPython)
-
-
- */
-
-/*
-
-
-  let downloadTextForPython = "["
-
-  for (let j = 0; j<AVLTrees.length; j++) {
-      const lvlOrder = AVLTrees[j].levelOrderAlternative()
-      let lvlText = "["
-      for (const lvl of lvlOrder) {
-        if (lvl === null) {
-          lvlText += '"",'
-        } else {
-          lvlText += '"' + lvl + '",'
-        }
-      }
-      lvlText += "],"
-      downloadTextForPython += lvlText + "\n"
-  }
-
-  downloadTextForPython += "]"
-
-  download("hTrees", downloadTextForPython)
-
- */

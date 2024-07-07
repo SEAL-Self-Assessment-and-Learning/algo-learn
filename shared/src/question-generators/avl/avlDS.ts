@@ -2,10 +2,13 @@
 // https://files.tcs.uni-frankfurt.de/algo1/binarysearchtrees.pdf
 // Do we write sources for the code we use? I'm not sure if this is necessary since it's a common algorithm
 
-import {AVLTreeRotations} from "@shared/question-generators/avl/utils.ts";
+import { AVLTreeRotations } from "@shared/question-generators/avl/utils.ts"
 
 /**
  * AVL Node structure
+ *
+ * Only possible to use with numbers
+ *
  */
 type AVLNode = {
   data: number
@@ -86,35 +89,68 @@ export class AVLTree {
 
   /**
    * Insert Helper function to insert a new node in the AVL Tree (recursive)
+   *
+   * !It also return the rotation that has been done during this process
+   *
    * @param node - The current node
    * @param data - The data to be inserted
    * @private
    */
-  private insertHelper(node: AVLNode | null, data: number): { avlNode: AVLNode, rotation: AVLTreeRotations } {
-    // 1. Perform the normal BST insertion
+  private insertHelper(
+    node: AVLNode | null,
+    data: number,
+  ): { node: AVLNode; rotation: AVLTreeRotations } {
     if (!node) {
       return {
-      avlNode: {
-        data: data,
+        node: {
+          data: data,
           left: null,
-        right: null,
-        height: 1,
-      }, rotation: "none"
+          right: null,
+          height: 1,
+        },
+        rotation: "none",
       }
     }
 
+    let rotationType: AVLTreeRotations = "none"
+
     if (data < node.data) {
-      const { avlNode } = this.insertHelper(node.left, data)
-      node.left = avlNode
+      const result = this.insertHelper(node.left, data)
+      node.left = result.node
+      rotationType = result.rotation
     } else if (data > node.data) {
-      const { avlNode} = this.insertHelper(node.right, data)
-      node.right = avlNode
+      const result = this.insertHelper(node.right, data)
+      node.right = result.node
+      rotationType = result.rotation
     } else {
-      return {avlNode: node, rotation: "none"} // Duplicate values are not allowed
+      return { node, rotation: "none" }
     }
 
-    // 2. Update height of this ancestor node
-    return this.rebalance(node)
+    node.height = 1 + Math.max(this.getHeight(node.left), this.getHeight(node.right))
+
+    const balance = this.getBalance(node)
+    let rotation: AVLTreeRotations = "none"
+
+    if (balance > 1) {
+      if (this.getBalance(node.left) < 0) {
+        node.left = this.leftRotate(node.left!)
+        rotation = "leftRight"
+      }
+      node = this.rightRotate(node)
+      if (rotation === "none") rotation = "right"
+    } else if (balance < -1) {
+      if (this.getBalance(node.right) > 0) {
+        node.right = this.rightRotate(node.right!)
+        rotation = "rightLeft"
+      }
+      node = this.leftRotate(node)
+      if (rotation === "none") rotation = "left"
+    }
+
+    if (rotationType !== "none") {
+      return { node, rotation: rotationType }
+    }
+    return { node, rotation: rotation }
   }
 
   /**
@@ -123,16 +159,14 @@ export class AVLTree {
    * @param data - The data to be deleted
    * @private
    */
-  private deleteHelper(node: AVLNode | null, data: number): {avlNode: AVLNode | null, rotation: AVLTreeRotations} {
-    if (!node) return {avlNode: node, rotation: "none"}
+  private deleteHelper(node: AVLNode | null, data: number): AVLNode | null {
+    if (!node) return node
 
     // Perform standard BST delete
     if (data < node.data) {
-      const { avlNode } = this.deleteHelper(node.left, data)
-      node.left = avlNode
+      node.left = this.deleteHelper(node.left, data)
     } else if (data > node.data) {
-      const { avlNode } = this.deleteHelper(node.right, data)
-      node.right = avlNode
+      node.right = this.deleteHelper(node.right, data)
     } else {
       // Node with only one child or no child
       if (!node.left || !node.right) {
@@ -146,18 +180,13 @@ export class AVLTree {
         // Node with two children: Get the inorder predecessor (largest in the left subtree)
         const temp = this.findMax(node.left)
         node.data = temp.data
-        const { avlNode } = this.deleteHelper(node.left, temp.data)
-        node.left = avlNode
+        node.left = this.deleteHelper(node.left, temp.data)
       }
     }
 
-    if (!node) return {avlNode: node, rotation: "none"}
+    if (!node) return node
 
     // Update height of the current node
-    return this.rebalance(node)
-  }
-
-  rebalance(node: AVLNode): {avlNode: AVLNode, rotation: AVLTreeRotations} {
     node.height = 1 + Math.max(this.getHeight(node.left), this.getHeight(node.right))
 
     // Get the balance factor of this node
@@ -167,25 +196,21 @@ export class AVLTree {
 
     // Left Cases (Left-Left and Left-Right)
     if (balance > 1) {
-      let doubleOperation = false
       if (this.getBalance(node.left) < 0) {
         node.left = this.leftRotate(node.left!)
-        doubleOperation = true
       }
-      return {avlNode: this.rightRotate(node), rotation: doubleOperation ? "left-right" : "right"}
+      return this.rightRotate(node)
     }
 
     // Right Cases (Right-Right and Right-Left)
     if (balance < -1) {
-      let doubleOperation = false
       if (this.getBalance(node.right) > 0) {
         node.right = this.rightRotate(node.right!)
-        doubleOperation = true
       }
-      return {avlNode: this.leftRotate(node), rotation: doubleOperation ? "right-left": "left"}
+      return this.leftRotate(node)
     }
 
-    return { avlNode: node, rotation: "none" }
+    return node
   }
 
   /**
@@ -301,14 +326,9 @@ export class AVLTree {
    * Insert a new node in the AVL Tree
    * @param data - The data to be inserted
    */
-  insert(data: number): void {
-    const { avlNode } = this.insertHelper(this.root, data)
-    this.root = avlNode
-  }
-
-  insertWouldDoRotation(data: number): AVLTreeRotations {
-
-    const { rotation } = this.insertHelper(this.root, data)
+  insert(data: number): AVLTreeRotations {
+    const { node, rotation } = this.insertHelper(this.root, data)
+    this.root = node
     return rotation
   }
 
@@ -317,7 +337,22 @@ export class AVLTree {
    * @param data - The data to be deleted
    */
   delete(data: number): void {
-    const { avlNode } = this.deleteHelper(this.root, data)
-    this.root = avlNode
+    this.root = this.deleteHelper(this.root, data)
+  }
+
+  /**
+   * Returns a deep copy of the AVL Tree
+   */
+  clone(): AVLTree {
+    const newTree: AVLTree = new AVLTree()
+    const lvlOrder = this.levelOrderAlternative()
+
+    for (const value of lvlOrder) {
+      if (value !== null) {
+        newTree.insert(value)
+      }
+    }
+
+    return newTree
   }
 }
