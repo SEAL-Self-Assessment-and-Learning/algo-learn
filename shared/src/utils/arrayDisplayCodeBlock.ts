@@ -23,7 +23,7 @@ export type ArrayDisplayProps<T> = {
 export function createArrayDisplayCodeBlock<T>({
   array,
   startingIndex = 0,
-  secondRowName = { de: "Wert:", en: "Value" },
+  secondRowName = { de: "Wert", en: "Value" },
 }: {
   array: T[]
   startingIndex?: number

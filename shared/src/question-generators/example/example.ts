@@ -1,4 +1,3 @@
-import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
@@ -16,7 +15,7 @@ const translations: Translations = {
   en: {
     name: "Compute a sum",
     description: "Compute the sum of two integers",
-    text: "Let ${{0}}$ and ${{1}}$ be two natural numbers. What is the **sum** ${{0}}+{{1}}$?{{2}}",
+    text: "Let ${{0}}$ and ${{1}}$ be two natural numbers. What is the **sum** ${{0}}+{{1}}$?",
   },
   de: {
     name: "Summe berechnen",
@@ -77,12 +76,6 @@ export const ExampleQuestion: QuestionGenerator = {
     random.shuffle(answers)
     const correctAnswerIndex = answers.indexOf(`$${correctAnswer}$`)
 
-    const justAnArray = ["a", "b", "c", "d", "e", "f", "g"]
-    const arrayDisplay = createArrayDisplayCodeBlock({
-      array: justAnArray,
-      startingIndex: 0,
-    })
-
     // generate the question object
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
@@ -93,7 +86,7 @@ export const ExampleQuestion: QuestionGenerator = {
         parameters,
         seed,
       }),
-      text: t(translations, lang, "text", [`${a}`, `${b}`, arrayDisplay]),
+      text: t(translations, lang, "text", [`${a}`, `${b}`]),
       answers,
       feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
     }

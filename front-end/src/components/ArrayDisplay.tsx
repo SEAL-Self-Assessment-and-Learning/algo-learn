@@ -27,7 +27,7 @@ export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): React
           <thead className="border-b border-gray-700 dark:border-gray-300">
             <tr>
               <th className="relative border-r border-gray-700 px-4 py-2 text-left text-gray-600 dark:border-gray-300 dark:text-gray-400">
-                <b>Index:</b>
+                Index
               </th>
               {parsedArrayObject.array.map((_, index) => (
                 <th key={index} className="text-gray-600 dark:text-gray-400">
@@ -39,7 +39,7 @@ export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): React
           <tbody>
             <tr>
               <th className="relative border-r border-gray-700 px-4 py-2 text-left dark:border-gray-300">
-                <b>{parsedArrayObject.secondRowName[lang]}:</b>
+                <b>{parsedArrayObject.secondRowName[lang]}</b>
               </th>
               {parsedArrayObject.array.map((value, index) => (
                 <td key={index} className="px-4 py-2 text-left">
