@@ -1,7 +1,6 @@
 import { ReactElement } from "react"
 import { ArrayDisplayProps } from "@shared/utils/arrayDisplayCodeBlock"
 import { Markdown } from "@/components/Markdown"
-import { Separator } from "@/components/ui/separator"
 import { useTranslation } from "@/hooks/useTranslation"
 
 /**
@@ -25,11 +24,10 @@ export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): React
     <div className="flex pl-2">
       <div className="my-5">
         <table className="w-full border-collapse">
-          <thead className="border-b">
+          <thead className="border-b border-gray-700 dark:border-gray-300">
             <tr>
-              <th className="relative px-4 py-2 text-left text-gray-600 dark:text-gray-400">
+              <th className="relative border-r border-gray-700 px-4 py-2 text-left text-gray-600 dark:border-gray-300 dark:text-gray-400">
                 <b>Index:</b>
-                <Separator orientation={`vertical`} className={`absolute inset-y-0 right-0`} />
               </th>
               {parsedArrayObject.array.map((_, index) => (
                 <th key={index} className="text-gray-600 dark:text-gray-400">
@@ -40,9 +38,8 @@ export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): React
           </thead>
           <tbody>
             <tr>
-              <th className="relative px-4 py-2 text-left">
+              <th className="relative border-r border-gray-700 px-4 py-2 text-left dark:border-gray-300">
                 <b>{parsedArrayObject.secondRowName[lang]}:</b>
-                <Separator orientation={`vertical`} className={`absolute inset-y-0 right-0`} />
               </th>
               {parsedArrayObject.array.map((value, index) => (
                 <td key={index} className="px-4 py-2 text-left">
