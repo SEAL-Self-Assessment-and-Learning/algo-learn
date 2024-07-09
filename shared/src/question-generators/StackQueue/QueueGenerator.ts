@@ -20,8 +20,8 @@ const translations: Translations = {
     queueEmpty: "Currently the queue is empty.",
     queueContainsValues: `The queue currently contains the following elements:`,
     freeTextInput:
-      `Consider a **Queue "{{0}}"** implemented as a fixed array. ` +
-      `{{1}} **We perform the following operations:** {{2}}
+      `Consider a **Queue "Q"**. ` +
+      `{{0}} **We perform the following operations:** {{1}}
     `,
   },
   de: {
@@ -34,8 +34,8 @@ const translations: Translations = {
     queueEmpty: "Die Queue ist aktuell leer.",
     queueContainsValues: `Die Queue enthält aktuell folgende Elemente:`,
     freeTextInput:
-      `Betrachte eine **Queue "{{0}}"** implementiert als fixer Array. ` +
-      `{{1}} **Wir führen die folgenden Operationen aus:** {{2}}
+      `Betrachte eine **Queue "Q"**. ` +
+      `{{0}} **Wir führen die folgenden Operationen aus:** {{1}}
     `,
   },
 }
@@ -137,13 +137,7 @@ export const queueQuestion: QuestionGenerator = {
       seed,
     })
 
-    const queueName = random.choice("ABCQU".split(""))
-    const queueSize = random.int(4, 8)
-
-    // dynamic does not exist in this queue code
-    // increase or decrease is not possible, when there is no dynamic queue
-    // and startElements not so much variation like in stack
-    const startElementsAmount = random.int(0, queueSize - 1)
+    const startElementsAmount = random.int(0, 8)
 
     const startElements: number[] = []
     let queueInformationElements: string
@@ -215,18 +209,18 @@ export const queueQuestion: QuestionGenerator = {
     let index = 0
     for (const operation of operationsFreeText.operations) {
       if (Object.prototype.hasOwnProperty.call(operation, "enqueue")) {
-        inputText += `| ${queueName}.enqueue(${operation.enqueue}) |(void function)|\n`
+        inputText += `| Q.enqueue(${operation.enqueue}) | - |\n`
       }
       if (Object.prototype.hasOwnProperty.call(operation, "dequeue")) {
-        inputText += `| ${queueName}.dequeue() | {{dequeue-${index}####}} |\n`
+        inputText += `| Q.dequeue() | {{dequeue-${index}####}} |\n`
         solutionIndex++
-        solutionDisplay.push(`|${solutionIndex}|${queueName}.dequeue() | ${operation.dequeue} |\n`)
+        solutionDisplay.push(`|${solutionIndex}|Q.dequeue() | ${operation.dequeue} |\n`)
         correctAnswers[`dequeue-${index}`] = operation.dequeue
       }
       if (Object.prototype.hasOwnProperty.call(operation, "empty")) {
-        inputText += `|${queueName}.isEmpty() | {{empty-${index}###false/true#}} |\n`
+        inputText += `|Q.isEmpty() | {{empty-${index}###false/true#}} |\n`
         solutionIndex++
-        solutionDisplay.push(`|${solutionIndex}|${queueName}.isEmpty() | ${operation.empty} |\n`)
+        solutionDisplay.push(`|${solutionIndex}|Q.isEmpty() | ${operation.empty} |\n`)
         correctAnswers[`empty-${index}`] = operation.empty
       }
       index++
@@ -239,7 +233,7 @@ export const queueQuestion: QuestionGenerator = {
       type: "MultiFreeTextQuestion",
       name: queueQuestion.name(lang),
       path: permalink,
-      text: t(translations, lang, "freeTextInput", [queueName, queueInformationElements, inputText]),
+      text: t(translations, lang, "freeTextInput", [queueInformationElements, inputText]),
       fillOutAll: true,
       checkFormat,
       feedback,

@@ -19,9 +19,7 @@ const translations: Translations = {
     checkFormatBool: "Please only enter *true* or *false*",
     stackEmpty: "Currently the stack is empty.",
     stackContainsValues: `The stack contains the following elements:`,
-    freeTextInput:
-      `Consider a **Stack "{{0}}"** implemented as a dynamic array. ` +
-      `{{1}} **We perform the following operations:** {{2}}`,
+    freeTextInput: `Consider a **Stack "S"**. ` + `{{0}} **We perform the following operations:** {{1}}`,
   },
   de: {
     name: "Stacks",
@@ -33,8 +31,7 @@ const translations: Translations = {
     stackEmpty: "Der Stack ist aktuell leer.",
     stackContainsValues: `Der Stack enthält aktuell folgende Elemente:`,
     freeTextInput:
-      `Betrachte einen **Stack "{{0}}"** implementiert als dynamisches Array. ` +
-      `{{1}} **Wir führen nun folgende Operationen aus:** {{2}}`,
+      `Betrachte einen **Stack "S"**. ` + `{{0}} **Wir führen nun folgende Operationen aus:** {{1}}`,
   },
 }
 
@@ -49,17 +46,21 @@ const wordTranslations: Translations = {
   },
 }
 
-function generateOperationsFreetextStack(elements: number[], random: Random) {
-  const stack: Stack = new Stack(8, true)
+/**
+ * This functions generates the operations performed on the stack during the question
+ * The user will only be asked about .pop und .isEmpty
+ * @param startingElements - starting elements inside the stack
+ * @param random
+ */
+function generateOperationsFreetextStack(startingElements: number[], random: Random) {
+  const stack: Stack<number> = new Stack()
+
   // initialize the stack with the elements
-  for (const value of elements) {
+  for (const value of startingElements) {
     stack.push(value)
   }
-
   let usedIsEmpty: boolean = false
-
   const operations: { [key: string]: string }[] = []
-
   const numOfOperations = random.int(7, 9)
 
   for (let i = 0; i < numOfOperations; i++) {
@@ -71,12 +72,8 @@ function generateOperationsFreetextStack(elements: number[], random: Random) {
       usedIsEmpty = true
       operations.push({ empty: stack.isEmpty().toString() })
     } else {
-      let pushOrPop = random.weightedChoice([
-        [true, 0.35],
-        [false, 0.65],
-      ])
-      // only check if array empty, because we are in state of resizing possible
-      if (stack.getCurrentPosition() === 0) pushOrPop = true
+      let pushOrPop = random.bool(0.35)
+      if (stack.getSize() === 0) pushOrPop = true
       if (pushOrPop) {
         const pushValue = random.int(1, 20)
         operations.push({ push: pushValue.toString() })
@@ -131,11 +128,7 @@ export const stackQuestion: QuestionGenerator = {
       seed,
     })
 
-    const stackName = random.choice("ABCSU".split(""))
-    const stackSize = random.int(4, 8)
-    // pick a number between 0 and stack size
-    const stackElementsAmount = random.int(0, stackSize - 1)
-
+    const stackElementsAmount = random.int(0, 8)
     let stackElementsString: string
     const stackElementsValues = []
     if (stackElementsAmount === 0) {
@@ -150,7 +143,7 @@ export const stackQuestion: QuestionGenerator = {
       for (let i = 0; i < stackElementsAmount; i++) {
         stackElementsString += `\n| ${i} | ${stackElementsValues[i]} |`
       }
-      // add the new line to the table for the extra feature #div_my-5#
+      // add the new line to the table for the extra feature #div_my-5# and td for transpose definitely
       stackElementsString += `\n|#div_my-5?td#| |\n`
     }
 
@@ -201,7 +194,7 @@ export const stackQuestion: QuestionGenerator = {
     const generatedOperations = generateOperationsFreetextStack(stackElementsValues, random)
     const operations = generatedOperations.operations
 
-    // Example inputfield {{test#NL#**Char: **##overlay}}
+    // Example input field {{test#NL#**Char: **##overlay}}
     let inputText = `\n| Operation | ${t(wordTranslations, lang, "result")} |\n| --- | --- |\n`
     const solutionDisplay: string[] = []
     let solutionIndex = 0
@@ -209,20 +202,20 @@ export const stackQuestion: QuestionGenerator = {
     let index = 0
     for (const operation of operations) {
       if (Object.prototype.hasOwnProperty.call(operation, "push")) {
-        inputText += `|${stackName}.push(${operation.push})|(void function)|\n`
+        inputText += `|S.push(${operation.push})|(void function)|\n`
       } else {
         if (Object.prototype.hasOwnProperty.call(operation, "pop")) {
-          inputText += `|${stackName}.pop()|{{input-${index}#TL###overlay}}|\n`
+          inputText += `|S.pop()|{{input-${index}#TL###overlay}}|\n`
           solutionIndex++
           correctAnswers[`input-${index}`] = operation.pop
           correctAnswers[`input-${index}-format`] = "pop"
-          solutionDisplay.push(`|${solutionIndex}|${stackName}.pop() | ${operation.pop} |\n`)
+          solutionDisplay.push(`|${solutionIndex}|S.pop() | ${operation.pop} |\n`)
         } else if (Object.prototype.hasOwnProperty.call(operation, "empty")) {
-          inputText += `|${stackName}.isEmpty()|{{input-${index}#TL##false/true#overlay}}|\n`
+          inputText += `|S.isEmpty()|{{input-${index}#TL##false/true#overlay}}|\n`
           solutionIndex++
           correctAnswers[`input-${index}`] = operation.empty
           correctAnswers[`input-${index}-format`] = "empty"
-          solutionDisplay.push(`|${solutionIndex}|${stackName}.isEmpty() | ${operation.empty} |\n`)
+          solutionDisplay.push(`|${solutionIndex}|S.isEmpty() | ${operation.empty} |\n`)
         }
       }
       index++
@@ -237,7 +230,7 @@ export const stackQuestion: QuestionGenerator = {
       name: stackQuestion.name(lang),
       path: permalink,
       fillOutAll: true,
-      text: t(translations, lang, "freeTextInput", [stackName, stackElementsString, inputText]),
+      text: t(translations, lang, "freeTextInput", [stackElementsString, inputText]),
       checkFormat,
       feedback,
     }
