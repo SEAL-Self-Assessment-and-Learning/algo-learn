@@ -5,7 +5,6 @@ import { InteractWithQuestion, MODE } from "@/components/InteractWithQuestion.ts
 import { Markdown } from "@/components/Markdown.tsx"
 import { Result } from "@/components/QuestionComponent.tsx"
 import { formContext, TextFieldState } from "@/hooks/useFormContext.ts"
-// import { Input } from "@/components/ui/input"
 import useGlobalDOMEvents from "@/hooks/useGlobalDOMEvents.ts"
 import { useSound } from "@/hooks/useSound.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"

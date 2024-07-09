@@ -57,9 +57,9 @@ const wordTranslations: Translations = {
  * @param random
  */
 function generateOperationsQueueFreetext(elements: number[], random: Random) {
-  const queue: Queue = new Queue(100) // the size of 100 will never be reached
+  const queue: Queue<number> = new Queue()
   for (const value of elements) {
-    queue.queueElement(value)
+    queue.enqueue(value)
   }
 
   let isEmptyUsed: boolean = false
@@ -84,17 +84,14 @@ function generateOperationsQueueFreetext(elements: number[], random: Random) {
       if (queue.getCurrentNumberOfElements() === 0) {
         // only possible to enqueue
         enOrDe = "enqueue"
-      } else if (queue.getCurrentNumberOfElements() === queue.getSize()) {
-        // only dequeue is possible
-        enOrDe = "dequeue"
       }
       // if enqueue or dequeue is chosen, add the operation
       if (enOrDe === "enqueue") {
         const enqueueValue = random.int(1, 20)
         operations.push({ enqueue: enqueueValue.toString() })
-        queue.queueElement(enqueueValue)
+        queue.enqueue(enqueueValue)
       } else {
-        const dequeueValue = queue.dequeueElement()
+        const dequeueValue = queue.dequeue()
         operations.push({ dequeue: dequeueValue.toString() })
       }
     }
@@ -107,7 +104,7 @@ function generateOperationsQueueFreetext(elements: number[], random: Random) {
 
   // ensure at least one dequeue operation is done
   if (!queue.isEmpty()) {
-    operations.push({ dequeue: queue.dequeueElement().toString() })
+    operations.push({ dequeue: queue.dequeue().toString() })
   }
 
   return {

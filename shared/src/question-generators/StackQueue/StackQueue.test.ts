@@ -110,65 +110,26 @@ describe("test for Stack class main", () => {
 })
 
 describe("test for Queue class", () => {
-  let queue: Queue
+  let queue: Queue<number>
 
   test("queues elements", () => {
-    queue = new Queue(10)
-    queue.queueElement(1)
+    queue = new Queue()
+    queue.enqueue(1)
     expect(queue.getCurrentNumberOfElements()).toBe(1)
   })
 
   test("dequeues elements", () => {
-    queue = new Queue(10)
-    queue.queueElement(1)
-    queue.queueElement(2)
-    expect(queue.dequeueElement()).toBe(1)
-  })
-
-  test("throws error when trying to dequeue from empty queue", () => {
-    queue = new Queue(10)
-    expect(() => queue.dequeueElement()).toThrow("The queue is empty")
-  })
-
-  test("throws error when trying to queue to a full queue", () => {
-    queue = new Queue(10)
-    for (let i = 0; i < 10; i++) {
-      queue.queueElement(i)
-    }
-    expect(() => queue.queueElement(10)).toThrow("The queue is full")
+    queue = new Queue()
+    queue.enqueue(1)
+    queue.enqueue(2)
+    expect(queue.dequeue()).toBe(1)
   })
 
   test("returns the current queue as a string", () => {
-    queue = new Queue(10)
-    queue.queueElement(1)
-    queue.queueElement(2)
-    queue.queueElement(3)
+    queue = new Queue()
+    queue.enqueue(1)
+    queue.enqueue(2)
+    queue.enqueue(3)
     expect(queue.toString()).toBe("1,2,3")
-  })
-
-  test("returns the complete queue", () => {
-    queue = new Queue(10)
-    for (let i = 0; i < 10; i++) {
-      queue.queueElement(i)
-    }
-    expect(queue.getQueue()).toEqual("0,1,2,3,4,5,6,7,8,9")
-    queue.dequeueElement()
-    queue.dequeueElement()
-    queue.dequeueElement()
-    queue.dequeueElement()
-    queue.dequeueElement()
-    queue.queueElement(20)
-    queue.queueElement(21)
-    expect(queue.getQueue()).toEqual("20,21,-1,-1,-1,5,6,7,8,9")
-  })
-
-  test("handles wrap-around correctly", () => {
-    queue = new Queue(3)
-    queue.queueElement(1)
-    queue.queueElement(2)
-    queue.queueElement(3)
-    queue.dequeueElement()
-    queue.queueElement(4)
-    expect(queue.getQueue()).toEqual("4,2,3")
   })
 })
