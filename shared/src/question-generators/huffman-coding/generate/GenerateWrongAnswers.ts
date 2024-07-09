@@ -1,3 +1,5 @@
+// TODO refactor this file
+
 import {
   getHuffmanCodeOfTable,
   getHuffmanCodeOfWord,
