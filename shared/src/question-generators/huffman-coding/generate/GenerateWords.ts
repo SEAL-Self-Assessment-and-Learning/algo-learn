@@ -74,7 +74,6 @@ function generateWordBasedOnFrequency(chosenFrequency: number[], random: Random)
  */
 export function generateCharacterFrequencyTable(numDifferentCharacters: number, random: Random) {
   const chosenChars = random.subset(possibleChars.split(""), numDifferentCharacters)
-  // create an array with values 1 to 100
   const amountCharsArray = random.shuffle([...Array(99).keys()]).slice(0, numDifferentCharacters)
   const charArray: { [key: string]: number } = {}
   for (let i = 0; i < numDifferentCharacters; i++) {

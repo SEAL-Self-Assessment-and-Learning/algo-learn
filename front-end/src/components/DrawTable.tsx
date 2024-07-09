@@ -18,8 +18,6 @@ import { Markdown } from "@/components/Markdown.tsx"
 /**
  * A component that returns a table
  * @param table The table to be drawn (passed as md format)
- * @param setText
- * @param state
  */
 export function DrawTable({
   table,
@@ -62,26 +60,26 @@ export function DrawTable({
       contentSecond.push(line.slice(half))
     }
 
-    // draw the first table
-    const tableFirst = {
-      header: headerFirst,
-      content: contentFirst,
-      alignment: parsedAlignment,
-      extraFeature,
-    }
-    const firstTable = DrawTable({ table: tableFirst })
-    // draw the second table
-    const tableSecond = {
-      header: headerSecond,
-      content: contentSecond,
-      alignment: parsedAlignment,
-      extraFeature,
-    }
-    const secondTable = DrawTable({ table: tableSecond })
     return (
       <div>
-        <div className={`mb-2`}>{firstTable}</div>
-        {secondTable}
+        <div className={`mb-2`}>
+          {DrawTable({
+            table: {
+              header: headerFirst,
+              content: contentFirst,
+              alignment: parsedAlignment,
+              extraFeature,
+            },
+          })}
+        </div>
+        {DrawTable({
+          table: {
+            header: headerSecond,
+            content: contentSecond,
+            alignment: parsedAlignment,
+            extraFeature,
+          },
+        })}
       </div>
     )
   }
