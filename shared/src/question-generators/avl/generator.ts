@@ -1,4 +1,8 @@
-import { FreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator"
+import {
+  FreeTextFeedbackFunction,
+  FreeTextQuestion,
+  QuestionGenerator,
+} from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { avlTreeWeightedRotations, generateAVLTreeInsert } from "@shared/question-generators/avl/utils"
 import Random from "@shared/utils/random"
@@ -37,6 +41,20 @@ export const AVLGenerator: QuestionGenerator = {
   ],
 
   generate: (lang, parameters, seed) => {
+    const feedback: FreeTextFeedbackFunction = ({ text }) => {
+      if (text === "0") {
+        return {
+          correct: true,
+          message: "t(feedback.correct)",
+        }
+      }
+
+      return {
+        correct: false,
+        message: "t(feedback.correct)",
+      }
+    }
+
     const permalink = serializeGeneratorCall({
       generator: AVLGenerator,
       lang,
@@ -49,11 +67,16 @@ export const AVLGenerator: QuestionGenerator = {
     const variant = parameters.variant as "insert" | "delete" | "combine"
     console.log(variant)
 
-    return avlInsertQuestion(lang, random, permalink)
+    return avlInsertQuestion(random, feedback, lang, permalink)
   },
 }
 
-function avlInsertQuestion(lang: "de" | "en", random: Random, permalink: string) {
+function avlInsertQuestion(
+  random: Random,
+  feedback: FreeTextFeedbackFunction,
+  lang: "de" | "en",
+  permalink: string,
+) {
   const avlTreeSize = random.int(6, 11)
   const rotationOption = random.weightedChoice(avlTreeWeightedRotations)
 
@@ -79,6 +102,7 @@ function avlInsertQuestion(lang: "de" | "en", random: Random, permalink: string)
     name: AVLGenerator.name(lang),
     text: t(translations, lang, "insert", [avlTreeString, askValue]),
     path: permalink,
+    feedback,
   }
   return {
     question,
