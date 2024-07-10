@@ -3,11 +3,11 @@ import {
   MultiFreeTextFormatFunction,
   MultiFreeTextQuestion,
   QuestionGenerator,
-} from "@shared/api/QuestionGenerator.ts"
-import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { Stack } from "@shared/question-generators/StackQueue/Stack.ts"
-import Random from "@shared/utils/random.ts"
-import { t, tFunction, tFunctional, Translations } from "@shared/utils/translations.ts"
+} from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { Stack } from "@shared/question-generators/StackQueue/Stack"
+import Random from "@shared/utils/random"
+import { t, tFunction, tFunctional, Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {
@@ -18,8 +18,8 @@ const translations: Translations = {
     checkFormat: "Please only enter a number",
     checkFormatBool: "Please only enter *true* or *false*",
     stackEmpty: "Currently the stack is empty.",
-    stackContainsValues: `The stack contains the following elements:`,
-    freeTextInput: `Consider a **Stack "S"**. ` + `{{0}} **We perform the following operations:** {{1}}`,
+    stackContainsValues: `The stack contains the following elements (*with the top at the highest index*):`,
+    freeTextInput: `Consider a **Stack "S"**. {{0}} **We perform the following operations:** {{1}}`,
   },
   de: {
     name: "Stacks",
@@ -29,9 +29,8 @@ const translations: Translations = {
     checkFormat: "Bitte gib nur Zahlen ein.",
     checkFormatBool: "Bitte gib nur *true* oder *false* ein.",
     stackEmpty: "Der Stack ist aktuell leer.",
-    stackContainsValues: `Der Stack enthält aktuell folgende Elemente:`,
-    freeTextInput:
-      `Betrachte einen **Stack "S"**. ` + `{{0}} **Wir führen nun folgende Operationen aus:** {{1}}`,
+    stackContainsValues: `Der Stack enthält folgende Elemente (*mit dem Top-Element am höchsten Index*):`,
+    freeTextInput: `Betrachte einen **Stack "S"**. {{0}} **Wir führen nun folgende Operationen aus:** {{1}}`,
   },
 }
 
@@ -202,7 +201,7 @@ export const stackQuestion: QuestionGenerator = {
     let index = 0
     for (const operation of operations) {
       if (Object.prototype.hasOwnProperty.call(operation, "push")) {
-        inputText += `|S.push(${operation.push})|(void function)|\n`
+        inputText += `|S.push(${operation.push})|-|\n`
       } else {
         if (Object.prototype.hasOwnProperty.call(operation, "pop")) {
           inputText += `|S.pop()|{{input-${index}#TL###overlay}}|\n`

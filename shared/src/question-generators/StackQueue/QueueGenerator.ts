@@ -3,11 +3,11 @@ import {
   MultiFreeTextFormatFunction,
   MultiFreeTextQuestion,
   QuestionGenerator,
-} from "@shared/api/QuestionGenerator.ts"
-import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { Queue } from "@shared/question-generators/StackQueue/Queue.ts"
-import Random from "@shared/utils/random.ts"
-import { t, tFunction, tFunctional, Translations } from "@shared/utils/translations.ts"
+} from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { Queue } from "@shared/question-generators/StackQueue/Queue"
+import Random from "@shared/utils/random"
+import { t, tFunction, tFunctional, Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {
@@ -18,11 +18,8 @@ const translations: Translations = {
     checkFormat: "Please only enter a number.",
     checkFormatBool: "Please only enter *false* or *true*",
     queueEmpty: "Currently the queue is empty.",
-    queueContainsValues: `The queue currently contains the following elements:`,
-    freeTextInput:
-      `Consider a **Queue "Q"**. ` +
-      `{{0}} **We perform the following operations:** {{1}}
-    `,
+    queueContainsValues: `The queue currently contains the following elements (*with the front at the lowest index*):`,
+    freeTextInput: `Consider a **Queue "Q"**. ` + `{{0}} **We perform the following operations:** {{1}}`,
   },
   de: {
     name: "Queues",
@@ -32,11 +29,9 @@ const translations: Translations = {
     checkFormat: "Bitte gib nur Zahlen ein.",
     checkFormatBool: "Bitte gib nur *false* oder *true* ein.",
     queueEmpty: "Die Queue ist aktuell leer.",
-    queueContainsValues: `Die Queue enthält aktuell folgende Elemente:`,
+    queueContainsValues: `Die Queue enthält aktuell folgende Elemente (*mit dem Front-Element am niedrigsten Index*):`,
     freeTextInput:
-      `Betrachte eine **Queue "Q"**. ` +
-      `{{0}} **Wir führen die folgenden Operationen aus:** {{1}}
-    `,
+      `Betrachte eine **Queue "Q"**. ` + `{{0}} **Wir führen die folgenden Operationen aus:** {{1}}`,
   },
 }
 
