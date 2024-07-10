@@ -4,9 +4,10 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { avlTreeWeightedRotations, generateAVLTreeInsert } from "@shared/question-generators/avl/utils"
+import { avlTreeWeightedRotations } from "@shared/question-generators/avl/utils/utils.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
+import {generateAVLTreeInsert} from "@shared/question-generators/avl/utils/utilsInsert.ts";
 
 const translations: Translations = {
   en: {
