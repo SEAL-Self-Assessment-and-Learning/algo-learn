@@ -52,7 +52,7 @@ Run all tests (format checker, unit tests, linter, type checker):
 bun run test
 ```
 
-To only run hte unit tests one can use
+To only run the unit tests one can use
 ```bash
 bun test
 ```

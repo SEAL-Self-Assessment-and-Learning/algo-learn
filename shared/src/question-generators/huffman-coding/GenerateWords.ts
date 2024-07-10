@@ -1,6 +1,5 @@
 import Random from "@shared/utils/random.ts"
 
-/* eslint-disable @typescript-eslint/naming-convention */
 const tmpFrequencies: { [key: number]: number[][] } = {
   8: [
     [1, 2, 5],
@@ -72,15 +71,16 @@ function generateWordBasedOnFrequency(chosenFrequency: number[], random: Random)
 /**
  * This function creates an array of chars, this is for more challenging questions (but easier to read, instead of a
  * word with 26 letters or so)
+ * @param numDifferentCharacters
  * @param random
  */
-export function generateWordArray(differentLetters: number, random: Random) {
+export function generateCharacterFrequencyTable(numDifferentCharacters: number, random: Random) {
   const possibleChars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  const chosenChars = random.subset(possibleChars.split(""), differentLetters)
+  const chosenChars = random.subset(possibleChars.split(""), numDifferentCharacters)
   // create an array with values 1 to 100
-  const amountCharsArray = random.shuffle([...Array(99).keys()]).slice(0, differentLetters)
+  const amountCharsArray = random.shuffle([...Array(99).keys()]).slice(0, numDifferentCharacters)
   const charArray: { [key: string]: number } = {}
-  for (let i = 0; i < differentLetters; i++) {
+  for (let i = 0; i < numDifferentCharacters; i++) {
     charArray[chosenChars[i]] = amountCharsArray[i] + 1
   }
 
