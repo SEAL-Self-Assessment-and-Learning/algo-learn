@@ -43,7 +43,7 @@ export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): React
               </th>
               {parsedArrayObject.array.map((value, index) => (
                 <td key={index} className="px-4 py-2 text-left">
-                  <Markdown md={value as string} />
+                  <Markdown md={String(value)} />
                 </td>
               ))}
             </tr>
