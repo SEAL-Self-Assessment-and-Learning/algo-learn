@@ -31,39 +31,4 @@ export class QuickFind {
     // only provide a copy
     return this.id.slice()
   }
-
-  /**
-   * Converts the current union array field into a string-table
-   *
-   * example:
-   *  | Index | 0 | 1 | 2 | ...
-   *  |  ---  |---|---|---| ...
-   *  | Value | 2 | 5 | 1 | ...
-   */
-  toStringTable(div?: boolean) {
-    let stringTable = "|Index:"
-
-    // create the header index line
-    for (let i = 0; i < this.id.length; i++) {
-      stringTable += "|" + i.toString()
-    }
-    stringTable += "|\n"
-
-    // create the separator line
-    stringTable += "|---".repeat(this.id.length + 1) + "|\n"
-
-    // create the values
-    // Translation of Value should be done inside the generator
-    stringTable += "|Value:"
-    for (const id of this.id) {
-      stringTable += "|" + id.toString()
-    }
-    stringTable += "|\n"
-
-    // add a div around the table
-    if (div) {
-      stringTable += "|#div_my-5#||\n"
-    }
-    return stringTable
-  }
 }

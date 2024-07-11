@@ -61,9 +61,6 @@ describe("QuickFindGenerator - Reproducible", () => {
 
   test("different languages, same question", () => {
     expect(q1.type).toEqual(q2.type)
-
-    expect(t1.union.toStringTable()).toEqual(t2.union.toStringTable())
-    expect(t1.gapField).toEqual(t2.gapField.replace("Wert", "Value"))
     expect(t1.gapOperationValues).toEqual(t2.gapOperationValues)
   })
 })

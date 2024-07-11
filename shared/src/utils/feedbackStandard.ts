@@ -2,7 +2,8 @@
  * This file includes standard feedback functions which could be used in the question generators.
  */
 import { FreeTextFeedbackFunction } from "@shared/api/QuestionGenerator.ts"
-import { parseArrayTable, parseStringToArray } from "@shared/utils/checkFormatStandard.ts"
+import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
+import { parseStringToArray } from "@shared/utils/checkFormatStandard.ts"
 
 export function feedbackArray({
   solution,
@@ -22,7 +23,11 @@ export function feedbackArray({
     if (inputArray.length !== solution.length) {
       return {
         correct: false,
-        correctAnswer: solutionTable ? parseArrayTable(solution) : "",
+        correctAnswer: solutionTable
+          ? createArrayDisplayCodeBlock({
+              array: solution,
+            })
+          : "",
       }
     }
 
@@ -31,7 +36,11 @@ export function feedbackArray({
       if (inputArray[i].trim() !== solution[i].trim()) {
         return {
           correct: false,
-          correctAnswer: solutionTable ? parseArrayTable(solution) : "",
+          correctAnswer: solutionTable
+            ? createArrayDisplayCodeBlock({
+                array: solution,
+              })
+            : "",
         }
       }
     }

@@ -1,4 +1,5 @@
 import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm"
+import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import Random from "@shared/utils/random"
 
 /**
@@ -50,7 +51,9 @@ function findAndPerformUnionOperation(
   blockValues: number[],
   unionSize: number,
 ) {
-  const gapField = union.toStringTable(true)
+  const gapField = createArrayDisplayCodeBlock({
+    array: union.getArray(),
+  })
 
   const gapOperationValues: number[] = []
   gapOperationValues[0] = random.choice(blockValues)
@@ -188,7 +191,9 @@ export function unionTwoBlocksCombineBoth({
   const { block1Values, block2Values, union: union_ } = generateTwoBlocks({ random, union, unionSize })
   union = union_
 
-  const gapField = union.toStringTable(true)
+  const gapField = createArrayDisplayCodeBlock({
+    array: union.getArray(),
+  })
 
   const gapOperationValues: number[] = []
   gapOperationValues[0] = random.choice(block1Values)
@@ -256,7 +261,9 @@ export function unionTwoBlocksCombineNone({
   } while (block1Values.length + block2Values.length >= unionSize - 1)
   // The loop ensures there's at least one element outside the two blocks
 
-  const gapField = union.toStringTable(true)
+  const gapField = createArrayDisplayCodeBlock({
+    array: union.getArray(),
+  })
 
   // Select two values not in block1Values or block2Values
   const gapOperationValues = random.subset(
@@ -291,7 +298,9 @@ export function unionTwoBlocksCombineSame({
   const { block1Values, union: union_ } = generateTwoBlocks({ random, union, unionSize })
   union = union_
 
-  const gapField = union.toStringTable(true)
+  const gapField = createArrayDisplayCodeBlock({
+    array: union.getArray(),
+  })
 
   const gapOperationValues: number[] = random.subset(block1Values, 2)
 
@@ -356,7 +365,9 @@ export function unionOneBlockCombineNone({
   })
   union = union_
 
-  const gapField = union.toStringTable(true)
+  const gapField = createArrayDisplayCodeBlock({
+    array: union.getArray(),
+  })
 
   const gapOperationValues: number[] = random.subset(
     [...Array(unionSize).keys()].filter((value) => !block1Values.includes(value)),

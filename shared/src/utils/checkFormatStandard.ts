@@ -2,6 +2,7 @@
  * This file includes standard checkFormat functions which could be used in the question generators.
  */
 import { FreeTextFormatFunction } from "@shared/api/QuestionGenerator"
+import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import { t, Translations } from "@shared/utils/translations"
 
 export type ArraySeparator = "," | " " | ", "
@@ -71,25 +72,6 @@ export function parseStringToArray(text: string, sep: ArraySeparator) {
   return textSplit
 }
 
-/**
- * This function parses a text into a table
- *
- * Exmaple:
- *  1,2,3,4
- *  will be parsed into
- *  |1|2|3|4|
- *  |---|---|---|---|
- *
- * @param array - array with any values
- */
-export function parseArrayTable(array: any[]) {
-  const table = array.map((value) => `|${value}`).join(" ") + " |"
-
-  const separator = "|" + array.map(() => "---").join("|") + "|"
-
-  return `\n${table}\n${separator}\n`
-}
-
 export function checkFormatArray({
   lang,
   values = "any",
@@ -118,10 +100,20 @@ export function checkFormatArray({
 
     return values === "any"
       ? isAnyArray(text, ", ")
-        ? { valid: true, message: parseArrayTable(parseStringToArray(text, ", ")) }
+        ? {
+            valid: true,
+            message: createArrayDisplayCodeBlock({
+              array: parseStringToArray(text, ", "),
+            }),
+          }
         : { valid: false, message: t(checkFormatTranslations, lang, "formatAnyArray") }
       : isIntArray(text, ", ")
-        ? { valid: true, message: parseArrayTable(parseStringToArray(text, ", ")) }
+        ? {
+            valid: true,
+            message: createArrayDisplayCodeBlock({
+              array: parseStringToArray(text, ", "),
+            }),
+          }
         : { valid: false, message: t(checkFormatTranslations, lang, "formatIntArray") }
   }
 
