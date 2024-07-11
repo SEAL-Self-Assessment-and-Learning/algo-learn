@@ -95,6 +95,13 @@ export function generateQueueStartElements({
   }
 }
 
+/**
+ * This function creates the input fields for the queue question (within a table)
+ * @param operations - the operations that were performed on the queue
+ *                     (dequeue, empty are the only ones that are asked)
+ * @param translations
+ * @param lang
+ */
 export function createQueueInputFields({
   operations,
   translations,

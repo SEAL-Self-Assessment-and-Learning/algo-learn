@@ -52,6 +52,12 @@ export function generateOperationsFreetextStack(startingElements: number[], rand
   }
 }
 
+/**
+ * This function generates the starting elements of the stack
+ * @param random .
+ * @param translations .
+ * @param lang .
+ */
 export function generateStackStartElements({
   random,
   translations,
@@ -80,6 +86,12 @@ export function generateStackStartElements({
   return { stackElementsString, stackElementsValues }
 }
 
+/**
+ * This function creates the input fields for the stack question (within a table)
+ * @param operations - the operations that were performed on the stack (pop, empty are the only ones that are asked)
+ * @param translations .
+ * @param lang .
+ */
 export function createStackInputFields({
   operations,
   translations,
