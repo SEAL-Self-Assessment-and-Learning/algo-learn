@@ -1,8 +1,8 @@
 import {
-  createHuffmanCoding,
-  huffmanCodingAlgorithm,
-  TreeNode,
-} from "@shared/question-generators/huffman-coding/Algorithm.ts"
+  getHuffmanCodeOfTable,
+  getHuffmanCodeOfWord,
+  HuffmanNode,
+} from "@shared/question-generators/huffman-coding/Huffman.ts"
 import Random from "@shared/utils/random.ts"
 
 /**
@@ -26,7 +26,7 @@ export function generateRandomWrongAnswer(random: Random, correctAnswer: string)
       wrongAnswer[flipPositions[i]] = "0"
     }
   }
-  console.log(correctAnswer, wrongAnswer.join(""))
+
   return wrongAnswer.join("")
 }
 
@@ -41,11 +41,11 @@ export function generateRandomWrongAnswer(random: Random, correctAnswer: string)
  */
 export function generateWrongAnswerSwitchLetters(
   random: Random,
-  currentTree: TreeNode,
+  currentTree: HuffmanNode,
   word: string,
   table: boolean,
 ) {
-  const huffmanDict: { [key: string]: string } = createHuffmanCoding({}, currentTree, "")
+  const huffmanDict: { [key: string]: string } = currentTree.getEncodingTable()
   const keySet: string[] = Object.keys(huffmanDict)
   const randomKeys = random.subset(keySet, 2)
   ;[huffmanDict[randomKeys[0]], huffmanDict[randomKeys[1]]] = [
@@ -76,8 +76,8 @@ export function generateWrongAnswerSwitchLetters(
  * @param word
  */
 export function generateWrongAnswerShuffleWord(random: Random, word: string) {
-  const wrongAnswer = random.shuffle(word.split("")).join("")
-  return huffmanCodingAlgorithm(wrongAnswer).result
+  const permutatedWord = random.shuffle(word.split("")).join("")
+  return getHuffmanCodeOfWord(permutatedWord).encodedWord
 }
 
 /**
@@ -86,10 +86,9 @@ export function generateWrongAnswerShuffleWord(random: Random, word: string) {
  * @param word
  * @param currentTree
  */
-export function generateWrongAnswerReduceCodeOfLetter(word: string, currentTree: TreeNode) {
-  const huffmanDictKey = createHuffmanDict(currentTree)
-  const huffmanDict = huffmanDictKey.huffmanDict
-  const currentLongestKey = huffmanDictKey.currentLongestKey
+export function generateWrongAnswerReduceCodeOfLetter(word: string, currentTree: HuffmanNode) {
+  const huffmanDict = currentTree.getEncodingTable()
+  const currentLongestKey = getKeyWithLongestHuffmanCode(huffmanDict)
   huffmanDict[currentLongestKey] = huffmanDict[currentLongestKey].slice(
     0,
     huffmanDict[currentLongestKey].length - 1,
@@ -103,12 +102,11 @@ export function generateWrongAnswerReduceCodeOfLetter(word: string, currentTree:
 
 export function generateWrongAnswerFlip01InCodeChar(
   random: Random,
-  currentTree: TreeNode,
+  currentTree: HuffmanNode,
   word: string,
 ) {
-  const huffmanDictKey = createHuffmanDict(currentTree)
-  const huffmanDict = huffmanDictKey.huffmanDict
-  const currentLongestKey = huffmanDictKey.currentLongestKey
+  const huffmanDict = currentTree.getEncodingTable()
+  const currentLongestKey = getKeyWithLongestHuffmanCode(huffmanDict)
   // flip a 0 or 1 in the longest key
   const randomIndex = random.int(0, huffmanDict[currentLongestKey].length - 1)
   const newChar = huffmanDict[currentLongestKey][randomIndex] === "0" ? "1" : "0"
@@ -126,7 +124,7 @@ export function generateWrongAnswerFlip01InCodeChar(
 }
 
 /*
-Maybe add more challenging wrong answers, but I don't have any idea at the moment
+todo Maybe add more challenging wrong answers, but I don't have any idea at the moment
 - Maybe another wrong answer where the code is too short at the end
 */
 
@@ -166,7 +164,7 @@ export function swapManyLetters(inputDict: { [key: string]: number }) {
   }
 
   // create a correct huffman dictionary
-  return createHuffmanDict(huffmanCodingAlgorithm("", newDict).mainNode).huffmanDict
+  return getHuffmanCodeOfTable(newDict).getEncodingTable()
 }
 
 /**
@@ -185,18 +183,13 @@ export function changeFrequenciesRandomly(random: Random, inputDict: { [key: str
   }
 
   // create a correct huffman dictionary
-  return createHuffmanDict(huffmanCodingAlgorithm("", inputDict).mainNode).huffmanDict
+  return getHuffmanCodeOfTable(inputDict).getEncodingTable()
 }
 
 export function wrongAdditionTree(random: Random, inputDict: { [key: string]: number }) {
-  // create a correct huffman dictionary
-  return createHuffmanDict(huffmanCodingAlgorithm("", inputDict, random.int(-10, 20)).mainNode)
-    .huffmanDict
+  // create an incorrect huffman dictionary
+  return getHuffmanCodeOfTable(inputDict, random).getEncodingTable()
 }
-
-/*
-Helper
- */
 
 /**
  * This function generates a new random word by changing a random letter to another random letter
@@ -213,29 +206,25 @@ export function generateWrongAnswerChangeWord(random: Random, word: string) {
     randomIndex2 = random.int(0, word.length - 1)
   }
   wordArray[randomIndex] = word[randomIndex2]
-  return huffmanCodingAlgorithm(wordArray.join("")).result
+  return getHuffmanCodeOfWord(wordArray.join("")).encodedWord
 }
 
-function createHuffmanDict(currentTree: TreeNode) {
-  let huffmanDict: { [key: string]: string } = {}
-  huffmanDict = createHuffmanCoding(huffmanDict, currentTree, "")
-  // get the key with the longest value
-  let currentLongestKey: string = ""
-  for (const currentKey in huffmanDict) {
-    if (currentLongestKey === "") {
-      currentLongestKey = currentKey
-      continue
-    }
-    if (huffmanDict[currentKey].length > huffmanDict[currentLongestKey].length) {
+function getKeyWithLongestHuffmanCode(encodingTable: Record<string, string>) {
+  let currentLongestKey: string = Object.keys(encodingTable)[0]
+  for (const currentKey in encodingTable) {
+    if (encodingTable[currentKey].length > encodingTable[currentLongestKey].length) {
       currentLongestKey = currentKey
     }
   }
-  return { huffmanDict, currentLongestKey: currentLongestKey }
+
+  return currentLongestKey
 }
 
+// todo not used at the moment. is the only function that modifies the tree.
+//  if this function is obsolete, some properties of HuffmanNode can be made private
 export function createHuffmanCodingBitError(
   huffmanCode: { [key: string]: string },
-  node: TreeNode,
+  node: HuffmanNode,
   code: string,
   random: Random,
 ) {
