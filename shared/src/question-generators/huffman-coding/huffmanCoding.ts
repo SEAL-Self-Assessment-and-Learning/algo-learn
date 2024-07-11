@@ -342,6 +342,7 @@ export const huffmanCoding: QuestionGenerator = {
           type: "MultipleChoiceQuestion",
           name: huffmanCoding.name(lang),
           path: permalink,
+          allowMultiple: true,
           text: t(translations, lang, "textChoice", [word]),
           answers: answers,
           feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex: correctAnswerIndexes }),
