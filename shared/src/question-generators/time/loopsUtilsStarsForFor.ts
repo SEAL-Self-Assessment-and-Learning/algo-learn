@@ -283,8 +283,6 @@ export function createForForLoop(
 
   if (printStarsAfter) numStars += numPrintAfter
 
-  // console.log(numStars)
-
   return { code: pseudoCode, numStars }
 }
 

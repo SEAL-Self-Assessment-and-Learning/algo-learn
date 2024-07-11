@@ -531,25 +531,6 @@ function createWhileLoop(
   let i = startVar1
   let j = startVar2
 
-  /*
-  console.log(
-    "startvar1",
-    startVar1,
-    "startVar2",
-    startVar2,
-    "endValue",
-    endValue,
-    "endManipulation",
-    endManipulation,
-    "vars",
-    vars,
-    "compare",
-    compare,
-    "compareVar",
-    compareVar,
-  )
-   */
-
   while (condition(i, j)) {
     // calculate the stars
     numStars += calculateNumStars(
@@ -559,8 +540,6 @@ function createWhileLoop(
       numPrintElse,
       elseAfter,
     )
-
-    // console.log(numStars)
 
     const changedCode = createWhileChangeValues({
       cOption,
@@ -582,8 +561,6 @@ function createWhileLoop(
     pseudoCodeBlock.block.push(printStarsNew(numPrintAfter))
     numStars += numPrintAfter
   }
-
-  console.log(numStars)
 
   return { code: pseudoCode, numStars }
 }
