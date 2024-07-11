@@ -1,5 +1,8 @@
 /**
  * Parent class for Min and Max Heap
+ *
+ * @Restriction Only usable with numbers
+ *
  */
 export abstract class Heap {
   heap: number[] = []
@@ -71,24 +74,15 @@ export abstract class Heap {
     return this.heap.toString()
   }
 
-  toTableString() {
-    let heapTable = "\n|Index:"
-    for (let i = 0; i < this.heap.length; i++) {
-      heapTable += `|${i} `
-    }
-    heapTable += "|\n"
-    heapTable += "|---".repeat(this.heap.length + 1) + "|\n|Value:"
-    heapTable += "|" + this.heap.join("|") + "|\n"
-    return heapTable
-  }
-
   abstract bubbleUp(index: number): void
   abstract bubbleDown(index: number): void
 }
 
 /**
  * Class for a MinHeap
- * Heaps in different files, to avoid confusion
+ *
+ * @Restriction Only usable with numbers
+ *
  */
 export class MinHeap extends Heap {
   heap: number[] = []
@@ -131,7 +125,9 @@ export class MinHeap extends Heap {
 
 /**
  * Class for a MaxHeap
- * Heaps in different files, to avoid confusion
+ *
+ * @Restriction Only usable with numbers
+ *
  */
 export class MaxHeap extends Heap {
   heap: number[] = []

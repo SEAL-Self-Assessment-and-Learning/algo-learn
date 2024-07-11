@@ -1,4 +1,5 @@
 import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax.ts"
+import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import Random from "@shared/utils/random.ts"
 
 /**
@@ -84,12 +85,12 @@ export function generateNeighbourOptions(random: Random) {
 }
 
 /**
- * Generates random correct and wrong heaps for the heap understanding question
+ * Generates random correct and wrong heaps for the heap verifying question
  * Also the solution index will be generated
  * @param heapType
  * @param random
  */
-export function generateHeapsForQuestion(
+export function generateHeapsForChoiceQuestion(
   heapType: "Max" | "Min",
   random: Random,
 ): { heapStringTable: string[]; correctAnswerIndex: number[] } {
@@ -101,10 +102,20 @@ export function generateHeapsForQuestion(
   )
 
   const correctRandomHeaps = generateRandomHeaps(heapType, amountOfCorrectHeaps, random)
-  const correctRandomHeapsString = correctRandomHeaps.map((heap) => heap.toTableString())
+  const correctRandomHeapsString = correctRandomHeaps.map((heap) =>
+    createArrayDisplayCodeBlock({
+      array: heap.getHeap(),
+      startingIndex: 1,
+    }),
+  )
 
   const wrongRandomHeapsString = random.subset(
-    wrongRandomHeaps.map((heap) => convertNumberArrayToTable(heap)),
+    wrongRandomHeaps.map((heap) =>
+      createArrayDisplayCodeBlock({
+        array: heap,
+        startingIndex: 1,
+      }),
+    ),
     4 - correctRandomHeaps.length,
   )
 
@@ -249,28 +260,4 @@ export function checkCorrectHeap(heap: number[], type: "Max" | "Min"): boolean {
     }
   }
   return true
-}
-
-/**
- * Converts number[] to a table string
- *
- * Sample:
- *  [1,2,3,4]
- *  converts into
- *  | 1 | 2 | 3 | 4 |
- *  |---|---|---|---|
- *
- *
- * @param array
- */
-export function convertNumberArrayToTable(array: number[]): string {
-  let arrayTable = "\n|Index:|"
-  for (let i = 0; i < array.length; i++) {
-    arrayTable += (i + 1).toString() + "|"
-  }
-  arrayTable += "\n" + "|---".repeat(array.length + 1) + "|\n|Value:|"
-  array.forEach((element) => {
-    arrayTable += (Number.isNaN(element) ? " " : element) + "|"
-  })
-  return arrayTable
 }

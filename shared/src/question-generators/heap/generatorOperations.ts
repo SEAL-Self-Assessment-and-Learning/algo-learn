@@ -2,22 +2,16 @@ import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
-  minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax.ts"
-import {
-  convertNumberArrayToTable,
-  generateHeapsForQuestion,
-  generateNeighbourOptions,
-  generateOperationSequence,
-} from "@shared/question-generators/heap/utils.ts"
+import { generateOperationSequence } from "@shared/question-generators/heap/utils/utilsGenerate.ts"
+import { generateHeapOperationsFoundation } from "@shared/question-generators/heap/utils/utilsOperations.ts"
+import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
 
-// TODO improve both descriptions translations of the generators
 const translationHeapOperations: Translations = {
   en: {
     name: "Heap-Operations",
@@ -47,43 +41,14 @@ const translationHeapOperations: Translations = {
   },
 }
 
-const translationsHeapUnderstanding: Translations = {
-  en: {
-    name: "Heap-Understanding",
-    description: "Verify basic heap properties",
-    taskCorrectness:
-      "Which of the following arrays satisfy all **Heap-Properties** for a **{{0}}-Heap**?",
-    taskNeighbours:
-      "Consider a random Heap with $n$ elements. The value at index $0$ is *null*. What is the index of the **{{0}}** of the element at **index {{1}}** in a *Heap*?",
-    checkFormatPermutations: "Please only enter an Integer.",
-  },
-  de: {
-    name: "Heap-Verständnis",
-    description: "Überprüfe grundlegende Heap-Eigenschaften",
-    taskCorrectness:
-      "Welche der folgenden Arrays erfüllen alle **Heap-Eigenschaften** für einen **{{0}}-Heap**?",
-    taskNeighbours:
-      "Betrachte einen beliebigen Heap mit $n$ Element. Der Wert an index $0$ ist *null*. Was ist der Index des **{{0}}** des Elements an **Index {{1}}* in einem *Heap*?",
-    checkFormatPermutations: "Bitte etwas ganzzahliges eingeben.",
-  },
-}
-
 const wordTranslations: Translations = {
   en: {
     maximal: "maximal",
     minimal: "minimal",
-    grandParent: "grandparent",
-    parent: "parent",
-    rightChild: "right child",
-    leftChild: "left child",
   },
   de: {
     maximal: "maximale",
     minimal: "minimale",
-    grandParent: "Großelternknoten",
-    parent: "Elternknoten",
-    rightChild: "rechten Kindes",
-    leftChild: "linken Kindes",
   },
 }
 
@@ -113,20 +78,15 @@ export const HeapOperations: QuestionGenerator = {
 
     const variant = parameters.variant as "insert" | "extract" | "build" | "combine"
 
-    const heapType: "Max" | "Min" = random.choice(["Max", "Min"])
-    const heapSize: number = random.int(5, 9)
-    const heapElements: number[] = []
-    for (let i = 0; i < heapSize; i++) {
-      heapElements.push(random.int(1, 20))
-    }
-
     let solutionHeap: MaxHeap | MinHeap
-    if (heapType === "Min") {
-      solutionHeap = new MinHeap()
-    } else {
-      solutionHeap = new MaxHeap()
-    }
+    const {
+      heapElements,
+      heapType,
+      solutionHeap: solutionHeap_,
+    } = generateHeapOperationsFoundation({ random })
+    solutionHeap = solutionHeap_
 
+    // TODO: replace this with future standard feedback and checkFormat functions from PR QuickFind
     const checkFormat: FreeTextFormatFunction = ({ text }) => {
       if (text.trim() === "") return { valid: false }
 
@@ -170,7 +130,10 @@ export const HeapOperations: QuestionGenerator = {
       if (userHeap.toString() !== solutionHeap.toString()) {
         return {
           correct: false,
-          correctAnswer: solutionHeap.toTableString() + "|#div_my-5#||\n",
+          correctAnswer: createArrayDisplayCodeBlock({
+            array: solutionHeap.getHeap(),
+            startingIndex: 1,
+          }),
         }
       }
 
@@ -181,7 +144,9 @@ export const HeapOperations: QuestionGenerator = {
 
     if (variant === "insert") {
       // build a table representing the index - value pair starting at 1
-      let elementsTable = convertNumberArrayToTable(heapElements)
+      let elementsTable = createArrayDisplayCodeBlock({
+        array: heapElements,
+      })
       elementsTable += "|#div_my-5#||\n"
 
       for (const element of heapElements) {
@@ -201,7 +166,10 @@ export const HeapOperations: QuestionGenerator = {
       for (const element of heapElements) {
         solutionHeap.insert(element)
       }
-      const elementsTable = solutionHeap.toTableString() + "|#div_my-5#||\n"
+      const elementsTable = createArrayDisplayCodeBlock({
+        array: solutionHeap.getHeap(),
+        startingIndex: 1,
+      })
 
       const extractAmount = random.int(2, 3)
       for (let i = 0; i < extractAmount; i++) {
@@ -227,8 +195,9 @@ export const HeapOperations: QuestionGenerator = {
       }
       return { question }
     } else if (variant === "build") {
-      const elementsTable =
-        "\n|" + heapElements.join("|") + "|\n" + "|---".repeat(heapSize) + "|\n|#div_my-5#||\n"
+      const elementsTable = createArrayDisplayCodeBlock({
+        array: heapElements,
+      })
 
       solutionHeap.build(heapElements)
 
@@ -253,94 +222,6 @@ export const HeapOperations: QuestionGenerator = {
         name: HeapOperations.name(lang),
         path: permaLink,
         text: t(translationHeapOperations, lang, "taskCombine", [variableName, sequence, heapType]),
-        checkFormat,
-        feedback,
-      }
-      return { question }
-    }
-  },
-}
-
-export const HeapUnderstanding: QuestionGenerator = {
-  id: "heapund",
-  name: tFunctional(translationsHeapUnderstanding, "name"),
-  description: tFunctional(translationsHeapUnderstanding, "description"),
-  tags: ["heap", "priority-queue", "proofs"],
-  languages: ["en", "de"],
-  expectedParameters: [
-    {
-      type: "string",
-      name: "variant",
-      allowedValues: ["correctness", "neighbours"],
-    },
-  ],
-
-  generate: (lang = "en", parameters, seed) => {
-    const permaLink = serializeGeneratorCall({
-      generator: HeapUnderstanding,
-      lang,
-      parameters,
-      seed,
-    })
-    const random = new Random(seed)
-
-    const variant: "correctness" | "proofs" = parameters.variant as "correctness" | "proofs"
-
-    const heapType: "Max" | "Min" = random.choice(["Max", "Min"])
-
-    const checkFormat: FreeTextFormatFunction = ({ text }) => {
-      // check if the input is an integer
-      text = text.trim()
-      if (text === "") return { valid: false }
-      if (!/^\d+$/.test(text)) {
-        return {
-          valid: false,
-          message: t(translationsHeapUnderstanding, lang, "checkFormatPermutations"),
-        }
-      }
-      return { valid: true }
-    }
-
-    let solution = -1
-    const feedback: FreeTextFeedbackFunction = ({ text }) => {
-      const cleanedText = text.trim()
-      if (parseInt(cleanedText) !== solution) {
-        return {
-          correct: false,
-          correctAnswer: solution.toString(),
-        }
-      }
-      return { correct: true }
-    }
-
-    if (variant === "correctness") {
-      const { heapStringTable, correctAnswerIndex } = generateHeapsForQuestion(heapType, random)
-
-      const question: MultipleChoiceQuestion = {
-        type: "MultipleChoiceQuestion",
-        name: HeapUnderstanding.name(lang),
-        path: permaLink,
-        text: t(translationsHeapUnderstanding, lang, "taskCorrectness", [heapType]),
-        answers: heapStringTable,
-        feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
-        allowMultiple: true,
-      }
-      return { question }
-    } else {
-      const { formula, text } = generateNeighbourOptions(random)
-      const randomIndex = random.int(2, 50)
-
-      solution = formula(randomIndex)
-      const neighbourText = text.map((word) => t(wordTranslations, lang, word)).join(" ")
-
-      const question: FreeTextQuestion = {
-        type: "FreeTextQuestion",
-        name: HeapUnderstanding.name(lang),
-        path: permaLink,
-        text: t(translationsHeapUnderstanding, lang, "taskNeighbours", [
-          neighbourText,
-          randomIndex.toString(),
-        ]),
         checkFormat,
         feedback,
       }
