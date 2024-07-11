@@ -159,14 +159,20 @@ export class HuffmanNode {
     if (this.left?.value.includes(character)) {
       if (this.leftLabel !== null && this.leftLabel !== codeBit) throw Error("Code is not prefix free")
       this.leftLabel = codeBit
+      this.rightLabel = this.getInverseBit(codeBit)
       return this.left?.setCharacterLabel(character, codeSuffix)
     } else if (this.right?.value.includes(character)) {
       if (this.rightLabel !== null && this.rightLabel !== codeBit) throw Error("Code is not prefix free")
       this.rightLabel = codeBit
+      this.leftLabel = this.getInverseBit(codeBit)
       return this.right?.setCharacterLabel(character, codeSuffix)
     }
 
     throw Error(`Character "${character}" is not encoded by this Huffman code.`)
+  }
+
+  private getInverseBit(bit: "0" | "1"): "0" | "1" {
+    return bit === "0" ? "1" : "0"
   }
 
   /**
