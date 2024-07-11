@@ -26,7 +26,7 @@ export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): React
         <table className="w-full border-collapse">
           <thead className="border-b border-gray-700 dark:border-gray-300">
             <tr>
-              <th className="relative border-r border-gray-700 dark:border-gray-300 px-4 py-2 text-left text-gray-600 dark:text-gray-400">
+              <th className="relative border-r border-gray-700 px-4 py-2 text-left text-gray-600 dark:border-gray-300 dark:text-gray-400">
                 Index
               </th>
               {parsedArrayObject.array.map((_, index) => (
@@ -38,7 +38,7 @@ export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): React
           </thead>
           <tbody>
             <tr>
-              <th className="relative border-r border-gray-700 dark:border-gray-300 px-4 py-2 text-left">
+              <th className="relative border-r border-gray-700 px-4 py-2 text-left dark:border-gray-300">
                 <b>{parsedArrayObject.secondRowName[lang]}</b>
               </th>
               {parsedArrayObject.array.map((value, index) => (
