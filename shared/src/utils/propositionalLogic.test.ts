@@ -222,7 +222,6 @@ describe("negation", () => {
 
 test("shuffle", () => {
   const seed = sampleRandomSeed()
-  // console.log(seed)
   const random = new Random(seed)
   const expression = new Operator(
     "\\and",
@@ -230,10 +229,8 @@ test("shuffle", () => {
     new Operator("\\and", new Operator("\\xor", v[1], new Operator("\\xor", v[2], v[1]), true), notV[0]),
   )
 
-  // console.log("orig: " + expression.toString())
   for (let i = 0; i < 20; i++) {
     const shuffledExpression = expression.copy().shuffle(random)
-    // console.log(i, "shuffled: " + shuffledExpression.toString())
     expect(shuffledExpression.getTruthTable()).toEqual(expression.getTruthTable())
   }
 })
@@ -249,7 +246,6 @@ describe("parser", () => {
     const parseResult = PropositionalLogicParser.parse(expr)
     if (parseResult instanceof ParserError) {
       // expect() does not narrow down the type, so "if" is used here
-      console.log(parseResult.infoToStr())
       expect(parseResult).not.toBeInstanceOf(ParserError)
     } else {
       expect(parseResult.toString()).toEqual(expectedStr)
