@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
 import { MultiFreeTextQuestion, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator.ts"
-import { queueQuestion } from "@shared/question-generators/StackQueue/QueueGenerator.ts"
-import { stackQuestion } from "@shared/question-generators/StackQueue/StackGenerator.ts"
+import { queueQuestion } from "@shared/question-generators/StackQueue/Queue/QueueGenerator.ts"
+import { stackQuestion } from "@shared/question-generators/StackQueue/Stack/StackGenerator.ts"
 import { sampleRandomSeed } from "../../utils/random"
 
 interface TestingObjectFreetext {
