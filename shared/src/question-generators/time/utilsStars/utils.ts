@@ -9,8 +9,8 @@ import {
   IfOptions,
   WhileCompareOptions,
   WhileOrderOptions,
-} from "@shared/question-generators/time/loopsUtils.ts"
-import { createForForLoop } from "@shared/question-generators/time/loopsUtilsStarsForFor.ts"
+} from "@shared/question-generators/time/utils.ts"
+import { createForForLoop } from "@shared/question-generators/time/utilsStars/utilsForFor.ts"
 import {
   printStarsNew,
   PseudoCode,
@@ -20,7 +20,7 @@ import {
   PseudoCodeIf,
   PseudoCodeWhile,
 } from "@shared/utils/pseudoCodeUtils.ts"
-import Random from "@shared/utils/random"
+import Random from "@shared/utils/random.ts"
 
 /**
  * Sample the source code of a loop that prints stars
@@ -248,13 +248,7 @@ function createForLoop(
   bodyBlock.block.push(forStatement)
 
   const cond: IfOptions = random.choice(["none", "even", "odd", "square"])
-  const elseStatement =
-    cond !== "none"
-      ? random.weightedChoice([
-          [true, 0.7],
-          [false, 0.3],
-        ])
-      : false
+  const elseStatement = cond !== "none" ? random.bool(0.7) : false
 
   if (cond === "none") {
     if ("forAll" in forStatement) {
@@ -291,8 +285,6 @@ function createForLoop(
 
   return { numStars, code: completeCode }
 }
-
-// TODO move this into a separate file
 
 /**
  *
@@ -392,17 +384,8 @@ function createWhileLoop(
 
   // Choose a condition
   const condEnd: IfOptions = random.choice(["even", "odd", "square", "none"])
-  const elseAfter =
-    condEnd === "none"
-      ? false
-      : random.weightedChoice([
-          [true, 0.3],
-          [false, 0.7],
-        ])
-  const printAfter = random.weightedChoice([
-    [true, 0.25],
-    [false, 0.75],
-  ])
+  const elseAfter = condEnd === "none" ? false : random.bool(0.3)
+  const printAfter = random.bool(0.25)
 
   const pseudoCode: PseudoCode = []
   const pseudoCodeBlock: PseudoCodeBlock = {

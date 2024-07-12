@@ -3,8 +3,8 @@ import {
   createForLine,
   createIfCondition,
   IfOptions,
-} from "@shared/question-generators/time/loopsUtils.ts"
-import { calculateNumStars } from "@shared/question-generators/time/loopsUtilsStars.ts"
+} from "@shared/question-generators/time/utils.ts"
+import { calculateNumStars } from "@shared/question-generators/time/utilsStars/utils.ts"
 import {
   printStarsNew,
   PseudoCode,
@@ -13,7 +13,7 @@ import {
   PseudoCodeForAll,
   PseudoCodeVariable,
 } from "@shared/utils/pseudoCodeUtils.ts"
-import Random from "@shared/utils/random"
+import Random from "@shared/utils/random.ts"
 
 /**
  * This function generates code for a double for loop
@@ -28,9 +28,6 @@ import Random from "@shared/utils/random"
  *       print("*")
  *     else:
  *       print("**")
- *
- * Just for fun: Also the options for a "continue" (never enter the second for loop)
- * and a "break" (exit the second for loop after the first iteration)
  *
  * @param innerVar the name of the first variable
  * @param innerVar2
@@ -55,7 +52,7 @@ export function createForForLoop(
   numStars: number,
   random: Random,
 ) {
-  // get all possible random variables from the helper function
+  // get all possible random variables via helper function
   const {
     startFirst,
     stepFirst,
@@ -64,7 +61,6 @@ export function createForForLoop(
     printStarsMiddle,
     condMiddle,
     elseMiddle,
-    continueMiddle,
     startSecond,
     startSecondManipulation,
     startSecondManipulationValue,
@@ -74,7 +70,6 @@ export function createForForLoop(
     condEnd,
     askFirstVar,
     elseEnd,
-    breakEnd,
     printStarsAfter,
   } = generateForForRandomVariables(random)
 
@@ -136,14 +131,6 @@ export function createForForLoop(
   } else {
     // if the condition is none (we still want to print stars) in this case (printStarsMiddle is false)
     firstForBlock.block.push(printStarsNew(numPrintMiddleIf))
-  }
-  // continue middle
-  if (continueMiddle) {
-    firstForBlock.block.push({
-      state: {
-        continueState: true,
-      },
-    })
   }
 
   let startManipulation: BoundsOptions = "none"
@@ -212,14 +199,6 @@ export function createForForLoop(
     // if there is no if condition we still want to print stars (empty for loop does not make sense)
     secondForBlock.block.push(printStarsNew(numPrint))
   }
-  // break end
-  if (breakEnd) {
-    secondForBlock.block.push({
-      state: {
-        breakState: true,
-      },
-    })
-  }
 
   // print stars after
   if (printStarsAfter) {
@@ -241,8 +220,6 @@ export function createForForLoop(
     if (printStarsMiddle) numStars += numPrintMiddle
 
     numStars += calculateNumStars(condMiddle, i, numPrintMiddleIf, numPrintMiddleElse, elseMiddle)
-
-    if (continueMiddle) continue
 
     // second loop
     let j =
@@ -277,7 +254,6 @@ export function createForForLoop(
         elseEnd,
         askFirstVar ? j : i,
       )
-      if (breakEnd) break
     }
   }
 
@@ -362,25 +338,12 @@ function generateForForRandomVariables(random: Random) {
     [endManipulationOptions[2], 0.125],
   ])
 
-  let printStarsMiddle = random.weightedChoice([
-    [true, 0.15],
-    [false, 0.85],
-  ])
+  let printStarsMiddle = random.bool(0.15)
 
   const condMiddle: IfOptions = random.choice(ifOptions)
-  const elseMiddle: boolean =
-    condMiddle === "none"
-      ? false
-      : random.weightedChoice([
-          [true, 0.2],
-          [false, 0.8],
-        ])
+  const elseMiddle: boolean = condMiddle === "none" ? false : random.bool(0.2)
   // if condMiddle is none (numPrintMiddleIf will be printed instead of numPrintMiddle)
   if (condMiddle === "none") printStarsMiddle = false
-  const continueMiddle = random.weightedChoice([
-    [true, 0.03],
-    [false, 0.97],
-  ])
 
   const startSecond = random.int(0, 3)
   const startSecondManipulation: "none" | "var-normal" | "var-mult" | "var-square" =
@@ -442,20 +405,9 @@ function generateForForRandomVariables(random: Random) {
   const elseEnd =
     condEnd === "none" || elseMiddle // no two else statements (would be too much)
       ? false
-      : random.weightedChoice([
-          [true, 0.5],
-          [false, 0.5],
-        ])
+      : random.bool()
 
-  const breakEnd = random.weightedChoice([
-    [true, 0.03],
-    [false, 0.97],
-  ])
-
-  const printStarsAfter = random.weightedChoice([
-    [true, 0.05],
-    [false, 0.95],
-  ])
+  const printStarsAfter = random.bool(0.05)
 
   return {
     startFirst,
@@ -465,7 +417,6 @@ function generateForForRandomVariables(random: Random) {
     printStarsMiddle,
     condMiddle,
     elseMiddle,
-    continueMiddle,
     startSecond,
     startSecondManipulation,
     startSecondManipulationValue,
@@ -475,7 +426,6 @@ function generateForForRandomVariables(random: Random) {
     condEnd,
     askFirstVar,
     elseEnd,
-    breakEnd,
     printStarsAfter,
   }
 }
