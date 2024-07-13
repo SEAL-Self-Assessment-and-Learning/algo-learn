@@ -50,6 +50,7 @@ for (const generator of generators) {
       for (const parameters of allCombinations) {
         test(`Generate with language ${lang} and parameters ${JSON.stringify(parameters)}`, () => {
           const ret = generator.generate(lang, parameters, "myFancySeed")
+          console.log("test")
           expect(!(ret instanceof Promise)).toBe(true)
           if (ret instanceof Promise) return
           const { question } = ret

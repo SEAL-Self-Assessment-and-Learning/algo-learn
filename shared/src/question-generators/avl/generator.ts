@@ -5,9 +5,9 @@ import {
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { avlTreeWeightedRotations } from "@shared/question-generators/avl/utils/utils.ts"
+import { generateAVLTreeInsert } from "@shared/question-generators/avl/utils/utilsInsert.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
-import {generateAVLTreeInsert} from "@shared/question-generators/avl/utils/utilsInsert.ts";
 
 const translations: Translations = {
   en: {
@@ -66,7 +66,7 @@ export const AVLGenerator: QuestionGenerator = {
     const random: Random = new Random(seed)
 
     const variant = parameters.variant as "insert" | "delete" | "combine"
-    console.log(variant)
+    console.log(variant) // TODO: remove
 
     return avlInsertQuestion(random, feedback, lang, permalink)
   },
@@ -78,7 +78,7 @@ function avlInsertQuestion(
   lang: "de" | "en",
   permalink: string,
 ) {
-  const avlTreeSize = random.int(6, 11)
+  const avlTreeSize = random.int(6, 13)
   const rotationOption = random.weightedChoice(avlTreeWeightedRotations)
 
   const { avlTree, askValue } = generateAVLTreeInsert({
