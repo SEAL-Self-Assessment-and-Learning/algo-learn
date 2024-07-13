@@ -1,3 +1,4 @@
+import { stringifyPseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
 import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -14,9 +15,9 @@ import { parseRecursiveFunction, sampleRecurrenceAnswers, sampleRecursiveFunctio
 const translations: Translations = {
   en: {
     basecase: "The base case is",
-    text1: "Consider the following recursive procedure `{{0}}` with integer input ${{1}}$:",
+    text1: "Consider the following recursive procedure ${{0}}$ with integer input ${{1}}$:",
     text2Stars: "Let ${{0}}$ be the number of stars (`*`) that the procedure prints.",
-    text2Arithmetic: "Let ${{0}}$ be the number of arithmetic operations (+, -, $*$, /).",
+    text2Arithmetic: "Let ${{0}}$ be the number of arithmetic operations ($+$, $-$, $\\cdot$, /).",
     longName: "Recurrence Relation",
     question: "What is the recurrence relation of",
     name: "Recurrence",
@@ -27,9 +28,9 @@ const translations: Translations = {
   },
   de: {
     basecase: "Der Basisfall ist",
-    text1: "Betrachte die folgende rekursive Prozedur `{{0}}` mit ganzzahliger Eingabe ${{1}}$:",
+    text1: "Betrachte die folgende rekursive Prozedur ${{0}}$ mit ganzzahliger Eingabe ${{1}}$:",
     text2Stars: "Sei ${{0}}$ die Anzahl der Sterne (`*`), die die Prozedur ausgibt.",
-    text2Arithmetic: "Sei ${{0}}$ die Anzahl der arithmetischen Operationen (+, -, $*$, /).",
+    text2Arithmetic: "Sei ${{0}}$ die Anzahl der arithmetischen Operationen ($+$, $-$, $\\cdot$, /).",
     longName: "Rekurrenzrelation",
     question: "Was ist die Rekurrenzrelation von",
     name: "Rekurrenz",
@@ -72,9 +73,7 @@ export const RecursionFormula: QuestionGenerator = {
     let text = `
 ${format(t("text1"), [functionName, n])}
 
-\`\`\`python
-${functionText.trim()}
-\`\`\`
+${stringifyPseudoCode(functionText)}
 
 ${format(t("text2" + type), [`${T}(${n})`])}`
 
