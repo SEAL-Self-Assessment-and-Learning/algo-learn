@@ -441,7 +441,7 @@ function pseudoCodeReturnToString(returnState: PseudoCodeReturn): {
 } {
   const { psString, psStringColor, psStringLatex } = pseudoCodeStringToString(returnState.returnValue)
   const returnNormal = `\\textbf{return}\\text{ }${psString}`
-  const returnColor = `{\\color{${controlFlowColor}} \\textbf{return}}\\text{ }${psStringColor}`
+  const returnColor = `{\\color{${keyWordsColor}} \\textbf{return}}\\text{ }${psStringColor}`
   const returnLatex = `\\Return $${psStringLatex}$`
   return { returnNormal, returnColor, returnLatex }
 }
