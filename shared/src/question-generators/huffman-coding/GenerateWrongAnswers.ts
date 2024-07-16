@@ -151,7 +151,7 @@ export function swapManyLetters(inputDict: { [key: string]: number }) {
     }
   }
 
-  for (let i = 0; i < charList.length; i += 2) {
+  for (let i = 0; i < charList.length - 1; i += 2) {
     const temp = frequencyList[i]
     frequencyList[i] = frequencyList[i + 1]
     frequencyList[i + 1] = temp
