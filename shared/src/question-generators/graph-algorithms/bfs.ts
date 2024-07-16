@@ -3,10 +3,10 @@ import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
   QuestionGenerator,
-} from "../../api/QuestionGenerator"
-import { serializeGeneratorCall } from "../../api/QuestionRouter"
+} from "@shared/api/QuestionGenerator.ts"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import Random from "../../utils/random"
-import { t, tFunctional, Translations } from "../../utils/translations"
+import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
 import { ExampleQuestion } from "../example/example"
 
 const translations: Translations = {
@@ -38,6 +38,7 @@ Angenommen, wir starten Breitensuche (BFS) bei Knoten \${{2}}$. In welcher Reihe
  * This question generator generates a simple multiple choice question.
  */
 export const BFS: QuestionGenerator = {
+  id: "bfs",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["graph", "bfs"],
@@ -55,7 +56,7 @@ export const BFS: QuestionGenerator = {
    * @param seed The seed for the random number generator
    * @returns A new MultipleChoiceQuestion question
    */
-  generate: (generatorPath, lang = "en", parameters, seed) => {
+  generate: (lang = "en", parameters, seed) => {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
 
@@ -91,7 +92,6 @@ export const BFS: QuestionGenerator = {
         lang,
         parameters,
         seed,
-        generatorPath,
       }),
       text: t(translations, lang, "text", [`${a}`, G.toString(), `${b}`]),
       answers,

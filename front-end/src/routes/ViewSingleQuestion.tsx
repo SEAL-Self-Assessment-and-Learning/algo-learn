@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom"
 import SyntaxHighlighter from "react-syntax-highlighter"
 import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
-import { Parameters, validateParameters } from "../../../shared/src/api/Parameters"
-import { QuestionGenerator, questionToJSON } from "../../../shared/src/api/QuestionGenerator"
-import { serializeGeneratorCall } from "../../../shared/src/api/QuestionRouter"
-import { questionToTex } from "../../../shared/src/utils/toLatex"
+import { Parameters, validateParameters } from "@shared/api/Parameters"
+import { QuestionGenerator, questionToJSON } from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { questionToTex } from "@shared/utils/toLatex"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import Loading from "../components/Loading"
 import { QuestionComponent, Result } from "../components/QuestionComponent"
@@ -16,13 +16,11 @@ import { Debug } from "./debug"
 
 export function ViewSingleQuestion({
   generator,
-  generatorPath,
   parameters,
   seed,
   onResult,
 }: {
   generator: QuestionGenerator
-  generatorPath: string
   parameters: Parameters
   seed: string
   onResult?: (result: Result) => void
@@ -32,7 +30,7 @@ export function ViewSingleQuestion({
   const { debug, format } = useFormat()
   const { theme } = useTheme()
 
-  const q = useQuestion(generator, generatorPath, lang, parameters, seed)
+  const q = useQuestion(generator, lang, parameters, seed)
 
   if (!validateParameters(parameters, generator.expectedParameters)) {
     throw new Error("Invalid parameters: " + JSON.stringify(parameters))
@@ -46,7 +44,6 @@ export function ViewSingleQuestion({
           generator,
           parameters,
           seed,
-          generatorPath,
         })}
         question={q.question}
         onResult={onResult ?? (() => navigate("/"))}

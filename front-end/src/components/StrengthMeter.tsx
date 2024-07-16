@@ -1,7 +1,6 @@
 import { CircularProgressbarWithChildren } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
-import { Tooltip } from "react-tooltip"
-import "react-tooltip/dist/react-tooltip.css"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useTranslation } from "../hooks/useTranslation"
 
 /**
@@ -32,12 +31,10 @@ export function StrengthMeterCircular({ strength }: { strength: number }) {
  * @param props.tooltip A tooltip to display on hover
  */
 export function StrengthMeter({
-  id,
   strength,
   steps = 4,
   tooltip,
 }: {
-  id: string
   strength: number
   steps?: number
   tooltip?: string
@@ -46,12 +43,10 @@ export function StrengthMeter({
   const bar = <ProgressBar done={strengthRounded} total={steps} />
   if (tooltip) {
     return (
-      <>
-        <div id={`strength-meter-${id}`}>{bar}</div>
-        <Tooltip anchorSelect={`#strength-meter-${id}`} place="right">
-          {tooltip}
-        </Tooltip>
-      </>
+      <Tooltip placement="right">
+        <TooltipTrigger>{bar}</TooltipTrigger>
+        <TooltipContent>{tooltip}</TooltipContent>
+      </Tooltip>
     )
   } else {
     return bar

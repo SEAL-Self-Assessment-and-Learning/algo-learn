@@ -3,8 +3,11 @@ import { Link } from "react-router-dom"
 import SyntaxHighlighter from "react-syntax-highlighter"
 import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { Graph } from "@shared/utils/graph"
-import { parseMarkdown, ParseTree, ParseTreeNode } from "../../../shared/src/utils/parseMarkdown"
-import { useTheme } from "../hooks/useTheme"
+import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
+import { ArrayDisplay } from "@/components/ArrayDisplay.tsx"
+import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
+import { DrawTable } from "@/components/DrawTable.tsx"
+import { useTheme } from "@/hooks/useTheme.ts"
 import { DrawGraph } from "./DrawGraph"
 import { Format } from "./Format"
 import TeX from "./TeX"
@@ -86,9 +89,19 @@ export const MarkdownTreeNode: FunctionComponent<{
     )
   }
   if (parseTreeNode.kind === "`") {
-    return <span className="font-mono">{format(parseTreeNode.child, parameters)}</span>
+    return (
+      <span className="rounded-sm bg-gray-200 px-2 py-1 font-mono dark:bg-gray-700">
+        {format(parseTreeNode.child, parameters)}
+      </span>
+    )
   }
   if (parseTreeNode.kind === "```") {
+    if (parseTreeNode.language === "array") {
+      return <ArrayDisplay arrayObject={parseTreeNode.child} />
+    }
+    if (parseTreeNode.language === "pseudoCode") {
+      return <DrawPseudoCode displayCode={parseTreeNode.child} />
+    }
     if (parseTreeNode.language === "graph") {
       return (
         <div className="my-5">
@@ -106,6 +119,9 @@ export const MarkdownTreeNode: FunctionComponent<{
         </SyntaxHighlighter>
       </div>
     )
+  }
+  if (parseTreeNode.kind === "table") {
+    return <DrawTable table={parseTreeNode.child} />
   }
   if (parseTreeNode.kind === "a") {
     return (
