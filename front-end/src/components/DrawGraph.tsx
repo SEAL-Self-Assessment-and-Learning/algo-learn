@@ -3,42 +3,21 @@ import { Graph } from "@shared/utils/graph"
 
 const Node = ({
   pos,
-  updatePos,
+  setDragged,
   size,
   label,
-  svgRef,
 }: {
   pos: { x: number; y: number }
-  updatePos: (x: number, y: number) => void
+  setDragged: () => void
   size: number
   label?: string
-  svgRef: RefObject<SVGSVGElement>
 }) => {
-  const [state, setState] = useState({
-    isDragged: false,
-    origin: { x: 0, y: 0 },
-  })
-
   return (
     <g
       className="group"
       transform={`translate(${pos.x},${pos.y})`}
-      onMouseDown={(e) => {
-        setState({ isDragged: true, origin: { x: e.clientX, y: e.clientY } })
-      }}
-      onMouseMove={(e) => {
-        if (state.isDragged && svgRef.current) {
-          const pt = svgRef.current.createSVGPoint()
-          pt.x = e.clientX
-          pt.y = e.clientY
-          // The cursor point, translated into svg coordinates
-          const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
-
-          updatePos(svgPos.x, svgPos.y)
-        }
-      }}
-      onMouseUp={() => {
-        setState({ isDragged: false, origin: { x: 0, y: 0 } })
+      onMouseDown={() => {
+        setDragged()
       }}
     >
       <circle
@@ -159,7 +138,7 @@ export function DrawGraph({
   const coordinateScale = 50
   const nodeScale = 20
 
-  // const [dragState, setDragState] = useState({ nodeDragged: null, initPos: { x: 0, y: 0 } })
+  const [currentlyDragged, setCurrentlyDragged] = useState(null)
   const [nodePositions, setNodePositions] = useState(
     graph.nodes.map((u) => {
       return {
@@ -189,15 +168,11 @@ export function DrawGraph({
       <Node
         key={`n${i}`}
         pos={nodePositions[i]}
-        updatePos={(x, y) => {
-          nodePositions[i].x = x
-          nodePositions[i].y = y
-          // react requires a new array here
-          setNodePositions([...nodePositions])
+        setDragged={() => {
+          if (currentlyDragged === null) setCurrentlyDragged(i)
         }}
         size={nodeScale}
         label={u.label ?? ""}
-        svgRef={svgRef}
       />
     )
   })
@@ -211,6 +186,23 @@ export function DrawGraph({
       height={height}
       viewBox={`${(dimensions.minX - dimensions.width * 0.2) * coordinateScale} ${(dimensions.minY - dimensions.height * 0.2) * coordinateScale} ${dimensions.width * 1.4 * coordinateScale} ${dimensions.height * 1.4 * coordinateScale}`}
       className="mx-auto h-auto max-w-full rounded-2xl bg-secondary"
+      onMouseMove={(e) => {
+        if (currentlyDragged === null) return
+
+        const pt = svgRef.current.createSVGPoint()
+        pt.x = e.clientX
+        pt.y = e.clientY
+        // The cursor point, translated into svg coordinates
+        const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
+
+        nodePositions[currentlyDragged].x = svgPos.x
+        nodePositions[currentlyDragged].y = svgPos.y
+        // react requires a new array here
+        setNodePositions([...nodePositions])
+      }}
+      onMouseUp={() => {
+        if (currentlyDragged !== null) setCurrentlyDragged(null)
+      }}
     >
       {!graph.directed ? null : (
         <defs>
