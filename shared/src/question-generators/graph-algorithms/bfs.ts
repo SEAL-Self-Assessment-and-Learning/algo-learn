@@ -1,12 +1,12 @@
-import { RandomGraph } from "@shared/utils/graph"
 import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import Random from "../../utils/random"
+import { RandomGraph } from "@shared/utils/graph"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+import Random from "../../utils/random"
 import { ExampleQuestion } from "../example/example"
 
 const translations: Translations = {
@@ -69,6 +69,11 @@ export const BFS: QuestionGenerator = {
       random.float(0, 1) < 0.5,
       random.float(0, 1) < 0.5,
     )
+
+    G.nodeGroupMax = 8
+    G.nodeClickType = "group"
+    G.edgeGroupMax = 8
+    G.edgeClickType = "group"
 
     // generate the question values
     const a = random.choice(["G"])

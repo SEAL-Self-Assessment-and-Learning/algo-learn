@@ -3,24 +3,26 @@ import Random from "./random"
 type NodeId = number
 type NodeList = Node[]
 type EdgeList = Edge[][]
+type ClickEventType = "none" | "select" | "group"
 
 /**
  * A node in a graph.
- * @property id - The unique identifier of the node.
- * @property group - The group to which the node belongs.
+ * @property label - A name of the node.
+ * @property group - The group to which the node belongs. Can be used e.g. for node coloring
+ * @property coords - The coordinates the node is placed.
  */
 export interface Node {
-  id?: NodeId // todo remove?
   label?: string
-  group?: number
+  group?: number | null
   coords: { x: number; y: number }
 }
 
 /**
- * A link between two nodes in a graph.
- * @property source - The source node of the link.
- * @property target - The target node of the link.
- * @property value - The value of the link.
+ * An edge between two nodes in a graph.
+ * @property source - The source node of the edge.
+ * @property target - The target node of the edge.
+ * @property value - The value of the edge, e.g. weight or travel time
+ * @property group - Can be used e.g. for edge coloring
  */
 export interface Edge {
   source: NodeId
@@ -39,12 +41,30 @@ export class Graph {
   edges: EdgeList
   weighted: boolean
   directed: boolean
+  public nodeClickType: ClickEventType
+  public edgeClickType: ClickEventType
+  // groups are counted from 0 to [node|edge]GroupMax -1
+  public nodeGroupMax: number
+  public edgeGroupMax: number
 
-  constructor(nodes: NodeList, edges: EdgeList, directed: boolean, weighted: boolean) {
+  constructor(
+    nodes: NodeList,
+    edges: EdgeList,
+    directed: boolean,
+    weighted: boolean,
+    nodeClick: ClickEventType = "none",
+    edgeClick: ClickEventType = "none",
+    nodeGroupMax: number = 0,
+    edgeGroupMax: number = 0,
+  ) {
     this.nodes = nodes
     this.edges = edges
     this.directed = directed
     this.weighted = weighted
+    this.nodeClickType = nodeClick
+    this.edgeClickType = edgeClick
+    this.nodeGroupMax = nodeGroupMax
+    this.edgeGroupMax = edgeGroupMax
   }
 
   public getDimensions(): {
@@ -77,16 +97,18 @@ export class Graph {
   }
 
   public toString(): string {
-    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"}\n`
+    const clickTypeMapping: Record<ClickEventType, string> = { none: "0", select: "1", group: "2" }
+    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
 
     for (const node of this.nodes) {
-      graphStr += `${Math.round(node.coords.x * 100) / 100} ${Math.round(node.coords.y * 100) / 100} ${node.group ?? 0} "${node.label ?? ""}"\n`
+      graphStr += `${Math.round(node.coords.x * 100) / 100} ${Math.round(node.coords.y * 100) / 100} ${node.group ?? "-"} "${node.label ?? ""}"\n`
     }
 
     for (const neighbors of this.edges) {
       for (const edge of neighbors) {
-        if (this.weighted) graphStr += `${edge.source} ${edge.target} ${edge.group ?? 0} ${edge.value}\n`
-        else graphStr += `${edge.source} ${edge.target} ${edge.group ?? 0}\n`
+        graphStr += `${edge.source} ${edge.target} ${edge.group ?? "-"}`
+        if (this.weighted) graphStr += ` ${edge.value}`
+        graphStr += `\n`
       }
     }
 
@@ -95,49 +117,55 @@ export class Graph {
 
   public static parse(graphStr: string): Graph {
     const lines = graphStr.split("\n")
-    const graphMetaData = lines[0].match(/^(\d+) (\d+) ([01]) ([01])$/)
+    const graphMetaData = lines[0].match(/^(\d+) (\d+) ([01]) ([01]) ([012]) ([012]) (\d+) (\d+)$/)
 
     if (graphMetaData === null) throw Error("Input error: graph data has invalid meta data")
-
     const numNodes = parseInt(graphMetaData[1])
     const numEdges = parseInt(graphMetaData[2])
     const directed = graphMetaData[3] === "1"
     const weighted = graphMetaData[4] === "1"
+    const clickTypeMapping: Record<string, ClickEventType> = { "0": "none", "1": "select", "2": "group" }
+    const nodeClick = clickTypeMapping[graphMetaData[5]]
+    const edgeClick = clickTypeMapping[graphMetaData[6]]
+    const nodeGroupMax = parseInt(graphMetaData[7])
+    const edgeGroupMax = parseInt(graphMetaData[8])
 
     if (lines.length < numNodes + numEdges + 1) throw Error("Input error: graph data is incomplete")
+    if (nodeClick === undefined || edgeClick === undefined)
+      throw Error("Input error: click events invalid")
 
     const nodes: Node[] = []
     const nodesEnd = numNodes + 1
     for (let i = 1; i < nodesEnd; i++) {
-      const nodeData = lines[i].match(/^(-?\d+(?:\.\d{1,2})?) (-?\d+(?:\.\d{1,2})?) (\d+) "(.*)"$/)
+      const nodeData = lines[i].match(/^(-?\d+(?:\.\d{1,2})?) (-?\d+(?:\.\d{1,2})?) (-|\d+) "(.*)"$/)
       if (nodeData === null) throw Error("Input error: invalid node data: " + lines[i])
 
       nodes.push({
         coords: { x: parseFloat(nodeData[1]), y: parseFloat(nodeData[2]) },
-        group: parseInt(nodeData[3]),
+        group: nodeData[3] === "-" ? null : parseInt(nodeData[3]),
         label: nodeData[4],
       })
     }
 
     const edgeEnd = nodesEnd + numEdges
-    const edgeRegex = weighted ? /^(\d+) (\d+) (\d+) (\d+)$/ : /^(\d+) (\d+) (\d+)$/
+    const edgeRegex = weighted ? /^(\d+) (\d+) (-|\d+) (\d+)$/ : /^(\d+) (\d+) (-|\d+)$/
 
     const edges: EdgeList = Array.from(Array(numNodes), () => [])
 
     for (let i = nodesEnd; i < edgeEnd; i++) {
       const edgeData = lines[i].match(edgeRegex)
-      if (edgeData === null) throw Error("Input error: invalid edge data: " + graphStr)
+      if (edgeData === null) throw Error("Input error: invalid edge data: " + lines[i])
 
       const source = parseInt(edgeData[1])
       edges[source].push({
         source: source,
         target: parseInt(edgeData[2]),
-        group: parseInt(edgeData[3]),
+        group: edgeData[3] === "-" ? null : parseInt(edgeData[3]),
         value: edgeData[4] !== undefined ? parseInt(edgeData[4]) : undefined,
       })
     }
 
-    return new Graph(nodes, edges, directed, weighted)
+    return new Graph(nodes, edges, directed, weighted, nodeClick, edgeClick, nodeGroupMax, edgeGroupMax)
   }
 
   public getNeighbors(u: NodeId) {
@@ -316,8 +344,7 @@ export class RandomGraph {
     const links: EdgeList = Array.from(Array(vertices.length), () => [])
     links.forEach((outEdges, u: NodeId) => {
       getPossibleNeighbors(u).forEach((v: NodeId) => {
-        // todo refactor
-        if (random.float(0, 1) < p) {
+        if (random.bool(p)) {
           numEdges++
           outEdges.push({ source: u, target: v })
           if (!directed) links[v].push({ source: v, target: u })
