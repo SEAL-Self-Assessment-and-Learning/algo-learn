@@ -7,7 +7,7 @@ import Random from "@shared/utils/random.ts"
 export type AVLTreeRotations = "none" | "left" | "right" | "leftRight" | "rightLeft"
 
 export const avlTreeWeightedRotations: [AVLTreeRotations, number][] = [
-  ["none", 11110.1],
+  ["none", 0.1],
   ["left", 0.2],
   ["right", 0.2],
   ["leftRight", 0.25],
@@ -21,7 +21,7 @@ export type AVLTreeHelper = {
   root: string
   left: AVLTreeHelper | null
   right: AVLTreeHelper | null
-  nodes: number
+  numNodes: number
 }
 
 /**
@@ -67,83 +67,110 @@ export function convertAVLHelperToRandomAVLTree(random: Random, treeHelper: AVLT
   return avlTrees
 }
 
-// TODO refactor this function
+/**
+ * Those trees are all possible AVL trees with a height of 1 and 2
+ * 1 tree height 1 and 1 node
+ * 2 trees height 2 and 2 nodes
+ * 1 trees height 2 and 3 nodes
+ */
+const baseCaseTreeStructure = [
+  [{ root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper],
+  [
+    {
+      root: "x",
+      left: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
+      right: null,
+      numNodes: 2,
+    } as AVLTreeHelper,
+
+    {
+      root: "x",
+      left: null,
+      right: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
+      numNodes: 2,
+    } as AVLTreeHelper,
+
+    {
+      root: "x",
+      left: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
+      right: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
+      numNodes: 3,
+    } as AVLTreeHelper,
+  ],
+]
+
+/**
+ * This function computes the number of nodes in a tree
+ * (using the nodes property of the AVLTreeHelper)
+ * @param tree - the tree to compute the number of nodes for
+ */
+function computeNumberOfNodes(tree: AVLTreeHelper | null): number {
+  if (!tree) return 0
+  return 1 + tree.left!.numNodes + tree.right!.numNodes
+}
+
+/**
+ * This function filters out all trees with a specific number of nodes
+ * @param trees - the list of trees to filter
+ * @param numberOfNodes - the minimum number of nodes to filter for
+ */
+function getAllTreesWithMinNNodes(trees: AVLTreeHelper[][], numberOfNodes: number): AVLTreeHelper[] {
+  const resultTrees: AVLTreeHelper[] = []
+  for (let i = 0; i < trees.length; i++) {
+    for (let j = 0; j < trees[i].length; j++) {
+      if (trees[i][j].numNodes >= numberOfNodes) {
+        resultTrees.push(trees[i][j])
+      }
+    }
+  }
+  return resultTrees
+}
+
+/**
+ * This function generates all possible AVL tree structures with a specific height and a specific number of nodes
+ * @param maxHeight - the maximum height of the trees
+ * @param minNodes - the minimum number of nodes
+ * @param maxNodes - the maximum number of nodes
+ */
 export function generateAllAVLTrees(maxHeight: number, minNodes: number, maxNodes: number) {
-  // create the base cases
-  const baseCaseTrees = [
-    [{ root: "x", left: null, right: null, nodes: 1 } as AVLTreeHelper],
-    [
-      {
-        root: "x",
-        left: { root: "x", left: null, right: null, nodes: 1 } as AVLTreeHelper,
-        right: null,
-        nodes: 2,
-      } as AVLTreeHelper,
-
-      {
-        root: "x",
-        left: null,
-        right: { root: "x", left: null, right: null, nodes: 1 } as AVLTreeHelper,
-        nodes: 2,
-      } as AVLTreeHelper,
-
-      {
-        root: "x",
-        left: { root: "x", left: null, right: null, nodes: 1 } as AVLTreeHelper,
-        right: { root: "x", left: null, right: null, nodes: 1 } as AVLTreeHelper,
-        nodes: 3,
-      } as AVLTreeHelper,
-    ],
-  ]
-
   // create all trees by combining new trees
   // root and h-1 * h-1 | root and h-1 * h-2 | and h-2 * h-1
   // using "x" as node name and assigning unique ids to every node later
   for (let i = 2; i <= maxHeight; i++) {
-    baseCaseTrees.push([])
-    for (let m = 0; m < baseCaseTrees[i - 1].length; m++) {
-      for (let n = 0; n < baseCaseTrees[i - 1].length; n++) {
-        const newNode = { root: "x", left: null, right: null, nodes: 1 } as AVLTreeHelper
-        newNode.left = baseCaseTrees[i - 1][n]
-        newNode.right = baseCaseTrees[i - 1][m]
-        newNode.nodes = 1 + newNode.left.nodes + newNode.right.nodes
-        if (newNode.nodes <= maxNodes) {
-          baseCaseTrees[i].push(newNode)
+    baseCaseTreeStructure.push([])
+    for (let m = 0; m < baseCaseTreeStructure[i - 1].length; m++) {
+      for (let n = 0; n < baseCaseTreeStructure[i - 1].length; n++) {
+        const newNode = { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper
+        newNode.left = baseCaseTreeStructure[i - 1][n]
+        newNode.right = baseCaseTreeStructure[i - 1][m]
+        newNode.numNodes = computeNumberOfNodes(newNode)
+        if (newNode.numNodes <= maxNodes) {
+          baseCaseTreeStructure[i].push(newNode)
         }
       }
     }
-    for (let k = 0; k < baseCaseTrees[i - 1].length; k++) {
-      for (let l = 0; l < baseCaseTrees[i - 2].length; l++) {
-        const newNode1 = { root: "x", left: null, right: null, nodes: 1 } as AVLTreeHelper
-        newNode1.left = baseCaseTrees[i - 1][k]
-        newNode1.right = baseCaseTrees[i - 2][l]
-        newNode1.nodes = 1 + newNode1.left.nodes + newNode1.right.nodes
-        if (newNode1.nodes <= maxNodes) {
-          baseCaseTrees[i].push(newNode1)
+    for (let k = 0; k < baseCaseTreeStructure[i - 1].length; k++) {
+      for (let l = 0; l < baseCaseTreeStructure[i - 2].length; l++) {
+        const newNode1 = { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper
+        newNode1.left = baseCaseTreeStructure[i - 1][k]
+        newNode1.right = baseCaseTreeStructure[i - 2][l]
+        newNode1.numNodes = computeNumberOfNodes(newNode1)
+        if (newNode1.numNodes <= maxNodes) {
+          baseCaseTreeStructure[i].push(newNode1)
         }
 
-        const newNode2 = { root: "x", left: null, right: null, nodes: 1 } as AVLTreeHelper
-        newNode2.left = baseCaseTrees[i - 2][l]
-        newNode2.right = baseCaseTrees[i - 1][k]
-        newNode2.nodes = 1 + newNode2.left.nodes + newNode2.right.nodes
-        if (newNode2.nodes <= maxNodes) {
-          baseCaseTrees[i].push(newNode2)
+        const newNode2 = { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper
+        newNode2.left = baseCaseTreeStructure[i - 2][l]
+        newNode2.right = baseCaseTreeStructure[i - 1][k]
+        newNode2.numNodes = computeNumberOfNodes(newNode2)
+        if (newNode2.numNodes <= maxNodes) {
+          baseCaseTreeStructure[i].push(newNode2)
         }
       }
     }
   }
 
-  const resultTrees: AVLTreeHelper[] = []
-
-  for (let i = 0; i < baseCaseTrees.length; i++) {
-    for (let j = 0; j < baseCaseTrees[i].length; j++) {
-      if (baseCaseTrees[i][j].nodes >= minNodes) {
-        resultTrees.push(baseCaseTrees[i][j])
-      }
-    }
-  }
-
-  return resultTrees
+  return getAllTreesWithMinNNodes(baseCaseTreeStructure, minNodes)
 }
 
 /**
@@ -169,7 +196,7 @@ export function assignUniqueIDsToTrees(trees: AVLTreeHelper[], random: Random): 
  */
 function assignUniqueIDToEveryNode(tree: AVLTreeHelper, random: Random) {
   const possibleIDs: string[] = []
-  while (possibleIDs.length < tree.nodes) {
+  while (possibleIDs.length < tree.numNodes) {
     const newID = random.float(-100, 100).toString()
     if (!possibleIDs.includes(newID)) {
       possibleIDs.push(newID)

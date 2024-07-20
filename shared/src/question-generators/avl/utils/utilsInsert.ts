@@ -63,7 +63,11 @@ function handleAVLRotation(
   avlTrees: AVLTree[],
   rotationOption: AVLTreeRotations,
 ): { avlTree: AVLTree; askValue: string } {
-  const { insertValue, currentTree } = getRandomTreeInsertPair(random, avlTrees, rotationOption)
+  const { insertValue, currentTree } = getRandomTreeInsertPairForRotation(
+    random,
+    avlTrees,
+    rotationOption,
+  )
   const askValue = insertValue.toString()
   checkAVLNull(currentTree)
 
@@ -73,44 +77,69 @@ function handleAVLRotation(
   }
 }
 
-// TODO refactor to be more clean
-function getRandomTreeInsertPair(random: Random, avlTrees: AVLTree[], rotationOption: AVLTreeRotations) {
-  avlTrees = random.shuffle(avlTrees)
+/**
+ * This function checks if the current tree can be rotated in the desired way
+ * It trys all possible values
+ * So with n nodes there are n+1 possible values
+ * @param currentTree - the current AVL tree
+ * @param rotationOption - the desired rotation
+ * @param random .
+ */
+function checkTreeForRotation(currentTree: AVLTree, rotationOption: AVLTreeRotations, random: Random) {
+  const inOrder = currentTree.inOrder()
 
-  for (let i = 0; i < avlTrees.length; i++) {
-    const inOrder = avlTrees[i].inOrder()
-
-    // the minimum node in the generated AVL trees will be 1
-    let lastSeen = -1
-    const currentTree = avlTrees[i]
-    const allPossibleValues: number[] = []
-    for (let j = 0; j < inOrder.length; j++) {
-      // in this case we cannot generate a natural number
-      if (lastSeen + 1 > inOrder[j] - 1) {
-        lastSeen = inOrder[j]
-        continue
-      }
-
-      const insertValue = random.int(lastSeen + 1, inOrder[j] - 1)
-      // clone the tree, so the current tree can be reused for the next round
-      const treeClone = currentTree.clone()
-      const treeCloneInsert = treeClone.insert(insertValue)
-      // check if it is the desired rotation
-      if (treeCloneInsert === rotationOption) {
-        allPossibleValues.push(insertValue)
-      }
+  // the minimum node in the generated AVL trees will be 1
+  let lastSeen = -1
+  const allPossibleValues: number[] = []
+  for (let j = 0; j < inOrder.length; j++) {
+    // in this case we cannot generate a natural number
+    if (lastSeen + 1 > inOrder[j] - 1) {
       lastSeen = inOrder[j]
+      continue
     }
 
-    // We found a tree were an insert operation would result in the desired rotation
-    if (allPossibleValues.length > 0) {
-      return {
-        insertValue: random.choice(allPossibleValues),
-        currentTree,
-      }
+    const insertValue = random.int(lastSeen + 1, inOrder[j] - 1)
+    // clone the tree, so the current tree can be reused for the next round
+    const treeClone = currentTree.clone()
+    const treeCloneInsert = treeClone.insert(insertValue)
+    // check if it is the desired rotation
+    if (treeCloneInsert === rotationOption) {
+      allPossibleValues.push(insertValue)
+    }
+    lastSeen = inOrder[j]
+  }
+
+  // We found a tree were an insert operation would result in the desired rotation
+  if (allPossibleValues.length > 0) {
+    return {
+      insertValue: random.choice(allPossibleValues),
+      currentTree,
     }
   }
 
-  // will never be reached
+  return null
+}
+
+/**
+ * This function generates a random tree and a value to insert
+ * This insert operation will result in the desired rotation
+ * @param random .
+ * @param avlTrees - all possible AVL trees
+ * @param rotationOption - the desired rotation
+ */
+function getRandomTreeInsertPairForRotation(
+  random: Random,
+  avlTrees: AVLTree[],
+  rotationOption: AVLTreeRotations,
+) {
+  avlTrees = random.shuffle(avlTrees)
+
+  // iterate through all trees until we find a tree where the desired rotation is possible
+  for (let i = 0; i < avlTrees.length; i++) {
+    const result = checkTreeForRotation(avlTrees[i], rotationOption, random)
+    if (result) return result
+  }
+
+  // should never be reached
   return { insertValue: 0, currentTree: null }
 }
