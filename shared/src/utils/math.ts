@@ -48,7 +48,7 @@ customFunctions.log.toTex = "\\mathrm{${name}}\\left(${args}\\right)"
 customFunctions.log2.toTex = "\\mathrm{${name}}\\left(${args}\\right)"
 math.import(customFunctions)
 
-// @ts-ignore
+// @ts-expect-error mathjs does not provide types
 delete math.Unit
 
 export default math
