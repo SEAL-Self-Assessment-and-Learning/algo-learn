@@ -4,7 +4,7 @@ import {
   createIfCondition,
   IfOptions,
 } from "@shared/question-generators/time/utils.ts"
-import { calculateNumStars } from "@shared/question-generators/time/utilsStars/utils.ts"
+import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/utils.ts"
 import {
   printStarsNew,
   PseudoCode,
@@ -219,7 +219,7 @@ export function createForForLoop(
   for (let i = startFirst; i <= endFirstValue; i += stepFirst) {
     if (printStarsMiddle) numStars += numPrintMiddle
 
-    numStars += calculateNumStars(condMiddle, i, numPrintMiddleIf, numPrintMiddleElse, elseMiddle)
+    numStars += calculateNumberOfStars(condMiddle, i, numPrintMiddleIf, numPrintMiddleElse, elseMiddle)
 
     // second loop
     let j =
@@ -246,7 +246,7 @@ export function createForForLoop(
     }
 
     for (; j <= endSecondValue; j += stepSecond) {
-      numStars += calculateNumStars(
+      numStars += calculateNumberOfStars(
         condEnd,
         askFirstVar ? i : j,
         numPrint,
