@@ -1,5 +1,3 @@
-import primesJSON from "./primes.json"
-
 export type HashFunction = (key: number, size: number) => number
 export type DoubleHashFunction = (key: number, i: number, size: number) => number
 
@@ -15,21 +13,18 @@ export type DoubleHashFunction = (key: number, i: number, size: number) => numbe
 export class MapLinProbing {
   private mapKeys: (number | null)[]
   private mapValues: (string | null)[]
-  private size: number
+  private readonly size: number
   private amount: number = 0
   private readonly hashFunction: HashFunction | null = null
   private readonly doubleHashFunction: DoubleHashFunction | null = null
   private readonly doubleHashing: boolean = false
-  private readonly resize: boolean = false
 
   constructor({
     size,
     hashFunction,
-    resize,
   }: {
     size: number
     hashFunction?: HashFunction | DoubleHashFunction
-    resize?: boolean
   }) {
     this.mapKeys = new Array(size).fill(null) as (number | null)[]
     this.mapValues = new Array(size).fill(null) as (string | null)[]
@@ -47,9 +42,6 @@ export class MapLinProbing {
     } else {
       this.hashFunction = this.defaultHashFunction
       this.doubleHashing = false
-    }
-    if (resize !== undefined) {
-      this.resize = resize
     }
   }
 
@@ -80,9 +72,6 @@ export class MapLinProbing {
     this.mapKeys[hashKey] = key
     this.mapValues[hashKey] = value
     this.amount++
-    if (this.amount >= this.size / 2) {
-      this.resizeMap(true)
-    }
   }
 
   /**
@@ -142,9 +131,6 @@ export class MapLinProbing {
       this.insert(keyToRehash, valueToRehash)
       count++
       hashKey = this.doubleHashing ? this.getHashValue(key, count) : (hashKey + 1) % this.size
-    }
-    if (this.amount <= this.size / 8) {
-      this.resizeMap(false)
     }
   }
 
@@ -236,43 +222,6 @@ export class MapLinProbing {
     this.mapKeys = new Array(this.size).fill(null) as (number | null)[]
     this.mapValues = new Array(this.size).fill(null) as (string | null)[]
     this.amount = 0
-  }
-
-  private resizeMap(increase: boolean) {
-    if (this.resize) {
-      const keys = this.keys()
-      const values = this.values()
-      if (increase) {
-        this.size *= 2
-      } else {
-        this.size /= 2
-      }
-      this.size = this.getNextPrime(this.size)
-      this.mapKeys = new Array(this.size).fill(null) as (number | null)[]
-      this.mapValues = new Array(this.size).fill(null) as (string | null)[]
-      this.amount = 0
-      for (let i = 0; i < keys.length; i++) {
-        this.insert(keys[i], values[i])
-      }
-    }
-  }
-
-  /**
-   * Returns the next prime number bigger than the given value
-   * @param value
-   * @private
-   *
-   * @throws Error if no prime number is found (then the use case of this function is wrong)
-   */
-  private getNextPrime(value: number): number {
-    // get the next bigger prime number
-    for (let i = 0; i < primesJSON.length; i++) {
-      if (primesJSON[i] > value) {
-        return primesJSON[i]
-      }
-    }
-
-    throw new Error("No prime number found, the array is to big")
   }
 
   /**
