@@ -1,6 +1,6 @@
 import { DoubleHashFunction, HashFunction } from "@shared/question-generators/Hashing/MapLinProbing.ts"
 import Random from "@shared/utils/random.ts"
-import primesJSON from "./primes.json"
+import primesJSON from "../../utils/primes.json"
 
 /**
  * The type of the hash function generator

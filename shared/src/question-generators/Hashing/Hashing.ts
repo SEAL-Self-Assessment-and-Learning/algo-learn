@@ -1,16 +1,7 @@
 import { validateParameters } from "@shared/api/Parameters.ts"
-import {
-  FreeTextFeedbackFunction,
-  FreeTextFormatFunction,
-  FreeTextQuestion,
-  QuestionGenerator,
-} from "@shared/api/QuestionGenerator.ts"
+import { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { generateHashFunction } from "@shared/question-generators/Hashing/Functions.ts"
-import {
-  createTableForValues,
-  generateOperationsHashMap,
-} from "@shared/question-generators/Hashing/utils.ts"
+import { generateQuestionLinearProbing } from "@shared/question-generators/Hashing/utils.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
 
@@ -45,45 +36,6 @@ const translations: Translations = {
   },
 }
 
-/**
- * Generates a question with a hash map and operations
- * @param random
- * @param variant
- * @param lang
- */
-function generateQuestionBase(random: Random, variant: "linear", lang: "de" | "en") {
-  const tableSize = random.int(6, 8)
-  const tableSizeVariable = random.choice("mnxyzpvw".split(""))
-
-  // insert -> only inserting into hash table
-  // insert-delete -> inserting and deleting from hash table
-  const task: "insert" | "insert-delete" = random.weightedChoice([
-    ["insert", 0.85],
-    ["insert-delete", 0.15],
-  ])
-
-  const randomHashFunction = generateHashFunction(tableSizeVariable, tableSize, variant, random)()
-
-  const generated = generateOperationsHashMap({
-    random,
-    tableSize,
-    task,
-    mapStyle: variant,
-    hashFunction: randomHashFunction.hashFunction,
-  })
-
-  const hashMap = generated.hashMap
-  const insertions = generated.insertions
-  const deletions = generated.deletions
-
-  const insertTable = createTableForValues(insertions.map((i) => i.toString()))
-  const insertString = t(translations, lang, "insert", [insertTable])
-
-  const deleteTable = createTableForValues(deletions.map((i) => i.toString()))
-  const deleteString = deletions.length > 0 ? t(translations, lang, "delete", [deleteTable]) : ""
-  return { tableSize, tableSizeVariable, randomHashFunction, hashMap, insertString, deleteString }
-}
-
 export const hashingQuestion: QuestionGenerator = {
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
@@ -116,106 +68,38 @@ export const hashingQuestion: QuestionGenerator = {
       )
     }
 
-    let variant = parameters.variant as "linked" | "linear"
-    variant = "linear"
+    const variant = parameters.variant as "linked" | "linear"
 
-    const { tableSize, tableSizeVariable, randomHashFunction, hashMap, insertString, deleteString } =
-      generateQuestionBase(random, variant, lang)
-
-    const checkFormat: FreeTextFormatFunction = ({ text }) => {
-      text = text.trim()
-      text = text.replace("[", "")
-      text = text.replace("]", "")
-      const fields = text.split(",")
-
-      // Don't compare length in checkFormat, because this could be a mistake by the user
-      let tableHeader: string = `|`
-      let tableSeparator: string = `|`
-      for (const field of fields) {
-        if (field.trim() !== "" && isNaN(parseInt(field.trim()))) {
-          return { valid: false, message: t(translations, lang, "checkFormatLinear") }
-        }
-        if (field.trim() === "") {
-          tableHeader += `-|`
-        } else {
-          tableHeader += `$${field.trim()}$|`
-        }
-        tableSeparator += `---|`
-      }
-
-      // generate a table based on the user input
-      const arrayTable = `
-${tableHeader}
-${tableSeparator}
-      `
-
-      return { valid: true, message: arrayTable }
-    }
-
-    const feedback: FreeTextFeedbackFunction = ({ text }) => {
-      text = text.trim()
-      text = text.replace("[", "")
-      text = text.replace("]", "")
-
-      const correctSolution: string[] = []
-      for (const key of hashMap.keysList() as (number | null)[]) {
-        if (key === null) {
-          correctSolution.push("_")
-        } else {
-          correctSolution.push("$" + key.toString() + "$")
-        }
-      }
-      const correctAnswer = "$[$" + correctSolution.join("**,**") + "$]$"
-
-      const fields = text.split(",")
-      if (fields.length !== tableSize) {
-        return {
-          correct: false,
-          correctAnswer,
-        }
-      }
-
-      let i: number = 0
-      for (const key of hashMap.keysList() as (number | null)[]) {
-        if (key === null) {
-          if (fields[i].trim() !== "") {
-            return {
-              correct: false,
-              correctAnswer,
-            }
-          }
-        } else {
-          if (parseInt(fields[i].trim()) !== key) {
-            return {
-              correct: false,
-              correctAnswer,
-            }
-          }
-        }
-        i++
-      }
-
-      return { correct: true, feedback: text }
-    }
-
-    const question: FreeTextQuestion = {
-      type: "FreeTextQuestion",
-      name: t(translations, lang, "name"),
-      path: permalink,
-      text: t(translations, lang, "textLinear", [
-        tableSizeVariable + "=" + tableSize.toString(),
+    if (variant === "linked") {
+      throw new Error("Linked Hashing is not yet implemented")
+    } else {
+      const {
+        tableSize,
+        tableSizeVariable,
+        randomHashFunction,
         insertString,
         deleteString,
-        randomHashFunction.hashFunctionString,
-      ]),
-      bottomText: t(translations, lang, "bottomTextLinear"),
-      placeholder: "[ ,5, ,3,...",
-      feedback,
-      checkFormat,
-    }
+        checkFormat,
+        feedback,
+      } = generateQuestionLinearProbing(random, translations, lang)
 
-    return {
-      question,
+      return {
+        question: {
+          type: "FreeTextQuestion",
+          name: t(translations, lang, "name"),
+          path: permalink,
+          text: t(translations, lang, "textLinear", [
+            tableSizeVariable + "=" + tableSize.toString(),
+            insertString,
+            deleteString,
+            randomHashFunction.hashFunctionString,
+          ]),
+          bottomText: t(translations, lang, "bottomTextLinear"),
+          placeholder: "[ ,5, ,3,...",
+          feedback,
+          checkFormat,
+        },
+      }
     }
   },
 }
