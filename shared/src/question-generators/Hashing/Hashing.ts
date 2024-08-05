@@ -1,4 +1,3 @@
-import { validateParameters } from "@shared/api/Parameters.ts"
 import { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { generateQuestionLinearProbing } from "@shared/question-generators/Hashing/utils.ts"
@@ -36,8 +35,9 @@ const translations: Translations = {
   },
 }
 
-export const hashingQuestion: QuestionGenerator = {
+export const hashingGenerator: QuestionGenerator = {
   name: tFunctional(translations, "name"),
+  id: "hashing",
   description: tFunctional(translations, "description"),
   tags: ["hashing", "hash-map", "hash-list", "hash-function"],
   languages: ["en", "de"],
@@ -49,24 +49,15 @@ export const hashingQuestion: QuestionGenerator = {
     },
   ],
 
-  generate(generatorPath, lang, parameters, seed) {
+  generate(lang, parameters, seed) {
     const random = new Random(seed)
 
     const permalink = serializeGeneratorCall({
-      generator: hashingQuestion,
+      generator: hashingGenerator,
       lang,
       parameters,
       seed,
-      generatorPath,
     })
-
-    if (!validateParameters(parameters, hashingQuestion.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${hashingQuestion.expectedParameters.join(
-          ", ",
-        )}`,
-      )
-    }
 
     const variant = parameters.variant as "linked" | "linear"
 
