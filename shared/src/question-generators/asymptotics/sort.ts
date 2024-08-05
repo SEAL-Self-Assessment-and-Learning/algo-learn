@@ -1,4 +1,3 @@
-import { validateParameters } from "../../api/Parameters"
 import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
@@ -40,6 +39,7 @@ const translations: Translations = {
  * @returns Output
  */
 export const SortTerms: QuestionGenerator = {
+  id: "asort",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   languages: ["en", "de"],
@@ -50,16 +50,8 @@ export const SortTerms: QuestionGenerator = {
       allowedValues: ["start", "pure", "polylog", "polylogexp"],
     },
   ],
-  generate: (generatorPath, lang, parameters, seed) => {
+  generate: (lang, parameters, seed) => {
     const { t } = tFunction(translations, lang)
-
-    if (!validateParameters(parameters, SortTerms.expectedParameters)) {
-      throw new Error(
-        `Unknown variant ${parameters.variant.toString()}. Valid variants are: ${SortTerms.expectedParameters.join(
-          ", ",
-        )}`,
-      )
-    }
 
     const random = new Random(seed)
     const variable = random.choice("nmNMxyztk".split(""))
@@ -98,7 +90,6 @@ export const SortTerms: QuestionGenerator = {
         lang,
         parameters,
         seed,
-        generatorPath,
       }),
       text: t("text"),
       answers: answers.map((a) => a.text),

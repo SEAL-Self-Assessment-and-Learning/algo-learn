@@ -207,7 +207,7 @@ export class ProductTerm {
   }
 
   /**
-   * Compute the limit of a as the variable approaches infinity.
+   * Compute the limit of a term as the variable approaches infinity.
    *
    * @returns The limit of the product term.
    */

@@ -1,7 +1,7 @@
 import { CheckCheck, XCircle } from "lucide-react"
 import { useState } from "react"
-import { Tooltip } from "react-tooltip"
 import { MultipleChoiceFeedback, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
@@ -102,7 +102,7 @@ export function ExerciseMultipleChoice({
         })
       }
     } else if (mode === "correct" || mode === "incorrect") {
-      onResult && onResult(mode)
+      if (onResult) onResult(mode)
     }
   }
 
@@ -130,19 +130,23 @@ export function ExerciseMultipleChoice({
   })
 
   if (!question.sorting) {
-    let message = null
+    const message = []
     if (mode === "correct") {
-      message = <b className="text-2xl">Correct!</b>
+      message.push(<b className="text-2xl">Correct!</b>)
     } else if (mode === "incorrect") {
-      message = feedbackObject?.correctChoice ? (
-        <>
-          <b className="text-xl">{t("correct.solution")}:</b>
-          <br />
-          {t("see.above")}
-        </>
-      ) : (
-        t("incorrect")
+      message.push(
+        feedbackObject?.correctChoice ? (
+          <>
+            <b className="text-xl">{t("correct.solution")}:</b>
+            <br />
+            {t("see.above")}
+            <br />
+          </>
+        ) : (
+          t("incorrect")
+        ),
       )
+      if (feedbackObject?.feedbackText) message.push(<Markdown md={feedbackObject.feedbackText} />)
     }
     const disabled = mode === "correct" || mode === "incorrect"
     return (
@@ -165,7 +169,6 @@ export function ExerciseMultipleChoice({
                   isCorrectAnswer={isCorrectAnswer}
                   userGaveCorrectAnswer={isCorrectAnswer === choice.includes(index)}
                   hidden={!disabled}
-                  id={id}
                 />
                 <Checkbox
                   id={id}
@@ -194,7 +197,11 @@ export function ExerciseMultipleChoice({
         <>
           <b className="text-lg">{t("feedback.thats-ok")}</b>
           <br />
-          {t("feedback.correct-order")}
+          <Markdown
+            md={t("feedback.correct-order", [
+              `${state.feedbackObject?.correctChoice?.map((i) => "\n|" + question.answers[i] + "|").join("")}\n|#div_my-5#|\n`,
+            ])}
+          />
         </>
       ) : null
     const items: BaseItem[] = []
@@ -226,31 +233,29 @@ function FeedbackIconAndTooltip({
   isCorrectAnswer,
   userGaveCorrectAnswer,
   hidden,
-  id = "",
 }: {
   isCorrectAnswer: boolean
   userGaveCorrectAnswer: boolean
   hidden: boolean
-  id?: string
 }) {
   const { t } = useTranslation()
   const correctnessMsg = isCorrectAnswer ? t("answer.correct") : t("answer.wrong")
   const choiceMsg = userGaveCorrectAnswer ? t("choice.correct") : t("choice.wrong")
   return (
-    <>
-      <a id={`myid-${id}`}>
+    <Tooltip placement="left">
+      <TooltipTrigger>
         <FeedbackIcon correct={isCorrectAnswer} hidden={hidden} />
-      </a>
-      <Tooltip anchorSelect={`#myid-${id}`} place="left" className="z-10" hidden={hidden}>
+      </TooltipTrigger>
+      <TooltipContent hidden={hidden}>
         {correctnessMsg}
         <br />
         {choiceMsg}
-      </Tooltip>
-    </>
+      </TooltipContent>
+    </Tooltip>
   )
 }
 
-function FeedbackIcon({ correct, hidden }: { correct: boolean; hidden: boolean }) {
+function FeedbackIcon({ correct, hidden }: { correct: boolean; hidden?: boolean }) {
   const cn = hidden ? " invisible" : ""
   if (correct) {
     return <CheckCheck className={"h-4 w-4 text-green-700" + cn} />
