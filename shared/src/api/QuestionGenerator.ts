@@ -8,7 +8,7 @@ import { ExpectedParameters, Parameters } from "./Parameters"
  * optional properties. If this is not possible, a new question type should be
  * added.
  */
-export type Question = MultipleChoiceQuestion | FreeTextQuestion
+export type Question = MultipleChoiceQuestion | FreeTextQuestion | MultiFreeTextQuestion
 
 /**
  * Base type for all question types; they must contain the already-translated
@@ -194,6 +194,43 @@ export type FreeTextFeedbackFunction = (
 export type FreeTextFormatFunction = (
   answer: FreeTextAnswer,
 ) => { valid: boolean; message?: string } | Promise<{ valid: boolean; message?: string }>
+
+/** The signature of the function that checks the syntax or basic format. */
+export type MultiFreeTextFormatFunction = (
+  answer: MultiFreeTextAnswer,
+  fieldID: string,
+) => { valid: boolean; message?: string } | Promise<{ valid: boolean; message?: string }>
+
+/**
+ * After the user enters an answer, this answer is stored as a dictionary of
+ * strings.
+ */
+export interface MultiFreeTextAnswer {
+  /** The text entered by the user */
+  text: { [key: string]: string }
+}
+
+/** The signature of the feedback function for multi-free-text questions */
+export type MultiFreeTextFeedbackFunction = (
+  answer: MultiFreeTextAnswer,
+) => FreeTextFeedback | Promise<FreeTextFeedback>
+
+export interface MultiFreeTextQuestion extends QuestionBase {
+  type: "MultiFreeTextQuestion"
+
+  /** The feedback function for this question; defaults to undefined */
+  feedback?: MultiFreeTextFeedbackFunction
+
+  /** If all input fields need to be filled out. Defaults to false */
+  fillOutAll?: boolean
+
+  /**
+   * If provided, the following function performs a preliminary check on the
+   * provided answers. For example, it can be used to check whether the syntax of
+   * the given answers is correct and to provide feedback on the syntax.
+   */
+  checkFormat?: MultiFreeTextFormatFunction
+}
 
 /**
  * QuestionGenerator type for generating questions.
