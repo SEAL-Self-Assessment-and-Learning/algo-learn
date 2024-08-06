@@ -115,22 +115,92 @@ export class AVLTree {
     let rotationType: AVLTreeRotations = "none"
 
     if (data < node.data) {
-      const result = this.insertHelper(node.left, data)
-      node.left = result.node
-      rotationType = result.rotation
+      const insertResult = this.insertHelper(node.left, data)
+      node.left = insertResult.node
+      rotationType = insertResult.rotation
     } else if (data > node.data) {
-      const result = this.insertHelper(node.right, data)
-      node.right = result.node
-      rotationType = result.rotation
+      const insertResult = this.insertHelper(node.right, data)
+      node.right = insertResult.node
+      rotationType = insertResult.rotation
     } else {
       return { node, rotation: "none" }
     }
 
+    return this.rebalance(node, rotationType)
+  }
+
+  /**
+   * Delete Helper function to delete a node from the AVL Tree (recursive)
+   * @param node - The current node
+   * @param data - The data to be deleted
+   * @private
+   */
+  private deleteHelper(
+    node: AVLNode | null,
+    data: number,
+  ): {
+    node: AVLNode | null
+    rotation: AVLTreeRotations
+  } {
+    if (!node)
+      return {
+        node: null,
+        rotation: "none",
+      }
+
+    let prevRotation: AVLTreeRotations = "none"
+
+    // Perform standard BST delete
+    if (data < node.data) {
+      const deleteResult = this.deleteHelper(node.left, data)
+      node.left = deleteResult.node
+      prevRotation = deleteResult.rotation
+    } else if (data > node.data) {
+      const deleteResult = this.deleteHelper(node.right, data)
+      node.right = deleteResult.node
+      prevRotation = deleteResult.rotation
+    } else {
+      // Node with only one child or no child
+      if (!node.left || !node.right) {
+        const temp = node.left ? node.left : node.right
+        if (!temp) {
+          node = null
+        } else {
+          node = temp
+        }
+      } else {
+        // Node with two children: Get the inorder predecessor (largest in the left subtree)
+        const temp = this.findMax(node.left)
+        node.data = temp.data
+        const deleteResult = this.deleteHelper(node.left, temp.data)
+        node.left = deleteResult.node
+        prevRotation = deleteResult.rotation
+      }
+    }
+
+    if (!node)
+      return {
+        node: null,
+        rotation: "none",
+      }
+
+    return this.rebalance(node, prevRotation)
+  }
+
+  private rebalance(
+    node: AVLNode,
+    rotation: AVLTreeRotations,
+  ): {
+    node: AVLNode
+    rotation: AVLTreeRotations
+  } {
     node.height = 1 + Math.max(this.getHeight(node.left), this.getHeight(node.right))
 
+    // Get the balance factor of this node
     const balance = this.getBalance(node)
-    let rotation: AVLTreeRotations = "none"
 
+    // Balance the node if it has become unbalanced
+    // Left Cases (Left-Left and Left-Right)
     if (balance > 1) {
       if (this.getBalance(node.left) < 0) {
         node.left = this.leftRotate(node.left!)
@@ -147,70 +217,7 @@ export class AVLTree {
       if (rotation === "none") rotation = "left"
     }
 
-    if (rotationType !== "none") {
-      return { node, rotation: rotationType }
-    }
-    return { node, rotation: rotation }
-  }
-
-  /**
-   * Delete Helper function to delete a node from the AVL Tree (recursive)
-   * @param node - The current node
-   * @param data - The data to be deleted
-   * @private
-   */
-  private deleteHelper(node: AVLNode | null, data: number): AVLNode | null {
-    if (!node) return node
-
-    // Perform standard BST delete
-    if (data < node.data) {
-      node.left = this.deleteHelper(node.left, data)
-    } else if (data > node.data) {
-      node.right = this.deleteHelper(node.right, data)
-    } else {
-      // Node with only one child or no child
-      if (!node.left || !node.right) {
-        const temp = node.left ? node.left : node.right
-        if (!temp) {
-          node = null
-        } else {
-          node = temp
-        }
-      } else {
-        // Node with two children: Get the inorder predecessor (largest in the left subtree)
-        const temp = this.findMax(node.left)
-        node.data = temp.data
-        node.left = this.deleteHelper(node.left, temp.data)
-      }
-    }
-
-    if (!node) return node
-
-    // Update height of the current node
-    node.height = 1 + Math.max(this.getHeight(node.left), this.getHeight(node.right))
-
-    // Get the balance factor of this node
-    const balance = this.getBalance(node)
-
-    // Balance the node if it has become unbalanced
-
-    // Left Cases (Left-Left and Left-Right)
-    if (balance > 1) {
-      if (this.getBalance(node.left) < 0) {
-        node.left = this.leftRotate(node.left!)
-      }
-      return this.rightRotate(node)
-    }
-
-    // Right Cases (Right-Right and Right-Left)
-    if (balance < -1) {
-      if (this.getBalance(node.right) > 0) {
-        node.right = this.rightRotate(node.right!)
-      }
-      return this.leftRotate(node)
-    }
-
-    return node
+    return { node, rotation }
   }
 
   /**
@@ -336,8 +343,10 @@ export class AVLTree {
    * Delete a node from the AVL Tree
    * @param data - The data to be deleted
    */
-  delete(data: number): void {
-    this.root = this.deleteHelper(this.root, data)
+  delete(data: number): AVLTreeRotations {
+    const { node, rotation } = this.deleteHelper(this.root, data)
+    this.root = node
+    return rotation
   }
 
   /**

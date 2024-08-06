@@ -4,9 +4,11 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { AVLTree } from "@shared/question-generators/avl/avlDS.ts"
 import { avlTreeWeightedRotations } from "@shared/question-generators/avl/utils/utils.ts"
+import { generateAVLTreeDelete } from "@shared/question-generators/avl/utils/utilsDelete.ts"
 import { generateAVLTreeInsert } from "@shared/question-generators/avl/utils/utilsInsert.ts"
-import Random from "@shared/utils/random"
+import Random, { sampleRandomSeed } from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
@@ -14,16 +16,14 @@ const translations: Translations = {
     name: "AVL Tree",
     description: "Operation on AVL Trees",
     insert: "Below is an AVL tree. {{0}} We call **Insert({{1}})**. Draw the AVL tree that results.",
-    delete: "blu blu blu",
-    combine: "ble ble ble",
+    delete: "Below is an AVL tree. {{0}} We call **Delete({{1}})**. Draw the AVL tree that results.",
   },
   de: {
     name: "AVL-Baum",
     description: "Operationen auf AVL-Bäumen",
     insert:
-      "Unten abgebildet ist ein AVL-Baum. {{0}} Wir rufen **Insert({{1}})** und **Insert({{2}})** in dieser Reihenfolge auf. Zeichne unten den AVL-Baum, der dadurch entsteht.",
+      "Unten abgebildet ist ein AVL-Baum. {{0}} Wir rufen **Delete({{1}})** auf. Zeichne unten den AVL-Baum, der dadurch entsteht.",
     delete: "blu blu blu",
-    combine: "ble ble ble",
   },
 }
 
@@ -37,7 +37,7 @@ export const AVLGenerator: QuestionGenerator = {
     {
       type: "string",
       name: "variant",
-      allowedValues: ["insert", "delete", "combine"],
+      allowedValues: ["insert", "delete"],
     },
   ],
 
@@ -63,13 +63,47 @@ export const AVLGenerator: QuestionGenerator = {
       seed,
     })
 
-    const random: Random = new Random(seed)
+    const random: Random = new Random(sampleRandomSeed())
 
     const variant = parameters.variant as "insert" | "delete" | "combine"
-    console.log(variant) // TODO: remove
 
+    if (variant === "delete") {
+      return avlDeleteQuestion(random, feedback, lang, permalink)
+    }
     return avlInsertQuestion(random, feedback, lang, permalink)
   },
+}
+
+function avlDeleteQuestion(
+  random: Random,
+  feedback: FreeTextFeedbackFunction,
+  lang: "de" | "en",
+  permalink: string,
+) {
+  const avlTreeSize = random.int(7, 14)
+  const rotationOption = random.weightedChoice(avlTreeWeightedRotations)
+  const { avlTree, askValue } = generateAVLTreeDelete({
+    random,
+    avlTreeSize,
+    rotationOption,
+  })
+
+  const avlTreeString = createQuestionLayout({
+    avlTree,
+  })
+  avlTree.delete(askValue)
+  console.log(avlTree.levelOrderAlternative())
+
+  const question: FreeTextQuestion = {
+    type: "FreeTextQuestion",
+    name: AVLGenerator.name(lang),
+    text: t(translations, lang, "delete", [avlTreeString, askValue.toString()]),
+    path: permalink,
+    feedback,
+  }
+  return {
+    question,
+  }
 }
 
 function avlInsertQuestion(
@@ -87,6 +121,27 @@ function avlInsertQuestion(
     rotationOption,
   })
 
+  const avlTreeString = createQuestionLayout({
+    avlTree,
+  })
+  avlTree.insert(askValue)
+  console.log(avlTree.levelOrderAlternative())
+
+  const question: FreeTextQuestion = {
+    type: "FreeTextQuestion",
+    name: AVLGenerator.name(lang),
+    text: t(translations, lang, "insert", [avlTreeString, askValue.toString()]),
+    path: permalink,
+    feedback,
+  }
+  return {
+    question,
+    avlTree,
+    askValue,
+  }
+}
+
+function createQuestionLayout({ avlTree }: { avlTree: AVLTree }) {
   let avlTreeString = "\n|Index:|"
   const levelOrder = avlTree.levelOrderAlternative()
   for (let i = 0; i < levelOrder.length; i++) {
@@ -98,14 +153,5 @@ function avlInsertQuestion(
   }
   avlTreeString += "|#div_my-5#||\n"
 
-  const question: FreeTextQuestion = {
-    type: "FreeTextQuestion",
-    name: AVLGenerator.name(lang),
-    text: t(translations, lang, "insert", [avlTreeString, askValue]),
-    path: permalink,
-    feedback,
-  }
-  return {
-    question,
-  }
+  return avlTreeString
 }

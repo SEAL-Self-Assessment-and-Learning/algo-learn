@@ -25,31 +25,15 @@ export function generateAVLTreeInsert({
   random: Random
   avlTreeSize: number
   rotationOption: AVLTreeRotations
-}): { askValue: string; avlTree: AVLTree } {
+}): { askValue: number; avlTree: AVLTree } {
   // Generates all possible AVL tree structures of the given avlTreeSize
-  /*
-  The art of computer programming, Volume 3, Sorting and searching, 2nd Edition
-  Theorem A: The height of a balanced tree with N internal nodes
-  always lies between
-    lg(N + 1)
-  and
-    1.4405 lg(N + 2) − 0.3277.
-  I will use the upper bound to generate the AVL trees, until this height
-   */
   const maxHeight = Math.ceil(1.45 * Math.log2(avlTreeSize + 2) - 0.32)
-  const tmpTrees: AVLTreeHelper[] = assignUniqueIDsToTrees(
-    generateAllAVLTrees(maxHeight, avlTreeSize, avlTreeSize),
-    random,
-  )
+  const allTrees = generateAllAVLTrees(maxHeight, avlTreeSize, avlTreeSize)
+  const tmpTrees: AVLTreeHelper[] = assignUniqueIDsToTrees(allTrees, random)
   // converting the avlTree structures in AVLTrees with numbers as value
   const avlTrees: AVLTree[] = convertAVLHelperToRandomAVLTree(random, tmpTrees)
 
-  const { avlTree, askValue } = handleAVLRotation(random, avlTrees, rotationOption)
-
-  return {
-    askValue,
-    avlTree,
-  }
+  return handleAVLRotation(random, avlTrees, rotationOption)
 }
 
 /**
@@ -62,18 +46,17 @@ function handleAVLRotation(
   random: Random,
   avlTrees: AVLTree[],
   rotationOption: AVLTreeRotations,
-): { avlTree: AVLTree; askValue: string } {
+): { avlTree: AVLTree; askValue: number } {
   const { insertValue, currentTree } = getRandomTreeInsertPairForRotation(
     random,
     avlTrees,
     rotationOption,
   )
-  const askValue = insertValue.toString()
   checkAVLNull(currentTree)
 
   return {
     avlTree: currentTree as AVLTree,
-    askValue,
+    askValue: insertValue,
   }
 }
 
@@ -102,14 +85,12 @@ function checkTreeForRotation(currentTree: AVLTree, rotationOption: AVLTreeRotat
     // clone the tree, so the current tree can be reused for the next round
     const treeClone = currentTree.clone()
     const treeCloneInsert = treeClone.insert(insertValue)
-    // check if it is the desired rotation
     if (treeCloneInsert === rotationOption) {
       allPossibleValues.push(insertValue)
     }
     lastSeen = inOrder[j]
   }
 
-  // We found a tree were an insert operation would result in the desired rotation
   if (allPossibleValues.length > 0) {
     return {
       insertValue: random.choice(allPossibleValues),
@@ -134,7 +115,6 @@ function getRandomTreeInsertPairForRotation(
 ) {
   avlTrees = random.shuffle(avlTrees)
 
-  // iterate through all trees until we find a tree where the desired rotation is possible
   for (let i = 0; i < avlTrees.length; i++) {
     const result = checkTreeForRotation(avlTrees[i], rotationOption, random)
     if (result) return result

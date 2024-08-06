@@ -38,13 +38,10 @@ export function convertAVLHelperToRandomAVLTree(random: Random, treeHelper: AVLT
     const newAVLTree: AVLTree = new AVLTree()
     avlTrees.push(newAVLTree)
 
-    // get the inorder for the helper tree
     const inOrder = inOrderHelper(treeHelper[i])
     const inOrderToValues: { [key: string]: number } = {}
 
-    // iterate through the inOrder
-    // convert every entry into a dict and
-    // assign every value in every iteration a new higher value
+    // convert every entry into a dict with a new higher number
     let lastUsedNumber = 1
     for (let j = 0; j < inOrder.length; j++) {
       const newNumber = random.int(lastUsedNumber + 1, lastUsedNumber + 15)
@@ -52,7 +49,6 @@ export function convertAVLHelperToRandomAVLTree(random: Random, treeHelper: AVLT
       inOrderToValues[inOrder[j]] = newNumber
     }
 
-    // get the lvlOrder, to convert into an avl tree
     const lvlOrder = levelOrderAlternativeHelper(treeHelper[i])
 
     for (let j = 0; j < lvlOrder.length; j++) {
@@ -66,38 +62,6 @@ export function convertAVLHelperToRandomAVLTree(random: Random, treeHelper: AVLT
 
   return avlTrees
 }
-
-/**
- * Those trees are all possible AVL trees with a height of 1 and 2
- * 1 tree height 1 and 1 node
- * 2 trees height 2 and 2 nodes
- * 1 trees height 2 and 3 nodes
- */
-const baseCaseTreeStructure = [
-  [{ root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper],
-  [
-    {
-      root: "x",
-      left: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
-      right: null,
-      numNodes: 2,
-    } as AVLTreeHelper,
-
-    {
-      root: "x",
-      left: null,
-      right: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
-      numNodes: 2,
-    } as AVLTreeHelper,
-
-    {
-      root: "x",
-      left: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
-      right: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
-      numNodes: 3,
-    } as AVLTreeHelper,
-  ],
-]
 
 /**
  * This function computes the number of nodes in a tree
@@ -133,9 +97,34 @@ function getAllTreesWithMinNNodes(trees: AVLTreeHelper[][], numberOfNodes: numbe
  * @param maxNodes - the maximum number of nodes
  */
 export function generateAllAVLTrees(maxHeight: number, minNodes: number, maxNodes: number) {
+  const baseCaseTreeStructure = [
+    [{ root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper],
+    [
+      {
+        root: "x",
+        left: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
+        right: null,
+        numNodes: 2,
+      } as AVLTreeHelper,
+
+      {
+        root: "x",
+        left: null,
+        right: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
+        numNodes: 2,
+      } as AVLTreeHelper,
+
+      {
+        root: "x",
+        left: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
+        right: { root: "x", left: null, right: null, numNodes: 1 } as AVLTreeHelper,
+        numNodes: 3,
+      } as AVLTreeHelper,
+    ],
+  ]
+
   // create all trees by combining new trees
   // root and h-1 * h-1 | root and h-1 * h-2 | and h-2 * h-1
-  // using "x" as node name and assigning unique ids to every node later
   for (let i = 2; i <= maxHeight; i++) {
     baseCaseTreeStructure.push([])
     for (let m = 0; m < baseCaseTreeStructure[i - 1].length; m++) {
