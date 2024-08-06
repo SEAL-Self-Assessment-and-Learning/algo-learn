@@ -186,7 +186,7 @@ export function assignUniqueIDsToTrees(trees: AVLTreeHelper[], random: Random): 
 function assignUniqueIDToEveryNode(tree: AVLTreeHelper, random: Random) {
   const possibleIDs: string[] = []
   while (possibleIDs.length < tree.numNodes) {
-    const newID = random.float(-100, 100).toString()
+    const newID = random.base36string(tree.numNodes)
     if (!possibleIDs.includes(newID)) {
       possibleIDs.push(newID)
     }
