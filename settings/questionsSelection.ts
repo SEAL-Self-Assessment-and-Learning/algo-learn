@@ -12,10 +12,10 @@ import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
+import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
-import { queueQuestion } from "@shared/question-generators/StackQueue/Queue/QueueGenerator.ts"
-import { stackQuestion } from "@shared/question-generators/StackQueue/Stack/StackGenerator.ts"
+import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
@@ -50,9 +50,14 @@ export const collection: QuestionCollection = [
     contents: [huffmanCoding],
   },
   {
-    slug: "stackqueue",
-    name: { de: "Stack und Queue", en: "Stack and Queue" },
-    contents: [stackQuestion, queueQuestion],
+    slug: "queue",
+    name: { de: "Queue", en: "Queue" },
+    contents: [queueQuestion],
+  },
+  {
+    slug: "stack",
+    name: { de: "Stack", en: "Stack" },
+    contents: [stackQuestion],
   },
   {
     slug: "propositional-logic",

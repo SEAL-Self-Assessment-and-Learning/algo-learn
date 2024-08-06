@@ -1,4 +1,4 @@
-import { Stack } from "@shared/question-generators/StackQueue/Stack/Stack.ts"
+import { Stack } from "@shared/question-generators/Stack/Stack.ts"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import Random from "@shared/utils/random.ts"
 import { t, Translations } from "@shared/utils/translations.ts"

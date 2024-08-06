@@ -9,7 +9,7 @@ import {
   createQueueInputFields,
   generateOperationsQueueFreetext,
   generateQueueStartElements,
-} from "@shared/question-generators/StackQueue/Queue/utils.ts"
+} from "@shared/question-generators/Queue/utils.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunction, tFunctional, Translations } from "@shared/utils/translations.ts"
 

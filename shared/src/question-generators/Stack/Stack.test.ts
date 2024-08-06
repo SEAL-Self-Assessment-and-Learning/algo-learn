@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { Queue } from "@shared/question-generators/StackQueue/Queue/Queue.ts"
-import { Stack } from "./Stack/Stack.ts"
+import { Stack } from "../Stack/Stack.ts"
 
 describe("test for Stack class main", () => {
   let stack: Stack<number>
@@ -61,30 +60,5 @@ describe("test for Stack class main", () => {
     expect(stack.getSize()).toBe(19)
     expect(stack.getTop()).toBe(19)
     expect(stack.getTop()).toBe(18)
-  })
-})
-
-describe("test for Queue class", () => {
-  let queue: Queue<number>
-
-  test("queues elements", () => {
-    queue = new Queue()
-    queue.enqueue(1)
-    expect(queue.getCurrentNumberOfElements()).toBe(1)
-  })
-
-  test("dequeues elements", () => {
-    queue = new Queue()
-    queue.enqueue(1)
-    queue.enqueue(2)
-    expect(queue.dequeue()).toBe(1)
-  })
-
-  test("returns the current queue as a string", () => {
-    queue = new Queue()
-    queue.enqueue(1)
-    queue.enqueue(2)
-    queue.enqueue(3)
-    expect(queue.toString()).toBe("1,2,3")
   })
 })
