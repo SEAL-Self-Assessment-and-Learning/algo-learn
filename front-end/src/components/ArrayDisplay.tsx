@@ -30,7 +30,7 @@ export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): React
                 Index
               </th>
               {parsedArrayObject.array.map((_, index) => (
-                <th key={index} className="text-gray-600 dark:text-gray-400">
+                <th key={index} className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">
                   {index + parsedArrayObject.startingIndex}
                 </th>
               ))}

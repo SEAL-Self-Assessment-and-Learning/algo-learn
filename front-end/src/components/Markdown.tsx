@@ -5,9 +5,11 @@ import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm
 import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
 import { ArrayDisplay } from "@/components/ArrayDisplay.tsx"
 import { DrawList } from "@/components/DrawList.tsx"
+import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
 import { FormInputField } from "@/components/ui/FormInputField.tsx"
 import { useTheme } from "../hooks/useTheme"
+import { useTheme } from "@/hooks/useTheme.ts"
 import { Format } from "./Format"
 import TeX from "./TeX"
 
@@ -97,6 +99,9 @@ export const MarkdownTreeNode: FunctionComponent<{
   if (parseTreeNode.kind === "```") {
     if (parseTreeNode.language === "array") {
       return <ArrayDisplay arrayObject={parseTreeNode.child} />
+    }
+    if (parseTreeNode.language === "pseudoCode") {
+      return <DrawPseudoCode displayCode={parseTreeNode.child} />
     }
     return (
       <div className="my-5">

@@ -106,8 +106,7 @@ export function sortByStrength({
 }> {
   random?.shuffle(generatorCalls) // If random was provided, shuffle to break ties
   generatorCalls.sort(
-    (a, b) =>
-      featureMap[serializeGeneratorCall(a)]?.p ?? 0 - featureMap[serializeGeneratorCall(b)]?.p ?? 0,
+    (a, b) => featureMap[serializeGeneratorCall(a)]?.p ?? 0 - featureMap[serializeGeneratorCall(b)]?.p,
   )
   return generatorCalls
 }
