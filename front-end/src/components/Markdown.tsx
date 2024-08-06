@@ -9,7 +9,6 @@ import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
 import { FormInputField } from "@/components/ui/FormInputField.tsx"
 import { useTheme } from "../hooks/useTheme"
-import { useTheme } from "@/hooks/useTheme.ts"
 import { Format } from "./Format"
 import TeX from "./TeX"
 
