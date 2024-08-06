@@ -1,5 +1,6 @@
-import Random from "@shared/utils/random.ts"
+import Random from "@shared/utils/random"
 
+// Todo: generate those frequencies
 const tmpFrequencies: { [key: number]: number[][] } = {
   8: [
     [1, 2, 5],
@@ -22,25 +23,21 @@ const tmpFrequencies: { [key: number]: number[][] } = {
     [2, 3, 6],
   ],
   12: [
-    //[1, 2, 9],
-    //[1, 3, 8],
-    //[1, 4, 7],
     [2, 3, 7],
     [3, 4, 5],
     [1, 2, 4, 5],
     [1, 2, 4, 5],
   ],
   13: [
-    //[1, 4, 8],
-    //[1, 5, 7],
-    //[2, 3, 8],
     [2, 4, 7],
-    //[2, 5, 6],
     [3, 4, 6],
     [1, 2, 4, 6],
     [1, 2, 4, 6],
   ],
 }
+
+// alphabet from A to Z
+const possibleChars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 /**
  * This function generates a random string of a given length and difficulty
@@ -55,29 +52,28 @@ export function generateString(length: keyof typeof tmpFrequencies, random: Rand
   return generateWordBasedOnFrequency(chosenFrequency[randomIndex], random)
 }
 
+/**
+ * Generates a word based on the frequency of the characters (characters are not chosen yet)
+ * @param chosenFrequency - the frequency of the characters
+ * @param random - the random object
+ */
 function generateWordBasedOnFrequency(chosenFrequency: number[], random: Random) {
   let word = ""
-  // not using "i", "j", "l", "n", "q" because they have similar shapes
-  const possibleChars: string = "ABCDEFGHKMOPRSTUVWXYZ"
   const chosenChars = random.subset(possibleChars.split(""), chosenFrequency.length)
-
   for (let j = 0; j < chosenFrequency.length; j++) {
     word += chosenChars[j].repeat(chosenFrequency[j])
   }
-
   return word
 }
 
 /**
- * This function creates an array of chars, this is for more challenging questions (but easier to read, instead of a
- * word with 26 letters or so)
- * @param numDifferentCharacters
+ * This function creates an array of chars, this is for more challenging questions
+ * (but easier to read, instead of a word with 26 letters or so)
+ * @param numDifferentCharacters - how many different chars appear (max 26)
  * @param random
  */
 export function generateCharacterFrequencyTable(numDifferentCharacters: number, random: Random) {
-  const possibleChars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
   const chosenChars = random.subset(possibleChars.split(""), numDifferentCharacters)
-  // create an array with values 1 to 100
   const amountCharsArray = random.shuffle([...Array(99).keys()]).slice(0, numDifferentCharacters)
   const charArray: { [key: string]: number } = {}
   for (let i = 0; i < numDifferentCharacters; i++) {
