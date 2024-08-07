@@ -7,13 +7,13 @@ import { HashFunction } from "@shared/question-generators/Hashing/MapLinProbing.
  * If the same key is inserted twice, the value of the first insert is updated
  */
 export class MapLinked {
-  private map: ListNode[] | null[]
-  private size: number
+  private map: (ListNode | null)[]
+  private readonly size: number
   private amount: number = 0
   private readonly hashFunction: HashFunction
 
   constructor(size: number, hashFunction?: HashFunction) {
-    this.map = new Array(size).fill(null) as ListNode[] | null[]
+    this.map = new Array(size).fill(null) as (ListNode | null)[]
     this.size = size
     this.hashFunction = hashFunction ? hashFunction : this.defaultHashFunction
   }
@@ -199,22 +199,6 @@ export class MapLinked {
   clear() {
     this.map = new Array(this.size).fill(null) as ListNode[] | null[]
     this.amount = 0
-  }
-
-  /**
-   * Resizes the map to a new size
-   * @param newSize
-   */
-  // TODO: Change this function to a more standard way of resizing
-  resize(newSize: number) {
-    const keys = this.keys()
-    const values = this.values()
-    this.map = new Array(newSize).fill(null) as ListNode[] | null[]
-    this.size = newSize
-
-    for (let i = keys.length - 1; i >= 0; i--) {
-      this.insert(keys[i], values[i])
-    }
   }
 
   /**

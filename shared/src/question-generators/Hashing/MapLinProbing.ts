@@ -54,7 +54,6 @@ export class MapLinProbing {
     if (this.amount >= this.size) {
       throw new Error(`Map is full. Cannot insert key ${key}`)
     }
-
     let hashKey = this.doubleHashing ? this.getHashValue(key, 0) : this.getHashValue(key)
     if (this.has(key)) {
       this.change(key, value)
@@ -167,7 +166,7 @@ export class MapLinProbing {
    * Returns an array of all the keys in the map
    */
   keys(): number[] {
-    return this.mapKeys.filter((key) => key !== null) as number[]
+    return this.mapKeys.filter((key) => key !== null)
   }
 
   /**
@@ -181,7 +180,7 @@ export class MapLinProbing {
    * Returns an array of all the values in the map
    */
   values(): string[] {
-    return this.mapValues.filter((value) => value !== null) as string[]
+    return this.mapValues.filter((value) => value !== null)
   }
 
   /**

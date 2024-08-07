@@ -99,36 +99,6 @@ describe("Hashing with Linked List", () => {
     expect(hashMap.values()).toEqual(["four", "TWO", "three"])
   })
 
-  test("Handles resizing (decrease) followed by toString()", () => {
-    const hashMap = createHashMap(MapLinked, 4)
-
-    hashMap.resize(2)
-
-    hashMap.delete(1)
-
-    expect(hashMap.toString()).toEqual(
-      `0: (4, four) -> (6, six) -> (2, TWO)  \n1: (5, five) -> (3, three)`,
-    )
-  })
-
-  test("Handles resizing (increase) followed by toString()", () => {
-    const hashMap = createHashMap(MapLinked, 4)
-
-    hashMap.resize(8)
-
-    hashMap.delete(1)
-
-    expect(hashMap.toString()).toEqual(
-      `0: \n1: \n2: (2, TWO)  \n3: (3, three)  \n4: (4, four)  \n5: (5, five)  \n6: (6, six)  \n7:`,
-    )
-
-    hashMap.resize(4)
-
-    expect(hashMap.toString()).toEqual(
-      `0: (4, four)  \n1: (5, five)  \n2: (2, TWO) -> (6, six)  \n3: (3, three)`,
-    )
-  })
-
   test("Handles entries(), isEmpty(), getAmount(), clear()", () => {
     const hashMap = createHashMap(MapLinked, 4)
 

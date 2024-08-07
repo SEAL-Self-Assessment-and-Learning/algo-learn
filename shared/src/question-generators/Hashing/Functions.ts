@@ -37,26 +37,12 @@ export function generateHashFunction(
     }
   }
 
-  const divisionMethodVariation = (): GenerateFuncType => {
-    const multValue = random.choice([3, 4, 6, 7, 8, 9, 10, 12, 13].filter((v) => v !== tableSize))
-
-    function hashFunction(key: number, size: number) {
-      return (key * multValue) % size
-    }
-    const hashFunctionString = `\n> $h_i(x) = (x*${multValue}+i) \\bmod ${variable}$`
-
-    return {
-      hashFunction,
-      hashFunctionString,
-    }
-  }
-
   const multiplicationMethod = (): GenerateFuncType => {
     // usually it is just one function, but for better readability we split it into two
     const multValue = random.choice([0.75, 0.9].filter((v) => v !== tableSize))
 
     function hashFunction(key: number, size: number) {
-      return Math.floor(size * key * multValue - Math.floor(key * multValue))
+      return Math.floor(size * key * multValue - Math.floor(key * multValue)) % size
     }
     // x*multValue % 1 <=> x*multValue - Math.floor(x*multValue)
     const fString = `\n> $f(x) = \\lfloor ${variable} \\cdot x \\cdot ${multValue} - \\lfloor x \\cdot ${multValue} \\rfloor \\rfloor$`
@@ -93,21 +79,17 @@ export function generateHashFunction(
   }
 
   const doubleLinearHashing = (): GenerateFuncType => {
-    // f(x) = multValue * x mod size
-    // g(x) = value - (x mod value)
-    // h_i(x) = (f(x) + i*g(x)) % size
     const multValue = random.choice([3, 4, 6, 7, 8, 9, 10, 12, 13].filter((v) => v !== tableSize))
-    const value = random.choice([8, 9, 10, 12, 13].filter((v) => v !== tableSize && v !== multValue))
 
     function hashFunction(key: number, i: number, size: number) {
       const f = (multValue * key) % size
-      const g = value - (key % value)
+      const g = tableSize - 1 - (key % (tableSize - 1))
       return (f + i * g) % size
     }
 
-    const fString = `\n> $f(x) = ${multValue} \\cdot x \\bmod ${variable}$`
-    const gString = `\n> $g(x) = ${value} - (x \\bmod ${value})$`
-    const hashFunctionString = `\n> $h_i(x) = (f(x) + i \\cdot g(x)) \\bmod ${variable}$`
+    const fString = `\n> $f(x) = ${multValue} \\cdot x \\bmod ${tableSize}$`
+    const gString = `\n> $g(x) = (${variable} - 1) - (x \\bmod ${variable} - 1)$`
+    const hashFunctionString = `\n> $h_i(x) = (f(x) + i \\cdot g(x)) \\bmod ${tableSize}$`
 
     return {
       hashFunction,
@@ -115,45 +97,9 @@ export function generateHashFunction(
     }
   }
 
-  const squareHashing = (): GenerateFuncType => {
-    // f(x) = multValue * x mod size
-    // c_1 = value1
-    // c_2 = value2
-    // h_i(x) = (f(x) + c_1*i + c_2*i^2) % size
-    const valueOptions = [3, 4, 6, 7, 8, 9, 10, 12, 13]
-    const multValue = random.choice(valueOptions.filter((v) => v !== tableSize))
-    const c1 = random.choice(valueOptions.filter((v) => v !== tableSize && v !== multValue))
-    const c2 = random.choice(valueOptions.filter((v) => v !== tableSize && v !== multValue && v !== c1))
-
-    function hashFunction(key: number, i: number, size: number) {
-      const f = (multValue * key) % size
-      return (f + c1 * i + c2 * i * i) % size
-    }
-
-    const fString = `\n> $f(x) = ${multValue} \\cdot x \\bmod ${variable}$`
-    const hashFunctionString = `\n> $h_i(x) = (f(x) + ${c1} \\cdot i + ${c2} \\cdot i^2) \\bmod ${variable}$`
-
-    return {
-      hashFunction,
-      hashFunctionString: fString + "\n\n" + hashFunctionString,
-    }
-  }
-
   if (type === "linear") {
-    return random.choice([
-      divisionMethod,
-      divisionMethodVariation,
-      multiplicationMethod,
-      universalHashing,
-      doubleLinearHashing,
-      squareHashing,
-    ])
+    return random.choice([divisionMethod, multiplicationMethod, universalHashing, doubleLinearHashing])
   } else {
-    return random.choice([
-      divisionMethod,
-      divisionMethodVariation,
-      multiplicationMethod,
-      universalHashing,
-    ])
+    return random.choice([divisionMethod, multiplicationMethod, universalHashing])
   }
 }
