@@ -67,6 +67,9 @@
   "Your learning progress": "Your learning progress",
   "copyLinkCopied": "Copied!",
   "copyLinkTooltip": "Copy link to this exercise to the clipboard.",
+  "copyCodeLatex": "Copy code as LaTeX",
+  "colorHighlightingTooltip": "Color highlighting",
+  "lineNumberTooltip": "Show line numbers",
   "detailed-learning-progress": "Detailed learning progress",
   "detailed-learning-progress-text": "Probably more details than you want to know.",
   "even": "even",
@@ -106,5 +109,6 @@
   "theme.light": "light",
   "time": "Time",
   "train.skills.desc": "Gain experience points (XP) through practice! Choose a topic:",
-  "your-learning-progress": "Your learning progress"
+  "your-learning-progress": "Your learning progress",
+  "provideFeedbackCheckFormat": "Here we will provide feedback to the format of your answer."
 }

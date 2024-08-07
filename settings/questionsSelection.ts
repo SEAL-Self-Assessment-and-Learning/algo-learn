@@ -12,8 +12,10 @@ import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
+import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
+import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF"
 
@@ -49,6 +51,16 @@ export const collection: QuestionCollection = [
     contents: [huffmanCoding],
   },
   {
+    slug: "queue",
+    name: { de: "Queue", en: "Queue" },
+    contents: [queueQuestion],
+  },
+  {
+    slug: "stack",
+    name: { de: "Stack", en: "Stack" },
+    contents: [stackQuestion],
+  },
+  {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
     contents: [Satisfiability, NormalForms],
@@ -70,4 +82,6 @@ export const oldPathToGenerator = {
   "recursion/master": RecurrenceMaster,
   "time/loops": Loops,
   "huffmancoding/huffmanCoding": huffmanCoding,
+  "stackqueue/stack": stackQuestion,
+  "stackqueue/queue": queueQuestion,
 }
