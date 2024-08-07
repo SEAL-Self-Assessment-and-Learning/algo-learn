@@ -29,7 +29,12 @@ export function generateHashFunction(
     function hashFunction(key: number, size: number) {
       return key % size
     }
-    const hashFunctionString = `\n> $h_i(x) = (x+i) \\bmod ${variable}$`
+    let hashFunctionString = ""
+    if (type === "linear") {
+      hashFunctionString = `\n> $h_i(x) = (x+i) \\bmod ${variable}$`
+    } else {
+      hashFunctionString = `\n> $h(x) = x \\bmod ${variable}$`
+    }
 
     return {
       hashFunction,
@@ -46,7 +51,12 @@ export function generateHashFunction(
     }
     // x*multValue % 1 <=> x*multValue - Math.floor(x*multValue)
     const fString = `\n> $f(x) = \\lfloor ${variable} \\cdot x \\cdot ${multValue} - \\lfloor x \\cdot ${multValue} \\rfloor \\rfloor$`
-    const hashFunctionString = `\n> $h_i(x) = (f(x) + i) \\bmod ${variable}$`
+    let hashFunctionString = ""
+    if (type === "linear") {
+      hashFunctionString = `\n> $h_i(x) = (f(x) + i) \\bmod ${variable}$`
+    } else {
+      hashFunctionString = `\n> $h(x) = f(x) \\bmod ${variable}$`
+    }
 
     return {
       hashFunction,
@@ -70,7 +80,12 @@ export function generateHashFunction(
       return ((a * key + b) % p) % size
     }
 
-    const hashFunctionString = `\n> $h_i(x) = (((${a} \\cdot x + ${b}) \\bmod ${p}) + i) \\bmod ${variable}$`
+    let hashFunctionString = ""
+    if (type === "linear") {
+      hashFunctionString = `\n> $h_i(x) = (((${a} \\cdot x + ${b}) \\bmod ${p}) + i) \\bmod ${variable}$`
+    } else {
+      hashFunctionString = `\n> $h(x) = ((${a} \\cdot x + ${b}) \\bmod ${p}) \\bmod ${variable}$`
+    }
 
     return {
       hashFunction,
