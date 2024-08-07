@@ -5,7 +5,7 @@ import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
 } from "@shared/api/QuestionGenerator"
-import { generateWrongAnswersWord } from "@shared/question-generators/huffman-coding/generate/GenerateStructure.ts"
+import { generatePossibleAnswersChoice1 } from "@shared/question-generators/huffman-coding/generate/GenerateChoiceAnswers.ts"
 import { generateString } from "@shared/question-generators/huffman-coding/generate/GenerateWords"
 import { getHuffmanCodeOfWord } from "@shared/question-generators/huffman-coding/Huffman"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
@@ -58,15 +58,11 @@ export function generateChoiceQuestion({
   const { correctAnswer, correctTree, word } = generateInputChoiceFoundations({ random })
 
   // get a set of obvious wrong answers
-  const answers = generateWrongAnswersWord(random, correctAnswer, correctTree, word)
-
+  const answers = generatePossibleAnswersChoice1(random, correctAnswer, correctTree, word)
   answers.push(correctAnswer)
-  // add second correct answer
-  correctTree.setNewLabels(random)
-  answers.push(correctTree.encode(word))
-  random.shuffle(answers)
-  const correctAnswerIndexes = []
-  // find all correct answers. maybe some of the wrong answers are correct by accident
+
+  const correctAnswerIndexes: number[] = []
+  // find all the correct answers
   for (let i = 0; i < answers.length; i++) {
     if (correctTree.setLabelsByCodeword(word, answers[i])) correctAnswerIndexes.push(i)
   }
