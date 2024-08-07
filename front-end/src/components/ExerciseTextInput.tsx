@@ -108,7 +108,7 @@ export function ExerciseTextInput({
         })
       }
     } else if (mode === "correct" || mode === "incorrect") {
-      onResult && onResult(mode)
+      if (onResult) onResult(mode)
     }
   }
 

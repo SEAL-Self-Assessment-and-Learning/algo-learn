@@ -5,6 +5,7 @@ import { QuestionHeader } from "./QuestionHeader"
 
 /** The current display mode */
 export type MODE =
+  | "initial" // Initial state, "Check" button is disabled
   | "invalid" // Invalid selection (e.g. nothing selected), "Check" button is disabled
   | "draft" // Valid selection (e.g. at least one answer), but not yet submitted
   | "submitted" // "Check" was clicked, feedback was requested
