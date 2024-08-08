@@ -1,10 +1,12 @@
-// TODO refactor this file
-
 import {
   getHuffmanCodeOfTable,
   getHuffmanCodeOfWord,
   HuffmanNode,
 } from "@shared/question-generators/huffman-coding/Huffman.ts"
+import {
+  checkProvidedCode,
+  convertDictToMdTable,
+} from "@shared/question-generators/huffman-coding/utils/utils.ts"
 import Random from "@shared/utils/random.ts"
 
 /**
@@ -23,17 +25,129 @@ export function generatePossibleAnswersChoice1(
 ): Array<string> {
   const answerSet: Set<string> = new Set<string>()
 
-  answerSet.add(generateRandomWrongAnswer(random, correctAnswer))
-  answerSet.add(generateWrongAnswerSwitchLetters(random, correctTree, word).resultWord)
+  answerSet.add(randomSwitch01(random, correctAnswer))
+  answerSet.add(switchLetters(random, correctTree, word).resultWord)
   answerSet.add(generateWrongAnswerChangeWord(random, word).slice(0, correctAnswer.length + 5))
-  answerSet.add(generateWrongAnswerReduceCodeOfLetter(word, correctTree).wrongAnswerCoding)
-  answerSet.add(generateWrongAnswerFlip01InCodeChar(random, correctTree, word).wrongAnswerCoding)
+  answerSet.add(reduceCodeOfLetter(word, correctTree).wrongAnswerCoding)
+  answerSet.add(flip01InCodeChar(random, correctTree, word).wrongAnswerCoding)
   for (let i = 0; i < 2; i++) {
     answerSet.add(generateNewLabelSetting(word, correctTree, random))
   }
-  answerSet.delete(correctAnswer)
+  answerSet.delete(correctAnswer) // we are adding this later to ensure at least one correct answer is included
 
   return random.shuffle(random.subset(Array.from(answerSet), 3))
+}
+
+/**
+ * This function sorts a possible answer into the correct or wrong answer list
+ * @param optionDict - the dictionary of the option (either correct or wrong)
+ * @param inputDict - the dictionary of the input
+ * @param correctTree - the correct tree
+ * @param correctAnswerList
+ * @param wrongAnswerList
+ */
+function processOption({
+  optionDict,
+  inputDict,
+  correctTree,
+  correctAnswerList,
+  wrongAnswerList,
+}: {
+  optionDict: { [key: string]: string }
+  inputDict: { [p: string]: number }
+  correctTree: HuffmanNode
+  correctAnswerList: Set<string>
+  wrongAnswerList: Set<string>
+}) {
+  const encodingTable = correctTree.getEncodingTable()
+  const optionMdTable = convertDictToMdTable(optionDict)
+
+  if (checkProvidedCode(inputDict, encodingTable, optionDict)) {
+    correctAnswerList.add(optionMdTable)
+  } else {
+    wrongAnswerList.add(optionMdTable)
+  }
+}
+
+/**
+ * This function creates the answer options for the multiple choice question
+ * Using correct and wrong answers, shuffling them and returning a list of both (at least one correct answer)
+ * Also returns the indices of the correct answers
+ * @param correctAnswerList
+ * @param wrongAnswerList
+ * @param random
+ */
+function createAnswerOptions(
+  correctAnswerList: Set<string>,
+  wrongAnswerList: Set<string>,
+  random: Random,
+) {
+  const correctAnswers = Array.from(correctAnswerList)
+  const wrongAnswers = Array.from(wrongAnswerList)
+
+  const answers: string[] = random.subset(
+    correctAnswers,
+    random.int(1, correctAnswers.length < 3 ? correctAnswers.length : 3),
+  )
+  answers.push(...random.subset(wrongAnswers, 4 - answers.length))
+  random.shuffle(answers)
+
+  // get the indices of the correct answers inside answers
+  const correctAnswerIndices: number[] = []
+  for (let i = 0; i < answers.length; i++) {
+    if (correctAnswers.includes(answers[i])) {
+      correctAnswerIndices.push(i)
+    }
+  }
+  return { answers, correctAnswerIndices }
+}
+
+/**
+ * This function generates wrong answers for the table questions
+ * Maybe optimize the wrong answer generation later (but I don't have any idea at the moment)
+ * @param random
+ * @param inputDict
+ * @param correctTree
+ */
+export function generateWrongAnswersDict(
+  random: Random,
+  inputDict: { [p: string]: number },
+  correctTree: HuffmanNode,
+) {
+  // List of correct answers
+  const wrongAnswerList: Set<string> = new Set<string>()
+  const correctAnswerList: Set<string> = new Set<string>()
+  correctAnswerList.add(convertDictToMdTable(correctTree.getEncodingTable()))
+
+  const fixInputCorrectSet = {
+    inputDict,
+    correctTree,
+    correctAnswerList,
+    wrongAnswerList,
+  }
+
+  while (wrongAnswerList.size + correctAnswerList.size < 4) {
+    // Generate and evaluate different options
+    processOption({ optionDict: changeFrequenciesRandomly(random, inputDict), ...fixInputCorrectSet })
+    processOption({ optionDict: wrongAdditionTree(random, inputDict), ...fixInputCorrectSet })
+    processOption({ optionDict: swapManyLetters(inputDict), ...fixInputCorrectSet })
+    processOption({
+      optionDict: flip01InCodeChar(random, correctTree, "").huffmanDict,
+      ...fixInputCorrectSet,
+    })
+    processOption({
+      optionDict: switchLetters(random, correctTree, "").huffmanDict,
+      ...fixInputCorrectSet,
+    })
+  }
+
+  const { answers, correctAnswerIndices } = createAnswerOptions(
+    correctAnswerList,
+    wrongAnswerList,
+    random,
+  )
+
+  return { answers, correctAnswerIndices }
 }
 
 /**
@@ -42,7 +156,7 @@ export function generatePossibleAnswersChoice1(
  * @param random
  * @param correctAnswer
  */
-export function generateRandomWrongAnswer(random: Random, correctAnswer: string) {
+export function randomSwitch01(random: Random, correctAnswer: string) {
   const wrongAnswer = correctAnswer.split("")
   const flipPositions = random.subset(
     Array.from({ length: correctAnswer.length }, (_, i) => i),
@@ -67,11 +181,7 @@ export function generateRandomWrongAnswer(random: Random, correctAnswer: string)
  * @param currentTree
  * @param word
  */
-export function generateWrongAnswerSwitchLetters(
-  random: Random,
-  currentTree: HuffmanNode,
-  word: string,
-) {
+export function switchLetters(random: Random, currentTree: HuffmanNode, word: string) {
   const huffmanDict: { [key: string]: string } = currentTree.getEncodingTable()
   const randomKeys = random.subset(Object.keys(huffmanDict), 2)
   ;[huffmanDict[randomKeys[0]], huffmanDict[randomKeys[1]]] = [
@@ -98,7 +208,7 @@ export function generateWrongAnswerSwitchLetters(
  * @param word
  * @param currentTree
  */
-export function generateWrongAnswerReduceCodeOfLetter(word: string, currentTree: HuffmanNode) {
+export function reduceCodeOfLetter(word: string, currentTree: HuffmanNode) {
   const huffmanDict = currentTree.getEncodingTable()
   const currentLongestKey = getKeyWithLongestHuffmanCode(huffmanDict)
   huffmanDict[currentLongestKey] = huffmanDict[currentLongestKey].slice(
@@ -115,11 +225,7 @@ export function generateWrongAnswerReduceCodeOfLetter(word: string, currentTree:
  * @param currentTree
  * @param word
  */
-export function generateWrongAnswerFlip01InCodeChar(
-  random: Random,
-  currentTree: HuffmanNode,
-  word: string,
-) {
+export function flip01InCodeChar(random: Random, currentTree: HuffmanNode, word: string) {
   const huffmanDict = currentTree.getEncodingTable()
   const randomKey = random.choice(Object.keys(huffmanDict))
   const randomIndex = random.int(0, huffmanDict[randomKey].length - 1)
@@ -194,6 +300,11 @@ export function changeFrequenciesRandomly(random: Random, inputDict: { [key: str
   return getHuffmanCodeOfTable(inputDict).getEncodingTable()
 }
 
+/**
+ * This creates a wrong encoding by adding a random value to the addition of two nodes
+ * @param random
+ * @param inputDict
+ */
 export function wrongAdditionTree(random: Random, inputDict: { [key: string]: number }) {
   // create an incorrect huffman dictionary
   return getHuffmanCodeOfTable(inputDict, random).getEncodingTable()
@@ -234,36 +345,4 @@ function createEncodingFromDict(huffmanDict: { [key: string]: string }, word: st
     encoding += huffmanDict[word[i]]
   }
   return encoding
-}
-
-// todo not used at the moment. is the only function that modifies the tree.
-//  if this function is obsolete, some properties of HuffmanNode can be made private
-export function createHuffmanCodingBitError(
-  huffmanCode: { [key: string]: string },
-  node: HuffmanNode,
-  code: string,
-  random: Random,
-) {
-  const firstValue = random.int(0, 1)
-  const secondValue = 1 - firstValue
-  if (node.left) {
-    huffmanCode = createHuffmanCodingBitError(
-      huffmanCode,
-      node.left,
-      code + firstValue.toString(),
-      random,
-    )
-  }
-  if (node.right) {
-    huffmanCode = createHuffmanCodingBitError(
-      huffmanCode,
-      node.right,
-      code + secondValue.toString(),
-      random,
-    )
-  }
-  if (node.value.length === 1) {
-    huffmanCode[node.value] = code
-  }
-  return huffmanCode
 }

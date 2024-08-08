@@ -122,13 +122,11 @@ export function generateInputQuestion({
     if (valid) {
       return {
         correct: true,
-        message: "t(feedback.correct)",
       }
     }
 
     return {
       correct: false,
-      message: "t(feedback.incomplete)",
       correctAnswer: insertSpaceAfterEveryXChars(correctAnswer, 3),
     }
   }
