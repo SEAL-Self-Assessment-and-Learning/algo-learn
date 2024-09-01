@@ -7,11 +7,13 @@ import { SingleTranslation } from "@shared/utils/translations"
  * @param startingIndex The index to in the top row to start with
  *                      (default is 0, mostly either 0 or 1)
  * @param secondRowName The name of the second row (default is ST "Value")
+ * @param transposeMobile If true, the array will be displayed transposed on smaller devices
  */
 export type ArrayDisplayProps<T> = {
   array: T[]
   startingIndex: number
   secondRowName: SingleTranslation
+  transposeMobile: boolean
 }
 
 /**
@@ -19,20 +21,24 @@ export type ArrayDisplayProps<T> = {
  * @param array
  * @param startingIndex
  * @param secondRowName
+ * @param transpose
  */
 export function createArrayDisplayCodeBlock<T>({
   array,
   startingIndex = 0,
   secondRowName = { de: "Wert", en: "Value" },
+  transposeMobile = false,
 }: {
   array: T[]
   startingIndex?: number
   secondRowName?: SingleTranslation
+  transposeMobile?: boolean
 }): string {
   const parseArrayBlock: ArrayDisplayProps<T> = {
     array,
     startingIndex,
     secondRowName,
+    transposeMobile: transposeMobile,
   }
 
   return `
