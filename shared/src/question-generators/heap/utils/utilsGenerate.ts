@@ -16,8 +16,9 @@ export function generateOperationSequence(
   heapType: "Min" | "Max",
   random: Random,
 ): { sequence: string; heap: MinHeap | MaxHeap } {
-  const sequenceLength = random.int(7, 11)
+  const sequenceLength = random.int(6, 9)
   const heap = heapType === "Min" ? new MinHeap() : new MaxHeap()
+  const usedValues = new Set<number>()
 
   let amountInserts = 0
   let amountExtracts = 0
@@ -25,16 +26,23 @@ export function generateOperationSequence(
   const operationSequence = []
 
   for (let i = 0; i < sequenceLength; i++) {
-    const canExtract = amountInserts - amountExtracts >= 3
-    const operation = canExtract
+    const canExtract = amountInserts - amountExtracts >= 2
+    let operation: "insert" | "extract" = canExtract
       ? random.weightedChoice([
-          ["insert", 0.7],
-          ["extract", 0.3],
+          ["insert", 0.6],
+          ["extract", 0.4],
         ])
       : "insert"
 
+    // include at least one extract operation
+    if (i === sequenceLength - 1 && amountExtracts === 0) operation = "extract"
+
     if (operation === "insert") {
-      const newValue = random.int(1, 20)
+      let newValue = random.int(1, 20)
+      while (usedValues.has(newValue)) {
+        newValue = random.int(1, 20)
+      }
+      usedValues.add(newValue)
       operationSequence.push(newValue.toString())
       heap.insert(newValue)
       amountInserts++
@@ -104,16 +112,14 @@ export function generateHeapsForChoiceQuestion(
   const correctRandomHeaps = generateRandomHeaps(heapType, amountOfCorrectHeaps, random)
   const correctRandomHeapsString = correctRandomHeaps.map((heap) =>
     createArrayDisplayCodeBlock({
-      array: heap.getHeap(),
-      startingIndex: 1,
+      array: ["-"].concat(heap.getHeap().map(String)),
     }),
   )
 
   const wrongRandomHeapsString = random.subset(
     wrongRandomHeaps.map((heap) =>
       createArrayDisplayCodeBlock({
-        array: heap,
-        startingIndex: 1,
+        array: ["-"].concat(heap.map(String)),
       }),
     ),
     4 - correctRandomHeaps.length,
@@ -146,7 +152,7 @@ export function generateRandomHeaps(
 
   while (heaps.length < count) {
     const heap = heapType === "Max" ? new MaxHeap() : new MinHeap()
-    const size = random.int(6, 10)
+    const size = random.int(6, 9)
     for (let j = 0; j < size; j++) {
       heap.insert(random.int(1, 20))
     }

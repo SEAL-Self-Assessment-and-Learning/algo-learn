@@ -17,38 +17,27 @@ const translationHeapOperations: Translations = {
     name: "Heap-Operations",
     description: "Determine the state of a Heap after various operations",
     taskInsert:
-      "Consider a **{{0}}-Heap**. Initally the Heap is empty. You insert the following elements in the given order: {{1}} Enter the state of the Heap after the insertions.",
+      "Consider a **{{0}}-Heap**. Initally the Heap is empty. Insert the elements in the given order: \\[{{1}}\\] Enter the final state of the Heap.",
     taskExtract:
-      "Consider the following **{{0}}-Heap**: {{1}} You extract the {{2}} element **{{3}}** times. Enter the state of the Heap after the extractions.",
+      "Consider the following **{{0}}-Heap**: {{1}} You call `Extract{{2}}` **{{3}}** times. Enter the final state of the Heap.",
     taskBuild:
       "Consider the following **Array**: {{0}} Enter the state of the Heap after **Build-{{1}}-Heap** on the above array.",
     taskCombine:
-      "Let **{{0}}** be a sequence of operations, where a **number** represents **inserting** this number into the **{{2}}-Heap** and $*$ represents an **Extract-{{2}}** operation. \\[{{0}}={{1}}\\] Enter the state of the Heap after all operations. Initially the Heap is empty.",
+      "Consider the following sequence of operations, where a **number** represents **inserting** this number into the **{{1}}-Heap** and $*$ represents an `Extract{{1}}` operation. \\[{{0}}\\] Enter the final state of the Heap. Initially the Heap is empty.",
     checkFormat: "Please only enter Integer seperated by commas.",
   },
   de: {
     name: "Heap-Operationen",
     description: "Bestimme den Zustand eines Heaps nach unterschiedlichen Operationen",
     taskInsert:
-      "Betrachte einen **{{0}}-Heap**. Anfänglich ist der Heap leer. Du fügst die folgenden Elemente in gegebener Reihenfolge ein: {{1}} Gib den Heap nach den Einfügeoperationen an.",
+      "Betrachte einen **{{0}}-Heap**. Anfänglich ist der Heap leer. Du fügst die folgenden Elemente in gegebener Reihenfolge ein: \\[{{1}}\\] Gib den finalen Zustand des Heaps an.",
     taskExtract:
-      "Betrachte den folgenden **{{0}}-Heap**: {{1}} Du extrahierst das {{2}} Element **{{3}}** mal. Gib den Heap nach den Extraktionen an.",
+      "Betrachte den folgenden **{{0}}-Heap**: {{1}} Du rufst `Extract{{2}}` **{{3}}** mal auf. Gib den finalen Zustand des Heaps an.",
     taskBuild:
       "Betrachte das folgende Array: {{0}} Gib den Heap nach **Build-{{1}}-Heap** auf dem obigen Array an.",
     taskCombine:
-      "Sei **{{0}}** eine Sequenz von Operationen, wobei eine **Zahl** das **Einfügen** dieser Zahl in den **{{2}}-Heap** repräsentiert und $*$ eine **Extract-{{2}}** Operation. \\[{{0}}={{1}}\\] Gib den Heap nach allen Operationen an. Der Heap ist anfangs leer.",
+      "Betrachte die folgende Sequenz von Operationen, wobei eine **Zahl** das **Einfügen** dieser Zahl in den **{{1}}-Heap** repräsentiert und $*$ eine `Extract{{1}}` Operation. \\[{{0}}\\] Gib den finalen Zustand des Heaps an. Anfänglich ist der Heap leer.",
     checkFormat: "Bitte nur ganze Zahlen durch Komma getrennt eingeben.",
-  },
-}
-
-const wordTranslations: Translations = {
-  en: {
-    maximal: "maximal",
-    minimal: "minimal",
-  },
-  de: {
-    maximal: "maximale",
-    minimal: "minimale",
   },
 }
 
@@ -62,7 +51,7 @@ export const HeapOperations: QuestionGenerator = {
     {
       type: "string",
       name: "variant",
-      allowedValues: ["insert", "extract", "build", "combine"],
+      allowedValues: ["insert", "extract", "combine"],
     },
   ],
 
@@ -131,8 +120,7 @@ export const HeapOperations: QuestionGenerator = {
         return {
           correct: false,
           correctAnswer: createArrayDisplayCodeBlock({
-            array: solutionHeap.getHeap(),
-            startingIndex: 1,
+            array: ["-"].concat(solutionHeap.getHeap().map(String)),
           }),
         }
       }
@@ -143,12 +131,6 @@ export const HeapOperations: QuestionGenerator = {
     }
 
     if (variant === "insert") {
-      // build a table representing the index - value pair starting at 1
-      let elementsTable = createArrayDisplayCodeBlock({
-        array: heapElements,
-      })
-      elementsTable += "|#div_my-5#||\n"
-
       for (const element of heapElements) {
         solutionHeap.insert(element)
       }
@@ -157,7 +139,7 @@ export const HeapOperations: QuestionGenerator = {
         type: "FreeTextQuestion",
         name: HeapOperations.name(lang),
         path: permaLink,
-        text: t(translationHeapOperations, lang, "taskInsert", [heapType, elementsTable]),
+        text: t(translationHeapOperations, lang, "taskInsert", [heapType, heapElements.toString()]),
         checkFormat,
         feedback,
       }
@@ -167,8 +149,7 @@ export const HeapOperations: QuestionGenerator = {
         solutionHeap.insert(element)
       }
       const elementsTable = createArrayDisplayCodeBlock({
-        array: solutionHeap.getHeap(),
-        startingIndex: 1,
+        array: ["-"].concat(solutionHeap.getHeap().map(String)),
       })
 
       const extractAmount = random.int(2, 3)
@@ -187,7 +168,7 @@ export const HeapOperations: QuestionGenerator = {
         text: t(translationHeapOperations, lang, "taskExtract", [
           heapType,
           elementsTable,
-          t(wordTranslations, lang, heapType === "Min" ? "minimal" : "maximal"),
+          heapType,
           extractAmount.toString(),
         ]),
         checkFormat,
@@ -196,7 +177,7 @@ export const HeapOperations: QuestionGenerator = {
       return { question }
     } else if (variant === "build") {
       const elementsTable = createArrayDisplayCodeBlock({
-        array: heapElements,
+        array: ["-"].concat(heapElements.map(String)),
       })
 
       solutionHeap.build(heapElements)
@@ -212,8 +193,6 @@ export const HeapOperations: QuestionGenerator = {
 
       return { question }
     } else {
-      const variableName = random.choice(["A", "B", "C", "D", "E"])
-
       const { sequence, heap } = generateOperationSequence(heapType, random)
       solutionHeap = heap
 
@@ -221,7 +200,7 @@ export const HeapOperations: QuestionGenerator = {
         type: "FreeTextQuestion",
         name: HeapOperations.name(lang),
         path: permaLink,
-        text: t(translationHeapOperations, lang, "taskCombine", [variableName, sequence, heapType]),
+        text: t(translationHeapOperations, lang, "taskCombine", [sequence, heapType]),
         checkFormat,
         feedback,
       }
