@@ -14,6 +14,46 @@ export type ArrayDisplayProps<T> = {
   startingIndex: number
   secondRowName: SingleTranslation
   transposeMobile: boolean
+  inputFieldSize?: number
+}
+
+/**
+ * This function creates an array display code block with user input fields.
+ * @param numberOfInputFields - (more than nine input fields may be too large)
+ * @param startingIndex
+ * @param secondRowName
+ * @param transposeMobile
+ * @param inputFieldSize - the size of the input field (11 is the default size (it fits two digits))
+ *                         (currently only **w-(10|11|12|14)** are included in the safelist,
+ *                         in case you need a different size, please add it to the safelist)
+ */
+export function createArrayDisplayCodeBlockUserInput({
+  numberOfInputFields,
+  startingIndex = 0,
+  secondRowName = { de: "Wert", en: "Value" },
+  transposeMobile = false,
+  inputFieldSize = 11,
+}: {
+  numberOfInputFields: number
+  startingIndex?: number
+  secondRowName?: SingleTranslation
+  transposeMobile?: boolean
+  inputFieldSize?: number
+}) {
+  // create as many input fields as needed
+  const inputFields: string[] = []
+  for (let i = 0; i < numberOfInputFields; i++) {
+    inputFields.push(`{{input-${i}#OS_w-${inputFieldSize.toString()}###overlay}}`)
+  }
+  return {
+    inputFields,
+    arrayDisplayBlock: createArrayDisplayCodeBlock({
+      array: inputFields,
+      startingIndex,
+      secondRowName,
+      transposeMobile,
+    }),
+  }
 }
 
 /**

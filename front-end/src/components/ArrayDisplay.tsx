@@ -45,19 +45,19 @@ function renderTransposedArrayView<T>(
         <table className="w-full border-collapse">
           <thead className="border-b border-gray-700 dark:border-gray-300">
             <tr>
-              <th className="relative border-r border-gray-700 px-4 py-2 text-center text-gray-600 dark:border-gray-300 dark:text-gray-400">
+              <th className="relative border-r border-gray-700 px-2 py-2 text-center text-gray-600 dark:border-gray-300 dark:text-gray-400">
                 Index
               </th>
-              <th className="px-4 py-2 text-center">{parsedArrayObject.secondRowName[lang]}</th>
+              <th className="px-2 py-2 text-center">{parsedArrayObject.secondRowName[lang]}</th>
             </tr>
           </thead>
           <tbody>
             {parsedArrayObject.array.map((value, index) => (
               <tr key={index}>
-                <td className="border-r border-gray-700 px-4 py-2 text-center text-gray-600 dark:border-gray-300 dark:text-gray-400">
+                <td className="border-r border-gray-700 px-2 py-2 text-center text-gray-600 dark:border-gray-300 dark:text-gray-400">
                   {index + parsedArrayObject.startingIndex}
                 </td>
-                <td className="px-4 py-2 text-center">
+                <td className="px-2 py-2 text-center">
                   <Markdown md={String(value)} />
                 </td>
               </tr>
@@ -89,11 +89,11 @@ function renderNormalArrayView<T>(
         <table className="w-full border-collapse">
           <thead className="border-b border-gray-700 dark:border-gray-300">
             <tr>
-              <th className="relative border-r border-gray-700 px-4 py-2 text-left text-gray-600 dark:border-gray-300 dark:text-gray-400">
+              <th className="relative border-r border-gray-700 px-2 py-2 text-center text-gray-600 dark:border-gray-300 dark:text-gray-400">
                 Index
               </th>
               {parsedArrayObject.array.map((_, index) => (
-                <th key={index} className="px-4 py-2 text-left text-gray-600 dark:text-gray-400">
+                <th key={index} className="px-2 py-2 text-center text-gray-600 dark:text-gray-400">
                   {index + parsedArrayObject.startingIndex}
                 </th>
               ))}
@@ -101,11 +101,11 @@ function renderNormalArrayView<T>(
           </thead>
           <tbody>
             <tr>
-              <th className="relative border-r border-gray-700 px-4 py-2 text-left dark:border-gray-300">
+              <th className="relative border-r border-gray-700 px-2 py-2 text-center dark:border-gray-300">
                 <b>{parsedArrayObject.secondRowName[lang]}</b>
               </th>
               {parsedArrayObject.array.map((value, index) => (
-                <td key={index} className="px-4 py-2 text-left">
+                <td key={index} className="px-2 py-2 text-center">
                   <Markdown md={String(value)} />
                 </td>
               ))}

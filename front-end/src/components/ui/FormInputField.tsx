@@ -49,7 +49,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
         {spacing}
         <div className="flex flex-col">
           <div className="flex flex-row items-center">
-            <div className="mr-2">{promptElement}</div>
+            <div className={`${prompt ? "mr-2" : ""}`}>{promptElement}</div>
             <div className={`relative h-full w-full`}>
               <Input
                 ref={focus ? firstInputRef : null}
@@ -61,7 +61,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
                   setText ? setText(e.target.value) : ""
                 }}
                 type="text"
-                className={`${inputBorderColor} focus:outline-none`}
+                className={`${inputBorderColor} focus:outline-none ${align.startsWith("OS") ? align.split("_")[1] : "w-full"}`}
                 placeholder={placeholder || ""}
               />
             </div>
@@ -80,7 +80,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
       <div>
         {spacing}
         <div className="flex flex-row items-center">
-          <div className="mr-2">{promptElement}</div>
+          <div className={`${prompt ? "mr-2" : ""}`}>{promptElement}</div>
           <div className={`relative h-full w-full`}>
             <Input
               ref={focus ? firstInputRef : null}
@@ -94,7 +94,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
               onFocus={() => setIsInputFocused(true)}
               onBlur={() => setIsInputFocused(false)}
               type="text"
-              className={`${inputBorderColor} mb-1 w-full focus:outline-none`}
+              className={`${inputBorderColor} mb-1 focus:outline-none ${align.startsWith("OS") ? align.split("_")[1] : "w-full"}`}
               placeholder={placeholder || ""}
             />
             {isInputFocused && feedback && (
