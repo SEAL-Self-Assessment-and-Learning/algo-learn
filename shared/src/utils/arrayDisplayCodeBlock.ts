@@ -26,6 +26,7 @@ export type ArrayDisplayProps<T> = {
  * @param inputFieldSize - the size of the input field (11 is the default size (it fits two digits))
  *                         (currently only **w-(10|11|12|14)** are included in the safelist,
  *                         in case you need a different size, please add it to the safelist)
+ * @param leadValues - the lead values are values in the columns in front of the input fields
  */
 export function createArrayDisplayCodeBlockUserInput({
   numberOfInputFields,
@@ -33,15 +34,17 @@ export function createArrayDisplayCodeBlockUserInput({
   secondRowName = { de: "Wert", en: "Value" },
   transposeMobile = false,
   inputFieldSize = 11,
+  leadValues = [],
 }: {
   numberOfInputFields: number
   startingIndex?: number
   secondRowName?: SingleTranslation
   transposeMobile?: boolean
   inputFieldSize?: number
+  leadValues?: string[]
 }) {
   // create as many input fields as needed
-  const inputFields: string[] = []
+  const inputFields: string[] = leadValues
   for (let i = 0; i < numberOfInputFields; i++) {
     inputFields.push(`{{input-${i}#OS_w-${inputFieldSize.toString()}###overlay}}`)
   }
