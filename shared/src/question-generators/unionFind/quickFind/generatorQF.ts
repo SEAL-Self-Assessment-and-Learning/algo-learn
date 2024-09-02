@@ -18,14 +18,14 @@ const translations: Translations = {
   en: {
     name: "QuickFind",
     description: "Determine QuickFind state after Union operation",
-    task: "A state of the Quick-Find data structure is given as the following array: \n{{0}}\n We call Union({{1}}, {{2}}). Provide the resulting state.",
+    task: "A state of the Quick-Find data structure is given as the following array: \n{{0}}\n We call `Union({{1}}, {{2}})`. Provide the resulting state.",
     explanationUnion:
       "We assume that the operation **Union(**$i$**,** $j$**)** always sets the value specified by **Find(**$i$**)** to the value specified by **Find(**$j$**)**.",
   },
   de: {
     name: "QuickFind",
     description: "Bestimme QuickFind-Zustand nach Union-Operation",
-    task: "Ein Zustand der Quick-Find Datenstruktur ist als folgendes Array gegeben: \n{{0}}\n Wir rufen **Union({{1}}, {{2}})** auf. Gib den Zustand an, der dadurch entsteht.",
+    task: "Ein Zustand der Quick-Find Datenstruktur ist als folgendes Array gegeben: \n{{0}}\n Wir rufen `Union({{1}}, {{2}})` auf. Gib den Zustand an, der dadurch entsteht.",
     explanationUnion:
       "Wir nehmen an, dass die Operation **Union(**$i$**,** $j$**)** immer den durch **Find(**$i$**)** spezifizierten Wert auf den von **Find(**$j$**)** spezifierten Wert setzt.",
   },
