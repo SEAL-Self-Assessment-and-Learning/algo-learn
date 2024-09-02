@@ -1,7 +1,7 @@
 import { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import {
-  generateQuestionLinearProbing,
+  generateQuestionLinearDoubleProbing,
   generateQuestionLinkedHashing,
 } from "@shared/question-generators/Hashing/utils.ts"
 import Random from "@shared/utils/random.ts"
@@ -13,16 +13,17 @@ const translations: Translations = {
     description: "Correctly insert value into a hash map",
     linearProbing: "Linear Probing",
     linkedList: "Linked List",
+    doubleHashing: "Double Hashing",
     Values: "Values",
-    insert: "We **insert** the following keys: {{0}}",
-    delete: "and then **delete** the following keys: {{0}}",
-    text: `Consider a hash table (size \${{0}}$) implemented with  "{{1}}". 
+    insert: "We **insert** the following keys in the given order: \\[{{0}}\\]",
+    delete: "and then **delete** the following keys in the given order: \\[{{0}}\\]",
+    text: `Consider a hash table of size \${{0}}$ implemented with  "{{1}}". 
 {{2}}
 {{3}}
-    The hash-function is: 
-{{4}} 
-    How is the state of the field after the operations?
-    {{5}}`,
+    The hash-function {{4}} is: 
+{{5}} 
+    Enter the final state of the hash table.
+{{6}}`,
     bottomTextLinear: `Please enter the state of the map after the operations in the format of an Array. You can keep free entries empty or just spaces.`,
     checkFormatLinear: "Please Provide an array only with numbers, commas and spaces",
     checkFormat: "Please enter a list of numbers",
@@ -30,18 +31,19 @@ const translations: Translations = {
   de: {
     name: "Hashing",
     description: "Füge den Wert korrekt in eine Hash-Map ein",
-    linearProbing: "Lineares Sondieren",
-    linkedList: "Verkettete Liste",
+    linearProbing: "Linearem Sondieren",
+    linkedList: "Verketteter Liste",
+    doubleHashing: "Doppeltem Hashing",
     Values: "Werte",
-    insert: "Wir **fügen** die folgenden Schlüssel ein: {{0}}",
-    delete: "und dann **löschen** wir die folgenden Schlüssel: {{0}}",
-    text: `Betrachten Sie eine Hashtabelle (Größe \${{0}}$), die mit "{{1}}" implementiert ist.
+    insert: "Wir **fügen** die folgenden Schlüssel in gegebener Reihenfolge ein: \\[{{0}}\\]",
+    delete: "und dann **löschen** wir die folgenden Schlüssel in gegebener Reihenfolge: \\[{{0}}\\]",
+    text: `Betrachten Sie eine Hashtabelle der Größe \${{0}}$, die mit "{{1}}" implementiert ist.
 {{2}}
 {{3}}
-    Die Hash-Funktion ist: 
-{{4}}
-    Wie ist der Zustand des Feldes nach den Operationen?
-{{5}}`,
+    Die Hash-Funktion {{4}} ist: 
+{{5}}
+    Gib den finalen Zustand der Hashtabelle ein.
+{{6}}`,
     bottomTextLinear: `Bitte geben Sie den Zustand der Karte nach den Operationen im Format eines Arrays ein. Sie können freie Einträge leer lassen oder einfach Leerzeichen verwenden.`,
     checkFormatLinear: "Bitte geben Sie nur ein Array mit Zahlen, Kommas und Leerzeichen an",
     checkFormat: "Bitte gib eine Liste von Zahlen ein",
@@ -58,7 +60,7 @@ export const hashingGenerator: QuestionGenerator = {
     {
       type: "string",
       name: "variant",
-      allowedValues: ["linear", "linked"],
+      allowedValues: ["linear", "linked", "double"],
     },
   ],
 
@@ -72,12 +74,11 @@ export const hashingGenerator: QuestionGenerator = {
       seed,
     })
 
-    const variant = parameters.variant as "linked" | "linear"
+    const variant = parameters.variant as "linked" | "linear" | "double"
 
     if (variant === "linked") {
       const {
         tableSize,
-        tableSizeVariable,
         randomHashFunction,
         insertValuesString,
         deleteValuesString,
@@ -92,10 +93,11 @@ export const hashingGenerator: QuestionGenerator = {
           name: t(translations, lang, "name"),
           path: permalink,
           text: t(translations, lang, "text", [
-            tableSizeVariable + "=" + tableSize.toString(),
+            tableSize.toString(),
             t(translations, lang, "linkedList"),
             insertValuesString,
             deleteValuesString,
+            "$h(x)$",
             randomHashFunction.hashFunctionString,
             inputTableString,
           ]),
@@ -105,26 +107,55 @@ export const hashingGenerator: QuestionGenerator = {
           feedback,
         },
       }
-    } else {
+    } else if (variant === "linear") {
       const {
         tableSize,
-        tableSizeVariable,
         randomHashFunction,
         insertValuesString,
         deleteValuesString,
         checkFormat,
         feedback,
-      } = generateQuestionLinearProbing(random, translations, lang)
+      } = generateQuestionLinearDoubleProbing(random, "linear", translations, lang)
       return {
         question: {
           type: "FreeTextQuestion",
           name: t(translations, lang, "name"),
           path: permalink,
           text: t(translations, lang, "text", [
-            tableSizeVariable + "=" + tableSize.toString(),
+            tableSize.toString(),
             t(translations, lang, "linearProbing"),
             insertValuesString,
             deleteValuesString,
+            "$h(x)$",
+            randomHashFunction.hashFunctionString,
+            "", // empty (only needed for linked)
+          ]),
+          bottomText: t(translations, lang, "bottomTextLinear"),
+          placeholder: "[ ,5, ,3,...",
+          feedback,
+          checkFormat,
+        },
+      }
+    } else {
+      const {
+        tableSize,
+        randomHashFunction,
+        insertValuesString,
+        deleteValuesString,
+        checkFormat,
+        feedback,
+      } = generateQuestionLinearDoubleProbing(random, "double", translations, lang)
+      return {
+        question: {
+          type: "FreeTextQuestion",
+          name: t(translations, lang, "name"),
+          path: permalink,
+          text: t(translations, lang, "text", [
+            tableSize.toString(),
+            t(translations, lang, "doubleHashing"),
+            insertValuesString,
+            deleteValuesString,
+            "$h_i(x)$",
             randomHashFunction.hashFunctionString,
             "", // empty (only needed for linked)
           ]),

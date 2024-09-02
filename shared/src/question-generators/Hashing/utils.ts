@@ -75,11 +75,11 @@ export function generateOperationsHashMap({
   random: Random
   tableSize: number
   task: "insert" | "insert-delete"
-  mapStyle: "linked" | "linear"
+  mapStyle: "linked" | "linear" | "double"
   hashFunction: HashFunction | DoubleHashFunction
 }) {
   let hashMap: MapLinked | MapLinProbing
-  if (mapStyle === "linear") {
+  if (mapStyle === "linear" || mapStyle === "double") {
     hashMap = new MapLinProbing({ size: tableSize, hashFunction: hashFunction })
   } else {
     if (isHashFunction(hashFunction)) {
@@ -91,7 +91,7 @@ export function generateOperationsHashMap({
 
   const insertions: number[] = []
   const possibleValues = Array.from({ length: 25 }, (_, i) => i + 1)
-  for (let i = 0; i < tableSize - random.int(1, 3); i++) {
+  for (let i = 0; i < Math.min(tableSize - random.int(1, 3), 8); i++) {
     if (hashMap.getAmount === hashMap.getSize) {
       break
     }
@@ -137,12 +137,11 @@ function isHashFunction(
  */
 export function generateQuestionBase(
   random: Random,
-  variant: "linear" | "linked",
+  variant: "linear" | "linked" | "double",
   translations: Translations,
   lang: "de" | "en",
 ) {
   const tableSize = random.choice([7, 11])
-  const tableSizeVariable = random.choice("mnyzpvw".split(""))
 
   // insert -> only inserting into hash table
   // insert-delete -> inserting and deleting from hash table
@@ -151,7 +150,7 @@ export function generateQuestionBase(
     ["insert-delete", 0.15],
   ])
 
-  const randomHashFunction = generateHashFunction(tableSizeVariable, tableSize, variant, random)()
+  const randomHashFunction = generateHashFunction(tableSize, variant, random)()
   const generated = generateOperationsHashMap({
     random,
     tableSize,
@@ -164,14 +163,12 @@ export function generateQuestionBase(
   const insertions = generated.insertions
   const deletions = generated.deletions
 
-  const insertTable = createTableForValues(insertions.map((i) => i.toString()))
-  const insertValuesString = t(translations, lang, "insert", [insertTable])
+  const insertValuesString = t(translations, lang, "insert", [insertions.toString()])
 
-  const deleteTable = createTableForValues(deletions.map((i) => i.toString()))
-  const deleteValuesString = deletions.length > 0 ? t(translations, lang, "delete", [deleteTable]) : ""
+  const deleteValuesString =
+    deletions.length > 0 ? t(translations, lang, "delete", [deletions.toString()]) : ""
   return {
     tableSize,
-    tableSizeVariable,
     randomHashFunction,
     hashMap,
     insertValuesString,
@@ -190,14 +187,8 @@ export function generateQuestionLinkedHashing(
   translations: Translations,
   lang: "de" | "en",
 ) {
-  const {
-    tableSize,
-    tableSizeVariable,
-    randomHashFunction,
-    hashMap,
-    insertValuesString,
-    deleteValuesString,
-  } = generateQuestionBase(random, "linked", translations, lang)
+  const { tableSize, randomHashFunction, hashMap, insertValuesString, deleteValuesString } =
+    generateQuestionBase(random, "linked", translations, lang)
 
   const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
     // check if the input is a list of numbers separated by commas or - or ->
@@ -261,7 +252,6 @@ export function generateQuestionLinkedHashing(
 
   return {
     tableSize,
-    tableSizeVariable,
     randomHashFunction,
     insertValuesString,
     deleteValuesString,
@@ -272,24 +262,20 @@ export function generateQuestionLinkedHashing(
 }
 
 /**
- * This function generates a question for hashing with linear probing
+ * This function generates a question for hashing with linear probing or double hashing
  * @param random
+ * @param variant - here
  * @param translations
  * @param lang
  */
-export function generateQuestionLinearProbing(
+export function generateQuestionLinearDoubleProbing(
   random: Random,
+  variant: "linear" | "double",
   translations: Translations,
   lang: "de" | "en",
 ) {
-  const {
-    tableSize,
-    tableSizeVariable,
-    randomHashFunction,
-    hashMap,
-    insertValuesString,
-    deleteValuesString,
-  } = generateQuestionBase(random, "linear", translations, lang)
+  const { tableSize, randomHashFunction, hashMap, insertValuesString, deleteValuesString } =
+    generateQuestionBase(random, variant, translations, lang)
 
   const checkFormat: FreeTextFormatFunction = ({ text }) => {
     text = text.trim()
@@ -368,7 +354,6 @@ ${tableSeparator}
   }
   return {
     tableSize,
-    tableSizeVariable,
     randomHashFunction,
     insertValuesString,
     deleteValuesString,
