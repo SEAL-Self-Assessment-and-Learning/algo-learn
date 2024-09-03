@@ -63,7 +63,6 @@ ${markdownToLatex(q.text ?? "")}
 ${markdownToLatex(q.prompt ?? "")}
 \\end{exercise}`
   } else {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     throw new Error(`Unsupported question type: ${t}`)
   }
 }
