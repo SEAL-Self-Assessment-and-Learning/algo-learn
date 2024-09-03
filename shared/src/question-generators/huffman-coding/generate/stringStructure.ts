@@ -8,6 +8,7 @@ import {
 } from "@shared/question-generators/huffman-coding/generate/answerOptions.ts"
 import { generateString } from "@shared/question-generators/huffman-coding/generate/words.ts"
 import { getHuffmanCodeOfWord, HuffmanNode } from "@shared/question-generators/huffman-coding/Huffman.ts"
+import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils.ts"
 import Random from "@shared/utils/random.ts"
 
 /**
@@ -79,6 +80,7 @@ export function generateChoice1Question(random: Random) {
   // find all the correct answers and store the indices
   for (let i = 0; i < answers.length; i++) {
     if (correctTree.setLabelsByCodeword(word, answers[i])) correctAnswerIndexes.push(i)
+    answers[i] = "`" + insertSpaceAfterEveryXChars(answers[i], 5) + "`"
   }
 
   return { word, answers, correctAnswerIndexes }
