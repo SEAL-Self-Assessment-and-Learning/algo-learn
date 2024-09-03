@@ -5,34 +5,14 @@ import {
   minimalMultipleChoiceFeedback,
   MultipleChoiceQuestion,
 } from "@shared/api/QuestionGenerator"
-import { generatePossibleAnswersChoice1 } from "@shared/question-generators/huffman-coding/generate/GenerateChoiceAnswers.ts"
-import { generateString } from "@shared/question-generators/huffman-coding/generate/GenerateWords"
-import { getHuffmanCodeOfWord } from "@shared/question-generators/huffman-coding/Huffman"
+import {
+  generateChoice1Question,
+  generateInputChoice1Foundations,
+} from "@shared/question-generators/huffman-coding/generate/stringStructure.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils.ts"
 import Random from "@shared/utils/random"
 import { t, Translations } from "@shared/utils/translations"
-
-/**
- * This function generates the foundation for input and choice question
- * It generates a random word and computes a correct answer
- * @param random
- */
-function generateInputChoiceFoundations({ random }: { random: Random }) {
-  const wordLength = random.weightedChoice([
-    [13, 0.25],
-    [12, 0.25],
-    [11, 0.125],
-    [10, 0.125],
-    [9, 0.125],
-    [8, 0.125],
-  ])
-  let word = generateString(wordLength, random)
-  word = random.shuffle(word.split("")).join("")
-  const { encodedWord: correctAnswer, huffmanTree: correctTree } = getHuffmanCodeOfWord(word)
-
-  return { correctAnswer, correctTree, word }
-}
 
 /**
  * This function generates a multiple choice question
@@ -55,17 +35,7 @@ export function generateChoiceQuestion({
   lang: "en" | "de"
   permalink: string
 }) {
-  const { correctAnswer, correctTree, word } = generateInputChoiceFoundations({ random })
-
-  // get a set of obvious wrong answers
-  const answers = generatePossibleAnswersChoice1(random, correctAnswer, correctTree, word)
-  answers.push(correctAnswer)
-
-  const correctAnswerIndexes: number[] = []
-  // find all the correct answers
-  for (let i = 0; i < answers.length; i++) {
-    if (correctTree.setLabelsByCodeword(word, answers[i])) correctAnswerIndexes.push(i)
-  }
+  const { word, answers, correctAnswerIndexes } = generateChoice1Question(random)
 
   const question: MultipleChoiceQuestion = {
     type: "MultipleChoiceQuestion",
@@ -99,7 +69,7 @@ export function generateInputQuestion({
   lang: "en" | "de"
   permalink: string
 }) {
-  const { correctAnswer, correctTree, word } = generateInputChoiceFoundations({ random })
+  const { correctAnswer, correctTree, word } = generateInputChoice1Foundations({ random })
 
   const checkFormat: FreeTextFormatFunction = ({ text }) => {
     if (text.trim() === "") return { valid: false }

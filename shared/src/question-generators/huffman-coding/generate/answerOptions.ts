@@ -3,152 +3,7 @@ import {
   getHuffmanCodeOfWord,
   HuffmanNode,
 } from "@shared/question-generators/huffman-coding/Huffman.ts"
-import {
-  checkProvidedCode,
-  convertDictToMdTable,
-} from "@shared/question-generators/huffman-coding/utils/utils.ts"
 import Random from "@shared/utils/random.ts"
-
-/**
- * This function generates wrong and correct answers
- *
- * @param random
- * @param correctAnswer a correct answer for the huffman code
- * @param correctTree a correct tree for the huffman code
- * @param word the word that is encoded
- */
-export function generatePossibleAnswersChoice1(
-  random: Random,
-  correctAnswer: string,
-  correctTree: HuffmanNode,
-  word: string,
-): Array<string> {
-  const answerSet: Set<string> = new Set<string>()
-
-  answerSet.add(randomSwitch01(random, correctAnswer))
-  answerSet.add(switchLetters(random, correctTree, word).resultWord)
-  answerSet.add(generateWrongAnswerChangeWord(random, word).slice(0, correctAnswer.length + 5))
-  answerSet.add(reduceCodeOfLetter(word, correctTree).wrongAnswerCoding)
-  answerSet.add(flip01InCodeChar(random, correctTree, word).wrongAnswerCoding)
-  for (let i = 0; i < 2; i++) {
-    answerSet.add(generateNewLabelSetting(word, correctTree, random))
-  }
-  answerSet.delete(correctAnswer) // we are adding this later to ensure at least one correct answer is included
-
-  return random.shuffle(random.subset(Array.from(answerSet), 3))
-}
-
-/**
- * This function sorts a possible answer into the correct or wrong answer list
- * @param optionDict - the dictionary of the option (either correct or wrong)
- * @param inputDict - the dictionary of the input
- * @param correctTree - the correct tree
- * @param correctAnswerList
- * @param wrongAnswerList
- */
-function processOption({
-  optionDict,
-  inputDict,
-  correctTree,
-  correctAnswerList,
-  wrongAnswerList,
-}: {
-  optionDict: { [key: string]: string }
-  inputDict: { [p: string]: number }
-  correctTree: HuffmanNode
-  correctAnswerList: Set<string>
-  wrongAnswerList: Set<string>
-}) {
-  const encodingTable = correctTree.getEncodingTable()
-  const optionMdTable = convertDictToMdTable(optionDict)
-
-  if (checkProvidedCode(inputDict, encodingTable, optionDict)) {
-    correctAnswerList.add(optionMdTable)
-  } else {
-    wrongAnswerList.add(optionMdTable)
-  }
-}
-
-/**
- * This function creates the answer options for the multiple choice question
- * Using correct and wrong answers, shuffling them and returning a list of both (at least one correct answer)
- * Also returns the indices of the correct answers
- * @param correctAnswerList
- * @param wrongAnswerList
- * @param random
- */
-function createAnswerOptions(
-  correctAnswerList: Set<string>,
-  wrongAnswerList: Set<string>,
-  random: Random,
-) {
-  const correctAnswers = Array.from(correctAnswerList)
-  const wrongAnswers = Array.from(wrongAnswerList)
-
-  const answers: string[] = random.subset(
-    correctAnswers,
-    random.int(1, correctAnswers.length < 3 ? correctAnswers.length : 3),
-  )
-  answers.push(...random.subset(wrongAnswers, 4 - answers.length))
-  random.shuffle(answers)
-
-  // get the indices of the correct answers inside answers
-  const correctAnswerIndices: number[] = []
-  for (let i = 0; i < answers.length; i++) {
-    if (correctAnswers.includes(answers[i])) {
-      correctAnswerIndices.push(i)
-    }
-  }
-  return { answers, correctAnswerIndices }
-}
-
-/**
- * This function generates wrong answers for the table questions
- * Maybe optimize the wrong answer generation later (but I don't have any idea at the moment)
- * @param random
- * @param inputDict
- * @param correctTree
- */
-export function generateWrongAnswersDict(
-  random: Random,
-  inputDict: { [p: string]: number },
-  correctTree: HuffmanNode,
-) {
-  // List of correct answers
-  const wrongAnswerList: Set<string> = new Set<string>()
-  const correctAnswerList: Set<string> = new Set<string>()
-  correctAnswerList.add(convertDictToMdTable(correctTree.getEncodingTable()))
-
-  const fixInputCorrectSet = {
-    inputDict,
-    correctTree,
-    correctAnswerList,
-    wrongAnswerList,
-  }
-
-  while (wrongAnswerList.size + correctAnswerList.size < 4) {
-    // Generate and evaluate different options
-    processOption({ optionDict: changeFrequenciesRandomly(random, inputDict), ...fixInputCorrectSet })
-    processOption({ optionDict: wrongAdditionTree(random, inputDict), ...fixInputCorrectSet })
-    processOption({ optionDict: swapManyLetters(inputDict), ...fixInputCorrectSet })
-    processOption({
-      optionDict: flip01InCodeChar(random, correctTree, "").huffmanDict,
-      ...fixInputCorrectSet,
-    })
-    processOption({
-      optionDict: switchLetters(random, correctTree, "").huffmanDict,
-      ...fixInputCorrectSet,
-    })
-  }
-
-  const { answers, correctAnswerIndices } = createAnswerOptions(
-    correctAnswerList,
-    wrongAnswerList,
-    random,
-  )
-
-  return { answers, correctAnswerIndices }
-}
 
 /**
  * This function generates a new random word by switching some random 1 to 0 and 0 to 1
@@ -210,7 +65,7 @@ export function switchLetters(random: Random, currentTree: HuffmanNode, word: st
  */
 export function reduceCodeOfLetter(word: string, currentTree: HuffmanNode) {
   const huffmanDict = currentTree.getEncodingTable()
-  const currentLongestKey = getKeyWithLongestHuffmanCode(huffmanDict)
+  const currentLongestKey = getKeyWithLongestCode(huffmanDict)
   huffmanDict[currentLongestKey] = huffmanDict[currentLongestKey].slice(
     0,
     huffmanDict[currentLongestKey].length - 1,
@@ -328,7 +183,11 @@ export function generateWrongAnswerChangeWord(random: Random, word: string) {
   return getHuffmanCodeOfWord(wordArray.join("")).encodedWord
 }
 
-function getKeyWithLongestHuffmanCode(encodingTable: Record<string, string>) {
+/**
+ * Finding the longest key inside the huffman encoding table and returning it
+ * @param encodingTable - encoding table of each letter of the word
+ */
+function getKeyWithLongestCode(encodingTable: Record<string, string>) {
   let currentLongestKey: string = Object.keys(encodingTable)[0]
   for (const currentKey in encodingTable) {
     if (encodingTable[currentKey].length > encodingTable[currentLongestKey].length) {
@@ -339,6 +198,11 @@ function getKeyWithLongestHuffmanCode(encodingTable: Record<string, string>) {
   return currentLongestKey
 }
 
+/**
+ * Takes the huffman dictionary, the input word and creates the encoding of the word
+ * @param huffmanDict
+ * @param word
+ */
 function createEncodingFromDict(huffmanDict: { [key: string]: string }, word: string) {
   let encoding = ""
   for (let i = 0; i < word.length; i++) {

@@ -5,8 +5,8 @@ import {
   MultiFreeTextQuestion,
   MultipleChoiceQuestion,
 } from "@shared/api/QuestionGenerator"
-import { generateWrongAnswersDict } from "@shared/question-generators/huffman-coding/generate/GenerateChoiceAnswers.ts"
-import { generateCharacterFrequencyTable } from "@shared/question-generators/huffman-coding/generate/GenerateWords"
+import { generatePossibleAnswersChoice2 } from "@shared/question-generators/huffman-coding/generate/dictStructure.ts"
+import { generateCharacterFrequencyTable } from "@shared/question-generators/huffman-coding/generate/words.ts"
 import { getHuffmanCodeOfTable } from "@shared/question-generators/huffman-coding/Huffman"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import {
@@ -179,7 +179,7 @@ export function generateChoice2Question({
   const { characterFrequencies, displayTable, correctAnswerTreeNode } = generateDictFoundations({
     random,
   })
-  const { answers, correctAnswerIndices } = generateWrongAnswersDict(
+  const { answers, correctAnswerIndices } = generatePossibleAnswersChoice2(
     random,
     characterFrequencies,
     correctAnswerTreeNode,
