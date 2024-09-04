@@ -49,14 +49,21 @@ function generateVariableNames(random: Random, availableVarNames: string[]) {
  * This function generates the number of stars to print in different parts of the code
  * @param random
  */
-function generateDifferentAmountOfStarPrints(random: Random) {
+export function generateDifferentAmountOfStarPrints(random: Random) {
   const numPrint = random.int(1, 4)
   const numPrintElse = random.choice([1, 2, 3, 4].filter((n) => n !== numPrint))
-  const numPrintMiddle = random.choice([1, 2, 3, 4])
-  const numPrintMiddleIf = random.choice([1, 2, 3, 4])
-  const numPrintMiddleElse = random.choice([1, 2, 3, 4].filter((n) => n !== numPrintMiddleIf))
-  const numPrintAfter = random.choice([1, 2, 3, 4])
-  return { numPrint, numPrintElse, numPrintMiddle, numPrintMiddleIf, numPrintMiddleElse, numPrintAfter }
+  const numPrintBetweenLoops = random.choice([1, 2, 3, 4])
+  const numPrintSecondCondition = random.choice([1, 2, 3, 4])
+  const numPrintSecondElse = random.choice([1, 2, 3, 4].filter((n) => n !== numPrintSecondCondition))
+  const numPrintAfterAll = random.choice([1, 2, 3, 4])
+  return {
+    numPrint,
+    numPrintElse,
+    numPrintBetweenLoops,
+    numPrintSecondCondition,
+    numPrintSecondElse,
+    numPrintAfterAll,
+  }
 }
 
 /**
@@ -75,44 +82,24 @@ export function sampleExact({
   availableVarNames?: string[]
 }): { code: PseudoCode; numStars: number } {
   const { firstVariableName, secondVariableName } = generateVariableNames(random, availableVarNames)
-  const { numPrint, numPrintElse, numPrintMiddle, numPrintMiddleIf, numPrintMiddleElse, numPrintAfter } =
-    generateDifferentAmountOfStarPrints(random)
+  generateDifferentAmountOfStarPrints(random)
 
   const loopType: "for" | "forfor" | "while" = random.choice(["for", "forfor", "while"])
 
   if (loopType === "for") {
-    const forResult = generateForLoopQuestion(firstVariableName, numPrint, numPrintElse, random)
+    const forResult = generateForLoopQuestion(firstVariableName, random)
     return {
       numStars: forResult.numStars,
       code: forResult.code,
     }
   } else if (loopType === "forfor") {
-    const forForResult = createForForLoop(
-      firstVariableName,
-      secondVariableName,
-      numPrint,
-      numPrintElse,
-      numPrintMiddle,
-      numPrintMiddleIf,
-      numPrintMiddleElse,
-      numPrintAfter,
-      0,
-      random,
-    )
+    const forForResult = createForForLoop(firstVariableName, secondVariableName, random)
     return {
       numStars: forForResult.numStars,
       code: forForResult.code,
     }
   } else if (loopType === "while") {
-    const whileLoopResult = createWhileLoop(
-      firstVariableName,
-      secondVariableName,
-      0,
-      numPrint,
-      numPrintElse,
-      numPrintAfter,
-      random,
-    )
+    const whileLoopResult = createWhileLoop(firstVariableName, secondVariableName, random)
     return {
       numStars: whileLoopResult.numStars,
       code: whileLoopResult.code,

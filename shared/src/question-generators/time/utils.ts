@@ -87,55 +87,57 @@ export function getCompare(random: Random, com: "<" | ">" | "<<" | ">>"): WhileC
 }
 
 /**
- * Creates a for loop line
+ * Creates a basic for loop line when no step set is provided
  * @param variableName
  * @param startValueLoop
  * @param startManipulation
  * @param endValueLoop
  * @param endManipulation
- * @param stepSet
  * @param timeOrStars (if used to print stars or to determine the runtime of code)
  */
-export function createForLine({
+export function createBasicForLine({
   variableName,
   startValueLoop,
   startManipulation = "none",
   endValueLoop,
   endManipulation = "none",
-  stepSet,
   timeOrStars = "stars",
 }: {
   variableName: string
-  startValueLoop?: string | PseudoCodeVariable
+  startValueLoop: string | PseudoCodeVariable
   startManipulation?: BoundsOptions
-  endValueLoop?: string
+  endValueLoop: string
   endManipulation?: BoundsOptions
-  stepSet?: string
   timeOrStars?: "time" | "stars"
-}): PseudoCodeFor | PseudoCodeForAll {
-  if (stepSet === undefined) {
-    if (startValueLoop === undefined || endValueLoop === undefined)
-      throw new Error("Either start, end or step should be defined.")
-
-    // create start string via createBoundsString
-    const startString = createBoundsString(startValueLoop, startManipulation, timeOrStars)
-    // create the end string via createBoundsString
-    const endString = createBoundsString(endValueLoop, endManipulation, timeOrStars)
-
-    return {
-      for: {
-        variable: variableName,
-        from: startString,
-        to: endString,
-        do: null,
-      },
-    }
+}): PseudoCodeFor {
+  const startString = createBoundsString(startValueLoop, startManipulation, timeOrStars)
+  const endString = createBoundsString(endValueLoop, endManipulation, timeOrStars)
+  return {
+    for: {
+      variable: variableName,
+      from: startString,
+      to: endString,
+      do: null,
+    },
   }
+}
 
+/**
+ * Creates a for loop line when a step set is provided
+ * @param variableName
+ * @param stepValuesSet
+ */
+export function createForLineWithStepSet({
+  variableName,
+  stepValuesSet,
+}: {
+  variableName: string
+  stepValuesSet: string
+}): PseudoCodeForAll {
   return {
     forAll: {
       variable: variableName,
-      set: [stepSet],
+      set: [stepValuesSet],
       do: null,
     },
   }

@@ -10,6 +10,7 @@ import {
   WhileOrderOptions,
 } from "@shared/question-generators/time/utils.ts"
 import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars.ts"
+import { generateDifferentAmountOfStarPrints } from "@shared/question-generators/time/utilsStars/utils.ts"
 import {
   printStarsNew,
   PseudoCode,
@@ -54,21 +55,9 @@ function compareTwoValues(i: number, j: number, compare: string) {
  *
  * @param firstVariableName the name of the first variable
  * @param secondVariableName second variable
- * @param numStars total number of stars calculated
- * @param numPrint number of stars to print in the if condition
- * @param numPrintElse number of stars to print in the else condition
- * @param numPrintAfter number of stars to print after the loop
  * @param random
  */
-export function createWhileLoop(
-  firstVariableName: string,
-  secondVariableName: string,
-  numStars: number,
-  numPrint: number,
-  numPrintElse: number,
-  numPrintAfter: number,
-  random: Random,
-) {
+export function createWhileLoop(firstVariableName: string, secondVariableName: string, random: Random) {
   function condition(i: number, j: number) {
     return vars === "xy"
       ? compareTwoValues(
@@ -126,6 +115,8 @@ export function createWhileLoop(
             )
           : false
   }
+
+  const { numPrint, numPrintElse, numPrintAfterAll } = generateDifferentAmountOfStarPrints(random)
 
   const { startVar1, startVar2, endValue, vars, compare, endManipulation, cOption } =
     computeStartEndVarsWhile(random)
@@ -265,6 +256,7 @@ export function createWhileLoop(
   // create the while loop
   let i = startVar1
   let j = startVar2
+  let numStars = 0
 
   while (condition(i, j)) {
     // calculate the stars
@@ -291,10 +283,9 @@ export function createWhileLoop(
     j = changedCode.changeJ
   }
 
-  // printAfter
   if (printAfter) {
-    pseudoCodeBlock.block.push(printStarsNew(numPrintAfter))
-    numStars += numPrintAfter
+    pseudoCodeBlock.block.push(printStarsNew(numPrintAfterAll))
+    numStars += numPrintAfterAll
   }
 
   return { code: pseudoCode, numStars }

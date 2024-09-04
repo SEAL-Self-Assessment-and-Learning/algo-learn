@@ -1,10 +1,11 @@
 import {
   BoundsOptions,
-  createForLine,
+  createBasicForLine,
   createIfCondition,
   IfOptions,
 } from "@shared/question-generators/time/utils.ts"
 import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars.ts"
+import { generateDifferentAmountOfStarPrints } from "@shared/question-generators/time/utilsStars/utils.ts"
 import {
   printStarsNew,
   PseudoCode,
@@ -73,7 +74,7 @@ function createPseudoCodeFor({
   }
   completeCode.push(bodyBlock)
 
-  const forStatement: PseudoCodeFor | PseudoCodeForAll = createForLine({
+  const forStatement: PseudoCodeFor | PseudoCodeForAll = createBasicForLine({
     variableName: firstVariableName,
     startValueLoop: startValueLoop.toString(),
     endValueLoop: endValueLoop.toString(),
@@ -82,14 +83,8 @@ function createPseudoCodeFor({
   bodyBlock.block.push(forStatement)
 
   if (condition === "none") {
-    if ("forAll" in forStatement) {
-      forStatement.forAll.do = {
-        block: [printStarsNew(numPrint)],
-      }
-    } else {
-      forStatement.for.do = {
-        block: [printStarsNew(numPrint)],
-      }
+    forStatement.for.do = {
+      block: [printStarsNew(numPrint)],
     }
   } else {
     const ifStatement: PseudoCodeIf = createIfCondition({
@@ -99,14 +94,8 @@ function createPseudoCodeFor({
       numPrint,
       numPrintElse,
     })
-    if ("forAll" in forStatement) {
-      forStatement.forAll.do = {
-        block: [ifStatement],
-      }
-    } else {
-      forStatement.for.do = {
-        block: [ifStatement],
-      }
+    forStatement.for.do = {
+      block: [ifStatement],
     }
   }
   return completeCode
@@ -143,16 +132,10 @@ function forLoopConditionCheck(
  *     print("***")
  *
  * @param firstVariableName
- * @param numPrint
- * @param numPrintElse
  * @param random
  */
-export function generateForLoopQuestion(
-  firstVariableName: string,
-  numPrint: number,
-  numPrintElse: number,
-  random: Random,
-) {
+export function generateForLoopQuestion(firstVariableName: string, random: Random) {
+  const { numPrint, numPrintElse } = generateDifferentAmountOfStarPrints(random)
   const { startValueLoop, endValueLoop, endManipulation, condition, elseStatement } =
     generateRandomConditions(random)
   const completeCode = createPseudoCodeFor({
