@@ -4,7 +4,7 @@ import {
   createIfCondition,
   IfOptions,
 } from "@shared/question-generators/time/utils.ts"
-import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/utils.ts"
+import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars.ts"
 import {
   printStarsNew,
   PseudoCode,
@@ -29,8 +29,8 @@ import Random from "@shared/utils/random.ts"
  *     else:
  *       print("**")
  *
- * @param innerVar the name of the first variable
- * @param innerVar2
+ * @param firstVariableName the name of the first variable
+ * @param secondVariableName
  * @param numPrint number of stars to print in the if condition
  * @param numPrintElse number of stars to print in the else condition
  * @param numPrintMiddle number of stars to print in between the two loops
@@ -41,8 +41,8 @@ import Random from "@shared/utils/random.ts"
  * @param random
  */
 export function createForForLoop(
-  innerVar: string,
-  innerVar2: string,
+  firstVariableName: string,
+  secondVariableName: string,
   numPrint: number,
   numPrintElse: number,
   numPrintMiddle: number,
@@ -83,10 +83,10 @@ export function createForForLoop(
   if (stepFirst === 1) {
     // Generate the pseudocode
     firstForStatement = createForLine({
-      innerVar,
-      start: startFirst.toString(),
+      variableName: firstVariableName,
+      startValueLoop: startFirst.toString(),
       startManipulation: "none",
-      end: endFirst.toString(),
+      endValueLoop: endFirst.toString(),
       endManipulation: endFirstManipulation,
     })
     pseudoCodeBlock.block.push(firstForStatement)
@@ -98,7 +98,7 @@ export function createForForLoop(
       endFirstManipulation,
     })
     firstForStatement = createForLine({
-      innerVar,
+      variableName: firstVariableName,
       stepSet,
     })
     pseudoCodeBlock.block.push(firstForStatement)
@@ -121,7 +121,7 @@ export function createForForLoop(
   // if middle
   if (condMiddle !== "none") {
     const ifForStatementMiddle = createIfCondition({
-      innerVar1: innerVar,
+      firstVariableName: firstVariableName,
       condition: condMiddle,
       elseStatement: elseMiddle,
       numPrint: numPrintMiddleIf,
@@ -136,12 +136,12 @@ export function createForForLoop(
   let startManipulation: BoundsOptions = "none"
   let startValue: string | PseudoCodeVariable = startSecond.toString()
   if (startSecondManipulation === "var-normal") {
-    startValue = { variable: innerVar }
+    startValue = { variable: firstVariableName }
   } else if (startSecondManipulation === "var-mult") {
-    startValue = { variable: innerVar }
+    startValue = { variable: firstVariableName }
     startManipulation = { type: "mult", value: startSecondManipulationValue }
   } else if (startSecondManipulation === "var-square") {
-    startValue = { variable: innerVar }
+    startValue = { variable: firstVariableName }
     // we only have positive numbers so abs is not necessary
     startManipulation = { type: "square", abs: false }
   }
@@ -149,10 +149,10 @@ export function createForForLoop(
   if (stepSecond === 1) {
     // Generate the pseudocode
     secondForStatement = createForLine({
-      innerVar: innerVar2,
-      start: startValue,
+      variableName: secondVariableName,
+      startValueLoop: startValue,
       startManipulation: startManipulation,
-      end: endSecond.toString(),
+      endValueLoop: endSecond.toString(),
       endManipulation: endSecondManipulation,
     })
     firstForBlock.block.push(secondForStatement)
@@ -164,7 +164,7 @@ export function createForForLoop(
       endFirstManipulation: endSecondManipulation,
     })
     secondForStatement = createForLine({
-      innerVar: innerVar2,
+      variableName: secondVariableName,
       stepSet,
     })
     firstForBlock.block.push(secondForStatement)
@@ -181,14 +181,14 @@ export function createForForLoop(
   }
 
   // create the if inside the second for loop
-  let askVar = `${innerVar2}`
+  let askVar = `${secondVariableName}`
   if (askFirstVar) {
-    askVar = `${innerVar}`
+    askVar = `${firstVariableName}`
   }
   if (condEnd !== "none") {
     const secondIfStatement = createIfCondition({
-      innerVar1: askVar,
-      innerVar2: askVar === innerVar ? innerVar2 : innerVar,
+      firstVariableName: askVar,
+      secondVariableName: askVar === firstVariableName ? secondVariableName : firstVariableName,
       condition: condEnd,
       elseStatement: elseEnd,
       numPrint,

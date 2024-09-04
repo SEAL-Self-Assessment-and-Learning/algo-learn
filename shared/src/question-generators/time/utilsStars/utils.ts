@@ -35,6 +35,31 @@ export function sampleLoopStars(random: Random): {
 }
 
 /**
+ * This function generates two different variable names
+ * @param random
+ * @param availableVarNames
+ */
+function generateVariableNames(random: Random, availableVarNames: string[]) {
+  const firstVariableName = random.choice(availableVarNames)
+  const secondVariableName = random.choice(availableVarNames.filter((v) => v !== firstVariableName))
+  return { firstVariableName, secondVariableName }
+}
+
+/**
+ * This function generates the number of stars to print in different parts of the code
+ * @param random
+ */
+function generateDifferentAmountOfStarPrints(random: Random) {
+  const numPrint = random.int(1, 4)
+  const numPrintElse = random.choice([1, 2, 3, 4].filter((n) => n !== numPrint))
+  const numPrintMiddle = random.choice([1, 2, 3, 4])
+  const numPrintMiddleIf = random.choice([1, 2, 3, 4])
+  const numPrintMiddleElse = random.choice([1, 2, 3, 4].filter((n) => n !== numPrintMiddleIf))
+  const numPrintAfter = random.choice([1, 2, 3, 4])
+  return { numPrint, numPrintElse, numPrintMiddle, numPrintMiddleIf, numPrintMiddleElse, numPrintAfter }
+}
+
+/**
  * Sample the source code of a simple loop that prints stars
  *
  * @param props
@@ -49,30 +74,22 @@ export function sampleExact({
   random: Random
   availableVarNames?: string[]
 }): { code: PseudoCode; numStars: number } {
-  const innerVar = random.choice(availableVarNames)
-  const innerVar2 = random.choice(availableVarNames.filter((v) => v !== innerVar))
-
-  // All possible numPrint values, which could occur inside a loop
-  // numPrintMiddle... currently only necessary for "forfor" loops
-  const numPrint = random.int(1, 4)
-  const numPrintElse = random.choice([1, 2, 3, 4].filter((n) => n !== numPrint))
-  const numPrintMiddle = random.choice([1, 2, 3, 4])
-  const numPrintMiddleIf = random.choice([1, 2, 3, 4])
-  const numPrintMiddleElse = random.choice([1, 2, 3, 4].filter((n) => n !== numPrintMiddleIf))
-  const numPrintAfter = random.choice([1, 2, 3, 4])
+  const { firstVariableName, secondVariableName } = generateVariableNames(random, availableVarNames)
+  const { numPrint, numPrintElse, numPrintMiddle, numPrintMiddleIf, numPrintMiddleElse, numPrintAfter } =
+    generateDifferentAmountOfStarPrints(random)
 
   const loopType: "for" | "forfor" | "while" = random.choice(["for", "forfor", "while"])
 
   if (loopType === "for") {
-    const forResult = generateForLoopQuestion(innerVar, numPrint, numPrintElse, 0, random)
+    const forResult = generateForLoopQuestion(firstVariableName, numPrint, numPrintElse, random)
     return {
       numStars: forResult.numStars,
       code: forResult.code,
     }
   } else if (loopType === "forfor") {
     const forForResult = createForForLoop(
-      innerVar,
-      innerVar2,
+      firstVariableName,
+      secondVariableName,
       numPrint,
       numPrintElse,
       numPrintMiddle,
@@ -88,8 +105,8 @@ export function sampleExact({
     }
   } else if (loopType === "while") {
     const whileLoopResult = createWhileLoop(
-      innerVar,
-      innerVar2,
+      firstVariableName,
+      secondVariableName,
       0,
       numPrint,
       numPrintElse,
@@ -103,36 +120,4 @@ export function sampleExact({
   } else {
     throw new Error("Unknown loop type")
   }
-}
-
-/**
- * This function calculates the number of stars to print based on the condition
- *
- * @param cond the condition to check
- * @param i the current value of the loop
- * @param numPrint number of stars to print in the if condition
- * @param numPrintElse number of stars to print in the else condition
- * @param elseStatement if an else statement should be printed
- * @param j the second value of the loop (only if two loops) (default NaN)
- */
-export function calculateNumberOfStars(
-  cond: string,
-  i: number,
-  numPrint: number,
-  numPrintElse: number,
-  elseStatement: boolean,
-  j: number = Number.NaN,
-): number {
-  let numStars = 0
-  if (cond === "odd" && (i % 2 === 1 || i % 2 === -1)) numStars += numPrint
-  else if (cond === "odd" && i % 2 === 0 && elseStatement) numStars += numPrintElse
-  else if (cond === "even" && i % 2 === 0) numStars += numPrint
-  else if (cond === "even" && (i % 2 === 1 || i % 2 === -1) && elseStatement) numStars += numPrintElse
-  else if (cond === "square" && Number.isInteger(Math.sqrt(i))) numStars += numPrint
-  else if (cond === "square" && !Number.isInteger(Math.sqrt(i)) && elseStatement)
-    numStars += numPrintElse
-  else if (cond === "same" && i === j) numStars += numPrint
-  else if (cond === "same" && elseStatement && i !== j) numStars += numPrintElse
-  else if (cond === "none") numStars += numPrint
-  return numStars
 }

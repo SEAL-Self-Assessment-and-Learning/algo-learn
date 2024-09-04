@@ -4,7 +4,7 @@ import {
   createIfCondition,
   IfOptions,
 } from "@shared/question-generators/time/utils.ts"
-import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/utils.ts"
+import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars.ts"
 import {
   printStarsNew,
   PseudoCode,
@@ -21,8 +21,8 @@ import Random from "@shared/utils/random.ts"
  * @param random
  */
 function generateRandomConditions(random: Random) {
-  const low = random.int(0, 2)
-  const high = random.int(6, 10)
+  const startValueLoop = random.int(0, 2)
+  const endValueLoop = random.int(6, 10)
 
   const endManipulation = random.weightedChoice([
     ["none" as BoundsOptions, 0.7],
@@ -31,38 +31,17 @@ function generateRandomConditions(random: Random) {
     [{ type: "log", value: 2 }, 0.05],
   ])
 
-  const cond: IfOptions = random.choice(["none", "even", "odd", "square"])
-  const elseStatement = cond !== "none" ? random.bool(0.7) : false
+  const condition: IfOptions = random.choice(["none", "even", "odd", "square"])
+  const elseStatement = condition !== "none" ? random.bool(0.7) : false
 
-  return { low, high, endManipulation, cond, elseStatement }
-}
-
-/**
- * This function checks if the loop should continue
- * @param i - current iteration of the loop
- * @param endManipulation - the manipulation of the end value of the loop
- * @param endValueLoop - the end value of the loop
- */
-function forLoopConditionCheck(i: number, endManipulation: BoundsOptions, endValueLoop: number) {
-  let compareValue: number
-  if (endManipulation === "none") {
-    compareValue = endValueLoop
-  } else if (endManipulation.type === "mult") {
-    compareValue = endValueLoop * endManipulation.value
-  } else if (endManipulation.type === "square") {
-    compareValue = endValueLoop * endValueLoop
-  } else {
-    compareValue = Math.ceil(Math.log2(endValueLoop))
-  }
-
-  return i <= compareValue
+  return { startValueLoop, endValueLoop, endManipulation, condition, elseStatement }
 }
 
 /**
  * This function creates the pseudo code for the for-loop
- * @param innerVar
- * @param low
- * @param high
+ * @param firstVariableName
+ * @param startValueLoop
+ * @param endValueLoop
  * @param endManipulation
  * @param cond
  * @param numPrint
@@ -70,20 +49,20 @@ function forLoopConditionCheck(i: number, endManipulation: BoundsOptions, endVal
  * @param numPrintElse
  */
 function createPseudoCodeFor({
-  innerVar,
-  low,
-  high,
+  firstVariableName,
+  startValueLoop,
+  endValueLoop,
   endManipulation,
-  cond,
+  condition,
   numPrint,
   elseStatement,
   numPrintElse,
 }: {
-  innerVar: string
-  low: number
-  high: number
+  firstVariableName: string
+  startValueLoop: number
+  endValueLoop: number
   endManipulation: BoundsOptions
-  cond: IfOptions
+  condition: IfOptions
   numPrint: number
   elseStatement: boolean
   numPrintElse: number
@@ -95,14 +74,14 @@ function createPseudoCodeFor({
   completeCode.push(bodyBlock)
 
   const forStatement: PseudoCodeFor | PseudoCodeForAll = createForLine({
-    innerVar,
-    start: low.toString(),
-    end: high.toString(),
+    variableName: firstVariableName,
+    startValueLoop: startValueLoop.toString(),
+    endValueLoop: endValueLoop.toString(),
     endManipulation,
   })
   bodyBlock.block.push(forStatement)
 
-  if (cond === "none") {
+  if (condition === "none") {
     if ("forAll" in forStatement) {
       forStatement.forAll.do = {
         block: [printStarsNew(numPrint)],
@@ -114,8 +93,8 @@ function createPseudoCodeFor({
     }
   } else {
     const ifStatement: PseudoCodeIf = createIfCondition({
-      innerVar1: innerVar,
-      condition: cond,
+      firstVariableName,
+      condition,
       elseStatement,
       numPrint,
       numPrintElse,
@@ -134,6 +113,28 @@ function createPseudoCodeFor({
 }
 
 /**
+ * This function checks if the loop should continue
+ * @param loopIteration - current iteration of the loop
+ * @param endManipulation - the manipulation of the end value of the loop
+ * @param endValueLoop - the end value of the loop
+ */
+function forLoopConditionCheck(
+  loopIteration: number,
+  endManipulation: BoundsOptions,
+  endValueLoop: number,
+) {
+  if (endManipulation === "none") {
+    return loopIteration <= endValueLoop
+  } else if (endManipulation.type === "mult") {
+    return loopIteration <= endValueLoop * endManipulation.value
+  } else if (endManipulation.type === "square") {
+    return loopIteration <= endValueLoop * endValueLoop
+  } else {
+    return loopIteration <= Math.ceil(Math.log2(endValueLoop))
+  }
+}
+
+/**
  * This function generates code for a for loop
  *
  * Example:
@@ -141,34 +142,33 @@ function createPseudoCodeFor({
  *   if t is odd
  *     print("***")
  *
- * @param innerVar
+ * @param firstVariableName
  * @param numPrint
  * @param numPrintElse
- * @param numStars
  * @param random
  */
 export function generateForLoopQuestion(
-  innerVar: string,
+  firstVariableName: string,
   numPrint: number,
   numPrintElse: number,
-  numStars: number,
   random: Random,
 ) {
-  const { low, high, endManipulation, cond, elseStatement } = generateRandomConditions(random)
-
+  const { startValueLoop, endValueLoop, endManipulation, condition, elseStatement } =
+    generateRandomConditions(random)
   const completeCode = createPseudoCodeFor({
-    innerVar,
-    low,
-    high,
+    firstVariableName,
+    startValueLoop,
+    endValueLoop,
     endManipulation,
-    cond,
+    condition,
     numPrint,
     elseStatement,
     numPrintElse,
   })
 
-  for (let i = low; forLoopConditionCheck(i, endManipulation, high); i++) {
-    numStars += calculateNumberOfStars(cond, i, numPrint, numPrintElse, elseStatement)
+  let numStars = 0
+  for (let i = startValueLoop; forLoopConditionCheck(i, endManipulation, endValueLoop); i++) {
+    numStars += calculateNumberOfStars(condition, i, numPrint, numPrintElse, elseStatement)
   }
 
   return { numStars, code: completeCode }

@@ -9,7 +9,7 @@ import {
   WhileCompareOptions,
   WhileOrderOptions,
 } from "@shared/question-generators/time/utils.ts"
-import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/utils.ts"
+import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars.ts"
 import {
   printStarsNew,
   PseudoCode,
@@ -52,8 +52,8 @@ function compareTwoValues(i: number, j: number, compare: string) {
  *   t = floor(t / 2)
  *   n += 3
  *
- * @param innerVar the name of the first variable
- * @param innerVar2 second variable
+ * @param firstVariableName the name of the first variable
+ * @param secondVariableName second variable
  * @param numStars total number of stars calculated
  * @param numPrint number of stars to print in the if condition
  * @param numPrintElse number of stars to print in the else condition
@@ -61,8 +61,8 @@ function compareTwoValues(i: number, j: number, compare: string) {
  * @param random
  */
 export function createWhileLoop(
-  innerVar: string,
-  innerVar2: string,
+  firstVariableName: string,
+  secondVariableName: string,
   numStars: number,
   numPrint: number,
   numPrintElse: number,
@@ -156,20 +156,20 @@ export function createWhileLoop(
     // introduce var1 and var2
     pseudoCodeBlock.block.push({
       state: {
-        assignment: innerVar,
+        assignment: firstVariableName,
         value: [startVar1.toString()],
       },
     })
     pseudoCodeBlock.block.push({
       state: {
-        assignment: innerVar2,
+        assignment: secondVariableName,
         value: [startVar2.toString()],
       },
     })
   } else if (cOption.toLowerCase().indexOf("x") !== -1) {
     pseudoCodeBlock.block.push({
       state: {
-        assignment: innerVar,
+        assignment: firstVariableName,
         value: [startVar1.toString()],
       },
     })
@@ -178,7 +178,7 @@ export function createWhileLoop(
     compareVar = "var2"
     pseudoCodeBlock.block.push({
       state: {
-        assignment: innerVar,
+        assignment: firstVariableName,
         value: [startVar2.toString()],
       },
     })
@@ -190,23 +190,23 @@ export function createWhileLoop(
   let whilePseudoCode: PseudoCodeWhile
   if (vars === "xy") {
     whilePseudoCode = createWhileLine({
-      start: { variable: innerVar },
+      start: { variable: firstVariableName },
       startManipulation: startVar2 > startVar1 ? "none" : endManipulation,
-      end: { variable: innerVar2 },
+      end: { variable: secondVariableName },
       endManipulation: startVar2 > startVar1 ? endManipulation : "none",
       compare,
     })
   } else if (vars === "yx") {
     whilePseudoCode = createWhileLine({
-      start: { variable: innerVar2 },
+      start: { variable: secondVariableName },
       startManipulation: startVar1 > startVar2 ? "none" : endManipulation,
-      end: { variable: innerVar },
+      end: { variable: firstVariableName },
       endManipulation: startVar1 > startVar2 ? endManipulation : "none",
       compare,
     })
   } else if (vars === "xn") {
     whilePseudoCode = createWhileLine({
-      start: { variable: innerVar },
+      start: { variable: firstVariableName },
       startManipulation: startVar1 < endValue ? "none" : endManipulation,
       end: endValue.toString(),
       endManipulation: startVar1 < endValue ? endManipulation : "none",
@@ -228,7 +228,7 @@ export function createWhileLoop(
   } else {
     whilePseudoBlock.block.push(
       createIfCondition({
-        innerVar1: compareVar === "var1" ? innerVar : innerVar2,
+        firstVariableName: compareVar === "var1" ? firstVariableName : secondVariableName,
         condition: condEnd,
         elseStatement: elseAfter,
         numPrint,
@@ -244,8 +244,8 @@ export function createWhileLoop(
     cOption,
     firstChangeValue,
     secondChangeValue,
-    innerVar,
-    innerVar2,
+    firstVariableName: firstVariableName,
+    secondVariableName: secondVariableName,
     compare,
     vars,
     random,
