@@ -4,13 +4,24 @@ import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.
 import Random from "@shared/utils/random.ts"
 import { t, Translations } from "@shared/utils/translations.ts"
 
+/**
+ * Generates a new Stack question for the sequence1 variant
+ *
+ * Generates a sequence of push and pop operations
+ * and asks the user for the final state of the stack
+ *
+ * @param lang
+ * @param random
+ * @param permalink
+ * @param translations
+ */
 export function generateVariantSequence(
   lang: "de" | "en",
   random: Random,
   permalink: string,
   translations: Translations,
 ) {
-  const { operations } = generateOperationsVariantSequence(random)
+  const { operations } = generateOperationsVariantSequence1(random)
 
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
@@ -21,7 +32,12 @@ export function generateVariantSequence(
   return { question }
 }
 
-function generateOperationsVariantSequence(random: Random) {
+/**
+ * Generates a sequence of push and pop operations
+ * and returns the final state of the stack
+ * @param random
+ */
+function generateOperationsVariantSequence1(random: Random) {
   const amountOfOperations = random.int(6, 9)
   const s = new Stack<number>()
   const operations = []
