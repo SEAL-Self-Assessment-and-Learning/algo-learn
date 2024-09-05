@@ -1,17 +1,9 @@
-import {
-  MultiFreeTextFeedbackFunction,
-  MultiFreeTextFormatFunction,
-  MultiFreeTextQuestion,
-  QuestionGenerator,
-} from "@shared/api/QuestionGenerator.ts"
+import { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import {
-  createStackInputFields,
-  generateOperationsFreetextStack,
-  generateStackStartElements,
-} from "@shared/question-generators/Stack/utils.ts"
+import { generateVariantSequence } from "@shared/question-generators/Stack/utilsSequence.ts"
+import { generateVariantStart } from "@shared/question-generators/Stack/utilsStart.ts"
 import Random from "@shared/utils/random.ts"
-import { t, tFunction, tFunctional, Translations } from "@shared/utils/translations.ts"
+import { tFunctional, Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
@@ -24,6 +16,7 @@ const translations: Translations = {
     stackEmpty: "Currently the stack is empty.",
     stackContainsValues: `The stack contains the following elements (*with the top at the highest index*):`,
     freeTextInput: `Consider a **Stack "S"**. {{0}} **We perform the following operations:** {{1}}`,
+    sequence1Text: `Consider an initially empty stack on which the operations {{0}} are executed. Enter the final state of the stack. *(The top element is at the highest index.)*`,
   },
   de: {
     name: "Stacks",
@@ -35,6 +28,7 @@ const translations: Translations = {
     stackEmpty: "Der Stack ist aktuell leer.",
     stackContainsValues: `Der Stack enthält folgende Elemente (*mit dem Top-Element am höchsten Index*):`,
     freeTextInput: `Betrachte einen **Stack "S"**. {{0}} **Wir führen nun folgende Operationen aus:** {{1}}`,
+    sequence1Text: `Betrachte einen anfangs leeren Stapel, auf dem die Operationen {{0}} ausgeführt werden. Gib den finalen Zustand des Stapels an. *(Das Top Element ist am höchsten Index.)*`,
   },
 }
 
@@ -59,7 +53,7 @@ export const stackQuestion: QuestionGenerator = {
     {
       type: "string",
       name: "variant",
-      allowedValues: ["input"],
+      allowedValues: ["start", "sequence1"],
     },
   ],
 
@@ -73,6 +67,7 @@ export const stackQuestion: QuestionGenerator = {
    */
   generate: (lang = "en", parameters, seed) => {
     const random = new Random(seed)
+    const variant = parameters.variant as "start" | "sequence1"
 
     const permalink = serializeGeneratorCall({
       generator: stackQuestion,
@@ -81,76 +76,10 @@ export const stackQuestion: QuestionGenerator = {
       seed,
     })
 
-    // TODO: same checkFormat as in QueueGenerator, future extract those into seperate file
-    //       structure is inside QuickFind PR
-    const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
-      // check if the text provided is for the toString question
-      if (fieldID.includes("empty")) {
-        // test if either false or true
-        if (text[fieldID].trim() !== "true" && text[fieldID].trim() !== "false") {
-          return { valid: false, message: t(translations, lang, "checkFormatBool") }
-        }
-        return { valid: true, message: "" }
-      }
-      // else check if the text only contains numbers
-      if (!/^\d+$/.test(text[fieldID])) {
-        return { valid: false, message: t(translations, lang, "checkFormat") }
-      }
-      return { valid: true, message: "" }
+    if (variant === "start") {
+      return generateVariantStart(lang, random, permalink, translations, wordTranslations)
+    } else {
+      return generateVariantSequence(lang, random, permalink, translations)
     }
-
-    const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
-      // renaming for better understanding
-      const resultMap: { [key: string]: string } = text
-
-      let foundError = false
-      let count = 0
-      for (const key in resultMap) {
-        const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
-        if (resultMap[key].trim() !== correctAnswers[key].trim()) {
-          foundError = true
-          const secondSolutionPart: string = "**" + correctAnswers[key] + "**\n"
-          solutionDisplay[count] = firstSolutionPart + secondSolutionPart
-        }
-        count++
-      }
-      if (foundError) {
-        return {
-          correct: false,
-          message: tFunction(translations, lang).t("feedback.incomplete"),
-          correctAnswer: t(translations, lang, "solutionFreetext", [solutionDisplay.join("")]),
-        }
-      }
-      return {
-        correct: true,
-        message: tFunction(translations, lang).t("feedback.correct"),
-      }
-    }
-
-    const { stackElementsString, stackElementsValues } = generateStackStartElements({
-      random,
-      translations,
-      lang,
-    })
-    const operations = generateOperationsFreetextStack(stackElementsValues, random).operations
-
-    const { solutionDisplay, inputText, correctAnswers } = createStackInputFields({
-      operations,
-      lang,
-      translations: wordTranslations,
-    })
-
-    const question: MultiFreeTextQuestion = {
-      type: "MultiFreeTextQuestion",
-      name: stackQuestion.name(lang),
-      path: permalink,
-      fillOutAll: true,
-      text: t(translations, lang, "freeTextInput", [stackElementsString, inputText]),
-      checkFormat,
-      feedback,
-    }
-    const testing = { correctAnswer: correctAnswers }
-
-    return { question, testing }
   },
 }

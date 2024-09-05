@@ -1,7 +1,13 @@
+import {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
+  MultiFreeTextQuestion,
+} from "@shared/api/QuestionGenerator.ts"
 import { Stack } from "@shared/question-generators/Stack/Stack.ts"
+import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import Random from "@shared/utils/random.ts"
-import { t, Translations } from "@shared/utils/translations.ts"
+import { t, tFunction, Translations } from "@shared/utils/translations.ts"
 
 /**
  * This functions generates the operations performed on the stack during the question
@@ -9,7 +15,7 @@ import { t, Translations } from "@shared/utils/translations.ts"
  * @param startingElements - starting elements inside the stack
  * @param random
  */
-export function generateOperationsFreetextStack(startingElements: number[], random: Random) {
+export function generateOperationsVariantStart(startingElements: number[], random: Random) {
   const stack: Stack<number> = new Stack()
 
   // initialize the stack with the elements
@@ -130,4 +136,83 @@ export function createStackInputFields({
   inputText += `|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |`
 
   return { inputText, solutionDisplay, correctAnswers }
+}
+
+export function generateVariantStart(
+  lang: "de" | "en",
+  random: Random,
+  permalink: string,
+  translations: Translations,
+  wordTranslations: Translations,
+) {
+  // TODO: same checkFormat as in QueueGenerator, future extract those into seperate file
+  //       structure is inside QuickFind PR
+  const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
+    // check if the text provided is for the toString question
+    if (fieldID.includes("empty")) {
+      // test if either false or true
+      if (text[fieldID].trim() !== "true" && text[fieldID].trim() !== "false") {
+        return { valid: false, message: t(translations, lang, "checkFormatBool") }
+      }
+      return { valid: true, message: "" }
+    }
+    // else check if the text only contains numbers
+    if (!/^\d+$/.test(text[fieldID])) {
+      return { valid: false, message: t(translations, lang, "checkFormat") }
+    }
+    return { valid: true, message: "" }
+  }
+
+  const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
+    // renaming for better understanding
+    const resultMap: { [key: string]: string } = text
+
+    let foundError = false
+    let count = 0
+    for (const key in resultMap) {
+      const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
+      if (resultMap[key].trim() !== correctAnswers[key].trim()) {
+        foundError = true
+        const secondSolutionPart: string = "**" + correctAnswers[key] + "**\n"
+        solutionDisplay[count] = firstSolutionPart + secondSolutionPart
+      }
+      count++
+    }
+    if (foundError) {
+      return {
+        correct: false,
+        message: tFunction(translations, lang).t("feedback.incomplete"),
+        correctAnswer: t(translations, lang, "solutionFreetext", [solutionDisplay.join("")]),
+      }
+    }
+    return {
+      correct: true,
+      message: tFunction(translations, lang).t("feedback.correct"),
+    }
+  }
+
+  const { stackElementsString, stackElementsValues } = generateStackStartElements({
+    random,
+    translations,
+    lang,
+  })
+  const operations = generateOperationsVariantStart(stackElementsValues, random).operations
+
+  const { solutionDisplay, inputText, correctAnswers } = createStackInputFields({
+    operations,
+    lang,
+    translations: wordTranslations,
+  })
+
+  const question: MultiFreeTextQuestion = {
+    type: "MultiFreeTextQuestion",
+    name: stackQuestion.name(lang),
+    path: permalink,
+    fillOutAll: true,
+    text: t(translations, lang, "freeTextInput", [stackElementsString, inputText]),
+    checkFormat,
+    feedback,
+  }
+  const testing = { correctAnswer: correctAnswers }
+  return { question, testing }
 }
