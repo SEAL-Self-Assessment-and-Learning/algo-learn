@@ -169,7 +169,6 @@ export function ExerciseTextInput({
         <Markdown md={question.prompt} />
         <Input
           ref={userInputRef}
-          autoFocus
           disabled={mode === "correct" || mode === "incorrect"}
           value={text}
           onChange={(e) => {

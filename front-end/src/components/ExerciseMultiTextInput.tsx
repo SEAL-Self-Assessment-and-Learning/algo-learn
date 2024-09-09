@@ -147,7 +147,6 @@ export function ExerciseMultiTextInput({
       invalid: state.modeID[fieldValues.inputIds[i]] === "invalid",
       disabled: mode === "correct" || mode === "incorrect",
       feedback: state.formatFeedback[fieldValues.inputIds[i]],
-      focus: i === 0,
     }
   }
 

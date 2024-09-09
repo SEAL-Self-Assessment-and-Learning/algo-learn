@@ -13,7 +13,6 @@ export type TextFieldState = {
   invalid: boolean // the mode of the input field
   disabled?: boolean // the mode of the question
   feedback?: string // immediate feedback on the value of this field
-  focus?: boolean // true if this is the first input field in the form
 }
 
 /**
