@@ -49,7 +49,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
         {spacing}
         <div className="flex flex-col">
           <div className="flex flex-row items-center">
-            <div className="mr-2">{promptElement}</div>
+            <div className="mr-2 whitespace-nowrap">{promptElement}</div>
             <div className={`relative h-full w-full`}>
               <Input
                 ref={focus ? firstInputRef : null}
@@ -82,7 +82,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
       <div>
         {spacing}
         <div className="flex flex-row items-center">
-          <div className="mr-2">{promptElement}</div>
+          <div className="mr-2 whitespace-nowrap">{promptElement}</div>
           <div className={`relative h-full w-full`}>
             <Input
               ref={focus ? firstInputRef : null}
