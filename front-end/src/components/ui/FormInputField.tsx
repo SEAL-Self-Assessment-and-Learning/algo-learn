@@ -58,7 +58,9 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
                 disabled={disabled}
                 value={text || ""}
                 onChange={(e) => {
-                  setText ? setText(e.target.value) : ""
+                  if (setText) {
+                    setText(e.target.value)
+                  }
                 }}
                 type="text"
                 className={`${inputBorderColor} focus:outline-none`}
@@ -89,7 +91,9 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
               disabled={disabled}
               value={text || ""}
               onChange={(e) => {
-                setText ? setText(e.target.value) : ""
+                if (setText) {
+                  setText(e.target.value)
+                }
               }}
               onFocus={() => setIsInputFocused(true)}
               onBlur={() => setIsInputFocused(false)}
