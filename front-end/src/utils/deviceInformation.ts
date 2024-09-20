@@ -1,5 +1,5 @@
 /**
- * Check if the device is a mobile or tablet 
+ * Check if the device is a mobile or tablet
  */
 export const isMobileOrTablet = (): boolean => {
   let check = false
