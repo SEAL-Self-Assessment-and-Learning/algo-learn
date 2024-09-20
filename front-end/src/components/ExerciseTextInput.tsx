@@ -2,6 +2,7 @@ import { useRef, useState } from "react"
 import { FreeTextFeedback, FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { isMobileOrTablet } from "@/utils/deviceInformation.ts"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
@@ -169,6 +170,7 @@ export function ExerciseTextInput({
         <Markdown md={question.prompt} />
         <Input
           ref={userInputRef}
+          autoFocus={!isMobileOrTablet()}
           disabled={mode === "correct" || mode === "incorrect"}
           value={text}
           onChange={(e) => {

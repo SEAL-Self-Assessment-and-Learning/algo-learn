@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Input } from "@/components/ui/input.tsx"
 import { useFormContext } from "@/hooks/useFormContext.ts"
@@ -7,8 +7,26 @@ import { useTranslation } from "@/hooks/useTranslation.ts"
 export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
   const formContext = useFormContext()
 
-  const { feedbackVariation, feedback, align, placeholder, prompt, invalid, disabled, setText, text } =
-    formContext[id]
+  const {
+    feedbackVariation,
+    focus,
+    feedback,
+    align,
+    placeholder,
+    prompt,
+    invalid,
+    disabled,
+    setText,
+    text,
+  } = formContext[id]
+
+  // To select the first created input field on the site
+  const firstInputRef = useRef<HTMLInputElement | null>(null)
+  useEffect(() => {
+    if (firstInputRef.current) {
+      firstInputRef.current.focus()
+    }
+  }, [id])
 
   const inputBorderColor = invalid ? "border-red-500 focus:border-red-500" : ""
 
@@ -34,7 +52,9 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
             <div className="mr-2">{promptElement}</div>
             <div className={`relative h-full w-full`}>
               <Input
+                ref={focus ? firstInputRef : null}
                 key={`newline-input-${id}`}
+                autoFocus={focus}
                 disabled={disabled}
                 value={text || ""}
                 onChange={(e) => {
@@ -63,7 +83,9 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
           <div className="mr-2">{promptElement}</div>
           <div className={`relative h-full w-full`}>
             <Input
+              ref={focus ? firstInputRef : null}
               key={`newline-input-${id}`}
+              autoFocus={focus}
               disabled={disabled}
               value={text || ""}
               onChange={(e) => {
