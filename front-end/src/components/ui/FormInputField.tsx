@@ -23,8 +23,8 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
   // To select the first created input field on the site
   const firstInputRef = useRef<HTMLInputElement | null>(null)
   useEffect(() => {
-    if (firstInputRef.current) {
-      firstInputRef.current.focus()
+    if (firstInputRef.current && focus) {
+      firstInputRef.current.focus({ preventScroll: true })
     }
   }, [id])
 
@@ -54,7 +54,6 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
               <Input
                 ref={focus ? firstInputRef : null}
                 key={`newline-input-${id}`}
-                autoFocus={focus}
                 disabled={disabled}
                 value={text || ""}
                 onChange={(e) => {
@@ -85,7 +84,6 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
             <Input
               ref={focus ? firstInputRef : null}
               key={`newline-input-${id}`}
-              autoFocus={focus}
               disabled={disabled}
               value={text || ""}
               onChange={(e) => {

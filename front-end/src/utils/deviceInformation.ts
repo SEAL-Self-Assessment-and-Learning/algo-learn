@@ -1,7 +1,5 @@
-/**
- * Check if the device is a mobile or tablet
- */
-export const isMobileOrTablet = (): boolean => {
+// Define a global variable
+export const isMobileOrTablet: boolean = (() => {
   let check = false
   ;(function (a) {
     if (
@@ -15,4 +13,4 @@ export const isMobileOrTablet = (): boolean => {
       check = true
   })(navigator.userAgent)
   return check
-}
+})()
