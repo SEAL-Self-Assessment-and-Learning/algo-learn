@@ -221,7 +221,7 @@ export function createBoundsString(
         endPseudoCodeString = [`\\lceil log_${boundsManipulation.value}(`, value, `) \\rceil`]
       } else {
         endPseudoCodeString = [
-          `log_${boundsManipulation.value === 0 ? "" : boundsManipulation.value}(`,
+          `log${boundsManipulation.value === 0 ? "" : "_" + boundsManipulation.value}(`,
           value,
           `)`,
         ]
@@ -267,7 +267,7 @@ export function createBoundsString(
  * @param elseStatement
  * @param numPrint
  * @param numPrintElse
- * @param writeCode if other code should be written inside the if statement
+ * @param writeCode if other code (other than printStars) should be written inside the if statement
  */
 export function createIfCondition({
   firstVariableName,
@@ -342,8 +342,8 @@ export function createIfCondition({
  * @param compare
  * @param vars
  * @param changeCode
- * @param changeI
- * @param changeJ
+ * @param changeFirstVariable
+ * @param changeSecondVariable
  * @param random
  */
 export function createWhileChangeValues({
@@ -355,8 +355,8 @@ export function createWhileChangeValues({
   compare,
   vars,
   changeCode = true,
-  changeI = 0,
-  changeJ = 0,
+  changeFirstVariable = 0,
+  changeSecondVariable = 0,
   random,
 }: {
   cOption: string
@@ -367,44 +367,42 @@ export function createWhileChangeValues({
   compare: WhileCompareOptions
   vars: WhileOrderOptions
   changeCode?: boolean
-  changeI?: number
-  changeJ?: number
+  changeFirstVariable?: number
+  changeSecondVariable?: number
   random: Random
 }) {
-  // changeI -> firstVariableName
-  // changeJ -> secondVariableName
   const assignments: PseudoCodeAssignment[] = []
   if (cOption === "xPlus") {
     assignments.push({
       assignment: firstVariableName,
       value: [{ variable: firstVariableName }, "+", firstChangeValue.toString()],
     })
-    changeI += firstChangeValue
+    changeFirstVariable += firstChangeValue
   } else if (cOption === "xMult") {
     if (changeCode) firstChangeValue = random.int(2, 3)
     assignments.push({
       assignment: firstVariableName,
       value: [{ variable: firstVariableName }, "*", firstChangeValue.toString()],
     })
-    changeI *= firstChangeValue
+    changeFirstVariable *= firstChangeValue
   } else if (cOption === "xSquare") {
     assignments.push({
       assignment: firstVariableName,
       value: [{ variable: firstVariableName }, "^2"],
     })
-    changeI *= changeI
+    changeFirstVariable *= changeFirstVariable
   } else if (cOption === "xPlusX") {
     assignments.push({
       assignment: firstVariableName,
       value: [{ variable: firstVariableName }, "+", { variable: firstVariableName }],
     })
-    changeI += changeI
+    changeFirstVariable += changeFirstVariable
   } else if (cOption === "xMinus") {
     assignments.push({
       assignment: firstVariableName,
       value: [{ variable: firstVariableName }, "-", firstChangeValue.toString()],
     })
-    changeI -= firstChangeValue
+    changeFirstVariable -= firstChangeValue
   } else if (cOption === "xDiv") {
     if (changeCode) firstChangeValue = random.int(2, 3)
     assignments.push({
@@ -417,19 +415,19 @@ export function createWhileChangeValues({
         "} \\rfloor",
       ],
     })
-    changeI = Math.floor(changeI / firstChangeValue)
+    changeFirstVariable = Math.floor(changeFirstVariable / firstChangeValue)
   } else if (cOption === "xLog") {
     assignments.push({
       assignment: firstVariableName,
       value: ["\\lceil ", "log_2(", firstVariableName, ")", "\\rceil"],
     })
-    changeI = Math.ceil(Math.log2(changeI))
+    changeFirstVariable = Math.ceil(Math.log2(changeFirstVariable))
   } else if (cOption === "xMinusY") {
     assignments.push({
       assignment: firstVariableName,
       value: [{ variable: firstVariableName }, "-", { variable: secondVariableName }],
     })
-    changeI -= changeJ
+    changeFirstVariable -= changeSecondVariable
   } else if (cOption === "xDivY") {
     assignments.push({
       assignment: firstVariableName,
@@ -441,19 +439,19 @@ export function createWhileChangeValues({
         "} \\rfloor",
       ],
     })
-    changeI = Math.floor(changeI / changeJ)
+    changeFirstVariable = Math.floor(changeFirstVariable / changeSecondVariable)
   } else if (cOption === "xPlusY") {
     assignments.push({
       assignment: firstVariableName,
       value: [{ variable: firstVariableName }, "+", { variable: secondVariableName }],
     })
-    changeI += changeJ
+    changeFirstVariable += changeSecondVariable
   } else if (cOption === "xMultY") {
     assignments.push({
       assignment: firstVariableName,
       value: [{ variable: firstVariableName }, "*", { variable: secondVariableName }],
     })
-    changeI *= changeJ
+    changeFirstVariable *= changeSecondVariable
   } else if (cOption === "xMinusYPlus") {
     assignments.push({
       assignment: firstVariableName,
@@ -463,8 +461,8 @@ export function createWhileChangeValues({
       assignment: secondVariableName,
       value: [{ variable: secondVariableName }, "+", secondChangeValue.toString()],
     })
-    changeI -= firstChangeValue
-    changeJ += secondChangeValue
+    changeFirstVariable -= firstChangeValue
+    changeSecondVariable += secondChangeValue
   } else if (cOption === "xDivYPlus") {
     if (changeCode) firstChangeValue = random.int(2, 3)
     assignments.push({
@@ -481,8 +479,8 @@ export function createWhileChangeValues({
       assignment: secondVariableName,
       value: [{ variable: secondVariableName }, "+", secondChangeValue.toString()],
     })
-    changeI = Math.floor(changeI / firstChangeValue)
-    changeJ += secondChangeValue
+    changeFirstVariable = Math.floor(changeFirstVariable / firstChangeValue)
+    changeSecondVariable += secondChangeValue
   } else if (cOption === "xMinusYMult") {
     assignments.push({
       assignment: firstVariableName,
@@ -493,8 +491,8 @@ export function createWhileChangeValues({
       assignment: secondVariableName,
       value: [{ variable: secondVariableName }, " \\cdot ", secondChangeValue.toString()],
     })
-    changeI -= firstChangeValue
-    changeJ *= secondChangeValue
+    changeFirstVariable -= firstChangeValue
+    changeSecondVariable *= secondChangeValue
   } else if (cOption === "xDivYMult") {
     if (changeCode) firstChangeValue = random.int(2, 3)
     assignments.push({
@@ -512,8 +510,8 @@ export function createWhileChangeValues({
       assignment: secondVariableName,
       value: [{ variable: secondVariableName }, "*", secondChangeValue.toString()],
     })
-    changeI = Math.floor(changeI / firstChangeValue)
-    changeJ *= secondChangeValue
+    changeFirstVariable = Math.floor(changeFirstVariable / firstChangeValue)
+    changeSecondVariable *= secondChangeValue
   } else if (cOption === "xMinusYYPlus") {
     assignments.push({
       assignment: firstVariableName,
@@ -523,8 +521,8 @@ export function createWhileChangeValues({
       assignment: secondVariableName,
       value: [{ variable: secondVariableName }, "+", secondChangeValue.toString()],
     })
-    changeI -= changeJ
-    changeJ += secondChangeValue
+    changeFirstVariable -= changeSecondVariable
+    changeSecondVariable += secondChangeValue
   } else if (cOption === "bothMinus") {
     if (
       (vars === "xy" && (compare === ">" || compare === ">=")) ||
@@ -544,8 +542,8 @@ export function createWhileChangeValues({
       assignment: secondVariableName,
       value: [{ variable: secondVariableName }, "-", secondChangeValue.toString()],
     })
-    changeI -= firstChangeValue
-    changeJ -= secondChangeValue
+    changeFirstVariable -= firstChangeValue
+    changeSecondVariable -= secondChangeValue
   } else if (cOption === "bothPlus") {
     if (
       (vars === "xy" && (compare === ">" || compare === ">=")) ||
@@ -565,8 +563,8 @@ export function createWhileChangeValues({
       assignment: secondVariableName,
       value: [{ variable: secondVariableName }, "+", secondChangeValue.toString()],
     })
-    changeI += firstChangeValue
-    changeJ += secondChangeValue
+    changeFirstVariable += firstChangeValue
+    changeSecondVariable += secondChangeValue
   } else if (cOption === "bothMult") {
     if (
       (vars === "xy" && (compare === ">" || compare === ">=")) ||
@@ -586,15 +584,15 @@ export function createWhileChangeValues({
       assignment: secondVariableName,
       value: [{ variable: secondVariableName }, "*", secondChangeValue.toString()],
     })
-    changeI *= firstChangeValue
-    changeJ *= secondChangeValue
+    changeFirstVariable *= firstChangeValue
+    changeSecondVariable *= secondChangeValue
   }
 
   return {
     assignments,
     firstChangeValue,
     secondChangeValue,
-    changeI,
-    changeJ,
+    changeFirstVariable,
+    changeSecondVariable,
   }
 }

@@ -58,7 +58,7 @@ function manipulateVariable(
  * @param endValue
  * @param endManipulation
  */
-export function condition(
+export function conditionCheck(
   i: number,
   j: number,
   varToManipulate: "i" | "j" | "e" | "",

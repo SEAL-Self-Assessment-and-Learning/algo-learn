@@ -213,7 +213,7 @@ export function createPseudoCodeForForLoop(
     secondForStatement.for.do = secondForBlock
   }
 
-  // create the if inside the second for loop
+  // create if inside the second for loop
   let askVar = `${secondVariableName}`
   if (askFirstVariableInSecondLoop) {
     askVar = `${firstVariableName}`

@@ -11,7 +11,6 @@ import {
   PseudoCode,
   PseudoCodeBlock,
   PseudoCodeFor,
-  PseudoCodeForAll,
   PseudoCodeIf,
 } from "@shared/utils/pseudoCodeUtils.ts"
 import Random from "@shared/utils/random.ts"
@@ -74,7 +73,7 @@ function createPseudoCodeFor({
   }
   completeCode.push(bodyBlock)
 
-  const forStatement: PseudoCodeFor | PseudoCodeForAll = createBasicForLine({
+  const forStatement: PseudoCodeFor = createBasicForLine({
     variableName: firstVariableName,
     startValueLoop: startValueLoop.toString(),
     endValueLoop: endValueLoop.toString(),

@@ -9,14 +9,19 @@ import Random from "@shared/utils/random.ts"
  * @param endManipulationFirstLoop
  * @param endValueFirstLoop
  */
-function computeEndValueFirstLoop(endManipulationFirstLoop: BoundsOptions, endValueFirstLoop: number) {
-  return endManipulationFirstLoop === "none"
-    ? endValueFirstLoop
-    : endManipulationFirstLoop.type === "mult"
-      ? endValueFirstLoop * endManipulationFirstLoop.value
-      : endManipulationFirstLoop.type === "square"
-        ? endValueFirstLoop * endValueFirstLoop
-        : Math.ceil(Math.log2(endValueFirstLoop))
+function computeEndValueFirstLoop(
+  endManipulationFirstLoop: BoundsOptions,
+  endValueFirstLoop: number,
+): number {
+  if (endManipulationFirstLoop === "none") {
+    return endValueFirstLoop
+  } else if (endManipulationFirstLoop.type === "mult") {
+    return endValueFirstLoop * endManipulationFirstLoop.value
+  } else if (endManipulationFirstLoop.type === "square") {
+    return endValueFirstLoop * endValueFirstLoop
+  } else {
+    return Math.ceil(Math.log2(endValueFirstLoop))
+  }
 }
 
 /**
@@ -31,14 +36,16 @@ function computeStartValueSecondLoop(
   loopIteration: number,
   startSecondManipulationMultiplier: number,
   startValueSecondLoop: number,
-) {
-  return startManipulationSecondLoop === "var-normal"
-    ? loopIteration
-    : startManipulationSecondLoop === "var-mult"
-      ? loopIteration * startSecondManipulationMultiplier
-      : startManipulationSecondLoop === "var-square"
-        ? loopIteration * loopIteration
-        : startValueSecondLoop
+): number {
+  if (startManipulationSecondLoop === "none") {
+    return startValueSecondLoop
+  } else if (startManipulationSecondLoop === "var-normal") {
+    return loopIteration
+  } else if (startManipulationSecondLoop === "var-mult") {
+    return loopIteration * startSecondManipulationMultiplier
+  } else {
+    return loopIteration * loopIteration
+  }
 }
 
 /**
@@ -50,15 +57,15 @@ function computeEndValueSecondLoop(
   endManipulationSecondLoop: BoundsOptions,
   endValueSecondLoop: number,
 ) {
-  return endManipulationSecondLoop === "none"
-    ? endValueSecondLoop
-    : endManipulationSecondLoop.type === "square"
-      ? endValueSecondLoop * endValueSecondLoop
-      : endManipulationSecondLoop.type === "log"
-        ? Math.ceil(Math.log2(endValueSecondLoop))
-        : endManipulationSecondLoop.type === "mult"
-          ? endValueSecondLoop * endManipulationSecondLoop.value
-          : Number.NaN
+  if (endManipulationSecondLoop === "none") {
+    return endValueSecondLoop
+  } else if (endManipulationSecondLoop.type === "square") {
+    return endValueSecondLoop * endValueSecondLoop
+  } else if (endManipulationSecondLoop.type === "mult") {
+    return endValueSecondLoop * endManipulationSecondLoop.value
+  } else {
+    return Math.ceil(Math.log2(endValueSecondLoop))
+  }
 }
 
 /**

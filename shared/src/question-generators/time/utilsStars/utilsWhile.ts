@@ -7,7 +7,7 @@ import {
 } from "@shared/question-generators/time/utils.ts"
 import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars.ts"
 import { generateDifferentAmountOfStarPrints } from "@shared/question-generators/time/utilsStars/utils.ts"
-import { condition } from "@shared/question-generators/time/utilsStars/utilsWhileCondition.ts"
+import { conditionCheck } from "@shared/question-generators/time/utilsStars/utilsWhileCondition.ts"
 import { computeStartEndVarsWhile } from "@shared/question-generators/time/utilsStars/utilsWhileVarValues.ts"
 import {
   printStarsNew,
@@ -187,7 +187,9 @@ export function createWhileLoop(firstVariableName: string, secondVariableName: s
   let j = secondVariableValue
   let numStars = 0
 
-  while (condition(i, j, varToManipulate, variableOrder, compareOption, endValue, endManipulation)) {
+  while (
+    conditionCheck(i, j, varToManipulate, variableOrder, compareOption, endValue, endManipulation)
+  ) {
     // calculate the stars
     numStars += calculateNumberOfStars(
       condEnd,
@@ -204,12 +206,12 @@ export function createWhileLoop(firstVariableName: string, secondVariableName: s
       compare: compareOption,
       vars: variableOrder,
       changeCode: false,
-      changeI: i,
-      changeJ: j,
+      changeFirstVariable: i,
+      changeSecondVariable: j,
       random,
     })
-    i = changedCode.changeI
-    j = changedCode.changeJ
+    i = changedCode.changeFirstVariable
+    j = changedCode.changeSecondVariable
   }
 
   if (printAfter) {

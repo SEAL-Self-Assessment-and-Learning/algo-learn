@@ -82,7 +82,6 @@ export function sampleExact({
   availableVarNames?: string[]
 }): { code: PseudoCode; numStars: number } {
   const { firstVariableName, secondVariableName } = generateVariableNames(random, availableVarNames)
-  generateDifferentAmountOfStarPrints(random)
 
   const loopType: "for" | "forfor" | "while" = random.choice(["for", "forfor", "while"])
 
@@ -98,13 +97,11 @@ export function sampleExact({
       numStars: forForResult.numStars,
       code: forForResult.code,
     }
-  } else if (loopType === "while") {
+  } else {
     const whileLoopResult = createWhileLoop(firstVariableName, secondVariableName, random)
     return {
       numStars: whileLoopResult.numStars,
       code: whileLoopResult.code,
     }
-  } else {
-    throw new Error("Unknown loop type")
   }
 }
