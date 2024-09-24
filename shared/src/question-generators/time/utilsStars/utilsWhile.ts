@@ -67,13 +67,10 @@ export function createWhileLoop(firstVariableName: string, secondVariableName: s
   if (
     (whileCaseOption.toLowerCase().indexOf("x") !== -1 &&
       whileCaseOption.toLowerCase().indexOf("y") !== -1) ||
-    (whileCaseOption.toLowerCase().indexOf("x") === -1 &&
-      whileCaseOption.toLowerCase().indexOf("y") === -1) ||
     variableOrder === "xy" ||
     variableOrder === "yx"
   ) {
     compareVar = random.choice(["var1", "var2"])
-    // introduce var1 and var2
     pseudoCodeBlock.block.push({
       state: {
         assignment: firstVariableName,
@@ -95,13 +92,13 @@ export function createWhileLoop(firstVariableName: string, secondVariableName: s
     })
     compareVar = "var1"
   } else if (whileCaseOption.toLowerCase().indexOf("y") !== -1) {
-    compareVar = "var2"
     pseudoCodeBlock.block.push({
       state: {
         assignment: firstVariableName,
         value: [secondVariableValue.toString()],
       },
     })
+    compareVar = "var2"
   }
 
   // while loop statement
@@ -124,7 +121,7 @@ export function createWhileLoop(firstVariableName: string, secondVariableName: s
       endManipulation: firstVariableValue > secondVariableValue ? endManipulation : "none",
       compare: compareOption,
     })
-  } else if (variableOrder === "xn") {
+  } else {
     whilePseudoCode = createWhileLine({
       start: { variable: firstVariableName },
       startManipulation: firstVariableValue < endValue ? "none" : endManipulation,
@@ -132,8 +129,6 @@ export function createWhileLoop(firstVariableName: string, secondVariableName: s
       endManipulation: firstVariableValue < endValue ? endManipulation : "none",
       compare: compareOption,
     })
-  } else {
-    throw new Error("Only vars options allowed are xy, yx, xn")
   }
 
   pseudoCodeBlock.block.push(whilePseudoCode)
@@ -142,7 +137,6 @@ export function createWhileLoop(firstVariableName: string, secondVariableName: s
   }
   whilePseudoCode.while.do = whilePseudoBlock
 
-  // create the if and else statement
   if (condEnd === "none") {
     whilePseudoBlock.block.push(printStarsNew(numPrint))
   } else {

@@ -7,15 +7,12 @@ import {
 } from "@shared/question-generators/time/utils.ts"
 import Random from "@shared/utils/random.ts"
 
-function computeOptionXPlus(
-  variableOrder: "xy" | "yx" | "xn",
-  random: Random,
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  firstVariableValue: number,
-  secondVariableValue: number,
-  endValue: number,
-) {
-  variableOrder = random.choice(["xy", "yx", "xn"])
+function computeOptionXPlus(random: Random) {
+  const variableOrder: "xy" | "yx" | "xn" = random.choice(["xy", "yx", "xn"])
+  let compareOption: WhileCompareOptions
+  let firstVariableValue: number
+  let secondVariableValue: number = 0
+  let endValue: number = 0
   if (variableOrder === "xy" || variableOrder == "yx") {
     if (variableOrder == "xy") {
       // case x increases, so needs to be smaller than y (x+c <= y)
@@ -44,16 +41,13 @@ function computeOptionXPlus(
   return { variableOrder, compareOption, firstVariableValue, secondVariableValue, endValue }
 }
 
-function computeOptionXMultxPlusX(
-  variableOrder: "xy" | "yx" | "xn",
-  random: Random,
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  firstVariableValue: number,
-  secondVariableValue: number,
-  endValue: number,
-) {
+function computeOptionXMultxPlusX(random: Random) {
   // xMult and xPlusX have the same logic
-  variableOrder = random.choice(["xy", "yx", "xn"])
+  const variableOrder: "xy" | "yx" | "xn" = random.choice(["xy", "yx", "xn"])
+  let compareOption: WhileCompareOptions
+  let firstVariableValue: number
+  let secondVariableValue: number = 0
+  let endValue: number = 0
   if (variableOrder === "xy" || variableOrder === "yx") {
     if (variableOrder === "xy") {
       // cases y is static and x increase to x needs to be smaller than y
@@ -83,15 +77,12 @@ function computeOptionXMultxPlusX(
   return { variableOrder, compareOption, firstVariableValue, secondVariableValue, endValue }
 }
 
-function computeOptionxSquare(
-  variableOrder: "xy" | "yx" | "xn",
-  random: Random,
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  firstVariableValue: number,
-  secondVariableValue: number,
-  endValue: number,
-) {
-  variableOrder = random.choice(["xy", "yx", "xn"])
+function computeOptionxSquare(random: Random) {
+  const variableOrder: "xy" | "yx" | "xn" = random.choice(["xy", "yx", "xn"])
+  let compareOption: WhileCompareOptions
+  let firstVariableValue: number
+  let secondVariableValue: number = 0
+  let endValue: number = 0
   if (variableOrder === "xy" || variableOrder === "yx") {
     if (variableOrder === "xy") {
       // x increases, so it needs to be smaller than (because y is static)
@@ -121,15 +112,12 @@ function computeOptionxSquare(
   return { variableOrder, compareOption, firstVariableValue, secondVariableValue, endValue }
 }
 
-function computeOptionxMinus(
-  variableOrder: "xy" | "yx" | "xn",
-  random: Random,
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  firstVariableValue: number,
-  secondVariableValue: number,
-  endValue: number,
-) {
-  variableOrder = random.choice(["xy", "yx", "xn"])
+function computeOptionxMinus(random: Random) {
+  const variableOrder: "xy" | "yx" | "xn" = random.choice(["xy", "yx", "xn"])
+  let compareOption: WhileCompareOptions
+  let firstVariableValue: number
+  let secondVariableValue: number = 0
+  let endValue: number = 0
   if (variableOrder === "xy" || variableOrder === "yx") {
     if (variableOrder === "xy") {
       // x decreases, so it needs to be larger than y, because y is still static
@@ -160,15 +148,12 @@ function computeOptionxMinus(
   return { variableOrder, compareOption, firstVariableValue, secondVariableValue, endValue }
 }
 
-function computeOptionxDivXLog(
-  variableOrder: "xy" | "yx" | "xn",
-  random: Random,
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  firstVariableValue: number,
-  secondVariableValue: number,
-  endValue: number,
-) {
-  variableOrder = random.choice(["xy", "yx", "xn"])
+function computeOptionxDivXLog(random: Random) {
+  const variableOrder: "xy" | "yx" | "xn" = random.choice(["xy", "yx", "xn"])
+  let compareOption: WhileCompareOptions
+  let firstVariableValue: number
+  let secondVariableValue: number = 0
+  let endValue: number = 0
   if (variableOrder === "xy" || variableOrder === "yx") {
     if (variableOrder === "xy") {
       // x decreases, so it needs to be larger than y, because y is still static
@@ -203,19 +188,15 @@ function computeOptionxDivXLog(
   return { variableOrder, compareOption, firstVariableValue, secondVariableValue, endValue }
 }
 
-function computeOptionxPlusY(
-  variableOrder: "xy" | "yx" | "xn",
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  random: Random,
-  firstVariableValue: number,
-  secondVariableValue: number,
-  endValue: number,
-) {
+function computeOptionxPlusY(random: Random) {
   // only xn makes sense
   // x+y <= y will be false after one iteration
-  variableOrder = "xn"
+  const variableOrder: "xy" | "yx" | "xn" = "xn"
   // because x increases and n is static x+y<=n
-  compareOption = getCompare(random, "<")
+  const compareOption = getCompare(random, "<")
+  let firstVariableValue: number
+  let secondVariableValue: number
+  let endValue: number
   if (compareOption === "==") {
     firstVariableValue = random.int(4, 8)
     secondVariableValue = random.int(1, 2)
@@ -230,19 +211,15 @@ function computeOptionxPlusY(
   return { variableOrder, compareOption, firstVariableValue, secondVariableValue, endValue }
 }
 
-function computeOptionxMultY(
-  variableOrder: "xy" | "yx" | "xn",
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  random: Random,
-  firstVariableValue: number,
-  secondVariableValue: number,
-  endValue: number,
-) {
+function computeOptionxMultY(random: Random) {
   // only xn makes sense
   // because x*y <= y will be false after one iteration
-  variableOrder = "xn"
+  const variableOrder: "xy" | "yx" | "xn" = "xn"
   // because x increases and n is static (x*y<=n)
-  compareOption = getCompare(random, "<")
+  const compareOption = getCompare(random, "<")
+  let firstVariableValue: number
+  let secondVariableValue: number
+  let endValue: number
   if (compareOption === "==") {
     firstVariableValue = random.int(4, 8)
     secondVariableValue = random.int(2, 3)
@@ -257,15 +234,12 @@ function computeOptionxMultY(
   return { variableOrder, compareOption, firstVariableValue, secondVariableValue, endValue }
 }
 
-function computeOptionxDivY(
-  variableOrder: "xy" | "yx" | "xn",
-  random: Random,
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  firstVariableValue: number,
-  secondVariableValue: number,
-  endValue: number,
-) {
-  variableOrder = random.choice(["xy", "yx", "xn"])
+function computeOptionxDivY(random: Random) {
+  const variableOrder: "xy" | "yx" | "xn" = random.choice(["xy", "yx", "xn"])
+  let compareOption: WhileCompareOptions
+  let firstVariableValue: number
+  let secondVariableValue: number
+  let endValue: number = 0
   if (variableOrder === "xy" || variableOrder === "yx") {
     if (variableOrder == "xy") {
       // x decreases, so it needs to be larger than y, because y is still static
@@ -301,18 +275,16 @@ function computeOptionxDivY(
   return { variableOrder, compareOption, firstVariableValue, secondVariableValue, endValue }
 }
 
-function computeOptionxMinusYxMinusYPlus(
-  variableOrder: "xy" | "yx" | "xn",
-  random: Random,
-  whileCaseOption: string,
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  firstVariableValue: number,
-  secondVariableValue: number,
-  endValue: number,
-) {
+function computeOptionxMinusYxMinusYPlus(random: Random, whileCaseOption: string) {
   // case xMinusY (y is static, and we decrease x by y) all three make
   // case xMinusYPlus (y increases with addition, and we decrease x with subtraction)
-  variableOrder = random.choice(whileCaseOption === "xMinusY" ? ["xy", "yx", "xn"] : ["xy", "yx"])
+  const variableOrder: "xy" | "yx" | "xn" = random.choice(
+    whileCaseOption === "xMinusY" ? ["xy", "yx", "xn"] : ["xy", "yx"],
+  )
+  let compareOption: WhileCompareOptions
+  let firstVariableValue: number
+  let secondVariableValue: number
+  let endValue: number = 0
   if (variableOrder === "xy" || variableOrder === "yx") {
     if (variableOrder == "xy") {
       // in both cases x decreases (the one case y is either static or increases)
@@ -346,16 +318,12 @@ function computeOptionxMinusYxMinusYPlus(
   return { variableOrder, compareOption, firstVariableValue, secondVariableValue, endValue }
 }
 
-function computeOptionxMinusYMultxDivYPlusxDivYMult(
-  variableOrder: "xy" | "yx" | "xn",
-  random: Random,
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  firstVariableValue: number,
-  secondVariableValue: number,
-  whileCaseOption: string,
-  endValue: number,
-) {
-  variableOrder = random.choice(["xy", "yx", "xn"])
+function computeOptionxMinusYMultxDivYPlusxDivYMult(random: Random, whileCaseOption: string) {
+  const variableOrder: "xy" | "yx" | "xn" = random.choice(["xy", "yx", "xn"])
+  let compareOption: WhileCompareOptions
+  let firstVariableValue: number
+  let secondVariableValue: number
+  let endValue: number = 0
   if (variableOrder === "xy" || variableOrder === "yx") {
     if (variableOrder == "xy") {
       // in all three cases x decreases and y increases
@@ -393,15 +361,12 @@ function computeOptionxMinusYMultxDivYPlusxDivYMult(
   return { variableOrder, compareOption, firstVariableValue, secondVariableValue, endValue }
 }
 
-function computeOptionxMinusYYPlus(
-  variableOrder: "xy" | "yx" | "xn",
-  random: Random,
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  firstVariableValue: number,
-  secondVariableValue: number,
-  endValue: number,
-) {
-  variableOrder = random.choice(["xy", "yx", "xn"])
+function computeOptionxMinusYYPlus(random: Random) {
+  const variableOrder: "xy" | "yx" | "xn" = random.choice(["xy", "yx", "xn"])
+  let compareOption: WhileCompareOptions
+  let firstVariableValue: number
+  let secondVariableValue: number
+  let endValue: number = 0
   if (variableOrder === "xy" || variableOrder === "yx") {
     if (variableOrder == "xy") {
       // x decreases by y and y increases by c
@@ -439,69 +404,25 @@ function computeOptionxMinusYYPlus(
   return { variableOrder, compareOption, firstVariableValue, secondVariableValue, endValue }
 }
 
-function computeOptionbothPlusbothMult(
-  endManipulation: BoundsOptions,
-  variableOrder: "xy" | "yx" | "xn",
-  random: Random,
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  firstVariableValue: number,
-  secondVariableValue: number,
-  whileCaseOption: string,
-) {
-  // not endManipulation, because the runtime could be too long
-  // x=9, y=1
-  // while x*x or 3*x < y
-  //  x = x+3
-  //  y = y+4
-  // this example takes quite a while to finish
+function computeOptionbothPlusbothMultbothMinus(endManipulation: BoundsOptions, random: Random) {
   endManipulation = "none"
-  variableOrder = random.choice(["xy", "yx"])
-  // x should increase slower, so it starts higher
-  if (variableOrder === "xy" || variableOrder === "yx") {
-    if (variableOrder == "xy") {
-      compareOption = getCompare(random, ">")
-    } else {
-      compareOption = getCompare(random, "<")
-    }
-    if (compareOption === "==") {
-      firstVariableValue = random.int(4, 8)
-      secondVariableValue = firstVariableValue
-    } else {
-      // x starts higher than
-      firstVariableValue = random.int(7, 10)
-      // if Mult, y at least 1 otherwise doesn't matter
-      secondVariableValue = random.int(0, 2) + (whileCaseOption === "bothMult" ? 1 : 0)
-    }
+  const variableOrder: "xy" | "yx" | "xn" = random.choice(["xy", "yx"])
+  let compareOption: WhileCompareOptions
+  let firstVariableValue: number
+  let secondVariableValue: number
+  if (variableOrder == "xy") {
+    compareOption = getCompare(random, ">")
+  } else {
+    compareOption = getCompare(random, "<")
   }
-  return { endManipulation, variableOrder, compareOption, firstVariableValue, secondVariableValue }
-}
+  if (compareOption === "==") {
+    firstVariableValue = random.int(4, 8)
+    secondVariableValue = firstVariableValue
+  } else {
+    firstVariableValue = random.int(7, 10)
+    secondVariableValue = random.int(1, 2)
+  }
 
-function computeOptionBothMinus(
-  endManipulation: BoundsOptions,
-  variableOrder: "xy" | "yx" | "xn",
-  random: Random,
-  compareOption: "==" | "<" | ">" | "<=" | ">=",
-  firstVariableValue: number,
-  secondVariableValue: number,
-) {
-  endManipulation = "none"
-  variableOrder = random.choice(["xy", "yx"])
-  if (variableOrder === "xy" || variableOrder === "yx") {
-    if (variableOrder == "xy") {
-      // x decreases faster, so it starts higher
-      compareOption = getCompare(random, ">")
-    } else {
-      compareOption = getCompare(random, "<")
-    }
-    if (compareOption === "==") {
-      firstVariableValue = random.int(4, 8)
-      secondVariableValue = firstVariableValue
-    } else {
-      // values are not important here
-      firstVariableValue = random.int(7, 10)
-      secondVariableValue = random.int(0, 2)
-    }
-  }
   return { endManipulation, variableOrder, compareOption, firstVariableValue, secondVariableValue }
 }
 
@@ -530,14 +451,7 @@ export function computeStartEndVarsWhile(random: Random) {
   ])
 
   if (whileCaseOption === "xPlus") {
-    const _ = computeOptionXPlus(
-      variableOrder,
-      random,
-      compareOption,
-      firstVariableValue,
-      secondVariableValue,
-      endValue,
-    )
+    const _ = computeOptionXPlus(random)
     variableOrder = _.variableOrder
     compareOption = _.compareOption
     firstVariableValue = _.firstVariableValue
@@ -545,14 +459,7 @@ export function computeStartEndVarsWhile(random: Random) {
     endValue = _.endValue
   }
   if (whileCaseOption === "xMult" || whileCaseOption === "xPlusX") {
-    const _ = computeOptionXMultxPlusX(
-      variableOrder,
-      random,
-      compareOption,
-      firstVariableValue,
-      secondVariableValue,
-      endValue,
-    )
+    const _ = computeOptionXMultxPlusX(random)
     variableOrder = _.variableOrder
     compareOption = _.compareOption
     firstVariableValue = _.firstVariableValue
@@ -560,14 +467,7 @@ export function computeStartEndVarsWhile(random: Random) {
     endValue = _.endValue
   }
   if (whileCaseOption === "xSquare") {
-    const _ = computeOptionxSquare(
-      variableOrder,
-      random,
-      compareOption,
-      firstVariableValue,
-      secondVariableValue,
-      endValue,
-    )
+    const _ = computeOptionxSquare(random)
     variableOrder = _.variableOrder
     compareOption = _.compareOption
     firstVariableValue = _.firstVariableValue
@@ -575,14 +475,7 @@ export function computeStartEndVarsWhile(random: Random) {
     endValue = _.endValue
   }
   if (whileCaseOption === "xMinus") {
-    const _ = computeOptionxMinus(
-      variableOrder,
-      random,
-      compareOption,
-      firstVariableValue,
-      secondVariableValue,
-      endValue,
-    )
+    const _ = computeOptionxMinus(random)
     variableOrder = _.variableOrder
     compareOption = _.compareOption
     firstVariableValue = _.firstVariableValue
@@ -590,14 +483,7 @@ export function computeStartEndVarsWhile(random: Random) {
     endValue = _.endValue
   }
   if (whileCaseOption === "xDiv" || whileCaseOption === "xLog") {
-    const _ = computeOptionxDivXLog(
-      variableOrder,
-      random,
-      compareOption,
-      firstVariableValue,
-      secondVariableValue,
-      endValue,
-    )
+    const _ = computeOptionxDivXLog(random)
     variableOrder = _.variableOrder
     compareOption = _.compareOption
     firstVariableValue = _.firstVariableValue
@@ -605,14 +491,7 @@ export function computeStartEndVarsWhile(random: Random) {
     endValue = _.endValue
   }
   if (whileCaseOption === "xPlusY") {
-    const _ = computeOptionxPlusY(
-      variableOrder,
-      compareOption,
-      random,
-      firstVariableValue,
-      secondVariableValue,
-      endValue,
-    )
+    const _ = computeOptionxPlusY(random)
     variableOrder = _.variableOrder
     compareOption = _.compareOption
     firstVariableValue = _.firstVariableValue
@@ -620,14 +499,7 @@ export function computeStartEndVarsWhile(random: Random) {
     endValue = _.endValue
   }
   if (whileCaseOption === "xMultY") {
-    const _ = computeOptionxMultY(
-      variableOrder,
-      compareOption,
-      random,
-      firstVariableValue,
-      secondVariableValue,
-      endValue,
-    )
+    const _ = computeOptionxMultY(random)
     variableOrder = _.variableOrder
     compareOption = _.compareOption
     firstVariableValue = _.firstVariableValue
@@ -635,14 +507,7 @@ export function computeStartEndVarsWhile(random: Random) {
     endValue = _.endValue
   }
   if (whileCaseOption === "xDivY") {
-    const _ = computeOptionxDivY(
-      variableOrder,
-      random,
-      compareOption,
-      firstVariableValue,
-      secondVariableValue,
-      endValue,
-    )
+    const _ = computeOptionxDivY(random)
     variableOrder = _.variableOrder
     compareOption = _.compareOption
     firstVariableValue = _.firstVariableValue
@@ -650,15 +515,7 @@ export function computeStartEndVarsWhile(random: Random) {
     endValue = _.endValue
   }
   if (whileCaseOption === "xMinusY" || whileCaseOption === "xMinusYPlus") {
-    const _ = computeOptionxMinusYxMinusYPlus(
-      variableOrder,
-      random,
-      whileCaseOption,
-      compareOption,
-      firstVariableValue,
-      secondVariableValue,
-      endValue,
-    )
+    const _ = computeOptionxMinusYxMinusYPlus(random, whileCaseOption)
     variableOrder = _.variableOrder
     compareOption = _.compareOption
     firstVariableValue = _.firstVariableValue
@@ -670,15 +527,7 @@ export function computeStartEndVarsWhile(random: Random) {
     whileCaseOption === "xDivYPlus" ||
     whileCaseOption === "xDivYMult"
   ) {
-    const _ = computeOptionxMinusYMultxDivYPlusxDivYMult(
-      variableOrder,
-      random,
-      compareOption,
-      firstVariableValue,
-      secondVariableValue,
-      whileCaseOption,
-      endValue,
-    )
+    const _ = computeOptionxMinusYMultxDivYPlusxDivYMult(random, whileCaseOption)
     variableOrder = _.variableOrder
     compareOption = _.compareOption
     firstVariableValue = _.firstVariableValue
@@ -686,45 +535,19 @@ export function computeStartEndVarsWhile(random: Random) {
     endValue = _.endValue
   }
   if (whileCaseOption === "xMinusYYPlus") {
-    const _ = computeOptionxMinusYYPlus(
-      variableOrder,
-      random,
-      compareOption,
-      firstVariableValue,
-      secondVariableValue,
-      endValue,
-    )
+    const _ = computeOptionxMinusYYPlus(random)
     variableOrder = _.variableOrder
     compareOption = _.compareOption
     firstVariableValue = _.firstVariableValue
     secondVariableValue = _.secondVariableValue
     endValue = _.endValue
   }
-  if (whileCaseOption === "bothPlus" || whileCaseOption === "bothMult") {
-    const _ = computeOptionbothPlusbothMult(
-      endManipulation,
-      variableOrder,
-      random,
-      compareOption,
-      firstVariableValue,
-      secondVariableValue,
-      whileCaseOption,
-    )
-    endManipulation = _.endManipulation
-    variableOrder = _.variableOrder
-    compareOption = _.compareOption
-    firstVariableValue = _.firstVariableValue
-    secondVariableValue = _.secondVariableValue
-  }
-  if (whileCaseOption === "bothMinus") {
-    const _ = computeOptionBothMinus(
-      endManipulation,
-      variableOrder,
-      random,
-      compareOption,
-      firstVariableValue,
-      secondVariableValue,
-    )
+  if (
+    whileCaseOption === "bothPlus" ||
+    whileCaseOption === "bothMult" ||
+    whileCaseOption === "bothMinus"
+  ) {
+    const _ = computeOptionbothPlusbothMultbothMinus(endManipulation, random)
     endManipulation = _.endManipulation
     variableOrder = _.variableOrder
     compareOption = _.compareOption
