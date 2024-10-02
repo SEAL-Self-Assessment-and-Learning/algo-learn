@@ -8,7 +8,30 @@ import { formContext, TextFieldState } from "@/hooks/useFormContext.ts"
 import useGlobalDOMEvents from "@/hooks/useGlobalDOMEvents.ts"
 import { useSound } from "@/hooks/useSound.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
+import { isMobileOrTablet } from "@/utils/deviceInformation.ts"
 
+/**
+ * This component is used to create a question with multiple input fields
+ *
+ * The input fields are defined in the Markdown text using the following syntax:
+ * {{id#align#promt#placeholder#checkformat}}
+ * - id: a unique identifier for the input field
+ * - align: the alignment of the input field
+ *          NL: new line (places a line break before and after the input field)
+ *          -: default (no linebreaks)
+ * - prompt: text displayed before the input field
+ * - placeholder: the placeholder text inside the input field
+ * - checkFormat: determines how feedback on the format of the userinput is displayed
+ *               - below: displays feedback in a div anchored below the input field
+ *               -: displays feedback in an overlaid div (appearing over other components),
+ *                  shown only when the input field is focused.
+ *
+ * @param question
+ * @param regenerate
+ * @param onResult
+ * @param permalink
+ * @constructor
+ */
 export function ExerciseMultiTextInput({
   question,
   regenerate,
@@ -74,7 +97,11 @@ export function ExerciseMultiTextInput({
       })
     } else {
       const valid = value.trim().length > 0
-      setState({ ...state, text, mode: valid ? "draft" : "invalid" })
+      setState({
+        ...state,
+        text: { ...state.text, [fieldID]: value },
+        mode: valid ? "draft" : "invalid",
+      })
     }
   }
 
@@ -147,7 +174,7 @@ export function ExerciseMultiTextInput({
       invalid: state.modeID[fieldValues.inputIds[i]] === "invalid",
       disabled: mode === "correct" || mode === "incorrect",
       feedback: state.formatFeedback[fieldValues.inputIds[i]],
-      focus: i === 0,
+      focus: i === 0 && !isMobileOrTablet,
     }
   }
 

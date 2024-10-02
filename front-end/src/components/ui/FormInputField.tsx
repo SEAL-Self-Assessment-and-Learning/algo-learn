@@ -23,8 +23,8 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
   // To select the first created input field on the site
   const firstInputRef = useRef<HTMLInputElement | null>(null)
   useEffect(() => {
-    if (firstInputRef.current) {
-      firstInputRef.current.focus()
+    if (firstInputRef.current && focus) {
+      firstInputRef.current.focus({ preventScroll: true })
     }
   }, [id])
 
@@ -49,16 +49,17 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
         {spacing}
         <div className="flex flex-col">
           <div className="flex flex-row items-center">
-            <div className={`${prompt ? "mr-2" : ""}`}>{promptElement}</div>
+            <div className="mr-2 whitespace-nowrap">{promptElement}</div>
             <div className={`relative h-full w-full`}>
               <Input
                 ref={focus ? firstInputRef : null}
                 key={`newline-input-${id}`}
-                autoFocus
                 disabled={disabled}
                 value={text || ""}
                 onChange={(e) => {
-                  setText ? setText(e.target.value) : ""
+                  if (setText) {
+                    setText(e.target.value)
+                  }
                 }}
                 type="text"
                 className={`${inputBorderColor} focus:outline-none ${align.startsWith("OS") ? align.split("_")[1] : "w-full"}`}
@@ -80,16 +81,17 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
       <div>
         {spacing}
         <div className="flex flex-row items-center">
-          <div className={`${prompt ? "mr-2" : ""}`}>{promptElement}</div>
+          <div className="mr-2 whitespace-nowrap">{promptElement}</div>
           <div className={`relative h-full w-full`}>
             <Input
               ref={focus ? firstInputRef : null}
               key={`newline-input-${id}`}
-              autoFocus
               disabled={disabled}
               value={text || ""}
               onChange={(e) => {
-                setText ? setText(e.target.value) : ""
+                if (setText) {
+                  setText(e.target.value)
+                }
               }}
               onFocus={() => setIsInputFocused(true)}
               onBlur={() => setIsInputFocused(false)}
