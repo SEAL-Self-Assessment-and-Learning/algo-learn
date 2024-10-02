@@ -29,10 +29,8 @@ export function useQuestion(
   useEffect(() => {
     if (questionPromise instanceof Promise) {
       void questionPromise.then((q) => setQuestion(q.question))
-    } else if (question !== questionPromise.question) {
-      setQuestion(questionPromise.question)
     }
-  }, [question, questionPromise])
+  }, [questionPromise])
   if (isLoading) {
     return { isLoading: true }
   } else {

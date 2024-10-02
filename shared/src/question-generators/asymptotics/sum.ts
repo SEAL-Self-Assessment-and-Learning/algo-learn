@@ -69,7 +69,7 @@ export const SimplifySum: QuestionGenerator = {
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
       name: t("name"),
-      text: format(t("text" ?? "text", [functionDeclaration, functionDefinition])),
+      text: format(t("text", [functionDeclaration, functionDefinition])),
       answers: answers.map(({ element }) => element),
       feedback: minimalMultipleChoiceFeedback({
         correctAnswerIndex: answers

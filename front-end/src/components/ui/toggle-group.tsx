@@ -19,7 +19,9 @@ const ToggleGroup = React.forwardRef<
     style={{ flexDirection: "column" }}
     {...props}
   >
-    <ToggleGroupContext.Provider value={{ variant, size }}>{children}</ToggleGroupContext.Provider>
+    <ToggleGroupContext.Provider value={React.useMemo(() => ({ variant, size }), [variant, size])}>
+      {children}
+    </ToggleGroupContext.Provider>
   </ToggleGroupPrimitive.Root>
 ))
 

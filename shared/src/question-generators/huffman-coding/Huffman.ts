@@ -131,7 +131,7 @@ export class HuffmanNode {
     for (let i = 0; i < word.length; i++) {
       try {
         code = this.setCharacterLabel(word[i], code)
-      } catch (e) {
+      } catch {
         return false
       }
     }
