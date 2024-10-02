@@ -1,4 +1,4 @@
-import React, {ReactElement, useEffect, useRef, useState} from "react"
+import React, { ReactElement, useEffect, useRef, useState } from "react"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Input } from "@/components/ui/input.tsx"
 import { useFormContext } from "@/hooks/useFormContext.ts"
@@ -32,7 +32,11 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
 
   let promptElement: ReactElement = <></>
   if (prompt) {
-    promptElement = (<div className={`${prompt ? "mr-2 whitespace-nowrap" : ""}`}><Markdown md={prompt}/></div>)
+    promptElement = (
+      <div className={`${prompt ? "mr-2 whitespace-nowrap" : ""}`}>
+        <Markdown md={prompt} />
+      </div>
+    )
   }
 
   let spacing
@@ -108,9 +112,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
               style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
               placeholder={placeholder || ""}
             />
-            {isInputFocused && feedback && (
-              feedbackElement
-            )}
+            {isInputFocused && feedback && feedbackElement}
           </div>
         </div>
         {spacing}
