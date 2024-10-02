@@ -9,15 +9,17 @@ import { BoundsOptions } from "@shared/question-generators/time/utils.ts"
  * @param compare
  */
 function compareTwoValues(i: number, j: number, compare: string) {
-  return compare === "<"
-    ? i < j
-    : compare === "<="
-      ? i <= j
-      : compare === ">"
-        ? i > j
-        : compare === ">="
-          ? i >= j
-          : i === j
+  if (compare === "<") {
+    return i < j
+  } else if (compare === "<=") {
+    return i <= j
+  } else if (compare === ">") {
+    return i > j
+  } else if (compare === ">=") {
+    return i >= j
+  } else {
+    return i === j
+  }
 }
 
 /**

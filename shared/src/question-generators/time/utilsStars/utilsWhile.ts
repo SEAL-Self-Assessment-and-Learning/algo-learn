@@ -48,10 +48,6 @@ export function createWhileLoop(firstVariableName: string, secondVariableName: s
     whileCaseOption,
   } = computeStartEndVarsWhile(random)
 
-  if (firstVariableValue === -10 && secondVariableValue === -10) {
-    throw new Error("Start values are not set" + whileCaseOption + variableOrder + compareOption)
-  }
-
   // Choose a condition
   const condEnd: IfOptions = random.choice(["even", "odd", "square", "none"])
   const elseAfter = condEnd === "none" ? false : random.bool(0.3)
