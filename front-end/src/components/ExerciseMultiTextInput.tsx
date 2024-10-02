@@ -8,6 +8,7 @@ import { formContext, TextFieldState } from "@/hooks/useFormContext.ts"
 import useGlobalDOMEvents from "@/hooks/useGlobalDOMEvents.ts"
 import { useSound } from "@/hooks/useSound.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
+import { isMobileOrTablet } from "@/utils/deviceInformation.ts"
 
 /**
  * This component is used to create a question with multiple input fields
@@ -173,7 +174,7 @@ export function ExerciseMultiTextInput({
       invalid: state.modeID[fieldValues.inputIds[i]] === "invalid",
       disabled: mode === "correct" || mode === "incorrect",
       feedback: state.formatFeedback[fieldValues.inputIds[i]],
-      focus: i === 0,
+      focus: i === 0 && !isMobileOrTablet,
     }
   }
 
