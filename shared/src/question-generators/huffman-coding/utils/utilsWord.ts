@@ -8,9 +8,9 @@ import {
 import {
   generateChoice1Question,
   generateInputChoice1Foundations,
-} from "@shared/question-generators/huffman-coding/generate/stringStructure.ts"
+} from "@shared/question-generators/huffman-coding/generate/stringStructure"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
-import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils.ts"
+import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils"
 import Random from "@shared/utils/random"
 import { t, Translations } from "@shared/utils/translations"
 

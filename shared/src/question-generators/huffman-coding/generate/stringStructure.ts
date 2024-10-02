@@ -5,11 +5,11 @@ import {
   randomSwitch01,
   reduceCodeOfLetter,
   switchLetters,
-} from "@shared/question-generators/huffman-coding/generate/answerOptions.ts"
-import { generateString } from "@shared/question-generators/huffman-coding/generate/words.ts"
-import { getHuffmanCodeOfWord, HuffmanNode } from "@shared/question-generators/huffman-coding/Huffman.ts"
-import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils.ts"
-import Random from "@shared/utils/random.ts"
+} from "@shared/question-generators/huffman-coding/generate/answerOptions"
+import { generateString } from "@shared/question-generators/huffman-coding/generate/words"
+import { getHuffmanCodeOfWord, HuffmanNode } from "@shared/question-generators/huffman-coding/Huffman"
+import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils"
+import Random from "@shared/utils/random"
 
 /**
  * This function generates the foundation for input and choice question

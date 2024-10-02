@@ -1,4 +1,4 @@
-import Random from "@shared/utils/random.ts"
+import Random from "@shared/utils/random"
 
 /**
  * Generates a Huffman tree + encoded word from a given word of character frequencies.

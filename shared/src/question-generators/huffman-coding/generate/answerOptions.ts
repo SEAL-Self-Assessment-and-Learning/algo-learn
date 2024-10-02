@@ -2,12 +2,12 @@ import {
   getHuffmanCodeOfTable,
   getHuffmanCodeOfWord,
   HuffmanNode,
-} from "@shared/question-generators/huffman-coding/Huffman.ts"
-import Random from "@shared/utils/random.ts"
+} from "@shared/question-generators/huffman-coding/Huffman"
+import Random from "@shared/utils/random"
 
 /**
  * This function generates a new random word by switching some random 1 to 0 and 0 to 1
- * Not this high difficulty, because it is quite obvious to find the error
+ * Fairly easy, because it is quite obvious to find the error
  * @param random
  * @param correctAnswer
  */
@@ -59,7 +59,6 @@ export function switchLetters(random: Random, currentTree: HuffmanNode, word: st
 
 /**
  * Function to generate a wrong code, it takes the longest code and reduces the length by 1 (deleting the last char)
- * @Difficulty Medium
  * @param word
  * @param currentTree
  */
@@ -168,7 +167,6 @@ export function wrongAdditionTree(random: Random, inputDict: { [key: string]: nu
 /**
  * This function generates a new random word by changing a random letter to another random letter
  * The new word coding could be a little longer or shorter than the correct answer
- * @Difficulty Easy
  * @param random
  * @param word
  */

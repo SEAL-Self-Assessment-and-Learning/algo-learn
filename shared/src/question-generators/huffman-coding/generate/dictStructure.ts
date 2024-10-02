@@ -4,13 +4,13 @@ import {
   swapManyLetters,
   switchLetters,
   wrongAdditionTree,
-} from "@shared/question-generators/huffman-coding/generate/answerOptions.ts"
-import { HuffmanNode } from "@shared/question-generators/huffman-coding/Huffman.ts"
+} from "@shared/question-generators/huffman-coding/generate/answerOptions"
+import { HuffmanNode } from "@shared/question-generators/huffman-coding/Huffman"
 import {
   checkProvidedCode,
   convertDictToMdTable,
-} from "@shared/question-generators/huffman-coding/utils/utils.ts"
-import Random from "@shared/utils/random.ts"
+} from "@shared/question-generators/huffman-coding/utils/utils"
+import Random from "@shared/utils/random"
 
 /**
  * This function sorts a possible answer into the correct or wrong answer list

@@ -5,8 +5,8 @@ import {
   MultiFreeTextQuestion,
   MultipleChoiceQuestion,
 } from "@shared/api/QuestionGenerator"
-import { generatePossibleAnswersChoice2 } from "@shared/question-generators/huffman-coding/generate/dictStructure.ts"
-import { generateCharacterFrequencyTable } from "@shared/question-generators/huffman-coding/generate/words.ts"
+import { generatePossibleAnswersChoice2 } from "@shared/question-generators/huffman-coding/generate/dictStructure"
+import { generateCharacterFrequencyTable } from "@shared/question-generators/huffman-coding/generate/words"
 import { getHuffmanCodeOfTable } from "@shared/question-generators/huffman-coding/Huffman"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import {
