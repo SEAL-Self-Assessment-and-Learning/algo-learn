@@ -54,7 +54,7 @@ export default class Random {
   }
 
   /**
-   * From the uniform distribution on [min, max].
+   * Returns a random integer from the uniform distribution on [min, max].
    *
    * @param min - The minimum number.
    * @param max - The maximum number.
