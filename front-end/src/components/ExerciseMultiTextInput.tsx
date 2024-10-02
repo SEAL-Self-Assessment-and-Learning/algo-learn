@@ -155,7 +155,8 @@ export function ExerciseMultiTextInput({
 
   const fieldValues = getInputFields(question.text ? question.text : "")
 
-  const textFieldStateValues: { [id: string]: TextFieldState } = useMemo(() => {
+  const textFieldStateValues = useMemo(() => {
+    const textFieldStateValues: { [id: string]: TextFieldState } = {}
     for (let i = 0; i < fieldValues.inputIds.length; i++) {
       // first initialize every field in state
       if (!state.text[fieldValues.inputIds[i]]) {
