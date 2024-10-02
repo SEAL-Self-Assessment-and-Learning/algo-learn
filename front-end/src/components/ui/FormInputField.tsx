@@ -36,8 +36,11 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
   }
 
   let spacing
+  let fieldWidth: number | null = null
   if (align === "NL") {
     spacing = <br />
+  } else if (align.startsWith("OS")) {
+    fieldWidth = Number.parseInt(align.slice(3))
   }
 
   const [isInputFocused, setIsInputFocused] = useState(false)
@@ -62,7 +65,8 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
                   }
                 }}
                 type="text"
-                className={`${inputBorderColor} focus:outline-none ${align.startsWith("OS") ? align.split("_")[1] : "w-full"}`}
+                className={`${inputBorderColor} focus:outline-none`}
+                style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
                 placeholder={placeholder || ""}
               />
             </div>
@@ -96,7 +100,8 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
               onFocus={() => setIsInputFocused(true)}
               onBlur={() => setIsInputFocused(false)}
               type="text"
-              className={`${inputBorderColor} mb-1 focus:outline-none ${align.startsWith("OS") ? align.split("_")[1] : "w-full"}`}
+              className={`${inputBorderColor} mb-1 focus:outline-none`}
+              style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
               placeholder={placeholder || ""}
             />
             {isInputFocused && feedback && (

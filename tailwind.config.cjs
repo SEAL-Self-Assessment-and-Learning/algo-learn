@@ -76,9 +76,4 @@ module.exports = {
     hoverOnlyWhenSupported: true,
   },
   plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
-  safelist: [
-    {
-      pattern: /w-(10|11|12|14|16)/,
-    },
-  ],
 }

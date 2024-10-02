@@ -1,8 +1,8 @@
 import { ReactElement } from "react"
 import { ArrayDisplayProps } from "@shared/utils/arrayDisplayCodeBlock"
 import { Markdown } from "@/components/Markdown"
+import { useDeviceSize } from "@/hooks/useDeviceSize.ts"
 import { useTranslation } from "@/hooks/useTranslation"
-import { hasSpecificDeviceSize } from "@/utils/deviceInformation.ts"
 
 /**
  * This component displays an array in a table.
@@ -16,12 +16,11 @@ import { hasSpecificDeviceSize } from "@/utils/deviceInformation.ts"
  */
 export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): ReactElement {
   const parsedArrayObject = JSON.parse(arrayObject) as ArrayDisplayProps<T>
-  const { lang } = useTranslation()
-  const transposedView = hasSpecificDeviceSize("sm") && parsedArrayObject.transposeMobile
+  const transposedView = useDeviceSize() === "sm"
 
   return transposedView
-    ? renderTransposedArrayView(parsedArrayObject, lang)
-    : renderNormalArrayView(parsedArrayObject, lang)
+    ? RenderTransposedArrayView({ parsedArrayObject })
+    : RenderNormalArrayView({ parsedArrayObject })
 }
 
 /**
@@ -33,12 +32,13 @@ export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): React
  *   2   |  b
  *
  * @param parsedArrayObject
- * @param lang
  */
-function renderTransposedArrayView<T>(
-  parsedArrayObject: ArrayDisplayProps<T>,
-  lang: "de" | "en",
-): ReactElement {
+function RenderTransposedArrayView<T>({
+  parsedArrayObject,
+}: {
+  parsedArrayObject: ArrayDisplayProps<T>
+}): ReactElement {
+  const { lang } = useTranslation()
   return (
     <div className="flex justify-center">
       <div className="my-5">
@@ -77,12 +77,13 @@ function renderTransposedArrayView<T>(
  * Value: | a b c d ...
  *
  * @param parsedArrayObject
- * @param lang
  */
-function renderNormalArrayView<T>(
-  parsedArrayObject: ArrayDisplayProps<T>,
-  lang: "de" | "en",
-): ReactElement {
+function RenderNormalArrayView<T>({
+  parsedArrayObject,
+}: {
+  parsedArrayObject: ArrayDisplayProps<T>
+}): ReactElement {
+  const { lang } = useTranslation()
   return (
     <div className="flex pl-2">
       <div className="my-5">

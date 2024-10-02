@@ -80,7 +80,6 @@ export function generateStackStartElements({
     }
     stackElementsString += createArrayDisplayCodeBlock({
       array: stackElementsValues,
-      transposeMobile: true,
     })
   }
 

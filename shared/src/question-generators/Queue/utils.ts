@@ -88,7 +88,6 @@ export function generateQueueStartElements({
     }
     queueInformationElements += createArrayDisplayCodeBlock({
       array: startElements,
-      transposeMobile: true,
     })
   }
 
