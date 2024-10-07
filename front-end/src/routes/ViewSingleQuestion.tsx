@@ -1,6 +1,4 @@
 import { useNavigate } from "react-router-dom"
-import SyntaxHighlighter from "react-syntax-highlighter"
-import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { Parameters, validateParameters } from "@shared/api/Parameters"
 import { QuestionGenerator, questionToJSON } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
@@ -10,7 +8,6 @@ import Loading from "../components/Loading"
 import { QuestionComponent, Result } from "../components/QuestionComponent"
 import { useFormat } from "../hooks/useDebug"
 import { useQuestion } from "../hooks/useQuestion"
-import { useTheme } from "../hooks/useTheme"
 import { useTranslation } from "../hooks/useTranslation"
 import { Debug } from "./debug"
 
@@ -28,7 +25,6 @@ export function ViewSingleQuestion({
   const { lang } = useTranslation()
   const navigate = useNavigate()
   const { debug, format } = useFormat()
-  const { theme } = useTheme()
 
   const q = useQuestion(generator, lang, parameters, seed)
 
@@ -52,15 +48,13 @@ export function ViewSingleQuestion({
     </>
   ) : (
     <>
-      <HorizontallyCenteredDiv className="w-full flex-grow overflow-y-scroll">
+      <HorizontallyCenteredDiv className="mt-10 w-full flex-grow overflow-y-scroll">
         <h1>{q.question.name}</h1>
-        <SyntaxHighlighter
-          language={format}
-          wrapLongLines
-          style={theme === "dark" ? solarizedDark : solarizedLight}
-        >
-          {(format == "latex" ? questionToTex : questionToJSON)(q.question)}
-        </SyntaxHighlighter>
+        <div className={`container mx-auto p-4`}>
+          <pre className="overflow-auto rounded-md bg-gray-800 p-4 text-white">
+            <code>{(format == "latex" ? questionToTex : questionToJSON)(q.question)}</code>
+          </pre>
+        </div>
       </HorizontallyCenteredDiv>
       <Debug />
     </>
