@@ -13,6 +13,7 @@ import {
   powDependencies,
   simplifyDependencies,
   subtractDependencies,
+  transposeDependencies,
 } from "mathjs"
 
 const config: ConfigOptions = {
@@ -31,6 +32,7 @@ const math = create(
     powDependencies,
     simplifyDependencies,
     subtractDependencies,
+    transposeDependencies,
   },
   config,
 )
