@@ -1,5 +1,5 @@
 import math from "@shared/utils/math.ts"
-import Random from "@shared/utils/random.ts"
+import Random, { PrecisionValues } from "@shared/utils/random.ts"
 
 /**
  * All different types of matrices that can be generated
@@ -41,7 +41,7 @@ export function allRandomMatrix({
   cols: number
   min?: number
   max?: number
-  precision?: number
+  precision?: PrecisionValues
   identity?: boolean
 }) {
   const matrixType: MatrixType = random.weightedChoice([
@@ -96,14 +96,13 @@ export function randomStandardMatrix({
   cols: number
   min?: number
   max?: number
-  precision?: number
+  precision?: PrecisionValues
 }) {
   const matrix = []
   for (let i = 0; i < rows; i++) {
     const row = []
     for (let j = 0; j < cols; j++) {
-      const value = random.float(min, max)
-      row.push(Math.round(value * (1 / precision)) / (1 / precision))
+      row.push(random.floatPrecision(min, max, precision))
     }
     matrix.push(row)
   }
@@ -129,14 +128,13 @@ export function generateUpperRightTriangleMatrix({
   size: number
   min?: number
   max?: number
-  precision?: number
+  precision?: PrecisionValues
 }) {
   const matrix = []
   for (let i = 0; i < size; i++) {
     const row = []
     for (let j = 0; j < size; j++) {
-      const value = i <= j ? random.float(min, max) : 0
-      row.push(Math.round(value * (1 / precision)) / (1 / precision))
+      row.push(random.floatPrecision(min, max, precision))
     }
     matrix.push(row)
   }
@@ -163,7 +161,7 @@ export function generateLowerLeftTriangleMatrix({
   size: number
   min?: number
   max?: number
-  precision?: number
+  precision?: PrecisionValues
 }) {
   const mat = generateUpperRightTriangleMatrix({ random, size, min, max, precision })
   return math.transpose(mat)
@@ -188,7 +186,7 @@ export function generateLowerRightTriangleMatrix({
   size: number
   min?: number
   max?: number
-  precision?: number
+  precision?: PrecisionValues
 }) {
   // Generate an upper triangular matrix
   const upperMat = generateUpperRightTriangleMatrix({ random, size, min, max, precision })
@@ -217,7 +215,7 @@ export function generateUpperLeftTriangleMatrix({
   size: number
   min?: number
   max?: number
-  precision?: number
+  precision?: PrecisionValues
 }) {
   // Generate an upper triangular matrix
   const upperMat = generateUpperRightTriangleMatrix({ random, size, min, max, precision })
@@ -302,4 +300,72 @@ function zeroOutExceptIndex(
       matrix[i][col] = i === row ? value : 0
     }
   }
+}
+
+/**
+ * This function generates a matrix A given a vector x and b
+ * such that **Ax = b**.
+ *
+ * The b vector is adjusted to match the condition
+ * (such that more user-friendly values are possible)
+ *
+ * Given [min, max], the matrix values may be greater/smaller to satisfy the condition
+ * Also b may be outside the range of [min, max]
+ *
+ * @param random
+ * @param x - vector x
+ * @param b - vector b
+ * @param min - minimum value for the matrix
+ * @param max - maximum value for the matrix
+ * @param precision - precision of the matrix values
+ */
+export function generateAforAxEqualsB({
+  random,
+  x,
+  b,
+  min = -10,
+  max = 10,
+  precision = 1,
+}: {
+  random: Random
+  x: number[]
+  b: number[]
+  min?: number
+  max?: number
+  precision?: PrecisionValues
+}) {
+  const n = x.length
+  const positiveX = x.map((value) => Math.abs(value)).sort()
+  const minPositiveX = positiveX.find((value) => value > 0) ?? -1
+  const A: number[][] = []
+  const updatedB: number[] = []
+
+  for (let k = 0; k < n; k++) {
+    const a = Array.from({ length: n }, () => random.floatPrecision(min, max, precision))
+
+    // Adjust 'a' until it satisfies the condition for b[k]
+    while (math.dot(x, a) > b[k] + minPositiveX || math.dot(x, a) < b[k] - minPositiveX) {
+      const currentDistance = math.dot(x, a) - b[k]
+
+      // Adjust 'a' by changing the component corresponding to the largest absolute value in x
+      for (let i = 0; i < n; i++) {
+        const cpv = positiveX[n - i - 1]
+        if (cpv < Math.abs(currentDistance)) {
+          const cpvIndex = x.findIndex((value) => value === cpv || value === -cpv)
+          // Adjust the relevant component of 'a' based on the direction of the distance
+          if (currentDistance > 0) {
+            a[cpvIndex] -= x[cpvIndex] > 0 ? precision : -precision
+          } else {
+            a[cpvIndex] += x[cpvIndex] > 0 ? precision : -precision
+          }
+          break
+        }
+      }
+    }
+
+    A.push(a)
+    updatedB.push(math.dot(x, a))
+  }
+
+  return { A, updatedB }
 }
