@@ -11,7 +11,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
     feedbackVariation,
     focus,
     feedback,
-    align,
+    type,
     placeholder,
     prompt,
     invalid,
@@ -36,8 +36,18 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
   }
 
   let spacing
-  if (align === "NL") {
+  let inputClasses: string = ""
+  if (type === "NL") {
     spacing = <br />
+  }
+  if (type === "MAT") {
+    inputClasses = `w-12 p-2 mx-0.5 focus-visible:ring-1 focus-visible:ring-offset-0`
+  } else {
+    if (feedbackVariation === "below") {
+      inputClasses = "focus:outline-none"
+    } else {
+      inputClasses = "mb-1 w-full focus:outline-none"
+    }
   }
 
   const [isInputFocused, setIsInputFocused] = useState(false)
@@ -62,7 +72,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
                   }
                 }}
                 type="text"
-                className={`${inputBorderColor} focus:outline-none`}
+                className={`${inputBorderColor} ${inputClasses} focus:outline-none`}
                 placeholder={placeholder || ""}
               />
             </div>
@@ -81,7 +91,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
       <div>
         {spacing}
         <div className="flex flex-row items-center">
-          <div className="mr-2 whitespace-nowrap">{promptElement}</div>
+          <div className={`mr-2 whitespace-nowrap`}>{promptElement}</div>
           <div className={`relative h-full w-full`}>
             <Input
               ref={focus ? firstInputRef : null}
@@ -96,7 +106,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
               onFocus={() => setIsInputFocused(true)}
               onBlur={() => setIsInputFocused(false)}
               type="text"
-              className={`${inputBorderColor} mb-1 w-full focus:outline-none`}
+              className={`${inputBorderColor} ${inputClasses} `}
               placeholder={placeholder || ""}
             />
             {isInputFocused && feedback && (
