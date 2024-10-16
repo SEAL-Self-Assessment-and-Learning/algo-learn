@@ -70,34 +70,52 @@ export const ModTricks: QuestionGenerator = {
 
         const random = new Random(seed);
         const variant = parameters.variant as "simple" | "reduction" | "inverse" | "exponentiation" | "crt";
-        
+
+        let question;
+        let testing;
+
         switch (variant) {
-            case "simple":
-                return { question: generateSimpleQuestion(lang, path, random) };
-            case "reduction":
-                return { question: generateReductionQuestion(lang, path, random) };
-            case "inverse":
-                return { question: generateInverseQuestion(lang, path, random) };
-            case "exponentiation":
-                return { question: generateExponentiationQuestion(lang, path, random) };
-            case "crt":
-                return { question: generateCRTQuestion(lang, path, random) };
+        case "simple":
+            ({ question, testing } = generateSimpleQuestion(lang, path, random));
+            break;
+        case "reduction":
+            ({ question, testing } = generateReductionQuestion(lang, path, random));
+            break;
+        case "inverse":
+            ({ question, testing } = generateInverseQuestion(lang, path, random));
+            break;
+        case "exponentiation":
+            ({ question, testing } = generateExponentiationQuestion(lang, path, random));
+            break;
+        case "crt":
+            ({ question, testing } = generateCRTQuestion(lang, path, random));
+            break;
+        default:
+            throw new Error("Unknown variant");
         }
+
+        return {
+        question,
+        testing, // allows for unit tests
+        };
     },
 };
 
 // Simple
-function generateSimpleQuestion(lang: Language, path: string, random: Random): FreeTextQuestion {
+function generateSimpleQuestion(lang: Language, path: string, random: Random) {
     const a = random.int(0, 19);
     const b = random.int(2, 20);
 
-    return {
+    const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
         name: ModTricks.name(lang),
         path: path,
         text: t(translations, lang, "simpleQuestion", { a: String(a), b: String(b) }),
         feedback: getSimpleFeedbackFunction(lang, a, b),
     };
+
+    const testing = { a, b };
+    return { question, testing };
 }
 
 function getSimpleFeedbackFunction(lang: Language, a: number, b: number): FreeTextFeedbackFunction {
@@ -114,25 +132,28 @@ function getSimpleFeedbackFunction(lang: Language, a: number, b: number): FreeTe
 }
 
 // Reduction
-function generateReductionQuestion(lang: Language, path: string, random: Random): FreeTextQuestion {
+function generateReductionQuestion(lang: Language, path: string, random: Random) {
     const x = random.int(100, 999);
     const n = random.int(2, 20);
 
-    return {
+    const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
         name: ModTricks.name(lang),
         path: path,
         text: t(translations, lang, "reductionQuestion", { x: String(x), n: String(n) }),
         feedback: getReductionFeedbackFunction(lang, x, n),
     };
+
+    const testing = { x, n };
+    return { question, testing };
 }
 
 function getReductionFeedbackFunction(lang: Language, x: number, n: number): FreeTextFeedbackFunction {
     return ({ text }) => {
-        const userAnswer = parseInt(text.trim(), 10);
+        const userAnswer = parseFloat(text.trim());
         // normalize answer to smallest positive integer
         const correctAnswer = ((x % n) + n) % n;
-        if (isNaN(userAnswer)) {
+        if (isNaN(userAnswer) || !Number.isInteger(userAnswer)) {
             return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") };
         }
         return userAnswer === correctAnswer
@@ -142,7 +163,7 @@ function getReductionFeedbackFunction(lang: Language, x: number, n: number): Fre
 }
 
 // Inverse
-function generateInverseQuestion(lang: Language, path: string, random: Random): FreeTextQuestion {
+function generateInverseQuestion(lang: Language, path: string, random: Random) {
     let a, n;
     do {
         a = random.int(2, 15);
@@ -151,19 +172,22 @@ function generateInverseQuestion(lang: Language, path: string, random: Random): 
 
     const inverse = calculateModularInverse(a, n);
 
-    return {
+    const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
         name: ModTricks.name(lang),
         path: path,
         text: t(translations, lang, "inverseQuestion", { a: String(a), n: String(n) }),
         feedback: getInverseFeedbackFunction(lang, inverse),
     };
+
+    const testing = { a, n, inverse };
+    return { question, testing };
 }
 
 function getInverseFeedbackFunction(lang: Language, correctAnswer: number | null): FreeTextFeedbackFunction {
     return ({ text }) => {
-        const userAnswer = parseInt(text.trim(), 10);
-        if (isNaN(userAnswer)) {
+        const userAnswer = parseFloat(text.trim());
+        if (isNaN(userAnswer) || !Number.isInteger(userAnswer)) {
             return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") };
         }
         return userAnswer === correctAnswer
@@ -173,24 +197,30 @@ function getInverseFeedbackFunction(lang: Language, correctAnswer: number | null
 }
 
 // Exponentiation
-function generateExponentiationQuestion(lang: Language, path: string, random: Random): FreeTextQuestion {
+function generateExponentiationQuestion(lang: Language, path: string, random: Random) {
     const a = random.int(2, 10);
     const b = random.int(2, 10);
     const n = random.int(2, 20);
     const result = modularExponentiation(a, b, n);
 
-    return {
+    const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
         name: ModTricks.name(lang),
         path: path,
         text: t(translations, lang, "expQuestion", { a: String(a), b: String(b), n: String(n) }),
         feedback: getExponentiationFeedbackFunction(lang, result),
     };
+
+    const testing = { a, b, n, result };
+    return { question, testing };
 }
 
 function getExponentiationFeedbackFunction(lang: Language, correctAnswer: number): FreeTextFeedbackFunction {
     return ({ text }) => {
-        const userAnswer = parseInt(text.trim(), 10);
+        const userAnswer = parseFloat(text.trim());
+        if (isNaN(userAnswer) || !Number.isInteger(userAnswer)) {
+            return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") };
+        }
         return userAnswer === correctAnswer
             ? { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
             : { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") };
@@ -198,7 +228,7 @@ function getExponentiationFeedbackFunction(lang: Language, correctAnswer: number
 }
 
 // Chinese Remainder Theorem
-function generateCRTQuestion(lang: Language, path: string, random: Random): FreeTextQuestion {
+function generateCRTQuestion(lang: Language, path: string, random: Random) {
     //determine number of congruences
     const numCongruences = random.int(2, 4);
     // congruence with a as remainder within (1, 20) and n as modulus within (2, 20)
@@ -222,7 +252,7 @@ function generateCRTQuestion(lang: Language, path: string, random: Random): Free
     const crtValue = solveCRT(congruences);
     const commonModulus = congruences.reduce((acc, { n }) => acc * n, 1);
 
-    return {
+    const question: FreeTextQuestion = {
         type: "FreeTextQuestion",
         name: ModTricks.name(lang),
         path: path,
@@ -231,12 +261,15 @@ function generateCRTQuestion(lang: Language, path: string, random: Random): Free
         bottomText: t(translations, lang, "crtBottomText"),
         feedback: getCRTFeedbackFunction(lang, crtValue, commonModulus),
     };
+
+    const testing = { crtValue, commonModulus };
+    return { question, testing };
 }
 
 function getCRTFeedbackFunction(lang: Language, crtValue: number, commonModulus: number): FreeTextFeedbackFunction {
     return ({ text }) => {
         // match "y (mod z)" (optional whitespaces) and capture y and z
-        const pattern = /^(\d+)\text*\(\text*mod\text*(\d+)\text*\)$/i; 
+        const pattern = /^(\d+)\s*\(\s*mod\s*(\d+)\s*\)$/i; 
         const match = text.trim().match(pattern);
 
         // dismiss incorrectly formatted answers
