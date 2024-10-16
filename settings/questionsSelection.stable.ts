@@ -8,26 +8,16 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
-import { DemoMultiInput } from "@shared/question-generators/demos/multiInput"
-import { DemoMultipleChoice } from "@shared/question-generators/demos/multipleChoice"
-import { DemoSingleInput } from "@shared/question-generators/demos/singleInput"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
-import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
-import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
-import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
+import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
+import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
-import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
 export const collection: QuestionCollection = [
-  {
-    slug: "demos",
-    name: { de: "Demos", en: "Demos" },
-    contents: [DemoMultipleChoice, DemoSingleInput, DemoMultiInput],
-  },
   {
     slug: "asymptotics",
     name: { de: "Asymptotik", en: "Asymptotics" },
@@ -52,16 +42,6 @@ export const collection: QuestionCollection = [
     contents: [huffmanCoding],
   },
   {
-    slug: "queue",
-    name: { de: "Queue", en: "Queue" },
-    contents: [queueQuestion],
-  },
-  {
-    slug: "stack",
-    name: { de: "Stack", en: "Stack" },
-    contents: [stackQuestion],
-  },
-  {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
     contents: [Satisfiability, NormalForms],
@@ -78,6 +58,4 @@ export const oldPathToGenerator = {
   "recursion/master": RecurrenceMaster,
   "time/loops": Loops,
   "huffmancoding/huffmanCoding": huffmanCoding,
-  "stackqueue/stack": stackQuestion,
-  "stackqueue/queue": queueQuestion,
 }
