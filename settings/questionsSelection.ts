@@ -66,8 +66,8 @@ export const collection: QuestionCollection = [
     contents: [Satisfiability, NormalForms],
   },
   {
-    slug: "modular-arithmetic-tricks",
-    name: { de: "Modulare Arithmetik Tricks", en: "Modular Arithmetic Tricks" },
+    slug: "modular-arithmetic",
+    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
     contents: [ModTricks],
   },  
 ]
