@@ -7,6 +7,10 @@ import {
 import { serializeGeneratorCall } from "../../api/QuestionRouter";
 import Random from "../../utils/random";
 import { t, tFunctional, Translations } from "../../utils/translations";
+import {
+    gcd,
+    calculateModularInverse,
+    modularExponentiation } from "@shared/question-generators/math/utils.ts";
 
 const translations: Translations = {
     en: {
@@ -15,6 +19,7 @@ const translations: Translations = {
         reductionQuestion: "Reduce ${{x}}$ modulo ${{n}}$.",
         inverseQuestion: "Find the modular inverse of ${{a}}$ modulo ${{n}}$.",
         expQuestion: "Calculate ${{a}}^{{{b}}} \\pmod{ {{n}} }$.",
+        simpleQuestion: "Find an integer $x$ such that $x ≡ {{a}} \\pmod{ {{b}} }$.",
         feedbackInvalid: "Your answer is not valid.",
         feedbackCorrect: "Correct!",
         feedbackIncorrect: "Incorrect.",
@@ -25,6 +30,7 @@ const translations: Translations = {
         reductionQuestion: "Reduzieren Sie ${{x}}$ modulo ${{n}}$.",
         inverseQuestion: "Finden Sie das Inverse von ${{a}}$ modulo ${{n}}$.",
         expQuestion: "Berechnen Sie ${{a}}^{{{b}}} \\pmod{ {{n}} }$.",
+        simpleQuestion: "Finden Sie eine ganze Zahl $x$, so dass $x ≡ {{a}} \\pmod{ {{b}} }$.",
         feedbackInvalid: "Ihre Antwort ist ungültig.",
         feedbackCorrect: "Richtig!",
         feedbackIncorrect: "Falsch.",
@@ -43,7 +49,7 @@ export const ModTricks: QuestionGenerator = {
         {
             type: "string",
             name: "variant",
-            allowedValues: ["reduction", "inverse", "exponentiation"],
+            allowedValues: ["reduction", "inverse", "exponentiation", "simple"],
         },
     ],
 
@@ -56,7 +62,7 @@ export const ModTricks: QuestionGenerator = {
         });
 
         const random = new Random(seed);
-        const variant = parameters.variant as "reduction" | "inverse" | "exponentiation";
+        const variant = parameters.variant as "reduction" | "inverse" | "exponentiation" | "simple";
         
         switch (variant) {
             case "reduction":
@@ -65,6 +71,8 @@ export const ModTricks: QuestionGenerator = {
                 return { question: generateInverseQuestion(lang, path, random) };
             case "exponentiation":
                 return { question: generateExponentiationQuestion(lang, path, random) };
+            case "simple":
+                return { question: generateSimpleQuestion(lang, path, random) };
         }
     },
 };
@@ -115,13 +123,6 @@ function generateInverseQuestion(lang: Language, path: string, random: Random): 
     };
 }
 
-function gcd(a: number, b: number): number {
-    while (b !== 0) {
-        [a, b] = [b, a % b];
-    }
-    return a;
-}
-
 function getInverseFeedbackFunction(lang: Language, inverse: number | null): FreeTextFeedbackFunction {
     return ({ text }) => {
         const userAnswer = parseInt(text.trim(), 10);
@@ -134,19 +135,7 @@ function getInverseFeedbackFunction(lang: Language, inverse: number | null): Fre
     };
 }
 
-function calculateModularInverse(a: number, n: number): number | null {
-    let t = 0, newT = 1;
-    let r = n, newR = a;
-    while (newR !== 0) {
-        const quotient = Math.floor(r / newR);
-        [t, newT] = [newT, t - quotient * newT];
-        [r, newR] = [newR, r - quotient * newR];
-    }
-    if (r > 1) return null;
-    return t < 0 ? t + n : t;
-}
-
-// Modular Exponentiation
+// Exponentiation
 function generateExponentiationQuestion(lang: Language, path: string, random: Random): FreeTextQuestion {
     const a = random.int(2, 10);
     const b = random.int(2, 10);
@@ -162,22 +151,40 @@ function generateExponentiationQuestion(lang: Language, path: string, random: Ra
     };
 }
 
-function modularExponentiation(a: number, b: number, n: number): number {
-    let result = 1;
-    a = a % n;
-    while (b > 0) {
-        if (b % 2 === 1) result = (result * a) % n;
-        b = Math.floor(b / 2);
-        a = (a * a) % n;
-    }
-    return result;
-}
-
 function getExponentiationFeedbackFunction(lang: Language, correctAnswer: number): FreeTextFeedbackFunction {
     return ({ text }) => {
         const userAnswer = parseInt(text.trim(), 10);
         return userAnswer === correctAnswer
             ? { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
             : { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") };
+    };
+}
+
+// Simple
+function generateSimpleQuestion(lang: Language, path: string, random: Random): FreeTextQuestion {
+    const a = random.int(0, 19);
+    const b = random.int(2, 20);
+
+    return {
+        type: "FreeTextQuestion",
+        name: ModTricks.name(lang),
+        path: path,
+        text: t(translations, lang, "simpleQuestion", { a: String(a), b: String(b) }),
+        feedback: getSimpleFeedbackFunction(lang, a, b),
+    };
+}
+
+function getSimpleFeedbackFunction(lang: Language, a: number, b: number): FreeTextFeedbackFunction {
+    return ({ text }) => {
+        const userAnswer = parseFloat(text.trim());
+        if (isNaN(userAnswer) || !Number.isInteger(userAnswer)) {
+            return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") };
+        }
+
+        if ((userAnswer - a) % b === 0) {
+            return { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") };
+        } else {
+            return { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") };
+        }
     };
 }
