@@ -18,6 +18,7 @@ import { RecurrenceMaster } from "@shared/question-generators/recursion/recurren
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 import { ModularArithmetic } from "@shared/question-generators/math/modularArithmetic"
+import { ModTricks } from "@shared/question-generators/math/modTricks"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
@@ -70,6 +71,11 @@ export const collection: QuestionCollection = [
     name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
     contents: [ModularArithmetic],
   },  
+  {
+    slug: "modular-arithmetic-tricks",
+    name: { de: "Modulare Arithmetik Tricks", en: "Modular Arithmetic Tricks" },
+    contents: [ModTricks],
+  },  
 ]
 
 export const oldPathToGenerator = {
@@ -84,5 +90,6 @@ export const oldPathToGenerator = {
   "huffmancoding/huffmanCoding": huffmanCoding,
   "stackqueue/stack": stackQuestion,
   "stackqueue/queue": queueQuestion,
-  "modular-arithmetic/modularArithmetic": ModularArithmetic,
+  "math/modularArithmetic": ModularArithmetic,
+  "math/modTricks": ModTricks,
 }
