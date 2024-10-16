@@ -20,8 +20,8 @@ const translations: Translations = {
   },
   de: {
     name: "Modulare Arithmetik",
-    description: "Finde eine ganze Zahl, die eine gegebene Modulare Gleichung erfüllt.",
-    question: "Finde eine ganze Zahl $x$, so dass $x ≡ {{a}} \\pmod{ {{b}} }$.",
+    description: "Finden Sie eine ganze Zahl, die eine gegebene modulare Gleichung erfüllt.",
+    question: "Finden Sie eine ganze Zahl $x$, so dass $x ≡ {{a}} \\pmod{ {{b}} }$.",
     prompt: "Geben Sie Ihre Antwort hier ein:",
     bottomText: "Erinnern Sie sich, dass $x$ die Gleichung $x ≡ a \\pmod{ b }$ erfüllen muss.",
     feedback_invalid: "Ihre Antwort ist keine gültige Zahl.",
