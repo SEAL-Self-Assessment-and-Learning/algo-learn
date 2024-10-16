@@ -1,5 +1,3 @@
-// modularArithmeticUtils.ts
-
 export function gcd(a: number, b: number): number {
     while (b !== 0) {
         [a, b] = [b, a % b];
@@ -28,4 +26,23 @@ export function modularExponentiation(a: number, b: number, n: number): number {
         a = (a * a) % n;
     }
     return result;
+}
+
+export function solveCRT(congruences: { a: number; n: number }[]): number {
+    let x = 0;
+    const product = congruences.reduce((acc, { n }) => acc * n, 1);
+
+    for (const { a, n } of congruences) {
+        const partialProduct = product / n;
+        const inverse = calculateModularInverse(partialProduct, n);
+        if (inverse !== null) {
+            x += a * partialProduct * inverse;
+        }
+    }
+
+    return ((x % product) + product) % product;
+}
+
+export function areCoprime(a: number, b: number): boolean {
+    return gcd(a, b) === 1;
 }

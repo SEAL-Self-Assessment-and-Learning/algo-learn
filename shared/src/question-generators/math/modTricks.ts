@@ -1,16 +1,19 @@
-import { Language } from "../../api/Language";
+import { Language } from "@shared/api/Language";
 import {
     FreeTextFeedbackFunction,
     FreeTextQuestion,
     QuestionGenerator,
-} from "../../api/QuestionGenerator";
-import { serializeGeneratorCall } from "../../api/QuestionRouter";
-import Random from "../../utils/random";
-import { t, tFunctional, Translations } from "../../utils/translations";
+} from "@shared/api/QuestionGenerator";
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter";
+import Random from "@shared/utils/random";
+import { t, tFunctional, Translations } from "@shared/utils/translations";
 import {
     gcd,
     calculateModularInverse,
-    modularExponentiation } from "@shared/question-generators/math/utils.ts";
+    modularExponentiation,
+    solveCRT,
+    areCoprime
+} from "@shared/question-generators/math/utils";
 
 const translations: Translations = {
     en: {
@@ -20,6 +23,8 @@ const translations: Translations = {
         inverseQuestion: "Find the modular inverse of ${{a}}$ modulo ${{n}}$.",
         expQuestion: "Calculate ${{a}}^{{{b}}} \\pmod{ {{n}} }$.",
         simpleQuestion: "Find an integer $x$ such that $x ≡ {{a}} \\pmod{ {{b}} }$.",
+        crtQuestion: "Solve the system of congruences: \\[ {{text}} \\text{.}\\]",
+        crtBottomText: "Provide your answer in the form: $y\\pmod{z}$.",
         feedbackInvalid: "Your answer is not valid.",
         feedbackCorrect: "Correct!",
         feedbackIncorrect: "Incorrect.",
@@ -31,6 +36,8 @@ const translations: Translations = {
         inverseQuestion: "Finden Sie das Inverse von ${{a}}$ modulo ${{n}}$.",
         expQuestion: "Berechnen Sie ${{a}}^{{{b}}} \\pmod{ {{n}} }$.",
         simpleQuestion: "Finden Sie eine ganze Zahl $x$, so dass $x ≡ {{a}} \\pmod{ {{b}} }$.",
+        crtQuestion: "Lösen Sie das System von Kongruenzen: \\[ {{text}} \\text{.}\\]",
+        crtBottomText: "Geben Sie Ihre Antwort in der Form $y\\pmod{z}$ an.",
         feedbackInvalid: "Ihre Antwort ist ungültig.",
         feedbackCorrect: "Richtig!",
         feedbackIncorrect: "Falsch.",
@@ -49,7 +56,7 @@ export const ModTricks: QuestionGenerator = {
         {
             type: "string",
             name: "variant",
-            allowedValues: ["reduction", "inverse", "exponentiation", "simple"],
+            allowedValues: ["simple", "reduction", "inverse", "exponentiation", "crt"],
         },
     ],
 
@@ -62,20 +69,49 @@ export const ModTricks: QuestionGenerator = {
         });
 
         const random = new Random(seed);
-        const variant = parameters.variant as "reduction" | "inverse" | "exponentiation" | "simple";
+        const variant = parameters.variant as "simple" | "reduction" | "inverse" | "exponentiation" | "crt";
         
         switch (variant) {
+            case "simple":
+                return { question: generateSimpleQuestion(lang, path, random) };
             case "reduction":
                 return { question: generateReductionQuestion(lang, path, random) };
             case "inverse":
                 return { question: generateInverseQuestion(lang, path, random) };
             case "exponentiation":
                 return { question: generateExponentiationQuestion(lang, path, random) };
-            case "simple":
-                return { question: generateSimpleQuestion(lang, path, random) };
+            case "crt":
+                return { question: generateCRTQuestion(lang, path, random) };
         }
     },
 };
+
+// Simple
+function generateSimpleQuestion(lang: Language, path: string, random: Random): FreeTextQuestion {
+    const a = random.int(0, 19);
+    const b = random.int(2, 20);
+
+    return {
+        type: "FreeTextQuestion",
+        name: ModTricks.name(lang),
+        path: path,
+        text: t(translations, lang, "simpleQuestion", { a: String(a), b: String(b) }),
+        feedback: getSimpleFeedbackFunction(lang, a, b),
+    };
+}
+
+function getSimpleFeedbackFunction(lang: Language, a: number, b: number): FreeTextFeedbackFunction {
+    return ({ text }) => {
+        // parse to Float to correctly recognize non-integer numbers
+        const userAnswer = parseFloat(text.trim());
+        if (isNaN(userAnswer) || !Number.isInteger(userAnswer)) {
+            return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") };
+        }
+        return (userAnswer - a) % b === 0
+            ? { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
+            : { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") };
+    };
+}
 
 // Reduction
 function generateReductionQuestion(lang: Language, path: string, random: Random): FreeTextQuestion {
@@ -94,7 +130,8 @@ function generateReductionQuestion(lang: Language, path: string, random: Random)
 function getReductionFeedbackFunction(lang: Language, x: number, n: number): FreeTextFeedbackFunction {
     return ({ text }) => {
         const userAnswer = parseInt(text.trim(), 10);
-        const correctAnswer = x % n;
+        // normalize answer to smallest positive integer
+        const correctAnswer = ((x % n) + n) % n;
         if (isNaN(userAnswer)) {
             return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") };
         }
@@ -123,13 +160,13 @@ function generateInverseQuestion(lang: Language, path: string, random: Random): 
     };
 }
 
-function getInverseFeedbackFunction(lang: Language, inverse: number | null): FreeTextFeedbackFunction {
+function getInverseFeedbackFunction(lang: Language, correctAnswer: number | null): FreeTextFeedbackFunction {
     return ({ text }) => {
         const userAnswer = parseInt(text.trim(), 10);
         if (isNaN(userAnswer)) {
             return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") };
         }
-        return userAnswer === inverse
+        return userAnswer === correctAnswer
             ? { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
             : { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") };
     };
@@ -160,31 +197,63 @@ function getExponentiationFeedbackFunction(lang: Language, correctAnswer: number
     };
 }
 
-// Simple
-function generateSimpleQuestion(lang: Language, path: string, random: Random): FreeTextQuestion {
-    const a = random.int(0, 19);
-    const b = random.int(2, 20);
+// Chinese Remainder Theorem
+function generateCRTQuestion(lang: Language, path: string, random: Random): FreeTextQuestion {
+    //determine number of congruences
+    const numCongruences = random.int(2, 4);
+    // congruence with a as remainder within (1, 20) and n as modulus within (2, 20)
+    const congruences: { a: number; n: number }[] = [];
+    const text: string[] = [];
+
+    // generate system of congruences
+    for (let i = 0; i < numCongruences; i++) {
+        const a = random.int(1, 20);
+        let n: number;
+
+        // find new modulus that is coprime to preceding moduli
+        do {
+            n = random.int(2, 20);
+        } while (congruences.some(({ n: precedingModulus }) => !areCoprime(n, precedingModulus)));
+
+        congruences.push({ a, n });
+        text.push(`x ≡ ${a} \\pmod{ ${n} }`);
+    }
+
+    const crtValue = solveCRT(congruences);
+    const commonModulus = congruences.reduce((acc, { n }) => acc * n, 1);
 
     return {
         type: "FreeTextQuestion",
         name: ModTricks.name(lang),
         path: path,
-        text: t(translations, lang, "simpleQuestion", { a: String(a), b: String(b) }),
-        feedback: getSimpleFeedbackFunction(lang, a, b),
+        text: t(translations, lang, "crtQuestion", { text: text.join(", \\\\") }),
+        prompt: `$x ≡ $`,
+        bottomText: t(translations, lang, "crtBottomText"),
+        feedback: getCRTFeedbackFunction(lang, crtValue, commonModulus),
     };
 }
 
-function getSimpleFeedbackFunction(lang: Language, a: number, b: number): FreeTextFeedbackFunction {
+function getCRTFeedbackFunction(lang: Language, crtValue: number, commonModulus: number): FreeTextFeedbackFunction {
     return ({ text }) => {
-        const userAnswer = parseFloat(text.trim());
-        if (isNaN(userAnswer) || !Number.isInteger(userAnswer)) {
+        // match "y (mod z)" (optional whitespaces) and capture y and z
+        const pattern = /^(\d+)\text*\(\text*mod\text*(\d+)\text*\)$/i; 
+        const match = text.trim().match(pattern);
+
+        // dismiss incorrectly formatted answers
+        if (!match) {
             return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") };
         }
 
-        if ((userAnswer - a) % b === 0) {
-            return { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") };
-        } else {
-            return { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") };
-        }
+        // y: userValue and z: userModulus
+        let userValue = parseInt(match[1], 10);
+        let userModulus = parseInt(match[2], 10);
+
+        // normalize to range [0, commonModulus]
+        userValue = (userValue % commonModulus + commonModulus) % commonModulus;
+        crtValue = (crtValue % commonModulus + commonModulus) % commonModulus;
+
+        return userModulus !== commonModulus || userValue !== crtValue
+            ? { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") }
+            : { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") };
     };
 }
