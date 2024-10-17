@@ -4,7 +4,7 @@ import {
   createForLineWithStepSet,
   createIfCondition,
   IfOptions,
-} from "@shared/question-generators/time/utils.ts"
+} from "@shared/question-generators/time/utils"
 import {
   printStarsNew,
   PseudoCode,
@@ -12,7 +12,7 @@ import {
   PseudoCodeFor,
   PseudoCodeForAll,
   PseudoCodeVariable,
-} from "@shared/utils/pseudoCodeUtils.ts"
+} from "@shared/utils/pseudoCodeUtils"
 
 /**
  * This creates the pseudoCode for the first for loop of the for-for loop

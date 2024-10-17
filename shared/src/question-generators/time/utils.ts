@@ -8,8 +8,8 @@ import {
   PseudoCodeString,
   PseudoCodeVariable,
   PseudoCodeWhile,
-} from "@shared/utils/pseudoCodeUtils.ts"
-import Random from "@shared/utils/random.ts"
+} from "@shared/utils/pseudoCodeUtils"
+import Random from "@shared/utils/random"
 
 export type AdditionOption = { type: "add"; value: number }
 export type MultiplicationOption = { type: "mult"; value: number }

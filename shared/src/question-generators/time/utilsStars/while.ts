@@ -4,18 +4,18 @@ import {
   createWhileChangeValues,
   createWhileLine,
   IfOptions,
-} from "@shared/question-generators/time/utils.ts"
-import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars.ts"
-import { generateDifferentAmountOfStarPrints } from "@shared/question-generators/time/utilsStars/utils.ts"
-import { conditionCheck } from "@shared/question-generators/time/utilsStars/utilsWhileCondition.ts"
-import { computeStartEndVarsWhile } from "@shared/question-generators/time/utilsStars/utilsWhileVarValues.ts"
+} from "@shared/question-generators/time/utils"
+import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars"
+import { generateDifferentAmountOfStarPrints } from "@shared/question-generators/time/utilsStars/general"
+import { conditionCheck } from "@shared/question-generators/time/utilsStars/whileCondition"
+import { computeStartEndVarsWhile } from "@shared/question-generators/time/utilsStars/whileVarValues"
 import {
   printStarsNew,
   PseudoCode,
   PseudoCodeBlock,
   PseudoCodeWhile,
-} from "@shared/utils/pseudoCodeUtils.ts"
-import Random from "@shared/utils/random.ts"
+} from "@shared/utils/pseudoCodeUtils"
+import Random from "@shared/utils/random"
 
 /**
  *

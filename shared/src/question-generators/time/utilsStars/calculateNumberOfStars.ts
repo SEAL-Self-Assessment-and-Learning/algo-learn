@@ -1,4 +1,4 @@
-import { IfOptions } from "@shared/question-generators/time/utils.ts"
+import { IfOptions } from "@shared/question-generators/time/utils"
 
 interface StarCalculationParams {
   loopIteration: number
@@ -39,7 +39,7 @@ export function calculateNumberOfStars(
     case "square":
       return calculateCondition(calculationParameters, isSquare)
     case "same":
-      return calculateCondition(calculationParameters, (n) => isSame(n, j))
+      return calculateCondition(calculationParameters, (n) => n === j)
     case "none":
       return calculationParameters.starsToPrintBase
 
@@ -70,8 +70,4 @@ function isEven(n: number): boolean {
 
 function isSquare(n: number): boolean {
   return Number.isInteger(Math.sqrt(n))
-}
-
-function isSame(n: number, j: number): boolean {
-  return n === j
 }

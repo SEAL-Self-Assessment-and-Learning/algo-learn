@@ -3,17 +3,17 @@ import {
   createBasicForLine,
   createIfCondition,
   IfOptions,
-} from "@shared/question-generators/time/utils.ts"
-import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars.ts"
-import { generateDifferentAmountOfStarPrints } from "@shared/question-generators/time/utilsStars/utils.ts"
+} from "@shared/question-generators/time/utils"
+import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars"
+import { generateDifferentAmountOfStarPrints } from "@shared/question-generators/time/utilsStars/general"
 import {
   printStarsNew,
   PseudoCode,
   PseudoCodeBlock,
   PseudoCodeFor,
   PseudoCodeIf,
-} from "@shared/utils/pseudoCodeUtils.ts"
-import Random from "@shared/utils/random.ts"
+} from "@shared/utils/pseudoCodeUtils"
+import Random from "@shared/utils/random"
 
 /**
  * This function generates random variables for the loop
