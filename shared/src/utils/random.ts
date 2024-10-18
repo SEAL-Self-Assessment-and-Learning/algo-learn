@@ -25,7 +25,8 @@ export default class Random {
   /** Returns a random number between 0 (inclusive) and 1 (exclusive). */
   uniform: () => number
 
-  /** Returns a random number from the standard normal distribution. */
+  /** Returns a random number from the standard normal distribution.
+   * Using the Box-Muller transformation */
   normal(): number {
     let u = 0
     let v = 0
@@ -70,7 +71,9 @@ export default class Random {
    * Returns a random integer (normal distribution)
    *
    * The function tries to generate a number within the range of min and max.
-   * If it fails to do so after 10 tries, it returns the mean value.
+   * If it fails to do so after 10 tries, it returns
+   *  - min (if closer last generated value is smaller then min)
+   *  - max (otherwise)
    *
    * So not perfect, because usually normal distribution does not have a min and max.
    *
@@ -82,11 +85,9 @@ export default class Random {
   intNormal(min: number, max: number, mean = Math.round((min + max) / 2), stdev = 1): number {
     let value = 0
     // try 10 times to generate a value within min and max
-    // so the probability of failing gets smaller
-    // otherwise return either min or max
+    // so the probability of failing gets smaller, otherwise return either min or max
     for (let i = 0; i < 10; i++) {
-      const normal = this.normal()
-      value = Math.round(normal * stdev + mean)
+      value = Math.round(this.normal() * stdev + mean)
       if (value >= min && value <= max) {
         return value
       }
