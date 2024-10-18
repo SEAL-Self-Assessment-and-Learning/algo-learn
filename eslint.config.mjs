@@ -1,7 +1,8 @@
 // @ts-check
 
 import tseslint from "typescript-eslint"
-import eslint from "@eslint/js"
+import react from "@eslint-react/eslint-plugin"
+import js from "@eslint/js"
 
 const namingConvention = [
   {
@@ -34,22 +35,38 @@ const namingConvention = [
   },
 ]
 
-export default tseslint.config(eslint.configs.recommended, ...tseslint.configs.recommendedTypeChecked, {
-  languageOptions: {
-    parserOptions: {
-      projectService: true,
-      tsconfigRootDir: import.meta.dirname,
+export default [
+  {
+    ignores: ["**/*.config.{js,cjs,mjs}", "node_modules", "front-end/dist"],
+  },
+  js.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  {
+    languageOptions: {
+      parserOptions: {
+        parser: tseslint.parser,
+        project: "./tsconfig.json",
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
   },
-  rules: {
-    "@typescript-eslint/naming-convention": ["error", ...namingConvention],
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-unsafe-member-access": "off",
-    "@typescript-eslint/unbound-method": [
-      "error",
-      {
-        ignoreStatic: true,
-      },
-    ],
+  {
+    ...react.configs["recommended-type-checked"],
   },
-})
+  {
+    rules: {
+      "@eslint-react/no-leaked-conditional-rendering": "error",
+      "@eslint-react/no-array-index-key": "off",
+      "@typescript-eslint/naming-convention": ["error", ...namingConvention],
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/unbound-method": [
+        "error",
+        {
+          ignoreStatic: true,
+        },
+      ],
+    },
+  },
+]
