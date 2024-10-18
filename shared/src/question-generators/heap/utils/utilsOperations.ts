@@ -9,16 +9,12 @@ import Random from "@shared/utils/random.ts"
 export function generateHeapOperationsFoundation({ random }: { random: Random }) {
   const heapType: "Max" | "Min" = random.choice(["Max", "Min"])
   const heapSize: number = random.int(5, 8)
-  const heapElements: number[] = []
-  const uniqueElements = new Set<number>()
-
-  while (uniqueElements.size < heapSize) {
-    const randomNumber = random.int(1, 20)
-    if (!uniqueElements.has(randomNumber)) {
-      uniqueElements.add(randomNumber)
-      heapElements.push(randomNumber)
-    }
-  }
+  const heapElements: number[] = random.subset(
+    Array.from({ length: 20 })
+      .fill(0)
+      .map((_, i) => i + 1),
+    heapSize,
+  )
 
   let solutionHeap: MaxHeap | MinHeap
   if (heapType === "Min") {

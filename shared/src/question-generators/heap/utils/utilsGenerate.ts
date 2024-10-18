@@ -47,12 +47,7 @@ export function generateOperationSequence(
       heap.insert(newValue)
       amountInserts++
     } else {
-      operationSequence.push("*")
-      if (heap instanceof MinHeap) {
-        heap.extractMin()
-      } else {
-        heap.extractMax()
-      }
+      heap.extract()
       amountExtracts++
     }
   }
@@ -112,14 +107,14 @@ export function generateHeapsForChoiceQuestion(
   const correctRandomHeaps = generateRandomHeaps(heapType, amountOfCorrectHeaps, random)
   const correctRandomHeapsString = correctRandomHeaps.map((heap) =>
     createArrayDisplayCodeBlock({
-      array: ["-"].concat(heap.getHeap().map(String)),
+      array: ["-", ...heap.getHeap()],
     }),
   )
 
   const wrongRandomHeapsString = random.subset(
     wrongRandomHeaps.map((heap) =>
       createArrayDisplayCodeBlock({
-        array: ["-"].concat(heap.map(String)),
+        array: ["-", ...heap.map((value) => (isNaN(value) ? "-" : value))],
       }),
     ),
     4 - correctRandomHeaps.length,

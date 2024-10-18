@@ -75,7 +75,6 @@ export const HeapOperations: QuestionGenerator = {
     } = generateHeapOperationsFoundation({ random })
     solutionHeap = solutionHeap_
 
-    // TODO: replace this with future standard feedback and checkFormat functions from PR QuickFind
     const checkFormat: FreeTextFormatFunction = ({ text }) => {
       if (text.trim() === "") return { valid: false }
 
