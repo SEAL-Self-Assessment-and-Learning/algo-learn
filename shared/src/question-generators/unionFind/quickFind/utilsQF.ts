@@ -173,40 +173,6 @@ function generateOneBlock({
 
 /**
  * This will generate a question with two bigger unions
- * And as next operation to combine those two
- *
- * @param random
- * @param union
- * @param unionSize
- */
-export function unionTwoBlocksCombineBoth({
-  random,
-  union,
-  unionSize,
-}: {
-  random: Random
-  union: QuickFind
-  unionSize: number
-}) {
-  const { block1Values, block2Values, union: union_ } = generateTwoBlocks({ random, union, unionSize })
-  union = union_
-
-  const gapField = createArrayDisplayCodeBlock({
-    array: union.getArray(),
-  })
-
-  const gapOperationValues: number[] = []
-  gapOperationValues[0] = random.choice(block1Values)
-  gapOperationValues[1] = random.choice(block2Values)
-
-  // compute the final union
-  union.union(gapOperationValues[0], gapOperationValues[1])
-
-  return { gapField, gapOperationValues }
-}
-
-/**
- * This will generate a question with two bigger unions
  * And as next operation to combine one element inside one of the blocks
  * with one element outside the blocks
  * @param random - random class object

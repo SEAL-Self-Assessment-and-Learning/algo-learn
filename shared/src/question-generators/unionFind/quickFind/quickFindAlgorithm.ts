@@ -2,10 +2,7 @@ export class QuickFind {
   private readonly id: number[]
 
   constructor(n: number) {
-    this.id = new Array(n) as number[]
-    for (let i = 0; i < n; i++) {
-      this.id[i] = i
-    }
+    this.id = Array.from({ length: n }, (_, i) => i)
   }
 
   find(i: number) {

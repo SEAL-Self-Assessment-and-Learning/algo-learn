@@ -1,42 +1,36 @@
-import { FreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator"
+import {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextQuestion,
+  QuestionGenerator,
+} from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm"
 import {
   unionOneBlockCombineNone,
   unionOneBlockCombineOne,
-  unionTwoBlocksCombineBoth,
   unionTwoBlocksCombineNone,
   unionTwoBlocksCombineOne,
   unionTwoBlocksCombineSame,
 } from "@shared/question-generators/unionFind/quickFind/utilsQF"
-import { checkFormatArray } from "@shared/utils/checkFormatStandard"
-import { feedbackArray } from "@shared/utils/feedbackStandard"
+import {
+  createArrayDisplayCodeBlock,
+  createArrayDisplayCodeBlockUserInput,
+} from "@shared/utils/arrayDisplayCodeBlock.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {
-    name: "QuickFind",
-    description: "Determine QuickFind state after Union operation",
-    task: "A state of the Quick-Find data structure is given as the following array: \n{{0}}\n We call `Union({{1}}, {{2}})`. Provide the resulting state.",
-    explanationUnion:
-      "We assume that the operation **Union(**$i$**,** $j$**)** always sets the value specified by **Find(**$i$**)** to the value specified by **Find(**$j$**)**.",
+    name: "Quick-Find",
+    description: "Determine Quick-Find state after Union operation",
+    task: `A state of the Quick-Find data structure is given as the following array: \n{{0}}\n We call \`Union({{1}}, {{2}})\`. Provide the resulting state. {{3}}
+      We assume that the operation **Union(**$i$**,** $j$**)** always sets the value specified by **Find(**$i$**)** to the value specified by **Find(**$j$**)**.`,
   },
   de: {
-    name: "QuickFind",
-    description: "Bestimme QuickFind-Zustand nach Union-Operation",
-    task: "Ein Zustand der Quick-Find Datenstruktur ist als folgendes Array gegeben: \n{{0}}\n Wir rufen `Union({{1}}, {{2}})` auf. Gib den Zustand an, der dadurch entsteht.",
-    explanationUnion:
-      "Wir nehmen an, dass die Operation **Union(**$i$**,** $j$**)** immer den durch **Find(**$i$**)** spezifizierten Wert auf den von **Find(**$j$**)** spezifierten Wert setzt.",
-  },
-}
-
-const wordTranslations: Translations = {
-  en: {
-    Value: "Value",
-  },
-  de: {
-    Value: "Wert",
+    name: "Quick-Find",
+    description: "Bestimme Quick-Find-Zustand nach Union-Operation",
+    task: `Ein Zustand der Quick-Find Datenstruktur ist als folgendes Array gegeben: \n{{0}}\n Wir rufen \`Union({{1}}, {{2}})\` auf. Gib den Zustand an, der dadurch entsteht. {{3}}
+      Wir nehmen an, dass die Operation **Union(**$i$**,** $j$**)** immer den durch **Find(**$i$**)** spezifizierten Wert auf den von **Find(**$j$**)** spezifierten Wert setzt.`,
   },
 }
 
@@ -63,25 +57,25 @@ export const QuickFindGenerator: QuestionGenerator = {
     const union = new QuickFind(unionSize)
 
     const unionCaseGeneration = random.weightedChoice([
-      [unionTwoBlocksCombineBoth, 0.25],
-      [unionTwoBlocksCombineOne, 0.25],
-      [unionTwoBlocksCombineNone, 0.1],
+      [unionTwoBlocksCombineOne, 0.35],
+      [unionTwoBlocksCombineNone, 0.2],
       [unionTwoBlocksCombineSame, 0.05],
       [unionOneBlockCombineOne, 0.25],
-      [unionOneBlockCombineNone, 0.1],
+      [unionOneBlockCombineNone, 0.15],
     ])
 
-    const { gapField: gapField_, gapOperationValues } = unionCaseGeneration({
+    const { gapField, gapOperationValues } = unionCaseGeneration({
       random,
       union,
       unionSize,
     })
 
-    // replace Value with the translation of Value (German Wert)
-    const gapField = gapField_.replace("Value", t(wordTranslations, lang, "Value"))
+    const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
+      numberOfInputFields: union.getArray().length,
+    })
 
-    const question: FreeTextQuestion = {
-      type: "FreeTextQuestion",
+    const question: MultiFreeTextQuestion = {
+      type: "MultiFreeTextQuestion",
       name: QuickFindGenerator.name(lang),
       path: serializeGeneratorCall({
         generator: QuickFindGenerator,
@@ -93,19 +87,39 @@ export const QuickFindGenerator: QuestionGenerator = {
         gapField,
         gapOperationValues[0].toString(),
         gapOperationValues[1].toString(),
+        arrayDisplayBlock,
       ]),
-      bottomText: t(translations, lang, "explanationUnion"),
-      checkFormat: checkFormatArray({ lang, values: "int" }).display,
-      feedback: feedbackArray({ solution: union.getArray().map((x) => x.toString()) }).normal,
+      feedback: getFeedbackFunction(union),
     }
 
     return {
       question,
-      testing: {
-        union,
-        gapField,
-        gapOperationValues,
-      },
     }
   },
+}
+
+/**
+ * Returns a simple feedback function to check if the user input is the same as
+ * the solution union
+ * @param solutionUnion - correct calculated union
+ */
+function getFeedbackFunction(solutionUnion: QuickFind): MultiFreeTextFeedbackFunction {
+  // fieldIds form input-x x \in [0,1,2,3...]
+  return ({ text }) => {
+    const solutionArray = solutionUnion.getArray()
+    for (let i = 0; i < solutionArray.length; i++) {
+      const userFieldAnswer = parseInt(text["input-" + i].trim())
+      if (userFieldAnswer !== solutionArray[i]) {
+        return {
+          correct: false,
+          correctAnswer: createArrayDisplayCodeBlock({
+            array: solutionArray,
+          }),
+        }
+      }
+    }
+    return {
+      correct: true,
+    }
+  }
 }
