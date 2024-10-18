@@ -3,17 +3,17 @@ import {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextQuestion,
   QuestionGenerator,
-} from "@shared/api/QuestionGenerator.ts"
-import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { Heap, MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax.ts"
-import { generateOperationSequence } from "@shared/question-generators/heap/utils/utilsGenerate.ts"
-import { generateHeapOperationsFoundation } from "@shared/question-generators/heap/utils/utilsOperations.ts"
+} from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { Heap, MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax"
+import { generateOperationSequence } from "@shared/question-generators/heap/utils/utilsGenerate"
+import { generateHeapOperationsFoundation } from "@shared/question-generators/heap/utils/utilsOperations"
 import {
   createArrayDisplayCodeBlock,
   createArrayDisplayCodeBlockUserInput,
-} from "@shared/utils/arrayDisplayCodeBlock.ts"
-import Random from "@shared/utils/random.ts"
-import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+} from "@shared/utils/arrayDisplayCodeBlock"
+import Random from "@shared/utils/random"
+import { t, tFunctional, Translations } from "@shared/utils/translations"
 
 const translationHeapOperations: Translations = {
   en: {

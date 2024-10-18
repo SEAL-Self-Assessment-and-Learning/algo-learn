@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { MaxHeap, MinHeap } from "./heapMinMax.ts"
+import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax.ts"
 
 describe("Min Heap - Correctness", () => {
   test("Inserting elements (1)", () => {

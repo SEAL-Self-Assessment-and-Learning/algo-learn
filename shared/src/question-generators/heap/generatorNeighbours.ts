@@ -3,11 +3,11 @@ import {
   FreeTextFormatFunction,
   FreeTextQuestion,
   QuestionGenerator,
-} from "@shared/api/QuestionGenerator.ts"
-import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { generateNeighbourOptions } from "@shared/question-generators/heap/utils/utilsGenerate.ts"
-import Random from "@shared/utils/random.ts"
-import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+} from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { generateNeighbourOptions } from "@shared/question-generators/heap/utils/utilsGenerate"
+import Random from "@shared/utils/random"
+import { t, tFunctional, Translations } from "@shared/utils/translations"
 
 const translationsHeapNeighbours: Translations = {
   en: {
