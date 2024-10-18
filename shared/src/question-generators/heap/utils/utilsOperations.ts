@@ -8,7 +8,7 @@ import Random from "@shared/utils/random.ts"
  */
 export function generateHeapOperationsFoundation({ random }: { random: Random }) {
   const heapType: "Max" | "Min" = random.choice(["Max", "Min"])
-  const heapSize: number = random.int(5, 8)
+  const heapSize: number = random.int(5, 7)
   const heapElements: number[] = random.subset(
     Array.from({ length: 20 })
       .fill(0)
