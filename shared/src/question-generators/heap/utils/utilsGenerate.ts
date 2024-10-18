@@ -48,6 +48,7 @@ export function generateOperationSequence(
       amountInserts++
     } else {
       heap.extract()
+      operationSequence.push("*")
       amountExtracts++
     }
   }

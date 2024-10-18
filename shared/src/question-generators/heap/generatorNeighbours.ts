@@ -44,7 +44,7 @@ const wordTranslations: Translations = {
 }
 
 export const HeapNeighbours: QuestionGenerator = {
-  id: "heapneighbours",
+  id: "heapnb",
   name: tFunctional(translationsHeapNeighbours, "name"),
   description: tFunctional(translationsHeapNeighbours, "description"),
   tags: ["heap", "priority-queue"],
