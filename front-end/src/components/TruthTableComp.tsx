@@ -18,9 +18,9 @@ import { Markdown } from "@/components/Markdown.tsx"
  * @constructor
  */
 export function TruthTableComp({ truthTableObject }: { truthTableObject: string }) {
-
   const parsedTruthTable = JSON.parse(truthTableObject) as TruthTableProps
-  const {parsedFunctions, parsedFunctionNames, variableNames, tableSize, truthTables} = parsePassedFunctionsToTables(parsedTruthTable);
+  const { parsedFunctions, parsedFunctionNames, variableNames, tableSize, truthTables } =
+    parsePassedFunctionsToTables(parsedTruthTable)
 
   return (
     <div className="flex items-center justify-center">
@@ -158,7 +158,7 @@ function parsePassedFunctionsToTables(parsedTruthTable: TruthTableProps) {
       truthTables.push(truthTable)
     }
   }
-  return {parsedFunctions, parsedFunctionNames, variableNames, tableSize, truthTables};
+  return { parsedFunctions, parsedFunctionNames, variableNames, tableSize, truthTables }
 }
 
 /**
