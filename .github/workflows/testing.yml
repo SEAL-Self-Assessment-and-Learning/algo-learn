@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - main
-      - 'feat*'
+      - "feat*"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -41,7 +41,7 @@ jobs:
           # cache: "yarn"
 
       - uses: oven-sh/setup-bun@v1
-  
+
       # See https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables for a definition of GITHUB_REF.
       # The GITHUB_REF is in the form of refs/heads/<branch_name> or refs/pull/<pull_request_number>/merge. We replace the slashes with underscores.
       - name: Get a clean name of the current branch or pull request
@@ -50,7 +50,7 @@ jobs:
 
       - name: Bun install 🔧
         run: bun install --frozen-lockfile
-    
+
       - name: Write basename and version number to front-end/src/config.ts
         run: |
           sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$CLEAN_REF\"/g" front-end/src/config.ts
@@ -58,7 +58,7 @@ jobs:
 
       - name: Run test suite
         run: bun run test
-  
+
       - name: Build 🔧
         run: bun run build --base /algo-learn-testing/$CLEAN_REF/
 

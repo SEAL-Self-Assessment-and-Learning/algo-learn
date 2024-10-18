@@ -17,13 +17,17 @@ export function useOSDefaultTheme() {
   const [osDefaultTheme, setOSDefaultTheme] = useState<typeof LIGHT | typeof DARK>(
     window.matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT,
   )
+  const setDark = (e: MediaQueryListEvent) => e.matches && setOSDefaultTheme(DARK)
+  const setLight = (e: MediaQueryListEvent) => e.matches && setOSDefaultTheme(LIGHT)
   useEffect(() => {
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", (e) => e.matches && setOSDefaultTheme(DARK))
-    window
-      .matchMedia("(prefers-color-scheme: light)")
-      .addEventListener("change", (e) => e.matches && setOSDefaultTheme(LIGHT))
+    const darkMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+    const lightMediaQuery = window.matchMedia("(prefers-color-scheme: light)")
+    darkMediaQuery.addEventListener("change", setDark)
+    lightMediaQuery.addEventListener("change", setLight)
+    return () => {
+      darkMediaQuery.removeEventListener("change", setDark)
+      lightMediaQuery.removeEventListener("change", setLight)
+    }
   }, [osDefaultTheme])
   return osDefaultTheme
 }
