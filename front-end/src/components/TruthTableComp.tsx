@@ -22,12 +22,16 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
   const { parsedFunctions, parsedFunctionNames, variableNames, tableSize, truthTables } =
     parsePassedFunctionsToTables(parsedTruthTable)
 
+  const wrongFeedback = parsedTruthTable.wrongFeedback
+  const borderColor = wrongFeedback ? "border-red-900" : "border-gray-600 dark:border-gray-300"
+  const cellBgColor = wrongFeedback ? "bg-red-300" : "bg-gray-300 dark:bg-gray-800"
+
   return (
     <div className="flex items-center justify-center">
-      <div className={`my-5 rounded-md border-2 border-gray-600 p-1 dark:border-gray-300`}>
+      <div className={`my-5 rounded-md border-2 p-1 ${borderColor}`}>
         <table className="border-collapse">
           <thead>
-            <tr className="rounded-t-md border-b-2 border-gray-600 bg-goethe text-white dark:border-gray-300">
+            <tr className={`rounded-t-md border-b-2 bg-goethe text-white ${borderColor}`}>
               {/* Variable names */}
               {variableNames.map((_, i) => (
                 <th className={`px-3 py-2 font-black`} key={i}>
@@ -36,13 +40,13 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
               ))}
 
               {/* Divider with border between variable names and functions */}
-              <th className="border-l border-gray-600 dark:border-gray-300"></th>
-              <th className="border-r border-gray-600 dark:border-gray-300"></th>
+              <th className={`border-l ${borderColor}`}></th>
+              <th className={`border-r ${borderColor}`}></th>
 
               {/* Parsed functions */}
               {parsedFunctions.map((func, index) => (
                 <th
-                  className={`whitespace-nowrap px-6 py-2 font-black ${index === 0 ? "" : "border-l border-gray-600 dark:border-gray-300"}`}
+                  className={`whitespace-nowrap px-6 py-2 font-black ${index === 0 ? "" : `border-l ${borderColor}`}`}
                   key={index}
                 >
                   <Markdown
@@ -54,7 +58,7 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
           </thead>
           <tbody>
             {Array.from({ length: tableSize }).map((_, i) => (
-              <tr key={i} className={`${i % 2 === 1 ? "bg-gray-300 dark:bg-gray-800" : ""}`}>
+              <tr key={i} className={`${i % 2 === 1 ? cellBgColor : ""}`}>
                 {/* Write down the binary of i (reversed) */}
                 {variableNames.map((_, j) => (
                   <td className={`py-1 text-center`} key={j}>
@@ -65,13 +69,13 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
                 ))}
 
                 {/* Divider with border between variable names and functions */}
-                <th className="border-l border-gray-600 dark:border-gray-300"></th>
-                <th className="border-r border-gray-600 dark:border-gray-300"></th>
+                <th className={`border-l ${borderColor}`}></th>
+                <th className={`border-r ${borderColor}`}></th>
 
                 {/* Write down the evaluation of each function */}
                 {parsedFunctions.map((_, index) => (
                   <td
-                    className={`text-center ${index === 0 ? "" : "border-l border-gray-600 dark:border-gray-300"}`}
+                    className={`text-center ${index === 0 ? "" : `border-l ${borderColor}`}`}
                     key={index}
                   >
                     {createCellValue(truthTables, index, parsedTruthTable, i)}
