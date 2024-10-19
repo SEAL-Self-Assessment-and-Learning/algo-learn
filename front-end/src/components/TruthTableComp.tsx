@@ -5,7 +5,7 @@ import {
   SyntaxTreeNodeType,
   TruthTable,
 } from "@shared/utils/propositionalLogic.ts"
-import { TruthTableProps } from "@shared/utils/truthTableBlock.ts"
+import { InputTruthTableProps, TruthTableProps } from "@shared/utils/truthTableBlock.ts"
 import { Markdown } from "@/components/Markdown.tsx"
 
 /**
@@ -141,9 +141,15 @@ function parsePassedFunctionsToTables(parsedTruthTable: TruthTableProps) {
     throw new Error("No valid functions found")
   }
 
-  const variableNames = getAllVarNames(parsedFunctions.filter((x) => x !== null))
-    .sort()
-    .reverse()
+  const variableOptionsCollection: (SyntaxTreeNodeType | InputTruthTableProps)[] = []
+  for (let i = 0; i < parsedFunctions.length; i++) {
+    if (parsedFunctions[i] === null) {
+      variableOptionsCollection.push(parsedTruthTable.functions[i] as InputTruthTableProps)
+    } else {
+      variableOptionsCollection.push(parsedFunctions[i] as SyntaxTreeNodeType)
+    }
+  }
+  const variableNames = getAllVarNames(variableOptionsCollection).sort().reverse()
   const tableSize = Math.pow(2, variableNames.length)
 
   const truthTables: (TruthTable | null)[] = []
@@ -165,12 +171,18 @@ function parsePassedFunctionsToTables(parsedTruthTable: TruthTableProps) {
  * Collects all unique variable names from the SyntaxTreeNodes
  * @param parsedFunctions
  */
-function getAllVarNames(parsedFunctions: SyntaxTreeNodeType[]): string[] {
+function getAllVarNames(parsedFunctions: (SyntaxTreeNodeType | InputTruthTableProps)[]): string[] {
   const varNames = new Set<string>()
   for (const func of parsedFunctions) {
-    const funcVarNames = func.getProperties().variables
-    for (const varName of funcVarNames) {
-      varNames.add(varName)
+    if ("vars" in func) {
+      func.vars.map((x) => {
+        varNames.add(x)
+      })
+    } else {
+      const funcVarNames = func.getProperties().variables
+      for (const varName of funcVarNames) {
+        varNames.add(varName)
+      }
     }
   }
   return Array.from(varNames)

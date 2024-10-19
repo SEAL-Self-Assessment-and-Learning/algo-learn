@@ -1,4 +1,4 @@
-export type InputTruthTableProps = { fields: string[]; name: string }
+export type InputTruthTableProps = { fields: string[]; name: string; vars: string[] }
 export type FunctionTruthTableProps = { func: string; alternativeName?: string }
 
 /** Either a propositional logic function or a list of input fields */
