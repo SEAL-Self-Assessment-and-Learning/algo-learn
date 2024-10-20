@@ -25,13 +25,14 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
   const wrongFeedback = parsedTruthTable.wrongFeedback
   const borderColor = wrongFeedback ? "border-red-900" : "border-gray-600 dark:border-gray-300"
   const cellBgColor = wrongFeedback ? "bg-red-300" : "bg-gray-300 dark:bg-gray-800"
+  const headerColor = wrongFeedback ? "" : "bg-goethe text-white"
 
   return (
     <div className="flex items-center justify-center">
       <div className={`my-5 rounded-md border-2 p-1 ${borderColor}`}>
         <table className="border-collapse">
           <thead>
-            <tr className={`rounded-t-md border-b-2 bg-goethe text-white ${borderColor}`}>
+            <tr className={`rounded-t-md border-b-2 ${headerColor} ${borderColor}`}>
               {/* Variable names */}
               {variableNames.map((_, i) => (
                 <th className={`px-3 py-2 font-black`} key={i}>
