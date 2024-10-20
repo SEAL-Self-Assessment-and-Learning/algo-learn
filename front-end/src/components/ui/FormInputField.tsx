@@ -40,13 +40,14 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
   }
 
   let spacing
-  let inputClasses: string = ""
+  let inputClasses: string
   let fieldWidth: number | null = null
   if (type === "NL") {
     spacing = <br />
   } else if (type.startsWith("OS")) {
     fieldWidth = Number.parseInt(type.slice(3)) * 3
   }
+
   if (type === "MAT") {
     inputClasses = `w-12 p-2 mx-0.5 focus-visible:ring-1 focus-visible:ring-offset-0`
   } else {
