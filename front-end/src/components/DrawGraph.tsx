@@ -3,6 +3,9 @@ import { Graph } from "@shared/utils/graph"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
 
+// limited by the number of colors we have. See tailwind --color-group-0,...,--color-group-7.
+const maxGroups = 8
+
 const Node = ({
   pos,
   setDragged,
@@ -233,9 +236,7 @@ export function DrawGraph({
             setEdgeStates([...edgeStates])
           } else if (graph.edgeClickType === "group") {
             edgeStates[i].group =
-              // todo currently at most 8 color groups are supported. This should somehow be encoded in a central
-              //  place to avoid inconsistent magic numbers all over the place
-              edgeStates[i].group === Math.min(graph.edgeGroupMax ?? 8, 8) - 1
+              edgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
                 ? null
                 : edgeStates[i].group === null
                   ? 0
@@ -266,9 +267,7 @@ export function DrawGraph({
             setEdgeStates([...nodeStates])
           } else if (graph.nodeClickType === "group") {
             nodeStates[i].group =
-              // todo currently at most 8 color groups are supported. This should somehow be encoded in a central
-              //  place to avoid inconsistent magic numbers all over the place
-              nodeStates[i].group === Math.min(graph.nodeGroupMax ?? 8, 8) - 1
+              nodeStates[i].group === Math.min(graph.nodeGroupMax ?? maxGroups, maxGroups) - 1
                 ? null
                 : nodeStates[i].group === null
                   ? 0
