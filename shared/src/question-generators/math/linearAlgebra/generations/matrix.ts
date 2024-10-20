@@ -134,7 +134,11 @@ export function generateUpperRightTriangleMatrix({
   for (let i = 0; i < size; i++) {
     const row = []
     for (let j = 0; j < size; j++) {
-      row.push(random.floatPrecision(min, max, precision))
+      if (j <= i) {
+        row.push(random.floatPrecision(min, max, precision))
+      } else {
+        row.push(0)
+      }
     }
     matrix.push(row)
   }
@@ -164,6 +168,7 @@ export function generateLowerLeftTriangleMatrix({
   precision?: PrecisionValues
 }) {
   const mat = generateUpperRightTriangleMatrix({ random, size, min, max, precision })
+  console.log(mat)
   return math.transpose(mat)
 }
 
@@ -248,7 +253,7 @@ export function generateGoodCofactorMatrix({
   max?: number
 }) {
   if (size <= 3) {
-    throw new Error("Size must be at least 4. Use Laplace or Sarrus for smaller sizes.")
+    throw new Error("Size must be at least 4. Use Sarrus for smaller sizes.")
   }
 
   const manipulationCount = size - 3

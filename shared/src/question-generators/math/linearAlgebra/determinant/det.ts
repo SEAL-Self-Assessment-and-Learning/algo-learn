@@ -29,7 +29,20 @@ const translations: Translations = {
   de: {
     name: "Determinante",
     description: "Berechne die Determinante einer Matrix",
-    text: "Was ist die Determinante der Matrix {{0}}?",
+    text: `Berechne die Determinante der Matrix 
+    $ A = {{0}} $.`,
+    mul: `Die Matrix $C$ ist wie folgt definiert: 
+    \\[ {{0}} \\]
+    \\[{{1}} \\]
+    Wie lautet die Determinante von $C$?`,
+    inv: `Gegeben ist die Matrix:
+    \\[{{0}} \\]
+    Berechne die Determinante von $A^{-1}$.`,
+    invBottom: "Bitte runde deine Antwort auf zwei Dezimalstellen.",
+    rowManipulation: `Gegeben sind die Matrizen: 
+    \\[ {{0}} \\]
+    Gegeben ist det $B = {{1}} $.
+    **Berechne** det $A$.`,
   },
 }
 
@@ -71,7 +84,6 @@ export const determinant: QuestionGenerator = {
     const random = new Random(seed)
 
     const variant = parameters.variant as "start" | "deep" | "cofactor" | "rules"
-
     if (variant === "start") {
       return generateVariantStartDet({
         random,

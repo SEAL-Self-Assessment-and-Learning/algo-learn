@@ -11,14 +11,17 @@ const translations: Translations = {
     text: `Solve $Ax=b$ for $x$, given $A$ and $b$ as follows:
     \\[ A={{0}} \\quad b={{1}}\\]
     Please provide a possible solution $\\forall x_i \\in x$.
-    {{2}}
-    Future: Let the input be a vector to fill out (maybe)`,
+    {{2}}`,
     checkFormat: "Please only enter a number",
   },
   de: {
     name: "Lineares Gleichungssystem",
     description: "Löse ein lineares Gleichungssystem",
-    text: "blabla",
+    text: `Löse $Ax=b$ für $x$, gegeben $A$ und $b$ wie folgt:
+    \\[ A={{0}} \\quad b={{1}} \\]
+    Bitte gib eine mögliche Lösung $\\forall x_i \\in x$ an.
+    {{2}}`,
+    checkFormat: "Bitte gib nur eine Zahl ein",
   },
 }
 
