@@ -35,7 +35,7 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
               {/* Variable names */}
               {variableNames.map((_, i) => (
                 <th className={`px-3 py-2 font-black`} key={i}>
-                  {variableNames[variableNames.length - i - 1]}
+                  <Markdown md={`$${variableNames[variableNames.length - i - 1]}$`} />
                 </th>
               ))}
 
