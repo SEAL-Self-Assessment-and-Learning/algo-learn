@@ -128,7 +128,7 @@ const CodeJSX = ({
       {currentCode.map((cd, index) => (
         <div key={index}>
           <span
-            className={`text-right ${numCodeLines > 9 ? "min-w-8" : "min-w-6"} inline-block pr-1 ${toggleStateLines ? "text-gray-400 dark:text-gray-600" : "text-transparent"} no-select `}
+            className={`text-right ${numCodeLines > 9 ? "min-w-8" : "min-w-6"} inline-block pr-1 ${toggleStateLines ? "text-gray-400 dark:text-gray-600" : "text-transparent"} no-select`}
           >
             {index + 1}:
           </span>

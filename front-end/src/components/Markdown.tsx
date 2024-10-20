@@ -5,9 +5,11 @@ import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm
 import { Graph } from "@shared/utils/graph"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
 import { ArrayDisplay } from "@/components/ArrayDisplay.tsx"
+import { DrawList } from "@/components/DrawList.tsx"
 import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
-import { useTheme } from "@/hooks/useTheme.ts"
+import { FormInputField } from "@/components/ui/FormInputField.tsx"
+import { useTheme } from "../hooks/useTheme"
 import { DrawGraph } from "./DrawGraph"
 import { Format } from "./Format"
 import TeX from "./TeX"
@@ -123,6 +125,9 @@ export const MarkdownTreeNode: FunctionComponent<{
   if (parseTreeNode.kind === "table") {
     return <DrawTable table={parseTreeNode.child} />
   }
+  if (parseTreeNode.kind === "list") {
+    return <DrawList list={parseTreeNode.child} />
+  }
   if (parseTreeNode.kind === "a") {
     return (
       <Link to={format(parseTreeNode.url, parameters)}>
@@ -136,6 +141,13 @@ export const MarkdownTreeNode: FunctionComponent<{
         <MarkdownTree parseTree={parseTreeNode.child} />
       </blockquote>
     )
+  }
+  if (parseTreeNode.kind === "input") {
+    // only provide the id of the input field
+    const inputSplit = parseTreeNode.child.split("#")
+    const id = inputSplit[0]
+
+    return <FormInputField id={id} />
   }
 
   // will never be reached:

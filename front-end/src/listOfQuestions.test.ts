@@ -55,13 +55,15 @@ for (const generator of generators) {
           const { question } = ret
           expect(question.name).not.toBe("")
           expect(question.path).not.toBe("")
-          expect(question.type).toMatch(/^(MultipleChoiceQuestion|FreeTextQuestion)$/)
+          expect(question.type).toMatch(
+            /^(MultipleChoiceQuestion|FreeTextQuestion|MultiFreeTextQuestion)$/,
+          )
           expect(question.text).toBeDefined()
           expect(question.text).not.toBe("")
           expect(question.feedback).toBeDefined()
           if (question.type === "MultipleChoiceQuestion") {
             expect(() => question.feedback!({ choice: [0] })).not.toThrow()
-          } else {
+          } else if (question.type === "FreeTextQuestion") {
             const f = question.feedback!({ text: "some random wrong answer" })
             expect(!(f instanceof Promise)).toBe(true)
             if (f instanceof Promise) return

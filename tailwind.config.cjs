@@ -91,7 +91,7 @@ module.exports = {
     },
   ],
   future: {
-    hoverOnlyWhenSupported: true
+    hoverOnlyWhenSupported: true,
   },
   plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
 }
