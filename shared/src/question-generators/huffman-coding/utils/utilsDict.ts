@@ -5,8 +5,8 @@ import {
   MultiFreeTextQuestion,
   MultipleChoiceQuestion,
 } from "@shared/api/QuestionGenerator"
-import { generateWrongAnswersDict } from "@shared/question-generators/huffman-coding/generate/GenerateStructure"
-import { generateCharacterFrequencyTable } from "@shared/question-generators/huffman-coding/generate/GenerateWords"
+import { generatePossibleAnswersChoice2 } from "@shared/question-generators/huffman-coding/generate/dictStructure"
+import { generateCharacterFrequencyTable } from "@shared/question-generators/huffman-coding/generate/words"
 import { getHuffmanCodeOfTable } from "@shared/question-generators/huffman-coding/Huffman"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import {
@@ -20,7 +20,7 @@ import { t, Translations } from "@shared/utils/translations"
  * This function generates the basic structure for input2 and choice2 questions
  * @param random
  */
-function generateInput2Choice2Foundations({ random }: { random: Random }) {
+function generateDictFoundations({ random }: { random: Random }) {
   const numDifferentCharacters = random.int(6, 9)
   const characterFrequencies = generateCharacterFrequencyTable(numDifferentCharacters, random)
   // only temporary displaying the word array
@@ -35,6 +35,42 @@ function generateInput2Choice2Foundations({ random }: { random: Random }) {
     correctAnswerDict,
     correctAnswerTreeNode,
   }
+}
+
+/**
+ * This function creates the input fields for the user to provide the encoding
+ * as a string inside a md table
+ * @param characterFrequencies
+ */
+function createInputFields(characterFrequencies: { [p: string]: number }) {
+  let inputFields = ""
+  const fieldIDCharMap: { [key: string]: string } = {}
+  // iterate through the wordArray to create the input fields
+  let i = 0
+  for (const key in characterFrequencies) {
+    const fieldID = `index-${i}-${key}` // this is the unique ID for the input field
+    fieldIDCharMap[fieldID] = key
+    inputFields += "|{{" + fieldID + "#TL#" + key + ": ##overlay}}"
+    if (i % 2 == 1) {
+      inputFields += "|\n"
+    }
+    i++
+  }
+  inputFields += "|\n|#border_none?table_w-full#||"
+  return inputFields
+}
+
+/**
+ * This function creates the solution table for the user to see a correct encoding
+ * @param correctAnswerDict
+ */
+function createSolutionTable(correctAnswerDict: Record<string, string>) {
+  let solutionDisplay = ""
+  for (const key in correctAnswerDict) {
+    solutionDisplay += `|**${key}**|$${correctAnswerDict[key]}$|\n`
+  }
+  solutionDisplay += "|#table_w-full?td?sd?ah_center?div_my-5#| |"
+  return solutionDisplay
 }
 
 /**
@@ -58,30 +94,11 @@ export function generateInput2Question({
   lang: "en" | "de"
   permalink: string
 }) {
-  const { characterFrequencies, displayTable, correctAnswerDict } = generateInput2Choice2Foundations({
+  const { characterFrequencies, displayTable, correctAnswerDict } = generateDictFoundations({
     random,
   })
-
-  let inputFields = ""
-  const fieldIDCharMap: { [key: string]: string } = {}
-  // iterate through the wordArray to create the input fields
-  let i = 0
-  for (const key in characterFrequencies) {
-    const fieldID = `index-${i}-${key}` // this is the unique ID for the input field
-    fieldIDCharMap[fieldID] = key
-    inputFields += "|{{" + fieldID + "#TL#" + key + ": ##overlay}}"
-    if (i % 2 == 1) {
-      inputFields += "|\n"
-    }
-    i++
-  }
-  inputFields += "|\n|#border_none?table_w-full#||"
-
-  let solutionDisplay = ""
-  for (const key in correctAnswerDict) {
-    solutionDisplay += `|**${key}**|$${correctAnswerDict[key]}$|\n`
-  }
-  solutionDisplay += "|#table_w-full?td?sd?ah_center?div_my-5#| |"
+  const inputFields = createInputFields(characterFrequencies)
+  const solutionTable = createSolutionTable(correctAnswerDict)
 
   const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
     if (text[fieldID].trim() === "") return { valid: false, message: "" }
@@ -115,13 +132,11 @@ export function generateInput2Question({
     if (!checkProvidedCode(characterFrequencies, correctAnswerDict, userAnswerDict)) {
       return {
         correct: false,
-        message: t(translations, lang, "feedback.incomplete"),
-        correctAnswer: solutionDisplay,
+        correctAnswer: solutionTable,
       }
     }
     return {
       correct: true,
-      message: t(translations, lang, "feedback.correct"),
     }
   }
 
@@ -161,29 +176,24 @@ export function generateChoice2Question({
   lang: "en" | "de"
   permalink: string
 }) {
-  const { characterFrequencies, displayTable, correctAnswerDict, correctAnswerTreeNode } =
-    generateInput2Choice2Foundations({ random })
-
-  const possibleAnswersTableString: string[] = []
-  possibleAnswersTableString.push("\n" + convertDictToMdTable(correctAnswerDict) + "\n")
-  generateWrongAnswersDict(random, characterFrequencies, correctAnswerTreeNode).forEach((element) => {
-    possibleAnswersTableString.push("\n" + convertDictToMdTable(element) + "\n")
+  const { characterFrequencies, displayTable, correctAnswerTreeNode } = generateDictFoundations({
+    random,
   })
-
-  // shuffle the answers and find the correct index
-  random.shuffle(possibleAnswersTableString)
-  const correctAnswerIndex = possibleAnswersTableString.indexOf(
-    "\n" + convertDictToMdTable(correctAnswerDict) + "\n",
+  const { answers, correctAnswerIndices } = generatePossibleAnswersChoice2(
+    random,
+    characterFrequencies,
+    correctAnswerTreeNode,
   )
 
   const question: MultipleChoiceQuestion = {
     type: "MultipleChoiceQuestion",
     name: huffmanCoding.name(lang),
     path: permalink,
+    allowMultiple: true,
     text: t(translations, lang, "textTable", [displayTable, "frequency-table"]),
-    answers: possibleAnswersTableString,
+    answers: answers,
     feedback: minimalMultipleChoiceFeedback({
-      correctAnswerIndex: correctAnswerIndex,
+      correctAnswerIndex: correctAnswerIndices,
     }),
   }
   return {
