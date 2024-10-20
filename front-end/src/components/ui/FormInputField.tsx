@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { ReactElement, useEffect, useRef, useState } from "react"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Input } from "@/components/ui/input.tsx"
 import { useFormContext } from "@/hooks/useFormContext.ts"
@@ -30,15 +30,22 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
 
   const inputBorderColor = invalid ? "border-red-500 focus:border-red-500" : ""
 
-  let promptElement
+  let promptElement: ReactElement = <></>
   if (prompt) {
-    promptElement = <Markdown md={prompt} />
+    promptElement = (
+      <div className={`${prompt ? "mr-2 whitespace-nowrap" : ""}`}>
+        <Markdown md={prompt} />
+      </div>
+    )
   }
 
   let spacing
   let inputClasses: string = ""
+  let fieldWidth: number | null = null
   if (type === "NL") {
     spacing = <br />
+  } else if (type.startsWith("OS")) {
+    fieldWidth = Number.parseInt(type.slice(3)) * 3
   }
   if (type === "MAT") {
     inputClasses = `w-12 p-2 mx-0.5 focus-visible:ring-1 focus-visible:ring-offset-0`
@@ -50,6 +57,14 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
     }
   }
 
+  const feedbackElement: ReactElement = (
+    <FeedbackComponent
+      formatFeedback={feedback ? feedback : ""}
+      invalid={invalid}
+      type={feedbackVariation === "below" ? "below" : "overlay"}
+    />
+  )
+
   const [isInputFocused, setIsInputFocused] = useState(false)
   let inputElement
   // constantly below the input field
@@ -59,7 +74,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
         {spacing}
         <div className="flex flex-col">
           <div className="flex flex-row items-center">
-            <div className="mr-2 whitespace-nowrap">{promptElement}</div>
+            {promptElement}
             <div className={`relative h-full w-full`}>
               <Input
                 ref={focus ? firstInputRef : null}
@@ -73,15 +88,12 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
                 }}
                 type="text"
                 className={`${inputBorderColor} ${inputClasses} focus:outline-none`}
+                style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
                 placeholder={placeholder || ""}
               />
             </div>
           </div>
-          <FeedbackComponent
-            formatFeedback={feedback ? feedback : ""}
-            invalid={invalid}
-            type={"below"}
-          />
+          {feedbackElement}
         </div>
         {spacing}
       </div>
@@ -91,7 +103,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
       <div>
         {spacing}
         <div className="flex flex-row items-center">
-          <div className={`mr-2 whitespace-nowrap`}>{promptElement}</div>
+          {promptElement}
           <div className={`relative h-full w-full`}>
             <Input
               ref={focus ? firstInputRef : null}
@@ -107,15 +119,10 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
               onBlur={() => setIsInputFocused(false)}
               type="text"
               className={`${inputBorderColor} ${inputClasses} `}
+              style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
               placeholder={placeholder || ""}
             />
-            {isInputFocused && feedback && (
-              <FeedbackComponent
-                formatFeedback={feedback ? feedback : ""}
-                invalid={invalid}
-                type={"overlay"}
-              />
-            )}
+            {isInputFocused && feedback && feedbackElement}
           </div>
         </div>
         {spacing}
