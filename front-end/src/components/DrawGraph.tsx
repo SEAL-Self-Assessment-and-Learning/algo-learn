@@ -239,9 +239,7 @@ export function DrawGraph({
                 ? null
                 : edgeStates[i].group === null
                   ? 0
-                  : // todo we literally just checkt if edgeStates[i].group is null but typescript complains.
-                    //  Maybe it is better with typescript 5.5? Until then the `!` seems to be needed.
-                    edgeStates[i].group! + 1
+                  : edgeStates[i].group + 1
             setEdgeStates([...edgeStates])
           }
         }}
@@ -274,9 +272,7 @@ export function DrawGraph({
                 ? null
                 : nodeStates[i].group === null
                   ? 0
-                  : // todo we literally just checkt if edgeStates[i].group is null but typescript complains.
-                    //  Maybe it is better with typescript 5.5? Until then the `!` seems to be needed.
-                    nodeStates[i].group! + 1
+                  : nodeStates[i].group + 1
             setNodeStates([...nodeStates])
           }
         }}
