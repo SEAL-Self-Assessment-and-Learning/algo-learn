@@ -1,17 +1,14 @@
 import { Language } from "@shared/api/Language"
 import {
   FreeTextFeedbackFunction,
-  FreeTextFormatFunction,
   FreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import {
-  areCoprime,
   calculateModularInverse,
   gcd,
   modularExponentiation,
-  solveCRT,
 } from "@shared/question-generators/math/utils"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
