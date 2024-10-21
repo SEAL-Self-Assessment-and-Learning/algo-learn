@@ -10,6 +10,8 @@ import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptot
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import { ModTricks } from "@shared/question-generators/math/modTricks"
+import { CRT } from "@shared/question-generators/math/crt"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
@@ -17,7 +19,6 @@ import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
-import { ModTricks } from "@shared/question-generators/math/modTricks"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
@@ -68,8 +69,8 @@ export const collection: QuestionCollection = [
   {
     slug: "modular-arithmetic",
     name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
-    contents: [ModTricks],
-  },  
+    contents: [ModTricks, CRT],
+  },
 ]
 
 export const oldPathToGenerator = {
@@ -84,5 +85,4 @@ export const oldPathToGenerator = {
   "huffmancoding/huffmanCoding": huffmanCoding,
   "stackqueue/stack": stackQuestion,
   "stackqueue/queue": queueQuestion,
-  "math/modTricks": ModTricks,
 }
