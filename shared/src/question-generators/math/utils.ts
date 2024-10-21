@@ -1,3 +1,10 @@
+/**
+ * Computes the greatest common divisor (GCD) of two numbers.
+ *
+ * @param a First number
+ * @param b Second number
+ * @returns Greatest common divisor of a and b
+ */
 export function gcd(a: number, b: number): number {
   while (b !== 0) {
     ;[a, b] = [b, a % b]
@@ -5,6 +12,13 @@ export function gcd(a: number, b: number): number {
   return a
 }
 
+/**
+ * Calculates the modular inverse of a modulo n using the Extended Euclidean Algorithm.
+ *
+ * @param a Number for which to find the modular inverse
+ * @param n Modulus
+ * @returns Modular inverse of a modulo n if it exists, otherwise null
+ */
 export function calculateModularInverse(a: number, n: number): number | null {
   let t = 0,
     newT = 1
@@ -19,6 +33,14 @@ export function calculateModularInverse(a: number, n: number): number | null {
   return t < 0 ? t + n : t
 }
 
+/**
+ * Performs modular exponentiation i.e. (a^b) % n
+ *
+ * @param a Base
+ * @param b Exponent
+ * @param n Modulus
+ * @returns Result of (a^b) % n
+ */
 export function modularExponentiation(a: number, b: number, n: number): number {
   let result = 1
   a = a % n
@@ -30,6 +52,12 @@ export function modularExponentiation(a: number, b: number, n: number): number {
   return result
 }
 
+/**
+ * Solves system of congruences using the Chinese Remainder Theorem (CRT).
+ *
+ * @param congruences Array of objects representing the system of congruences, where each object contains a (remainder) and n (modulus)
+ * @returns Smallest non-negative solution to the system of congruences
+ */
 export function solveCRT(congruences: { a: number; n: number }[]): number {
   let x = 0
   const product = congruences.reduce((acc, { n }) => acc * n, 1)
