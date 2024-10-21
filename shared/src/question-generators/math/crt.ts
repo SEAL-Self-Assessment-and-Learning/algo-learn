@@ -48,7 +48,7 @@ export const CRT: QuestionGenerator = {
     {
       type: "string",
       name: "variant",
-      allowedValues: ["crt"],
+      allowedValues: ["rand", "2", "3", "4"],
     },
   ],
 
@@ -61,16 +61,30 @@ export const CRT: QuestionGenerator = {
     });
 
     const random = new Random(seed);
-    return generateCRTQuestion(lang, path, random);
+    let numCongruences: number;
+
+    // Ensure numCongruences is always assigned a number
+    if (parameters.variant === "rand") {
+        numCongruences = random.int(2, 4);
+    } else if (parameters.variant === "2") {
+        numCongruences = 2;
+    } else if (parameters.variant === "3") {
+        numCongruences = 3;
+    } else if (parameters.variant === "4") {
+        numCongruences = 4;
+    } else {
+        // Assign a default value to prevent undefined case
+        throw new Error("Unknown variant");
+    }
+
+    return generateCRTQuestion(lang, path, random, numCongruences)
   },
 };
 
-function generateCRTQuestion(lang: Language, path: string, random: Random) {
-  //determine number of congruences
-  const numCongruences = random.int(2, 4)
-  // congruence with a as remainder within (1, 20) and n as modulus within (2, 20)
-  const congruences: { a: number; n: number }[] = []
-  const text: string[] = []
+// CRT generation function with numCongruences parameter
+function generateCRTQuestion(lang: Language, path: string, random: Random, numCongruences: number) {
+  const congruences: { a: number; n: number }[] = [];
+  const text: string[] = [];
 
   // generate system of congruences
   for (let i = 0; i < numCongruences; i++) {
@@ -103,6 +117,7 @@ function generateCRTQuestion(lang: Language, path: string, random: Random) {
   return { question, testing: { crtValue, commonModulus } };
 }
 
+// Format check function for CRT
 function getCRTCheckFormatFunction(lang: Language): FreeTextFormatFunction {
   return ({ text }) => {
     if (text.trim() === "") {
@@ -120,6 +135,7 @@ function getCRTCheckFormatFunction(lang: Language): FreeTextFormatFunction {
   };
 }
 
+// Feedback function for CRT
 function getCRTFeedbackFunction(
   lang: Language,
   crtValue: number,
