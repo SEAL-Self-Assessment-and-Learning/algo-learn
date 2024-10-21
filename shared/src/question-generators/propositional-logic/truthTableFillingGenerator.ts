@@ -7,8 +7,8 @@ import {
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import {
   generateRandomExpression,
+  numToVariableValues,
   SyntaxTreeNodeType,
-  TruthTable,
 } from "@shared/utils/propositionalLogic.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
@@ -72,17 +72,16 @@ export const TruthTableFillingGenerator: QuestionGenerator = {
 function generateVariantStart(random: Random, permalink: string, lang: "en" | "de") {
   const numberOfVariables = random.int(2, 3)
   const varNames = random.subset(["x", "y", "z"], numberOfVariables)
-  const numLeaves = random.int(2, 5)
+  const numLeaves = random.int(3, 6)
   const randomFormula = generateRandomExpression(random, numLeaves, varNames)
   const truthTableText = createTruthTableProps({
     functions: [
       {
         fields: createTruthTableInputFields(Math.pow(2, numberOfVariables)).inputFields,
         name: "$\\varPhi$",
-        vars: varNames,
+        vars: randomFormula.getProperties().variables,
       },
     ],
-    wrongFeedback: false,
   })
 
   const question: MultiFreeTextQuestion = {
@@ -114,16 +113,18 @@ function dumbCheckFormat(): MultiFreeTextFormatFunction {
 }
 
 function feedbackVariantStart(formula: SyntaxTreeNodeType): MultiFreeTextFeedbackFunction {
-  const solutionTruthTable: TruthTable = formula.getTruthTable().truthTable
   return ({ text }) => {
-    for (let i = 0; i < solutionTruthTable.length; i++) {
+    for (let i = 0; i < formula.getTruthTable().truthTable.length; i++) {
       const userAnswer = text["truthInput-" + i] === "1"
-      if (userAnswer !== solutionTruthTable[i]) {
+      if (
+        userAnswer !==
+        formula.eval(numToVariableValues(i, formula.getProperties().variables.sort().reverse()))
+      ) {
         return {
           correct: false,
           correctAnswer: createTruthTableProps({
             functions: [{ func: formula.toString(), alternativeName: "$\\varPhi$" }],
-            wrongFeedback: true,
+            inFeedbackPart: true,
           }),
         }
       }
