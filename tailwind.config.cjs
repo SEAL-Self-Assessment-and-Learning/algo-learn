@@ -51,7 +51,7 @@ module.exports = {
           foreground: "hsl(var(--goethe-foreground))",
         },
         // color groups, used wherever items need to be separated by color.
-        cg:{
+        cg: {
           foreground: "hsl(var(--color-group-foreground))",
           0: "var(--color-group-0)",
           1: "var(--color-group-1)",
