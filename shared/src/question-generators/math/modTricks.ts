@@ -1,5 +1,6 @@
 import { Language } from "@shared/api/Language"
 import {
+  FreeTextFeedback,
   FreeTextFeedbackFunction,
   FreeTextQuestion,
   QuestionGenerator,
@@ -25,7 +26,7 @@ const translations: Translations = {
     crtBottomText: "Provide your answer in the form: $y\\pmod{z}$.",
     feedbackInvalid: "Your answer is not valid.",
     feedbackCorrect: "Correct!",
-    feedbackIncorrect: "Incorrect.",
+    feedbackIncorrect: "Incorrect. The correct answer is: ${{correctAnswer}}$.",
     feedbackIncomplete: "Incomplete or too complex",
   },
   de: {
@@ -39,7 +40,7 @@ const translations: Translations = {
     crtBottomText: "Gib deine Antwort in der Form $y\\pmod{z}$ an.",
     feedbackInvalid: "Deine Antwort ist ungültig.",
     feedbackCorrect: "Richtig!",
-    feedbackIncorrect: "Falsch.",
+    feedbackIncorrect: "Falsch. Die richtige Antwort ist: ${{correctAnswer}}$.",
     feedbackIncomplete: "Nicht vollständig oder zu komplex",
   },
 }
@@ -98,6 +99,37 @@ export const ModTricks: QuestionGenerator = {
   },
 }
 
+// helper for feedback funtions with normalization
+function generateModularFeedback(
+  lang: Language,
+  userAnswerText: string,
+  correctValue: number,
+  modulus: number,
+): FreeTextFeedback {
+  const userAnswer = parseFloat(userAnswerText.trim())
+
+  // If input is invalid, return invalid feedback
+  if (isNaN(userAnswer) || !Number.isInteger(userAnswer)) {
+    return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") }
+  }
+
+  // Normalize the correct answer and user answer within the range [0, modulus-1]
+  const normalizedCorrectAnswer = ((correctValue % modulus) + modulus) % modulus
+  const normalizedUserAnswer = ((userAnswer % modulus) + modulus) % modulus
+
+  // Check if the normalized answers match
+  if (normalizedUserAnswer === normalizedCorrectAnswer) {
+    return { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
+  } else {
+    return {
+      correct: false,
+      feedbackText: t(translations, lang, "feedbackIncorrect", {
+        correctAnswer: normalizedCorrectAnswer.toString(),
+      }),
+    }
+  }
+}
+
 // Simple
 function generateSimpleQuestion(lang: Language, path: string, random: Random) {
   const a = random.int(0, 19)
@@ -116,16 +148,7 @@ function generateSimpleQuestion(lang: Language, path: string, random: Random) {
 }
 
 function getSimpleFeedbackFunction(lang: Language, a: number, b: number): FreeTextFeedbackFunction {
-  return ({ text }) => {
-    // parse to Float to correctly recognize non-integer numbers
-    const userAnswer = parseFloat(text.trim())
-    if (isNaN(userAnswer) || !Number.isInteger(userAnswer)) {
-      return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") }
-    }
-    return (userAnswer - a) % b === 0
-      ? { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
-      : { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") }
-  }
+  return ({ text }) => generateModularFeedback(lang, text, a, b)
 }
 
 // Reduction
@@ -146,17 +169,7 @@ function generateReductionQuestion(lang: Language, path: string, random: Random)
 }
 
 function getReductionFeedbackFunction(lang: Language, x: number, n: number): FreeTextFeedbackFunction {
-  return ({ text }) => {
-    const userAnswer = parseFloat(text.trim())
-    // normalize answer to smallest positive integer
-    const correctAnswer = ((x % n) + n) % n
-    if (isNaN(userAnswer) || !Number.isInteger(userAnswer)) {
-      return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") }
-    }
-    return userAnswer === correctAnswer
-      ? { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
-      : { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") }
-  }
+  return ({ text }) => generateModularFeedback(lang, text, x, n)
 }
 
 // Inverse
@@ -187,12 +200,23 @@ function getInverseFeedbackFunction(
 ): FreeTextFeedbackFunction {
   return ({ text }) => {
     const userAnswer = parseFloat(text.trim())
+
     if (isNaN(userAnswer) || !Number.isInteger(userAnswer)) {
       return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") }
     }
-    return userAnswer === correctAnswer
-      ? { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
-      : { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") }
+
+    if (userAnswer === correctAnswer) {
+      return { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
+    } else {
+      const answerText = correctAnswer !== null ? correctAnswer.toString() : "N/A"
+
+      return {
+        correct: false,
+        feedbackText: t(translations, lang, "feedbackIncorrect", {
+          correctAnswer: answerText,
+        }),
+      }
+    }
   }
 }
 
@@ -208,7 +232,7 @@ function generateExponentiationQuestion(lang: Language, path: string, random: Ra
     name: ModTricks.name(lang),
     path: path,
     text: t(translations, lang, "expQuestion", { a: String(a), b: String(b), n: String(n) }),
-    feedback: getExponentiationFeedbackFunction(lang, result),
+    feedback: getExponentiationFeedbackFunction(lang, result, n),
   }
 
   const testing = { a, b, n, result }
@@ -217,15 +241,8 @@ function generateExponentiationQuestion(lang: Language, path: string, random: Ra
 
 function getExponentiationFeedbackFunction(
   lang: Language,
-  correctAnswer: number,
+  result: number,
+  modulus: number,
 ): FreeTextFeedbackFunction {
-  return ({ text }) => {
-    const userAnswer = parseFloat(text.trim())
-    if (isNaN(userAnswer) || !Number.isInteger(userAnswer)) {
-      return { correct: false, feedbackText: t(translations, lang, "feedbackInvalid") }
-    }
-    return userAnswer === correctAnswer
-      ? { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
-      : { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") }
-  }
+  return ({ text }) => generateModularFeedback(lang, text, result, modulus)
 }

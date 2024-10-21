@@ -18,7 +18,7 @@ const translations: Translations = {
     crtBottomText: "Provide your answer in the form: $y\\pmod{z}$.",
     feedbackInvalid: "Your answer is not valid.",
     feedbackCorrect: "Correct!",
-    feedbackIncorrect: "Incorrect.",
+    feedbackIncorrect: "Incorrect. The correct answer is: {{correctAnswer}}.",
     feedbackIncomplete: "Incomplete or too complex",
   },
   de: {
@@ -28,7 +28,7 @@ const translations: Translations = {
     crtBottomText: "Gib deine Antwort in der Form $y\\pmod{z}$ an.",
     feedbackInvalid: "Deine Antwort ist ungültig.",
     feedbackCorrect: "Richtig!",
-    feedbackIncorrect: "Falsch.",
+    feedbackIncorrect: "Falsch. Die richtige Antwort ist: {{correctAnswer}}.",
     feedbackIncomplete: "Nicht vollständig oder zu komplex",
   },
 }
@@ -60,7 +60,6 @@ export const CRT: QuestionGenerator = {
     const random = new Random(seed)
     let numCongruences: number
 
-    // Ensure numCongruences is always assigned a number
     if (parameters.variant === "rand") {
       numCongruences = random.int(2, 4)
     } else if (parameters.variant === "2") {
@@ -70,7 +69,6 @@ export const CRT: QuestionGenerator = {
     } else if (parameters.variant === "4") {
       numCongruences = 4
     } else {
-      // Assign a default value to prevent undefined case
       throw new Error("Unknown variant")
     }
 
@@ -78,7 +76,6 @@ export const CRT: QuestionGenerator = {
   },
 }
 
-// CRT generation function with numCongruences parameter
 function generateCRTQuestion(lang: Language, path: string, random: Random, numCongruences: number) {
   const congruences: { a: number; n: number }[] = []
   const text: string[] = []
@@ -114,7 +111,6 @@ function generateCRTQuestion(lang: Language, path: string, random: Random, numCo
   return { question, testing: { crtValue, commonModulus } }
 }
 
-// Format check function for CRT
 function getCRTCheckFormatFunction(lang: Language): FreeTextFormatFunction {
   return ({ text }) => {
     if (text.trim() === "") {
@@ -132,7 +128,6 @@ function getCRTCheckFormatFunction(lang: Language): FreeTextFormatFunction {
   }
 }
 
-// Feedback function for CRT
 function getCRTFeedbackFunction(
   lang: Language,
   crtValue: number,
@@ -156,8 +151,15 @@ function getCRTFeedbackFunction(
     userValue = ((userValue % commonModulus) + commonModulus) % commonModulus
     crtValue = ((crtValue % commonModulus) + commonModulus) % commonModulus
 
-    return userModulus !== commonModulus || userValue !== crtValue
-      ? { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") }
-      : { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
+    const isCorrect = userModulus === commonModulus && userValue === crtValue
+
+    return {
+      correct: isCorrect,
+      feedbackText: isCorrect
+        ? t(translations, lang, "feedbackCorrect")
+        : t(translations, lang, "feedbackIncorrect", {
+            correctAnswer: `${crtValue} (mod ${commonModulus})`,
+          }),
+    }
   }
 }
