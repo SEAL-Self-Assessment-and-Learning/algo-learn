@@ -1,17 +1,14 @@
-import { Language } from "@shared/api/Language";
+import { Language } from "@shared/api/Language"
 import {
   FreeTextFeedbackFunction,
-  FreeTextQuestion,
   FreeTextFormatFunction,
+  FreeTextQuestion,
   QuestionGenerator,
-} from "@shared/api/QuestionGenerator";
-import { serializeGeneratorCall } from "@shared/api/QuestionRouter";
-import {
-    areCoprime,
-    solveCRT
-} from "@shared/question-generators/math/utils";
-import Random from "@shared/utils/random";
-import { t, tFunctional, Translations } from "@shared/utils/translations";
+} from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { areCoprime, solveCRT } from "@shared/question-generators/math/utils"
+import Random from "@shared/utils/random"
+import { t, tFunctional, Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {
@@ -34,7 +31,7 @@ const translations: Translations = {
     feedbackIncorrect: "Falsch.",
     feedbackIncomplete: "Nicht vollständig oder zu komplex",
   },
-};
+}
 
 export const CRT: QuestionGenerator = {
   id: "crt",
@@ -58,33 +55,33 @@ export const CRT: QuestionGenerator = {
       lang,
       parameters,
       seed,
-    });
+    })
 
-    const random = new Random(seed);
-    let numCongruences: number;
+    const random = new Random(seed)
+    let numCongruences: number
 
     // Ensure numCongruences is always assigned a number
     if (parameters.variant === "rand") {
-        numCongruences = random.int(2, 4);
+      numCongruences = random.int(2, 4)
     } else if (parameters.variant === "2") {
-        numCongruences = 2;
+      numCongruences = 2
     } else if (parameters.variant === "3") {
-        numCongruences = 3;
+      numCongruences = 3
     } else if (parameters.variant === "4") {
-        numCongruences = 4;
+      numCongruences = 4
     } else {
-        // Assign a default value to prevent undefined case
-        throw new Error("Unknown variant");
+      // Assign a default value to prevent undefined case
+      throw new Error("Unknown variant")
     }
 
     return generateCRTQuestion(lang, path, random, numCongruences)
   },
-};
+}
 
 // CRT generation function with numCongruences parameter
 function generateCRTQuestion(lang: Language, path: string, random: Random, numCongruences: number) {
-  const congruences: { a: number; n: number }[] = [];
-  const text: string[] = [];
+  const congruences: { a: number; n: number }[] = []
+  const text: string[] = []
 
   // generate system of congruences
   for (let i = 0; i < numCongruences; i++) {
@@ -112,34 +109,34 @@ function generateCRTQuestion(lang: Language, path: string, random: Random, numCo
     bottomText: t(translations, lang, "crtBottomText"),
     feedback: getCRTFeedbackFunction(lang, crtValue, commonModulus),
     checkFormat: getCRTCheckFormatFunction(lang),
-  };
+  }
 
-  return { question, testing: { crtValue, commonModulus } };
+  return { question, testing: { crtValue, commonModulus } }
 }
 
 // Format check function for CRT
 function getCRTCheckFormatFunction(lang: Language): FreeTextFormatFunction {
   return ({ text }) => {
     if (text.trim() === "") {
-      return { valid: false, message: t(translations, lang, "feedbackIncomplete") };
+      return { valid: false, message: t(translations, lang, "feedbackIncomplete") }
     }
 
     // ensure format "$value (mod $modulus)" and inform user
-    const pattern = /^(\d+)\s*\(\s*mod\s*(\d+)\s*\)$/i;
-    const match = text.trim().match(pattern);
+    const pattern = /^(\d+)\s*\(\s*mod\s*(\d+)\s*\)$/i
+    const match = text.trim().match(pattern)
     if (!match) {
-      return { valid: false, message: t(translations, lang, "feedbackIncomplete") };
+      return { valid: false, message: t(translations, lang, "feedbackIncomplete") }
     }
 
-    return { valid: true };
-  };
+    return { valid: true }
+  }
 }
 
 // Feedback function for CRT
 function getCRTFeedbackFunction(
   lang: Language,
   crtValue: number,
-  commonModulus: number
+  commonModulus: number,
 ): FreeTextFeedbackFunction {
   return ({ text }) => {
     // match "y (mod z)" (optional whitespaces) and capture y and z
@@ -162,5 +159,5 @@ function getCRTFeedbackFunction(
     return userModulus !== commonModulus || userValue !== crtValue
       ? { correct: false, feedbackText: t(translations, lang, "feedbackIncorrect") }
       : { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
-  };
+  }
 }

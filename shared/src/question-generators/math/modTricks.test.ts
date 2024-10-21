@@ -12,7 +12,6 @@ const variants = [
     params: { variant: "exponentiation" },
     testingKeys: ["a", "b", "n", "result"],
   },
-  { name: "crt", params: { variant: "crt" }, testingKeys: ["crtValue", "commonModulus"] },
 ]
 
 describe("ModTricks - Correctness", () => {
@@ -40,9 +39,6 @@ describe("ModTricks - Correctness", () => {
         case "exponentiation":
           correctAnswer = testing.result
           break
-        case "crt":
-          correctAnswer = `${testing.crtValue} (mod ${testing.commonModulus})`
-          break
         default:
           throw new Error(`Unknown variant: ${name}`)
       }
@@ -58,7 +54,7 @@ describe("ModTricks - Correctness", () => {
       })) as FreeTextFeedback
       expect(correctFeedback.correct).toBe(true)
 
-      // test incorrect answers
+      // Test incorrect answers
       const incorrectAnswer = typeof correctAnswer === "number" ? correctAnswer + 1 : "incorrect"
       const incorrectFeedback = (await question.feedback?.({
         text: incorrectAnswer.toString(),
@@ -144,9 +140,6 @@ describe("ModTricks - Multiple Random Generations", () => {
           expect(testing.b).toBeLessThanOrEqual(10)
           expect(testing.n).toBeGreaterThanOrEqual(2)
           expect(testing.n).toBeLessThanOrEqual(20)
-        } else if (name === "crt") {
-          expect(testing.crtValue).toBeGreaterThanOrEqual(0)
-          expect(testing.commonModulus).toBeGreaterThanOrEqual(2)
         }
       })
     }
