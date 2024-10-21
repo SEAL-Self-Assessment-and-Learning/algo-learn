@@ -3,7 +3,6 @@ import {
   ParserError,
   PropositionalLogicParser,
   SyntaxTreeNodeType,
-  TruthTable,
 } from "@shared/utils/propositionalLogic.ts"
 import { InputTruthTableProps, TruthTableProps } from "@shared/utils/truthTableBlock.ts"
 import { Markdown } from "@/components/Markdown.tsx"
@@ -11,21 +10,21 @@ import { Markdown } from "@/components/Markdown.tsx"
 /**
  * Creates a Truth table
  * Options:
- *  - show a function and in the header the function
- *  - show a function and in the header an alias name
+ *  - show a functions truth table and in the header the function
+ *  - show a functions truth table and in the header an alias name
  *  - show input fields and an alias name / or function in the header
  * @param truthTableObject
  * @constructor
  */
 export function TruthTableComp({ truthTableObject }: { truthTableObject: string }) {
   const parsedTruthTable = JSON.parse(truthTableObject) as TruthTableProps
-  const { parsedFunctions, parsedFunctionNames, variableNames, tableSize, truthTables } =
+  const { parsedObjects, parsedFunctionNames, variableNames } =
     parsePassedFunctionsToTables(parsedTruthTable)
 
-  const wrongFeedback = parsedTruthTable.wrongFeedback
-  const borderColor = wrongFeedback ? "border-red-900" : "border-gray-600 dark:border-gray-300"
-  const cellBgColor = wrongFeedback ? "bg-red-300" : "bg-gray-300 dark:bg-gray-800"
-  const headerColor = wrongFeedback ? "" : "bg-goethe text-white"
+  const inFeedbackPart = parsedTruthTable.inFeedbackPart
+  const borderColor = inFeedbackPart ? "border-red-900" : "border-gray-600 dark:border-gray-300"
+  const cellBgColor = inFeedbackPart ? "bg-red-300" : "bg-gray-300 dark:bg-gray-800"
+  const headerColor = inFeedbackPart ? "" : "bg-goethe text-white"
 
   return (
     <div className="flex items-center justify-center">
@@ -40,25 +39,25 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
                 </th>
               ))}
 
-              {/* Divider with border between variable names and functions */}
+              {/* Divider - border between variable names and functions */}
               <th className={`border-l ${borderColor}`}></th>
               <th className={`border-r ${borderColor}`}></th>
 
               {/* Parsed functions */}
-              {parsedFunctions.map((func, index) => (
+              {parsedObjects.map((func, index) => (
                 <th
                   className={`whitespace-nowrap px-6 py-2 font-black ${index === 0 ? "" : `border-l ${borderColor}`}`}
                   key={index}
                 >
                   <Markdown
-                    md={`${parsedFunctionNames[index] === "" && func !== null ? `$ ${func.toString(true)} $` : parsedFunctionNames[index]}`}
+                    md={`${!("fields" in func) ? `$ ${func.toString(true)} $` : parsedFunctionNames[index]}`}
                   />
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {Array.from({ length: tableSize }).map((_, i) => (
+            {Array.from({ length: Math.pow(2, variableNames.length) }).map((_, i) => (
               <tr key={i} className={`${i % 2 === 1 ? cellBgColor : ""}`}>
                 {/* Write down the binary of i (reversed) */}
                 {variableNames.map((_, j) => (
@@ -69,17 +68,14 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
                   </td>
                 ))}
 
-                {/* Divider with border between variable names and functions */}
+                {/* Divider - border between variable names and functions */}
                 <th className={`border-l ${borderColor}`}></th>
                 <th className={`border-r ${borderColor}`}></th>
 
                 {/* Write down the evaluation of each function */}
-                {parsedFunctions.map((_, index) => (
-                  <td
-                    className={`text-center ${index === 0 ? "" : `border-l ${borderColor}`}`}
-                    key={index}
-                  >
-                    {createCellValue(truthTables, index, parsedTruthTable, i)}
+                {parsedObjects.map((_, j) => (
+                  <td className={`text-center ${j === 0 ? "" : `border-l ${borderColor}`}`} key={j}>
+                    {createCellValue(parsedObjects, variableNames, j, i)}
                   </td>
                 ))}
               </tr>
@@ -92,84 +88,57 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
 }
 
 /**
- * Displays either an input field or 0/1 from a truth table
- * if truhtable[index] === null => there should be an input field
- *                                 input fields are stored in the parsedTruthTable.functions...
- * @param truthTables
- * @param index
- * @param parsedTruthTable
+ * j indicates the first index in the parsedObject and i is the current index
+ * count from 0 to tablesize - 1
+ * - if fields in parsedObjects[j] its a input field, display with md comp
+ * - otherwise evaluate the expression with index i
+ * @param parsedObjects
+ * @param variableNames
+ * @param j
  * @param i
  */
 function createCellValue(
-  truthTables: (TruthTable | null)[],
-  index: number,
-  parsedTruthTable: TruthTableProps,
+  parsedObjects: (SyntaxTreeNodeType | InputTruthTableProps)[],
+  variableNames: string[],
+  j: number,
   i: number,
 ) {
-  if (truthTables[index] !== null) {
-    return <Markdown md={truthTables[index][i] ? "$1$" : "$0$"} />
+  if ("fields" in parsedObjects[j]) {
+    return <Markdown md={parsedObjects[j].fields[i]} />
   } else {
-    if ("fields" in parsedTruthTable.functions[index]) {
-      return <Markdown md={parsedTruthTable.functions[index].fields[i]} />
-    }
-    throw new Error("Should never be reached")
+    return <Markdown md={parsedObjects[j].eval(numToVariableValues(i, variableNames)) ? "$1$" : "$0"} />
   }
 }
 
 /**
  * Gets the parsedTruthTable as TruthTableProps
  * Creates:
- *  - parsedFunctions[] (x \or y ... )
+ *  - parsedObjects[] (x \or y ... ) or ({fields: string[], name: string})
  *  - parsedFunctionNames (if the function should not be shown, instead a name like $f$)
  *  - all unique variable names
- *  - tableSize
- *  - list of the truthTables (also a inputField list may be included -> indicated by null)
  * @param parsedTruthTable
  */
 function parsePassedFunctionsToTables(parsedTruthTable: TruthTableProps) {
-  const parsedFunctions: (SyntaxTreeNodeType | null)[] = []
   const parsedFunctionNames: string[] = []
+  const parsedObjects: (SyntaxTreeNodeType | InputTruthTableProps)[] = []
   for (const func of parsedTruthTable.functions) {
     if ("func" in func) {
       const parsedFunction = PropositionalLogicParser.parse(func.func)
       if (!(parsedFunction instanceof ParserError)) {
-        parsedFunctions.push(parsedFunction)
         parsedFunctionNames.push(func.alternativeName || "")
+        parsedObjects.push(parsedFunction)
       }
     } else {
       parsedFunctionNames.push(func.name)
-      parsedFunctions.push(null)
+      parsedObjects.push(func)
     }
   }
-
-  if (parsedFunctions.length === 0) {
+  if (parsedObjects.length === 0) {
     throw new Error("No valid functions found")
   }
 
-  const variableOptionsCollection: (SyntaxTreeNodeType | InputTruthTableProps)[] = []
-  for (let i = 0; i < parsedFunctions.length; i++) {
-    if (parsedFunctions[i] === null) {
-      variableOptionsCollection.push(parsedTruthTable.functions[i] as InputTruthTableProps)
-    } else {
-      variableOptionsCollection.push(parsedFunctions[i] as SyntaxTreeNodeType)
-    }
-  }
-  const variableNames = getAllVarNames(variableOptionsCollection).sort().reverse()
-  const tableSize = Math.pow(2, variableNames.length)
-
-  const truthTables: (TruthTable | null)[] = []
-  for (const func of parsedFunctions) {
-    if (func === null) {
-      truthTables.push(null)
-    } else {
-      const truthTable: TruthTable = []
-      for (let i = 0; i < tableSize; i++) {
-        truthTable.push(func.eval(numToVariableValues(i, variableNames)))
-      }
-      truthTables.push(truthTable)
-    }
-  }
-  return { parsedFunctions, parsedFunctionNames, variableNames, tableSize, truthTables }
+  const variableNames = getAllVarNames(parsedObjects).sort().reverse()
+  return { parsedObjects, parsedFunctionNames, variableNames }
 }
 
 /**
