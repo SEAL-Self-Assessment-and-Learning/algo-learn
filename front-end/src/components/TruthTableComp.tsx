@@ -106,7 +106,7 @@ function createCellValue(
   if ("fields" in parsedObjects[j]) {
     return <Markdown md={parsedObjects[j].fields[i]} />
   } else {
-    return <Markdown md={parsedObjects[j].eval(numToVariableValues(i, variableNames)) ? "$1$" : "$0"} />
+    return <Markdown md={parsedObjects[j].eval(numToVariableValues(i, variableNames)) ? "$1$" : "$0$"} />
   }
 }
 
