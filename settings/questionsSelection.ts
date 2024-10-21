@@ -11,6 +11,7 @@ import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { CRT } from "@shared/question-generators/math/crt"
+import { modFactor } from "@shared/question-generators/math/modFactorization"
 import { ModTricks } from "@shared/question-generators/math/modTricks"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
@@ -69,7 +70,7 @@ export const collection: QuestionCollection = [
   {
     slug: "modular-arithmetic",
     name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
-    contents: [ModTricks, CRT],
+    contents: [ModTricks, CRT, modFactor],
   },
 ]
 

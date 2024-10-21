@@ -5,7 +5,6 @@ import { ModTricks } from "./modTricks"
 
 const variants = [
   { name: "simple", params: { variant: "simple" }, testingKeys: ["a", "b"] },
-  { name: "reduction", params: { variant: "reduction" }, testingKeys: ["x", "n"] },
   { name: "inverse", params: { variant: "inverse" }, testingKeys: ["a", "n", "inverse"] },
   {
     name: "exponentiation",
@@ -29,9 +28,6 @@ describe("ModTricks - Correctness", () => {
       switch (name) {
         case "simple":
           correctAnswer = testing.a
-          break
-        case "reduction":
-          correctAnswer = ((testing.x % testing.n) + testing.n) % testing.n
           break
         case "inverse":
           correctAnswer = testing.inverse

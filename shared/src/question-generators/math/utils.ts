@@ -1,3 +1,5 @@
+import Random from "@shared/utils/random"
+
 /**
  * Computes the greatest common divisor (GCD) of two numbers.
  *
@@ -75,4 +77,31 @@ export function solveCRT(congruences: { a: number; n: number }[]): number {
 
 export function areCoprime(a: number, b: number): boolean {
   return gcd(a, b) === 1
+}
+
+/**
+ * Generates a set of random factors within the specified range.
+ *
+ * @param random An instance of the Random class to generate random numbers.
+ * @param minFactors Minimum number of factors to generate.
+ * @param maxFactors Maximum number of factors to generate.
+ * @param minValue Minimum value of each factor.
+ * @param maxValue Maximum value of each factor.
+ * @returns An array of random factors.
+ */
+export function generateFactors(
+  random: Random,
+  minFactors: number = 2,
+  maxFactors: number = 3,
+  minValue: number = 2,
+  maxValue: number = 10,
+): number[] {
+  const numFactors = random.int(minFactors, maxFactors)
+  const factors: number[] = []
+
+  for (let i = 0; i < numFactors; i++) {
+    factors.push(random.int(minValue, maxValue))
+  }
+
+  return factors
 }
