@@ -122,7 +122,6 @@ function generateVariantStart(random: Random, lang: "de" | "en", permalink: stri
 
   const truthTable = createTruthTableProps({
     functions: [{ func: randomExpression.toString(), alternativeName: "$\\varPhi$" }],
-    wrongFeedback: false,
   })
 
   const question: FreeTextQuestion = {
@@ -188,7 +187,6 @@ function generateVariantCDnf(
 
   const truthTable = createTruthTableProps({
     functions: [{ func: randomExpression.toString(), alternativeName: "$\\varPhi$" }],
-    wrongFeedback: false,
   })
 
   const question: FreeTextQuestion = {
