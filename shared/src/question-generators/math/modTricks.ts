@@ -47,6 +47,7 @@ const translations: Translations = {
     feedbackInvalid: "Deine Antwort ist ungültig.",
     feedbackCorrect: "Richtig!",
     feedbackIncorrect: "Falsch. Die richtige Antwort ist: ${{correctAnswer}}$.",
+    feedbackIncorrectFermat: "Falsch. Die richtige Antwort ist: ${{correctAnswer}}$.",
     feedbackIncomplete: "Nicht vollständig oder zu komplex",
   },
 }
@@ -301,7 +302,7 @@ function generateCalc(base: number, exponent: number, modulus: number): string {
     currentBase = (currentBase * currentBase) % modulus
   }
 
-  return `$(${exponent})_2 = ${binaryExponent} \\leadsto ( (${powers.join("\\times")}) \\pmod{${modulus}}) \\equiv ${result}$`
+  return `$(${exponent})_2 = ${binaryExponent} \\leadsto ( (${powers.join("\\cdot")}) \\pmod{${modulus}}) \\equiv ${result}$`
 }
 
 // Fermat Exponentiation
@@ -339,7 +340,7 @@ function getFermatFeedbackFunction(
     const feedback = generateModularFeedback(lang, text, correctValue, modulus)
 
     if (!feedback.correct) {
-      feedback.feedbackText += `$ ${originalExponent} \\eqiv ${reducedExponent} \\pmod{${modulus - 1}}$.`
+      feedback.feedbackText += ` Exponent $${originalExponent} \\equiv ${reducedExponent} \\pmod{${modulus - 1}}$`
     }
 
     return feedback
