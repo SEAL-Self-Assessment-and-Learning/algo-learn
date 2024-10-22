@@ -33,7 +33,8 @@ export function createMatrixInput({
   name?: string
   elementOf?: string
 }) {
-  // InputField type {{test#NL#**Char: **#placeholder#overlay}}
+  if (rows < 1 || cols < 1) throw new Error("Rows and cols both have to be at least 1.")
+  // input field type: {{id#style#promt#placeholder#checkformat}}
   const inputFields: { [key: string]: string } = {}
   const fieldIDs: string[][] = []
   for (let i = 0; i < rows; i++) {
