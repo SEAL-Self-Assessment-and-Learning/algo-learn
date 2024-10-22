@@ -82,7 +82,7 @@ function generateCRTQuestion(lang: Language, path: string, random: Random, numCo
 
   // generate system of congruences
   for (let i = 0; i < numCongruences; i++) {
-    const a = random.int(1, 20)
+    let a = random.int(1, 20)
     let n: number
 
     // find new modulus that is coprime to preceding moduli
@@ -90,6 +90,7 @@ function generateCRTQuestion(lang: Language, path: string, random: Random, numCo
       n = random.int(2, 20)
     } while (congruences.some(({ n: precedingModulus }) => !areCoprime(n, precedingModulus)))
 
+    a = ((a % n) + n) % n // a should be within the range [0, n-1]
     congruences.push({ a, n })
     text.push(`x \\equiv ${a} \\pmod{ ${n} }`)
   }
