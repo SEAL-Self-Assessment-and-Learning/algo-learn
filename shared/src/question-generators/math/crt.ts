@@ -145,7 +145,7 @@ function getCRTFeedbackFunction(
 
     // y: userValue and z: userModulus
     let userValue = parseInt(match[1], 10)
-    let userModulus = parseInt(match[2], 10)
+    const userModulus = parseInt(match[2], 10)
 
     // normalize to range [0, commonModulus]
     userValue = ((userValue % commonModulus) + commonModulus) % commonModulus

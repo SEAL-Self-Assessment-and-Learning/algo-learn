@@ -290,7 +290,7 @@ function generateCalc(base: number, exponent: number, modulus: number): string {
   const binaryExponent = exponent.toString(2)
   let result = 1
   let currentBase = base % modulus
-  let powers: string[] = []
+  const powers: string[] = []
 
   for (let i = 0; i < binaryExponent.length; i++) {
     const bit = binaryExponent[binaryExponent.length - 1 - i]
@@ -339,7 +339,7 @@ function getFermatFeedbackFunction(
     const feedback = generateModularFeedback(lang, text, correctValue, modulus)
 
     if (!feedback.correct) {
-      feedback.feedbackText += `$ ${originalExponent} \\eqiv ${reducedExponent} \pmod{${modulus - 1}}$.`
+      feedback.feedbackText += `$ ${originalExponent} \\eqiv ${reducedExponent} \\pmod{${modulus - 1}}$.`
     }
 
     return feedback
