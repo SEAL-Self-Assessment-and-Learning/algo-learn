@@ -6,8 +6,16 @@ import { modFactor } from "./modFactorization"
 // Define the variants to be tested
 const variants = [
   { name: "large_number", params: { variant: "large_number" }, testingKeys: ["x", "n", "calculation"] },
-  { name: "multiplication", params: { variant: "multiplication" }, testingKeys: ["a", "b", "n", "calculation", "result"] },
-  { name: "large_exponent", params: { variant: "large_exponent" }, testingKeys: ["base", "exp", "n", "factors", "result"] },
+  {
+    name: "multiplication",
+    params: { variant: "multiplication" },
+    testingKeys: ["a", "b", "n", "calculation", "result"],
+  },
+  {
+    name: "large_exponent",
+    params: { variant: "large_exponent" },
+    testingKeys: ["base", "exp", "n", "factors", "result"],
+  },
 ]
 
 describe("modFactor - Correctness", () => {
