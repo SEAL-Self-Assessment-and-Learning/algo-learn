@@ -11,6 +11,16 @@ const variants = [
     params: { variant: "exponentiation" },
     testingKeys: ["a", "b", "n", "result"],
   },
+  {
+    name: "successiveSquaring",
+    params: { variant: "successiveSquaring" },
+    testingKeys: ["base", "exponent", "modulus", "result"],
+  },
+  {
+    name: "fermatExponentiation",
+    params: { variant: "fermatExponentiation" },
+    testingKeys: ["base", "exponent", "primeModulus", "result", "reducedExponent"],
+  },
 ]
 
 describe("ModTricks - Correctness", () => {
@@ -33,6 +43,8 @@ describe("ModTricks - Correctness", () => {
           correctAnswer = testing.inverse
           break
         case "exponentiation":
+        case "successiveSquaring":
+        case "fermatExponentiation":
           correctAnswer = testing.result
           break
         default:
@@ -119,11 +131,6 @@ describe("ModTricks - Multiple Random Generations", () => {
           expect(testing.b).toBeGreaterThan(1)
           expect(testing.a).toBeLessThanOrEqual(19)
           expect(testing.b).toBeLessThanOrEqual(20)
-        } else if (name === "reduction") {
-          expect(testing.x).toBeGreaterThanOrEqual(100)
-          expect(testing.x).toBeLessThanOrEqual(999)
-          expect(testing.n).toBeGreaterThanOrEqual(2)
-          expect(testing.n).toBeLessThanOrEqual(20)
         } else if (name === "inverse") {
           expect(testing.a).toBeGreaterThanOrEqual(2)
           expect(testing.a).toBeLessThanOrEqual(15)
@@ -136,6 +143,20 @@ describe("ModTricks - Multiple Random Generations", () => {
           expect(testing.b).toBeLessThanOrEqual(10)
           expect(testing.n).toBeGreaterThanOrEqual(2)
           expect(testing.n).toBeLessThanOrEqual(20)
+        } else if (name === "successiveSquaring") {
+          expect(testing.base).toBeGreaterThanOrEqual(2)
+          expect(testing.base).toBeLessThanOrEqual(10)
+          expect(testing.exponent).toBeGreaterThanOrEqual(10)
+          expect(testing.exponent).toBeLessThanOrEqual(100)
+          expect(testing.modulus).toBeGreaterThanOrEqual(5)
+          expect(testing.modulus).toBeLessThanOrEqual(19)
+        } else if (name === "fermatExponentiation") {
+          expect(testing.base).toBeGreaterThanOrEqual(2)
+          expect(testing.base).toBeLessThanOrEqual(10)
+          expect(testing.exponent).toBeGreaterThanOrEqual(1)
+          expect(testing.exponent).toBeLessThanOrEqual(100)
+          expect(testing.primeModulus).toBeGreaterThanOrEqual(5)
+          expect(testing.primeModulus).toBeLessThanOrEqual(19)
         }
       })
     }
