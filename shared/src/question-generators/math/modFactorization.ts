@@ -128,9 +128,7 @@ function generateFactorMultiplicationQuestion(lang: Language, path: string, rand
     }
   } while ((a * b) % n !== result && attempts < maxAttempts + 1000)
   if ((a * b) % n !== result) {
-    throw new Error(
-      `Timeout at factor generation after ${maxAttempts + 1000} attempts`,
-    )
+    throw new Error(`Timeout at factor generation after ${maxAttempts + 1000} attempts`)
   }
 
   const calculationA = factorsA
