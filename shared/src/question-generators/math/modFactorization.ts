@@ -104,18 +104,24 @@ function generateFactorLargeNumberQuestion(lang: Language, path: string, random:
 
 // Modular multiplication
 function generateFactorMultiplicationQuestion(lang: Language, path: string, random: Random) {
+  // sample desired result between (0,n-1) for less repetitive solutions
   const n = random.int(2, 20)
+  const result = random.int(0, n - 1)
 
-  const factorsA = generateFactors(random)
-  const factorsB = generateFactors(random)
+  let a, b
+  let factorsA, factorsB
 
-  const a = factorsA.reduce((acc, factor) => acc * factor, 1)
-  const b = factorsB.reduce((acc, factor) => acc * factor, 1)
-  const result = (a * b) % n
+  // try generating factors until desired result is achieved
+  do {
+    factorsA = generateFactors(random)
+    factorsB = generateFactors(random)
+    a = factorsA.reduce((acc, factor) => acc * factor, 1)
+    b = factorsB.reduce((acc, factor) => acc * factor, 1)
+  } while ((a * b) % n !== result)
 
-  const calculationA = factorsA.map((factor) => `${factor}`).join(" \\times ")
-  const calculationB = factorsB.map((factor) => `${factor}`).join(" \\times ")
-  const calculation = `(${calculationA}) \\times (${calculationB}) \\pmod{${n}} \\equiv ${result}`
+  const calculationA = factorsA.map((factor) => `${factor}`).join(" \\cdot ")
+  const calculationB = factorsB.map((factor) => `${factor}`).join(" \\cdot ")
+  const calculation = `(${calculationA}) \\cdot (${calculationB}) \\pmod{${n}} \\equiv ${result}`
 
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
