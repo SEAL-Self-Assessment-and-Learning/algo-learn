@@ -112,15 +112,35 @@ function generateFactorMultiplicationQuestion(lang: Language, path: string, rand
   let factorsA, factorsB
 
   // try generating factors until desired result is achieved
+  let attempts = 0
+  const maxAttempts = 1000
+  let allowOneAsFactor = false
+
   do {
-    factorsA = generateFactors(random)
-    factorsB = generateFactors(random)
+    factorsA = generateFactors(random, 2, 3, allowOneAsFactor ? 1 : 2, 50)
+    factorsB = generateFactors(random, 2, 3, allowOneAsFactor ? 1 : 2, 50)
     a = factorsA.reduce((acc, factor) => acc * factor, 1)
     b = factorsB.reduce((acc, factor) => acc * factor, 1)
-  } while ((a * b) % n !== result)
+    attempts++
 
-  const calculationA = factorsA.map((factor) => `${factor}`).join(" \\cdot ")
-  const calculationB = factorsB.map((factor) => `${factor}`).join(" \\cdot ")
+    if (attempts >= maxAttempts) {
+      allowOneAsFactor = true
+    }
+  } while ((a * b) % n !== result && attempts < maxAttempts + 1000)
+  if ((a * b) % n !== result) {
+    throw new Error(
+      `Timeout at factor generation after ${maxAttempts + 1000} attempts`,
+    )
+  }
+
+  const calculationA = factorsA
+    .filter((factor) => factor !== 1)
+    .map((factor) => `${factor}`)
+    .join(" \\cdot ")
+  const calculationB = factorsB
+    .filter((factor) => factor !== 1)
+    .map((factor) => `${factor}`)
+    .join(" \\cdot ")
   const calculation = `(${calculationA}) \\cdot (${calculationB}) \\pmod{${n}} \\equiv ${result}`
 
   const question: FreeTextQuestion = {
