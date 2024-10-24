@@ -68,7 +68,7 @@ jobs:
         run: bun run test
 
       - name: Build 🔧
-        run: bun run build --base /algo-learn-testing/$CLEAN_REF/
+        run: bun run build --mode staging --base /algo-learn-testing/$CLEAN_REF/
 
       - name: Deploy to server 🚀
         id: deploy

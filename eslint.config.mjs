@@ -7,7 +7,7 @@ import js from "@eslint/js"
 const namingConvention = [
   {
     selector: "default",
-    format: ["camelCase"],
+    format: ["camelCase", "UPPER_CASE"],
     leadingUnderscore: "allow",
     trailingUnderscore: "allow",
   },
