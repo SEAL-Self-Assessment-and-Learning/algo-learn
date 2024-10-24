@@ -38,11 +38,14 @@ export function createArrayDisplayCodeBlockUserInput({
 }) {
   // create as many input fields as needed
   const inputFields: string[] = leadValues
+  const fieldIDs: string[] = []
   for (let i = 0; i < numberOfInputFields; i++) {
-    inputFields.push(`{{input-${i}#OS_${inputFieldCharacters.toString()}###overlay}}`)
+    const fieldID = `input-${i}`
+    fieldIDs.push(fieldID)
+    inputFields.push(`{{${fieldID}#OS_${inputFieldCharacters.toString()}###overlay}}`)
   }
   return {
-    inputFields,
+    fieldIDs,
     arrayDisplayBlock: createArrayDisplayCodeBlock({
       array: inputFields,
       startingIndex,
