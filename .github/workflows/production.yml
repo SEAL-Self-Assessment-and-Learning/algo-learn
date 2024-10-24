@@ -52,7 +52,7 @@ jobs:
         run: bun run test
 
       - name: Build 🔧
-        run: bun run build --base /algo-learn/
+        run: bun run build --mode production --base /algo-learn/
 
       - name: Deploy to server 🚀
         id: deploy
