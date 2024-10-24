@@ -266,7 +266,7 @@ export class ProductTerm {
    * @returns The sum of the two product terms.
    */
   add(t: ProductTerm): ProductTerm {
-    if (!this.abs().Theta(t.abs())) {
+    if (!this.abs().bigTheta(t.abs())) {
       throw new Error("Cannot add ProductTerms with different asymptotic behaviour!")
     }
     return new ProductTerm({
@@ -342,7 +342,7 @@ export class ProductTerm {
   }
 
   /** Landau-Oh */
-  Oh(t: ProductTerm): boolean {
+  bigOh(t: ProductTerm): boolean {
     return this.compare(t) <= 0
   }
 
@@ -352,7 +352,7 @@ export class ProductTerm {
   }
 
   /** Landau-Omega */
-  Omega(t: ProductTerm): boolean {
+  bigOmega(t: ProductTerm): boolean {
     return this.compare(t) >= 0
   }
 
@@ -362,7 +362,7 @@ export class ProductTerm {
   }
 
   /** Landau-Theta */
-  Theta(t: ProductTerm): boolean {
+  bigTheta(t: ProductTerm): boolean {
     return this.compare(t) === 0
   }
 
@@ -530,7 +530,7 @@ export class SumProductTerm {
     let x
     for (const t of this.terms) {
       if (x === undefined) x = t
-      else if (x.abs().Theta(t.abs())) x = x.add(t)
+      else if (x.abs().bigTheta(t.abs())) x = x.add(t)
       else {
         if (!x.coefficient.equals(0)) newTerms.push(x)
         x = t
@@ -723,11 +723,11 @@ export class SumProductTerm {
     }
     return this.dominantTerm().compare(x)
   }
-  Oh(x: SumProductTerm): boolean {
-    return this.dominantTerm().Oh(x.dominantTerm())
+  bigOh(x: SumProductTerm): boolean {
+    return this.dominantTerm().bigOh(x.dominantTerm())
   }
-  Omega(x: SumProductTerm): boolean {
-    return this.dominantTerm().Omega(x.dominantTerm())
+  bigOmega(x: SumProductTerm): boolean {
+    return this.dominantTerm().bigOmega(x.dominantTerm())
   }
   oh(x: SumProductTerm): boolean {
     return this.dominantTerm().oh(x.dominantTerm())
@@ -735,8 +735,8 @@ export class SumProductTerm {
   omega(x: SumProductTerm): boolean {
     return this.dominantTerm().omega(x.dominantTerm())
   }
-  Theta(x: SumProductTerm): boolean {
-    return this.dominantTerm().Theta(x.dominantTerm())
+  bigTheta(x: SumProductTerm): boolean {
+    return this.dominantTerm().bigTheta(x.dominantTerm())
   }
   tilde(x: SumProductTerm): boolean {
     return this.dominantTerm().tilde(x.dominantTerm())

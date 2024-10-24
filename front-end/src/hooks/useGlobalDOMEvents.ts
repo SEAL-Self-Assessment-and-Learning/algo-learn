@@ -21,6 +21,7 @@ export type Props = {
 export default function useGlobalDOMEvents(props: Props) {
   useEffect(() => {
     for (const [key, func] of Object.entries(props)) {
+      // eslint-disable-next-line @eslint-react/web-api/no-leaked-event-listener
       window.addEventListener(key, func, false)
     }
     return () => {

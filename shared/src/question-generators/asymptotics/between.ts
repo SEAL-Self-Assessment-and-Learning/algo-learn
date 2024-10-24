@@ -101,7 +101,7 @@ export const Between: QuestionGenerator = {
       let valid = true
       try {
         mathNode = math.parse(text)
-      } catch (e) {
+      } catch {
         valid = false
       }
       if (
@@ -142,7 +142,7 @@ ${t("feedback.expected")}: $${variable}$.`,
       let mathNode: MathNode
       try {
         mathNode = math.parse(text)
-      } catch (e) {
+      } catch {
         return {
           correct: false,
           message: t("feedback.invalid-expression"),
@@ -163,7 +163,7 @@ ${t("feedback.expected")}: $${variable}$.`,
       let sumProductTerm: SumProductTerm
       try {
         sumProductTerm = mathNodeToSumProductTerm(math.parse(text))
-      } catch (e) {
+      } catch {
         return {
           correct: false,
           feedbackText: t("feedback.incomplete"),
@@ -176,7 +176,7 @@ ${t("feedback.expected")}: $${variable}$.`,
           coefficient: 1,
         })
         return {
-          correct: solution.Theta(sumProductTerm.dominantTerm()),
+          correct: solution.bigTheta(sumProductTerm.dominantTerm()),
           feedbackText:
             "$" +
             mathNode.toTex({

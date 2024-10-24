@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { FreeTextFeedback, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
 import { inputRegex } from "@shared/utils/parseMarkdown.ts"
 import { InteractWithQuestion, MODE } from "@/components/InteractWithQuestion.tsx"
@@ -8,6 +8,7 @@ import { formContext, TextFieldState } from "@/hooks/useFormContext.ts"
 import useGlobalDOMEvents from "@/hooks/useGlobalDOMEvents.ts"
 import { useSound } from "@/hooks/useSound.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
+import { isMobileOrTablet } from "@/utils/deviceInformation.ts"
 
 /**
  * This component is used to create a question with multiple input fields
@@ -154,28 +155,31 @@ export function ExerciseMultiTextInput({
 
   const fieldValues = getInputFields(question.text ? question.text : "")
 
-  const textFieldStateValues: { [id: string]: TextFieldState } = {}
-  for (let i = 0; i < fieldValues.inputIds.length; i++) {
-    // first initialize every field in state
-    if (!state.text[fieldValues.inputIds[i]]) {
-      state.text[fieldValues.inputIds[i]] = ""
-      state.modeID[fieldValues.inputIds[i]] = "initial"
-      state.formatFeedback[fieldValues.inputIds[i]] = ""
-    }
+  const textFieldStateValues = useMemo(() => {
+    const textFieldStateValues: { [id: string]: TextFieldState } = {}
+    for (let i = 0; i < fieldValues.inputIds.length; i++) {
+      // first initialize every field in state
+      if (!state.text[fieldValues.inputIds[i]]) {
+        state.text[fieldValues.inputIds[i]] = ""
+        state.modeID[fieldValues.inputIds[i]] = "initial"
+        state.formatFeedback[fieldValues.inputIds[i]] = ""
+      }
 
-    textFieldStateValues[fieldValues.inputIds[i]] = {
-      text: state.text[fieldValues.inputIds[i]],
-      align: fieldValues.inputAligns[i],
-      prompt: fieldValues.inputPrompts[i],
-      feedbackVariation: fieldValues.inputFeedbackVariations[i],
-      setText: (text: string) => setText(fieldValues.inputIds[i], text),
-      placeholder: fieldValues.inputPlaceholders[i],
-      invalid: state.modeID[fieldValues.inputIds[i]] === "invalid",
-      disabled: mode === "correct" || mode === "incorrect",
-      feedback: state.formatFeedback[fieldValues.inputIds[i]],
-      focus: i === 0,
+      textFieldStateValues[fieldValues.inputIds[i]] = {
+        text: state.text[fieldValues.inputIds[i]],
+        align: fieldValues.inputAligns[i],
+        prompt: fieldValues.inputPrompts[i],
+        feedbackVariation: fieldValues.inputFeedbackVariations[i],
+        setText: (text: string) => setText(fieldValues.inputIds[i], text),
+        placeholder: fieldValues.inputPlaceholders[i],
+        invalid: state.modeID[fieldValues.inputIds[i]] === "invalid",
+        disabled: mode === "correct" || mode === "incorrect",
+        feedback: state.formatFeedback[fieldValues.inputIds[i]],
+        focus: i === 0 && !isMobileOrTablet,
+      }
     }
-  }
+    return textFieldStateValues
+  }, [fieldValues, state.text, state.modeID, state.formatFeedback, mode])
 
   return (
     <InteractWithQuestion

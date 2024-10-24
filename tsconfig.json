@@ -30,6 +30,7 @@
       "@settings/*": ["settings/*"]
     }
   },
-  "include": ["shared/src", "front-end/src", "settings"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+  "exclude": ["node_modules", "front-end/dist", "front-end/vite.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
