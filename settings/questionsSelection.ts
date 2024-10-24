@@ -3,7 +3,6 @@ import { oldPathToGenerator, collection as stable } from "./questionsSelection.s
 
 /** The mode can be 'production', 'testing', and 'development' */
 const mode: string = import.meta.env.MODE
-console.log(mode)
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 export { oldPathToGenerator }
