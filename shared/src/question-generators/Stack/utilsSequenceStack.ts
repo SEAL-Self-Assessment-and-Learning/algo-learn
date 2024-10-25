@@ -72,6 +72,7 @@ function generateOperationsVariantSequenceStack(random: Random) {
   for (let i = 0; i < amountOfOperations; i++) {
     let operation = random.weightedChoice(["push", "pop"], [0.7, 0.3])
     if (s.isEmpty() || s.getSize() === 1) operation = "push"
+    if (s.getSize() >= 7) operation = "pop"
     if (operation === "push") {
       const value = random.int(1, 30)
       s.push(value)
