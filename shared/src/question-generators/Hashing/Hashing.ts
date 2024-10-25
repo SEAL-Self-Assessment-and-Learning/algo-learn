@@ -14,7 +14,6 @@ const translations: Translations = {
     linearProbing: "Linear Probing",
     linkedList: "Linked List",
     doubleHashing: "Double Hashing",
-    Values: "Values",
     insert: "We **insert** the following keys in the given order: \\[{{0}}\\]",
     delete: "and then **delete** the following keys in the given order: \\[{{0}}\\]",
     text: `Consider a hash table of size \${{0}}$ implemented with  "{{1}}". 
@@ -34,7 +33,6 @@ const translations: Translations = {
     linearProbing: "Linearem Sondieren",
     linkedList: "Verketteter Liste",
     doubleHashing: "Doppeltem Hashing",
-    Values: "Werte",
     insert: "Wir **fügen** die folgenden Schlüssel in gegebener Reihenfolge ein: \\[{{0}}\\]",
     delete: "und dann **löschen** wir die folgenden Schlüssel in gegebener Reihenfolge: \\[{{0}}\\]",
     text: `Betrachten Sie eine Hashtabelle der Größe \${{0}}$, die mit "{{1}}" implementiert ist.
@@ -75,7 +73,6 @@ export const hashingGenerator: QuestionGenerator = {
     })
 
     const variant = parameters.variant as "linked" | "linear" | "double"
-
     if (variant === "linked") {
       const {
         tableSize,
@@ -86,7 +83,6 @@ export const hashingGenerator: QuestionGenerator = {
         checkFormat,
         feedback,
       } = generateQuestionLinkedHashing(random, translations, lang)
-
       return {
         question: {
           type: "MultiFreeTextQuestion",
@@ -113,14 +109,15 @@ export const hashingGenerator: QuestionGenerator = {
         randomHashFunction,
         insertValuesString,
         deleteValuesString,
-        checkFormat,
+        arrayDisplayBlock,
         feedback,
       } = generateQuestionLinearDoubleProbing(random, "linear", translations, lang)
       return {
         question: {
-          type: "FreeTextQuestion",
+          type: "MultiFreeTextQuestion",
           name: t(translations, lang, "name"),
           path: permalink,
+          fillOutAll: false,
           text: t(translations, lang, "text", [
             tableSize.toString(),
             t(translations, lang, "linearProbing"),
@@ -128,12 +125,9 @@ export const hashingGenerator: QuestionGenerator = {
             deleteValuesString,
             "$h(x)$",
             randomHashFunction.hashFunctionString,
-            "", // empty (only needed for linked)
+            arrayDisplayBlock,
           ]),
-          bottomText: t(translations, lang, "bottomTextLinear"),
-          placeholder: "[ ,5, ,3,...",
           feedback,
-          checkFormat,
         },
       }
     } else {
@@ -142,14 +136,15 @@ export const hashingGenerator: QuestionGenerator = {
         randomHashFunction,
         insertValuesString,
         deleteValuesString,
-        checkFormat,
+        arrayDisplayBlock,
         feedback,
       } = generateQuestionLinearDoubleProbing(random, "double", translations, lang)
       return {
         question: {
-          type: "FreeTextQuestion",
+          type: "MultiFreeTextQuestion",
           name: t(translations, lang, "name"),
           path: permalink,
+          fillOutAll: false,
           text: t(translations, lang, "text", [
             tableSize.toString(),
             t(translations, lang, "doubleHashing"),
@@ -157,12 +152,9 @@ export const hashingGenerator: QuestionGenerator = {
             deleteValuesString,
             "$h_i(x)$",
             randomHashFunction.hashFunctionString,
-            "", // empty (only needed for linked)
+            arrayDisplayBlock,
           ]),
-          bottomText: t(translations, lang, "bottomTextLinear"),
-          placeholder: "[ ,5, ,3,...",
           feedback,
-          checkFormat,
         },
       }
     }

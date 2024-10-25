@@ -1,6 +1,4 @@
 import {
-  FreeTextFeedbackFunction,
-  FreeTextFormatFunction,
   MultiFreeTextFeedbackFunction,
   MultiFreeTextFormatFunction,
 } from "@shared/api/QuestionGenerator.ts"
@@ -11,22 +9,12 @@ import {
   HashFunction,
   MapLinProbing,
 } from "@shared/question-generators/Hashing/MapLinProbing.ts"
+import {
+  createArrayDisplayCodeBlock,
+  createArrayDisplayCodeBlockUserInput,
+} from "@shared/utils/arrayDisplayCodeBlock.ts"
 import Random from "@shared/utils/random.ts"
 import { t, Translations } from "@shared/utils/translations.ts"
-
-/**
- * Creates a md table format for the given values
- * @param values
- */
-export function createTableForValues(values: string[]): string {
-  let table = "\n|$" + values.join("$|$") + "$|\n|"
-  for (let i = 0; i < values.length; i++) {
-    table += "---|"
-  }
-  table += "\n|#div_my-5#|"
-
-  return table
-}
 
 /**
  * This function creates the view to create a better readable solution for the user
@@ -88,10 +76,9 @@ export function generateOperationsHashMap({
       throw new Error("Provided function is not a valid HashFunction")
     }
   }
-
   const insertions: number[] = []
   const possibleValues = Array.from({ length: 25 }, (_, i) => i + 1)
-  for (let i = 0; i < Math.min(tableSize - random.int(1, 3), 8); i++) {
+  for (let i = 0; i < tableSize - random.int(0, 2); i++) {
     if (hashMap.getAmount === hashMap.getSize) {
       break
     }
@@ -141,8 +128,7 @@ export function generateQuestionBase(
   translations: Translations,
   lang: "de" | "en",
 ) {
-  const tableSize = random.choice([7, 11])
-
+  const tableSize = random.choice([7, 11]) // has to be prime
   // insert -> only inserting into hash table
   // insert-delete -> inserting and deleting from hash table
   const task: "insert" | "insert-delete" = random.weightedChoice([
@@ -276,88 +262,52 @@ export function generateQuestionLinearDoubleProbing(
 ) {
   const { tableSize, randomHashFunction, hashMap, insertValuesString, deleteValuesString } =
     generateQuestionBase(random, variant, translations, lang)
-
-  const checkFormat: FreeTextFormatFunction = ({ text }) => {
-    text = text.trim()
-    text = text.replace("[", "")
-    text = text.replace("]", "")
-    const fields = text.split(",")
-
-    // Don't compare length in checkFormat, because this could be a mistake by the user
-    let tableHeader: string = `|`
-    let tableSeparator: string = `|`
-    for (const field of fields) {
-      if (field.trim() !== "" && isNaN(parseInt(field.trim()))) {
-        return { valid: false, message: t(translations, lang, "checkFormatLinear") }
-      }
-      if (field.trim() === "") {
-        tableHeader += `-|`
-      } else {
-        tableHeader += `$${field.trim()}$|`
-      }
-      tableSeparator += `---|`
-    }
-
-    // generate a table based on the user input
-    const arrayTable = `
-${tableHeader}
-${tableSeparator}
-      `
-
-    return { valid: true, message: arrayTable }
+  let arrayDisplayBlock
+  if (tableSize <= 7) {
+    const { arrayDisplayBlock: arrayDisplayBlock_ } = createArrayDisplayCodeBlockUserInput({
+      numberOfInputFields: tableSize,
+    })
+    arrayDisplayBlock = arrayDisplayBlock_
+  } else {
+    // work around ...
+    const { arrayDisplayBlock: arrayDisplayBlockPart1 } = createArrayDisplayCodeBlockUserInput({
+      numberOfInputFields: 7,
+    })
+    const { arrayDisplayBlock: arrayDisplayBlockPart2 } = createArrayDisplayCodeBlockUserInput({
+      numberOfInputFields: tableSize - 7,
+      startingIndex: 7,
+    })
+    arrayDisplayBlock = arrayDisplayBlockPart1 + arrayDisplayBlockPart2
   }
 
-  const feedback: FreeTextFeedbackFunction = ({ text }) => {
-    text = text.trim()
-    text = text.replace("[", "")
-    text = text.replace("]", "")
-
-    const correctSolution: string[] = []
-    for (const key of hashMap.keysList() as (number | null)[]) {
-      if (key === null) {
-        correctSolution.push("_")
-      } else {
-        correctSolution.push("$" + key.toString() + "$")
-      }
+  const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
+    // input-x are the keys in text
+    const solutionMap = (hashMap as MapLinProbing).keysList()
+    const falseReturn = {
+      correct: false,
+      correctAnswer: createArrayDisplayCodeBlock({
+        array: solutionMap.map((x) => (x === null ? " " : x)),
+      }),
     }
-    const correctAnswer = "$[$" + correctSolution.join("**,**") + "$]$"
-
-    const fields = text.split(",")
-    if (fields.length !== tableSize) {
-      return {
-        correct: false,
-        correctAnswer,
-      }
-    }
-
-    let i: number = 0
-    for (const key of hashMap.keysList() as (number | null)[]) {
-      if (key === null) {
-        if (fields[i].trim() !== "") {
-          return {
-            correct: false,
-            correctAnswer,
-          }
+    for (let i = 0; i < solutionMap.length; i++) {
+      if (solutionMap[i] === null) {
+        if (text["input-" + i].trim() !== "") {
+          return falseReturn
         }
-      } else {
-        if (parseInt(fields[i].trim()) !== key) {
-          return {
-            correct: false,
-            correctAnswer,
-          }
-        }
+      } else if (solutionMap[i]!.toString() !== text["input-" + i].trim()) {
+        return falseReturn
       }
-      i++
     }
-
-    return { correct: true, feedback: text }
+    return {
+      correct: true,
+    }
   }
   return {
     tableSize,
     randomHashFunction,
     insertValuesString,
     deleteValuesString,
-    checkFormat,
+    arrayDisplayBlock,
     feedback,
   }
 }

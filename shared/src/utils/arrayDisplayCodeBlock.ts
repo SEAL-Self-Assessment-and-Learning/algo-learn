@@ -38,7 +38,7 @@ export function createArrayDisplayCodeBlockUserInput({
 }) {
   // create as many input fields as needed
   const inputFields: string[] = leadValues
-  for (let i = 0; i < numberOfInputFields; i++) {
+  for (let i = startingIndex; i < numberOfInputFields + startingIndex; i++) {
     inputFields.push(`{{input-${i}#OS_${inputFieldCharacters.toString()}###overlay}}`)
   }
   return {
