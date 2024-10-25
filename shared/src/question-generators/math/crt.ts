@@ -17,8 +17,6 @@ const translations: Translations = {
     crtQuestion: "Solve the system of congruences: \\[ {{text}} \\text{.}\\]",
     crtBottomText: "Provide your answer in the form: $y\\pmod{z}$.",
     feedbackInvalid: "Your answer is not valid.",
-    feedbackCorrect: "Correct!",
-    feedbackIncorrect: "Incorrect. The correct answer is: {{correctAnswer}}.",
     feedbackIncomplete: "Incomplete or too complex",
   },
   de: {
@@ -27,8 +25,6 @@ const translations: Translations = {
     crtQuestion: "Löse das System von Kongruenzen: \\[ {{text}} \\text{.}\\]",
     crtBottomText: "Gib deine Antwort in der Form $y\\pmod{z}$ an.",
     feedbackInvalid: "Deine Antwort ist ungültig.",
-    feedbackCorrect: "Richtig!",
-    feedbackIncorrect: "Falsch. Die richtige Antwort ist: {{correctAnswer}}.",
     feedbackIncomplete: "Nicht vollständig oder zu komplex",
   },
 }
@@ -156,11 +152,7 @@ function getCRTFeedbackFunction(
 
     return {
       correct: isCorrect,
-      feedbackText: isCorrect
-        ? t(translations, lang, "feedbackCorrect")
-        : t(translations, lang, "feedbackIncorrect", {
-            correctAnswer: `${crtValue} (mod ${commonModulus})`,
-          }),
+      correctAnswer: isCorrect ? "" : `$x \\equiv ${crtValue} \\pmod{ ${commonModulus} }$`
     }
   }
 }

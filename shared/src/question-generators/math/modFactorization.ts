@@ -14,14 +14,12 @@ const translations: Translations = {
     name: "Modular Arithmetic with Factorization",
     description: "Answer modular arithmetic questions with large numbers using factorization.",
     factorLargeNumberQuestion: "Find $x \\equiv {{x}} \\pmod{{{n}}}$ using the factors of $x$.",
-    factorMultiplicationQuestion: "Simplify ${{a}} \\times {{b}} \\pmod{{{n}}}$ using factorization.",
+    factorMultiplicationQuestion: "Simplify ${{a}} \\cdot {{b}} \\pmod{{{n}}}$ using factorization.",
     factorLargeExponentQuestion:
       "Simplify ${{base}}^{{{exp}}} \\pmod{{{n}}}$ by breaking the exponent into factors.",
     bottomText: "Give $x$ such that $0\\leq x < {{n}}$ and $x\\in\\mathbb{N}$.",
     feedbackInvalid: "Your answer is not valid.",
-    feedbackCorrect: "Correct!",
-    feedbackIncorrect:
-      "Incorrect. The correct answer is: ${{correctAnswer}}$. Possible Simplification: ${{calculation}}$.",
+    via: "Simplification:",
   },
   de: {
     name: "Modulare Arithmetik mit Faktorisierung",
@@ -30,14 +28,12 @@ const translations: Translations = {
     factorLargeNumberQuestion:
       "Finde $x \\equiv {{x}} \\pmod{{{n}}}$ indem du die Faktoren von $x$ verwendest.",
     factorMultiplicationQuestion:
-      "Vereinfache ${{a}} \\times {{b}} \\pmod{{{n}}}$ durch Faktorisierung.",
+      "Vereinfache ${{a}} \\cdot {{b}} \\pmod{{{n}}}$ durch Faktorisierung.",
     factorLargeExponentQuestion:
       "Vereinfache ${{base}}^{{{exp}}} \\pmod{{{n}}}$ durch Faktorisierung des Exponenten.",
     bottomText: "Gib $x$ so an, dass $0 \\leq x < {{n}}$ und $x \\in \\mathbb{N}$.",
     feedbackInvalid: "Deine Antwort ist ungültig.",
-    feedbackCorrect: "Richtig!",
-    feedbackIncorrect:
-      "Falsch. Die richtige Antwort ist: ${{correctAnswer}}$. Mögliche Vereinfachung: ${{calculation}}$.",
+    via: "Vereinfachung:",
   },
 }
 
@@ -87,7 +83,7 @@ function generateFactorLargeNumberQuestion(lang: Language, path: string, random:
   const factors = generateFactors(random, 2, 3, 10, 50)
   const x = factors.reduce((acc, factor) => acc * factor, 1)
   const calculation =
-    factors.map((factor) => `(${factor} \\pmod{${n}})`).join(" \\times ") + ` \\equiv ${x % n}`
+    factors.map((factor) => `(${factor} \\pmod{${n}})`).join(" \\cdot ") + ` \\equiv ${x % n}`
 
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
@@ -166,7 +162,7 @@ function generateFactorLargeExponentQuestion(lang: Language, path: string, rando
   const exp = factors.reduce((acc, factor) => acc * factor, 1)
   const result = ((modularExponentiation(base, exp, n) % n) + n) % n
   const calculation =
-    factors.map((factor) => `(${base}^${factor} \\pmod{${n}})`).join(" \\times ") + ` \\equiv ${result}`
+    factors.map((factor) => `(${base}^${factor} \\pmod{${n}})`).join(" \\cdot ") + ` \\equiv ${result}`
 
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
@@ -202,16 +198,13 @@ function generateModularFeedback(
     const normalizedCorrectAnswer = ((value % modulus) + modulus) % modulus
     const normalizedUserAnswer = ((userAnswer % modulus) + modulus) % modulus
 
-    if (normalizedUserAnswer === normalizedCorrectAnswer) {
-      return { correct: true, feedbackText: t(translations, lang, "feedbackCorrect") }
-    } else {
-      return {
-        correct: false,
-        feedbackText: t(translations, lang, "feedbackIncorrect", {
-          correctAnswer: normalizedCorrectAnswer.toString(),
-          calculation: calculation,
-        }),
-      }
+    const isCorrect = normalizedUserAnswer === normalizedCorrectAnswer
+
+    return {
+      correct: isCorrect,
+      correctAnswer: isCorrect
+        ? ""
+        : `$x \\equiv ${normalizedCorrectAnswer}\\pmod{ ${modulus} }$ ${calculation ? `(${t(translations, lang, "via")} $ ${calculation} $)` : ""}`
     }
   }
 }
