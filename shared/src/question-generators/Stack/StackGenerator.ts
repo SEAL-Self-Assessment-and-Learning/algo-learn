@@ -1,10 +1,10 @@
-import { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
-import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { generateVariantSequenceLetter } from "@shared/question-generators/Stack/utilsSequenceLetter.ts"
-import { generateVariantSequenceStack } from "@shared/question-generators/Stack/utilsSequenceStack.ts"
-import { generateVariantStart } from "@shared/question-generators/Stack/utilsStart.ts"
-import Random from "@shared/utils/random.ts"
-import { tFunctional, Translations } from "@shared/utils/translations.ts"
+import { QuestionGenerator } from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { generateVariantSequenceLetter } from "@shared/question-generators/Stack/utilsSequenceLetter"
+import { generateVariantSequenceStack } from "@shared/question-generators/Stack/utilsSequenceStack"
+import { generateVariantStart } from "@shared/question-generators/Stack/utilsStart"
+import Random from "@shared/utils/random"
+import { tFunctional, Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {

@@ -1,12 +1,12 @@
-import { MultiFreeTextFeedbackFunction, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
-import { Stack } from "@shared/question-generators/Stack/Stack.ts"
-import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
+import { MultiFreeTextFeedbackFunction, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator"
+import { Stack } from "@shared/question-generators/Stack/Stack"
+import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator"
 import {
   createArrayDisplayCodeBlock,
   createArrayDisplayCodeBlockUserInput,
-} from "@shared/utils/arrayDisplayCodeBlock.ts"
-import Random from "@shared/utils/random.ts"
-import { t, Translations } from "@shared/utils/translations.ts"
+} from "@shared/utils/arrayDisplayCodeBlock"
+import Random from "@shared/utils/random"
+import { t, Translations } from "@shared/utils/translations"
 
 /**
  * Generates a new Stack question for the seqStack variant
@@ -25,8 +25,7 @@ export function generateVariantSequenceStack(
   permalink: string,
   translations: Translations,
 ) {
-  const { operations, s: stack } = generateOperationsVariantSequenceStack(random)
-
+  const { operations, stack } = generateOperationsVariantSequenceStack(random)
   const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
     numberOfInputFields: stack.getSize(),
   })
@@ -34,8 +33,7 @@ export function generateVariantSequenceStack(
   const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
     // input-x is the form for the input fields
     for (let i = 0; i < stack.getSize(); i++) {
-      const value = stack.getStackAsString()[i]
-      if (text[`input-${i}`] !== value) {
+      if (text[`input-${i}`] !== stack.getStackAsString()[i]) {
         return {
           correct: false,
           correctAnswer: createArrayDisplayCodeBlock({
@@ -66,24 +64,24 @@ export function generateVariantSequenceStack(
  */
 function generateOperationsVariantSequenceStack(random: Random) {
   const amountOfOperations = random.int(6, 9)
-  const s = new Stack<number>()
+  const stack = new Stack<number>()
   const operations = []
 
   for (let i = 0; i < amountOfOperations; i++) {
     let operation = random.weightedChoice(["push", "pop"], [0.7, 0.3])
-    if (s.isEmpty() || s.getSize() === 1) operation = "push"
-    if (s.getSize() >= 7) operation = "pop"
+    if (stack.isEmpty() || stack.getSize() === 1) operation = "push"
+    if (stack.getSize() >= 7) operation = "pop"
     if (operation === "push") {
       const value = random.int(1, 30)
-      s.push(value)
+      stack.push(value)
       operations.push("`Push(" + value + ")`")
     } else {
-      s.getTop()
+      stack.getTop()
       operations.push("`Pop()`")
     }
   }
   return {
     operations,
-    s,
+    stack,
   }
 }

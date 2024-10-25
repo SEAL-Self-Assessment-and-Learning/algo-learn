@@ -39,6 +39,9 @@ export class Stack<T> {
     return this.stack.length === 0
   }
 
+  /**
+   * Returns all stack elements as strings
+   */
   getStackAsString(): string[] {
     return this.stack.map((element) => String(element))
   }

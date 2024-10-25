@@ -2,17 +2,17 @@ import {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
-} from "@shared/api/QuestionGenerator.ts"
-import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils.ts"
-import { Stack } from "@shared/question-generators/Stack/Stack.ts"
-import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
-import Random from "@shared/utils/random.ts"
-import { t, Translations } from "@shared/utils/translations.ts"
+} from "@shared/api/QuestionGenerator"
+import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils"
+import { Stack } from "@shared/question-generators/Stack/Stack"
+import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator"
+import Random from "@shared/utils/random"
+import { t, Translations } from "@shared/utils/translations"
 
 /**
  * Generates a new Stack question for the seqLetter variant
  *
- * Generates a sequence of letter and star (vja* ad*a s...) (letter means push and * means pop)
+ * Generates a sequence of letters and stars (vja* ad*a s...) (letter means push and * means pop)
  * Asks the user to enter the sequence of letters that are popped from the stack
  *
  * @param lang
@@ -84,28 +84,25 @@ function generateOperationsVariantSequenceLetter(random: Random) {
   let lastOperation = "push"
 
   while (seenAmountPopOperations < amountPopOperations) {
-    let nextOperation: string
-
+    let currentOperation: string
     if (lastOperation === "pop") {
       // increases the chance of multiple pop operations in a row
-      nextOperation = random.weightedChoice(["push", "pop"], [0.4, 0.6])
+      currentOperation = random.weightedChoice(["push", "pop"], [0.4, 0.6])
     } else {
-      nextOperation = random.weightedChoice(["push", "pop"], [0.65, 0.35])
+      currentOperation = random.weightedChoice(["push", "pop"], [0.65, 0.35])
     }
+    if (s.isEmpty()) currentOperation = "push"
 
-    if (s.isEmpty()) nextOperation = "push"
-
-    if (nextOperation === "push") {
+    if (currentOperation === "push") {
       const value = random.choice(Array.from(possibleChars))
       sequence += value
-      s.push(value.toString())
-      lastOperation = "push"
+      s.push(value)
     } else {
       popSequence += s.getTop()
       sequence += "*"
       seenAmountPopOperations++
-      lastOperation = "pop"
     }
+    lastOperation = currentOperation
   }
   return {
     sequence,
