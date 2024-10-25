@@ -80,21 +80,29 @@ export function areCoprime(a: number, b: number): boolean {
 }
 
 /**
- * Generates a set of random factors within the specified range.
+ * Generates a set of random factors within a specified range.
  *
  * @param random An instance of the Random class to generate random numbers.
- * @param minFactors Minimum number of factors to generate.
- * @param maxFactors Maximum number of factors to generate.
- * @param minValue Minimum value of each factor.
- * @param maxValue Maximum value of each factor.
- * @returns An array of random factors.
+ * @param options An optional configuration object.
+ * @param options.minFactors Minimum number of factors to generate.
+ * @default 2
+ * @param options.maxFactors Maximum number of factors to generate.
+ * @default 3
+ * @param options.minValue Minimum value of each factor.
+ * @default 2
+ * @param options.maxValue Maximum value of each factor.
+ * @default 10
+ *
+ * @returns An array of random factors within the specified range.
  */
 export function generateFactors(
   random: Random,
-  minFactors: number = 2,
-  maxFactors: number = 3,
-  minValue: number = 2,
-  maxValue: number = 10,
+  { 
+    minFactors = 2, 
+    maxFactors = 3, 
+    minValue = 2, 
+    maxValue = 10 
+  }: GenerateFactorsOptions = {},
 ): number[] {
   const numFactors = random.int(minFactors, maxFactors)
   const factors: number[] = []
@@ -104,4 +112,11 @@ export function generateFactors(
   }
 
   return factors
+}
+
+interface GenerateFactorsOptions {
+  minFactors?: number
+  maxFactors?: number
+  minValue?: number
+  maxValue?: number
 }

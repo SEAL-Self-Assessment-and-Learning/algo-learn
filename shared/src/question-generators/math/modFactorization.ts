@@ -79,7 +79,7 @@ export const modFactor: QuestionGenerator = {
 // Large number
 function generateFactorLargeNumberQuestion(lang: Language, path: string, random: Random) {
   const n = random.int(2, 20)
-  const factors = generateFactors(random, 2, 3, 10, 50)
+  const factors = generateFactors(random, { minValue: 10, maxValue: 50 })
   const x = factors.reduce((acc, factor) => acc * factor, 1)
   const calculation =
     factors.map((factor) => `(${factor} \\pmod{${n}})`).join(" \\cdot ") + ` \\equiv ${x % n}`
@@ -112,8 +112,8 @@ function generateFactorMultiplicationQuestion(lang: Language, path: string, rand
   let allowOneAsFactor = false
 
   do {
-    factorsA = generateFactors(random, 2, 3, allowOneAsFactor ? 1 : 2, 50)
-    factorsB = generateFactors(random, 2, 3, allowOneAsFactor ? 1 : 2, 50)
+    factorsA = generateFactors(random, { minValue: allowOneAsFactor ? 1 : 2, maxValue: 50 })
+    factorsB = generateFactors(random, { minValue: allowOneAsFactor ? 1 : 2, maxValue: 50 })
     a = factorsA.reduce((acc, factor) => acc * factor, 1)
     b = factorsB.reduce((acc, factor) => acc * factor, 1)
     attempts++
