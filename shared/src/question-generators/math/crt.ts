@@ -152,7 +152,7 @@ function getCRTFeedbackFunction(
 
     return {
       correct: isCorrect,
-      correctAnswer: isCorrect ? "" : `$x \\equiv ${crtValue} \\pmod{ ${commonModulus} }$`
+      correctAnswer: isCorrect ? "" : `$x \\equiv ${crtValue} \\pmod{ ${commonModulus} }$`,
     }
   }
 }

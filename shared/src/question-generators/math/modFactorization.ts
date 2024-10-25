@@ -27,8 +27,7 @@ const translations: Translations = {
       "Beantworte Fragen zur modularen Arithmetik mit großen Zahlen mit Hilfe von Faktorisierung.",
     factorLargeNumberQuestion:
       "Finde $x \\equiv {{x}} \\pmod{{{n}}}$ indem du die Faktoren von $x$ verwendest.",
-    factorMultiplicationQuestion:
-      "Vereinfache ${{a}} \\cdot {{b}} \\pmod{{{n}}}$ durch Faktorisierung.",
+    factorMultiplicationQuestion: "Vereinfache ${{a}} \\cdot {{b}} \\pmod{{{n}}}$ durch Faktorisierung.",
     factorLargeExponentQuestion:
       "Vereinfache ${{base}}^{{{exp}}} \\pmod{{{n}}}$ durch Faktorisierung des Exponenten.",
     bottomText: "Gib $x$ so an, dass $0 \\leq x < {{n}}$ und $x \\in \\mathbb{N}$.",
@@ -124,7 +123,8 @@ function generateFactorMultiplicationQuestion(lang: Language, path: string, rand
     }
   } while ((a * b) % n !== result && attempts < maxAttempts + 1000)
   if ((a * b) % n !== result) {
-    throw new Error(`Timeout at factor generation after ${maxAttempts + 1000} attempts`)
+    factorsA = [1]
+    factorsB = [result]
   }
 
   const calculationA = factorsA
@@ -204,7 +204,7 @@ function generateModularFeedback(
       correct: isCorrect,
       correctAnswer: isCorrect
         ? ""
-        : `$x \\equiv ${normalizedCorrectAnswer}\\pmod{ ${modulus} }$ ${calculation ? `(${t(translations, lang, "via")} $ ${calculation} $)` : ""}`
+        : `$x \\equiv ${normalizedCorrectAnswer}\\pmod{ ${modulus} }$ ${calculation ? `(${t(translations, lang, "via")} $ ${calculation} $)` : ""}`,
     }
   }
 }

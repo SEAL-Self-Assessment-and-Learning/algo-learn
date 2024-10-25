@@ -118,12 +118,12 @@ export const ModTricks: QuestionGenerator = {
 
 // Simple
 function generateSimpleQuestion(lang: Language, path: string, random: Random) {
-  let a, b;
+  let a, b
   // solutions should not be the same as the question
   do {
-    a = random.int(2, 30);
-    b = random.int(2, a - 1);
-  } while (a % b === a);
+    a = random.int(2, 30)
+    b = random.int(2, a - 1)
+  } while (a % b === a)
 
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
@@ -234,7 +234,7 @@ function generateModularFeedback(
   userAnswerText: string,
   correctValue: number,
   modulus: number,
-  extraFeedback: string = ""
+  extraFeedback: string = "",
 ): FreeTextFeedback {
   const userAnswer = parseFloat(userAnswerText.trim())
 
@@ -249,18 +249,12 @@ function generateModularFeedback(
 
   return {
     correct: isCorrect,
-    correctAnswer: isCorrect
-      ? ""
-      : `$${normalizedCorrectAnswer}$ ${extraFeedback}`,
+    correctAnswer: isCorrect ? "" : `$${normalizedCorrectAnswer}$ ${extraFeedback}`,
   }
 }
 
 // Simple Feedback
-function getSimpleFeedbackFunction(
-  lang: Language,
-   a: number,
-   b: number
-): FreeTextFeedbackFunction {
+function getSimpleFeedbackFunction(lang: Language, a: number, b: number): FreeTextFeedbackFunction {
   return ({ text }) => generateModularFeedback(lang, text, a, b)
 }
 
@@ -268,7 +262,7 @@ function getSimpleFeedbackFunction(
 function getInverseFeedbackFunction(
   lang: Language,
   correctValue: number,
-  modulus: number
+  modulus: number,
 ): FreeTextFeedbackFunction {
   return ({ text }) => generateModularFeedback(lang, text, correctValue, modulus)
 }
@@ -277,7 +271,7 @@ function getInverseFeedbackFunction(
 function getExponentiationFeedbackFunction(
   lang: Language,
   correctValue: number,
-  modulus: number
+  modulus: number,
 ): FreeTextFeedbackFunction {
   return ({ text }) => generateModularFeedback(lang, text, correctValue, modulus)
 }
@@ -288,7 +282,7 @@ function getSuccessiveSquaringFeedback(
   base: number,
   exponent: number,
   modulus: number,
-  correctValue: number
+  correctValue: number,
 ): FreeTextFeedbackFunction {
   return ({ text }) => {
     const calculation = generateCalc(base, exponent, modulus)
@@ -322,7 +316,7 @@ function getFermatFeedbackFunction(
   correctValue: number,
   modulus: number,
   reducedExponent: number,
-  originalExponent: number
+  originalExponent: number,
 ): FreeTextFeedbackFunction {
   const extraFeedback = ` ( ${t(translations, lang, "via")} $${originalExponent} \\equiv ${reducedExponent} \\pmod{${modulus - 1}}$ )`
   return ({ text }) => generateModularFeedback(lang, text, correctValue, modulus, extraFeedback)
