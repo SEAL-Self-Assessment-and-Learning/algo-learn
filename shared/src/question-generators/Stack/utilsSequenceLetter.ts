@@ -10,9 +10,9 @@ import Random from "@shared/utils/random.ts"
 import { t, Translations } from "@shared/utils/translations.ts"
 
 /**
- * Generates a new Stack question for the sequence2 variant
+ * Generates a new Stack question for the seqLetter variant
  *
- * Generates a sequence of letter and star (vja*ad*as...) (letter means push and * means pop)
+ * Generates a sequence of letter and star (vja* ad*a s...) (letter means push and * means pop)
  * Asks the user to enter the sequence of letters that are popped from the stack
  *
  * @param lang
@@ -20,13 +20,13 @@ import { t, Translations } from "@shared/utils/translations.ts"
  * @param permalink
  * @param translations
  */
-export function generateVariantSequence2(
+export function generateVariantSequenceLetter(
   lang: "de" | "en",
   random: Random,
   permalink: string,
   translations: Translations,
 ) {
-  const { sequence, popSequence } = generateOperationsVariantSequence2(random)
+  const { sequence, popSequence } = generateOperationsVariantSequenceLetter(random)
 
   const checkFormat: FreeTextFormatFunction = ({ text }) => {
     // check if the user input only consists of letters
@@ -34,7 +34,7 @@ export function generateVariantSequence2(
     if (!/^[A-Z]*$/.test(text.toUpperCase())) {
       return {
         valid: false,
-        message: t(translations, lang, "checkFormatSeq2"),
+        message: t(translations, lang, "checkFormatSeqLetter"),
       }
     }
     return {
@@ -60,7 +60,7 @@ export function generateVariantSequence2(
     type: "FreeTextQuestion",
     name: stackQuestion.name(lang),
     path: permalink,
-    text: t(translations, lang, "sequence2Text", [insertSpaceAfterEveryXChars(sequence, 3)]),
+    text: t(translations, lang, "sequenceLetterText", [insertSpaceAfterEveryXChars(sequence, 3)]),
     checkFormat,
     feedback,
   }
@@ -72,7 +72,7 @@ export function generateVariantSequence2(
  *
  * @param random
  */
-function generateOperationsVariantSequence2(random: Random) {
+function generateOperationsVariantSequenceLetter(random: Random) {
   const s = new Stack<string>()
   const possibleChars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 

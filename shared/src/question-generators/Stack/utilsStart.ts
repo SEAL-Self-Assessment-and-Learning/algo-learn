@@ -145,8 +145,6 @@ export function generateVariantStart(
   translations: Translations,
   wordTranslations: Translations,
 ) {
-  // TODO: same checkFormat as in QueueGenerator, future extract those into seperate file
-  //       structure is inside QuickFind PR
   const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
     // check if the text provided is for the toString question
     if (fieldID.includes("empty")) {

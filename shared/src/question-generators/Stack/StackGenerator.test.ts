@@ -17,7 +17,7 @@ describe("StackQueueGenerator - Correctness", () => {
       const { question: q, testing: t } = stackQuestion.generate(
         "en", // language not relevant
         {
-          variant: "input",
+          variant: "start",
         },
         sampleRandomSeed(),
       ) as TestingObjectFreetext
@@ -30,7 +30,7 @@ describe("StackQueueGenerator - Correctness", () => {
       const { question: q, testing: t } = queueQuestion.generate(
         "en", // language not relevant
         {
-          variant: "input",
+          variant: "start",
         },
         sampleRandomSeed(),
       ) as TestingObjectFreetext
@@ -49,14 +49,14 @@ describe("StackQueueGenerator - Reproducible", () => {
       const { question: q1, testing: t1 } = stackQuestion.generate(
         "en", // language not relevant
         {
-          variant: "input",
+          variant: "start",
         },
         seed,
       ) as TestingObjectFreetext
       const { question: q2, testing: t2 } = stackQuestion.generate(
         "de", // language not relevant
         {
-          variant: "input",
+          variant: "start",
         },
         seed,
       ) as TestingObjectFreetext
@@ -73,14 +73,14 @@ describe("StackQueueGenerator - Reproducible", () => {
       const { question: q1, testing: t1 } = queueQuestion.generate(
         "en", // language not relevant
         {
-          variant: "input",
+          variant: "start",
         },
         seed,
       ) as TestingObjectFreetext
       const { question: q2, testing: t2 } = queueQuestion.generate(
         "de", // language not relevant
         {
-          variant: "input",
+          variant: "start",
         },
         seed,
       ) as TestingObjectFreetext
