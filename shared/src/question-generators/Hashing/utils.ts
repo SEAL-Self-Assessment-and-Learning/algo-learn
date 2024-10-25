@@ -1,20 +1,20 @@
 import {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextFormatFunction,
-} from "@shared/api/QuestionGenerator.ts"
-import { generateHashFunction } from "@shared/question-generators/Hashing/Functions.ts"
-import { MapLinked } from "@shared/question-generators/Hashing/MapLinked.ts"
+} from "@shared/api/QuestionGenerator"
+import { generateHashFunction } from "@shared/question-generators/Hashing/Functions"
+import { MapLinked } from "@shared/question-generators/Hashing/MapLinked"
 import {
   DoubleHashFunction,
   HashFunction,
   MapLinProbing,
-} from "@shared/question-generators/Hashing/MapLinProbing.ts"
+} from "@shared/question-generators/Hashing/MapLinProbing"
 import {
   createArrayDisplayCodeBlock,
   createArrayDisplayCodeBlockUserInput,
-} from "@shared/utils/arrayDisplayCodeBlock.ts"
-import Random from "@shared/utils/random.ts"
-import { t, Translations } from "@shared/utils/translations.ts"
+} from "@shared/utils/arrayDisplayCodeBlock"
+import Random from "@shared/utils/random"
+import { t, Translations } from "@shared/utils/translations"
 
 /**
  * This function creates the view to create a better readable solution for the user
@@ -35,7 +35,7 @@ function createSolutionViewLinkedHashing(
     } else {
       let valueString = "$"
       for (let j = 0; j < keyList[i].length; j++) {
-        valueString += keyList[i][j] + "\\rightarrow"
+        valueString += keyList[i][j] + "\\rightarrow" // -> not =>
       }
       valueString = valueString.slice(0, -11) + "$"
       tableString += `|${i}|${valueString}|\n`
@@ -51,7 +51,7 @@ function createSolutionViewLinkedHashing(
  * @param tableSize - size of the HashMap
  * @param task - "insert" or "insert-delete" (first inserts, then deletes)
  * @param mapStyle - "linked" or "linear"
- * @param hashFunction -one of the hash functions from Functions.ts
+ * @param hashFunction - one of the hash functions from Functions.ts
  */
 export function generateOperationsHashMap({
   random,
@@ -76,16 +76,13 @@ export function generateOperationsHashMap({
       throw new Error("Provided function is not a valid HashFunction")
     }
   }
+
   const insertions: number[] = []
   const possibleValues = Array.from({ length: 25 }, (_, i) => i + 1)
   for (let i = 0; i < tableSize - random.int(0, 2); i++) {
-    if (hashMap.getAmount === hashMap.getSize) {
-      break
-    }
-
     const newValue = random.choice(possibleValues)
     possibleValues.splice(possibleValues.indexOf(newValue), 1)
-    hashMap.insert(newValue, newValue.toString())
+    hashMap.insert(newValue)
     insertions.push(newValue)
   }
   const deletions: number[] = []
@@ -105,7 +102,7 @@ export function generateOperationsHashMap({
 }
 
 /**
- * Checks if the given function is a valid HashFunction
+ * Checks if the given function is a valid HashFunction (doubleHashing not allowed)
  * @param functionToCheck
  */
 function isHashFunction(
@@ -129,8 +126,6 @@ export function generateQuestionBase(
   lang: "de" | "en",
 ) {
   const tableSize = random.choice([7, 11]) // has to be prime
-  // insert -> only inserting into hash table
-  // insert-delete -> inserting and deleting from hash table
   const task: "insert" | "insert-delete" = random.weightedChoice([
     ["insert", 0.85],
     ["insert-delete", 0.15],
@@ -144,15 +139,14 @@ export function generateQuestionBase(
     mapStyle: variant,
     hashFunction: randomHashFunction.hashFunction,
   })
-
   const hashMap = generated.hashMap
   const insertions = generated.insertions
   const deletions = generated.deletions
 
   const insertValuesString = t(translations, lang, "insert", [insertions.toString()])
-
   const deleteValuesString =
     deletions.length > 0 ? t(translations, lang, "delete", [deletions.toString()]) : ""
+
   return {
     tableSize,
     randomHashFunction,
@@ -283,7 +277,7 @@ export function generateQuestionLinearDoubleProbing(
   const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
     // input-x are the keys in text
     const solutionMap = (hashMap as MapLinProbing).keysList()
-    const falseReturn = {
+    const wrongAnswerFeedback = {
       correct: false,
       correctAnswer: createArrayDisplayCodeBlock({
         array: solutionMap.map((x) => (x === null ? " " : x)),
@@ -292,10 +286,10 @@ export function generateQuestionLinearDoubleProbing(
     for (let i = 0; i < solutionMap.length; i++) {
       if (solutionMap[i] === null) {
         if (text["input-" + i].trim() !== "") {
-          return falseReturn
+          return wrongAnswerFeedback
         }
       } else if (solutionMap[i]!.toString() !== text["input-" + i].trim()) {
-        return falseReturn
+        return wrongAnswerFeedback
       }
     }
     return {

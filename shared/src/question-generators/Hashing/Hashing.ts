@@ -10,7 +10,7 @@ import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
 const translations: Translations = {
   en: {
     name: "Hashing",
-    description: "Correctly insert value into a hash map",
+    description: "Correctly insert values into a hash map",
     linearProbing: "Linear Probing",
     linkedList: "Linked List",
     doubleHashing: "Double Hashing",
@@ -23,13 +23,11 @@ const translations: Translations = {
 {{5}} 
     Enter the final state of the hash table.
 {{6}}`,
-    bottomTextLinear: `Please enter the state of the map after the operations in the format of an Array. You can keep free entries empty or just spaces.`,
-    checkFormatLinear: "Please Provide an array only with numbers, commas and spaces",
-    checkFormat: "Please enter a list of numbers",
+    checkFormat: "Please enter a list of number seperated by '-' or '->'",
   },
   de: {
     name: "Hashing",
-    description: "Füge den Wert korrekt in eine Hash-Map ein",
+    description: "Füge Werte korrekt in eine Hash-Map ein",
     linearProbing: "Linearem Sondieren",
     linkedList: "Verketteter Liste",
     doubleHashing: "Doppeltem Hashing",
@@ -42,9 +40,7 @@ const translations: Translations = {
 {{5}}
     Gib den finalen Zustand der Hashtabelle ein.
 {{6}}`,
-    bottomTextLinear: `Bitte geben Sie den Zustand der Karte nach den Operationen im Format eines Arrays ein. Sie können freie Einträge leer lassen oder einfach Leerzeichen verwenden.`,
-    checkFormatLinear: "Bitte geben Sie nur ein Array mit Zahlen, Kommas und Leerzeichen an",
-    checkFormat: "Bitte gib eine Liste von Zahlen ein",
+    checkFormat: "Bitte gib eine Liste von Zahlen ein, die durch '-' oder '->' getrennt sind",
   },
 }
 
@@ -98,7 +94,6 @@ export const hashingGenerator: QuestionGenerator = {
             inputTableString,
           ]),
           fillOutAll: false,
-          bottomText: t(translations, lang, "bottomTextLinear"),
           checkFormat,
           feedback,
         },

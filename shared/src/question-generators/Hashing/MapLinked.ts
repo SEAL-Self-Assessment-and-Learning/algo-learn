@@ -1,4 +1,4 @@
-import { HashFunction } from "@shared/question-generators/Hashing/MapLinProbing.ts"
+import { HashFunction } from "@shared/question-generators/Hashing/MapLinProbing"
 
 /**
  * This is a hash map implementation using linked list to handle collisions
@@ -19,17 +19,15 @@ export class MapLinked {
   }
 
   /**
-   * Inserts a new key-value pair into the map or updates the value if the key already exists
+   * Inserts a new key into the map
    * @param key
-   * @param value
    */
-  insert(key: number, value: string) {
+  insert(key: number) {
     const hashKey = this.hashFunction(key, this.size)
     if (this.has(key)) {
-      this.change(key, value)
       return
     }
-    const newNode: ListNode = { key: key, value: value, next: null, prev: null }
+    const newNode: ListNode = { key: key, next: null, prev: null }
     // insert the new node at the beginning
     newNode.next = this.map[hashKey]
     this.map[hashKey] = newNode
@@ -41,27 +39,7 @@ export class MapLinked {
   }
 
   /**
-   * Changes the value of a key
-   * @param key
-   * @param value
-   *
-   * @throws Error if the key is not found
-   */
-  change(key: number, value: string) {
-    const hashKey = this.hashFunction(key, this.size)
-    let node = this.map[hashKey]
-    while (node) {
-      if (node.key === key) {
-        node.value = value
-        return
-      }
-      node = node.next
-    }
-    throw new Error(`Key ${key} not found. Cannot change value`)
-  }
-
-  /**
-   * Deletes a key-value pair from the map
+   * Deletes a key from the map
    * @param key
    */
   delete(key: number) {
@@ -96,37 +74,22 @@ export class MapLinked {
    * @param key
    */
   has(key: number): boolean {
-    return this.get(key) !== null
-  }
-
-  /**
-   * Returns the value of a key or null if the key is not in the map
-   * @param key
-   */
-  get(key: number): string | null {
     const hashKey = this.hashFunction(key, this.size)
     let node = this.map[hashKey]
     while (node) {
       if (node.key === key) {
-        return node.value
+        return true
       }
       node = node.next
     }
-    return null
+    return false
   }
 
   /**
    * Returns an array of all the keys in the map
    */
   keys(): number[] {
-    const keys: number[] = []
-    this.map.forEach((node) => {
-      while (node) {
-        keys.push(node.key)
-        node = node.next
-      }
-    })
-    return keys
+    return this.keysList().flat()
   }
 
   /**
@@ -148,35 +111,7 @@ export class MapLinked {
   }
 
   /**
-   * Returns an array of all the values in the map
-   */
-  values(): string[] {
-    const values: string[] = []
-    this.map.forEach((node) => {
-      while (node) {
-        values.push(node.value)
-        node = node.next
-      }
-    })
-    return values
-  }
-
-  /**
-   * Returns an array of all the key-value pairs in the map
-   */
-  entries(): [number, string][] {
-    const entries: [number, string][] = []
-    this.map.forEach((node) => {
-      while (node) {
-        entries.push([node.key, node.value])
-        node = node.next
-      }
-    })
-    return entries
-  }
-
-  /**
-   * Returns if the map is empty
+   * Returns true if the map is empty
    */
   isEmpty(): boolean {
     return this.getAmount() === 0
@@ -215,16 +150,16 @@ export class MapLinked {
    * Returns a string representation of the map
    *
    * Example:
-   * 0: (1, "a") -> (11, "b") -> (21, "c")
+   * 0: 1 -> 11 -> 21
    * 1:
-   * 2: (3, "g") -> (13, "h")
+   * 2: 3 -> 13
    */
   toString() {
     return this.map
       .map((node, index) => {
         let str = `${index}: `
         while (node) {
-          str += `(${node.key}, ${node.value}) ${node.next ? "->" : ""} `
+          str += `${node.key} ${node.next ? "->" : ""} `
           node = node.next
         }
         return str
@@ -236,7 +171,6 @@ export class MapLinked {
 
 type ListNode = {
   key: number
-  value: string
   next: ListNode | null
   prev: ListNode | null
 }
