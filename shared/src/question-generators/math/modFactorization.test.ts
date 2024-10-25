@@ -119,7 +119,7 @@ describe("modFactor - Multiple Random Generations", () => {
         // Range checks per variant
         if (name === "large_number") {
           expect(testing.x).toBeGreaterThan(10)
-          expect(testing.x).toBeLessThanOrEqual(125000) // adjust based on factor size
+          expect(testing.x).toBeLessThanOrEqual(125000)
           expect(testing.n).toBeGreaterThanOrEqual(2)
           expect(testing.n).toBeLessThanOrEqual(20)
         } else if (name === "multiplication") {

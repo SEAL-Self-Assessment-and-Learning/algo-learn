@@ -134,8 +134,7 @@ function generateSimpleQuestion(lang: Language, path: string, random: Random) {
     feedback: getSimpleFeedbackFunction(lang, a, b),
   }
 
-  const testing = { a, b }
-  return { question, testing }
+  return { question, testing: { a, b } }
 }
 
 // Inverse
@@ -156,8 +155,7 @@ function generateInverseQuestion(lang: Language, path: string, random: Random) {
     feedback: getInverseFeedbackFunction(lang, inverse, n),
   }
 
-  const testing = { a, n, inverse }
-  return { question, testing }
+  return { question, testing: { a, n, inverse } }
 }
 
 // Exponentiation
@@ -176,8 +174,7 @@ function generateExponentiationQuestion(lang: Language, path: string, random: Ra
     feedback: getExponentiationFeedbackFunction(lang, result, n),
   }
 
-  const testing = { a, b, n, result }
-  return { question, testing }
+  return { question, testing: { a, b, n, result } }
 }
 
 // Successive Squaring

@@ -117,11 +117,9 @@ function getCRTCheckFormatFunction(lang: Language): FreeTextFormatFunction {
     // ensure format "$value (mod $modulus)" and inform user
     const pattern = /^(\d+)\s*\(\s*mod\s*(\d+)\s*\)$/i
     const match = text.trim().match(pattern)
-    if (!match) {
-      return { valid: false, message: t(translations, lang, "feedbackIncomplete") }
-    }
-
-    return { valid: true }
+    return match
+      ? { valid: true }
+      : { valid: false, message: t(translations, lang, "feedbackIncomplete") }
   }
 }
 

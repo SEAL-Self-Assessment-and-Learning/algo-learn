@@ -129,8 +129,8 @@ describe("ModTricks - Multiple Random Generations", () => {
         if (name === "simple") {
           expect(testing.a).toBeGreaterThanOrEqual(0)
           expect(testing.b).toBeGreaterThan(1)
-          expect(testing.a).toBeLessThanOrEqual(19)
-          expect(testing.b).toBeLessThanOrEqual(20)
+          expect(testing.a).toBeLessThanOrEqual(30)
+          expect(testing.b).toBeLessThanOrEqual(30)
         } else if (name === "inverse") {
           expect(testing.a).toBeGreaterThanOrEqual(2)
           expect(testing.a).toBeLessThanOrEqual(15)

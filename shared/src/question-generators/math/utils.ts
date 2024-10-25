@@ -97,12 +97,7 @@ export function areCoprime(a: number, b: number): boolean {
  */
 export function generateFactors(
   random: Random,
-  { 
-    minFactors = 2, 
-    maxFactors = 3, 
-    minValue = 2, 
-    maxValue = 10 
-  }: GenerateFactorsOptions = {},
+  { minFactors = 2, maxFactors = 3, minValue = 2, maxValue = 10 }: GenerateFactorsOptions = {},
 ): number[] {
   const numFactors = random.int(minFactors, maxFactors)
   const factors: number[] = []
