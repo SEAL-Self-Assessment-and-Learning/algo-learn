@@ -23,7 +23,7 @@ const Node = ({
   state: GraphElementStateType
   onClickCallback: () => void
 }) => {
-  const nodeStyle = `${state.selected ? "cg-4" : state.group !== null ? `cg-${state.group}` : "primary"}${clickable ? " cursor-pointer" : "group-hover:fill-accent"}`
+  const nodeStyle = `${state.selected ? "cg-4" : state.group !== null ? `cg-${state.group}` : "primary"} ${clickable ? "cursor-pointer" : "group-hover:fill-accent"}`
 
   return (
     <g
@@ -172,21 +172,21 @@ const Edge = ({
 
 /**
  * A component that returns an SVG element representing a graph.
- * @param width - The width of the svg.
- * @param height - The height of the svg.
+ * @param maxWidth - The maximum width of the svg.
+ * @param maxHeight - The maximum height of the svg.
  * @param graph - The graph to draw.
  */
 export function DrawGraph({
-  width,
-  height,
+  maxWidth,
+  maxHeight,
   graph,
 }: {
-  width: number
-  height: number
+  maxWidth: number
+  maxHeight: number
   graph: Graph
 }): ReactElement {
   const svgRef = useRef(null as SVGSVGElement | null)
-  const coordinateScale = 50
+  const coordinateScale = 60
   const nodeScale = 20
 
   const edgeListFlat = graph.edges
@@ -280,13 +280,33 @@ export function DrawGraph({
   })
 
   const dimensions = graph.getDimensions()
+  const margin = 0.7
+  const viewBox = {
+    x: (dimensions.minX - margin) * coordinateScale,
+    y: (dimensions.minY - margin) * coordinateScale,
+    width: (dimensions.width  + 2 * margin) * coordinateScale,
+    height: (dimensions.height + 2 * margin) * coordinateScale,
+  }
+
+  const minViewBox = {width: 100, height: 100}
+  if(viewBox.width < minViewBox.width) {
+    viewBox.x -= (minViewBox.width -viewBox.width) * 0.5
+    viewBox.width = minViewBox.width
+  }
+
+  if(viewBox.height < minViewBox.height) {
+    viewBox.y -= (minViewBox.height - viewBox.height) * 0.5
+    viewBox.height = minViewBox.height
+  }
+
+  const viewBoxAspectRatio = Math.min(maxHeight / maxWidth, viewBox.height / viewBox.width)
 
   return (
     <svg
       ref={svgRef}
-      width={width}
-      height={height}
-      viewBox={`${(dimensions.minX - dimensions.width * 0.2) * coordinateScale} ${(dimensions.minY - dimensions.height * 0.2) * coordinateScale} ${dimensions.width * 1.4 * coordinateScale} ${dimensions.height * 1.4 * coordinateScale}`}
+      width={maxWidth}
+      height={viewBox.height / viewBox.width > 1 && viewBox.height < 300 ? viewBox.height * 0.75 : (maxWidth * viewBoxAspectRatio)}
+      viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
       className="mx-auto h-auto max-w-full rounded-2xl bg-secondary"
       onMouseMove={(e) => {
         if (currentlyDragged === null || svgRef.current === null) return

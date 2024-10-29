@@ -107,7 +107,7 @@ export const MarkdownTreeNode: FunctionComponent<{
     if (parseTreeNode.language === "graph") {
       return (
         <div className="my-5">
-          <DrawGraph width={500} height={300} graph={Graph.parse(parseTreeNode.child)} />
+          <DrawGraph maxWidth={500} maxHeight={300} graph={Graph.parse(parseTreeNode.child)} />
         </div>
       )
     }

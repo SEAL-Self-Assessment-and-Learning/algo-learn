@@ -4,7 +4,7 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { RandomGraph } from "@shared/utils/graph"
+import {RandomGraph, RootedTree} from "@shared/utils/graph"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
 import Random from "../../utils/random"
 import { ExampleQuestion } from "../example/example"
@@ -60,20 +60,25 @@ export const BFS: QuestionGenerator = {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
 
-    const G = RandomGraph.grid(
-      random,
-      [4, 3],
-      0.8,
-      random.choice(["triangle", "square", "square-width-diagonals"]),
-      random.choice(["unique", "random", null]),
-      random.float(0, 1) < 0.5,
-      random.float(0, 1) < 0.5,
-    )
+    const T = RootedTree.random(2, 3, random)
 
-    G.nodeGroupMax = 8
-    G.nodeClickType = "group"
-    G.edgeGroupMax = 8
-    G.edgeClickType = "group"
+    const H = T.toGraph()
+
+
+    // const G = RandomGraph.grid(
+    //   random,
+    //   [4, 3],
+    //   0.8,
+    //   random.choice(["triangle", "square", "square-width-diagonals"]),
+    //   random.choice(["unique", "random", null]),
+    //   random.float(0, 1) < 0.5,
+    //   random.float(0, 1) < 0.5,
+    // )
+    //
+    // G.nodeGroupMax = 8
+    // G.nodeClickType = "group"
+    // G.edgeGroupMax = 8
+    // G.edgeClickType = "group"
 
     // generate the question values
     const a = random.choice(["G"])
@@ -98,7 +103,7 @@ export const BFS: QuestionGenerator = {
         parameters,
         seed,
       }),
-      text: t(translations, lang, "text", [`${a}`, G.toString(), `${b}`]),
+      text: t(translations, lang, "text", [`${a}`, H.toString(), `${b}`]),
       answers,
       feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
     }

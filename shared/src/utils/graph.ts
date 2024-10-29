@@ -210,7 +210,7 @@ export class Graph {
 }
 
 export class RandomGraph {
-  private static getLabel(i: number): string {
+  public static getLabel(i: number): string {
     let label: string = ""
     do {
       const a = i % 26
@@ -383,6 +383,269 @@ export class RandomGraph {
     return graph
   }
 
-  // public static tree(): Graph {}
+  // public static tree(depth: number, minDegree: number, maxDegree: number = minDegree): Graph {}
+
   // public static bipartite: Graph {}
+}
+
+export class RootedTree {
+  root: string
+  children: RootedTree[] // left to right
+  coordinates: { x: number; y: number; mod: number; index: number; parent: RootedTree | null } = {
+    x: 0,
+    y: 0,
+    mod: 0,
+    index: 0,
+    parent: null,
+  }
+
+  nodeDistX: number = 1
+  nodeDistY: number = 1.5
+  siblingDist: number = 0
+  treeDist: number = 0
+
+  private constructor(root: string, children: RootedTree[]) {
+    this.root = root
+    this.children = children
+  }
+
+  public getNumNodes(): number {
+    // if (this.children.length === 0) return 1
+
+    return this.children.reduce((acc: number, node: RootedTree) => acc + node.getNumNodes(), 1)
+  }
+
+  public static fromSyntaxTree(): RootedTree {
+    // TODO
+  }
+
+  public static random(
+    depth: number | { min: number; max: number },
+    degree:
+      | number
+      | {
+          min: number
+          max: number
+        },
+    random: Random,
+  ): RootedTree {
+    const tree = RootedTree.rnd(depth, degree, random)
+    const numNodes = tree.getNumNodes()
+    let labels = []
+    for (let i = 0; i < numNodes; i++) {
+      labels.push(RandomGraph.getLabel(i))
+    }
+    labels = random.shuffle(labels)
+
+    RootedTree.relable(tree, labels)
+    return tree
+  }
+
+  private static rnd(
+    depth: number | { min: number; max: number },
+    degree:
+      | number
+      | {
+          min: number
+          max: number
+        },
+    random: Random,
+  ): RootedTree {
+    // assert(typeof depth === "number" || depth.min < depth.max)
+
+    if (typeof depth !== "number" && depth.min === 0) depth = random.int(depth.min, depth.max)
+
+    if (depth === 0) return new RootedTree("", [])
+
+    const newDepth = typeof depth === "number" ? depth - 1 : { min: depth.min - 1, max: depth.max - 1 }
+    const children: RootedTree[] = []
+    const numChildren = typeof degree === "number" ? degree : random.int(degree.min, degree.max)
+    for (let i = 0; i < numChildren; i++) {
+      children.push(RootedTree.rnd(newDepth, degree, random))
+    }
+
+    return new RootedTree("", children) //{ root: "", children: children }
+  }
+
+  private static relable(tree: RootedTree, labels: string[]): void {
+    tree.root = labels.pop()
+
+    for (let i = 0; i < tree.children.length; i++) {
+      this.relable(tree.children[i], labels)
+    }
+  }
+
+  public toGraph(): Graph {
+    const nodes: NodeList = []
+    const edges: EdgeList = []
+
+    this.computeNodeCoordinates()
+    this.collectNodesAndEdges(nodes, edges)
+
+    return new Graph(nodes, edges, false, false)
+  }
+
+  private collectNodesAndEdges(nodes: NodeList, edges: EdgeList[], parentNodeId = null): void {
+    const currentNodeId = nodes.length
+    nodes.push({ label: this.root, coords: {x: this.coordinates.x, y: this.coordinates.y}})
+    edges.push([])
+
+    if (parentNodeId !== null) {
+      edges[parentNodeId].push({ source: parentNodeId, target: currentNodeId })
+    }
+
+    this.children.forEach((child) => {
+      child.collectNodesAndEdges(nodes, edges, currentNodeId)
+    })
+  }
+
+  /**
+   * Reingold-Tilford algorithm for laying out trees.
+   */
+  private computeNodeCoordinates() {
+    this.initCoordinateComputation()
+    this.computeInitialX()
+    this.computeFinalNodeCoordinates()
+  }
+
+  /**
+   * Initializes the coordinates object for each node. It links each node with its parent and tells it
+   * its index in the parents child array. The depth is already set to the correct value.
+   */
+  private initCoordinateComputation(
+    depth: number = 0,
+    index: number = 0,
+    parent: RootedTree | null = null,
+  ): void {
+    this.coordinates = { x: 0, y: depth, mod: 0, index: index, parent: parent }
+
+    this.children.forEach((child, i) => {
+      child.initCoordinateComputation(depth + 1, i, this)
+    })
+  }
+
+  /**
+   * Computes initial x values for each node.
+   */
+  private computeInitialX(): void {
+    this.children.forEach((child) => {
+      child.computeInitialX()
+    })
+
+    // if this node is a leaf
+    if (this.children.length === 0) {
+      if (this.coordinates.index > 0) {
+        // place the node just right of its left sibling
+        this.coordinates.x = this.getPreviousSiblingX() + this.nodeDistX + this.siblingDist
+      }
+      // else x = 0 (initialization value)
+    } else {
+      // place the node in the center over its children
+      const center =
+        (this.children[0].coordinates.x + this.children[this.children.length - 1].coordinates.x) * 0.5
+
+      if (this.coordinates.index === 0) {
+        this.coordinates.x = center
+      } else {
+        this.coordinates.x = this.getPreviousSiblingX() + this.nodeDistX + this.siblingDist
+        this.coordinates.mod = this.coordinates.x - center
+      }
+
+      if (this.coordinates.index > 0) this.checkForOverlappingSubtrees()
+    }
+  }
+
+  private checkForOverlappingSubtrees(): void {
+    const minDistance = this.treeDist + this.nodeDistX
+    let shiftValue = 0
+
+    const nodeContour = this.getLeftContour()
+
+    // iterate all siblings to the left
+    for (let i = 0; i < this.coordinates.index; i++) {
+      const sibling = this.coordinates.parent.children[i]
+      const siblingContour = sibling.getRightContour()
+      for (
+        let y = this.coordinates.y + 1;
+        y <= Math.min(Math.max(...Object.keys(nodeContour)), Math.max(...Object.keys(siblingContour)));
+        y++
+      ) {
+
+        const dist = nodeContour[y] - siblingContour[y]
+        if (dist + shiftValue < minDistance) shiftValue = minDistance - dist
+      }
+
+      if (shiftValue > 0) {
+        console.log(shiftValue)
+        this.coordinates.x += shiftValue
+        this.coordinates.mod += shiftValue
+
+        this.centerNodes(sibling)
+
+        shiftValue = 0
+      }
+    }
+  }
+
+  private centerNodes(leftSibling: RootedTree): void {
+    const leftIndex = leftSibling.coordinates.index
+    const rightIndex = this.coordinates.index
+    const nodeSpan = rightIndex - leftIndex - 1
+
+    if (nodeSpan > 0) {
+      const nodeDist = (this.coordinates.x - leftSibling.coordinates.x) / (nodeSpan + 1)
+
+      for (let i = 1; i < rightIndex; i++) {
+        const middleNode = this.coordinates.parent.children[leftIndex + i]
+        const offset = leftSibling.coordinates.x + nodeDist * i - middleNode.coordinates.x
+        middleNode.coordinates.x += offset
+        middleNode.coordinates.mod += offset
+      }
+
+      this.checkForOverlappingSubtrees() // todo is this correct?
+    }
+  }
+
+  private getLeftContour(): Record<number, number> {
+    const contours = {}
+    this.getContour(0, contours, Math.min)
+    return contours
+  }
+
+  private getRightContour(): Record<number, number> {
+    const contours = {}
+    this.getContour(0, contours, Math.max)
+    return contours
+  }
+
+  private getContour(
+    modSum: number,
+    contours: Record<number, number>,
+    m: (a: number, b: number) => number,
+  ): void {
+    contours[this.coordinates.y] = m(
+      contours[this.coordinates.y] ?? (this.coordinates.x + modSum),
+      this.coordinates.x + modSum,
+    )
+
+    modSum += this.coordinates.mod
+    this.children.forEach((child) => {
+      child.getContour(modSum, contours, m)
+    })
+  }
+
+  private getPreviousSiblingX(): number {
+    if (this.coordinates.index > 0)
+      return this.coordinates.parent.children[this.coordinates.index - 1].coordinates.x
+
+    return 0
+  }
+
+  private computeFinalNodeCoordinates(modSum: number = 0) {
+    this.coordinates.x += modSum
+    this.coordinates.y *= this.nodeDistY
+    modSum += this.coordinates.mod
+
+    this.children.forEach((child) => child.computeFinalNodeCoordinates(modSum))
+  }
 }
