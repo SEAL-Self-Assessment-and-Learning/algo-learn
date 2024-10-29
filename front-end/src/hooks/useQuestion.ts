@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react"
 import { Language } from "@shared/api/Language"
 import { Parameters } from "@shared/api/Parameters"
 import { Question, QuestionGenerator } from "@shared/api/QuestionGenerator"
+import { useQuery } from "@tanstack/react-query"
 
 /**
  * A hook to fetch a question from a question generator. This is useful in case the question generator returns a promise, e.g. because it needs to fetch data from a server.
@@ -18,22 +18,12 @@ export function useQuestion(
   parameters: Parameters,
   seed: string,
 ): { isLoading: true } | { isLoading: false; question: Question } {
-  const questionPromise = useMemo(
-    () => generator.generate(lang, parameters, seed),
-    [generator, lang, parameters, seed],
-  )
-  const [question, setQuestion] = useState<Question | undefined>(
-    questionPromise instanceof Promise ? undefined : questionPromise.question,
-  )
-  const isLoading = question == undefined
-  useEffect(() => {
-    if (questionPromise instanceof Promise) {
-      void questionPromise.then((q) => setQuestion(q.question))
-    }
-  }, [questionPromise])
-  if (isLoading) {
+  const queryKey = [generator, lang, parameters, seed]
+  const query = useQuery({ queryKey, queryFn: async () => generator.generate(lang, parameters, seed) })
+
+  if (query.data === undefined) {
     return { isLoading: true }
   } else {
-    return { isLoading: false, question }
+    return { isLoading: false, question: query.data.question }
   }
 }
