@@ -415,6 +415,29 @@ export class RootedTree {
     return this.children.reduce((acc: number, node: RootedTree) => acc + node.getNumNodes(), 1)
   }
 
+  public getTraversalOrder(type: 'pre' | 'in' | 'post') : string[]
+  {
+    let order: string[] = []
+    if(type === 'pre') {
+      order.push(this.root)
+      this.children.forEach(child => {order = order.concat(child.getTraversalOrder(type))})
+    }
+    else if(type === 'post') {
+      this.children.forEach(child => {order = order.concat(child.getTraversalOrder(type))})
+      order.push(this.root)
+    }
+    else if(type === 'in') {
+      if(this.children.length > 0)
+        order = order.concat(this.children[0].getTraversalOrder(type))
+      order.push(this.root)
+      for(let i = 1; i < this.children.length; i++) {
+        order = order.concat(this.children[i].getTraversalOrder(type))
+      }
+    }
+
+    return order
+  }
+
   public static fromSyntaxTree(): RootedTree {
     // TODO
   }
@@ -576,7 +599,6 @@ export class RootedTree {
       }
 
       if (shiftValue > 0) {
-        console.log(shiftValue)
         this.coordinates.x += shiftValue
         this.coordinates.mod += shiftValue
 
