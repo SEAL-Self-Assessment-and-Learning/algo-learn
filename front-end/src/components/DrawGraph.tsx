@@ -284,17 +284,17 @@ export function DrawGraph({
   const viewBox = {
     x: (dimensions.minX - margin) * coordinateScale,
     y: (dimensions.minY - margin) * coordinateScale,
-    width: (dimensions.width  + 2 * margin) * coordinateScale,
+    width: (dimensions.width + 2 * margin) * coordinateScale,
     height: (dimensions.height + 2 * margin) * coordinateScale,
   }
 
-  const minViewBox = {width: 100, height: 100}
-  if(viewBox.width < minViewBox.width) {
-    viewBox.x -= (minViewBox.width -viewBox.width) * 0.5
+  const minViewBox = { width: 100, height: 100 }
+  if (viewBox.width < minViewBox.width) {
+    viewBox.x -= (minViewBox.width - viewBox.width) * 0.5
     viewBox.width = minViewBox.width
   }
 
-  if(viewBox.height < minViewBox.height) {
+  if (viewBox.height < minViewBox.height) {
     viewBox.y -= (minViewBox.height - viewBox.height) * 0.5
     viewBox.height = minViewBox.height
   }
@@ -305,7 +305,11 @@ export function DrawGraph({
     <svg
       ref={svgRef}
       width={maxWidth}
-      height={viewBox.height / viewBox.width > 1 && viewBox.height < 300 ? viewBox.height * 0.75 : (maxWidth * viewBoxAspectRatio)}
+      height={
+        viewBox.height / viewBox.width > 1 && viewBox.height < 300
+          ? viewBox.height * 0.75
+          : maxWidth * viewBoxAspectRatio
+      }
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
       className="mx-auto h-auto max-w-full rounded-2xl bg-secondary"
       onMouseMove={(e) => {

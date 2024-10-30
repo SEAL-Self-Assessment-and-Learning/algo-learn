@@ -5,7 +5,7 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import {RootedTree} from "@shared/utils/graph"
+import { RootedTree, traversalStrategies } from "@shared/utils/graph"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
 import Random from "../../utils/random"
 import { ExampleQuestion } from "../example/example"
@@ -20,8 +20,9 @@ const translations: Translations = {
 {{g}}
 \`\`\``,
     freetext_prompt: "Node order:",
-    check_unknown_node: "\"{{n}}\" is not a node in the tree.",
-    feedback_num_nodes: "The traversal order either does not contain all nodes or contains to many nodes.",
+    check_unknown_node: '"{{n}}" is not a node in the tree.',
+    feedback_num_nodes:
+      "The traversal order either does not contain all nodes or contains to many nodes.",
     feedback_order: "The traversal order is wrong from the {{i}}. nodes ({{n}}) onwards.",
   },
   de: {
@@ -33,20 +34,22 @@ const translations: Translations = {
 {{g}}
 \`\`\``,
     freetext_prompt: "Kontenreihenfolge",
-    check_unknown_node: "\"{{n}}\" ist kein Knoten des Baums.",
+    check_unknown_node: '"{{n}}" ist kein Knoten des Baums.',
     feedback_num_nodes: "Die Traversierung enthält nicht alle oder zu viele Knoten.",
     feedback_order: "Die Reihenfolge ist ab dem {{i}}. Knoten ({{n}}) nicht mehr korrekt.",
   },
 }
 
-const traversalStrategies: Translations = {
-  en: {pre: 'a preorder', in: 'an inorder', post: 'a postorder'},
-  de: {pre: 'eine Preorder', in: 'eine Inorder', post: 'eine Postorder'}
+const traversalStrategiesTranslations: Translations = {
+  en: { pre: "a preorder", in: "an inorder", post: "a postorder" },
+  de: { pre: "eine Preorder", in: "eine Inorder", post: "eine Postorder" },
 }
 
-function parseAnswers(text:string): string[]
-{
-  return text.split(',').map(s => s.trim().toUpperCase()).filter(s => s !== '')
+function parseAnswers(text: string): string[] {
+  return text
+    .split(",")
+    .map((s) => s.trim().toUpperCase())
+    .filter((s) => s !== "")
 }
 
 /**
@@ -74,61 +77,54 @@ export const TreeTraversal: QuestionGenerator = {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
 
-    const T = RootedTree.random({min:2, max:3}, {min:2, max:3}, random)
+    const T = RootedTree.random({ min: 2, max: 3 }, { min: 2, max: 3 }, random)
     const G = T.toGraph()
 
-    const strategy = random.choice(['pre','in','post'])
+    const strategy = random.choice(traversalStrategies)
 
     const correctOrder = T.getTraversalOrder(strategy)
 
     const checkFormat: FreeTextFormatFunction = (answer: FreeTextAnswer) => {
       const order = parseAnswers(answer.text)
 
-
-
-      for(let i = 0; i < order.length; i++)
-      {
-        if(!correctOrder.includes(order[i]))
-        {
+      for (let i = 0; i < order.length; i++) {
+        if (!correctOrder.includes(order[i])) {
           return {
             valid: false,
-            message: t(translations, lang, 'check_unknown_node', {n: order[i]}),
+            message: t(translations, lang, "check_unknown_node", { n: order[i] }),
           }
         }
       }
 
       return {
         valid: true,
-        message: '',
+        message: "",
       }
     }
 
-    const feedback = ({ text } : {text:string}) => {
+    const feedback = ({ text }: { text: string }) => {
       const answer = parseAnswers(text)
 
-      if(answer.length !== correctOrder.length)
-      {
+      if (answer.length !== correctOrder.length) {
         return {
           correct: false,
-          correctAnswer: correctOrder.join(', '),
+          correctAnswer: correctOrder.join(", "),
           feedbackText: t(translations, lang, "feedback_num_nodes"),
         }
       }
 
-      for(let i = 0; i < answer.length; i++)
-      {
-        if(answer[i] !== correctAnswer[i])
-        {
+      for (let i = 0; i < answer.length; i++) {
+        if (answer[i] !== correctOrder[i]) {
           return {
             correct: false,
-            correctAnswer: correctOrder.join(', '),
+            correctAnswer: correctOrder.join(", "),
             feedbackText: t(translations, lang, "feedback_order"),
           }
         }
       }
 
       return {
-        correct: true
+        correct: true,
       }
     }
 
@@ -142,11 +138,14 @@ export const TreeTraversal: QuestionGenerator = {
         parameters,
         seed,
       }),
-      text: t(translations, lang, "text", {t: t(traversalStrategies, lang, strategy), g: G.toString()}),
+      text: t(translations, lang, "text", {
+        t: t(traversalStrategiesTranslations, lang, strategy),
+        g: G.toString(),
+      }),
       prompt: t(translations, lang, "freetext_prompt"),
       placeholder: "A, B, C, ...",
       checkFormat,
-      feedback
+      feedback,
     }
 
     return { question }

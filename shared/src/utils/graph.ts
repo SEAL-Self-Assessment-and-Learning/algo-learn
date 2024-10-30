@@ -388,6 +388,9 @@ export class RandomGraph {
   // public static bipartite: Graph {}
 }
 
+export const traversalStrategies = ["pre", "in", "post"] as const
+type TraversalStrategies = (typeof traversalStrategies)[number]
+
 export class RootedTree {
   root: string
   children: RootedTree[] // left to right
@@ -415,22 +418,22 @@ export class RootedTree {
     return this.children.reduce((acc: number, node: RootedTree) => acc + node.getNumNodes(), 1)
   }
 
-  public getTraversalOrder(type: 'pre' | 'in' | 'post') : string[]
-  {
+  public getTraversalOrder(type: TraversalStrategies): string[] {
     let order: string[] = []
-    if(type === 'pre') {
+    if (type === "pre") {
       order.push(this.root)
-      this.children.forEach(child => {order = order.concat(child.getTraversalOrder(type))})
-    }
-    else if(type === 'post') {
-      this.children.forEach(child => {order = order.concat(child.getTraversalOrder(type))})
+      this.children.forEach((child) => {
+        order = order.concat(child.getTraversalOrder(type))
+      })
+    } else if (type === "post") {
+      this.children.forEach((child) => {
+        order = order.concat(child.getTraversalOrder(type))
+      })
       order.push(this.root)
-    }
-    else if(type === 'in') {
-      if(this.children.length > 0)
-        order = order.concat(this.children[0].getTraversalOrder(type))
+    } else if (type === "in") {
+      if (this.children.length > 0) order = order.concat(this.children[0].getTraversalOrder(type))
       order.push(this.root)
-      for(let i = 1; i < this.children.length; i++) {
+      for (let i = 1; i < this.children.length; i++) {
         order = order.concat(this.children[i].getTraversalOrder(type))
       }
     }
@@ -438,9 +441,9 @@ export class RootedTree {
     return order
   }
 
-  public static fromSyntaxTree(): RootedTree {
-    // TODO
-  }
+  // public static fromSyntaxTree(): RootedTree {
+  //   // TODO
+  // }
 
   public static random(
     depth: number | { min: number; max: number },
@@ -491,7 +494,8 @@ export class RootedTree {
   }
 
   private static relable(tree: RootedTree, labels: string[]): void {
-    tree.root = labels.pop()
+    if (labels.length === 0) throw new Error("Not enough labels")
+    tree.root = labels.pop()! // pop cannot return undefined since the array is not empty at this point
 
     for (let i = 0; i < tree.children.length; i++) {
       this.relable(tree.children[i], labels)
@@ -508,9 +512,13 @@ export class RootedTree {
     return new Graph(nodes, edges, false, false)
   }
 
-  private collectNodesAndEdges(nodes: NodeList, edges: EdgeList[], parentNodeId = null): void {
+  private collectNodesAndEdges(
+    nodes: NodeList,
+    edges: EdgeList,
+    parentNodeId: number | null = null,
+  ): void {
     const currentNodeId = nodes.length
-    nodes.push({ label: this.root, coords: {x: this.coordinates.x, y: this.coordinates.y}})
+    nodes.push({ label: this.root, coords: { x: this.coordinates.x, y: this.coordinates.y } })
     edges.push([])
 
     if (parentNodeId !== null) {
@@ -586,14 +594,17 @@ export class RootedTree {
 
     // iterate all siblings to the left
     for (let i = 0; i < this.coordinates.index; i++) {
-      const sibling = this.coordinates.parent.children[i]
+      const sibling = this.coordinates.parent!.children[i] // since the node has siblings it also has a parent.
       const siblingContour = sibling.getRightContour()
       for (
         let y = this.coordinates.y + 1;
-        y <= Math.min(Math.max(...Object.keys(nodeContour)), Math.max(...Object.keys(siblingContour)));
+        y <=
+        Math.min(
+          Math.max(...Object.keys(nodeContour).map(Number)),
+          Math.max(...Object.keys(siblingContour).map(Number)),
+        );
         y++
       ) {
-
         const dist = nodeContour[y] - siblingContour[y]
         if (dist + shiftValue < minDistance) shiftValue = minDistance - dist
       }
@@ -618,7 +629,7 @@ export class RootedTree {
       const nodeDist = (this.coordinates.x - leftSibling.coordinates.x) / (nodeSpan + 1)
 
       for (let i = 1; i < rightIndex; i++) {
-        const middleNode = this.coordinates.parent.children[leftIndex + i]
+        const middleNode = this.coordinates.parent!.children[leftIndex + i] // since the nod has siblings it has a parent
         const offset = leftSibling.coordinates.x + nodeDist * i - middleNode.coordinates.x
         middleNode.coordinates.x += offset
         middleNode.coordinates.mod += offset
@@ -646,7 +657,7 @@ export class RootedTree {
     m: (a: number, b: number) => number,
   ): void {
     contours[this.coordinates.y] = m(
-      contours[this.coordinates.y] ?? (this.coordinates.x + modSum),
+      contours[this.coordinates.y] ?? this.coordinates.x + modSum,
       this.coordinates.x + modSum,
     )
 
@@ -658,7 +669,7 @@ export class RootedTree {
 
   private getPreviousSiblingX(): number {
     if (this.coordinates.index > 0)
-      return this.coordinates.parent.children[this.coordinates.index - 1].coordinates.x
+      return this.coordinates.parent!.children[this.coordinates.index - 1].coordinates.x // since the nod has siblings it has a parent
 
     return 0
   }
