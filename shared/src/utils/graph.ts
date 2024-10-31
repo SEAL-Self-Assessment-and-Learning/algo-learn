@@ -423,7 +423,7 @@ export class RootedTree {
   siblingDist: number = 0
   treeDist: number = 0
 
-  private constructor(root: string, children: RootedTree[]) {
+  constructor(root: string, children: RootedTree[] = []) {
     this.root = root
     this.children = children
   }
