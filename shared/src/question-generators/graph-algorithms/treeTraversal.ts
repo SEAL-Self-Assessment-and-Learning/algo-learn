@@ -79,6 +79,7 @@ export const TreeTraversal: QuestionGenerator = {
 
     const T = RootedTree.random({ min: 2, max: 3 }, { min: 2, max: 3 }, random)
     const G = T.toGraph()
+    G.nodeDraggable = false
 
     const strategy = random.choice(traversalStrategies)
 

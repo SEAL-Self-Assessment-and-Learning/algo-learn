@@ -41,6 +41,7 @@ export class Graph {
   edges: EdgeList
   weighted: boolean
   directed: boolean
+  public nodeDraggable: boolean
   public nodeClickType: ClickEventType
   public edgeClickType: ClickEventType
   // groups are counted from 0 to [node|edge]GroupMax -1
@@ -52,6 +53,7 @@ export class Graph {
     edges: EdgeList,
     directed: boolean,
     weighted: boolean,
+    nodeDraggable: boolean = true,
     nodeClick: ClickEventType = "none",
     edgeClick: ClickEventType = "none",
     nodeGroupMax: number = 0,
@@ -61,6 +63,7 @@ export class Graph {
     this.edges = edges
     this.directed = directed
     this.weighted = weighted
+    this.nodeDraggable = nodeDraggable
     this.nodeClickType = nodeClick
     this.edgeClickType = edgeClick
     this.nodeGroupMax = nodeGroupMax
@@ -98,7 +101,7 @@ export class Graph {
 
   public toString(): string {
     const clickTypeMapping: Record<ClickEventType, string> = { none: "0", select: "1", group: "2" }
-    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
+    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${this.nodeDraggable ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
 
     for (const node of this.nodes) {
       graphStr += `${Math.round(node.coords.x * 100) / 100} ${Math.round(node.coords.y * 100) / 100} ${node.group ?? "-"} "${node.label ?? ""}"\n`
@@ -117,18 +120,19 @@ export class Graph {
 
   public static parse(graphStr: string): Graph {
     const lines = graphStr.split("\n")
-    const graphMetaData = lines[0].match(/^(\d+) (\d+) ([01]) ([01]) ([012]) ([012]) (\d+) (\d+)$/)
+    const graphMetaData = lines[0].match(/^(\d+) (\d+) ([01]) ([01]) ([01]) ([012]) ([012]) (\d+) (\d+)$/)
 
-    if (graphMetaData === null) throw Error("Input error: graph data has invalid meta data")
+    if (graphMetaData === null) throw Error(`Input error: graph data has invalid meta data: ${lines[0]}`)
     const numNodes = parseInt(graphMetaData[1])
     const numEdges = parseInt(graphMetaData[2])
     const directed = graphMetaData[3] === "1"
     const weighted = graphMetaData[4] === "1"
+    const nodeDraggable = graphMetaData[5] === "1"
     const clickTypeMapping: Record<string, ClickEventType> = { "0": "none", "1": "select", "2": "group" }
-    const nodeClick = clickTypeMapping[graphMetaData[5]]
-    const edgeClick = clickTypeMapping[graphMetaData[6]]
-    const nodeGroupMax = parseInt(graphMetaData[7])
-    const edgeGroupMax = parseInt(graphMetaData[8])
+    const nodeClick = clickTypeMapping[graphMetaData[6]]
+    const edgeClick = clickTypeMapping[graphMetaData[7]]
+    const nodeGroupMax = parseInt(graphMetaData[8])
+    const edgeGroupMax = parseInt(graphMetaData[9])
 
     if (lines.length < numNodes + numEdges + 1) throw Error("Input error: graph data is incomplete")
     if (nodeClick === undefined || edgeClick === undefined)
@@ -165,7 +169,7 @@ export class Graph {
       })
     }
 
-    return new Graph(nodes, edges, directed, weighted, nodeClick, edgeClick, nodeGroupMax, edgeGroupMax)
+    return new Graph(nodes, edges, directed, weighted, nodeDraggable, nodeClick, edgeClick, nodeGroupMax, edgeGroupMax)
   }
 
   public getNeighbors(u: NodeId) {

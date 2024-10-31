@@ -16,7 +16,7 @@ const Node = ({
   onClickCallback,
 }: {
   pos: { x: number; y: number }
-  setDragged: () => void
+  setDragged?: () => void
   size: number
   label?: string
   clickable: boolean
@@ -29,9 +29,9 @@ const Node = ({
     <g
       className="group"
       transform={`translate(${pos.x},${pos.y})`}
-      onMouseDown={() => {
+      onMouseDown={setDragged !== undefined ? () => {
         setDragged()
-      }}
+      } : null}
       onClick={onClickCallback}
     >
       <circle className={`fill-${nodeStyle} stroke-secondary`} r={size} strokeWidth="6" />
@@ -253,9 +253,9 @@ export function DrawGraph({
       <Node
         key={`n${i}`}
         pos={nodePositions[i]}
-        setDragged={() => {
+        setDragged={graph.nodeDraggable ? () => {
           if (currentlyDragged === null) setCurrentlyDragged(i)
-        }}
+        } : undefined}
         size={nodeScale}
         label={u.label ?? ""}
         clickable={graph.nodeClickType !== "none"}
