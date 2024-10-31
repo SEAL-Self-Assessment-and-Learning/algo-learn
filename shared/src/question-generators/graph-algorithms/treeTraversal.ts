@@ -8,12 +8,12 @@ import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { RootedTree, traversalStrategies } from "@shared/utils/graph"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
 import Random from "../../utils/random"
-import { ExampleQuestion } from "../example/example"
 
 const translations: Translations = {
   en: {
     name: "Tree Taversal",
     description: "Compute a traversal order of the nodes in a tree.",
+    param_size: "Tree size",
     text: `Given the following tree compute **{{t}} traversal** of the nodes.
 
 \`\`\`graph
@@ -23,11 +23,12 @@ const translations: Translations = {
     check_unknown_node: '"{{n}}" is not a node in the tree.',
     feedback_num_nodes:
       "The traversal order either does not contain all nodes or contains to many nodes.",
-    feedback_order: "The traversal order is wrong from the {{i}}. nodes ({{n}}) onwards.",
+    feedback_order: "The traversal order is wrong from the {{i}}. node ({{n}}) onwards.",
   },
   de: {
     name: "Baum Traversierung",
     description: "Berechne eine Traversierung eine Baums.",
+    param_size: "Baumgröße",
     text: `Gegeben sei der folgende Baum. Berechne **{{t}}-Traversierung**.
     
 \`\`\`graph
@@ -47,7 +48,7 @@ const traversalStrategiesTranslations: Translations = {
 
 function parseAnswers(text: string): string[] {
   return text
-    .split(",")
+    .split(/[\s,]+/)
     .map((s) => s.trim().toUpperCase())
     .filter((s) => s !== "")
 }
@@ -62,7 +63,15 @@ export const TreeTraversal: QuestionGenerator = {
   tags: ["graph", "tree", "traversal", "preorder", "inorder", "postorder"],
   languages: ["en", "de"],
   license: "MIT",
-  expectedParameters: [],
+  expectedParameters: [
+    {
+      name: "size",
+      description: tFunctional(translations, "param_size"),
+      type: "integer",
+      min: 1,
+      max: 3,
+    },
+  ],
 
   /**
    * Generates a new MultipleChoiceQuestion question.
@@ -76,8 +85,12 @@ export const TreeTraversal: QuestionGenerator = {
   generate: (lang = "en", parameters, seed) => {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
+    const size = parameters.size as number
 
-    const T = RootedTree.random({ min: 2, max: 3 }, { min: 2, max: 3 }, random)
+    const depth = { min: size < 3 ? 1 : 2, max: size < 2 ? 2 : 3 }
+    const degree = { min: 2, max: size < 2 ? 2 : 3 }
+
+    const T = RootedTree.random(depth, degree, random)
     const G = T.toGraph()
     G.nodeDraggable = false
 
@@ -119,7 +132,10 @@ export const TreeTraversal: QuestionGenerator = {
           return {
             correct: false,
             correctAnswer: correctOrder.join(", "),
-            feedbackText: t(translations, lang, "feedback_order"),
+            feedbackText: t(translations, lang, "feedback_order", {
+              i: (i + 1).toString(),
+              n: answer[i],
+            }),
           }
         }
       }
@@ -134,7 +150,7 @@ export const TreeTraversal: QuestionGenerator = {
       type: "FreeTextQuestion",
       name: TreeTraversal.name(lang),
       path: serializeGeneratorCall({
-        generator: ExampleQuestion,
+        generator: TreeTraversal,
         lang,
         parameters,
         seed,
