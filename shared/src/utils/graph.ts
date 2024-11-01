@@ -118,6 +118,11 @@ export class Graph {
     return graphStr
   }
 
+  public toMarkdown(): string
+  {
+    return `\n\`\`\`graph\n${this.toString()}\n\`\`\`\n`
+  }
+
   public static parse(graphStr: string): Graph {
     const lines = graphStr.split("\n")
     const graphMetaData = lines[0].match(
