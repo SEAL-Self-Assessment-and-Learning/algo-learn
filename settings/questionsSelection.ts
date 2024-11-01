@@ -15,6 +15,8 @@ import { modFactor } from "@shared/question-generators/math/modFactorization"
 import { ModTricks } from "@shared/question-generators/math/modTricks"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
+import { TruthTableFillingGenerator } from "@shared/question-generators/propositional-logic/truthTableFillingGenerator.ts"
+import { TruthTableReadingGenerator } from "@shared/question-generators/propositional-logic/truthTableReadingGenerator.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
@@ -65,7 +67,7 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms],
+    contents: [Satisfiability, NormalForms, TruthTableFillingGenerator, TruthTableReadingGenerator],
   },
   {
     slug: "modular-arithmetic",
