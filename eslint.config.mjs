@@ -1,6 +1,7 @@
 // @ts-check
 
 import tseslint from "typescript-eslint"
+import pluginQuery from '@tanstack/eslint-plugin-query'
 import react from "@eslint-react/eslint-plugin"
 import js from "@eslint/js"
 
@@ -36,6 +37,7 @@ const namingConvention = [
 ]
 
 export default [
+  ...pluginQuery.configs['flat/recommended'],
   {
     ignores: ["**/*.config.{js,cjs,mjs}", "node_modules", "front-end/dist"],
   },
