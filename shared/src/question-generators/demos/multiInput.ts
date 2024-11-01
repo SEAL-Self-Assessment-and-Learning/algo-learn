@@ -11,12 +11,12 @@ const translations: Translations = {
   en: {
     name: "Multi Input Question",
     description: "Compute the sum of two integers",
-    text: "Solve the following sums: {{test1#NL#A) {{0}} + {{1}} = #sum}} {{test2#NL#B) {{2}} + {{3}} = #sum}}",
+    text: "Solve the following sums:\n{{test1#-#A) {{0}} + {{1}} = #sum}}\n{{test2#-#B) {{2}} + {{3}} = #sum}}",
   },
   de: {
     name: "Frage mit mehreren Eingabefeldern",
     description: "Berechne die Summe zweier Zahlen",
-    text: "Löse die folgenden Summen:\n {{test1#x#A) {{0}} + {{1}} = #Summe}}\n {{test2#y#B) {{2}} + {{3}} = #Summe}}",
+    text: "Löse die folgenden Summen:\n{{test1#-#A) {{0}} + {{1}} = #Summe}}\n {{test2#-#B) {{2}} + {{3}} = #Summe}}",
   },
 }
 
@@ -45,8 +45,8 @@ export const DemoMultiInput: QuestionGenerator = {
     const random = new Random(seed)
 
     // generate the question values
-    const a = [random.int(5, 15), random.int(5, 15), random.int(5, 15), random.int(5, 15)]
-    const b = [random.int(5, 15), random.int(5, 15), random.int(5, 15), random.int(5, 15)]
+    const a = [random.int(5, 15), random.int(5, 15)]
+    const b = [random.int(5, 15), random.int(5, 15)]
 
     // generate the question object
     const question: MultiFreeTextQuestion = {

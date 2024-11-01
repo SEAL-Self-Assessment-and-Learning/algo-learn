@@ -60,8 +60,12 @@ export const DemoSingleInput: QuestionGenerator = {
         seed,
       }),
       text: t(translations, lang, "text", [`${a}`, `${b}`]),
-      feedback: (answer) => {
-        return { correct: parseInt(answer.text) === a + b, correctAnswer: `${correctAnswer}` }
+      feedback: ({ text }) => {
+        return { correct: parseInt(text) === a + b, correctAnswer: `${correctAnswer}` }
+      },
+      checkFormat: ({ text }) => {
+        const val = parseInt(text)
+        return { valid: !Number.isNaN(val), message: `${val}` }
       },
     }
 
