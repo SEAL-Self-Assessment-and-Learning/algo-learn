@@ -118,8 +118,7 @@ export class Graph {
     return graphStr
   }
 
-  public toMarkdown(): string
-  {
+  public toMarkdown(): string {
     return `\n\`\`\`graph\n${this.toString()}\n\`\`\`\n`
   }
 
