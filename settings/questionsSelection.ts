@@ -12,6 +12,7 @@ import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
+import { ReadingSyntaxTrees } from "@shared/question-generators/propositional-logic/readingSyntaxTrees.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
@@ -63,7 +64,7 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms],
+    contents: [Satisfiability, NormalForms, ReadingSyntaxTrees],
   },
   {
     slug: "tt",

@@ -457,10 +457,6 @@ export class RootedTree {
     return order
   }
 
-  // public static fromSyntaxTree(): RootedTree {
-  //   // TODO
-  // }
-
   public static random(
     depth: number | { min: number; max: number },
     degree:
