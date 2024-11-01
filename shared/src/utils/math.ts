@@ -9,10 +9,12 @@ import {
   log,
   log2,
   multiplyDependencies,
+  normDependencies,
   parseDependencies,
   powDependencies,
   simplifyDependencies,
   subtractDependencies,
+  transposeDependencies,
 } from "mathjs"
 
 const config: ConfigOptions = {
@@ -27,10 +29,12 @@ const math = create(
     formatDependencies,
     fractionDependencies,
     multiplyDependencies,
+    normDependencies,
     parseDependencies,
     powDependencies,
     simplifyDependencies,
     subtractDependencies,
+    transposeDependencies,
   },
   config,
 )

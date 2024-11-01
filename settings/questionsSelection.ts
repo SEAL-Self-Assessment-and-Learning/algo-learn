@@ -13,6 +13,8 @@ import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffma
 import { CRT } from "@shared/question-generators/math/crt"
 import { modFactor } from "@shared/question-generators/math/modFactorization"
 import { ModTricks } from "@shared/question-generators/math/modTricks"
+import { axb } from "@shared/question-generators/math/linearAlgebra/axb/axbGen.ts"
+import { determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { TruthTableFillingGenerator } from "@shared/question-generators/propositional-logic/truthTableFillingGenerator.ts"
@@ -73,6 +75,11 @@ export const collection: QuestionCollection = [
     slug: "modular-arithmetic",
     name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
     contents: [ModTricks, CRT, modFactor],
+  },
+  {
+    slug: "matrix",
+    name: { de: "Matrix", en: "Matrix" },
+    contents: [determinant, axb],
   },
 ]
 
