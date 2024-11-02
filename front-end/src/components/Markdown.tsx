@@ -1,5 +1,6 @@
 import { Fragment, FunctionComponent, ReactNode } from "react"
 import { Link } from "react-router-dom"
+import { Graph } from "@shared/utils/graph"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
 import { ArrayDisplay } from "@/components/ArrayDisplay.tsx"
 import { DrawList } from "@/components/DrawList.tsx"
@@ -7,6 +8,7 @@ import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
 import { TruthTableComp } from "@/components/TruthTableComp.tsx"
 import { FormInputField } from "@/components/ui/FormInputField.tsx"
+import { DrawGraph } from "./DrawGraph"
 import { Format } from "./Format"
 import TeX from "./TeX"
 
@@ -98,6 +100,13 @@ export const MarkdownTreeNode: FunctionComponent<{
     }
     if (parseTreeNode.language === "pseudoCode") {
       return <DrawPseudoCode displayCode={parseTreeNode.child} />
+    }
+    if (parseTreeNode.language === "graph") {
+      return (
+        <div className="my-5">
+          <DrawGraph maxWidth={500} maxHeight={300} graph={Graph.parse(parseTreeNode.child)} />
+        </div>
+      )
     }
     if (parseTreeNode.language === "truthTable") {
       return <TruthTableComp truthTableObject={parseTreeNode.child} />

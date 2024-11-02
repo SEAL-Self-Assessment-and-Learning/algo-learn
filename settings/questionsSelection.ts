@@ -9,6 +9,7 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { CRT } from "@shared/question-generators/math/crt"
 import { axb } from "@shared/question-generators/math/linearAlgebra/axb/axbGen.ts"
@@ -16,6 +17,7 @@ import { determinant } from "@shared/question-generators/math/linearAlgebra/dete
 import { modFactor } from "@shared/question-generators/math/modFactorization"
 import { ModTricks } from "@shared/question-generators/math/modTricks"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
+import { ReadingSyntaxTrees } from "@shared/question-generators/propositional-logic/readingSyntaxTrees.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { TruthTableFillingGenerator } from "@shared/question-generators/propositional-logic/truthTableFillingGenerator.ts"
 import { TruthTableReadingGenerator } from "@shared/question-generators/propositional-logic/truthTableReadingGenerator.ts"
@@ -69,7 +71,13 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms, TruthTableFillingGenerator, TruthTableReadingGenerator],
+    contents: [
+      Satisfiability,
+      NormalForms,
+      TruthTableFillingGenerator,
+      TruthTableReadingGenerator,
+      ReadingSyntaxTrees,
+    ],
   },
   {
     slug: "modular-arithmetic",
@@ -80,6 +88,11 @@ export const collection: QuestionCollection = [
     slug: "matrix",
     name: { de: "Matrix", en: "Matrix" },
     contents: [determinant, axb],
+  },
+  {
+    slug: "tt",
+    name: { de: "Graphalgorithmen", en: "Graph Algorithms" },
+    contents: [TreeTraversal],
   },
 ]
 

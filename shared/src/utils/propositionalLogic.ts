@@ -1,3 +1,4 @@
+import { RootedTree } from "@shared/utils/graph.ts"
 import Random from "./random.ts"
 
 export type VariableValues = Record<string, boolean>
@@ -169,6 +170,8 @@ abstract class SyntaxTreeNode {
       invert: false,
     })
   }
+
+  public abstract toRootedTree(): RootedTree
 }
 
 export class Literal extends SyntaxTreeNode {
@@ -246,6 +249,11 @@ export class Literal extends SyntaxTreeNode {
 
     return this
   }
+
+  public toRootedTree(): RootedTree {
+    if (this.negated) return new RootedTree(`${operatorToUnicode[negationType]}${this.name}`)
+    else return new RootedTree(this.name)
+  }
 }
 
 const negationType = "\\not"
@@ -263,6 +271,15 @@ const operatorToLatex: Record<BinaryOperatorType | NegationOperatorType, string>
   "\\xor": "\\oplus",
   "=>": "\\Rightarrow",
   "<=>": "\\Leftrightarrow",
+}
+
+const operatorToUnicode: Record<BinaryOperatorType | NegationOperatorType, string> = {
+  "\\not": "¬",
+  "\\and": "∧",
+  "\\or": "∨",
+  "\\xor": "⊕",
+  "=>": "⇒",
+  "<=>": "⇔",
 }
 
 export function tokenToLatex(str: string) {
@@ -599,6 +616,16 @@ export class Operator extends SyntaxTreeNode {
     }
 
     return this
+  }
+
+  toRootedTree(): RootedTree {
+    let op = new RootedTree(operatorToUnicode[this.type], [
+      this.leftOperand.toRootedTree(),
+      this.rightOperand.toRootedTree(),
+    ])
+    if (this.negated) op = new RootedTree(operatorToUnicode[negationType], [op])
+
+    return op
   }
 }
 
