@@ -888,3 +888,31 @@ export function generateRandomContradiction(
     return new Operator(rootOperator, operand.copy().negate(), operand).shuffle(random)
   }
 }
+
+/**
+ * Checks if a list of expressions is equivalent
+ * @param expressions - list of boolean expression
+ */
+export function compareExpressions(expressions: SyntaxTreeNodeType[]): boolean {
+  if (expressions.length < 2) {
+    throw new Error("At least two expressions are required for comparison.")
+  }
+  // Collect all var names, remove duplicates and sort
+  const vars = [...new Set(expressions.flatMap((expr) => expr.getTruthTable().variableNames))].sort()
+
+  for (let i = 0; i < Math.pow(2, vars.length); i++) {
+    const truthValues = numToVariableValues(i, vars)
+    // Evaluate the first expression as the baseline comparison
+    const firstResult = expressions[0].eval(truthValues)
+
+    // compare each other expr with the base
+    for (let j = 1; j < expressions.length; j++) {
+      if (expressions[j].eval(truthValues) !== firstResult) {
+        console.log("te")
+        return false
+      }
+    }
+  }
+
+  return true
+}
