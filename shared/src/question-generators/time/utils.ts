@@ -204,7 +204,7 @@ export function createBoundsString(
   let endPseudoCodeString: PseudoCodeString = [value]
   if (boundsManipulation !== "none") {
     if (boundsManipulation.type === "mult") {
-      endPseudoCodeString = [`${boundsManipulation.value} \\cdot`, value]
+      endPseudoCodeString = [`${boundsManipulation.value} \\cdot `, value]
     }
     if (boundsManipulation.type === "square") {
       if (timeOrStars === "stars" && boundsManipulation.abs) {

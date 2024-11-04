@@ -49,8 +49,9 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
                   className={`whitespace-nowrap px-6 py-2 font-black ${index === 0 ? "" : `border-l ${borderColor}`}`}
                   key={index}
                 >
+                  {/* Todo: fix choosing the alternative name */}
                   <Markdown
-                    md={`${!("fields" in func) ? `$ ${func.toString(true)} $` : parsedFunctionNames[index]}`}
+                    md={`${parsedFunctionNames[index] ? parsedFunctionNames[index] : !("fields" in func) ? `$ ${func.toString(true)} $` : ""}`}
                   />
                 </th>
               ))}
