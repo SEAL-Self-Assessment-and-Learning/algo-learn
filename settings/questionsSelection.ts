@@ -10,6 +10,7 @@ import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptot
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
@@ -62,7 +63,7 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms],
+    contents: [Satisfiability, NormalForms, MinimizePropositionalLogic],
   },
 ]
 
