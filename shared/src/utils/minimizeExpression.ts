@@ -72,12 +72,10 @@ function allImplCombination(length: number) {
   // create all possible sets of implicant rows
   const getAllSubsets = (arr: number[]): number[][] =>
     arr.reduce<number[][]>(
-      (subsets, value) => subsets.concat(
-        subsets.map(set => [value, ...set])
-      ),
-      [[]]
-    );
-  const allPossibleSets = getAllSubsets(Array.from({ length }, (_, i) => i + 1))
+      (subsets, value) => subsets.concat(subsets.map((set) => [value, ...set])),
+      [[]],
+    )
+  const allPossibleSets = getAllSubsets(Array.from({ length }, (_, i) => i))
   allPossibleSets.sort((a, b) => a.length - b.length)
   return allPossibleSets
 }
@@ -99,19 +97,19 @@ function isCover(rows: number[], trueRows: number[]) {
  * @param trueRows - the rows that are true in the truth table and need to be covered
  */
 function minimumCover(implicantRows: number[][], trueRows: number[]) {
-
   // order increasing by length of the elements
-  const allPossibleSets: number[][] = allImplCombination(implicantRows.length)
-
+  const allPossibleSets: number[][] = allImplCombination(implicantRows.length).filter(
+    (x) => x.length !== 0,
+  )
   // find the smallest set that covers all true rows
   for (const set of allPossibleSets) {
-    const rows = set.flatMap((i) => implicantRows[i])
+    const rows = set.flatMap((i) => implicantRows[i]).sort()
     if (isCover(rows, trueRows)) {
       return set
     }
   }
   // should never reach here
-  throw new Error("Not cover found")
+  throw new Error("No cover found")
 }
 
 /**
@@ -223,7 +221,11 @@ function removeDuplicates(arr: BinaryMix[][]) {
  * @param implicants2 - second list of implicants
  * @param diff - the number of different elements between the two implicant lists
  */
-function getDiffImplicantsLists(implicants1: BinaryMix[][], implicants2: BinaryMix[][], diff: number = 1) {
+function getDiffImplicantsLists(
+  implicants1: BinaryMix[][],
+  implicants2: BinaryMix[][],
+  diff: number = 1,
+) {
   const diffImplicants: BinaryMix[][] = []
   for (const implicant1 of implicants1) {
     let found = false

@@ -169,6 +169,8 @@ abstract class SyntaxTreeNode {
       invert: false,
     })
   }
+
+  public abstract getSize(): number
 }
 
 export class Literal extends SyntaxTreeNode {
@@ -245,6 +247,10 @@ export class Literal extends SyntaxTreeNode {
     if (maxNumVariables > 0) this.negate()
 
     return this
+  }
+
+  getSize(): number {
+    return 1
   }
 }
 
@@ -599,6 +605,10 @@ export class Operator extends SyntaxTreeNode {
     }
 
     return this
+  }
+
+  public getSize(): number {
+    return this.leftOperand.getSize() + this.rightOperand.getSize()
   }
 }
 
