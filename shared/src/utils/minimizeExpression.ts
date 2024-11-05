@@ -1,7 +1,15 @@
 import { Literal, Operator, SyntaxTreeNodeType, TruthTable } from "@shared/utils/propositionalLogic.ts"
 
+/**
+ * During the algorithm, the datatype for a truthTable can be a BinaryMix
+ * 0 --> false; 1 --> true; x --> true/false
+ */
 type BinaryMix = 0 | 1 | "x"
 
+/**
+ * Based on a given expression (truthTable), calculates a minimal DNF
+ * @param expr
+ */
 export function minimizeExpressionDNF(expr: SyntaxTreeNodeType): SyntaxTreeNodeType {
   const { truthTable: tTable, variableNames: varNames } = expr.getTruthTable()
 
@@ -13,40 +21,55 @@ export function minimizeExpressionDNF(expr: SyntaxTreeNodeType): SyntaxTreeNodeT
   return buildMinDNFExpression(minRows, finalImplicants, varNames)
 }
 
+/**
+ * Creates the SyntaxTreeNode for the minimized dnf
+ * - each row in minRows is one clause
+ * - finalImplicants[row] -> [x0, x1, ..., xn] xi in {0, 1, x} says how to create each literal
+ *  - if 0: negated variable
+ *  - if 1: normal variable
+ *  - if x: don't add (this clause does not rely on the variable)
+ * @param minRows
+ * @param finalImplicants
+ * @param varNames
+ */
 function buildMinDNFExpression(minRows: any[], finalImplicants: BinaryMix[][], varNames: string[]) {
-  const dnfClauses: SyntaxTreeNodeType[] = []
+  const clauses: SyntaxTreeNodeType[] = []
   for (const row of minRows) {
-    const clauseLiterals: Literal[] = []
+    const literals: Literal[] = []
     for (let i = 0; i < finalImplicants[row].length; i++) {
       if (finalImplicants[row][i] === "x") {
         continue
       }
       const negated = !finalImplicants[row][i]
-      clauseLiterals.push(
-        negated
-          ? new Literal(varNames[varNames.length - i - 1], true)
-          : new Literal(varNames[varNames.length - i - 1]),
-      )
+      literals.push(new Literal(varNames[varNames.length - i - 1], negated))
     }
     // combine literals with and
-    dnfClauses.push(combineLiteralsWithAnd(clauseLiterals))
+    clauses.push(combineLiteralsWithAnd(literals))
   }
   // combine clauses with or
-  return combineClausesWithOr(dnfClauses)
+  return combineClausesWithOr(clauses)
 }
 
-function combineClausesWithOr(dnfClauses: SyntaxTreeNodeType[]) {
-  let newExpr: SyntaxTreeNodeType = dnfClauses[0]
-  for (let i = 1; i < dnfClauses.length; i++) {
-    newExpr = new Operator("\\or", newExpr, dnfClauses[i])
+/**
+ * Combines clauses with \\or
+ * @param clauses
+ */
+function combineClausesWithOr(clauses: SyntaxTreeNodeType[]) {
+  let newExpr: SyntaxTreeNodeType = clauses[0]
+  for (let i = 1; i < clauses.length; i++) {
+    newExpr = new Operator("\\or", newExpr, clauses[i])
   }
   return newExpr
 }
 
-function combineLiteralsWithAnd(clauseLiterals: Literal[]) {
-  let newExpr: SyntaxTreeNodeType = clauseLiterals[0]
-  for (let i = 1; i < clauseLiterals.length; i++) {
-    newExpr = new Operator("\\and", newExpr, clauseLiterals[i])
+/**
+ * Creates one clause (combines the literals with \\and)
+ * @param literals
+ */
+function combineLiteralsWithAnd(literals: Literal[]) {
+  let newExpr: SyntaxTreeNodeType = literals[0]
+  for (let i = 1; i < literals.length; i++) {
+    newExpr = new Operator("\\and", newExpr, literals[i])
   }
   return newExpr
 }

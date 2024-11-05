@@ -1,9 +1,12 @@
 import {
   FreeTextFeedbackFunction,
+  FreeTextFormatFunction,
   FreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
+import { variableNames } from "@shared/question-generators/propositional-logic/globalPropLogic.ts"
+import { _ } from "@shared/utils/generics.ts"
 import { minimizeExpressionDNF } from "@shared/utils/minimizeExpression.ts"
 import {
   compareExpressions,
@@ -11,10 +14,10 @@ import {
   ParserError,
   PropositionalLogicParser,
   SyntaxTreeNodeType,
+  tokenToLatex,
 } from "@shared/utils/propositionalLogic.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
-import {variableNames} from "@shared/question-generators/propositional-logic/globalPropLogic.ts";
 
 const translations: Translations = {
   en: {
@@ -80,6 +83,7 @@ export const MinimizePropositionalLogic: QuestionGenerator = {
       prompt: "$\\varPhi^*=$",
       text: t(translations, lang, "text", [randExpression.toString(true), "DNF"]),
       feedback: feedbackFunction(randExpression, "DNF", lang),
+      checkFormat: checkFormat(varNames),
       typingAid: [
         { text: "$($", input: "(", label: t(translations, lang, "aria.left-parenthesis") },
         { text: "$)$", input: ")", label: t(translations, lang, "aria.right-parenthesis") },
@@ -98,13 +102,29 @@ export const MinimizePropositionalLogic: QuestionGenerator = {
 }
 
 /**
+ * Simple function to parse the user input
+ * Catch ParsingError and show, it's not parsable
+ * @param varNames
+ */
+function checkFormat(varNames: string[]): FreeTextFormatFunction {
+  return ({ text }) => {
+    const res = PropositionalLogicParser.parse(text)
+
+    return {
+      valid: !(res instanceof ParserError || _.difference(res.getVariableNames(), varNames).length > 0),
+      message: `$ ${tokenToLatex(text)}$`,
+    }
+  }
+}
+
+/**
  * Feedback function to check if the user input is
  * - a boolean expression
  * - either a DNF or CNF
  * - equivalent to solutionExpression
  * - has the same size as the minDNF/CNF of solutionExpression
  *
- * Todo: currently only supported is **DNF**
+ * Todo: currently only **DNF** is supported
  *
  * @param solutionExpression - base expression
  * @param functionType - normal form type
