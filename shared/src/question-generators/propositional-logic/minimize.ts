@@ -14,6 +14,7 @@ import {
 } from "@shared/utils/propositionalLogic.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+import {variableNames} from "@shared/question-generators/propositional-logic/globalPropLogic.ts";
 
 const translations: Translations = {
   en: {
@@ -36,12 +37,6 @@ const translations: Translations = {
       "Deine Antwoirt is äquivalent zu $\\varPhi$, aber sie ist nicht minimal.",
   },
 }
-
-const variableNames = [
-  ["x_1", "x_2", "x_3", "x_4"],
-  ["A", "B", "C", "D"],
-  ["u", "v", "w", "x"],
-]
 
 export const MinimizePropositionalLogic: QuestionGenerator = {
   id: "plminimize",
@@ -117,7 +112,7 @@ export const MinimizePropositionalLogic: QuestionGenerator = {
  */
 function feedbackFunction(
   solutionExpression: SyntaxTreeNodeType,
-  functionType: "DNF" | "CNF",
+  functionType: "DNF", // | "CNF"
   lang: "en" | "de",
 ): FreeTextFeedbackFunction {
   return ({ text }) => {
