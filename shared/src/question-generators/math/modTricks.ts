@@ -121,7 +121,7 @@ function generateSimpleQuestion(lang: Language, path: string, random: Random) {
   let a, b
   // solutions should not be the same as the question
   do {
-    a = random.int(2, 30)
+    a = random.int(3, 30)
     b = random.int(2, a - 1)
   } while (a % b === a)
 
