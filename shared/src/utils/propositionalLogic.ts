@@ -170,7 +170,10 @@ abstract class SyntaxTreeNode {
     })
   }
 
-  public abstract getSize(): number
+  /**
+   * Returns the number of literals in the expression
+   */
+  public abstract getLiteralSize(): number
 }
 
 export class Literal extends SyntaxTreeNode {
@@ -249,7 +252,7 @@ export class Literal extends SyntaxTreeNode {
     return this
   }
 
-  getSize(): number {
+  getLiteralSize(): number {
     return 1
   }
 }
@@ -607,8 +610,8 @@ export class Operator extends SyntaxTreeNode {
     return this
   }
 
-  public getSize(): number {
-    return this.leftOperand.getSize() + this.rightOperand.getSize()
+  public getLiteralSize(): number {
+    return this.leftOperand.getLiteralSize() + this.rightOperand.getLiteralSize()
   }
 }
 
@@ -908,7 +911,6 @@ export function compareExpressions(expressions: SyntaxTreeNodeType[]): boolean {
     // compare each other expr with the base
     for (let j = 1; j < expressions.length; j++) {
       if (expressions[j].eval(truthValues) !== firstResult) {
-        console.log("te")
         return false
       }
     }

@@ -1,14 +1,13 @@
-import { Literal, Operator, SyntaxTreeNodeType, TruthTable } from "@shared/utils/propositionalLogic.ts"
+import { Literal, Operator, SyntaxTreeNodeType, TruthTable } from "@shared/utils/propositionalLogic"
 
 /**
- * During the algorithm, the datatype for a truthTable can be a BinaryMix
+ * During the Quine–McCluskey algorithm, the datatype for a truthTable can be a BinaryMix
  * 0 --> false; 1 --> true; x --> true/false
  */
 type BinaryMix = 0 | 1 | "x"
 
 /**
  * Based on a given expression (truthTable), calculates a minimal DNF
- *
  * Using **Quine–McCluskey** algorithm
  *
  * @param expr

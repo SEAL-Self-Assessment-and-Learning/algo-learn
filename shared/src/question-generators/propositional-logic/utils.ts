@@ -1,4 +1,4 @@
-import { t, Translations } from "@shared/utils/translations.ts"
+import { t, Translations } from "@shared/utils/translations"
 
 /** Standard variable names for boolean expressions */
 export const variableNames = [
