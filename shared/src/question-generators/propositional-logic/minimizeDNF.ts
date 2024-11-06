@@ -8,6 +8,9 @@ type BinaryMix = 0 | 1 | "x"
 
 /**
  * Based on a given expression (truthTable), calculates a minimal DNF
+ *
+ * Using **Quine–McCluskey** algorithm
+ *
  * @param expr
  */
 export function minimizeExpressionDNF(expr: SyntaxTreeNodeType): SyntaxTreeNodeType {

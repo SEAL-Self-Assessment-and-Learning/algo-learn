@@ -5,9 +5,13 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { variableNames } from "@shared/question-generators/propositional-logic/globalPropLogic.ts"
+import { minimizeExpressionDNF } from "@shared/question-generators/propositional-logic/minimizeDNF.ts"
+import {
+  getTypingAids,
+  getTypingAidsVars,
+  variableNames,
+} from "@shared/question-generators/propositional-logic/utils.ts"
 import { _ } from "@shared/utils/generics.ts"
-import { minimizeExpressionDNF } from "@shared/utils/minimizeExpression.ts"
 import {
   compareExpressions,
   generateRandomExpression,
@@ -73,9 +77,7 @@ export const MinimizePropositionalLogic: QuestionGenerator = {
       randExpression = generateRandomExpression(random, numLeaves, varNames)
     } while (!randExpression.getProperties().falsifiable || !randExpression.getProperties().satisfiable)
 
-    const tmp = minimizeExpressionDNF(randExpression)
-    console.log(tmp.toString(true))
-
+    const typingsAids = getTypingAids(lang)
     const question: FreeTextQuestion = {
       type: "FreeTextQuestion",
       name: MinimizePropositionalLogic.name(lang),
@@ -85,16 +87,12 @@ export const MinimizePropositionalLogic: QuestionGenerator = {
       feedback: feedbackFunction(randExpression, "DNF", lang),
       checkFormat: checkFormat(varNames),
       typingAid: [
-        { text: "$($", input: "(", label: t(translations, lang, "aria.left-parenthesis") },
-        { text: "$)$", input: ")", label: t(translations, lang, "aria.right-parenthesis") },
-        { text: "$\\vee$", input: "\\or", label: t(translations, lang, "aria.or") },
-        { text: "$\\wedge$", input: "\\and", label: t(translations, lang, "aria.and") },
-        { text: "$\\neg$", input: "\\not", label: t(translations, lang, "aria.not") },
-      ].concat(
-        randExpression.getVariableNames().map((v) => {
-          return { text: `$${v}$`, input: ` ${v}`, label: t(translations, lang, "aria.variable", [v]) }
-        }),
-      ),
+        typingsAids.leftParenthesis,
+        typingsAids.rightParenthesis,
+        typingsAids.logicalOr,
+        typingsAids.logicalAnd,
+        typingsAids.logicalNot,
+      ].concat(getTypingAidsVars(lang, randExpression.getVariableNames()).typingAidVars),
     }
 
     return { question }
