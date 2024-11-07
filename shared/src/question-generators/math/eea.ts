@@ -103,7 +103,7 @@ function getFeedbackFunction(
         if (!dividendCorrect || !divisorCorrect || !quotientCorrect || !remainderCorrect) {
           allStepsCorrect = false
         }
-        
+
         return `| ${step.dividend} | $=$ | ${step.quotient} | $\\cdot$ | ${step.divisor} | $+$ | ${step.remainder} |`
       })
       .join("\n")
@@ -116,12 +116,16 @@ function getFeedbackFunction(
     const b = initialStep.divisor
     const finalStep = steps[steps.length - 1]
     const gcd = finalStep.remainder
+    
+    const userGCD = parseInt(text["gcd"], 10);
     const userCoefA = parseInt(text["coefA"], 10)
     const userCoefB = parseInt(text["coefB"], 10)
+
+    const gcdCorrect = userGCD === gcd
     const coefficientsCorrect = userCoefA === finalStep.s && userCoefB === finalStep.t
 
     // correctness for steps and coefficients
-    const isCorrect = allStepsCorrect && coefficientsCorrect
+    const isCorrect = allStepsCorrect && gcdCorrect &&coefficientsCorrect
 
     return {
       correct: isCorrect,
