@@ -208,8 +208,9 @@ function generateEEATableSteps(
   const calcTable = [...divisionSteps].join("")
 
   const linearCombinationPrompt = `\n${t(translations, lang, "linearCombinationPrompt")}\n`
-  const finalRow = `| $\\text{${t(translations, lang, "gcd")}}(${a},${b})$ |$=$| {{gcd#TL#}} |$=$| {{coefA#TL#}} |$\\cdot$| ${a} |$+$| {{coefB#TL#}} |$\\cdot$| ${b} |\n`
+  const gcdRow = `| $\\text{${t(translations, lang, "gcd")}}(${a},${b})$ | $=$ | {{gcd#TL#}} | | | |\n`
+  const combinationRow = `| | $=$ | {{coefA#TL#}} | $\\cdot$ | ${a} | $+$ | {{coefB#TL#}} | $\\cdot$ | ${b} |\n`
   const additionalStyling = "|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |\n"
 
-  return `${calcTable}${additionalStyling}${linearCombinationPrompt}\n|---|---|---|---|---|---|---|\n${finalRow}${additionalStyling}`
+  return `${calcTable}${additionalStyling}${linearCombinationPrompt}\n${gcdRow}${combinationRow}${additionalStyling}`
 }
