@@ -11,6 +11,9 @@ import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { ExtendedEuclideanAlgorithm } from "@shared/question-generators/math/eea"
+import { CRT } from "@shared/question-generators/math/crt"
+import { modFactor } from "@shared/question-generators/math/modFactorization"
+import { ModTricks } from "@shared/question-generators/math/modTricks"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
@@ -69,6 +72,11 @@ export const collection: QuestionCollection = [
     slug: "eea",
     name: { de: "Erweiterter Euklidischer Algorithmus", en: "Extended Euclidean Algorithm" },
     contents: [ExtendedEuclideanAlgorithm],
+  },
+  {
+    slug: "modular-arithmetic",
+    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
+    contents: [ModTricks, CRT, modFactor],
   },
 ]
 
