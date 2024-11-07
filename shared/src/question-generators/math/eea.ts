@@ -56,7 +56,7 @@ export const ExtendedEuclideanAlgorithm: QuestionGenerator = {
       name: t(translations, lang, "name"),
       fillOutAll: true,
       text: `${t(translations, lang, "eeaQuestion", { a: String(a), b: String(b) })}\n${table}`,
-      feedback: getFeedbackFunction(steps),
+      feedback: getFeedbackFunction(steps, lang),
     }
 
     return { question }
@@ -72,6 +72,7 @@ function getFeedbackFunction(
     s: number
     t: number
   }>,
+  lang: Language,
 ): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
     let allStepsCorrect = true
@@ -102,10 +103,12 @@ function getFeedbackFunction(
         if (!dividendCorrect || !divisorCorrect || !quotientCorrect || !remainderCorrect) {
           allStepsCorrect = false
         }
-
-        return `${stepIndex}: $ ${step.dividend} = ${step.quotient} \\cdot  ${step.divisor} + ${step.remainder}$\\n `
+        
+        return `| ${step.dividend} | $=$ | ${step.quotient} | $\\cdot$ | ${step.divisor} | $+$ | ${step.remainder} |`
       })
-      .join("; ")
+      .join("\n")
+
+    const additionalStyling = "|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |\n"
 
     // check final coefficients for linear combination
     const initialStep = steps[0]
@@ -122,9 +125,7 @@ function getFeedbackFunction(
 
     return {
       correct: isCorrect,
-      correctAnswer: isCorrect
-        ? ""
-        : `${feedbackDetails}\\n$ \\text{gcd}(${a}, ${b}) = ${gcd} = ${finalStep.s} \\cdot ${a} + ${finalStep.t} \\cdot ${b} $`,
+      correctAnswer: `${feedbackDetails}${additionalStyling}\n\n$\\text{${t(translations, lang, "gcd")}}(${a}, ${b}) = ${gcd} = ${finalStep.s} \\cdot ${a} + ${finalStep.t} \\cdot ${b}$`,
     }
   }
 }
@@ -200,11 +201,7 @@ function generateEEATableSteps(
         : `| {{dividend${stepIndex}#TL#}} |$=$| {{quotient${stepIndex}#TL#}} |$\\cdot$| {{divisor${stepIndex}#TL#}} |$+$| {{remainder${stepIndex}#TL#}} |\n`
     })
 
-  const calcTable = [
-    //"\n| **Dividend** |$=$| **Quotient** |$\\cdot$| **Divisor** |$+$| **Remainder** |\n",
-    //"|-----------|--|---------|-----|---------|--|-----------|\n",
-    ...divisionSteps,
-  ].join("")
+  const calcTable = [...divisionSteps].join("")
 
   const linearCombinationPrompt = `\n${t(translations, lang, "linearCombinationPrompt")}\n`
   const finalRow = `| $\\text{${t(translations, lang, "gcd")}}(${a},${b})$ |$=$| {{gcd#TL#}} |$=$| {{coefA#TL#}} |$\\cdot$| ${a} |$+$| {{coefB#TL#}} |$\\cdot$| ${b} |\n`
