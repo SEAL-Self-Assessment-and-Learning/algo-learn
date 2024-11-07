@@ -69,14 +69,9 @@ export const collection: QuestionCollection = [
     contents: [Satisfiability, NormalForms],
   },
   {
-    slug: "eea",
-    name: { de: "Erweiterter Euklidischer Algorithmus", en: "Extended Euclidean Algorithm" },
-    contents: [ExtendedEuclideanAlgorithm],
-  },
-  {
     slug: "modular-arithmetic",
     name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
-    contents: [ModTricks, CRT, modFactor],
+    contents: [ModTricks, CRT, modFactor, ExtendedEuclideanAlgorithm],
   },
 ]
 
