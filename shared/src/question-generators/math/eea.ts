@@ -1,6 +1,7 @@
 import { Language } from "@shared/api/Language"
 import {
   MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
   MultiFreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
@@ -16,6 +17,7 @@ const translations: Translations = {
     eeaQuestion: "Calculate the GCD of ${{a}}$ and ${{b}}$ by completing the following equations:",
     linearCombinationPrompt: "Express the GCD as a linear combination:",
     gcd: "gcd",
+    feedbackInvalid: "Input must be an integer.",
   },
   de: {
     name: "Erweiterter Euklidischer Algorithmus",
@@ -25,6 +27,7 @@ const translations: Translations = {
       "Berechne den GGT von ${{a}}$ und ${{b}}$ durch das Vervollständigen der folgenden Gleichungen:",
     linearCombinationPrompt: "Drücke den GGT als Linearkombination aus:",
     gcd: "ggt",
+    feedbackInvalid: "Eingabe muss eine ganze Zahl sein.",
   },
 }
 
@@ -50,6 +53,22 @@ export const ExtendedEuclideanAlgorithm: QuestionGenerator = {
 
     const table = generateEEATableSteps(a, b, lang, steps)
 
+    const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
+      if (text[fieldID].trim() === "") return { valid: false, message: "" }
+
+      if (!/^-?\d+$/.test(text[fieldID])) {
+        return {
+          valid: false,
+          message: t(translations, lang, "feedbackInvalid"),
+        }
+      }
+
+      return {
+        valid: true,
+        message: "",
+      }
+    }
+
     const question: MultiFreeTextQuestion = {
       type: "MultiFreeTextQuestion",
       path: permalink,
@@ -57,6 +76,7 @@ export const ExtendedEuclideanAlgorithm: QuestionGenerator = {
       fillOutAll: true,
       text: `${t(translations, lang, "eeaQuestion", { a: String(a), b: String(b) })}\n${table}`,
       feedback: getFeedbackFunction(steps, lang),
+      checkFormat,
     }
 
     return { question }
@@ -116,8 +136,8 @@ function getFeedbackFunction(
     const b = initialStep.divisor
     const finalStep = steps[steps.length - 1]
     const gcd = finalStep.remainder
-    
-    const userGCD = parseInt(text["gcd"], 10);
+
+    const userGCD = parseInt(text["gcd"], 10)
     const userCoefA = parseInt(text["coefA"], 10)
     const userCoefB = parseInt(text["coefB"], 10)
 
@@ -125,7 +145,7 @@ function getFeedbackFunction(
     const coefficientsCorrect = userCoefA === finalStep.s && userCoefB === finalStep.t
 
     // correctness for steps and coefficients
-    const isCorrect = allStepsCorrect && gcdCorrect &&coefficientsCorrect
+    const isCorrect = allStepsCorrect && gcdCorrect && coefficientsCorrect
 
     return {
       correct: isCorrect,
