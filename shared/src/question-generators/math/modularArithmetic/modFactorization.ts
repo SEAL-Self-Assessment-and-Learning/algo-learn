@@ -5,7 +5,10 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { generateFactors, modularExponentiation } from "@shared/question-generators/math/modularArithmetic/utils"
+import {
+  generateFactors,
+  modularExponentiation,
+} from "@shared/question-generators/math/modularArithmetic/utils"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
 
