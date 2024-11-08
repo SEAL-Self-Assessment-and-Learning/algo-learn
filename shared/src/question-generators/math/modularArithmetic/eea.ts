@@ -100,11 +100,9 @@ function getFeedbackFunction(
     const feedbackDetails = steps
       .filter((step) => step.quotient !== null) // skip null line
       .map((step, index) => {
-        const stepIndex = index + 1
-
         // parse and compare user inputs for each field
-        const userQuotient = parseInt(text[`quotient${stepIndex}`], 10)
-        const userRemainder = parseInt(text[`remainder${stepIndex}`], 10)
+        const userQuotient = parseInt(text[`quotient${index}`], 10)
+        const userRemainder = parseInt(text[`remainder${index}`], 10)
         const quotientCorrect = userQuotient === step.quotient
         const remainderCorrect = userRemainder === step.remainder
 
@@ -113,8 +111,8 @@ function getFeedbackFunction(
         let divisorCorrect = true
         //  include for subsequent rows
         if (index > 0) {
-          const userDividend = parseInt(text[`dividend${stepIndex}`], 10)
-          const userDivisor = parseInt(text[`divisor${stepIndex}`], 10)
+          const userDividend = parseInt(text[`dividend${index}`], 10)
+          const userDivisor = parseInt(text[`divisor${index}`], 10)
           dividendCorrect = userDividend === step.dividend
           divisorCorrect = userDivisor === step.divisor
         }
@@ -217,15 +215,13 @@ function generateEEATableSteps(
   const divisionSteps = steps
     .filter((step, index) => index === 0 || step.quotient !== null)
     .map((step, index) => {
-      const stepIndex = index + 1
-
       // first row displays known quantities a and b
       return index === 0
-        ? `| $ ${step.dividend} $ |$=$| {{quotient${stepIndex}#TL#}} |$\\cdot$| ${step.divisor} |$+$| {{remainder${stepIndex}#TL#}} |\n`
-        : `| {{dividend${stepIndex}#TL#}} |$=$| {{quotient${stepIndex}#TL#}} |$\\cdot$| {{divisor${stepIndex}#TL#}} |$+$| {{remainder${stepIndex}#TL#}} |\n`
+        ? `| $ ${step.dividend} $ |$=$| {{quotient${index}#TL#}} |$\\cdot$| ${step.divisor} |$+$| {{remainder${index}#TL#}} |\n`
+        : `| {{dividend${index}#TL#}} |$=$| {{quotient${index}#TL#}} |$\\cdot$| {{divisor${index}#TL#}} |$+$| {{remainder${index}#TL#}} |\n`
     })
 
-  const calcTable = [...divisionSteps].join("")
+  const calcTable = divisionSteps.join("")
 
   const linearCombinationPrompt = `\n${t(translations, lang, "linearCombinationPrompt")}\n`
   const gcdRow = `| $\\text{${t(translations, lang, "gcd")}}(${a},${b})$ | $=$ | {{gcd#TL#}} | | | |\n`
