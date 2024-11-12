@@ -27,6 +27,7 @@ const translations: Translations = {
   en: {
     name: "Minimize boolean expression",
     description: "Minimize the normal form of a boolean expression",
+    param_size: "The maximal number of variables used",
     text: "Given the boolean expression \\[\\varPhi={{0}}\\] Let $\\varPhi^*$ be the minimized expression of $\\varPhi$ in **{{1}}**.",
     freetext_feedback_parse_error: "Your answer couldn't be parsed.",
     freetext_feedback_no_normal_form: "Your answer is not a {{0}}.",
@@ -38,6 +39,7 @@ const translations: Translations = {
   de: {
     name: "Boolesche Ausdrücke minimieren",
     description: "Minimiere die Normalform eines booleschen Ausdruck",
+    param_size: "Die maximale Anzahl der verwendeten Variablen",
     text: "Gegeben sei der boolesche Ausdruck \\[\\varPhi={{0}}\\] Sei $\\varPhi^*$ der minimierte Ausdruck von $\\varPhi$ in **{{1}}**.",
     freetext_feedback_parse_error: "Deine Antwort ist kein gültiger aussagenlogischer Ausdruck.",
     freetext_feedback_no_normal_form: "Deine Antwort ist keine {{0}}.",
@@ -62,7 +64,14 @@ export const MinimizePropositionalLogic: QuestionGenerator = {
     {
       name: "variant",
       type: "string",
-      allowedValues: ["dnf"], // "CNF"
+      allowedValues: ["DNF"], // "CNF"
+    },
+    {
+      name: "size",
+      description: tFunctional(translations, "param_size"),
+      type: "integer",
+      min: 3,
+      max: 4,
     },
   ],
 
@@ -75,8 +84,8 @@ export const MinimizePropositionalLogic: QuestionGenerator = {
     })
     const random = new Random(seed)
 
-    const variant: "DNF" = (parameters.variant as "dnf").toUpperCase() as "DNF"
-    const numVariables = random.int(3, 4)
+    const variant: "DNF" = parameters.variant as "DNF"
+    const numVariables = (parameters.size as number) ?? 3
     const numLeaves = random.int(numVariables + 2, numVariables + 4)
     const varNames = random.choice(variableNames).slice(0, numVariables)
 
