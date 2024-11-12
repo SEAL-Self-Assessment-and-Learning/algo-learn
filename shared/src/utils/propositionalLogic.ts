@@ -52,6 +52,11 @@ abstract class SyntaxTreeNode {
    */
   public abstract getVariableNames(): string[]
 
+  /**
+   * Returns the number of literals in the expression
+   */
+  public abstract getNumLiterals(): number
+
   public abstract isConjunction(): boolean
 
   public abstract isDisjunction(): boolean
@@ -169,11 +174,6 @@ abstract class SyntaxTreeNode {
       invert: false,
     })
   }
-
-  /**
-   * Returns the number of literals in the expression
-   */
-  public abstract getLiteralSize(): number
 }
 
 export class Literal extends SyntaxTreeNode {
@@ -252,7 +252,7 @@ export class Literal extends SyntaxTreeNode {
     return this
   }
 
-  getLiteralSize(): number {
+  getNumLiterals(): number {
     return 1
   }
 }
@@ -610,8 +610,8 @@ export class Operator extends SyntaxTreeNode {
     return this
   }
 
-  public getLiteralSize(): number {
-    return this.leftOperand.getLiteralSize() + this.rightOperand.getLiteralSize()
+  public getNumLiterals(): number {
+    return this.leftOperand.getNumLiterals() + this.rightOperand.getNumLiterals()
   }
 }
 

@@ -185,7 +185,7 @@ function feedbackFunction(
       }
     }
 
-    if (minExpressionDNF.getLiteralSize() !== userExpression.getLiteralSize()) {
+    if (minExpressionDNF.getNumLiterals() !== userExpression.getNumLiterals()) {
       return {
         correct: false,
         feedbackText: t(translations, lang, "freetext_feedback_not_minimal"),
