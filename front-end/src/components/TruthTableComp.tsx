@@ -49,8 +49,10 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
                   className={`whitespace-nowrap px-6 py-2 font-black ${index === 0 ? "" : `border-l ${borderColor}`}`}
                   key={index}
                 >
-                  <Markdown
-                    md={`${!("fields" in func) ? `$ ${func.toString(true)} $` : parsedFunctionNames[index]}`}
+                  <GetFunctionHeader
+                    parsedFunctionNames={parsedFunctionNames}
+                    index={index}
+                    func={func}
                   />
                 </th>
               ))}
@@ -85,6 +87,31 @@ export function TruthTableComp({ truthTableObject }: { truthTableObject: string 
       </div>
     </div>
   )
+}
+
+/**
+ * The header of each function in the truth table
+ * @param parsedFunctionNames - the names of the functions (if provided)
+ * @param index - the index of the current function
+ * @param func - the function
+ * @constructor
+ */
+function GetFunctionHeader({
+  parsedFunctionNames,
+  index,
+  func,
+}: {
+  parsedFunctionNames: string[]
+  index: number
+  func: SyntaxTreeNodeType | InputTruthTableProps
+}) {
+  if (parsedFunctionNames[index]) {
+    return <Markdown md={parsedFunctionNames[index]} />
+  }
+  if (!("fields" in func)) {
+    return <Markdown md={`$ ${func.toString(true)} $`} />
+  }
+  throw new Error("Invalid function format")
 }
 
 /**
