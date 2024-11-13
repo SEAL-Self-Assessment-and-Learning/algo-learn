@@ -5,7 +5,6 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { minimizeExpressionDNF } from "@shared/question-generators/propositional-logic/minimizeDNF"
 import {
   getTypingAids,
   getTypingAidsVars,
@@ -20,6 +19,7 @@ import {
   SyntaxTreeNodeType,
   tokenToLatex,
 } from "@shared/utils/propositionalLogic"
+import { GetMinimalDNF } from "@shared/utils/propositionalLogicMinimize.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
 
@@ -154,8 +154,8 @@ function feedbackFunction(
   lang: "en" | "de",
 ): FreeTextFeedbackFunction {
   return ({ text }) => {
-    const minExpressionDNF: SyntaxTreeNodeType = minimizeExpressionDNF(solutionExpression)
-    const correctAnswer = "$" + minExpressionDNF.toString(true) + "$"
+    const minimalDNF = new GetMinimalDNF(solutionExpression)
+    const correctAnswer = "$" + minimalDNF.toString(true) + "$"
 
     const userExpression = PropositionalLogicParser.parse(text)
     if (userExpression instanceof ParserError) {
@@ -177,7 +177,7 @@ function feedbackFunction(
       }
     }
 
-    if (!compareExpressions([minExpressionDNF, userExpression])) {
+    if (!compareExpressions([minimalDNF.get(), userExpression])) {
       return {
         correct: false,
         feedbackText: t(translations, lang, "freetext_feedback_not_equivalent"),
@@ -185,7 +185,7 @@ function feedbackFunction(
       }
     }
 
-    if (minExpressionDNF.getNumLiterals() !== userExpression.getNumLiterals()) {
+    if (minimalDNF.get().getNumLiterals() !== userExpression.getNumLiterals()) {
       return {
         correct: false,
         feedbackText: t(translations, lang, "freetext_feedback_not_minimal"),

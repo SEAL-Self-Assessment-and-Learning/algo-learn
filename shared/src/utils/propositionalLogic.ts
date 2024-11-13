@@ -1,6 +1,7 @@
 import Random from "./random.ts"
 
 export type VariableValues = Record<string, boolean>
+export type NormalForm = "CNF" | "DNF"
 
 export type ExpressionProperties = {
   variables: string[]
