@@ -25,7 +25,7 @@ const translations: Translations = {
     Find a text $T$: 
 {{3}}
 - where the code stated **above is optimal**
-- Contains each of the letters $\\{$** {{1}} **$\\}$ at **least once**
+- contains each of the letters $\\{$** {{1}} **$\\}$ at **least once**
 - no two character occur with the same frequency
 
 Provide the number of occurrences for each letter in $T$:
