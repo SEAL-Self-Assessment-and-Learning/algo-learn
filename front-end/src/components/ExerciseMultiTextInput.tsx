@@ -138,20 +138,30 @@ export function ExerciseMultiTextInput({
     },
   })
 
-  const message =
-    mode === "correct" ? (
-      <b className="text-2xl">{t("feedback.correct")}</b>
-    ) : mode === "incorrect" ? (
-      feedbackObject?.correctAnswer ? (
+  const message = []
+  if (mode === "correct") {
+    message.push(<b className="text-2xl">{t("feedback.correct")}</b>)
+  } else if (mode === "incorrect") {
+    if (feedbackObject?.feedbackText) {
+      message.push(
+        <>
+          <Markdown md={feedbackObject.feedbackText} />
+          <br />
+        </>,
+      )
+    }
+    if (feedbackObject?.correctAnswer) {
+      message.push(
         <>
           <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
           <br />
           <Markdown md={feedbackObject.correctAnswer} />
-        </>
-      ) : (
-        <b className="text-2xl">{t("feedback.incorrect")}</b>
+        </>,
       )
-    ) : null
+    } else {
+      message.push(<b className="text-2xl">{t("feedback.incorrect")}</b>)
+    }
+  }
 
   const fieldValues = getInputFields(question.text ? question.text : "")
 
