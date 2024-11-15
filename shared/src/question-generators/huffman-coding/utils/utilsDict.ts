@@ -19,9 +19,15 @@ import { t, Translations } from "@shared/utils/translations"
 /**
  * This function generates the basic structure for input2 and choice2 questions
  * @param random
+ * @param numDifferentCharacters - number of different chars
  */
-function generateDictFoundations({ random }: { random: Random }) {
-  const numDifferentCharacters = random.int(6, 9)
+export function generateDictFoundations({
+  random,
+  numDifferentCharacters,
+}: {
+  random: Random
+  numDifferentCharacters: number
+}) {
   const characterFrequencies = generateCharacterFrequencyTable(numDifferentCharacters, random)
   // only temporary displaying the word array
   // add some spacing to table in the question text using extra feature div_my-5
@@ -63,13 +69,17 @@ function createInputFields(characterFrequencies: { [p: string]: number }) {
 /**
  * This function creates the solution table for the user to see a correct encoding
  * @param correctAnswerDict
+ * @param styleOptions - additional styling for the table (adding to
  */
-function createSolutionTable(correctAnswerDict: Record<string, string>) {
+export function createSolutionTable(
+  correctAnswerDict: Record<string, string | number>,
+  styleOptions?: string[],
+) {
   let solutionDisplay = ""
   for (const key in correctAnswerDict) {
     solutionDisplay += `|**${key}**|$${correctAnswerDict[key]}$|\n`
   }
-  solutionDisplay += "|#table_w-full?td?sd?ah_center?div_my-5#| |"
+  solutionDisplay += `|#table_w-full?ah_center?div_my-5${styleOptions ? "?" + styleOptions.join("?") : ""}#| |`
   return solutionDisplay
 }
 
@@ -94,11 +104,13 @@ export function generateInput2Question({
   lang: "en" | "de"
   permalink: string
 }) {
+  const numDifferentCharacters = random.int(6, 9)
   const { characterFrequencies, displayTable, correctAnswerDict } = generateDictFoundations({
     random,
+    numDifferentCharacters,
   })
   const inputFields = createInputFields(characterFrequencies)
-  const solutionTable = createSolutionTable(correctAnswerDict)
+  const solutionTable = createSolutionTable(correctAnswerDict, ["sd", "td"])
 
   const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
     if (text[fieldID].trim() === "") return { valid: false, message: "" }
@@ -176,8 +188,10 @@ export function generateChoice2Question({
   lang: "en" | "de"
   permalink: string
 }) {
+  const numDifferentCharacters = random.int(6, 9)
   const { characterFrequencies, displayTable, correctAnswerTreeNode } = generateDictFoundations({
     random,
+    numDifferentCharacters,
   })
   const { answers, correctAnswerIndices } = generatePossibleAnswersChoice2(
     random,

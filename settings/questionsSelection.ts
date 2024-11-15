@@ -10,6 +10,7 @@ import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptot
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import { ReverseHuffmanCoding } from "@shared/question-generators/huffman-coding/reverseHuffmanCoding.ts"
 import { CRT } from "@shared/question-generators/math/crt"
 import { modFactor } from "@shared/question-generators/math/modFactorization"
 import { ModTricks } from "@shared/question-generators/math/modTricks"
@@ -50,7 +51,7 @@ export const collection: QuestionCollection = [
   {
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
-    contents: [huffmanCoding],
+    contents: [huffmanCoding, ReverseHuffmanCoding],
   },
   {
     slug: "queue",
