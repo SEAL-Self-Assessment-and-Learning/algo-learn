@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": [
     "front-end",
+    "svelte-front-end",
     "settings",
     "shared"
   ],
@@ -15,9 +16,9 @@
     "build:json-schema": "$npm_execpath run ts-json-schema-generator --path 'src/**/QuestionGenerator.ts' --tsconfig ./tsconfig.ts-json-schema-generator.json --type 'Question'",
     "test": "$npm_execpath run lint && $npm_execpath run test:unit",
     "test:unit": "which bun && bun test --bail || vitest run --bail 1",
-    "lint": "eslint && tsc && prettier . --check",
+    "lint": "eslint && tsc && prettier . --check && cd svelte-front-end && $npm_execpath run lint",
     "format": "prettier . --write",
-    "clean": "rm -rf dist/ .yarn/cache/ node_modules/ front-end/node_modules settings/node_modules/ shared/node_modules/ docs/ vite-bundle-visualizer.html",
+    "clean": "rm -rf dist/ .yarn/cache/ node_modules/ *front-end/node_modules/ settings/node_modules/ shared/node_modules/ docs/ vite-bundle-visualizer.html",
     "visualize": "$npm_execpath run vite-bundle-visualizer -o vite-bundle-visualizer.html",
     "docs": "$npm_execpath run typedoc --out docs shared/src/**/*.ts shared/src/**/*.tsx"
   },
@@ -36,6 +37,7 @@
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "prettier-plugin-css-order": "^2.1.2",
+    "prettier-plugin-svelte": "^3.3.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
     "stylelint": "^16.11.0",
     "stylelint-config-recommended": "^14.0.1",
