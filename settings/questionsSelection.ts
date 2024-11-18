@@ -9,6 +9,7 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { DijkstraAlgorithm } from "@shared/question-generators/graph-algorithms/dijkstra.ts"
 import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
@@ -69,7 +70,7 @@ export const collection: QuestionCollection = [
   {
     slug: "tt",
     name: { de: "Graphalgorithmen", en: "Graph Algorithms" },
-    contents: [TreeTraversal],
+    contents: [TreeTraversal, DijkstraAlgorithm],
   },
 ]
 
