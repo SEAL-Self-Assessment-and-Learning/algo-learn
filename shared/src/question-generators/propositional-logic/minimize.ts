@@ -19,7 +19,7 @@ import {
   SyntaxTreeNodeType,
   tokenToLatex,
 } from "@shared/utils/propositionalLogic"
-import { GetMinimalDNF } from "@shared/utils/propositionalLogicMinimize.ts"
+import { GetMinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
 
@@ -64,14 +64,14 @@ export const MinimizePropositionalLogic: QuestionGenerator = {
     {
       name: "variant",
       type: "string",
-      allowedValues: ["DNF"], // "CNF"
+      allowedValues: ["DNF", "CNF"],
     },
     {
       name: "size",
       description: tFunctional(translations, "param_size"),
       type: "integer",
       min: 3,
-      max: 4,
+      max: 3,
     },
   ],
 
@@ -84,7 +84,7 @@ export const MinimizePropositionalLogic: QuestionGenerator = {
     })
     const random = new Random(seed)
 
-    const variant: "DNF" = parameters.variant as "DNF"
+    const variant: "DNF" | "CNF" = parameters.variant as "DNF" | "CNF"
     const numVariables = (parameters.size as number) ?? 3
     const numLeaves = random.int(numVariables + 2, numVariables + 4)
     const varNames = random.choice(variableNames).slice(0, numVariables)
@@ -142,20 +142,18 @@ function checkFormat(varNames: string[]): FreeTextFormatFunction {
  * - equivalent to solutionExpression
  * - has the same size as the minDNF/CNF of solutionExpression
  *
- * Todo: currently only **DNF** is supported
- *
  * @param solutionExpression - base expression
- * @param functionType - normal form type
+ * @param form - normal form type
  * @param lang
  */
 function feedbackFunction(
   solutionExpression: SyntaxTreeNodeType,
-  functionType: "DNF", // | "CNF"
+  form: "DNF" | "CNF",
   lang: "en" | "de",
 ): FreeTextFeedbackFunction {
   return ({ text }) => {
-    const minimalDNF = new GetMinimalDNF(solutionExpression)
-    const correctAnswer = "$" + minimalDNF.toString(true) + "$"
+    const correctMinNormalForm = new GetMinimalNormalForm(solutionExpression)
+    const correctAnswer = "$" + correctMinNormalForm.get(form).toString(true) + "$"
 
     const userExpression = PropositionalLogicParser.parse(text)
     if (userExpression instanceof ParserError) {
@@ -166,18 +164,18 @@ function feedbackFunction(
       }
     }
 
-    const isCorrectForm = functionType === "DNF" ? userExpression.isDNF() : userExpression.isCNF()
+    const isCorrectForm = form === "DNF" ? userExpression.isDNF() : userExpression.isCNF()
     if (!isCorrectForm) {
       return {
         correct: false,
         feedbackText: t(translations, lang, "freetext_feedback_no_normal_form", [
-          t(translations, lang, functionType),
+          t(translations, lang, form),
         ]),
         correctAnswer,
       }
     }
 
-    if (!compareExpressions([minimalDNF.get(), userExpression])) {
+    if (!compareExpressions([correctMinNormalForm.get(form), userExpression])) {
       return {
         correct: false,
         feedbackText: t(translations, lang, "freetext_feedback_not_equivalent"),
@@ -185,7 +183,7 @@ function feedbackFunction(
       }
     }
 
-    if (minimalDNF.get().getNumLiterals() !== userExpression.getNumLiterals()) {
+    if (correctMinNormalForm.get(form).getNumLiterals() !== userExpression.getNumLiterals()) {
       return {
         correct: false,
         feedbackText: t(translations, lang, "freetext_feedback_not_minimal"),
@@ -193,6 +191,6 @@ function feedbackFunction(
       }
     }
 
-    return { correct: true, correctAnswer }
+    return { correct: true }
   }
 }

@@ -19,19 +19,24 @@ type BinaryMix = 0 | 1 | "x"
  * - CNF (Conjunctive Normal
  * - The minimal normal form is the minimal number of literals needed
  */
-abstract class GetMinimalNormalForm {
-  protected expr: SyntaxTreeNodeType
+export class GetMinimalNormalForm {
+  private readonly expr: SyntaxTreeNodeType
+  private readonly cnfExpr: SyntaxTreeNodeType
+  private readonly dnfExpr: SyntaxTreeNodeType
 
-  protected constructor(expr: SyntaxTreeNodeType) {
+  constructor(expr: SyntaxTreeNodeType) {
     this.expr = expr
-    // always get the minimal form
-    this.getMinimalForm()
+    this.dnfExpr = this.getMinimalForm("DNF")
+    this.cnfExpr = this.getMinimalForm("CNF")
   }
 
   /**
-   * Returns the SyntaxTreeNode of the minimal normal form
+   * Returns the expression
+   * @param form - which form of expression
    */
-  get(): SyntaxTreeNodeType {
+  get(form: NormalForm | "base"): SyntaxTreeNodeType {
+    if (form === "DNF") return this.dnfExpr
+    if (form === "CNF") return this.cnfExpr
     return this.expr
   }
 
@@ -39,9 +44,32 @@ abstract class GetMinimalNormalForm {
    * Returns the string representation of the SyntaxTreeNode
    * Shortcut for x.get().toString()
    * @param latex - whether to return the latex representation
+   * @param form - which form returned
    */
-  toString(latex: boolean = false): string {
+  toString(latex: boolean = false, form: NormalForm | "base"): string {
+    if (form === "DNF") return this.dnfExpr.toString(latex)
+    if (form === "CNF") return this.cnfExpr.toString(latex)
     return this.expr.toString(latex)
+  }
+
+  /**
+   * Computes the minimal normal form (either CNF or DNF) for the given logical expression.
+   *
+   * @param form - either a minimal cnf or dnf
+   * @private
+   * @using Quine–McCluskey algorithm
+   */
+  private getMinimalForm(form: NormalForm): SyntaxTreeNodeType {
+    const { truthTable: tTable, variableNames: varNames } = this.expr.getTruthTable()
+
+    const calcRows = this.getIndicesOfRows(tTable, form === "DNF")
+    const { implicants } = this.getPrimeImplicants(calcRows, varNames.length)
+    const { implicantRows } = this.allImplicantRows(implicants)
+    const minRows = this.minimumCover(implicantRows, calcRows)
+    // get those implicants that are in the minimum cover
+    const minImplicants = minRows.map((i) => implicants[i])
+
+    return this.buildNormalFormTree(minImplicants, varNames, form)
   }
 
   /**
@@ -65,9 +93,9 @@ abstract class GetMinimalNormalForm {
    *  - x: don't add
    * @param finalImplicants
    * @param varNames
-   * @param type
+   * @param form
    */
-  protected buildNormalFormTree(finalImplicants: BinaryMix[][], varNames: string[], type: NormalForm) {
+  private buildNormalFormTree(finalImplicants: BinaryMix[][], varNames: string[], form: NormalForm) {
     const clauses: SyntaxTreeNodeType[] = []
     for (const implicant of finalImplicants) {
       const literals: Literal[] = []
@@ -75,67 +103,103 @@ abstract class GetMinimalNormalForm {
         if (implicant[i] === "x") {
           continue
         }
-        const negated = !implicant[i]
+        const negated = form === "DNF" ? !implicant[i] : implicant[i] === 1
         literals.push(new Literal(varNames[varNames.length - i - 1], negated))
       }
-      clauses.push(this.combineTrees(literals, type === "DNF" ? "\\and" : "\\or"))
+      clauses.push(this.combineTrees(literals, form === "DNF" ? "\\and" : "\\or"))
     }
-    return this.combineTrees(clauses, type === "DNF" ? "\\or" : "\\and")
+    return this.combineTrees(clauses, form === "DNF" ? "\\or" : "\\and")
   }
 
   /**
-   * Returns the binary representation for each row-index
-   * @param rows
-   * @param numVars
-   * @protected
+   * This function returns the prime implicants of the given rows
+   * @param rows - the row numbers (true rows)
+   * @param numVars - the number of variables (to pad the binary representation)
    */
-  protected getBinaryRepresentations(rows: number[], numVars: number) {
-    const rowBinary: (0 | 1)[][] = []
-    for (const row of rows) {
-      const binary = row.toString(2).padStart(numVars, "0")
-      rowBinary.push(binary.split("").map((val) => (val === "0" ? 0 : 1)))
+  private getPrimeImplicants(rows: number[], numVars: number) {
+    let { rowBinary: currentImplicants } = this.getBinaryRepresentations(rows, numVars) as {
+      rowBinary: (0 | 1 | "x")[][]
     }
-    return { rowBinary }
+    let nextImplicants: BinaryMix[][] = []
+    const implicants: BinaryMix[][] = []
+
+    while (currentImplicants.length > 0) {
+      for (let i = 0; i < currentImplicants.length; i++) {
+        for (let j = 0; j < currentImplicants.length; j++) {
+          // check if the difference between the two implicants is 1
+          if (this.getDiffBinary(currentImplicants[i], currentImplicants[j]) === 1) {
+            const copyImplicant = [...currentImplicants[i]]
+            // only one possible difference, implies the index is unique
+            const diffIndex = currentImplicants[i].findIndex(
+              (val, index) => val !== currentImplicants[j][index],
+            )
+            copyImplicant[diffIndex] = "x"
+            nextImplicants.push(copyImplicant)
+          }
+        }
+      }
+
+      // which currentImplicants are not inside the nextImplicants?
+      const { diffImplicants } = this.getDiffImplicantsLists(currentImplicants, nextImplicants)
+      implicants.push(...diffImplicants)
+
+      currentImplicants = this.removeDuplicates(nextImplicants)
+      nextImplicants = []
+    }
+
+    return { implicants }
   }
 
   /**
-   * This function returns the indices of the rows in the truth table that are true
-   * @param tTable - truth table of an expression
-   * @param rowType - either true or false rows
+   * This function returns the number of differences between two binary arrays of the **same length**
+   * @param binary1 - first binary array
+   * @param binary2 - second binary array
    */
-  protected getIndicesOfRows(tTable: TruthTable, rowType: true | false = true): number[] {
-    return tTable.map((val, i) => (val === rowType ? i : -1)).filter((i) => i !== -1)
+  private getDiffBinary(binary1: BinaryMix[], binary2: BinaryMix[]) {
+    if (binary1.length !== binary2.length) {
+      throw new Error("Binary arrays must be of the same length")
+    }
+    let num = 0
+    for (let i = 0; i < binary1.length; i++) {
+      if (binary1[i] !== binary2[i]) num++
+    }
+    return num
   }
 
   /**
-   * This function calculates the minimal normal form of the given expression
+   * This function returns the implicants that aren't in the second list
+   * @param implicants1 - first list of implicants
+   * @param implicants2 - second list of implicants
+   * @param diff - the number of different elements allowed between the two implicant lists
    */
-  protected abstract getMinimalForm(): void
-}
-
-/**
- * This class calculates the minimal DNF of a given expression
- */
-export class GetMinimalDNF extends GetMinimalNormalForm {
-  constructor(expr: SyntaxTreeNodeType) {
-    super(expr)
+  private getDiffImplicantsLists(
+    implicants1: BinaryMix[][],
+    implicants2: BinaryMix[][],
+    diff: number = 1,
+  ) {
+    const diffImplicants: BinaryMix[][] = []
+    for (const implicant1 of implicants1) {
+      let found = false
+      for (const implicant2 of implicants2) {
+        if (this.getDiffBinary(implicant1, implicant2) === diff) {
+          found = true
+          break
+        }
+      }
+      if (!found) {
+        diffImplicants.push(implicant1)
+      }
+    }
+    return { diffImplicants }
   }
 
   /**
-   * Calculates the minimal DNF
-   * Using **Quine–McCluskey** algorithm
+   * This function removes duplicates from a 2D array of binary arrays
+   * @param arr - the 2D array of binary arrays
    */
-  getMinimalForm() {
-    const { truthTable: tTable, variableNames: varNames } = this.expr.getTruthTable()
-
-    const trueRows = this.getIndicesOfRows(tTable)
-    const { implicants } = this.getPrimeImplicants(trueRows, varNames.length)
-    const { implicantRows } = this.allImplicantRows(implicants)
-    const minRows = this.minimumCover(implicantRows, trueRows)
-    // get those implicants that are in the minimum cover
-    const minImplicants = minRows.map((i) => implicants[i])
-
-    this.expr = this.buildNormalFormTree(minImplicants, varNames, "DNF")
+  private removeDuplicates(arr: BinaryMix[][]) {
+    const seen = new Set<string>()
+    return arr.filter((val) => !seen.has(val.join("")) && seen.add(val.join("")))
   }
 
   /**
@@ -184,42 +248,23 @@ export class GetMinimalDNF extends GetMinimalNormalForm {
   }
 
   /**
-   * This function returns the prime implicants of the given rows
-   * @param rows - the row numbers (true rows)
-   * @param numVars - the number of variables (to pad the binary representation)
+   * This function returns the minimum cover of the given implicant rows,
+   * such that all true rows are covered by the minimum number of implicants
+   * Set Cover Problem
+   * @param implicantRows - the rows of each implicant (2D array => [[1, 2], [1, 3, 4], ...])
+   * @param trueRows - the rows that are true in the truth table and need to be covered
    */
-  private getPrimeImplicants(rows: number[], numVars: number) {
-    let { rowBinary: currentImplicants } = this.getBinaryRepresentations(rows, numVars) as {
-      rowBinary: (0 | 1 | "x")[][]
-    }
-    let nextImplicants: BinaryMix[][] = []
-    const implicants: BinaryMix[][] = []
-
-    while (currentImplicants.length > 0) {
-      for (let i = 0; i < currentImplicants.length; i++) {
-        for (let j = 0; j < currentImplicants.length; j++) {
-          // check if the difference between the two implicants is 1
-          if (this.getDiffBinary(currentImplicants[i], currentImplicants[j]) === 1) {
-            const copyImplicant = [...currentImplicants[i]]
-            // only one possible difference, implies the index is unique
-            const diffIndex = currentImplicants[i].findIndex(
-              (val, index) => val !== currentImplicants[j][index],
-            )
-            copyImplicant[diffIndex] = "x"
-            nextImplicants.push(copyImplicant)
-          }
-        }
+  private minimumCover(implicantRows: number[][], trueRows: number[]) {
+    const sortedSubsets: number[][] = this.generateSortedSubsets(implicantRows.length)
+    // find the smallest set that covers all true rows
+    for (const set of sortedSubsets) {
+      const rows = set.flatMap((i) => implicantRows[i]).sort()
+      if (this.isCover(rows, trueRows)) {
+        return set
       }
-
-      // which currentImplicants are not inside the nextImplicants?
-      const { diffImplicants } = this.getDiffImplicantsLists(currentImplicants, nextImplicants)
-      implicants.push(...diffImplicants)
-
-      currentImplicants = this.removeDuplicates(nextImplicants)
-      nextImplicants = []
     }
-
-    return { implicants }
+    // should never reach here
+    throw new Error("No cover found")
   }
 
   /**
@@ -245,78 +290,6 @@ export class GetMinimalDNF extends GetMinimalNormalForm {
   }
 
   /**
-   * This function returns the implicants that aren't in the second list
-   * @param implicants1 - first list of implicants
-   * @param implicants2 - second list of implicants
-   * @param diff - the number of different elements allowed between the two implicant lists
-   */
-  private getDiffImplicantsLists(
-    implicants1: BinaryMix[][],
-    implicants2: BinaryMix[][],
-    diff: number = 1,
-  ) {
-    const diffImplicants: BinaryMix[][] = []
-    for (const implicant1 of implicants1) {
-      let found = false
-      for (const implicant2 of implicants2) {
-        if (this.getDiffBinary(implicant1, implicant2) === diff) {
-          found = true
-          break
-        }
-      }
-      if (!found) {
-        diffImplicants.push(implicant1)
-      }
-    }
-    return { diffImplicants }
-  }
-
-  /**
-   * This function returns the minimum cover of the given implicant rows,
-   * such that all true rows are covered by the minimum number of implicants
-   * Set Cover Problem
-   * @param implicantRows - the rows of each implicant (2D array => [[1, 2], [1, 3, 4], ...])
-   * @param trueRows - the rows that are true in the truth table and need to be covered
-   */
-  private minimumCover(implicantRows: number[][], trueRows: number[]) {
-    const sortedSubsets: number[][] = this.generateSortedSubsets(implicantRows.length)
-    // find the smallest set that covers all true rows
-    for (const set of sortedSubsets) {
-      const rows = set.flatMap((i) => implicantRows[i]).sort()
-      if (this.isCover(rows, trueRows)) {
-        return set
-      }
-    }
-    // should never reach here
-    throw new Error("No cover found")
-  }
-
-  /**
-   * This function returns the number of differences between two binary arrays of the **same length**
-   * @param binary1 - first binary array
-   * @param binary2 - second binary array
-   */
-  private getDiffBinary(binary1: BinaryMix[], binary2: BinaryMix[]) {
-    if (binary1.length !== binary2.length) {
-      throw new Error("Binary arrays must be of the same length")
-    }
-    let num = 0
-    for (let i = 0; i < binary1.length; i++) {
-      if (binary1[i] !== binary2[i]) num++
-    }
-    return num
-  }
-
-  /**
-   * This function removes duplicates from a 2D array of binary arrays
-   * @param arr - the 2D array of binary arrays
-   */
-  private removeDuplicates(arr: BinaryMix[][]) {
-    const seen = new Set<string>()
-    return arr.filter((val) => !seen.has(val.join("")) && seen.add(val.join("")))
-  }
-
-  /**
    * This function checks if the given rows cover all the true rows
    * @param rows
    * @param trueRows
@@ -324,16 +297,28 @@ export class GetMinimalDNF extends GetMinimalNormalForm {
   private isCover(rows: number[], trueRows: number[]) {
     return trueRows.every((row) => rows.includes(row))
   }
-}
 
-/**
- * This class calculates the minimal CNF of a given expression
- * //Todo: implement the CNF version
- */
-export class GetMinimalCNF extends GetMinimalNormalForm {
-  constructor(expr: SyntaxTreeNodeType) {
-    super(expr)
+  /**
+   * Returns the binary representation for each row-index
+   * @param rows
+   * @param numVars
+   * @private
+   */
+  private getBinaryRepresentations(rows: number[], numVars: number) {
+    const rowBinary: (0 | 1)[][] = []
+    for (const row of rows) {
+      const binary = row.toString(2).padStart(numVars, "0")
+      rowBinary.push(binary.split("").map((val) => (val === "0" ? 0 : 1)))
+    }
+    return { rowBinary }
   }
 
-  protected getMinimalForm(): void {}
+  /**
+   * This function returns the indices of the rows in the truth table that are true
+   * @param tTable - truth table of an expression
+   * @param rowType - either true or false rows
+   */
+  private getIndicesOfRows(tTable: TruthTable, rowType: true | false = true): number[] {
+    return tTable.map((val, i) => (val === rowType ? i : -1)).filter((i) => i !== -1)
+  }
 }
