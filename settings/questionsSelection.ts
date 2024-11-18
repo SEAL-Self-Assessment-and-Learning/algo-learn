@@ -9,6 +9,7 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { DijkstraAlgorithm } from "@shared/question-generators/graph-algorithms/dijkstra.ts"
 import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
@@ -78,7 +79,7 @@ export const collection: QuestionCollection = [
   {
     slug: "tt",
     name: { de: "Graphalgorithmen", en: "Graph Algorithms" },
-    contents: [TreeTraversal, DijkstraAlgorithm, DijkstraTableGenerator],
+    contents: [TreeTraversal, DijkstraAlgorithm, DijkstraAlgorithm, DijkstraTableGenerator],
   },
   {
     slug: "modular-arithmetic",
