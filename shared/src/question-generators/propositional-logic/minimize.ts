@@ -71,7 +71,7 @@ export const MinimizePropositionalLogic: QuestionGenerator = {
       description: tFunctional(translations, "param_size"),
       type: "integer",
       min: 3,
-      max: 3,
+      max: 4,
     },
   ],
 
