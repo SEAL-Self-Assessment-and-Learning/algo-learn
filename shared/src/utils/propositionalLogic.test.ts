@@ -3,6 +3,7 @@ import { GetMinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.t
 import {
   associativeOperators,
   BinaryOperatorType,
+  compareExpressions,
   Literal,
   Operator,
   ParserError,
@@ -275,8 +276,32 @@ describe("parser", () => {
   })
 })
 
+test("function compareExpressions", () => {
+  const inputTester = ([expr1, expr2]: string[]) => {
+    const parse1 = PropositionalLogicParser.parse(expr1)
+    const parse2 = PropositionalLogicParser.parse(expr2)
+    if (parse1 instanceof ParserError || parse2 instanceof ParserError) {
+      // expect() does not narrow down the type, so "if" is used here
+      expect(parse1).not.toBeInstanceOf(ParserError)
+      expect(parse2).not.toBeInstanceOf(ParserError)
+    } else {
+      expect(compareExpressions([parse1, parse2])).toBeTruthy()
+    }
+  }
+
+  ;[
+    ["\\not A \\and B", "\\not (B => A)"],
+    ["\\not(A \\and B)", "(\\not A \\and B) \\or (\\not B \\and A) \\or (\\not A \\and \\not B)"],
+    [
+      "\\not A \\and (B \\or C)",
+      "(\\not A \\and \\not B \\and C) \\or (\\not A \\and B \\and \\not C) \\or (\\not A \\and B \\and C)",
+    ],
+    ["(\\not A \\or B) \\and (B \\or C)", "B \\or (\\not A \\and C)"],
+  ].forEach(inputTester)
+})
+
 test("minimize normal forms", () => {
-  const inputTest = ([expr, numLiteralsDNF, numLiteralsCNF]: (string | number)[]) => {
+  const inputTester = ([expr, numLiteralsDNF, numLiteralsCNF]: (string | number)[]) => {
     const parseResult = PropositionalLogicParser.parse(expr as string)
     if (parseResult instanceof ParserError) {
       // expect() does not narrow down the type, so "if" is used here
@@ -284,10 +309,10 @@ test("minimize normal forms", () => {
     } else {
       const minimalForms = new GetMinimalNormalForm(parseResult)
 
-      expect(minimalForms.get("DNF").getTruthTable()).toEqual(parseResult.getTruthTable())
+      expect(compareExpressions([minimalForms.get("DNF"), parseResult])).toBeTruthy()
       expect(minimalForms.get("DNF").getNumLiterals()).toEqual(numLiteralsDNF)
 
-      expect(minimalForms.get("CNF").getTruthTable()).toEqual(parseResult.getTruthTable())
+      expect(compareExpressions([minimalForms.get("CNF"), parseResult])).toBeTruthy()
       expect(minimalForms.get("CNF").getNumLiterals()).toEqual(numLiteralsCNF)
     }
   }
@@ -298,5 +323,12 @@ test("minimize normal forms", () => {
     ["\\not A \\and (B \\or C)", 4, 3],
     ["(\\not A \\or B) \\and (B \\or C)", 3, 4],
     ["((\\notA\\orB)\\and(B\\xorC))=>(D<=>E)", 10, 18],
-  ].forEach(inputTest)
+    ["c \\or ((a \\or b) \\and ((\\not a \\xor b \\xor a) \\or a))", 2, 2],
+    ["\\not c \\or ((c \\or \\not a) \\and c \\and (a \\or c \\or b)) \\and b", 2, 2],
+    [
+      "(a \\xor c) \\and (((c => f) \\or e) => (\\not e \\or b \\or c)) \\and (b \\or (f \\and d)) \\and (c \\or f) \\and (a \\or e)",
+      18,
+      15,
+    ],
+  ].forEach(inputTester)
 })
