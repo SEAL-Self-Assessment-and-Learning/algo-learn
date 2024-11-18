@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest"
+import { GetMinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
 import {
   associativeOperators,
   BinaryOperatorType,
@@ -272,4 +273,30 @@ describe("parser", () => {
       ["((\\notA\\orB)\\and(B\\xorC))=>(D<=>E)", "((\\not A \\or B) \\and (B \\xor C)) => (D <=> E)"],
     ].forEach(inputTester)
   })
+})
+
+test("minimize normal forms", () => {
+  const inputTest = ([expr, numLiteralsDNF, numLiteralsCNF]: (string | number)[]) => {
+    const parseResult = PropositionalLogicParser.parse(expr as string)
+    if (parseResult instanceof ParserError) {
+      // expect() does not narrow down the type, so "if" is used here
+      expect(parseResult).not.toBeInstanceOf(ParserError)
+    } else {
+      const minimalForms = new GetMinimalNormalForm(parseResult)
+
+      expect(minimalForms.get("DNF").getTruthTable()).toEqual(parseResult.getTruthTable())
+      expect(minimalForms.get("DNF").getNumLiterals()).toEqual(numLiteralsDNF)
+
+      expect(minimalForms.get("CNF").getTruthTable()).toEqual(parseResult.getTruthTable())
+      expect(minimalForms.get("CNF").getNumLiterals()).toEqual(numLiteralsCNF)
+    }
+  }
+
+  ;[
+    ["\\not A \\and B", 2, 2],
+    ["\\not(A \\and B)", 2, 2],
+    ["\\not A \\and (B \\or C)", 4, 3],
+    ["(\\not A \\or B) \\and (B \\or C)", 3, 4],
+    ["((\\notA\\orB)\\and(B\\xorC))=>(D<=>E)", 10, 18],
+  ].forEach(inputTest)
 })
