@@ -35,9 +35,9 @@ const translations: Translations = {
     stackContainsValues: `Der Stack enthält folgende Elemente (*mit dem Top-Element am höchsten Index*):`,
     freeTextInput: `Betrachte einen **Stack "S"**. {{0}} **Wir führen nun folgende Operationen aus:** {{1}}`,
     sequenceStackText: `Betrachte einen anfangs leeren Stapel, auf dem die Operationen {{0}} ausgeführt werden. Gib den finalen Zustand des Stapels an. {{1}} *(Das Top Element ist am höchsten Index.)*`,
-    sequenceLetterText: `Sei S ein Stapel. Führe die folgenden Operationen von links nach rechts aus: Ein Buchstabe *i* steht hierbei für S.PUSH(i) und * steht für S.POP().
+    sequenceLetterText: `Sei S ein Stapel. Führe die folgenden Operationen von links nach rechts aus: Ein Buchstabe \`i\` steht hierbei für \`S.PUSH(i)\` und \`*\` steht für \`S.POP()\`.
                     \\[\\texttt{{{0}}}\\]
-                    Gib die Sequenz der Buchstaben an, die durch die POP-Aufrufe ausgegeben werden.`,
+                    Gib die Sequenz der Buchstaben an, die durch die \`POP\`-Aufrufe ausgegeben werden.`,
   },
 }
 
