@@ -276,27 +276,77 @@ describe("parser", () => {
   })
 })
 
-test("function compareExpressions", () => {
-  const inputTester = ([expr1, expr2]: string[]) => {
-    const parse1 = PropositionalLogicParser.parse(expr1)
-    const parse2 = PropositionalLogicParser.parse(expr2)
+test("function compareExpressions (pairs)", () => {
+  const inputTester = ([expr1, expr2, value]: (string | boolean)[]) => {
+    const parse1 = PropositionalLogicParser.parse(expr1 as string)
+    const parse2 = PropositionalLogicParser.parse(expr2 as string)
     if (parse1 instanceof ParserError || parse2 instanceof ParserError) {
       // expect() does not narrow down the type, so "if" is used here
       expect(parse1).not.toBeInstanceOf(ParserError)
       expect(parse2).not.toBeInstanceOf(ParserError)
     } else {
-      expect(compareExpressions([parse1, parse2])).toBeTruthy()
+      expect(compareExpressions([parse1, parse2])).toEqual(value)
     }
   }
 
   ;[
-    ["\\not A \\and B", "\\not (B => A)"],
-    ["\\not(A \\and B)", "(\\not A \\and B) \\or (\\not B \\and A) \\or (\\not A \\and \\not B)"],
+    ["\\not A \\and B", "\\not (B => A)", true],
+    ["\\not(A \\and B)", "(\\not A \\and B) \\or (\\not B \\and A) \\or (\\not A \\and \\not B)", true],
     [
       "\\not A \\and (B \\or C)",
       "(\\not A \\and \\not B \\and C) \\or (\\not A \\and B \\and \\not C) \\or (\\not A \\and B \\and C)",
+      true,
     ],
-    ["(\\not A \\or B) \\and (B \\or C)", "B \\or (\\not A \\and C)"],
+    ["(\\not A \\or B) \\and (B \\or C)", "B \\or (\\not A \\and C)", true],
+    ["(\\not A \\or B) \\and (B \\or C)", "B \\and (\\not A \\and C)", false],
+    ["A \\and B", "A \\or B", false],
+    [
+      "(\\not A \\and B \\and C) \\or (\\not A \\and B \\and \\not C) \\or (\\not A => B \\and C)",
+      "(\\not A \\and \\not B \\and C) \\or (\\not A \\xor B \\and \\not C) \\or (\\not A <=> B \\and C)",
+      false,
+    ],
+  ].forEach(inputTester)
+})
+
+test("function compareExpressions (quadruple)", () => {
+  const inputTester = ([expr1, expr2, expr3, expr4, value]: (string | boolean)[]) => {
+    const parse1 = PropositionalLogicParser.parse(expr1 as string)
+    const parse2 = PropositionalLogicParser.parse(expr2 as string)
+    const parse3 = PropositionalLogicParser.parse(expr3 as string)
+    const parse4 = PropositionalLogicParser.parse(expr4 as string)
+    if (
+      parse1 instanceof ParserError ||
+      parse2 instanceof ParserError ||
+      parse3 instanceof ParserError ||
+      parse4 instanceof ParserError
+    ) {
+      // expect() does not narrow down the type, so "if" is used here
+      expect(parse1).not.toBeInstanceOf(ParserError)
+      expect(parse2).not.toBeInstanceOf(ParserError)
+      expect(parse3).not.toBeInstanceOf(ParserError)
+      expect(parse4).not.toBeInstanceOf(ParserError)
+    } else {
+      expect(compareExpressions([parse1, parse2, parse3, parse4])).toEqual(value)
+    }
+  }
+
+  ;[
+    ["\\not A \\and B", "\\not (B => A)", "\\not (B => A)", "\\not (B => A)", true],
+    ["\\not A \\and B", "\\not (B => A)", "\\not (B => A)", "\\not (B \\xor A)", false],
+    [
+      "A => (B \\and C)",
+      "\\not A \\or (B \\and C)",
+      "(\\not A \\and \\not  B \\and \\not C) \\or (\\not A \\and \\not B \\and C) \\or (\\not A \\and B \\and \\not C) \\or (\\not A \\and B \\and C) \\or (A \\and B \\and C)",
+      "\\not ((A \\and \\not B \\and \\not C) \\or (A \\and \\not B \\and C) \\or (A \\and B \\and \\not C))",
+      true,
+    ],
+    [
+      "A => (B \\and C)",
+      "\\not A \\or (B \\and C)",
+      "(\\not A \\and \\not  B \\and \\not C) \\or (\\not A \\and \\not B \\and C) \\or (\\not A \\and B \\and \\not C) \\or (\\not A \\and B \\and C) \\or (A \\and B \\and C)",
+      "\\not ((A \\and B \\and \\not C) \\or (A \\and \\not B \\and C) \\or (A \\and B \\and \\not C))",
+      false,
+    ],
   ].forEach(inputTester)
 })
 
