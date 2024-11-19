@@ -9,6 +9,9 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
+import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
+import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { CRT } from "@shared/question-generators/math/crt"
 import { modFactor } from "@shared/question-generators/math/modFactorization"
@@ -71,6 +74,11 @@ export const collection: QuestionCollection = [
     slug: "modular-arithmetic",
     name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
     contents: [ModTricks, CRT, modFactor],
+  },
+  {
+    slug: "heap",
+    name: { de: "Heap", en: "Heap" },
+    contents: [HeapOperations, HeapVerifying, HeapNeighbours],
   },
 ]
 
