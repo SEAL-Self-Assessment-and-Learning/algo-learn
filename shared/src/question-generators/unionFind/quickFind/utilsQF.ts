@@ -150,7 +150,12 @@ function generateOneBlock({
 }) {
   const usedElements: number[] = []
 
-  const block1Size = random.intNormal(3, unionSize - 2, (unionSize - 2) / 2 + 1, 1.5)
+  let block1Size: number
+  try {
+    block1Size = random.intNormal(3, unionSize - 2, (unionSize - 2) / 2 + 1, 1.5)
+  } catch {
+    block1Size = (unionSize - 2) / 2 + 1
+  }
 
   const block1Values: number[] = random.subset([...Array(unionSize).keys()], block1Size)
   usedElements.push(...block1Values)

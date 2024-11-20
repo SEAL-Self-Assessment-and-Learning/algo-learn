@@ -75,6 +75,8 @@ export default class Random {
    *  - min (if closer last generated value is smaller then min)
    *  - max (otherwise)
    *
+   *  Min/Max has to be in the range of standard derivations.
+   *
    * So not perfect, because usually normal distribution does not have a min and max.
    *
    * @param min - The minimum number
@@ -83,6 +85,9 @@ export default class Random {
    * @param stdev - The standard deviation
    */
   intNormal(min: number, max: number, mean = Math.round((min + max) / 2), stdev = 1): number {
+    if (mean - 3 * stdev < min || mean + 3 * stdev > max) {
+      throw new Error("min/max has to be in three std of mean")
+    }
     let value = 0
     // try 10 times to generate a value within min and max
     // so the probability of failing gets smaller, otherwise return either min or max
