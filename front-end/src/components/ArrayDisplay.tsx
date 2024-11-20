@@ -16,7 +16,7 @@ import { useTranslation } from "@/hooks/useTranslation"
  */
 export function ArrayDisplay<T>({ arrayObject }: { arrayObject: string }): ReactElement {
   const parsedArrayObject = JSON.parse(arrayObject) as ArrayDisplayProps<T>
-  const transposedView = useDeviceSize() === "sm"
+  const transposedView = useDeviceSize() === "sm" || parsedArrayObject.transpose
 
   return transposedView
     ? RenderTransposedArrayView({ parsedArrayObject })

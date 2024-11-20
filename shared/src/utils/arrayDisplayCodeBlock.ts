@@ -7,12 +7,16 @@ import { SingleTranslation } from "@shared/utils/translations"
  * @param startingIndex The index to in the top row to start with
  *                      (default is 0, mostly either 0 or 1)
  * @param secondRowName The name of the second row (default is ST "Value")
+ * @param inputFieldSize The size of the input fields (default is 2)
+ * @param transpose If the array should be transposed (default is false)
+ *                  - if false, on mobile it will still transpose
  */
 export type ArrayDisplayProps<T> = {
   array: T[]
   startingIndex: number
   secondRowName: SingleTranslation
   inputFieldSize?: number
+  transpose: boolean
 }
 
 /**
@@ -22,6 +26,7 @@ export type ArrayDisplayProps<T> = {
  * @param secondRowName
  * @param inputFieldSize - the max number of characters necessary to fill the input field
  * @param leadValues - the lead values are values in the columns in front of the input fields
+ * @param transpose - if the array should be transposed
  */
 export function createArrayDisplayCodeBlockUserInput({
   numberOfInputFields,
@@ -29,12 +34,14 @@ export function createArrayDisplayCodeBlockUserInput({
   secondRowName = { de: "Wert", en: "Value" },
   inputFieldCharacters = 2,
   leadValues = [],
+  transpose = false,
 }: {
   numberOfInputFields: number
   startingIndex?: number
   secondRowName?: SingleTranslation
   inputFieldCharacters?: number
   leadValues?: string[]
+  transpose?: boolean
 }) {
   // create as many input fields as needed
   const inputFields: string[] = leadValues
@@ -50,6 +57,7 @@ export function createArrayDisplayCodeBlockUserInput({
       array: inputFields,
       startingIndex,
       secondRowName,
+      transpose,
     }),
   }
 }
@@ -59,20 +67,24 @@ export function createArrayDisplayCodeBlockUserInput({
  * @param array
  * @param startingIndex
  * @param secondRowName
+ * @param transpose
  */
 export function createArrayDisplayCodeBlock<T>({
   array,
   startingIndex = 0,
   secondRowName = { de: "Wert", en: "Value" },
+  transpose = false,
 }: {
   array: T[]
   startingIndex?: number
   secondRowName?: SingleTranslation
+  transpose?: boolean
 }): string {
   const parseArrayBlock: ArrayDisplayProps<T> = {
     array,
     startingIndex,
     secondRowName,
+    transpose,
   }
 
   return `

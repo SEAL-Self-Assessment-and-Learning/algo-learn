@@ -256,23 +256,11 @@ export function generateQuestionLinearDoubleProbing(
 ) {
   const { tableSize, randomHashFunction, hashMap, insertValuesString, deleteValuesString } =
     generateQuestionBase(random, variant, translations, lang)
-  let arrayDisplayBlock
-  if (tableSize <= 7) {
-    const { arrayDisplayBlock: arrayDisplayBlock_ } = createArrayDisplayCodeBlockUserInput({
-      numberOfInputFields: tableSize,
-    })
-    arrayDisplayBlock = arrayDisplayBlock_
-  } else {
-    // work around ...
-    const { arrayDisplayBlock: arrayDisplayBlockPart1 } = createArrayDisplayCodeBlockUserInput({
-      numberOfInputFields: 7,
-    })
-    const { arrayDisplayBlock: arrayDisplayBlockPart2 } = createArrayDisplayCodeBlockUserInput({
-      numberOfInputFields: tableSize - 7,
-      startingIndex: 7,
-    })
-    arrayDisplayBlock = arrayDisplayBlockPart1 + arrayDisplayBlockPart2
-  }
+
+  const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
+    numberOfInputFields: tableSize,
+    transpose: true,
+  })
 
   const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
     // input-x are the keys in text
