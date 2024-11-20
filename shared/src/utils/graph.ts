@@ -259,6 +259,7 @@ export class RandomGraph {
     shape: "square" | "square-width-diagonals" | "triangle",
     weights: "random" | "unique" | null,
     directed: boolean = false,
+    //connected: boolean = false,
     shakeUpNodePosition: boolean = false,
   ): Graph {
     const scale = 3
@@ -371,6 +372,69 @@ export class RandomGraph {
         }
       })
     })
+
+    // function ensureConnectedGraph(edges: EdgeList, nodes: NodeList, directed: boolean): void {
+    //   const numNodes = nodes.length
+    //   const visited = new Array(numNodes).fill(false)
+    //   const components: NodeId[][] = []
+
+    //   // DFS and mark connected nodes
+    //   const dfs = (node: NodeId, component: NodeId[]) => {
+    //     visited[node] = true
+    //     component.push(node)
+    //     edges[node].forEach((edge) => {
+    //       if (!visited[edge.target]) dfs(edge.target, component)
+    //     })
+    //   }
+
+    //   // identify all connected components
+    //   for (let i = 0; i < numNodes; i++) {
+    //     if (!visited[i]) {
+    //       const component: NodeId[] = []
+    //       dfs(i, component)
+    //       components.push(component)
+    //     }
+    //   }
+
+    //   // connect isolated components to form a single connected component
+    //   for (let i = 1; i < components.length; i++) {
+    //     const prevComponent = components[i - 1]
+    //     const currentComponent = components[i]
+
+    //     // pick random node from previous component
+    //     const source = prevComponent[Math.floor(Math.random() * prevComponent.length)]
+
+    //     // find closest neighbor in current component
+    //     let closestNode = currentComponent[0]
+    //     let minDistance = Infinity
+
+    //     for (const target of currentComponent) {
+    //       const dist = Math.hypot(
+    //         nodes[source].coords.x - nodes[target].coords.x,
+    //         nodes[source].coords.y - nodes[target].coords.y,
+    //       )
+    //       if (dist < minDistance) {
+    //         minDistance = dist
+    //         closestNode = target
+    //       }
+    //     }
+
+    //     // add edge to bridge components
+    //     edges[source].push({ source, target: closestNode })
+    //     if (!directed) {
+    //       edges[closestNode].push({ source: closestNode, target: source })
+    //     }
+
+    //     // log new edge
+    //     console.log(
+    //       `Connected component ${i - 1} to component ${i} by adding edge from ${source} to ${closestNode}`,
+    //     )
+    //   }
+    // }
+
+    // if (connected) {
+    //   ensureConnectedGraph(links, vertices, directed)
+    // }
 
     const graph = new Graph(vertices, links, directed, weights !== null)
 
@@ -696,5 +760,114 @@ export class RootedTree {
     modSum += this.coordinates.mod
 
     this.children.forEach((child) => child.computeFinalNodeCoordinates(modSum))
+  }
+}
+
+export class KNMGraphGenerator {
+  public static completeGraph(
+    random: Random,
+    size: number,
+    weights: "random" | "unique" | null,
+    directed: boolean = false,
+  ): Graph {
+    const nodes: NodeList = []
+    const edges: EdgeList = Array.from(Array(size), () => [])
+    const radius = 5
+
+    // arrange nodes in circle
+    for (let i = 0; i < size; i++) {
+      const angle = (2 * Math.PI * i) / size
+      nodes.push({
+        label: RandomGraph.getLabel(i),
+        coords: { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius },
+      })
+    }
+
+    // connect nodes
+    for (let i = 0; i < size; i++) {
+      for (let j = i + 1; j < size; j++) {
+        const weight = weights === "random" ? random.int(1, 20) : i + j + 1
+        edges[i].push({ source: i, target: j, value: weights ? weight : undefined })
+        if (!directed) edges[j].push({ source: j, target: i, value: weights ? weight : undefined })
+      }
+    }
+
+    return new Graph(nodes, edges, directed, !!weights)
+  }
+
+  public static bipartiteGraph(
+    random: Random,
+    nodesInPartA: number,
+    nodesInPartB: number,
+    weights: "random" | "unique" | null,
+    directed: boolean = false,
+  ): Graph {
+    const nodes: NodeList = []
+    const edges: EdgeList = Array.from(Array(nodesInPartA + nodesInPartB), () => [])
+    const yOffset = 3
+
+    // create nodes for partition A
+    for (let i = 0; i < nodesInPartA; i++) {
+      nodes.push({
+        label: RandomGraph.getLabel(i),
+        coords: { x: i * 2, y: -yOffset },
+      })
+    }
+
+    // create nodes for partition B
+    for (let j = 0; j < nodesInPartB; j++) {
+      nodes.push({
+        label: RandomGraph.getLabel(nodesInPartA + j),
+        coords: { x: j * 2, y: yOffset },
+      })
+    }
+
+    // connect each node in partition A to every node in partition B
+    for (let a = 0; a < nodesInPartA; a++) {
+      for (let b = nodesInPartA; b < nodesInPartA + nodesInPartB; b++) {
+        const weight = weights === "random" ? random.int(1, 20) : a + b
+        edges[a].push({ source: a, target: b, value: weights ? weight : undefined })
+        if (!directed) edges[b].push({ source: b, target: a, value: weights ? weight : undefined })
+      }
+    }
+
+    return new Graph(nodes, edges, directed, !!weights)
+  }
+}
+
+export class CycleGraph {
+  public static generate(
+    random: Random,
+    size: number,
+    weights: "random" | "unique" | null,
+    directed: boolean = false,
+    shakeUpNodePosition: boolean = false,
+  ): Graph {
+    const nodes: NodeList = []
+    const edges: EdgeList = Array.from(Array(size), () => [])
+    const radius = 5
+    const shakeup = shakeUpNodePosition ? () => random.float(-0.5, 0.5) : () => 0
+
+    // arrange nodes in circle
+    for (let i = 0; i < size; i++) {
+      const angle = (2 * Math.PI * i) / size
+      nodes.push({
+        label: RandomGraph.getLabel(i),
+        coords: {
+          x: Math.cos(angle) * radius + shakeup(),
+          y: Math.sin(angle) * radius + shakeup(),
+        },
+      })
+    }
+
+    // connect nodes
+    for (let i = 0; i < size; i++) {
+      const next = (i + 1) % size
+      const weight = weights === "random" ? random.int(1, 20) : i + 1
+      edges[i].push({ source: i, target: next, value: weights ? weight : undefined })
+      if (!directed) edges[next].push({ source: next, target: i, value: weights ? weight : undefined })
+    }
+
+    return new Graph(nodes, edges, directed, !!weights)
   }
 }
