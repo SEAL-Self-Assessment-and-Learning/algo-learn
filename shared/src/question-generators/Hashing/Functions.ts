@@ -15,7 +15,7 @@ type GenerateHashFuncType = {
 /**
  * Generates a hash function based on the type of hashing and the table size
  * @param tableSize - provide for better control over the generated numbers used inside the hash
- *                  - has to be prime
+ *                  - **has to be prime**
  * @param type - type of hashing
  * @param random
  */
@@ -42,7 +42,7 @@ export function generateHashFunction(
     // h(x) = ((ax + b) mod p) mod m
     // where p is a prime number larger than the universe of keys
     // a [1, p-1], b [0, p-1] random numbers
-    const pIndex = random.int(4, 8)
+    const pIndex = random.int(primesJSON.indexOf(tableSize) + 1, primesJSON.indexOf(tableSize) + 4)
     // we can choose a value like this, because there will never be a case
     // where the size of the hashtable is larger than the 11th prime number
     const p = primesJSON[pIndex]
@@ -59,13 +59,13 @@ export function generateHashFunction(
     }
   }
 
-  /** Can be used for double */
+  /** Can be used only for double */
   const doubleLinearHashing = (): GenerateHashFuncType => {
     const multValue = random.choice([3, 4, 6, 7, 8, 9].filter((v) => v !== tableSize))
 
     function hashFunction(key: number, i: number, size: number) {
       const f = (multValue * key) % size
-      const g = tableSize - 1 - (key % (tableSize - 1))
+      const g = tableSize - (key % (tableSize - 1)) - 1
       return (f + i * g) % size
     }
 

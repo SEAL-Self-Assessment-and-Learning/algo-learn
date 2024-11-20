@@ -7,7 +7,6 @@ import { SingleTranslation } from "@shared/utils/translations"
  * @param startingIndex The index to in the top row to start with
  *                      (default is 0, mostly either 0 or 1)
  * @param secondRowName The name of the second row (default is ST "Value")
- * @param inputFieldSize The size of the input fields (default is 2)
  * @param transpose If the array should be transposed (default is false)
  *                  - if false, on mobile it will still transpose
  */
@@ -15,7 +14,6 @@ export type ArrayDisplayProps<T> = {
   array: T[]
   startingIndex: number
   secondRowName: SingleTranslation
-  inputFieldSize?: number
   transpose: boolean
 }
 

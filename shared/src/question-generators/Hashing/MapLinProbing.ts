@@ -1,8 +1,10 @@
+/** Types for possible hash functions */
 export type HashFunction = (key: number, size: number) => number
 export type DoubleHashFunction = (key: number, i: number, size: number) => number
 
 /**
- * This is a hash map implementation using linear probing to handle collisions
+ * This is a hash map implementation using linear probing to handle collisions.
+ * Only numbers are allowed as keys
  *
  * If the same key is inserted twice, nothing happens
  */
@@ -46,11 +48,8 @@ export class MapLinProbing {
       throw new Error(`Map is full. Cannot insert key ${key}`)
     }
     let hashKey = this.doubleHashing ? this.getHashValue(key, 0) : this.getHashValue(key)
-    if (this.has(key)) {
-      return
-    }
     let counter = 1
-    while (this.mapKeys[hashKey] !== null) {
+    while (this.mapKeys[hashKey] !== null && this.mapKeys[hashKey] !== key) {
       if (this.doubleHashing) {
         hashKey = this.getHashValue(key, counter)
       } else {
@@ -75,7 +74,7 @@ export class MapLinProbing {
       } else {
         hashKey = (hashKey + 1) % this.size
       }
-      if (this.mapKeys[hashKey] === null) {
+      if (this.mapKeys[hashKey] === null || counter > this.getSize()) {
         return
       }
       counter++
@@ -83,20 +82,24 @@ export class MapLinProbing {
     this.mapKeys[hashKey] = null
     this.amount--
     // rehash the following keys
+    const keysToRehash: number[] = []
     let count = 1
     hashKey = this.doubleHashing ? this.getHashValue(key, count) : (hashKey + 1) % this.size
     while (this.mapKeys[hashKey] !== null) {
-      const keyToRehash = this.mapKeys[hashKey] as number
+      keysToRehash.push(this.mapKeys[hashKey] as number)
       this.mapKeys[hashKey] = null
       this.amount--
-      this.insert(keyToRehash)
       count++
       hashKey = this.doubleHashing ? this.getHashValue(key, count) : (hashKey + 1) % this.size
+    }
+    for (const rehashKey of keysToRehash) {
+      this.insert(rehashKey)
     }
   }
 
   /**
    * Returns true if the key is in the map, false otherwise
+   * (Simple approach)
    * @param key
    */
   has(key: number): boolean {
@@ -134,6 +137,10 @@ export class MapLinProbing {
     return this.amount
   }
 
+  /**
+   * Returns the size of the table
+   * Maximum amount of possible elements
+   */
   getSize(): number {
     return this.size
   }

@@ -16,7 +16,7 @@ const translations: Translations = {
     doubleHashing: "Double Hashing",
     insert: "We **insert** the following keys in the given order: \\[{{0}}\\]",
     delete: "and then **delete** the following keys in the given order: \\[{{0}}\\]",
-    text: `Consider a hash table of size \${{0}}$ implemented with  "{{1}}". 
+    text: `Consider a hash table of size \${{0}}$ implemented with **"{{1}}"**. 
 {{2}}
 {{3}}
     The hash-function {{4}} is: 
@@ -33,7 +33,7 @@ const translations: Translations = {
     doubleHashing: "Doppeltem Hashing",
     insert: "Wir **fügen** die folgenden Schlüssel in gegebener Reihenfolge ein: \\[{{0}}\\]",
     delete: "und dann **löschen** wir die folgenden Schlüssel in gegebener Reihenfolge: \\[{{0}}\\]",
-    text: `Betrachten Sie eine Hashtabelle der Größe \${{0}}$, die mit "{{1}}" implementiert ist.
+    text: `Betrachten Sie eine Hashtabelle der Größe \${{0}}$, die mit **"{{1}}"** implementiert ist.
 {{2}}
 {{3}}
     Die Hash-Funktion {{4}} ist: 

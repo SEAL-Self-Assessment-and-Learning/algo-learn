@@ -27,9 +27,8 @@ export class MapLinked {
     if (this.has(key)) {
       return
     }
-    const newNode: ListNode = { key: key, next: null, prev: null }
+    const newNode: ListNode = { key: key, next: this.map[hashKey], prev: null }
     // insert the new node at the beginning
-    newNode.next = this.map[hashKey]
     this.map[hashKey] = newNode
     // update the previous node
     if (newNode.next) {
@@ -48,6 +47,7 @@ export class MapLinked {
     if (!node) {
       return
     }
+    // base case (key at the start of the list)
     if (node.key === key) {
       this.amount--
       this.map[hashKey] = node.next
@@ -70,7 +70,7 @@ export class MapLinked {
   }
 
   /**
-   * Returns true if the key is in the map, false otherwise
+   * Returns if the key is in the map
    * @param key
    */
   has(key: number): boolean {
@@ -169,6 +169,7 @@ export class MapLinked {
   }
 }
 
+/** Simple type as helper only for MapLinked */
 type ListNode = {
   key: number
   next: ListNode | null

@@ -70,7 +70,7 @@ export function generateOperationsHashMap({
   if (mapStyle === "linear" || mapStyle === "double") {
     hashMap = new MapLinProbing({ size: tableSize, hashFunction: hashFunction })
   } else {
-    if (isHashFunction(hashFunction)) {
+    if (isSimpleHashFunction(hashFunction)) {
       hashMap = new MapLinked(tableSize, hashFunction)
     } else {
       throw new Error("Provided function is not a valid HashFunction")
@@ -78,12 +78,10 @@ export function generateOperationsHashMap({
   }
 
   const insertions: number[] = []
-  const possibleValues = Array.from({ length: 25 }, (_, i) => i + 1)
+  const possibleValues = random.shuffle(Array.from({ length: 25 }, (_, i) => i + 1))
   for (let i = 0; i < tableSize - random.int(0, 2); i++) {
-    const newValue = random.choice(possibleValues)
-    possibleValues.splice(possibleValues.indexOf(newValue), 1)
-    hashMap.insert(newValue)
-    insertions.push(newValue)
+    hashMap.insert(possibleValues[i])
+    insertions.push(possibleValues[i])
   }
   const deletions: number[] = []
   if (task === "insert-delete") {
@@ -105,7 +103,7 @@ export function generateOperationsHashMap({
  * Checks if the given function is a valid HashFunction (doubleHashing not allowed)
  * @param functionToCheck
  */
-function isHashFunction(
+function isSimpleHashFunction(
   functionToCheck: HashFunction | DoubleHashFunction,
 ): functionToCheck is HashFunction {
   return functionToCheck && typeof functionToCheck === "function" && functionToCheck.length === 2
@@ -125,24 +123,20 @@ export function generateQuestionBase(
   translations: Translations,
   lang: "de" | "en",
 ) {
-  const tableSize = random.choice([7, 11]) // has to be prime
+  const tableSize = random.choice([7, 11]) // has to be prime!
   const task: "insert" | "insert-delete" = random.weightedChoice([
     ["insert", 0.85],
     ["insert-delete", 0.15],
   ])
 
   const randomHashFunction = generateHashFunction(tableSize, variant, random)()
-  const generated = generateOperationsHashMap({
+  const { hashMap, insertions, deletions } = generateOperationsHashMap({
     random,
     tableSize,
     task,
     mapStyle: variant,
     hashFunction: randomHashFunction.hashFunction,
   })
-  const hashMap = generated.hashMap
-  const insertions = generated.insertions
-  const deletions = generated.deletions
-
   const insertValuesString = t(translations, lang, "insert", [insertions.toString()])
   const deleteValuesString =
     deletions.length > 0 ? t(translations, lang, "delete", [deletions.toString()]) : ""
@@ -184,7 +178,7 @@ export function generateQuestionLinkedHashing(
       }
       linkedListString += `${input} \\rightarrow`
     }
-    linkedListString = linkedListString.slice(0, -11) + "$"
+    linkedListString = linkedListString.slice(0, -11) + "$" // slice to remove last \\rightarrow
     return { valid: true, message: linkedListString }
   }
 
