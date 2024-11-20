@@ -9,8 +9,14 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
+import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
+import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
 import { hashingGenerator } from "@shared/question-generators/Hashing/Hashing.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import { CRT } from "@shared/question-generators/math/crt"
+import { modFactor } from "@shared/question-generators/math/modFactorization"
+import { ModTricks } from "@shared/question-generators/math/modTricks"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
@@ -64,6 +70,16 @@ export const collection: QuestionCollection = [
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
     contents: [Satisfiability, NormalForms],
+  },
+  {
+    slug: "modular-arithmetic",
+    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
+    contents: [ModTricks, CRT, modFactor],
+  },
+  {
+    slug: "heap",
+    name: { de: "Heap", en: "Heap" },
+    contents: [HeapOperations, HeapVerifying, HeapNeighbours],
   },
   {
     slug: "hashing",
