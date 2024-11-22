@@ -55,9 +55,9 @@ export const DijkstraTableGenerator: QuestionGenerator = {
 
   generate: (lang: Language, parameters, seed) => {
     const random = new Random(seed)
-    const graph = generateRandomGraph(random, parameters.size as number)
-    const startNode = graph.nodes[0].label ?? "A"
-    const { steps } = generateDijkstraSteps(graph, startNode)
+
+    const { graph, steps } = generateRandomGraphWithSteps(random, parameters.size as number)
+
     const permalink = serializeGeneratorCall({
       generator: DijkstraTableGenerator,
       lang,
@@ -69,7 +69,7 @@ export const DijkstraTableGenerator: QuestionGenerator = {
     const feedback = getFeedbackFunction(steps, graph)
     const checkFormat = getCheckFormatFunction(lang, graph)
 
-    console.log("debug", cheatForDebugging(steps, graph))
+    console.log("debug:\n", cheatForDebugging(steps, graph))
 
     const question: MultiFreeTextQuestion = {
       type: "MultiFreeTextQuestion",
@@ -110,19 +110,57 @@ function cheatForDebugging(
     .join("\n")
 }
 
-function generateRandomGraph(random: Random, size: number): Graph {
-  const width = random.int(1, size)
+interface DijkstraResult {
+  graph: Graph
+  steps: Array<{
+    set: Set<string>
+    distances: Record<string, string>
+    predecessors: Record<string, string>
+  }>
+}
+
+function generateRandomGraphWithSteps(random: Random, size: number): DijkstraResult {
+  const maxRetries = 100
+  let retries = 0
+  let edgeChance = 0.6
+
+  // guarantee more than one row in the algorithm
+  while (retries < maxRetries) {
+    const graph = createRandomGraph(random, size, edgeChance)
+    const steps = getDijkstraStepsIfValid(graph)
+    if (steps && steps.length > 1) {
+      return { graph, steps }
+    }
+
+    // increment retries and adjust edgeChance for next attempt
+    retries++
+    edgeChance += 0.1 // make graph denser on retry
+    console.log("retries so far:", retries)
+  }
+
+  throw new Error("Unable to generate a valid graph with more than one row after 100 retries.")
+}
+
+function createRandomGraph(random: Random, size: number, edgeChance: number): Graph {
+  const width = random.int(2, size)
   const height = random.int(1, size)
 
   return RandomGraph.grid(
     random,
     [width, height],
-    0.6,
+    edgeChance,
     random.choice(["square", "square-width-diagonals", "triangle"]),
     "unique",
     false,
     true,
   )
+}
+
+function getDijkstraStepsIfValid(graph: Graph): DijkstraResult["steps"] | null {
+  const startNode = graph.nodes[0]?.label ?? "A"
+  const { steps } = generateDijkstraSteps(graph, startNode)
+  // return steps only if algorithm is long enough
+  return steps.length > 1 ? steps : null
 }
 
 function getDijkstraInputTable(
@@ -136,9 +174,8 @@ function getDijkstraInputTable(
 ): string {
   const nodes = graph.nodes.map((n) => n.label!)
 
-  const headerRow = `| ${t(translations, lang, "set")} $S$ | ${nodes.map((n) => `${n} | |`).join("")}\n`
-  const subHeaderRow = `|   | ${nodes.map(() => "d | p |").join("")}\n`
-  const separatorRow = `|---|${nodes.map(() => "---:|---|").join("")}\n`
+  const headerRow = `|  | ${nodes.map((n) => `${n} | |`).join("")}\n`
+  const subHeaderRow = `|  ${t(translations, lang, "set")} $S$ | ${nodes.map((n) => `$d(${n})$ | $p(${n})$ |`).join("")}\n`
 
   const rows = steps
     .map((_, stepIndex) => {
@@ -149,9 +186,10 @@ function getDijkstraInputTable(
 
       return `| {{${setField}#TL#}} | ${nodeFields} |`
     })
+    .filter(Boolean) // ensure no undefined rows
     .join("\n")
 
-  return `${headerRow}${separatorRow}${subHeaderRow}${rows}`
+  return `${headerRow}${subHeaderRow}${rows}`
 }
 
 function getCheckFormatFunction(lang: Language, graph: Graph): MultiFreeTextFormatFunction {
@@ -162,10 +200,7 @@ function getCheckFormatFunction(lang: Language, graph: Graph): MultiFreeTextForm
 
     if (fieldID.includes("_s")) {
       const isValidSet = /^\{[A-Z](, *[A-Z])*\}$/i.test(input)
-      const setElements = input
-        .replace(/[{}]/g, "") // Remove curly braces
-        .split(/,\s*/)
-        .filter((label) => label) // Split and filter non-empty labels
+      const setElements = input.replace(/[{}]/g, "").split(/,\s*/)
       const allValidNodes = setElements.every((label) => nodeLabels.has(label))
       return {
         valid: isValidSet && allValidNodes,
@@ -200,17 +235,20 @@ function getFeedbackFunction(
 ): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
     let allStepsCorrect = true
-    console.log("debug:")
+
+    // generate feedback table
+    const headerRow = `| $S$ | ${graph.nodes.map((n) => `$(d(${n.label} ), p(${n.label} ))$ |`).join(" ")}`
+    const separatorRow = `| --- | ${graph.nodes.map(() => "---:|").join(" ")}`
+
     const feedbackDetails = steps
       .map((step, stepIndex) => {
         const setField = `step${stepIndex}_s`
         const userSet = text[setField]?.trim() || "-"
         const expectedSet = `{${[...step.set].join(", ")}}`
-        console.log("${expectedSet}")
 
-        if (userSet !== expectedSet) allStepsCorrect = false
+        if (userSet.replace(/\s/g, "") !== expectedSet.replace(/\s/g, "")) allStepsCorrect = false
 
-        const nodeFeedback = graph.nodes
+        const rowContent = graph.nodes
           .map((node) => {
             const nodeLabel = node.label!
 
@@ -225,18 +263,22 @@ function getFeedbackFunction(
             if (userDistance !== expectedDistance || userPredecessor !== expectedPredecessor) {
               allStepsCorrect = false
             }
-            console.log("${step.distances[nodeLabel]} | ${step.predecessors[nodeLabel]}")
-            return `${expectedDistance} | ${expectedPredecessor}`
+
+            return `$(${expectedDistance}, ${expectedPredecessor})$`
           })
           .join(" | ")
 
-        return `| {{${setField}#${userSet}}} | ${nodeFeedback} |`
+        return `| $\\{${expectedSet}\\}$ | ${rowContent} |`
       })
       .join("\n")
 
+    // final table structure
+    const completeTable = `${headerRow}\n${separatorRow}\n${feedbackDetails}`
+    console.log("Generated Feedback Table:\n", completeTable)
+
     return {
       correct: allStepsCorrect,
-      correctAnswer: feedbackDetails,
+      correctAnswer: completeTable,
     }
   }
 }
