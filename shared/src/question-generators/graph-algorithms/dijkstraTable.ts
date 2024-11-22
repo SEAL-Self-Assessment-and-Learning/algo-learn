@@ -48,8 +48,8 @@ export const DijkstraTableGenerator: QuestionGenerator = {
     {
       name: "size",
       type: "integer",
-      min: 1,
-      max: 3,
+      min: 2,
+      max: 4,
     },
   ],
 
@@ -178,8 +178,23 @@ function getDijkstraInputTable(
   const subHeaderRow = `|  ${t(translations, lang, "set")} $S$ | ${nodes.map((n) => `$d(${n})$ | $p(${n})$ |`).join("")}\n`
 
   const rows = steps
-    .map((_, stepIndex) => {
+    .map((step, stepIndex) => {
       const setField = `step${stepIndex}_s`
+
+      // prefill first row
+      if (stepIndex === 0) {
+        const prefilledSet = `$\\{${[...step.set].join(", ")}\\}$`
+        const prefilledFields = nodes
+          .map((node) => {
+            const prefilledDistance = step.distances[node] || "$-$"
+            const prefilledPredecessor = step.predecessors[node] || "$-$"
+            return `$${prefilledDistance}$ | $${prefilledPredecessor}$`
+          })
+          .join(" | ")
+
+        return `| ${prefilledSet} | ${prefilledFields} |`
+      }
+
       const nodeFields = nodes
         .map((node) => `{{step${stepIndex}_${node}_d#TL#}} | {{step${stepIndex}_${node}_p#TL#}}`)
         .join(" | ")
@@ -242,6 +257,13 @@ function getFeedbackFunction(
 
     const feedbackDetails = steps
       .map((step, stepIndex) => {
+        // handle prefilled row
+        if (stepIndex === 0) {
+          const nodeFeedback = graph.nodes.map(() => `$( - , - )$`).join(" | ")
+          return `| $\\{${graph.nodes[0].label}\\}$ | ${nodeFeedback} |`
+        }
+
+        // handle user input rows
         const setField = `step${stepIndex}_s`
         const userSet = text[setField]?.trim() || "-"
         const expectedSet = `{${[...step.set].join(", ")}}`
