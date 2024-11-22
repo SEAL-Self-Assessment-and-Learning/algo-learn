@@ -140,7 +140,9 @@ function getFeedbackFunction(
     const userCoefB = parseInt(text["coefB"], 10)
 
     const gcdCorrect = userGCD === gcd
-    const coefficientsCorrect = userCoefA === finalStep.s && userCoefB === finalStep.t
+    const coefficientsCorrect =
+      (userCoefA === finalStep.s && userCoefB === finalStep.t) ||
+      (userCoefA === finalStep.t && userCoefB === finalStep.s)
 
     // correctness for steps and coefficients
     const isCorrect = allStepsCorrect && gcdCorrect && coefficientsCorrect
