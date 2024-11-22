@@ -1,4 +1,4 @@
-import Random from "@shared/utils/random.ts"
+import Random from "@shared/utils/random"
 
 /**
  * Generates a Huffman tree + encoded word from a given word of character frequencies.
@@ -131,7 +131,7 @@ export class HuffmanNode {
     for (let i = 0; i < word.length; i++) {
       try {
         code = this.setCharacterLabel(word[i], code)
-      } catch (e) {
+      } catch {
         return false
       }
     }
@@ -220,43 +220,4 @@ export class HuffmanNode {
 
     throw Error(`Character ${character} cannot be encoded`)
   }
-}
-
-export function checkProvidedCode(
-  inputFrequencies: { [key: string]: number },
-  possibleCode: { [key: string]: string },
-  providedCode: { [key: string]: string },
-) {
-  // first check if the provided code will have the same length as the possible code
-  const possibleCodeLength = Object.keys(possibleCode).reduce((acc, key) => {
-    return acc + possibleCode[key].length * inputFrequencies[key]
-  }, 0)
-  const providedCodeLength = Object.keys(providedCode).reduce((acc, key) => {
-    // could be simplified, but I think this is more readable
-    if (inputFrequencies[key] === undefined) {
-      return NaN
-    }
-    return acc + providedCode[key].length * inputFrequencies[key]
-  }, 0)
-
-  if (possibleCodeLength !== providedCodeLength) {
-    return false
-  }
-
-  // convert the provided code to an array
-
-  const providedCodeArray = Object.values(providedCode)
-  providedCodeArray.sort((a, b) => a.length - b.length)
-
-  // checks if the code is prefix-free
-  // is it possible to optimize this?
-  for (let i = 0; i < providedCodeArray.length - 1; i++) {
-    for (let j = i + 1; j < providedCodeArray.length; j++) {
-      if (providedCodeArray[j].startsWith(providedCodeArray[i])) {
-        return false
-      }
-    }
-  }
-
-  return true
 }
