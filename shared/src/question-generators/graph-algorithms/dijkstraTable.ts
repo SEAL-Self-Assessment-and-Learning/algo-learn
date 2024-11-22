@@ -75,7 +75,7 @@ export const DijkstraTableGenerator: QuestionGenerator = {
       type: "MultiFreeTextQuestion",
       path: permalink,
       name: t(translations, lang, "name"),
-      fillOutAll: true,
+      fillOutAll: false,
       text: `${t(translations, lang, "tableQuestion")}\n${graph.toMarkdown()}\n${t(translations, lang, "tablePrompt")}\n\n${table}`,
       feedback,
       checkFormat,
@@ -210,8 +210,7 @@ function getDijkstraInputTable(
 function getCheckFormatFunction(lang: Language, graph: Graph): MultiFreeTextFormatFunction {
   const nodeLabels = new Set(graph.nodes.map((node) => node.label ?? ""))
   return ({ text }, fieldID) => {
-    const input = text[fieldID]?.trim()
-    if (!input) return { valid: false, message: "" }
+    const input = text[fieldID]?.trim() || "-"; // treat blank as "-"
 
     if (fieldID.includes("_s")) {
       const isValidSet = /^\{[A-Z](, *[A-Z])*\}$/i.test(input)
@@ -275,11 +274,11 @@ function getFeedbackFunction(
             const nodeLabel = node.label!
 
             const distanceField = `step${stepIndex}_${nodeLabel}_d`
-            const userDistance = text[distanceField]?.trim() || "-"
+            const userDistance = text[distanceField]?.trim().replace(/^\s*$/, "-") || "-"
             const expectedDistance = step.distances[nodeLabel] || "-"
 
             const predecessorField = `step${stepIndex}_${nodeLabel}_p`
-            const userPredecessor = text[predecessorField]?.trim() || "-"
+            const userPredecessor = text[predecessorField]?.trim().replace(/^\s*$/, "-") || "-"
             const expectedPredecessor = step.predecessors[nodeLabel] || "-"
 
             if (userDistance !== expectedDistance || userPredecessor !== expectedPredecessor) {
