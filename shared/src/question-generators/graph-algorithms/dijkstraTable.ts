@@ -210,7 +210,7 @@ function getDijkstraInputTable(
 function getCheckFormatFunction(lang: Language, graph: Graph): MultiFreeTextFormatFunction {
   const nodeLabels = new Set(graph.nodes.map((node) => node.label ?? ""))
   return ({ text }, fieldID) => {
-    const input = text[fieldID]?.trim() || "-"; // treat blank as "-"
+    const input = text[fieldID]?.trim() || "-" // treat blank as "-"
 
     if (fieldID.includes("_s")) {
       const isValidSet = /^\{[A-Z](, *[A-Z])*\}$/i.test(input)
