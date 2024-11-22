@@ -3,6 +3,7 @@
 // Do we write sources for the code we use? I'm not sure if this is necessary since it's a common algorithm
 
 import { AVLTreeRotations } from "@shared/question-generators/avl/utils/utils.ts"
+import { RootedTree } from "@shared/utils/graph.ts"
 
 /**
  * AVL Node structure
@@ -363,5 +364,19 @@ export class AVLTree {
     }
 
     return newTree
+  }
+
+  /**
+   * Creates a RootedTree object based on the root
+   */
+  toRootedTree(): RootedTree {
+    if (!this.root) throw new Error("Root has to be defined to create a RootedTree object.")
+    function helper(node: AVLNode) {
+      const children: RootedTree[] = []
+      if (node.left) children.push(helper(node.left))
+      if (node.right) children.push(helper(node.right))
+      return new RootedTree(node.data.toString(), children)
+    }
+    return helper(this.root)
   }
 }
