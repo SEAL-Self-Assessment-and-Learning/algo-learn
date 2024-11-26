@@ -90,6 +90,9 @@ function avlReverseQuestion(random: Random, lang: "de" | "en", permalink: string
     random,
     avlTreeSize,
     rotationOption,
+    randNextInt: (val, random) => {
+      return random.intNormal(val + 1, val + 20, val + 7, 2)
+    },
   })
 
   const graphTree = avlTree.toRootedTree().toGraph()
@@ -122,6 +125,9 @@ function avlStartQuestion(random: Random, lang: "de" | "en", permalink: string) 
     random,
     avlTreeSize,
     rotationOption,
+    randNextInt: (val, random) => {
+      return random.intNormal(val + 1, val + 20, val + 7, 2)
+    },
   })
   const graphTree = avlTree.toRootedTree().toGraph()
   graphTree.nodeDraggable = false

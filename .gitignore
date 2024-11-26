@@ -13,3 +13,5 @@ vite-bundle-visualizer.html
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+.DS_Store

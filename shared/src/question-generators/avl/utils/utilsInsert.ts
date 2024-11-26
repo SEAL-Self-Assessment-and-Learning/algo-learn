@@ -6,6 +6,7 @@ import {
   checkAVLNull,
   convertAVLHelperToRandomAVLTree,
   generateAllAVLTrees,
+  getStandardNextRandInt,
 } from "@shared/question-generators/avl/utils/utils.ts"
 import Random from "@shared/utils/random.ts"
 
@@ -16,22 +17,29 @@ import Random from "@shared/utils/random.ts"
  * @param random - random class
  * @param avlTreeSize - number of nodes the avl tree should have
  * @param rotationOption - the desired rotation (type AVLTreeRotations)
+ * @param randNextInt - a random formula to determine the next value for the tree
  */
 export function generateAVLTreeInsert({
   random,
   avlTreeSize,
   rotationOption,
+  randNextInt,
 }: {
   random: Random
   avlTreeSize: number
   rotationOption: AVLTreeRotations
+  randNextInt?: (val: number, random: Random) => number
 }): { askValue: number; avlTree: AVLTree } {
   // Generates all possible AVL tree structures of the given avlTreeSize
   const maxHeight = Math.ceil(1.45 * Math.log2(avlTreeSize + 2) - 0.32)
   const allTrees = generateAllAVLTrees(maxHeight, avlTreeSize, avlTreeSize)
   const tmpTrees: AVLTreeHelper[] = assignUniqueIDsToTrees(allTrees, random)
   // converting the avlTree structures in AVLTrees with numbers as value
-  const avlTrees: AVLTree[] = convertAVLHelperToRandomAVLTree(random, tmpTrees)
+  const avlTrees: AVLTree[] = convertAVLHelperToRandomAVLTree(
+    random,
+    randNextInt ? randNextInt : getStandardNextRandInt,
+    tmpTrees,
+  )
 
   return handleAVLRotation(random, avlTrees, rotationOption)
 }

@@ -24,14 +24,23 @@ export type AVLTreeHelper = {
   numNodes: number
 }
 
+export function getStandardNextRandInt(value: number, random: Random) {
+  return random.int(value + 1, value + 15)
+}
+
 /**
  * This function takes a tree with avl structure but no 'real' values
  * and assigns a numbered value to each node
  *
- * @param random - random class object (for random node value)
+ * @param random
+ * @param randNextInt
  * @param treeHelper - the trees with avl structure but currently as BST
  */
-export function convertAVLHelperToRandomAVLTree(random: Random, treeHelper: AVLTreeHelper[]): AVLTree[] {
+export function convertAVLHelperToRandomAVLTree(
+  random: Random,
+  randNextInt: (val: number, random: Random) => number,
+  treeHelper: AVLTreeHelper[],
+): AVLTree[] {
   const avlTrees: AVLTree[] = []
 
   for (let i = 0; i < treeHelper.length; i++) {
@@ -44,7 +53,7 @@ export function convertAVLHelperToRandomAVLTree(random: Random, treeHelper: AVLT
     // convert every entry into a dict with a new higher number
     let lastUsedNumber = 1
     for (let j = 0; j < inOrder.length; j++) {
-      const newNumber = random.int(lastUsedNumber + 1, lastUsedNumber + 15)
+      const newNumber = randNextInt(lastUsedNumber, random)
       lastUsedNumber = newNumber
       inOrderToValues[inOrder[j]] = newNumber
     }
