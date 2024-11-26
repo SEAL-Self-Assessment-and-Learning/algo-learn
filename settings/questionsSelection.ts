@@ -27,6 +27,7 @@ import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
+import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
@@ -98,6 +99,11 @@ export const collection: QuestionCollection = [
     slug: "heap",
     name: { de: "Heap", en: "Heap" },
     contents: [HeapOperations, HeapVerifying, HeapNeighbours],
+  },
+  {
+    slug: "union-find",
+    name: { de: "Union-Find", en: "Union-Find" },
+    contents: [QuickFindGenerator],
   },
 ]
 
