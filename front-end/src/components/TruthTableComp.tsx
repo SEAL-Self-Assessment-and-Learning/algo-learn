@@ -115,14 +115,16 @@ function GetFunctionHeader({
 }
 
 /**
- * j indicates the first index in the parsedObject and i is the current index
- * count from 0 to tablesize - 1
- * - if fields in parsedObjects[j] its a input field, display with md comp
- * - otherwise evaluate the expression with index i
- * @param parsedObjects
- * @param variableNames
- * @param j
- * @param i
+ * Generates the content for a table cell based on the type of parsed object and the current index.
+ *
+ * @param parsedObjects - An array of parsed objects, which can either be `SyntaxTreeNodeType` or `InputTruthTableProps`.
+ * @param variableNames - An array of variable names used for evaluation.
+ * @param j - The index of the current parsed object within the `parsedObjects` array.
+ * @param i - The current row index in the truth table.
+ *
+ * @returns A JSX element:
+ * - If the current parsed object (`parsedObjects[j]`) has an input field (`fields`), renders it as Markdown content.
+ * - Otherwise, evaluates the expression for the given row
  */
 function createCellValue(
   parsedObjects: (SyntaxTreeNodeType | InputTruthTableProps)[],
@@ -131,8 +133,10 @@ function createCellValue(
   i: number,
 ) {
   if ("fields" in parsedObjects[j]) {
+    // InputTableProps
     return <Markdown md={parsedObjects[j].fields[i]} />
   } else {
+    // SyntaxTreeNode
     return <Markdown md={parsedObjects[j].eval(numToVariableValues(i, variableNames)) ? "$1$" : "$0$"} />
   }
 }
@@ -180,7 +184,7 @@ function getAllVarNames(parsedFunctions: (SyntaxTreeNodeType | InputTruthTablePr
         varNames.add(x)
       })
     } else {
-      const funcVarNames = func.getProperties().variables
+      const funcVarNames = func.getVariableNames()
       for (const varName of funcVarNames) {
         varNames.add(varName)
       }
