@@ -14,11 +14,7 @@ const translations: Translations = {
     name: "Reading Syntax Trees",
     description: "Read and evaluate a given syntax tree.",
     param_size: "The size of the syntax tree.",
-    freetext_question: `Given the following propositional logic formular as syntax tree, compute a variable assignment such that the formular is **{{t}}**.
-      
-\`\`\`graph
-{{g}}
-\`\`\`\n`,
+    freetext_question: `Given the following propositional logic formular as syntax tree, compute a variable assignment such that the formular is **{{t}}**. {{g}}`,
     target_satisfied: "satisfied",
     target_falsified: "falsified",
     check_invalid: "Input invalid",
@@ -28,11 +24,7 @@ const translations: Translations = {
     name: "Syntaxbäume lesen",
     description: "Lesen und auswerten von Syntaxbäumen.",
     param_size: "Die Größe des Syntaxbaums",
-    freetext_question: `Gegeben sei die folgende aussagenlogische Formel als Syntaxbaum. Gib eine Variablenbelegung an, sodass die Formel **{{t}}** ist.
-      
-\`\`\`graph
-{{g}}
-\`\`\`\n`,
+    freetext_question: `Gegeben sei die folgende aussagenlogische Formel als Syntaxbaum. Gib eine Variablenbelegung an, sodass die Formel **{{t}}** ist. {{g}}`,
     target_satisfied: "erfüllt",
     target_falsified: "widerlegt",
     check_invalid: "Eingabe ungültig",
@@ -113,7 +105,7 @@ export const ReadingSyntaxTrees: QuestionGenerator = {
         fillOutAll: true,
         text:
           t(translations, lang, "freetext_question", {
-            g: tree.toString(),
+            g: tree.toMarkdown(),
             t: t(translations, lang, targetSatisfied ? "target_satisfied" : "target_falsified"),
           }) +
           vars.reduce((acc: string, v: string, i: number) => {

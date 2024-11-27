@@ -14,11 +14,7 @@ const translations: Translations = {
     name: "Tree Taversal",
     description: "Compute a traversal order of the nodes in a tree.",
     param_size: "Tree size",
-    text: `Given the following tree compute **{{t}} traversal** of the nodes.
-
-\`\`\`graph
-{{g}}
-\`\`\``,
+    text: `Given the following tree compute **{{t}} traversal** of the nodes. {{g}}`,
     freetext_prompt: "Node order:",
     check_unknown_node: '"{{n}}" is not a node in the tree.',
     feedback_num_nodes:
@@ -29,11 +25,7 @@ const translations: Translations = {
     name: "Baum Traversierung",
     description: "Berechne eine Traversierung eine Baums.",
     param_size: "Baumgröße",
-    text: `Gegeben sei der folgende Baum. Berechne **{{t}}-Traversierung**.
-    
-\`\`\`graph
-{{g}}
-\`\`\``,
+    text: `Gegeben sei der folgende Baum. Berechne **{{t}}-Traversierung**. {{g}}`,
     freetext_prompt: "Kontenreihenfolge",
     check_unknown_node: '"{{n}}" ist kein Knoten des Baums.',
     feedback_num_nodes: "Die Traversierung enthält nicht alle oder zu viele Knoten.",
@@ -157,7 +149,7 @@ export const TreeTraversal: QuestionGenerator = {
       }),
       text: t(translations, lang, "text", {
         t: t(traversalStrategiesTranslations, lang, strategy),
-        g: G.toString(),
+        g: G.toMarkdown(),
       }),
       prompt: t(translations, lang, "freetext_prompt"),
       placeholder: "A, B, C, ...",
