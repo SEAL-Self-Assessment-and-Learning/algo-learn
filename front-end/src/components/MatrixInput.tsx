@@ -14,11 +14,9 @@ function Parentheses({ svgColor, side }: { svgColor: string; side: "r" | "l" }) 
       ? "M85 0 A61 101 0 0 0 85 186 L75 186 A65 101 0 0 1 75 0"
       : "M24 0 A61 101 0 0 1 24 186 L34 186 A65 101 0 0 0 34 0"
   return (
-    <div className="h-full w-[0.85em]">
-      <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="3 0 106 186">
-        <path d={svgPath} fill={svgColor} stroke={svgColor}></path>
-      </svg>
-    </div>
+    <svg className="h-full w-[0.85em]" preserveAspectRatio="none" viewBox="3 0 106 186">
+      <path d={svgPath} fill={svgColor} stroke={svgColor}></path>
+    </svg>
   )
 }
 
@@ -33,16 +31,23 @@ export function MatrixInput({ matrixObject }: { matrixObject: string }): ReactEl
 
   const { theme } = useTheme()
 
-  const divHeight = 80 + (rows - 2) * 45
   const svgColor = theme === "dark" ? "white" : "black"
 
   return (
     <>
-      <div className={`flex items-center justify-center`} style={{ height: `${divHeight}px` }}>
+      <div className={`flex items-center justify-center`}>
         <Markdown md={parsedMatrixObject.name} />
-        <Parentheses svgColor={svgColor} side={"l"} />
-        <table>
+        <table className={"h-full"}>
           <tbody>
+            <tr className={"h-1"}>
+              <td className={"h-full"} rowSpan={rows + 2}>
+                <Parentheses svgColor={svgColor} side={"l"} />
+              </td>
+              <td colSpan={cols}></td>
+              <td className={"h-full"} rowSpan={rows + 2}>
+                <Parentheses svgColor={svgColor} side={"r"} />
+              </td>
+            </tr>
             {Array.from({ length: rows }).map((_, i) => (
               <tr key={i}>
                 {Array.from({ length: cols }).map((_, j) => (
@@ -52,9 +57,11 @@ export function MatrixInput({ matrixObject }: { matrixObject: string }): ReactEl
                 ))}
               </tr>
             ))}
+            <tr className={"h-1"}>
+              <td colSpan={cols}></td>
+            </tr>
           </tbody>
         </table>
-        <Parentheses svgColor={svgColor} side={"r"} />
         <Markdown md={parsedMatrixObject.elementOf} />
       </div>
     </>
