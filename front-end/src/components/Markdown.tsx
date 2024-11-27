@@ -1,5 +1,6 @@
 import { Fragment, FunctionComponent, ReactNode } from "react"
 import { Link } from "react-router-dom"
+import { Graph } from "@shared/utils/graph.ts"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
 import { ArrayDisplay } from "@/components/ArrayDisplay.tsx"
 import { DrawList } from "@/components/DrawList.tsx"
