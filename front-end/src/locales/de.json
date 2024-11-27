@@ -119,6 +119,6 @@
   "theme.light": "hell",
   "time": "Zeit",
   "train.skills.desc": "Sammle Erfahrungspunkte (XP) durch Übung! Wähle ein Thema:",
-  "provideFeedbackCheckFormat": "Hier werden wir dir Feedback zum Format deiner Antwort geben",
-  "your-learning-progress": "Dein Lernfortschritt"
+  "your-learning-progress": "Dein Lernfortschritt",
+  "provideFeedbackCheckFormat": "Hier werden wir dir Feedback zum Format deiner Antwort geben"
 }

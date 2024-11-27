@@ -119,6 +119,6 @@
   "theme.light": "light",
   "time": "Time",
   "train.skills.desc": "Gain experience points (XP) through practice! Choose a topic:",
-  "provideFeedbackCheckFormat": "Here we will provide feedback to the format of your answer.",
-  "your-learning-progress": "Your learning progress"
+  "your-learning-progress": "Your learning progress",
+  "provideFeedbackCheckFormat": "Here we will provide feedback to the format of your answer."
 }
