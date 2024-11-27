@@ -1,7 +1,8 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { FreeTextFeedback, FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { isMobileOrTablet } from "@/utils/deviceInformation.ts"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
@@ -59,6 +60,12 @@ export function ExerciseTextInput({
 
   const userInputRef = useRef<HTMLInputElement>(null)
 
+  useEffect(() => {
+    if (!isMobileOrTablet) {
+      userInputRef.current?.focus({ preventScroll: true })
+    }
+  }, [])
+
   function setText(text: string) {
     setState((state) => ({ ...state, text }))
     if (question.checkFormat) {
@@ -108,7 +115,7 @@ export function ExerciseTextInput({
         })
       }
     } else if (mode === "correct" || mode === "incorrect") {
-      onResult && onResult(mode)
+      if (onResult) onResult(mode)
     }
   }
 
@@ -169,7 +176,6 @@ export function ExerciseTextInput({
         <Markdown md={question.prompt} />
         <Input
           ref={userInputRef}
-          autoFocus
           disabled={mode === "correct" || mode === "incorrect"}
           value={text}
           onChange={(e) => {

@@ -1,13 +1,12 @@
 import { Fragment, FunctionComponent, ReactNode } from "react"
 import { Link } from "react-router-dom"
-import SyntaxHighlighter from "react-syntax-highlighter"
-import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { Graph } from "@shared/utils/graph"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
 import { ArrayDisplay } from "@/components/ArrayDisplay.tsx"
+import { DrawList } from "@/components/DrawList.tsx"
 import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
-import { useTheme } from "@/hooks/useTheme.ts"
+import { FormInputField } from "@/components/ui/FormInputField.tsx"
 import { DrawGraph } from "./DrawGraph"
 import { Format } from "./Format"
 import TeX from "./TeX"
@@ -64,7 +63,6 @@ export const MarkdownTreeNode: FunctionComponent<{
   parseTreeNode: ParseTreeNode
   parameters?: ReactNode[]
 }> = ({ parseTreeNode, parameters }) => {
-  const { theme } = useTheme()
   if (typeof parseTreeNode === "string") {
     return <Format template={parseTreeNode} parameters={parameters} />
   }
@@ -109,19 +107,13 @@ export const MarkdownTreeNode: FunctionComponent<{
         </div>
       )
     }
-    return (
-      <div className="my-5">
-        <SyntaxHighlighter
-          language={parseTreeNode.language}
-          style={theme === "light" ? solarizedLight : solarizedDark}
-        >
-          {parseTreeNode.child}
-        </SyntaxHighlighter>
-      </div>
-    )
+    throw new Error("Unknown language")
   }
   if (parseTreeNode.kind === "table") {
     return <DrawTable table={parseTreeNode.child} />
+  }
+  if (parseTreeNode.kind === "list") {
+    return <DrawList list={parseTreeNode.child} />
   }
   if (parseTreeNode.kind === "a") {
     return (
@@ -136,6 +128,13 @@ export const MarkdownTreeNode: FunctionComponent<{
         <MarkdownTree parseTree={parseTreeNode.child} />
       </blockquote>
     )
+  }
+  if (parseTreeNode.kind === "input") {
+    // only provide the id of the input field
+    const inputSplit = parseTreeNode.child.split("#")
+    const id = inputSplit[0]
+
+    return <FormInputField id={id} />
   }
 
   // will never be reached:

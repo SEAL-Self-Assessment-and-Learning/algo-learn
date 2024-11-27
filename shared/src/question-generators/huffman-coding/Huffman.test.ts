@@ -1,6 +1,10 @@
 import { expect, test } from "vitest"
-import Random from "@shared/utils/random.ts"
-import { checkProvidedCode, getHuffmanCodeOfTable, getHuffmanCodeOfWord } from "./Huffman.ts"
+import {
+  getHuffmanCodeOfTable,
+  getHuffmanCodeOfWord,
+} from "@shared/question-generators/huffman-coding/Huffman"
+import { checkProvidedCode } from "@shared/question-generators/huffman-coding/utils/utils"
+import Random from "@shared/utils/random"
 
 /**
  * Test to check if the huffmanCodingAlgorithm function works correctly

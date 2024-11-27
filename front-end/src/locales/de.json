@@ -60,7 +60,6 @@
   "Practice.desc": "In diesem Modus passe ich mich deinem Kenntnisstand an und erhöhe mit der Zeit die Schwierigkeit.",
   "Skill": "Kompetenz",
   "Strength": "Stärke",
-  "StrengthMeter.sort": "Sortieren...",
   "Training": "Übungsmöglichkeiten",
   "Training.desc": "Zwei Trainingsmodi stehen zur Verfügung:",
   "Version": "Version",
@@ -109,5 +108,6 @@
   "theme.light": "hell",
   "time": "Zeit",
   "train.skills.desc": "Sammle Erfahrungspunkte (XP) durch Übung! Wähle ein Thema:",
-  "your-learning-progress": "Dein Lernfortschritt"
+  "your-learning-progress": "Dein Lernfortschritt",
+  "provideFeedbackCheckFormat": "Hier werden wir dir Feedback zum Format deiner Antwort geben"
 }
