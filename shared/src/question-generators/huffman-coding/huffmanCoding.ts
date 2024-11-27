@@ -26,7 +26,7 @@ const translations: Translations = {
     prompt: "What is a possible Huffman-Coding?",
     textTable: `Suppose we have the following table, which represents how often each character appears in a given string:
 {{0}}
-What could be a correct **Huffman-Coding** for each char?`,
+What could be a correct **Huffman-Coding** for each letter?`,
     feedbackInvalid: "Can only contain 1 and 0",
     multiInputText: `Suppose we have the following table, which represents how often each character appears in a given string:
 {{0}}

@@ -284,7 +284,7 @@ const operatorToUnicode: Record<BinaryOperatorType | NegationOperatorType, strin
 
 export function tokenToLatex(str: string) {
   for (const t in operatorToLatex) {
-    str = str.replace(t, `${operatorToLatex[t as keyof typeof operatorToLatex]} `)
+    str = str.replaceAll(t, `${operatorToLatex[t as keyof typeof operatorToLatex]} `)
   }
 
   return str
