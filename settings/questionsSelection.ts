@@ -9,7 +9,13 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
+import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
+import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import { CRT } from "@shared/question-generators/math/crt"
+import { modFactor } from "@shared/question-generators/math/modFactorization"
+import { ModTricks } from "@shared/question-generators/math/modTricks"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
@@ -17,6 +23,7 @@ import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
+import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
@@ -63,6 +70,21 @@ export const collection: QuestionCollection = [
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
     contents: [Satisfiability, NormalForms],
+  },
+  {
+    slug: "modular-arithmetic",
+    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
+    contents: [ModTricks, CRT, modFactor],
+  },
+  {
+    slug: "heap",
+    name: { de: "Heap", en: "Heap" },
+    contents: [HeapOperations, HeapVerifying, HeapNeighbours],
+  },
+  {
+    slug: "union-find",
+    name: { de: "Union-Find", en: "Union-Find" },
+    contents: [QuickFindGenerator],
   },
 ]
 
