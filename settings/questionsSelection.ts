@@ -95,21 +95,6 @@ export const collection: QuestionCollection = [
     name: { de: "Union-Find", en: "Union-Find" },
     contents: [QuickFindGenerator],
   },
-  {
-    slug: "modular-arithmetic",
-    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
-    contents: [ModTricks, CRT, modFactor],
-  },
-  {
-    slug: "heap",
-    name: { de: "Heap", en: "Heap" },
-    contents: [HeapOperations, HeapVerifying, HeapNeighbours],
-  },
-  {
-    slug: "union-find",
-    name: { de: "Union-Find", en: "Union-Find" },
-    contents: [QuickFindGenerator],
-  },
 ]
 
 export const oldPathToGenerator = {
