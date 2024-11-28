@@ -15,8 +15,6 @@ import { TreeTraversal } from "@shared/question-generators/graph-algorithms/tree
 import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
-import { DijkstraAlgorithm } from "@shared/question-generators/graph-algorithms/dijkstra.ts"
-import { DijkstraTableGenerator } from "@shared/question-generators/graph-algorithms/dijkstraTable.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { CRT } from "@shared/question-generators/math/crt"
 import { modFactor } from "@shared/question-generators/math/modFactorization"
@@ -91,6 +89,21 @@ export const collection: QuestionCollection = [
     slug: "heap",
     name: { de: "Heap", en: "Heap" },
     contents: [HeapOperations, HeapVerifying, HeapNeighbours],
+  },
+  {
+    slug: "modular-arithmetic",
+    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
+    contents: [ModTricks, CRT, modFactor],
+  },
+  {
+    slug: "heap",
+    name: { de: "Heap", en: "Heap" },
+    contents: [HeapOperations, HeapVerifying, HeapNeighbours],
+  },
+  {
+    slug: "union-find",
+    name: { de: "Union-Find", en: "Union-Find" },
+    contents: [QuickFindGenerator],
   },
   {
     slug: "modular-arithmetic",
