@@ -6,8 +6,8 @@ import {
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { Graph, RandomGraph } from "@shared/utils/graph"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
 import Random from "@shared/utils/random"
+import { t, tFunctional, Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {
@@ -21,7 +21,8 @@ const translations: Translations = {
   },
   de: {
     name: "Dijkstras Algorithmus",
-    description: "Gib die Reihenfolge der Knoten an, wie sie aus der Prioritätswarteschlange entfernt werden.",
+    description:
+      "Gib die Reihenfolge der Knoten an, wie sie aus der Prioritätswarteschlange entfernt werden.",
     prompt: "Reihenfolge der Knotenentfernung:",
     invalid_node: '"{{n}}" ist kein Knoten im Graphen.',
     feedback_node_count: "Die Antwort enthält nicht die richtige Anzahl von Knoten.",
@@ -55,9 +56,9 @@ export const DijkstraAlgorithm: QuestionGenerator = {
 
   generate: (lang = "en", parameters, seed) => {
     const random = new Random(seed)
-    const sizeRange = parameters.size as number;
-    const width = random.int(2, sizeRange);
-    const height = random.int(2, sizeRange);
+    const sizeRange = parameters.size as number
+    const width = random.int(2, sizeRange)
+    const height = random.int(2, sizeRange)
 
     const graph = RandomGraph.grid(
       random,
@@ -67,8 +68,8 @@ export const DijkstraAlgorithm: QuestionGenerator = {
       "unique",
       true,
       true,
-    );
-    graph.nodeDraggable = false;
+    )
+    graph.nodeDraggable = false
 
     const startNode = graph.nodes[0].label ?? "A"
     const correctOrder = runDijkstra(graph, startNode)

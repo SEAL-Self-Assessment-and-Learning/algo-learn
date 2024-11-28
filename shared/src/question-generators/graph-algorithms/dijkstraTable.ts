@@ -39,7 +39,7 @@ const translations: Translations = {
 }
 
 export const DijkstraTableGenerator: QuestionGenerator = {
-  id: "dijkstraTable",
+  id: "dijkstraT",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["graph", "dijkstra", "table"],
