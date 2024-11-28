@@ -1,6 +1,6 @@
-import { QuickFind } from "@shared/question-generators/unionFind/quickFind/qFAlgorithm.ts"
+import { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
-import Random from "@shared/utils/random"
+import Random from "@shared/utils/random.ts"
 
 /**
  * This function performs additional union operations outside the block/blocks
@@ -20,7 +20,7 @@ function performAdditionalUnionOperation({
   otherOperations,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
   usedElements: number[]
   otherOperations: number
@@ -47,7 +47,7 @@ function performAdditionalUnionOperation({
  */
 function findAndPerformUnionOperation(
   random: Random,
-  union: QuickFind,
+  union: UnionFind,
   blockValues: number[],
   unionSize: number,
 ) {
@@ -85,7 +85,7 @@ function generateTwoBlocks({
   otherOperation = true,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
   otherOperation?: true | false
 }) {
@@ -144,7 +144,7 @@ function generateOneBlock({
   otherOperations = 1,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
   otherOperations?: number
 }) {
@@ -190,7 +190,7 @@ export function unionTwoBlocksCombineOne({
   unionSize,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
 }) {
   const { block1Values, union: updatedUnion } = generateTwoBlocks({
@@ -216,7 +216,7 @@ export function unionTwoBlocksCombineNone({
   unionSize,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
 }) {
   let block1Values: number[] = []
@@ -263,7 +263,7 @@ export function unionTwoBlocksCombineSame({
   unionSize,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
 }) {
   const { block1Values, union: union_ } = generateTwoBlocks({ random, union, unionSize })
@@ -298,7 +298,7 @@ export function unionOneBlockCombineOne({
   unionSize,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
 }) {
   const { block1Values, union: updatedUnion } = generateOneBlock({
@@ -325,7 +325,7 @@ export function unionOneBlockCombineNone({
   unionSize,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
 }) {
   const { block1Values, union: union_ } = generateOneBlock({

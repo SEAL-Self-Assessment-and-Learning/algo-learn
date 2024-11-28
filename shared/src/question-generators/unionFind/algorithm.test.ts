@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
-import { QuickUnion } from "@shared/question-generators/unionFind/quickUnion/qUalgorithm.ts"
-import { QuickFind } from "./quickFind/qFAlgorithm.ts"
+import { QuickUnion } from "@shared/question-generators/unionFind/quickUnion/algorithm.ts"
+import { QuickFind } from "./quickFind/algorithm.ts"
 
 describe("UnionFind via QuickFind", () => {
   test("Test union operation", () => {
