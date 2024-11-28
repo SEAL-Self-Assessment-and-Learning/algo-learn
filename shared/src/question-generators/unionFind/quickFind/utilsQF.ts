@@ -1,4 +1,4 @@
-import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm"
+import { QuickFind } from "@shared/question-generators/unionFind/quickFind/qFAlgorithm.ts"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import Random from "@shared/utils/random"
 

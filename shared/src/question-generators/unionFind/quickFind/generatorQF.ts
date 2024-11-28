@@ -4,7 +4,7 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm"
+import { QuickFind } from "@shared/question-generators/unionFind/quickFind/qFAlgorithm.ts"
 import {
   unionOneBlockCombineNone,
   unionOneBlockCombineOne,
