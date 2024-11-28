@@ -78,17 +78,7 @@ export const collection: QuestionCollection = [
   {
     slug: "tt",
     name: { de: "Graphalgorithmen", en: "Graph Algorithms" },
-    contents: [TreeTraversal, DijkstraAlgorithm, DijkstraTableGenerator, DijkstraAlgorithm, DijkstraTableGenerator],
-  },
-  {
-    slug: "modular-arithmetic",
-    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
-    contents: [ModTricks, CRT, modFactor],
-  },
-  {
-    slug: "heap",
-    name: { de: "Heap", en: "Heap" },
-    contents: [HeapOperations, HeapVerifying, HeapNeighbours],
+    contents: [TreeTraversal, DijkstraAlgorithm, DijkstraTableGenerator],
   },
   {
     slug: "modular-arithmetic",
