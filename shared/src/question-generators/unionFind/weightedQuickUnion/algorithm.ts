@@ -24,7 +24,7 @@ export class WeightedQuickUnion extends UnionFind {
     const ri = this.find(i)
     const rj = this.find(j)
     if (ri !== rj) {
-      if (this.sz[ri] < this.sz[rj]) {
+      if (this.sz[ri] <= this.sz[rj]) {
         this.id[ri] = rj
         this.sz[rj] += this.sz[ri]
       } else {

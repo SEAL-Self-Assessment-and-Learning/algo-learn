@@ -1,9 +1,9 @@
-import { QuickUnion } from "@shared/question-generators/unionFind/quickUnion/algorithm.ts"
+import { WeightedQuickUnion } from "@shared/question-generators/unionFind/weightedQuickUnion/algorithm.ts"
 
 /**
  * QuickUnion implementation
  */
-export class WeightedQuickUnionPath extends QuickUnion {
+export class WeightedQuickUnionPath extends WeightedQuickUnion {
   constructor(n: number) {
     super(n)
   }
