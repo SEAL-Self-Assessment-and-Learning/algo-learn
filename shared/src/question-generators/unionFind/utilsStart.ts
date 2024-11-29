@@ -1,6 +1,5 @@
 import { MultiFreeTextFeedbackFunction, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
 import { QuickFind } from "@shared/question-generators/unionFind/quickFind/algorithm.ts"
-import { QuickUnionGenerator } from "@shared/question-generators/unionFind/quickUnion/generator.ts"
 import { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
 import {
   unionOneBlockCombineNone,
@@ -49,6 +48,7 @@ export function unionFindStartQuestion({
   lang,
   permalink,
   translations,
+  name,
 }: {
   random: Random
   union: UnionFind
@@ -56,6 +56,7 @@ export function unionFindStartQuestion({
   lang: "de" | "en"
   permalink: string
   translations: Translations
+  name: string
 }) {
   const unionCaseGeneration = random.weightedChoice([
     [unionTwoBlocksCombineOne, 0.35],
@@ -77,7 +78,7 @@ export function unionFindStartQuestion({
 
   const question: MultiFreeTextQuestion = {
     type: "MultiFreeTextQuestion",
-    name: QuickUnionGenerator.name(lang),
+    name,
     path: permalink,
     text: t(translations, lang, "task", [
       gapField,
