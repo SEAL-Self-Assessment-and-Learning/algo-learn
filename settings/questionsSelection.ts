@@ -26,6 +26,7 @@ import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generator.ts"
 import { QuickUnionGenerator } from "@shared/question-generators/unionFind/quickUnion/generator.ts"
 import { WeightedQuickUnionGenerator } from "@shared/question-generators/unionFind/weightedQuickUnion/generator.ts"
+import { WeightedQuickUnionPathGenerator } from "@shared/question-generators/unionFind/weightedQuickUnionPath/generator.ts"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
@@ -86,7 +87,12 @@ export const collection: QuestionCollection = [
   {
     slug: "union-find",
     name: { de: "Union-Find", en: "Union-Find" },
-    contents: [QuickFindGenerator, QuickUnionGenerator, WeightedQuickUnionGenerator],
+    contents: [
+      QuickFindGenerator,
+      QuickUnionGenerator,
+      WeightedQuickUnionGenerator,
+      WeightedQuickUnionPathGenerator,
+    ],
   },
 ]
 

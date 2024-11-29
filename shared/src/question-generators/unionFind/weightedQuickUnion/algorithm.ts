@@ -4,7 +4,7 @@ import { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
  * QuickUnion implementation
  */
 export class WeightedQuickUnion extends UnionFind {
-  private readonly sz: number[] = []
+  protected readonly sz: number[] = []
 
   constructor(n: number) {
     super(n)
