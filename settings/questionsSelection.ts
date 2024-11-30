@@ -33,6 +33,17 @@ export const collection: QuestionCollection = [
   //   name: { de: "Beispiel", en: "Example" },
   //   contents: [ExampleQuestion],
   // },
+
+  {
+    slug: "propositional-logic",
+    name: { de: "Aussagenlogik", en: "Propositional Logic" },
+    contents: [Satisfiability, NormalForms],
+  },
+  {
+    slug: "modular-arithmetic",
+    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
+    contents: [ModTricks, CRT, modFactor],
+  },
   {
     slug: "asymptotics",
     name: { de: "Asymptotik", en: "Asymptotics" },
@@ -52,39 +63,24 @@ export const collection: QuestionCollection = [
     image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
   },
   {
-    slug: "huffmancoding",
-    name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
-    contents: [huffmanCoding],
-  },
-  {
-    slug: "queue",
-    name: { de: "Queue", en: "Queue" },
-    contents: [queueQuestion],
-  },
-  {
     slug: "stack",
-    name: { de: "Stack", en: "Stack" },
-    contents: [stackQuestion],
-  },
-  {
-    slug: "propositional-logic",
-    name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms],
-  },
-  {
-    slug: "modular-arithmetic",
-    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
-    contents: [ModTricks, CRT, modFactor],
+    name: { de: "Stacks und Queues", en: "Stacks and Queues" },
+    contents: [stackQuestion, queueQuestion],
   },
   {
     slug: "heap",
-    name: { de: "Heap", en: "Heap" },
+    name: { de: "Heaps", en: "Heaps" },
     contents: [HeapOperations, HeapVerifying, HeapNeighbours],
   },
   {
     slug: "union-find",
     name: { de: "Union-Find", en: "Union-Find" },
     contents: [QuickFindGenerator],
+  },
+  {
+    slug: "huffmancoding",
+    name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
+    contents: [huffmanCoding],
   },
 ]
 
