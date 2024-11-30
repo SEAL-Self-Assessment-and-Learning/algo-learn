@@ -117,7 +117,7 @@ ${format(t("text2" + type), [`${T}(${n})`])}`
             valid: true,
             message: `${parsed.a} ${parsed.t}(${parsed.n}${parsed.divOrSub === "div" ? "/" : "-"}${parsed.b}) + ${parsed.c}`,
           }
-        } catch (e) {
+        } catch {
           return { valid: false, message: t("feedbackIncomplete") }
         }
       }
@@ -128,7 +128,7 @@ ${format(t("text2" + type), [`${T}(${n})`])}`
         let p: ReturnType<typeof parseRecursiveFunction>
         try {
           p = parseRecursiveFunction(text)
-        } catch (e) {
+        } catch {
           return {
             correct: false,
             message: t("feedbackIncomplete"),

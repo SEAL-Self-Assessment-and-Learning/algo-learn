@@ -1,5 +1,3 @@
-import { _ } from "@shared/utils/generics"
-
 /**
  * Function to insert a space after every x characters
  * @param input - the input string
@@ -14,35 +12,16 @@ export function insertSpaceAfterEveryXChars(input: string, x: number): string {
 }
 
 /**
- * Function to check if a dict is already in a list of dictionaries
- * @param dict - the dictionary to check
- * @param listDict - the list of dictionaries
- */
-export function isDictInList(dict: { [key: string]: any }, listDict: { [key: string]: any }[]): boolean {
-  for (const item of listDict) {
-    if (_.isEqual(dict, item)) {
-      return true
-    }
-  }
-
-  return false
-}
-
-/**
  * Creates the table for markdown
  * @param wordArray - the word arrays with frequency of each letter
  * @param extraFeature - if the table should have any extra styling (like my-5 around)
  */
 export function convertDictToMdTable(wordArray: { [key: string]: any }, extraFeature: string = "none") {
   const header = Object.keys(wordArray)
-  const middleLine = header.map(() => "-------")
+  const middleLine = header.map(() => "---")
   const content = Object.values(wordArray)
   // create a table format for markdown (numbers are with $$)
-  const returnValue = `
-|${header.join("|")}|
-|${middleLine.join("|")}|
-|$${content.join("$|$")}$|
-`
+  const returnValue = `\n|${header.join("|")}|\n|${middleLine.join("|")}|\n|$${content.join("$|$")}$|\n`
   if (extraFeature !== "none") {
     const extraFeatureLine = header.map(() => extraFeature)
     return returnValue + `|${extraFeatureLine.join("|")}|`
@@ -54,8 +33,8 @@ export function convertDictToMdTable(wordArray: { [key: string]: any }, extraFea
  * This function checks if a given code is a correct encoding of inputFrequencies
  *
  * @param inputFrequencies - how often each char appears
- * @param possibleCode - the code to check for correctness
- * @param providedCode - an already correct computed code
+ * @param possibleCode - an already correct computed code
+ * @param providedCode - the code to check for correctness
  */
 export function checkProvidedCode(
   inputFrequencies: { [key: string]: number },
@@ -80,11 +59,10 @@ export function checkProvidedCode(
 
   // convert the provided code to an array
 
-  const providedCodeArray = Object.values(providedCode)
+  const providedCodeArray: string[] = Object.values(providedCode)
   providedCodeArray.sort((a, b) => a.length - b.length)
 
   // checks if the code is prefix-free
-  // is it possible to optimize this?
   for (let i = 0; i < providedCodeArray.length - 1; i++) {
     for (let j = i + 1; j < providedCodeArray.length; j++) {
       if (providedCodeArray[j].startsWith(providedCodeArray[i])) {

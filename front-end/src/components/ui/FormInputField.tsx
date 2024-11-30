@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { ReactElement, useEffect, useRef, useState } from "react"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Input } from "@/components/ui/input.tsx"
 import { useFormContext } from "@/hooks/useFormContext.ts"
@@ -23,22 +23,37 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
   // To select the first created input field on the site
   const firstInputRef = useRef<HTMLInputElement | null>(null)
   useEffect(() => {
-    if (firstInputRef.current) {
-      firstInputRef.current.focus()
+    if (firstInputRef.current && focus) {
+      firstInputRef.current.focus({ preventScroll: true })
     }
   }, [id])
 
   const inputBorderColor = invalid ? "border-red-500 focus:border-red-500" : ""
 
-  let promptElement
+  let promptElement: ReactElement = <></>
   if (prompt) {
-    promptElement = <Markdown md={prompt} />
+    promptElement = (
+      <div className={`${prompt ? "mr-2 whitespace-nowrap" : ""}`}>
+        <Markdown md={prompt} />
+      </div>
+    )
   }
 
   let spacing
+  let fieldWidth: number | null = null
   if (align === "NL") {
     spacing = <br />
+  } else if (align.startsWith("OS")) {
+    fieldWidth = Number.parseInt(align.slice(3)) * 3
   }
+
+  const feedbackElement: ReactElement = (
+    <FeedbackComponent
+      formatFeedback={feedback ? feedback : ""}
+      invalid={invalid}
+      type={feedbackVariation === "below" ? "below" : "overlay"}
+    />
+  )
 
   const [isInputFocused, setIsInputFocused] = useState(false)
   let inputElement
@@ -49,28 +64,26 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
         {spacing}
         <div className="flex flex-col">
           <div className="flex flex-row items-center">
-            <div className="mr-2">{promptElement}</div>
+            {promptElement}
             <div className={`relative h-full w-full`}>
               <Input
                 ref={focus ? firstInputRef : null}
                 key={`newline-input-${id}`}
-                autoFocus
                 disabled={disabled}
                 value={text || ""}
                 onChange={(e) => {
-                  setText ? setText(e.target.value) : ""
+                  if (setText) {
+                    setText(e.target.value)
+                  }
                 }}
                 type="text"
                 className={`${inputBorderColor} focus:outline-none`}
+                style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
                 placeholder={placeholder || ""}
               />
             </div>
           </div>
-          <FeedbackComponent
-            formatFeedback={feedback ? feedback : ""}
-            invalid={invalid}
-            type={"below"}
-          />
+          {feedbackElement}
         </div>
         {spacing}
       </div>
@@ -80,30 +93,26 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
       <div>
         {spacing}
         <div className="flex flex-row items-center">
-          <div className="mr-2">{promptElement}</div>
+          {promptElement}
           <div className={`relative h-full w-full`}>
             <Input
               ref={focus ? firstInputRef : null}
               key={`newline-input-${id}`}
-              autoFocus
               disabled={disabled}
               value={text || ""}
               onChange={(e) => {
-                setText ? setText(e.target.value) : ""
+                if (setText) {
+                  setText(e.target.value)
+                }
               }}
               onFocus={() => setIsInputFocused(true)}
               onBlur={() => setIsInputFocused(false)}
               type="text"
-              className={`${inputBorderColor} mb-1 w-full focus:outline-none`}
+              className={`${inputBorderColor} mb-1 focus:outline-none`}
+              style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
               placeholder={placeholder || ""}
             />
-            {isInputFocused && feedback && (
-              <FeedbackComponent
-                formatFeedback={feedback ? feedback : ""}
-                invalid={invalid}
-                type={"overlay"}
-              />
-            )}
+            {isInputFocused && feedback && feedbackElement}
           </div>
         </div>
         {spacing}

@@ -135,13 +135,13 @@ export const RecurrenceMaster: QuestionGenerator = {
                 }) +
                 "$",
             }
-          } catch (e) {
+          } catch {
             return {
               valid: false,
               message: t("feedback.incomplete"),
             }
           }
-        } catch (e) {
+        } catch {
           return {
             valid: false,
             message: t("feedback.invalid-expression"),
@@ -155,7 +155,7 @@ export const RecurrenceMaster: QuestionGenerator = {
         const sumProductTerm: SumProductTerm = mathNodeToSumProductTerm(math.parse(text))
 
         return {
-          correct: solution.Theta(sumProductTerm.dominantTerm()),
+          correct: solution.bigTheta(sumProductTerm.dominantTerm()),
           correctAnswer,
         }
       }

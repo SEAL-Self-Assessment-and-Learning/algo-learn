@@ -1,4 +1,4 @@
-import Random from "@shared/utils/random.ts"
+import Random from "@shared/utils/random"
 
 /**
  * Generates a Huffman tree + encoded word from a given word of character frequencies.
@@ -131,7 +131,7 @@ export class HuffmanNode {
     for (let i = 0; i < word.length; i++) {
       try {
         code = this.setCharacterLabel(word[i], code)
-      } catch (e) {
+      } catch {
         return false
       }
     }

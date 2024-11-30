@@ -24,6 +24,7 @@ Once bun is installed, you can download and install the project's dependencies:
 ```bash
 bun install --frozen-lockfile
 ```
+
 This command can also be used to install missing dependencies, e.g. when dependencies were changed.
 
 The following command will start a local HTTP server for development:
@@ -48,11 +49,13 @@ In principle, you're now in position to start development. However, we strongly 
 ### Run tests
 
 Run all tests (format checker, unit tests, linter, type checker):
+
 ```bash
 bun run test
 ```
 
 To only run the unit tests one can use
+
 ```bash
 bun test
 ```

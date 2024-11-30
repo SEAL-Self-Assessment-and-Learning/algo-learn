@@ -5,8 +5,8 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { sampleLoopStars } from "@shared/question-generators/time/utilsStars/utils.ts"
-import { stringifyPseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
+import { sampleLoopStars } from "@shared/question-generators/time/utilsStars/general"
+import { stringifyPseudoCode } from "@shared/utils/pseudoCodeUtils"
 import Random from "@shared/utils/random"
 import { tFunction, tFunctional, Translations } from "@shared/utils/translations"
 

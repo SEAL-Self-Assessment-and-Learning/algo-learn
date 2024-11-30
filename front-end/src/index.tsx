@@ -16,6 +16,7 @@ import { TestSimpleMC } from "./routes/test"
 import { ViewSingleQuestion } from "./routes/ViewSingleQuestion"
 import "./tailwind.css"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { collection } from "./listOfQuestions"
 
 const routes = []
@@ -84,8 +85,12 @@ const router = createBrowserRouter(
   },
 )
 
+const queryClient = new QueryClient()
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   </StrictMode>,
 )

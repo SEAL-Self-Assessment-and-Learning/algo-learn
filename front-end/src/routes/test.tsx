@@ -1,6 +1,4 @@
 import { useState } from "react"
-import SyntaxHighlighter from "react-syntax-highlighter"
-import { solarizedDark, solarizedLight } from "react-syntax-highlighter/dist/esm/styles/hljs"
 import { Question, questionToJSON } from "@shared/api/QuestionGenerator"
 import { ExampleQuestion } from "@shared/question-generators/example/example"
 import Random from "@shared/utils/random"
@@ -9,7 +7,6 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { QuestionComponent } from "../components/QuestionComponent"
-import { LIGHT, useTheme } from "../hooks/useTheme"
 import { useTranslation } from "../hooks/useTranslation"
 
 /** Component for testing the question generator */
@@ -62,20 +59,17 @@ function RenderQuestionAsFormat({
   format: "react" | "latex" | "json"
   question: Question
 }) {
-  const { userTheme } = useTheme()
   if (format === "react") {
     return <QuestionComponent question={question} onResult={() => undefined} />
   }
 
   return (
-    <HorizontallyCenteredDiv className="w-full flex-grow overflow-y-scroll">
-      <SyntaxHighlighter
-        language={format}
-        style={userTheme === LIGHT ? solarizedLight : solarizedDark}
-        wrapLongLines
-      >
-        {format === "latex" ? questionToTex(question) : questionToJSON(question)}
-      </SyntaxHighlighter>
+    <HorizontallyCenteredDiv className="mt-10 w-full flex-grow overflow-y-scroll">
+      <div className={`container mx-auto p-4`}>
+        <pre className="overflow-auto rounded-md bg-gray-800 p-4 text-white">
+          <code>{(format == "latex" ? questionToTex : questionToJSON)(question)}</code>
+        </pre>
+      </div>
     </HorizontallyCenteredDiv>
   )
 }

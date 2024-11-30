@@ -117,10 +117,10 @@ export function QuizSession({
   mode: "practice" | "exam"
 }): ReactElement {
   const { featureMap: fM, appendLogEntry } = useLearningAnalytics()
-  const [{ sessionSeed, featureMap }] = useState({
+  const [{ sessionSeed, featureMap }] = useState(() => ({
     sessionSeed: sampleRandomSeed(),
     featureMap: fM, // store in state to prevent re-rendering
-  })
+  }))
   const params = useParams()
   const generatorId = params["id"]
 

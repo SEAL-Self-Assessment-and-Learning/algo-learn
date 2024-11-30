@@ -24,10 +24,12 @@ const translations: Translations = {
     text: "What is a correct **Huffman encoding** of the string `{{0}}`?",
     textChoice: "What are correct **Huffman encodings** of the string `{{0}}`?",
     prompt: "What is a possible Huffman-Coding?",
-    textTable: `Suppose we have the following table, which represents how often each character appears in a given string:{{0}}
-What could be a correct **Huffman-Coding** for each char?`,
+    textTable: `Suppose we have the following table, which represents how often each character appears in a given string:
+{{0}}
+What could be a correct **Huffman-Coding** for each letter?`,
     feedbackInvalid: "Can only contain 1 and 0",
-    multiInputText: `Suppose we have the following table, which represents how often each character appears in a given string:{{0}}
+    multiInputText: `Suppose we have the following table, which represents how often each character appears in a given string:
+{{0}}
 Construct a correct **Huffman-Code** for the given string.
 {{1}}`,
   },
@@ -37,10 +39,12 @@ Construct a correct **Huffman-Code** for the given string.
     text: 'Was ist eine korrekte **Huffman-Kodierung** für den String "*{{0}}*"?',
     textChoice: 'Was sind korrekte **Huffman-Kodierungen** für den String "*{{0}}*"?',
     prompt: "Was ist eine mögliche Huffman-Kodierung?",
-    textTable: `Angenommen wir habe die folgende Tabelle, welche angibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:{{0}}
+    textTable: `Angenommen wir habe die folgende Tabelle, welche angibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:
+{{0}}
         Was wäre eine korrekte **Huffman-Codierung** für jeden Buchstaben?`,
     feedbackInvalid: "Darf nur 1 und 0 enthalten",
-    multiInputText: `Betrachte die folgende Tabelle, welche angebibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:{{0}}
+    multiInputText: `Betrachte die folgende Tabelle, welche angebibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:
+{{0}}
 Konstruiere einen korrekten **Huffman-Code** für den gegebenen String.
 {{1}}`,
   },
