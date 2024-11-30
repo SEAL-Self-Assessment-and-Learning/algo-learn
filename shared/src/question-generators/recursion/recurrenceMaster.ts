@@ -89,6 +89,7 @@ export const RecurrenceMaster: QuestionGenerator = {
       `${T}(n) = ${a === 1 ? "" : a} ${T}(n/${b}) + ${c.toLatex("n")}`,
       `${T}(1) = ${d}`,
     ])}
+    
     ${format(t("text2"), [`${T}(n)`])}`
     let question: Question
     if (variant === "choice") {
