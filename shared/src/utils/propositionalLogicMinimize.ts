@@ -27,7 +27,7 @@ export class MinimalNormalForm {
   constructor(expr: SyntaxTreeNodeType, form: NormalForm) {
     this.expr = expr
     this.form = form
-    this.minExpr = this.getMinimalForm()
+    this.minExpr = this.computeMinimalForm()
   }
 
   /**
@@ -37,16 +37,6 @@ export class MinimalNormalForm {
   get(base: boolean = false): SyntaxTreeNodeType {
     if (base) return this.expr
     return this.minExpr
-  }
-
-  /**
-   * Returns the string representation of the SyntaxTreeNode
-   * Shortcut for x.get().toString()
-   * @param latex - whether to return the latex representation
-   * @param base - if the base instead the minExpr should be printed
-   */
-  toString(latex: boolean = false, base: boolean = false): string {
-    return this.get(base).toString(latex)
   }
 
   /**
@@ -62,7 +52,7 @@ export class MinimalNormalForm {
    * @private
    * @using Quine–McCluskey algorithm
    */
-  private getMinimalForm(): SyntaxTreeNodeType {
+  private computeMinimalForm(): SyntaxTreeNodeType {
     const { truthTable: tTable, variableNames: varNames } = this.expr.getTruthTable()
 
     const calcRows = this.getIndicesOfRows(tTable, this.form === "DNF")

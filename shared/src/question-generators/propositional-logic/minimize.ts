@@ -29,10 +29,10 @@ const translations: Translations = {
     description: "Minimize the normal form of a boolean expression",
     param_size: "The maximal number of variables used",
     text: "Given the boolean expression \\[\\varPhi={{0}}\\] Compute  the minimized **{{1}}** of $\\varPhi$ labeled as $\\varPhi^*$.",
-    freetext_feedback_parse_error: "Your answer couldn't be parsed.",
-    freetext_feedback_no_normal_form: "Your answer is not a {{0}}.",
-    freetext_feedback_not_equivalent: "Your answer is **not** equivalent to $\\varPhi$.",
-    freetext_feedback_not_minimal: "Your answer is equivalent to $\\varPhi$, but it is not minimal.",
+    ff_parse_error: "Your answer couldn't be parsed.",
+    ff_no_normal_form: "Your answer is not a {{0}}.",
+    ff_not_equivalent: "Your answer is **not** equivalent to $\\varPhi$.",
+    ff_not_minimal: "Your answer is equivalent to $\\varPhi$, but it is not minimal.",
     DNF: "DNF",
     CNF: "CNF",
   },
@@ -41,11 +41,10 @@ const translations: Translations = {
     description: "Minimiere die Normalform eines booleschen Ausdruck",
     param_size: "Die maximale Anzahl der verwendeten Variablen",
     text: "Gegeben sei der boolesche Ausdruck \\[\\varPhi={{0}}\\] Bestimme die minimierte **{{1}}** von $\\varPhi$, bezeichnet als $\\varPhi^*$",
-    freetext_feedback_parse_error: "Deine Antwort ist kein gültiger aussagenlogischer Ausdruck.",
-    freetext_feedback_no_normal_form: "Deine Antwort ist keine {{0}}.",
-    freetext_feedback_not_equivalent: "Deine Antwort ist **nicht** äquivalent zu $\\varPhi$.",
-    freetext_feedback_not_minimal:
-      "Deine Antwort is äquivalent zu $\\varPhi$, aber sie ist nicht minimal.",
+    ff_parse_error: "Deine Antwort ist kein gültiger aussagenlogischer Ausdruck.",
+    ff_no_normal_form: "Deine Antwort ist keine {{0}}.",
+    ff_not_equivalent: "Deine Antwort ist **nicht** äquivalent zu $\\varPhi$.",
+    ff_not_minimal: "Deine Antwort is äquivalent zu $\\varPhi$, aber sie ist nicht minimal.",
     DNF: "DNF",
     CNF: "KNF",
   },
@@ -159,7 +158,7 @@ function feedbackFunction(
     if (userExpression instanceof ParserError) {
       return {
         correct: false,
-        feedbackText: t(translations, lang, "freetext_feedback_parse_error"),
+        feedbackText: t(translations, lang, "ff_parse_error"),
         correctAnswer,
       }
     }
@@ -168,9 +167,7 @@ function feedbackFunction(
     if (!isCorrectForm) {
       return {
         correct: false,
-        feedbackText: t(translations, lang, "freetext_feedback_no_normal_form", [
-          t(translations, lang, form),
-        ]),
+        feedbackText: t(translations, lang, "ff_no_normal_form", [t(translations, lang, form)]),
         correctAnswer,
       }
     }
@@ -178,7 +175,7 @@ function feedbackFunction(
     if (!compareExpressions([correctMinNormalForm.get(), userExpression])) {
       return {
         correct: false,
-        feedbackText: t(translations, lang, "freetext_feedback_not_equivalent"),
+        feedbackText: t(translations, lang, "ff_not_equivalent"),
         correctAnswer,
       }
     }
@@ -186,7 +183,7 @@ function feedbackFunction(
     if (correctMinNormalForm.get().getNumLiterals() !== userExpression.getNumLiterals()) {
       return {
         correct: false,
-        feedbackText: t(translations, lang, "freetext_feedback_not_minimal"),
+        feedbackText: t(translations, lang, "ff_not_minimal"),
         correctAnswer,
       }
     }
