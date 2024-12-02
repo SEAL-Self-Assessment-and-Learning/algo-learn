@@ -16,7 +16,6 @@ import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffma
 import { CRT } from "@shared/question-generators/math/crt"
 import { modFactor } from "@shared/question-generators/math/modFactorization"
 import { ModTricks } from "@shared/question-generators/math/modTricks"
-import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
@@ -25,6 +24,7 @@ import { RecurrenceMaster } from "@shared/question-generators/recursion/recurren
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF"
+import {MinimizePropositionalLogic} from "@shared/question-generators/propositional-logic/minimize.ts";
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
@@ -38,7 +38,7 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms],
+    contents: [Satisfiability, NormalForms, MinimizePropositionalLogic],
   },
   {
     slug: "modular-arithmetic",
@@ -82,26 +82,6 @@ export const collection: QuestionCollection = [
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     contents: [huffmanCoding],
-  },
-  {
-    slug: "queue",
-    name: { de: "Queue", en: "Queue" },
-    contents: [queueQuestion],
-  },
-  {
-    slug: "stack",
-    name: { de: "Stack", en: "Stack" },
-    contents: [stackQuestion],
-  },
-  {
-    slug: "propositional-logic",
-    name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms, MinimizePropositionalLogic],
-  },
-  {
-    slug: "modular-arithmetic",
-    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
-    contents: [ModTricks, CRT, modFactor],
   },
 ]
 
