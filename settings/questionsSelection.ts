@@ -21,6 +21,7 @@ import { Satisfiability } from "@shared/question-generators/propositional-logic/
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
+import { BubbleSortGenerator } from "@shared/question-generators/SortingAlgorithms/BubbleSort/generator.ts"
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF"
@@ -81,6 +82,11 @@ export const collection: QuestionCollection = [
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     contents: [huffmanCoding],
+  },
+  {
+    slug: "sortingalgorithm",
+    name: { en: "Sorting Algorithms", de: "Sortieralgorithmen" },
+    contents: [BubbleSortGenerator],
   },
 ]
 
