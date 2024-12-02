@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { GetMinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
+import { MinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
 import {
   associativeOperators,
   BinaryOperatorType,
@@ -357,13 +357,13 @@ test("minimize normal forms", () => {
       // expect() does not narrow down the type, so "if" is used here
       expect(parseResult).not.toBeInstanceOf(ParserError)
     } else {
-      const minimalForms = new GetMinimalNormalForm(parseResult)
+      const minimalFormsDNF = new MinimalNormalForm(parseResult, "DNF")
+      expect(compareExpressions([minimalFormsDNF.get(), parseResult])).toBeTruthy()
+      expect(minimalFormsDNF.get().getNumLiterals()).toEqual(numLiteralsDNF)
 
-      expect(compareExpressions([minimalForms.get("DNF"), parseResult])).toBeTruthy()
-      expect(minimalForms.get("DNF").getNumLiterals()).toEqual(numLiteralsDNF)
-
-      expect(compareExpressions([minimalForms.get("CNF"), parseResult])).toBeTruthy()
-      expect(minimalForms.get("CNF").getNumLiterals()).toEqual(numLiteralsCNF)
+      const minimalFormsCNF = new MinimalNormalForm(parseResult, "CNF")
+      expect(compareExpressions([minimalFormsCNF.get(), parseResult])).toBeTruthy()
+      expect(minimalFormsCNF.get().getNumLiterals()).toEqual(numLiteralsCNF)
     }
   }
 

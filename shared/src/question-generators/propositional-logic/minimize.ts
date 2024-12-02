@@ -19,7 +19,7 @@ import {
   SyntaxTreeNodeType,
   tokenToLatex,
 } from "@shared/utils/propositionalLogic"
-import { GetMinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
+import { MinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
 
@@ -152,8 +152,8 @@ function feedbackFunction(
   lang: "en" | "de",
 ): FreeTextFeedbackFunction {
   return ({ text }) => {
-    const correctMinNormalForm = new GetMinimalNormalForm(solutionExpression)
-    const correctAnswer = "$" + correctMinNormalForm.get(form).toString(true) + "$"
+    const correctMinNormalForm = new MinimalNormalForm(solutionExpression, form)
+    const correctAnswer = "$" + correctMinNormalForm.get().toString(true) + "$"
 
     const userExpression = PropositionalLogicParser.parse(text)
     if (userExpression instanceof ParserError) {
@@ -175,7 +175,7 @@ function feedbackFunction(
       }
     }
 
-    if (!compareExpressions([correctMinNormalForm.get(form), userExpression])) {
+    if (!compareExpressions([correctMinNormalForm.get(), userExpression])) {
       return {
         correct: false,
         feedbackText: t(translations, lang, "freetext_feedback_not_equivalent"),
@@ -183,7 +183,7 @@ function feedbackFunction(
       }
     }
 
-    if (correctMinNormalForm.get(form).getNumLiterals() !== userExpression.getNumLiterals()) {
+    if (correctMinNormalForm.get().getNumLiterals() !== userExpression.getNumLiterals()) {
       return {
         correct: false,
         feedbackText: t(translations, lang, "freetext_feedback_not_minimal"),

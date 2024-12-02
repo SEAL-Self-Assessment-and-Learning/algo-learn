@@ -19,57 +19,60 @@ type BinaryMix = 0 | 1 | "x"
  * - CNF (Conjunctive Normal
  * - The minimal normal form is the minimal number of literals needed
  */
-export class GetMinimalNormalForm {
+export class MinimalNormalForm {
   private readonly expr: SyntaxTreeNodeType
-  private readonly cnfExpr: SyntaxTreeNodeType
-  private readonly dnfExpr: SyntaxTreeNodeType
+  private readonly minExpr: SyntaxTreeNodeType
+  private readonly form: NormalForm
 
-  constructor(expr: SyntaxTreeNodeType) {
+  constructor(expr: SyntaxTreeNodeType, form: NormalForm) {
     this.expr = expr
-    this.dnfExpr = this.getMinimalForm("DNF")
-    this.cnfExpr = this.getMinimalForm("CNF")
+    this.form = form
+    this.minExpr = this.getMinimalForm()
   }
 
   /**
    * Returns the expression
-   * @param form - which form of expression
+   * @param base - if the base instead the minExpr should be returned
    */
-  get(form: NormalForm | "base"): SyntaxTreeNodeType {
-    if (form === "DNF") return this.dnfExpr
-    if (form === "CNF") return this.cnfExpr
-    return this.expr
+  get(base: boolean = false): SyntaxTreeNodeType {
+    if (base) return this.expr
+    return this.minExpr
   }
 
   /**
    * Returns the string representation of the SyntaxTreeNode
    * Shortcut for x.get().toString()
    * @param latex - whether to return the latex representation
-   * @param form - which form returned
+   * @param base - if the base instead the minExpr should be printed
    */
-  toString(latex: boolean = false, form: NormalForm | "base"): string {
-    if (form === "DNF") return this.dnfExpr.toString(latex)
-    if (form === "CNF") return this.cnfExpr.toString(latex)
-    return this.expr.toString(latex)
+  toString(latex: boolean = false, base: boolean = false): string {
+    return this.get(base).toString(latex)
+  }
+
+  /**
+   * Returns the type of normal form
+   */
+  getForm(): NormalForm {
+    return this.form
   }
 
   /**
    * Computes the minimal normal form (either CNF or DNF) for the given logical expression.
    *
-   * @param form - either a minimal cnf or dnf
    * @private
    * @using Quine–McCluskey algorithm
    */
-  private getMinimalForm(form: NormalForm): SyntaxTreeNodeType {
+  private getMinimalForm(): SyntaxTreeNodeType {
     const { truthTable: tTable, variableNames: varNames } = this.expr.getTruthTable()
 
-    const calcRows = this.getIndicesOfRows(tTable, form === "DNF")
+    const calcRows = this.getIndicesOfRows(tTable, this.form === "DNF")
     const { implicants } = this.getPrimeImplicants(calcRows, varNames.length)
     const { implicantRows } = this.allImplicantRows(implicants)
     const minRows = this.minimumCover(implicantRows, calcRows)
     // get those implicants that are in the minimum cover
     const minImplicants = minRows.map((i) => implicants[i])
 
-    return this.buildNormalFormTree(minImplicants, varNames, form)
+    return this.buildNormalFormTree(minImplicants, varNames, this.form)
   }
 
   /**
