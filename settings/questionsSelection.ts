@@ -16,6 +16,7 @@ import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffma
 import { CRT } from "@shared/question-generators/math/crt"
 import { modFactor } from "@shared/question-generators/math/modFactorization"
 import { ModTricks } from "@shared/question-generators/math/modTricks"
+import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
@@ -36,6 +37,17 @@ export const collection: QuestionCollection = [
   //   name: { de: "Beispiel", en: "Example" },
   //   contents: [ExampleQuestion],
   // },
+
+  {
+    slug: "propositional-logic",
+    name: { de: "Aussagenlogik", en: "Propositional Logic" },
+    contents: [Satisfiability, NormalForms, MinimizePropositionalLogic],
+  },
+  {
+    slug: "modular-arithmetic",
+    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
+    contents: [ModTricks, CRT, modFactor],
+  },
   {
     slug: "asymptotics",
     name: { de: "Asymptotik", en: "Asymptotics" },
@@ -55,33 +67,13 @@ export const collection: QuestionCollection = [
     image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
   },
   {
-    slug: "huffmancoding",
-    name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
-    contents: [huffmanCoding],
-  },
-  {
-    slug: "queue",
-    name: { de: "Queue", en: "Queue" },
-    contents: [queueQuestion],
-  },
-  {
     slug: "stack",
-    name: { de: "Stack", en: "Stack" },
-    contents: [stackQuestion],
-  },
-  {
-    slug: "propositional-logic",
-    name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms],
-  },
-  {
-    slug: "modular-arithmetic",
-    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
-    contents: [ModTricks, CRT, modFactor],
+    name: { de: "Stacks und Queues", en: "Stacks and Queues" },
+    contents: [stackQuestion, queueQuestion],
   },
   {
     slug: "heap",
-    name: { de: "Heap", en: "Heap" },
+    name: { de: "Heaps", en: "Heaps" },
     contents: [HeapOperations, HeapVerifying, HeapNeighbours],
   },
   {
@@ -93,6 +85,11 @@ export const collection: QuestionCollection = [
       WeightedQuickUnionGenerator,
       WeightedQuickUnionPathGenerator,
     ],
+  },
+  {
+    slug: "huffmancoding",
+    name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
+    contents: [huffmanCoding],
   },
 ]
 
