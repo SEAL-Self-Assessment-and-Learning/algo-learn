@@ -23,7 +23,6 @@ const translations: Translations = {
     description: "Create a string for a given Hufman-Coding",
     text: `Consider the following prefix free code \n{{0}} 
     Find a text $T$: 
-{{3}}
 - where the code stated **above is optimal**
 - contains each of the letters $\\{$** {{1}} **$\\}$ at **least once**
 - no two character occur with the same frequency
@@ -31,20 +30,16 @@ const translations: Translations = {
 Provide the number of occurrences for each letter in $T$:
 {{2}}
     `,
-    minimalAddition: "- that is as **short** as possible",
     checkFormatInteger: "Only positive Integer values",
     ">0": " > 0",
     feedbackDuplicates: "There are duplicated values in your frequencies.",
     feedbackEqu: "Your frequencies can't compute an equivalent prefix free code.",
-    feedbackNotMinimal:
-      "Your frequencies can compute an equivalent prefix free code, but it is **not minimal**.",
   },
   de: {
     name: "Umgekehrte Huffman-Kodierung",
     description: "Erstelle einen Text für eine gegebene Huffman-Kodierung",
     text: `Betrachte den folgenden präfixfreien Code \n{{0}} 
     Finde einen Text $T$: 
-{{3}}
 - bei dem der oben angegebene Code **optimal** ist
 - der jeden der Buchstaben $\\{$** {{1}} **$\\}$ **mindestens einmal** enthält
 - bei dem keine zwei Zeichen mit der gleichen Häufigkeit auftreten
@@ -52,13 +47,10 @@ Provide the number of occurrences for each letter in $T$:
 Gib die Anzahl der Vorkommen jedes Buchstabens in $T$ an:
 {{2}}
     `,
-    minimalAddition: "- der **so kurz wie möglich** ist",
     checkFormatInteger: "Nur positive Ganzzahlen",
     ">0": " > 0",
     feedbackDuplicates: "Es gibt doppelte Werte in deinen Häufigkeiten.",
     feedbackEqu: "Mit deinen Häufigkeiten kann kein äquivalenter präfixfreier Code erstellt werden.",
-    feedbackNotMinimal:
-      "Mit deinen Häufigkeiten kann ein äquivalenter präfixfreier Code erstellt werden, aber er ist **nicht minimal**.",
   },
 }
 
@@ -114,12 +106,7 @@ export const ReverseHuffmanCoding: QuestionGenerator = {
       type: "MultiFreeTextQuestion",
       name: ReverseHuffmanCoding.name(lang),
       path: permalink,
-      text: t(translations, lang, "text", [
-        frequencyTable,
-        charList.join(", "),
-        mixInputCharFreqTable,
-        "", // placeholder for future minimal variant
-      ]),
+      text: t(translations, lang, "text", [frequencyTable, charList.join(", "), mixInputCharFreqTable]),
       fillOutAll: true,
       checkFormat: checkIntegerInput(lang),
       feedback: getFeedback({
@@ -182,10 +169,6 @@ function getFeedback({
       combinedUserEncoding,
       originalTreeNode.getEncodingTable(),
     )
-
-    // originalTreeNode.minimizeCharFrequencies(indicesNormalFields.map((i) => charList[i]))
-    // const minCharacterFrequencies = originalTreeNode.getCharacterFrequencies()
-
     if (!validFrequencies) {
       return {
         correct: false,
@@ -194,17 +177,6 @@ function getFeedback({
       }
     }
 
-    // if (variant === "minimal") {
-    //   const minimizedAmount = Object.values(minCharacterFrequencies).reduce((acc, val) => acc + val, 0)
-    //   const userAmount = Object.values(combinedUserFrequencies).reduce((acc, val) => acc + val, 0)
-    //   if (userAmount > minimizedAmount) {
-    //     return {
-    //       correct: false,
-    //       correctAnswer: createSolutionTable(minCharacterFrequencies),
-    //       feedbackText: t(translations, lang, "feedbackNotMinimal"),
-    //     }
-    //   }
-    // }
     return {
       correct: true,
     }

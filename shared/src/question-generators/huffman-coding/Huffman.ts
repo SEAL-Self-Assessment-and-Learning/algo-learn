@@ -192,35 +192,6 @@ export class HuffmanNode {
   }
 
   /**
-   * Function to access the leaf nodes (which include the character with its frequency)
-   */
-  public getLeafNodes() {
-    const leafNodes: HuffmanNode[] = []
-    function traversal(node: HuffmanNode | null) {
-      if (!node) return
-      if (!node.left && !node.right) {
-        leafNodes.push(node)
-      }
-      traversal(node.left)
-      traversal(node.right)
-    }
-    traversal(this)
-    return leafNodes
-  }
-
-  /**
-   * Get the character frequencies of the current tree
-   */
-  public getCharacterFrequencies() {
-    const leafNodes: HuffmanNode[] = this.getLeafNodes()
-    const characterFrequencies: { [_: string]: number } = {}
-    for (const node of leafNodes) {
-      characterFrequencies[node.value] = node.frequency
-    }
-    return characterFrequencies
-  }
-
-  /**
    * Generates the encoding table for the tree.
    */
   public getEncodingTable(): Record<string, string> {
