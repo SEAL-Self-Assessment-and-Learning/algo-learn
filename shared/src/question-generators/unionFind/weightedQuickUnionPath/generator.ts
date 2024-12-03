@@ -7,7 +7,7 @@ import { tFunctional, Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
-    name: "Weighted-Quick-Union with path compr.",
+    name: "Weighted-Quick-Union with path compression",
     description: "Determine the Weighted-Quick-Union with path compression state after Union operation",
     task: `A state of the **Weighted-Quick-Union with path compression** data structure is given as the following array: \n{{0}}\n We call \`Union({{1}}, {{2}})\`. Provide the resulting state. {{3}}`,
   },
