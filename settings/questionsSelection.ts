@@ -16,6 +16,7 @@ import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffma
 import { CRT } from "@shared/question-generators/math/crt"
 import { modFactor } from "@shared/question-generators/math/modFactorization"
 import { ModTricks } from "@shared/question-generators/math/modTricks"
+import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
@@ -37,7 +38,7 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms],
+    contents: [Satisfiability, NormalForms, MinimizePropositionalLogic],
   },
   {
     slug: "modular-arithmetic",
