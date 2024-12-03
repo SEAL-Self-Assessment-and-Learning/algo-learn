@@ -11,7 +11,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
     feedbackVariation,
     focus,
     feedback,
-    align,
+    type,
     placeholder,
     prompt,
     invalid,
@@ -50,6 +50,22 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
   }
 
   const { spacing, additionalClassnames, fieldWidth } = getExtraStyles(align, feedbackVariation)
+  let spacing
+  let additionalClasses: string
+  let fieldWidth: number | null = null
+  if (feedbackVariation === "below") {
+    additionalClasses = "focus:outline-none"
+  } else {
+    additionalClasses = "mb-1 w-full focus:outline-none"
+  }
+  if (type === "NL") {
+    spacing = <br />
+  } else if (type.startsWith("OS")) {
+    fieldWidth = Number.parseInt(type.slice(3)) * 3
+  }
+  if (type === "MAT") {
+    additionalClasses = `w-12 p-2 mx-0.5 focus-visible:ring-1 focus-visible:ring-offset-0`
+  }
 
   const feedbackElement: ReactElement = (
     <FeedbackComponent
@@ -78,7 +94,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
                 onChange={handleChange}
                 maxLength={align === "TTABLE" ? 1 : undefined}
                 type="text"
-                className={`${inputBorderColor} ${additionalClassnames}`}
+                className={`${inputBorderColor} ${additionalClasses} focus:outline-none`}
                 style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
                 placeholder={placeholder || ""}
               />
@@ -106,7 +122,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
               onFocus={() => setIsInputFocused(true)}
               onBlur={() => setIsInputFocused(false)}
               type="text"
-              className={`${inputBorderColor} ${additionalClassnames}`}
+              className={`${inputBorderColor} ${additionalClasses} `}
               style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
               placeholder={placeholder || ""}
             />

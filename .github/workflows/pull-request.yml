@@ -24,7 +24,7 @@ concurrency:
 jobs:
   # This workflow contains a single job called "build"
   build-and-deploy:
-    if: github.event.pull_request.user.login == 'Fabianstw' || github.event.pull_request.user.login == 'AbcAeffchen'
+    if: github.event.pull_request.user.login == 'welkerje' || github.event.pull_request.user.login == 'Fabianstw' || github.event.pull_request.user.login == 'AbcAeffchen'
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
