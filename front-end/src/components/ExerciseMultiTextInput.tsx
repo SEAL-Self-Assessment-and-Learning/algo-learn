@@ -14,11 +14,13 @@ import { isMobileOrTablet } from "@/utils/deviceInformation.ts"
  * This component is used to create a question with multiple input fields
  *
  * The input fields are defined in the Markdown text using the following syntax:
- * {{id#align#promt#placeholder#checkformat}}
+ * {{id#style#promt#placeholder#checkformat}}
  * - id: a unique identifier for the input field
- * - align: the alignment of the input field
+ * - type: the type of the input field
  *          NL: new line (places a line break before and after the input field)
- *          -: default (no linebreaks)
+ *          MAT: input field for a matrix input
+ *          TTABLE: input field for truth table
+ *          -: nothing (default)
  * - prompt: text displayed before the input field
  * - placeholder: the placeholder text inside the input field
  * - checkFormat: determines how feedback on the format of the userinput is displayed
@@ -177,7 +179,7 @@ export function ExerciseMultiTextInput({
 
       textFieldStateValues[fieldValues.inputIds[i]] = {
         text: state.text[fieldValues.inputIds[i]],
-        align: fieldValues.inputAligns[i],
+        type: fieldValues.inputTypes[i],
         prompt: fieldValues.inputPrompts[i],
         feedbackVariation: fieldValues.inputFeedbackVariations[i],
         setText: (text: string) => setText(fieldValues.inputIds[i], text),
@@ -214,7 +216,7 @@ export function ExerciseMultiTextInput({
  */
 function getInputFields(text: string): {
   inputIds: string[]
-  inputAligns: string[]
+  inputTypes: string[]
   inputPrompts: string[]
   inputPlaceholders: string[]
   inputFeedbackVariations: string[]
@@ -229,7 +231,7 @@ function getInputFields(text: string): {
   if (matches.length === 0) {
     return {
       inputIds: [],
-      inputAligns: [],
+      inputTypes: [],
       inputPrompts: [],
       inputPlaceholders: [],
       inputFeedbackVariations: [],
@@ -249,13 +251,13 @@ function getInputFields(text: string): {
  */
 function getInputFieldValues(inputFields: string[]): {
   inputIds: string[]
-  inputAligns: string[]
+  inputTypes: string[]
   inputPrompts: string[]
   inputPlaceholders: string[]
   inputFeedbackVariations: string[]
 } {
   const inputIds: string[] = []
-  const inputAligns: string[] = []
+  const inputTypes: string[] = []
   const inputPrompts: string[] = []
   const inputPlaceholders: string[] = []
   const inputFeedbackVariations: string[] = []
@@ -263,11 +265,11 @@ function getInputFieldValues(inputFields: string[]): {
   for (const inputField of inputFields) {
     const inputFieldSplit = inputField.split("#")
     inputIds.push(inputFieldSplit[0])
-    inputAligns.push(inputFieldSplit[1])
+    inputTypes.push(inputFieldSplit[1])
     inputPrompts.push(inputFieldSplit[2])
     inputPlaceholders.push(inputFieldSplit[3])
     inputFeedbackVariations.push(inputFieldSplit[4])
   }
 
-  return { inputIds, inputAligns, inputPrompts, inputPlaceholders, inputFeedbackVariations }
+  return { inputIds, inputTypes, inputPrompts, inputPlaceholders, inputFeedbackVariations }
 }
