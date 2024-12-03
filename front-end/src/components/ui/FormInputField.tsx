@@ -30,7 +30,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (setText) {
-      if (align === "TTABLE" && e.target.value !== "0" && e.target.value !== "1") {
+      if (type === "TTABLE" && e.target.value !== "0" && e.target.value !== "1") {
         setText("")
       } else {
         setText(e.target.value)
@@ -49,23 +49,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
     )
   }
 
-  const { spacing, additionalClassnames, fieldWidth } = getExtraStyles(align, feedbackVariation)
-  let spacing
-  let additionalClasses: string
-  let fieldWidth: number | null = null
-  if (feedbackVariation === "below") {
-    additionalClasses = "focus:outline-none"
-  } else {
-    additionalClasses = "mb-1 w-full focus:outline-none"
-  }
-  if (type === "NL") {
-    spacing = <br />
-  } else if (type.startsWith("OS")) {
-    fieldWidth = Number.parseInt(type.slice(3)) * 3
-  }
-  if (type === "MAT") {
-    additionalClasses = `w-12 p-2 mx-0.5 focus-visible:ring-1 focus-visible:ring-offset-0`
-  }
+  const { spacing, additionalClassnames, fieldWidth } = getExtraStyles(type, feedbackVariation)
 
   const feedbackElement: ReactElement = (
     <FeedbackComponent
@@ -92,9 +76,9 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
                 disabled={disabled}
                 value={text || ""}
                 onChange={handleChange}
-                maxLength={align === "TTABLE" ? 1 : undefined}
+                maxLength={type === "TTABLE" ? 1 : undefined}
                 type="text"
-                className={`${inputBorderColor} ${additionalClasses} focus:outline-none`}
+                className={`${inputBorderColor} ${additionalClassnames} focus:outline-none`}
                 style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
                 placeholder={placeholder || ""}
               />
@@ -118,11 +102,11 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
               disabled={disabled}
               value={text || ""}
               onChange={handleChange}
-              maxLength={align === "TTABLE" ? 1 : undefined}
+              maxLength={type === "TTABLE" ? 1 : undefined}
               onFocus={() => setIsInputFocused(true)}
               onBlur={() => setIsInputFocused(false)}
               type="text"
-              className={`${inputBorderColor} ${additionalClasses} `}
+              className={`${inputBorderColor} ${additionalClassnames} `}
               style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
               placeholder={placeholder || ""}
             />
@@ -196,6 +180,8 @@ function getExtraStyles(style: string, feedbackVariation: string) {
   } else if (style === "TTABLE") {
     additionalClassnames =
       "focus:outline-none w-10 py-0.5 px-1 h-8 mx-0.5 my-0.5 focus-visible:ring-1 focus-visible:ring-offset-0 text-center"
+  } else if (style === "MAT") {
+    additionalClassnames = `w-12 p-2 mx-0.5 focus-visible:ring-1 focus-visible:ring-offset-0`
   }
   if (additionalClassnames === "") {
     if (feedbackVariation === "below") {
@@ -208,3 +194,22 @@ function getExtraStyles(style: string, feedbackVariation: string) {
   }
   return { spacing, additionalClassnames, fieldWidth }
 }
+
+/*
+  let spacing
+  let additionalClasses: string
+  let fieldWidth: number | null = null
+  if (feedbackVariation === "below") {
+    additionalClasses = "focus:outline-none"
+  } else {
+    additionalClasses = "mb-1 w-full focus:outline-none"
+  }
+  if (type === "NL") {
+    spacing = <br />
+  } else if (type.startsWith("OS")) {
+    fieldWidth = Number.parseInt(type.slice(3)) * 3
+  }
+  if (type === "MAT") {
+    additionalClasses = `w-12 p-2 mx-0.5 focus-visible:ring-1 focus-visible:ring-offset-0`
+  }
+ */
