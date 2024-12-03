@@ -1,4 +1,3 @@
-import { checkProvidedCode } from "@shared/question-generators/huffman-coding/utils/utils.ts"
 import Random from "@shared/utils/random"
 
 /**
@@ -219,49 +218,6 @@ export class HuffmanNode {
       characterFrequencies[node.value] = node.frequency
     }
     return characterFrequencies
-  }
-
-  /**
-   * Reduces the frequency of each character as much as possible.
-   * But keeping the tree structure
-   * No duplicated char frequencies
-   * @param exceptChar - it is forbidden to change the frequencies of those characters
-   */
-  public minimizeCharFrequencies(exceptChar: string[]) {
-    // get all leaf nodes and add them
-    const leafNodes: HuffmanNode[] = this.getLeafNodes().filter((x) => !exceptChar.includes(x.value))
-    const originalEncoding = this.getEncodingTable()
-    const characterFrequencies = this.getCharacterFrequencies()
-
-    // go to the first node and try to reduce the frequency by one
-    // if possible, store that in the characterFrequencies
-    // then go to the next until you're at the end
-    // start again with the first node
-    // repeat until no frequency changes
-    let reducedAValue: boolean = true
-    while (reducedAValue) {
-      reducedAValue = false
-      for (const leaf of leafNodes) {
-        const oldFrequency = characterFrequencies[leaf.value]
-        let newFrequency = oldFrequency - 1
-        while (Object.values(characterFrequencies).includes(newFrequency)) {
-          newFrequency--
-        }
-        characterFrequencies[leaf.value] = newFrequency
-        const en = getHuffmanCodeOfTable(characterFrequencies)
-        if (
-          !checkProvidedCode(characterFrequencies, en.getEncodingTable(), originalEncoding) ||
-          newFrequency <= 0
-        ) {
-          characterFrequencies[leaf.value] = oldFrequency
-          continue
-        }
-        reducedAValue = true
-      }
-    }
-
-    const newTree = getHuffmanCodeOfTable(characterFrequencies)
-    Object.assign(this, newTree)
   }
 
   /**

@@ -34,15 +34,31 @@ Provide the number of occurrences for each letter in $T$:
     minimalAddition: "- that is as **short** as possible",
     checkFormatInteger: "Only positive Integer values",
     ">0": " > 0",
-    "<100": "< 100",
     feedbackDuplicates: "There are duplicated values in your frequencies.",
     feedbackEqu: "Your frequencies can't compute an equivalent prefix free code.",
     feedbackNotMinimal:
       "Your frequencies can compute an equivalent prefix free code, but it is **not minimal**.",
   },
   de: {
-    name: "Reverse Huffman-Coding",
-    description: "Erstelle einen String für einen gegebenen String",
+    name: "Umgekehrte Huffman-Kodierung",
+    description: "Erstelle einen Text für eine gegebene Huffman-Kodierung",
+    text: `Betrachte den folgenden präfixfreien Code \n{{0}} 
+    Finde einen Text $T$: 
+{{3}}
+- bei dem der oben angegebene Code **optimal** ist
+- der jeden der Buchstaben $\\{$** {{1}} **$\\}$ **mindestens einmal** enthält
+- bei dem keine zwei Zeichen mit der gleichen Häufigkeit auftreten
+
+Gib die Anzahl der Vorkommen jedes Buchstabens in $T$ an:
+{{2}}
+    `,
+    minimalAddition: "- der **so kurz wie möglich** ist",
+    checkFormatInteger: "Nur positive Ganzzahlen",
+    ">0": " > 0",
+    feedbackDuplicates: "Es gibt doppelte Werte in deinen Häufigkeiten.",
+    feedbackEqu: "Mit deinen Häufigkeiten kann kein äquivalenter präfixfreier Code erstellt werden.",
+    feedbackNotMinimal:
+      "Mit deinen Häufigkeiten kann ein äquivalenter präfixfreier Code erstellt werden, aber er ist **nicht minimal**.",
   },
 }
 
@@ -55,7 +71,7 @@ export const ReverseHuffmanCoding: QuestionGenerator = {
     {
       type: "string",
       name: "variant",
-      allowedValues: ["start", "minimal"],
+      allowedValues: ["start"], // "minimal"
     },
   ],
 
@@ -66,10 +82,8 @@ export const ReverseHuffmanCoding: QuestionGenerator = {
       parameters,
       seed,
     })
-
-    const variant: "start" | "minimal" = parameters.variant as "start" | "minimal"
-
     const random = new Random(seed)
+    // const variant: "start" = parameters.variant as "start" // | "minimal"
 
     const numDifferentCharacters = random.int(6, 8)
     const {
@@ -90,10 +104,6 @@ export const ReverseHuffmanCoding: QuestionGenerator = {
       Array.from({ length: numDifferentCharacters }, (_, i) => i),
       numberOfInputFields,
     )
-    const indicesNormalFields = Array.from({ length: numDifferentCharacters }, (_, i) => i).filter(
-      (i) => !indicesOfInputFields.includes(i),
-    )
-
     const mixInputCharFreqTable = createMixInputCharFreqTable({
       characterFrequencies,
       indicesOfInputFields,
@@ -108,16 +118,14 @@ export const ReverseHuffmanCoding: QuestionGenerator = {
         frequencyTable,
         charList.join(", "),
         mixInputCharFreqTable,
-        variant === "minimal" ? t(translations, lang, "minimalAddition") : "",
+        "", // placeholder for future minimal variant
       ]),
       fillOutAll: true,
       checkFormat: checkIntegerInput(lang),
       feedback: getFeedback({
-        variant,
         lang,
         charList,
         indicesOfInputFields,
-        indicesNormalFields,
         characterFrequencies,
         originalTreeNode,
       }),
@@ -129,77 +137,84 @@ export const ReverseHuffmanCoding: QuestionGenerator = {
   },
 }
 
+/**
+ * Feedback to check if the user provided frequencies can compute the correct code
+ * - checks for duplicated frequencies
+ * - then checks if frequencies compute correct code
+ * @param lang
+ * @param charList
+ * @param indicesOfInputFields
+ * @param characterFrequencies
+ * @param originalTreeNode
+ */
 function getFeedback({
-  variant,
   lang,
   charList,
   indicesOfInputFields,
-  indicesNormalFields,
   characterFrequencies,
   originalTreeNode,
 }: {
-  variant: "start" | "minimal"
   lang: "de" | "en"
   charList: string[]
   indicesOfInputFields: number[]
-  indicesNormalFields: number[]
   characterFrequencies: { [_: string]: number }
   originalTreeNode: HuffmanNode
 }): MultiFreeTextFeedbackFunction {
   return ({ text: userDict }) => {
-    const combinedFrequencies: { [_: string]: number } = {}
+    const combinedUserFrequencies: { [_: string]: number } = {}
     for (let i = 0; i < Object.keys(characterFrequencies).length; i++) {
       if (indicesOfInputFields.includes(i)) {
-        combinedFrequencies[charList[i]] = Number.parseInt(userDict["char-" + i])
+        combinedUserFrequencies[charList[i]] = Number.parseInt(userDict["char-" + i])
       } else {
-        combinedFrequencies[charList[i]] = characterFrequencies[charList[i]]
+        combinedUserFrequencies[charList[i]] = characterFrequencies[charList[i]]
       }
     }
 
-    if (!feedbackDuplicatesCheck(combinedFrequencies)) {
+    if (!feedbackDuplicatesCheck(combinedUserFrequencies)) {
       return { correct: false, feedbackText: t(translations, lang, "feedbackDuplicates") }
     }
 
-    const combinedTreeNode = getHuffmanCodeOfTable(combinedFrequencies)
-    const combinedEncoding = combinedTreeNode.getEncodingTable()
+    const combinedUserTreeNode = getHuffmanCodeOfTable(combinedUserFrequencies)
+    const combinedUserEncoding = combinedUserTreeNode.getEncodingTable()
 
     const validFrequencies = checkProvidedCode(
-      combinedFrequencies,
-      combinedEncoding,
+      combinedUserFrequencies,
+      combinedUserEncoding,
       originalTreeNode.getEncodingTable(),
     )
 
-    originalTreeNode.minimizeCharFrequencies(indicesNormalFields.map((i) => charList[i]))
-    const minCharacterFrequencies = originalTreeNode.getCharacterFrequencies()
+    // originalTreeNode.minimizeCharFrequencies(indicesNormalFields.map((i) => charList[i]))
+    // const minCharacterFrequencies = originalTreeNode.getCharacterFrequencies()
 
     if (!validFrequencies) {
       return {
         correct: false,
-        correctAnswer: createSolutionTable(
-          variant === "minimal" ? minCharacterFrequencies : characterFrequencies,
-        ),
+        correctAnswer: createSolutionTable(characterFrequencies),
         feedbackText: t(translations, lang, "feedbackEqu"),
       }
     }
 
-    if (variant === "minimal") {
-      const minimizedAmount = Object.values(minCharacterFrequencies).reduce((acc, val) => acc + val, 0)
-      const userAmount = Object.values(combinedFrequencies).reduce((acc, val) => acc + val, 0)
-      if (userAmount > minimizedAmount) {
-        return {
-          correct: false,
-          correctAnswer: createSolutionTable(minCharacterFrequencies),
-          feedbackText: t(translations, lang, "feedbackNotMinimal"),
-        }
-      }
-    }
-
+    // if (variant === "minimal") {
+    //   const minimizedAmount = Object.values(minCharacterFrequencies).reduce((acc, val) => acc + val, 0)
+    //   const userAmount = Object.values(combinedUserFrequencies).reduce((acc, val) => acc + val, 0)
+    //   if (userAmount > minimizedAmount) {
+    //     return {
+    //       correct: false,
+    //       correctAnswer: createSolutionTable(minCharacterFrequencies),
+    //       feedbackText: t(translations, lang, "feedbackNotMinimal"),
+    //     }
+    //   }
+    // }
     return {
       correct: true,
     }
   }
 }
 
+/**
+ * Checks if a values appears twice in the dictionary and returns true or false
+ * @param combinedFrequencies
+ */
 function feedbackDuplicatesCheck(combinedFrequencies: { [p: string]: number }) {
   // check combined frequencies values for duplicated numbers
   const values = Object.values(combinedFrequencies)
@@ -207,6 +222,10 @@ function feedbackDuplicatesCheck(combinedFrequencies: { [p: string]: number }) {
   return values.length === uniqueValues.size
 }
 
+/**
+ * Checks if the user input is an integer greater than 0
+ * @param lang
+ */
 function checkIntegerInput(lang: "en" | "de"): MultiFreeTextFormatFunction {
   return ({ text }, fieldID) => {
     const userInput = text[fieldID].replace(/\s+/g, "")
@@ -226,16 +245,17 @@ function checkIntegerInput(lang: "en" | "de"): MultiFreeTextFormatFunction {
         message: t(translations, lang, ">0"),
       }
     }
-    if (Number.parseInt(userInput, 10) >= 100) {
-      return {
-        valid: false,
-        message: t(translations, lang, "<100"),
-      }
-    }
     return { valid: true }
   }
 }
 
+/**
+ * Creates a mixed table of char frequencies and input fields
+ * @param characterFrequencies -
+ * @param indicesOfInputFields - indicates which element in the char list should be replaced
+ *                               by an input field
+ * @param charList - all appearing chars (same as Object.keys(characterFrequencies), but sorted)
+ */
 function createMixInputCharFreqTable({
   characterFrequencies,
   indicesOfInputFields,
