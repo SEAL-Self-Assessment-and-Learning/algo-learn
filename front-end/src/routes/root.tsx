@@ -1,8 +1,23 @@
 import { FileKey2, GitCommitHorizontal, Home, Info, MoreVertical, Settings, WifiOff } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { AiFillGithub } from "react-icons/ai"
+import { CiMail } from "react-icons/ci"
+import { VscFeedback } from "react-icons/vsc"
 import { Link, Outlet } from "react-router-dom"
 import { Language } from "@shared/api/Language"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog.tsx"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card.tsx"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +35,8 @@ import { useSound } from "@/hooks/useSound"
 import { availableThemes, Themes, useTheme } from "@/hooks/useTheme"
 import { NATIVE_NAME, SUPPORTED_LANGUAGES, useTranslation } from "@/hooks/useTranslation"
 
+const SEALMAIL = "seal@ae.cs.uni-frankfurt.de"
+
 export default function Root() {
   return (
     <YScroll>
@@ -28,6 +45,79 @@ export default function Root() {
         <Outlet />
       </div>
     </YScroll>
+  )
+}
+
+function AlertFeedbackComp() {
+  const { t } = useTranslation()
+  const [alertOpen, setAlertOpen] = useState(false)
+
+  const mailTo = `mailto:${SEALMAIL}?subject=${t("About.mail.feedback.Subject")}&body=${t("About.mail.feedback.Body")}`
+
+  const openMail = () => {
+    window.location.href = mailTo
+    setAlertOpen(false)
+  }
+  const openGithubIssue = () => {
+    window.open("https://github.com/SEAL-Self-Assessment-and-Learning/algo-learn/issues")
+    setAlertOpen(false)
+  }
+
+  return (
+    <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+      <AlertDialogTrigger>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="bg-inherit hover:bg-primary hover:text-primary-foreground"
+        >
+          <VscFeedback className={`h-4 w-4`} />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t("About.valueFeedback")}</AlertDialogTitle>
+          <AlertDialogDescription>
+            <div className="flex flex-col space-y-4">
+              <Card className="w-full cursor-pointer" onClick={openMail}>
+                <CardHeader>
+                  <CardTitle>
+                    <CiMail className="mr-2 inline align-top" />
+                    {t("About.suggestImprovement")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>{t("About.suggestImprovement.text")}</CardContent>
+              </Card>
+              <Card className="w-full cursor-pointer" onClick={openGithubIssue}>
+                <CardHeader>
+                  <CardTitle>
+                    <AiFillGithub className="mr-2 inline align-top" />
+                    {t("About.reportBug")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>{t("About.reportBug.text")}</CardContent>
+                <CardFooter>
+                  <div className="text-sm text-gray-400">{t("About.reportBug.unsure")}</div>
+                </CardFooter>
+              </Card>
+            </div>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogAction className="flex items-center" onClick={openMail}>
+            <CiMail className={`mr-2`} />
+            {t("About.contactMail")}
+          </AlertDialogAction>
+          <AlertDialogAction className="flex items-center" onClick={openGithubIssue}>
+            <AiFillGithub className={`mr-2`} />
+            {t("About.openIssue")}
+          </AlertDialogAction>
+          <AlertDialogCancel className={`m-1`} onClick={() => setAlertOpen(false)}>
+            {t("About.cancel")}
+          </AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 
@@ -49,6 +139,7 @@ function GlobalHeader() {
           </Link>
         </Button>
       </div>
+      <AlertFeedbackComp />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
