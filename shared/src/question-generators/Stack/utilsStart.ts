@@ -149,7 +149,10 @@ export function generateVariantStart(
     // check if the text provided is for the toString question
     if (fieldID.includes("empty")) {
       // test if either false or true
-      if (text[fieldID].trim() !== "true" && text[fieldID].trim() !== "false") {
+      if (
+        text[fieldID].trim().toLowerCase() !== "true" &&
+        text[fieldID].trim().toLowerCase() !== "false"
+      ) {
         return { valid: false, message: t(translations, lang, "checkFormatBool") }
       }
       return { valid: true, message: "" }
@@ -169,7 +172,7 @@ export function generateVariantStart(
     let count = 0
     for (const key in resultMap) {
       const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
-      if (resultMap[key].trim() !== correctAnswers[key].trim()) {
+      if (resultMap[key].trim().toLowerCase() !== correctAnswers[key].trim()) {
         foundError = true
         const secondSolutionPart: string = "**" + correctAnswers[key] + "**\n"
         solutionDisplay[count] = firstSolutionPart + secondSolutionPart

@@ -27,19 +27,31 @@ export function generateVariantSequenceStack(
 ) {
   const { operations, stack } = generateOperationsVariantSequenceStack(random)
   const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
-    numberOfInputFields: stack.getSize(),
+    numberOfInputFields: operations.length,
   })
 
   const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
+    const correctAnswer = {
+      correct: false,
+      correctAnswer: createArrayDisplayCodeBlock({
+        array: [
+          ...stack.getStackAsString(),
+          ...(Array(operations.length - stack.getSize()).fill("") as string[]),
+        ],
+      }),
+    }
+    const allKeys: Set<string> = new Set<string>(Object.keys(text))
     // input-x is the form for the input fields
     for (let i = 0; i < stack.getSize(); i++) {
+      allKeys.delete(`input-${i}`)
       if (text[`input-${i}`] !== stack.getStackAsString()[i]) {
-        return {
-          correct: false,
-          correctAnswer: createArrayDisplayCodeBlock({
-            array: stack.getStackAsString(),
-          }),
-        }
+        return correctAnswer
+      }
+    }
+    // expect the rest input fields inside allKeys to be empty
+    for (const restKey in allKeys) {
+      if (text[restKey].trim() !== "") {
+        return correctAnswer
       }
     }
     return {
@@ -74,10 +86,10 @@ function generateOperationsVariantSequenceStack(random: Random) {
     if (operation === "push") {
       const value = random.int(1, 30)
       stack.push(value)
-      operations.push("`Push(" + value + ")`")
+      operations.push("`push(" + value + ")`")
     } else {
       stack.getTop()
-      operations.push("`Pop()`")
+      operations.push("`pop()`")
     }
   }
   return {
