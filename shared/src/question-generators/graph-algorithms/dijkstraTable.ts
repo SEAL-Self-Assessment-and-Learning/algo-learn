@@ -17,11 +17,12 @@ const translations: Translations = {
     tableQuestion:
       "Given the following undirected graph with weighted edges, determine the shortest paths from node $A$ to all other nodes using Dijkstra's algorithm.",
     tablePrompt:
-      "To do this, fill in the table below, where each row corresponds to a step of the algorithm. The column $d$ should contain the current distance value of the node, the column $p$ the current predecessor of the node in the parent array.",
+      "Fill in the table below. Each row represents a step of the algorithm. Columns $d(n)$ and $p(n)$ should show the current distance and predecessor in the parent array for node $n$. For the set $S$ fill in which node is added to it in each step. You do not need to fill in cells that remain unchanged from the previous row.",
     invalid_set: "Invalid node set.",
     invalid_dist: "Invalid distance.",
     invalid_pred: "Invalid predecessor.",
-    set: "Set",
+    inconsistency_error:
+      'Input "{{input}}" is inconsistent with the value "{{previous}}" in the previous row.',
   },
   de: {
     name: "Dijkstra Tabelle",
@@ -30,11 +31,12 @@ const translations: Translations = {
     tableQuestion:
       "Nutze den Dijkstra-Algorithmus um im folgenden ungerichteten Graphen mit Kantengewichten die kürzesten Wege vom Knoten $A$ zu allen anderen Knoten u bestimmen.",
     tablePrompt:
-      "Fülle dazu die Tabelle aus, wobei jede Zeile einem Schritt des Algorithmus entspricht. Die Spalte $d$ soll den aktuellen Entfernungswert des Knotens enthalten, die Spalte $p$ den aktuellen Vorgänger des Knotens im Elternarray.",
+      "Fülle dazu die folgende Tabelle aus. Hierbei entspricht jede Zeile einem Schritt des Algorithmus. Die Spalte $d(n)$ soll den aktuellen Abstand, die Spalte $p(n)$ den Vorgänger für den Knoten $n$ im Elternarray enthalten. Gib für die Menge $S$ an, welcher Knoten in jedem Schritt hinzugefügt wird. Es ist nicht notwendig Zellen auszufüllen, die sich nicht von der vorhergehenden Zeile unterscheiden.",
     invalid_set: "keine gültige Knotenmenge.",
     invalid_dist: "keine gültige Distanz.",
     invalid_pred: "kein gültiger Abstand.",
-    set: "Menge",
+    inconsistency_error:
+      'Eingabe "{{input}}" stimmt nicht mit dem Wert "{{previous}}" in der vorherigen Zeile überein.',
   },
 }
 
@@ -49,7 +51,7 @@ export const DijkstraTableGenerator: QuestionGenerator = {
       name: "size",
       type: "integer",
       min: 2,
-      max: 4,
+      max: 8,
     },
   ],
 
@@ -65,7 +67,7 @@ export const DijkstraTableGenerator: QuestionGenerator = {
       seed,
     })
 
-    const table = getDijkstraInputTable(steps, graph, lang)
+    const table = getDijkstraInputTable(steps, graph)
     const feedback = getFeedbackFunction(steps, graph)
     const checkFormat = getCheckFormatFunction(lang, graph)
 
@@ -76,7 +78,11 @@ export const DijkstraTableGenerator: QuestionGenerator = {
       path: permalink,
       name: t(translations, lang, "name"),
       fillOutAll: false,
-      text: `${t(translations, lang, "tableQuestion")}\n${graph.toMarkdown()}\n${t(translations, lang, "tablePrompt")}\n\n${table}`,
+      text: `${t(translations, lang, "tableQuestion")}\n${graph.toMarkdown()}\n${t(
+        translations,
+        lang,
+        "tablePrompt",
+      )}\n\n${table}`,
       feedback,
       checkFormat,
     }
@@ -99,8 +105,8 @@ function cheatForDebugging(
       const nodeFeedback = graph.nodes
         .map((node) => {
           const nodeLabel = node.label!
-          const expectedDistance = step.distances[nodeLabel] || "-"
-          const expectedPredecessor = step.predecessors[nodeLabel] || "-"
+          const expectedDistance = step.distances[nodeLabel] || ""
+          const expectedPredecessor = step.predecessors[nodeLabel] || ""
           return `${expectedDistance} | ${expectedPredecessor}`
         })
         .join(" | ")
@@ -142,18 +148,28 @@ function generateRandomGraphWithSteps(random: Random, size: number): DijkstraRes
 }
 
 function createRandomGraph(random: Random, size: number, edgeChance: number): Graph {
-  const width = random.int(2, size)
-  const height = random.int(1, size)
+  // calculate grid dimensions can accommodate nodes
+  const width = Math.ceil(Math.sqrt(size))
+  let height = Math.ceil(size / width)
+  while (width * height < size) height++
 
-  return RandomGraph.grid(
+  const graph = RandomGraph.grid(
     random,
     [width, height],
     edgeChance,
     random.choice(["square", "square-width-diagonals", "triangle"]),
     "unique",
     false,
-    true,
+    random.bool(),
   )
+
+  // trim excess nodes and edges to exactly match 'size'
+  graph.nodes = graph.nodes.slice(0, size)
+  graph.edges = graph.edges
+    .slice(0, size)
+    .map((edgeList) => edgeList.filter((edge) => edge.target < size))
+
+  return graph
 }
 
 function getDijkstraStepsIfValid(graph: Graph): DijkstraResult["steps"] | null {
@@ -170,12 +186,10 @@ function getDijkstraInputTable(
     predecessors: Record<string, string>
   }>,
   graph: Graph,
-  lang: Language,
 ): string {
   const nodes = graph.nodes.map((n) => n.label!)
-
-  const headerRow = `|  | ${nodes.map((n) => `${n} | |`).join("")}\n`
-  const subHeaderRow = `|  ${t(translations, lang, "set")} $S$ | ${nodes.map((n) => `$d(${n})$ | $p(${n})$ |`).join("")}\n`
+  const headerRow = `| | | | | ${nodes.map((n) => `${n} | |`).join("")}\n`
+  const subHeaderRow = `| | | | | ${nodes.map((n) => `$d(${n})$ | $p(${n})$ |`).join("")}\n`
 
   const rows = steps
     .map((step, stepIndex) => {
@@ -183,59 +197,102 @@ function getDijkstraInputTable(
 
       // prefill first row
       if (stepIndex === 0) {
-        const prefilledSet = `$\\{${[...step.set].join(", ")}\\}$`
+        const prefilledSet = `$${[...step.set].join(", ")}$`
         const prefilledFields = nodes
           .map((node) => {
-            const prefilledDistance = step.distances[node] || "$-$"
-            const prefilledPredecessor = step.predecessors[node] || "$-$"
-            return `$${prefilledDistance}$ | $${prefilledPredecessor}$`
+            const prefilledDistance = step.distances[node] || ""
+            const prefilledPredecessor = step.predecessors[node] || ""
+            return `${prefilledDistance} | ${prefilledPredecessor}`
           })
           .join(" | ")
 
-        return `| ${prefilledSet} | ${prefilledFields} |`
+        return `|  $S=$ | $\\{$ |${prefilledSet}| $\\}$ | ${prefilledFields} |`
       }
 
       const nodeFields = nodes
         .map((node) => `{{step${stepIndex}_${node}_d#TL#}} | {{step${stepIndex}_${node}_p#TL#}}`)
         .join(" | ")
 
-      return `| {{${setField}#TL#}} | ${nodeFields} |`
+      return `| $\\cup$ | $\\{$ | {{${setField}#TL#}} | $\\}$ | ${nodeFields} |`
     })
     .filter(Boolean) // ensure no undefined rows
     .join("\n")
 
-  return `${headerRow}${subHeaderRow}${rows}`
+  const additionalStyling = "|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |\n"
+
+  return `${headerRow}${subHeaderRow}${rows}${additionalStyling}`
 }
 
 function getCheckFormatFunction(lang: Language, graph: Graph): MultiFreeTextFormatFunction {
   const nodeLabels = new Set(graph.nodes.map((node) => node.label ?? ""))
-  return ({ text }, fieldID) => {
-    const input = text[fieldID]?.trim() || "-" // treat blank as "-"
 
-    if (fieldID.includes("_s")) {
-      const isValidSet = /^\{[A-Z](, *[A-Z])*\}$/i.test(input)
-      const setElements = input.replace(/[{}]/g, "").split(/,\s*/)
-      const allValidNodes = setElements.every((label) => nodeLabels.has(label))
-      return {
-        valid: isValidSet && allValidNodes,
-        message: isValidSet && allValidNodes ? "" : t(translations, lang, "invalid_set"),
+  // function to find the fieldID of the same node in the previous step
+  const getPreviousFieldID = (currentFieldID: string) => {
+    const match = currentFieldID.match(/^step(\d+)_(.+)$/)
+    if (match) {
+      const stepIndex = parseInt(match[1])
+      const fieldType = match[2] // e.g., node_d or node_p
+      if (stepIndex > 0) {
+        return `step${stepIndex - 1}_${fieldType}`
       }
     }
+    return null
+  }
 
-    return fieldID.includes("_d")
+  // function to validate consistency with the previous row
+  const checkConsistency = (input: string, previousInput: string | undefined) =>
+    input !== "" && previousInput && input !== previousInput
       ? {
-          valid: /^[-0-9]+$/i.test(input),
-          message: /^[-0-9]+$/i.test(input) ? "" : t(translations, lang, "invalid_dist"),
+          valid: false,
+          message: t(translations, lang, "inconsistency_error", { input, previous: previousInput }),
         }
-      : fieldID.includes("_p")
-        ? {
-            valid: /^[-A-Z]+$/i.test(input) && (input === "-" || nodeLabels.has(input)),
-            message:
-              /^[-A-Z]+$/i.test(input) && (input === "-" || nodeLabels.has(input))
-                ? ""
-                : t(translations, lang, "invalid_pred"),
-          }
-        : { valid: false, message: "" }
+      : { valid: true, message: "" }
+
+  // function to validate the format of a field
+  const validateField = (input: string, type: string): { valid: boolean; message: string } => {
+    switch (type) {
+      case "_s": {
+        const setElements = input.replace(/\s+/g, "").split(",")
+        const allValidNodes = setElements.every((label) => nodeLabels.has(label))
+        return allValidNodes
+          ? { valid: true, message: "" }
+          : { valid: false, message: t(translations, lang, "invalid_set") }
+      }
+      case "_d":
+        return /^[-0-9]*$/i.test(input)
+          ? { valid: true, message: "" }
+          : { valid: false, message: t(translations, lang, "invalid_dist") }
+      case "_p": {
+        const isValidPredecessor = /^[-A-Z]+$/i.test(input)
+        const isKnownNode = input === "" || nodeLabels.has(input)
+        return isValidPredecessor && isKnownNode
+          ? { valid: true, message: "" }
+          : { valid: false, message: t(translations, lang, "invalid_pred") }
+      }
+      default:
+        return { valid: false, message: "" }
+    }
+  }
+
+  return ({ text }, fieldID) => {
+    const input = text[fieldID]?.trim() || ""
+
+    const fieldType = fieldID.match(/_(s|d|p)$/)?.[1]
+    if (!fieldType) return { valid: false, message: "" }
+
+    // validate format
+    const validationResult = validateField(input, `_${fieldType}`)
+    if (!validationResult.valid) return validationResult
+
+    // perform consistency checks
+    if (fieldType === "s") return { valid: true, message: "" } // skip Set column
+    const prevFieldID = getPreviousFieldID(fieldID)
+    if (prevFieldID && text[prevFieldID]) {
+      const previousInput = text[prevFieldID]?.trim() || ""
+      return checkConsistency(input, previousInput)
+    }
+
+    return { valid: true, message: "" }
   }
 }
 
@@ -258,30 +315,36 @@ function getFeedbackFunction(
       .map((step, stepIndex) => {
         // handle prefilled row
         if (stepIndex === 0) {
-          const nodeFeedback = graph.nodes.map(() => `$( - , - )$`).join(" | ")
+          const nodeFeedback = graph.nodes.map(() => `$( , )$`).join(" | ")
           return `| $\\{${graph.nodes[0].label}\\}$ | ${nodeFeedback} |`
         }
 
         // handle user input rows
         const setField = `step${stepIndex}_s`
-        const userSet = text[setField]?.trim() || "-"
         const expectedSet = `{${[...step.set].join(", ")}}`
+        const userNewNode = text[setField]?.trim() || ""
+        const expectedNewNode = [...step.set].filter((node) => !steps[stepIndex - 1]?.set.has(node))[0]
 
-        if (userSet.replace(/\s/g, "") !== expectedSet.replace(/\s/g, "")) allStepsCorrect = false
+        if (userNewNode !== expectedNewNode) allStepsCorrect = false
 
+        const previousStep = steps[stepIndex - 1]
         const rowContent = graph.nodes
           .map((node) => {
             const nodeLabel = node.label!
 
             const distanceField = `step${stepIndex}_${nodeLabel}_d`
-            const userDistance = text[distanceField]?.trim().replace(/^\s*$/, "-") || "-"
-            const expectedDistance = step.distances[nodeLabel] || "-"
+            const userDistance = text[distanceField]?.trim().replace(/^\s*$/, "") || ""
+            const expectedDistance = step.distances[nodeLabel] || previousStep.distances[nodeLabel] || ""
 
             const predecessorField = `step${stepIndex}_${nodeLabel}_p`
-            const userPredecessor = text[predecessorField]?.trim().replace(/^\s*$/, "-") || "-"
-            const expectedPredecessor = step.predecessors[nodeLabel] || "-"
+            const userPredecessor = text[predecessorField]?.trim().replace(/^\s*$/, "") || ""
+            const expectedPredecessor =
+              step.predecessors[nodeLabel] || previousStep.predecessors[nodeLabel] || ""
 
-            if (userDistance !== expectedDistance || userPredecessor !== expectedPredecessor) {
+            if (
+              (userDistance !== "" && userDistance !== expectedDistance) ||
+              (userPredecessor !== "" && userPredecessor !== expectedPredecessor)
+            ) {
               allStepsCorrect = false
             }
 
@@ -318,7 +381,7 @@ function generateDijkstraSteps(graph: Graph, startLabel: string) {
   graph.nodes.forEach((node) => {
     const label = node.label ?? ""
     distances[label] = Infinity
-    predecessors[label] = "-"
+    predecessors[label] = ""
   })
   distances[startLabel] = 0
   priorityQueue.push([startLabel, 0])
@@ -347,7 +410,7 @@ function generateDijkstraSteps(graph: Graph, startLabel: string) {
 
 function mapDistances(distances: Record<string, number>): Record<string, string> {
   return Object.fromEntries(
-    Object.entries(distances).map(([key, value]) => [key, value === Infinity ? "-" : value.toString()]),
+    Object.entries(distances).map(([key, value]) => [key, value === Infinity ? "" : value.toString()]),
   )
 }
 
