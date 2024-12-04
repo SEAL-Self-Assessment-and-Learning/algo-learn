@@ -9,29 +9,28 @@ import {
   getHuffmanCodeOfTable,
   HuffmanNode,
 } from "@shared/question-generators/huffman-coding/Huffman.ts"
-import { checkProvidedCode } from "@shared/question-generators/huffman-coding/utils/utils.ts"
 import {
-  createSolutionTable,
-  generateDictFoundations,
-} from "@shared/question-generators/huffman-coding/utils/utilsDict.ts"
+  checkProvidedCode,
+  convertDictToMdTable,
+} from "@shared/question-generators/huffman-coding/utils/utils.ts"
+import { generateDictFoundations } from "@shared/question-generators/huffman-coding/utils/utilsDict.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
     name: "Reverse Huffman-Coding",
-    description: "Create a string for a given Hufman-Coding",
+    description: "Determine the frequency distribution for a given Huffman Coding",
     text: `Consider the following prefix free code \n{{0}} 
-    Find a text $T$: 
-- where the code stated **above is optimal**
-- contains each of the letters $\\{$** {{1}} **$\\}$ at **least once**
-- no two character occur with the same frequency
+    Find a frequency distribution that satisfies the following conditions: 
+- The given code is optimal for the distribution.
+- Each character in $\\{$** {{1}} **$\\}$ appears at least once.
+- No two characters occur with the same frequency.
 
-Provide the number of occurrences for each letter in $T$:
+Provide the number of frequencies for each character:
 {{2}}
     `,
     checkFormatInteger: "Only positive Integer values",
-    ">0": " > 0",
     feedbackDuplicates: "There are duplicated values in your frequencies.",
     feedbackEqu: "Your frequencies can't compute an equivalent prefix free code.",
   },
@@ -41,14 +40,13 @@ Provide the number of occurrences for each letter in $T$:
     text: `Betrachte den folgenden präfixfreien Code \n{{0}} 
     Finde einen Text $T$: 
 - bei dem der oben angegebene Code **optimal** ist
-- der jeden der Buchstaben $\\{$** {{1}} **$\\}$ **mindestens einmal** enthält
+- der jedes der Zeichen $\\{$** {{1}} **$\\}$ **mindestens einmal** enthält
 - bei dem keine zwei Zeichen mit der gleichen Häufigkeit auftreten
 
-Gib die Anzahl der Vorkommen jedes Buchstabens in $T$ an:
+Gib die Anzahl der Vorkommen jedes Zeichen in $T$ an:
 {{2}}
     `,
     checkFormatInteger: "Nur positive Ganzzahlen",
-    ">0": " > 0",
     feedbackDuplicates: "Es gibt doppelte Werte in deinen Häufigkeiten.",
     feedbackEqu: "Mit deinen Häufigkeiten kann kein äquivalenter präfixfreier Code erstellt werden.",
   },
@@ -75,7 +73,6 @@ export const ReverseHuffmanCoding: QuestionGenerator = {
       seed,
     })
     const random = new Random(seed)
-    // const variant: "start" = parameters.variant as "start" // | "minimal"
 
     const numDifferentCharacters = random.int(6, 8)
     const {
@@ -87,7 +84,7 @@ export const ReverseHuffmanCoding: QuestionGenerator = {
       numDifferentCharacters,
     })
     // fits on iPhone SE 3rd generation
-    const frequencyTable = createSolutionTable(originalEncoding, ["td"])
+    const frequencyTable = convertDictToMdTable(originalEncoding, "#div_my-5#")
 
     const charList: string[] = Object.keys(characterFrequencies)
     const numberOfInputFields =
@@ -158,7 +155,11 @@ function getFeedback({
     }
 
     if (!feedbackDuplicatesCheck(combinedUserFrequencies)) {
-      return { correct: false, feedbackText: t(translations, lang, "feedbackDuplicates") }
+      return {
+        correct: false,
+        correctAnswer: convertDictToMdTable(characterFrequencies),
+        feedbackText: t(translations, lang, "feedbackDuplicates"),
+      }
     }
 
     const combinedUserTreeNode = getHuffmanCodeOfTable(combinedUserFrequencies)
@@ -172,7 +173,7 @@ function getFeedback({
     if (!validFrequencies) {
       return {
         correct: false,
-        correctAnswer: createSolutionTable(characterFrequencies),
+        correctAnswer: convertDictToMdTable(characterFrequencies),
         feedbackText: t(translations, lang, "feedbackEqu"),
       }
     }
@@ -214,7 +215,7 @@ function checkIntegerInput(lang: "en" | "de"): MultiFreeTextFormatFunction {
     if (Number.parseInt(userInput, 10) < 1) {
       return {
         valid: false,
-        message: t(translations, lang, ">0"),
+        message: "> 0",
       }
     }
     return { valid: true }

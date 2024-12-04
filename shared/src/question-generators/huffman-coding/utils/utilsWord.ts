@@ -87,9 +87,8 @@ export function generateInputQuestion({
   }
 
   const feedback: FreeTextFeedbackFunction = ({ text: codeword }) => {
-    const valid = correctTree.setLabelsByCodeword(word, codeword.replace(/\s+/g, ""))
     return {
-      correct: valid,
+      correct: correctTree.setLabelsByCodeword(word, codeword.replace(/\s+/g, "")),
       correctAnswer: insertSpaceAfterEveryXChars(correctAnswer, 3),
     }
   }
