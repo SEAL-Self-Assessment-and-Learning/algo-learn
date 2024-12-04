@@ -12,21 +12,21 @@ import { t, tFunctional, Translations } from "@shared/utils/translations"
 const translations: Translations = {
   en: {
     name: "Dijkstra's Algorithm",
-    description:
-      "Determine the node order removed from the priority queue when running Dijkstra's algorithm.",
+    description: "Determine node prioritization in Dijkstra’s algorithm.",
     prompt: "Order of node removal:",
     invalid_node: '"{{n}}" is not a node in the graph.',
     feedback_node_count: "The answer does not include the correct number of nodes.",
     feedback_order: "The order is incorrect starting at node {{n}} (position {{i}}).",
+    start_node: "Start node",
   },
   de: {
     name: "Dijkstras Algorithmus",
-    description:
-      "Gib die Reihenfolge der Knoten an, wie sie aus der Prioritätswarteschlange entfernt werden.",
+    description: "Bestimme Priorisierung der Knoten im Dijkstra-Algorithmus.",
     prompt: "Reihenfolge der Knotenentfernung:",
     invalid_node: '"{{n}}" ist kein Knoten im Graphen.',
     feedback_node_count: "Die Antwort enthält nicht die richtige Anzahl von Knoten.",
     feedback_order: "Die Reihenfolge ist ab dem Knoten {{n}} (Position {{i}}) falsch.",
+    start_node: "Startknoten",
   },
 }
 
@@ -50,15 +50,16 @@ export const DijkstraAlgorithm: QuestionGenerator = {
       description: tFunctional(translations, "description"),
       type: "integer",
       min: 2,
-      max: 6,
+      max: 8,
     },
   ],
 
   generate: (lang = "en", parameters, seed) => {
     const random = new Random(seed)
-    const sizeRange = parameters.size as number
-    const width = random.int(2, sizeRange)
-    const height = random.int(2, sizeRange)
+    const size = parameters.size as number
+    const width = Math.ceil(Math.sqrt(size))
+    let height = Math.ceil(size / width)
+    while (width * height < size) height++
 
     const graph = RandomGraph.grid(
       random,
@@ -66,15 +67,21 @@ export const DijkstraAlgorithm: QuestionGenerator = {
       0.6,
       random.choice(["square", "square-width-diagonals", "triangle"]),
       "unique",
-      true,
+      random.bool(),
       true,
     )
     graph.nodeDraggable = false
 
-    const startNode = graph.nodes[0].label ?? "A"
+    // trim graph to match size
+    graph.nodes = graph.nodes.slice(0, size)
+    graph.edges = graph.edges
+      .slice(0, size)
+      .map((edgeList) => edgeList.filter((edge) => edge.target < size))
+
+    const startNode = random.choice(graph.nodes.map((node) => node.label)) ?? "A" // randomized start node
     const correctOrder = runDijkstra(graph, startNode)
 
-    console.log("Expected Order of Node Removal:", correctOrder.join(", "))
+    // console.log("Expected Order of Node Removal:", correctOrder.join(", "))
 
     const checkFormat: FreeTextFormatFunction = (answer: FreeTextAnswer) => {
       const order = parseNodeOrder(answer.text)
@@ -122,7 +129,7 @@ export const DijkstraAlgorithm: QuestionGenerator = {
       type: "FreeTextQuestion",
       name: DijkstraAlgorithm.name(lang),
       path: serializeGeneratorCall({ generator: DijkstraAlgorithm, lang, parameters, seed }),
-      text: `${t(translations, lang, "description")}\n\nStart node: **${startNode}**\n\n${graph.toMarkdown()}`,
+      text: `${t(translations, lang, "description")}\n\n${graph.toMarkdown()}\n\n${t(translations, lang, "start_node")}: **${startNode}**`,
       prompt: t(translations, lang, "prompt"),
       placeholder: "A, B, C, ...",
       checkFormat,
@@ -137,6 +144,12 @@ export const DijkstraAlgorithm: QuestionGenerator = {
   },
 }
 
+/**
+ * Runs Dijkstra's algorithm to compute the order of node removal based on a priority queue.
+ * @param graph the graph used
+ * @param startLabel label of the start node
+ * @returns order in which nodes are removed from the priority queue.
+ */
 function runDijkstra(graph: Graph, startLabel: string): string[] {
   const distances: Record<string, number> = {}
   const visited: Set<string> = new Set()
@@ -162,7 +175,6 @@ function runDijkstra(graph: Graph, startLabel: string): string[] {
 
     // explore neighbors
     const currentNodeIndex = graph.nodes.findIndex((n) => n.label === currentNode)
-    if (currentNodeIndex === -1) continue
 
     graph.getNeighbors(currentNodeIndex).forEach((edge) => {
       const neighborLabel = graph.nodes[edge.target]?.label
