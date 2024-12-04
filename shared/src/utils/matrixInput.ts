@@ -34,7 +34,7 @@ export function createMatrixInput({
   elementOf?: string
 }) {
   if (rows < 1 || cols < 1) throw new Error("Rows and cols both have to be at least 1.")
-  // input field type: {{id#style#promt#placeholder#checkformat}}
+  // input field type: {{id#style#prompt#placeholder#checkformat}}
   const inputFields: { [key: string]: string } = {}
   const fieldIDs: string[][] = []
   for (let i = 0; i < rows; i++) {

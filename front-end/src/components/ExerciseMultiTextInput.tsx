@@ -14,7 +14,7 @@ import { isMobileOrTablet } from "@/utils/deviceInformation.ts"
  * This component is used to create a question with multiple input fields
  *
  * The input fields are defined in the Markdown text using the following syntax:
- * {{id#style#promt#placeholder#checkformat}}
+ * {{id#style#prompt#placeholder#checkformat}}
  * - id: a unique identifier for the input field
  * - type: the type of the input field
  *          NL: new line (places a line break before and after the input field)
