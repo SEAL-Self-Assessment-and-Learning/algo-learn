@@ -358,7 +358,7 @@ function getFeedbackFunction(
 
     // final table structure
     const completeTable = `${headerRow}\n${separatorRow}\n${feedbackDetails}`
-    console.log("Generated Feedback Table:\n", completeTable)
+    //console.log("Generated Feedback Table:\n", completeTable)
 
     return {
       correct: allStepsCorrect,
