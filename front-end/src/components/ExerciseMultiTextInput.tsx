@@ -98,7 +98,7 @@ export function ExerciseMultiTextInput({
         })
       })
     } else {
-      const valid = value.trim().length > 0
+      const valid = value.trim().length > 0 || !question.fillOutAll
       setState({
         ...state,
         text: { ...state.text, [fieldID]: value },
