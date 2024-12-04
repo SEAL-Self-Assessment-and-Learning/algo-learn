@@ -1,15 +1,20 @@
-export class QuickFind {
-  private readonly id: number[]
+import { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
 
+/**
+ * Quick Find implementation
+ */
+export class QuickFind extends UnionFind {
   constructor(n: number) {
-    this.id = Array.from({ length: n }, (_, i) => i)
+    super(n)
   }
 
   find(i: number) {
+    this.checkValueRange([i])
     return this.id[i]
   }
 
   union(i: number, j: number) {
+    this.checkValueRange([i, j])
     const pid = this.id[i]
     const qid = this.id[j]
     if (pid !== qid) {
@@ -19,13 +24,5 @@ export class QuickFind {
         }
       }
     }
-  }
-
-  /**
-   * This function returns the current union array field as a copy
-   */
-  getArray() {
-    // only provide a copy
-    return this.id.slice()
   }
 }
