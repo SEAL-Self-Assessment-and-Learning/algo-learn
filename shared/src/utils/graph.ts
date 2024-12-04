@@ -772,9 +772,11 @@ export class KNMGraphGenerator {
   ): Graph {
     const nodes: NodeList = []
     const edges: EdgeList = Array.from(Array(size), () => [])
-    const radius = 5
 
-    // arrange nodes in circle
+    // calculate radius
+    const minDistance = 2
+    const radius = Math.max(minDistance / (2 * Math.sin(Math.PI / size)), 5) // fallback minimum
+
     for (let i = 0; i < size; i++) {
       const angle = (2 * Math.PI * i) / size
       nodes.push({
@@ -845,10 +847,13 @@ export class CycleGraph {
   ): Graph {
     const nodes: NodeList = []
     const edges: EdgeList = Array.from(Array(size), () => [])
-    const radius = 5
+
+    // calculate radius
+    const minDistance = 2
+    const radius = Math.max(minDistance / (2 * Math.sin(Math.PI / size)), 5) // fallback minimum
+
     const shakeup = shakeUpNodePosition ? () => random.float(-0.5, 0.5) : () => 0
 
-    // arrange nodes in circle
     for (let i = 0; i < size; i++) {
       const angle = (2 * Math.PI * i) / size
       nodes.push({
