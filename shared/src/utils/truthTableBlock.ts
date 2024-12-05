@@ -1,10 +1,8 @@
-export type InputTruthTableProps = { fields: string[]; name: string; vars: string[] }
-export type FunctionTruthTableProps = { func: string; alternativeName?: string }
-
-/** Either a propositional logic function or a list of input fields
- * if inFeedbackPart the colors change, so it looks better for wrong feedback*/
+// Todo: add documentation
 export type TruthTableProps = {
-  functions: (FunctionTruthTableProps | InputTruthTableProps)[]
+  variables: string[]
+  valuesHeader: string[]
+  values: string[][]
   inFeedbackPart?: boolean
 }
 
@@ -24,20 +22,23 @@ export function createTruthTableInputFields(numberOfFields: number) {
 }
 
 /**
- * Creates a stringified object to parse via Markdown to use a TruthTable
- * Please provide function already as function.toString()
- * @param functions
- * @param inFeedbackPart
+ * Todo: add documentation
  */
 export function createTruthTableProps({
-  functions,
+  variables,
+  valuesHeader,
+  values,
   inFeedbackPart = false,
 }: {
-  functions: (FunctionTruthTableProps | InputTruthTableProps)[]
+  variables: string[]
+  valuesHeader: string[]
+  values: string[][]
   inFeedbackPart?: boolean
 }): string {
   const truthTableProps: TruthTableProps = {
-    functions,
+    variables,
+    valuesHeader,
+    values,
     inFeedbackPart,
   }
   return `
