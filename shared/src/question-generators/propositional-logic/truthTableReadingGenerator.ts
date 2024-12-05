@@ -5,6 +5,7 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
+import { getCellValues } from "@shared/question-generators/propositional-logic/utils.ts"
 import { _ } from "@shared/utils/generics"
 import math from "@shared/utils/math.ts"
 import {
@@ -121,7 +122,9 @@ function generateVariantStart(random: Random, lang: "de" | "en", permalink: stri
   const randomExpression = generateRandomExpression(random, numLeaves, vars)
 
   const truthTable = createTruthTableProps({
-    functions: [{ func: randomExpression.toString(), alternativeName: "$\\varPhi$" }],
+    variables: randomExpression.getVariableNames(),
+    valuesHeader: ["$\\varPhi$"],
+    values: getCellValues(randomExpression, randomExpression.getVariableNames()),
   })
 
   const question: FreeTextQuestion = {
@@ -186,7 +189,9 @@ function generateVariantCDnf(
   randomExpression = format === "dnf" ? randomExpression.toDNF() : randomExpression.toCNF()
 
   const truthTable = createTruthTableProps({
-    functions: [{ func: randomExpression.toString(), alternativeName: "$\\varPhi$" }],
+    variables: randomExpression.getVariableNames(),
+    valuesHeader: ["$\\varPhi$"],
+    values: getCellValues(randomExpression, randomExpression.getVariableNames()),
   })
 
   const question: FreeTextQuestion = {

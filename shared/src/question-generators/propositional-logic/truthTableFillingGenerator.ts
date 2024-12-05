@@ -5,6 +5,7 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
+import { getCellValues } from "@shared/question-generators/propositional-logic/utils.ts"
 import {
   generateRandomExpression,
   numToVariableValues,
@@ -75,13 +76,11 @@ function generateVariantStart(random: Random, permalink: string, lang: "en" | "d
   const numLeaves = random.int(3, 6)
   const randomFormula = generateRandomExpression(random, numLeaves, varNames)
   const truthTableText = createTruthTableProps({
-    functions: [
-      {
-        fields: createTruthTableInputFields(Math.pow(2, numberOfVariables)).inputFields,
-        name: "$\\varPhi$",
-        vars: randomFormula.getProperties().variables,
-      },
-    ],
+    variables: randomFormula.getVariableNames(),
+    valuesHeader: ["$\\varPhi$"],
+    values: createTruthTableInputFields(Math.pow(2, numberOfVariables)).inputFields.map((value) => [
+      value,
+    ]),
   })
 
   const question: MultiFreeTextQuestion = {
@@ -123,7 +122,9 @@ function feedbackVariantStart(formula: SyntaxTreeNodeType): MultiFreeTextFeedbac
         return {
           correct: false,
           correctAnswer: createTruthTableProps({
-            functions: [{ func: formula.toString(), alternativeName: "$\\varPhi$" }],
+            variables: formula.getVariableNames(),
+            valuesHeader: ["$\\varPhi$"],
+            values: getCellValues(formula, formula.getVariableNames()),
             inFeedbackPart: true,
           }),
         }
