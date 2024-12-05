@@ -1,4 +1,9 @@
-// Todo: add documentation
+/**
+ * @param variables from left to right each row 0...000, 0...001, 0...010 aso
+ * @param valuesHeader e.g. \\varPhi or expr.toString()
+ * @param values each cell value below valuesHeader (either input field or already evaluated function)
+ * @param inFeedbackPart to show inside main question or in the feedback component
+ */
 export type TruthTableProps = {
   variables: string[]
   valuesHeader: string[]
@@ -22,7 +27,7 @@ export function createTruthTableInputFields(numberOfFields: number) {
 }
 
 /**
- * Todo: add documentation
+ * See @TruthTableProps
  */
 export function createTruthTableProps({
   variables,
