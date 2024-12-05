@@ -2,7 +2,11 @@ import { TruthTableProps } from "@shared/utils/truthTableBlock.ts"
 import { Markdown } from "@/components/Markdown.tsx"
 
 /**
- * Todo: add documentation
+ * Shows a standard TruthTable:
+ * On the left side all the variables with their corresponding values in each row
+ * On the right side the function's/function names (header):
+ *  below either the evaluation of the function (provide by generator)
+ *  or an input field, so the user has to evaluate the function (for a question)
  */
 export function TruthTableComp({ truthTableObject }: { readonly truthTableObject: string }) {
   const parsedTruthTable = JSON.parse(truthTableObject) as TruthTableProps
@@ -43,6 +47,7 @@ export function TruthTableComp({ truthTableObject }: { readonly truthTableObject
           <tbody>
             {parsedTruthTable.values.map((row, i) => (
               <tr key={i} className={i % 2 === 1 ? cellBgColor : ""}>
+                {/* Variable values */}
                 {parsedTruthTable.variables.map((_, j) => (
                   <td className={`py-1 text-center`} key={j}>
                     <Markdown
@@ -55,8 +60,9 @@ export function TruthTableComp({ truthTableObject }: { readonly truthTableObject
                 <th className={`border-l ${borderColor}`}></th>
                 <th className={`border-r ${borderColor}`}></th>
 
+                {/* Cell values for the function or input field */}
                 {row.map((cellValue, j) => (
-                  <td key={j}>
+                  <td className={`text-center ${j === 0 ? "" : `border-l ${borderColor}`}`} key={j}>
                     <Markdown md={cellValue} />
                   </td>
                 ))}
