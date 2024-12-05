@@ -41,7 +41,7 @@ export function useTranslation(additionalTranslations?: Translations) {
     if (lang !== newLang) {
       const regex = new RegExp(`^/(${SUPPORTED_LANGUAGES.join("|")})`)
       const newPath = pathname.replace(regex, `/${newLang}`)
-      navigate(newPath)
+      void navigate(newPath)
     }
   }
   function nextLang() {

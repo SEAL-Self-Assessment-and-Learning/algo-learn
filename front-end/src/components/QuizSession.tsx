@@ -175,7 +175,7 @@ export function QuizSession({
       const key = e.key
       if (key === "Enter" && status !== "running") {
         e.preventDefault()
-        navigate(`/${lang}`)
+        void navigate(`/${lang}`)
       }
     },
   })

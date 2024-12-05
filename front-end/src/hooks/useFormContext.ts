@@ -5,7 +5,7 @@ import { createContext, useContext } from "react"
  */
 export type TextFieldState = {
   text: string // the current contents of the input field
-  align: string // the alignment of the text in the input field
+  type: string // the type of the input field
   prompt: string // the prompt text of the input field
   feedbackVariation: string // the feedback variation of the input field
   setText?: (text: string) => void // callback when the user changes the value
