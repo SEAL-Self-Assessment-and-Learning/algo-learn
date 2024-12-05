@@ -194,22 +194,3 @@ function getExtraStyles(style: string, feedbackVariation: string) {
   }
   return { spacing, additionalClassnames, fieldWidth }
 }
-
-/*
-  let spacing
-  let additionalClasses: string
-  let fieldWidth: number | null = null
-  if (feedbackVariation === "below") {
-    additionalClasses = "focus:outline-none"
-  } else {
-    additionalClasses = "mb-1 w-full focus:outline-none"
-  }
-  if (type === "NL") {
-    spacing = <br />
-  } else if (type.startsWith("OS")) {
-    fieldWidth = Number.parseInt(type.slice(3)) * 3
-  }
-  if (type === "MAT") {
-    additionalClasses = `w-12 p-2 mx-0.5 focus-visible:ring-1 focus-visible:ring-offset-0`
-  }
- */
