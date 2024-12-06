@@ -15,6 +15,7 @@ export function insertSpaceAfterEveryXChars(input: string, x: number): string {
  * Creates the table for markdown
  * @param wordArray - the word arrays with frequency of each letter
  * @param extraFeature - if the table should have any extra styling (like my-5 around)
+ *                       see more details inside the DrawTable.tsx
  */
 export function convertDictToMdTable(wordArray: { [key: string]: any }, extraFeature: string = "none") {
   const header = Object.keys(wordArray)
