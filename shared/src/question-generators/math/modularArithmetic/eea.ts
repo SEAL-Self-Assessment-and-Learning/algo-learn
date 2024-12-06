@@ -17,7 +17,7 @@ const translations: Translations = {
     eeaQuestion: "Calculate the GCD of ${{a}}$ and ${{b}}$ by completing the following equations:",
     linearCombinationPrompt: "Express the GCD as a linear combination:",
     gcd: "gcd",
-    feedbackInvalid: "Input must be an integer.",
+    feedbackInvalid: "The input must be an integer.",
   },
   de: {
     name: "Erweiterter Euklidischer Algorithmus",
@@ -27,7 +27,7 @@ const translations: Translations = {
       "Berechne den GGT von ${{a}}$ und ${{b}}$ durch das Vervollständigen der folgenden Gleichungen:",
     linearCombinationPrompt: "Drücke den GGT als Linearkombination aus:",
     gcd: "ggt",
-    feedbackInvalid: "Eingabe muss eine ganze Zahl sein.",
+    feedbackInvalid: "Die Eingabe muss eine ganze Zahl sein.",
   },
 }
 
@@ -54,9 +54,10 @@ export const ExtendedEuclideanAlgorithm: QuestionGenerator = {
     const table = generateEEATableSteps(a, b, lang, steps)
 
     const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
-      if (text[fieldID].trim() === "") return { valid: false, message: "" }
+      const input = text[fieldID]?.trim() || ""
+      if (input === "") return { valid: false, message: "" }
 
-      if (!/^-?\d+$/.test(text[fieldID])) {
+      if (isNaN(parseInt(input, 10))) {
         return {
           valid: false,
           message: t(translations, lang, "feedbackInvalid"),
