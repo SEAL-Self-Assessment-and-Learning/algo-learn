@@ -12,8 +12,8 @@ import { t, Translations } from "@shared/utils/translations.ts"
 /**
  * Generates a new Stack question for the seqLetter variant
  *
- * Generates a sequence of letters and stars (vja* ad*a s...) (letter means push and * means pop)
- * Asks the user to enter the sequence of letters that are popped from the stack
+ * Generates a sequence of chars and stars (vja* ad*a s...) (char means enqueue and * means dequeue)
+ * Asks the user to enter the sequence of chars that are dequeued from the stack
  *
  * @param lang
  * @param random

@@ -19,7 +19,7 @@ const translations: Translations = {
     queueContainsValues: `The queue currently contains the following elements (*with the front at the lowest index*):`,
     freeTextInput: `Consider a **Queue "Q"**. ` + `{{0}} **We perform the following operations:** {{1}}`,
     sequenceStackText: `Consider an initially empty queue on which the operations {{0}} are executed. Enter the final state of the queue. {{1}} *(The front element is at the lowest index, shift the elements to index *$0$*.)*`,
-    sequenceCharText: `Let Q be a queue. Perform the following operations from left to right: A letter \`i\` stands for \`Q.enqueue(i)\` and \`*\` stands for \`Q.dequeue()\`.
+    sequenceCharText: `Let Q be a queue. Perform the following operations from left to right: A character \`i\` stands for \`Q.enqueue(i)\` and \`*\` stands for \`Q.dequeue()\`.
                     \\[\\texttt{{{0}}}\\]
                     Enter the sequence of characters that are output by the \`dequeue\` calls.`,
   },
@@ -36,9 +36,9 @@ const translations: Translations = {
     freeTextInput:
       `Betrachte eine **Queue "Q"**. ` + `{{0}} **Wir führen die folgenden Operationen aus:** {{1}}`,
     sequenceStackText: `Betrachte eine anfangs leere Queue, auf dem die Operationen {{0}} ausgeführt werden. Gib den finalen Zustand der Queue an. {{1}} *(Das vorderste Element ist am niedrigsten Index, verschiebe die Elemente an den index *$0$}*.)*`,
-    sequenceLetterText: `Sei Q eine Queue. Führe die folgenden Operationen von links nach rechts aus: Ein Buchstabe \`i\` steht hierbei für \`Q.enqueue(i)\` und \`*\` steht für \`Q.dequeue()\`.
+    sequenceLetterText: `Sei Q eine Queue. Führe die folgenden Operationen von links nach rechts aus: Ein Zeichen \`i\` steht hierbei für \`Q.enqueue(i)\` und \`*\` steht für \`Q.dequeue()\`.
                     \\[\\texttt{{{0}}}\\]
-                    Gib die Sequenz der Buchstaben an, die durch die \`dequeue\`-Aufrufe ausgegeben werden.`,
+                    Gib die Sequenz der Zeichen an, die durch die \`dequeue\`-Aufrufe ausgegeben werden.`,
   },
 }
 
