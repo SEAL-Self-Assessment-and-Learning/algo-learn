@@ -13,7 +13,7 @@ import { t, Translations } from "@shared/utils/translations.ts"
  * Generates a new Stack question for the seqLetter variant
  *
  * Generates a sequence of chars and stars (vja* ad*a s...) (char means enqueue and * means dequeue)
- * Asks the user to enter the sequence of chars that are dequeued from the stack
+ * Asks the user to enter the sequence of chars that are dequeued from the queue
  *
  * @param lang
  * @param random
