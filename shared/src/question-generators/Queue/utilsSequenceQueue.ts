@@ -65,7 +65,7 @@ export function generateVariantSequenceQueue(
     type: "MultiFreeTextQuestion",
     name: queueQuestion.name(lang),
     path: permalink,
-    text: t(translations, lang, "sequenceStackText", [operations.join(", "), arrayDisplayBlock]),
+    text: t(translations, lang, "sequenceQueueText", [operations.join(", "), arrayDisplayBlock]),
     feedback,
   }
   return { question }
