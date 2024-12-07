@@ -10,23 +10,23 @@ import Random from "@shared/utils/random.ts"
 import { t, Translations } from "@shared/utils/translations.ts"
 
 /**
- * Generates a new Stack question for the seqLetter variant
+ * Generates a new Queue question for the seqLetter variant
  *
- * Generates a sequence of chars and stars (vja* ad*a s...) (char means enqueue and * means dequeue)
- * Asks the user to enter the sequence of chars that are dequeued from the queue
+ * Generates a sequence of letters and stars (vja* ad*a s...) (letter means enqueue and * means dequeue)
+ * Asks the user to enter the sequence of letters that are dequeued from the queue
  *
  * @param lang
  * @param random
  * @param permalink
  * @param translations
  */
-export function generateVariantSequenceChar(
+export function generateVariantSequenceLetter(
   lang: "de" | "en",
   random: Random,
   permalink: string,
   translations: Translations,
 ) {
-  const { sequence, popSequence } = generateOperationsVariantSequenceChar(random)
+  const { sequence, popSequence } = generateOperationsVariantSequenceLetter(random)
 
   const checkFormat: FreeTextFormatFunction = ({ text }) => {
     // check if the user input only consists of letters
@@ -34,7 +34,7 @@ export function generateVariantSequenceChar(
     if (!/^[A-Z]*$/.test(text.toUpperCase())) {
       return {
         valid: false,
-        message: t(translations, lang, "checkFormatSeqChar"),
+        message: t(translations, lang, "checkFormatSeqLetter"),
       }
     }
     return {
@@ -72,7 +72,7 @@ export function generateVariantSequenceChar(
  *
  * @param random
  */
-function generateOperationsVariantSequenceChar(random: Random) {
+function generateOperationsVariantSequenceLetter(random: Random) {
   const queue = new Queue<string>()
   const possibleChars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
