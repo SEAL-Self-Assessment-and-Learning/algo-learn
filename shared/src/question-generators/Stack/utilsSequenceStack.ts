@@ -49,7 +49,7 @@ export function generateVariantSequenceStack(
       }
     }
     // expect the rest input fields inside allKeys to be empty
-    for (const restKey in allKeys) {
+    for (const restKey of allKeys) {
       if (text[restKey].trim() !== "") {
         return correctAnswer
       }
