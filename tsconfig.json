@@ -8,7 +8,6 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
-    "types": ["vite/client"],
 
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
