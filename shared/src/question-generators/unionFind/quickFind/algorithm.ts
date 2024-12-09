@@ -8,21 +8,20 @@ export class QuickFind extends UnionFind {
     super(n)
   }
 
-  find(i: number) {
-    this.checkValueRange([i])
-    return this.id[i]
+  _find(id: number[], i: number): number {
+    return id[i]
   }
 
-  union(i: number, j: number) {
-    this.checkValueRange([i, j])
-    const pid = this.id[i]
-    const qid = this.id[j]
+  _union(id: number[], i: number, j: number): { id: number[]; sz: number[] } {
+    const pid = id[i]
+    const qid = id[j]
     if (pid !== qid) {
-      for (let i = 0; i < this.id.length; i++) {
-        if (this.id[i] === pid) {
-          this.id[i] = qid
+      for (let i = 0; i < id.length; i++) {
+        if (id[i] === pid) {
+          id[i] = qid
         }
       }
     }
+    return { id, sz: [] }
   }
 }

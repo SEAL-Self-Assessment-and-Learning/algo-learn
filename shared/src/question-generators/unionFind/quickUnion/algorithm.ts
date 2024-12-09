@@ -8,20 +8,19 @@ export class QuickUnion extends UnionFind {
     super(n)
   }
 
-  find(i: number): number {
-    this.checkValueRange([i])
-    while (i !== this.id[i]) {
-      i = this.id[i]
+  _find(id: number[], i: number) {
+    while (i !== id[i]) {
+      i = id[i]
     }
     return i
   }
 
-  union(i: number, j: number) {
-    this.checkValueRange([i, j])
-    const ri = this.find(i)
-    const rj = this.find(j)
+  _union(id: number[], i: number, j: number): { id: number[]; sz: number[] } {
+    const ri = this._find(id, i)
+    const rj = this._find(id, j)
     if (ri !== rj) {
-      this.id[ri] = rj
+      id[ri] = rj
     }
+    return { id, sz: [] }
   }
 }

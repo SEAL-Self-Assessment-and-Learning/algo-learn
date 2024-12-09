@@ -8,11 +8,11 @@ export class WeightedQuickUnionPath extends WeightedQuickUnion {
     super(n)
   }
 
-  find(i: number): number {
+  _find(id: number[], i: number): number {
     this.checkValueRange([i])
-    if (i !== this.id[i]) {
-      this.id[i] = this.find(this.id[i])
+    if (i !== id[i]) {
+      id[i] = this._find(id, id[i])
     }
-    return this.id[i]
+    return id[i]
   }
 }

@@ -4,33 +4,31 @@ import { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
  * QuickUnion implementation
  */
 export class WeightedQuickUnion extends UnionFind {
-  protected readonly sz: number[] = []
-
   constructor(n: number) {
     super(n)
-    this.sz = Array.from({ length: n }).fill(1) as number[]
   }
 
-  find(i: number): number {
+  _find(id: number[], i: number): number {
     this.checkValueRange([i])
-    while (i !== this.id[i]) {
-      i = this.id[i]
+    while (i !== id[i]) {
+      i = id[i]
     }
     return i
   }
 
-  union(i: number, j: number) {
+  _union(id: number[], i: number, j: number, sz: number[]): { id: number[]; sz: number[] } {
     this.checkValueRange([i, j])
-    const ri = this.find(i)
-    const rj = this.find(j)
+    const ri = this._find(id, i)
+    const rj = this._find(id, j)
     if (ri !== rj) {
-      if (this.sz[ri] <= this.sz[rj]) {
-        this.id[ri] = rj
-        this.sz[rj] += this.sz[ri]
+      if (sz[ri] <= sz[rj]) {
+        id[ri] = rj
+        sz[rj] += sz[ri]
       } else {
-        this.id[rj] = ri
-        this.sz[ri] += this.sz[rj]
+        id[rj] = ri
+        sz[ri] += sz[rj]
       }
     }
+    return { id, sz }
   }
 }

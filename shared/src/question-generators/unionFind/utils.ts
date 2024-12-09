@@ -52,7 +52,7 @@ function findAndPerformUnionOperation(
   unionSize: number,
 ) {
   const gapField = createArrayDisplayCodeBlock({
-    array: union.getArray(),
+    array: union.getArray()[0],
   })
 
   const gapOperationValues: number[] = []
@@ -63,7 +63,7 @@ function findAndPerformUnionOperation(
   )
 
   // compute the final union after combining one more element
-  union.union(gapOperationValues[0], gapOperationValues[1])
+  union.union(gapOperationValues[0], gapOperationValues[1], true)
 
   return { gapField, gapOperationValues }
 }
@@ -233,7 +233,7 @@ export function unionTwoBlocksCombineNone({
   // The loop ensures there's at least one element outside the two blocks
 
   const gapField = createArrayDisplayCodeBlock({
-    array: union.getArray(),
+    array: union.getArray()[0],
   })
 
   // Select two values not in block1Values or block2Values
@@ -245,7 +245,7 @@ export function unionTwoBlocksCombineNone({
   )
 
   // Perform the final union operation
-  union.union(gapOperationValues[0], gapOperationValues[1])
+  union.union(gapOperationValues[0], gapOperationValues[1], true)
 
   return { gapField, gapOperationValues }
 }
@@ -270,13 +270,13 @@ export function unionTwoBlocksCombineSame({
   union = union_
 
   const gapField = createArrayDisplayCodeBlock({
-    array: union.getArray(),
+    array: union.getArray()[0],
   })
 
   const gapOperationValues: number[] = random.subset(block1Values, 2)
 
   // compute the final union
-  union.union(gapOperationValues[0], gapOperationValues[1])
+  union.union(gapOperationValues[0], gapOperationValues[1], true)
 
   return {
     gapField,
@@ -337,7 +337,7 @@ export function unionOneBlockCombineNone({
   union = union_
 
   const gapField = createArrayDisplayCodeBlock({
-    array: union.getArray(),
+    array: union.getArray()[0],
   })
 
   const gapOperationValues: number[] = random.subset(
@@ -346,7 +346,7 @@ export function unionOneBlockCombineNone({
   )
 
   // compute the final union
-  union.union(gapOperationValues[0], gapOperationValues[1])
+  union.union(gapOperationValues[0], gapOperationValues[1], true)
 
   return {
     gapField,

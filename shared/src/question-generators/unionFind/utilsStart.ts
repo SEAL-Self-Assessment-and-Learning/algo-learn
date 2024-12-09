@@ -1,5 +1,4 @@
 import { MultiFreeTextFeedbackFunction, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
-import { QuickFind } from "@shared/question-generators/unionFind/quickFind/algorithm.ts"
 import { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
 import {
   unionOneBlockCombineNone,
@@ -18,25 +17,30 @@ import { t, Translations } from "@shared/utils/translations.ts"
 /**
  * Returns a simple feedback function to check if the user input is the same as
  * the solution union
- * @param solutionUnion - correct calculated union
+ * @param solutionUnions - correct calculated union
  */
-export function getFeedbackFunction(solutionUnion: QuickFind): MultiFreeTextFeedbackFunction {
+export function getFeedbackFunction(solutionUnions: UnionFind): MultiFreeTextFeedbackFunction {
   // fieldIds form input-x x \in [0,1,2,3...]
   return ({ text }) => {
-    const solutionArray = solutionUnion.getArray()
-    for (let i = 0; i < solutionArray.length; i++) {
-      const userFieldAnswer = parseInt(text["input-" + i].trim())
-      if (userFieldAnswer !== solutionArray[i]) {
+    for (let j = 0; j < solutionUnions.getUnionAmount(); j++) {
+      let correctUnion = true
+      for (let i = 0; i < solutionUnions.getArray()[j].length; i++) {
+        const userFieldAnswer = parseInt(text["input-" + i].trim())
+        if (userFieldAnswer !== solutionUnions.getArray()[j][i]) {
+          correctUnion = false
+        }
+      }
+      if (correctUnion) {
         return {
-          correct: false,
-          correctAnswer: createArrayDisplayCodeBlock({
-            array: solutionArray,
-          }),
+          correct: true,
         }
       }
     }
     return {
-      correct: true,
+      correct: false,
+      correctAnswer: createArrayDisplayCodeBlock({
+        array: solutionUnions.getArray()[0],
+      }),
     }
   }
 }
@@ -73,13 +77,14 @@ export function unionFindStartQuestion({
   })
 
   const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
-    numberOfInputFields: union.getArray().length,
+    numberOfInputFields: union.getArray()[0].length,
   })
 
   const question: MultiFreeTextQuestion = {
     type: "MultiFreeTextQuestion",
     name,
     path: permalink,
+    fillOutAll: true,
     text: t(translations, lang, "task", [
       gapField,
       gapOperationValues[0].toString(),

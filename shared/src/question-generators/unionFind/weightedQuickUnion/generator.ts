@@ -9,12 +9,14 @@ const translations: Translations = {
   en: {
     name: "Weighted-Quick-Union",
     description: "Determine the Weighted-Quick-Union state after Union operation",
-    task: `A state of the **Weighted-Quick-Union** data structure is given as the following array: \n{{0}}\n We call \`Union({{1}}, {{2}})\`. Provide the resulting state. {{3}}`,
+    task: `A state of the **Weighted-Quick-Union** data structure is given as the following array: \n{{0}}\n We call \`Union({{1}}, {{2}})\`. Provide the resulting state. {{3}}
+    *Note: Compare the size of the trees.*`,
   },
   de: {
     name: "Weighted-Quick-Union",
     description: "Bestimme den Weighted-Quick-Union-Zustand nach Union-Operation",
-    task: `Ein Zustand der **Weighted-Quick-Union** Datenstruktur ist als folgendes Array gegeben: \n{{0}}\n Wir rufen \`Union({{1}}, {{2}})\` auf. Gib den Zustand an, der dadurch entsteht. {{3}}`,
+    task: `Ein Zustand der **Weighted-Quick-Union** Datenstruktur ist als folgendes Array gegeben: \n{{0}}\n Wir rufen \`Union({{1}}, {{2}})\` auf. Gib den Zustand an, der dadurch entsteht. {{3}}
+    *Hinweis: Vergleich die Größe der Bäume.*`,
   },
 }
 
@@ -24,13 +26,7 @@ export const WeightedQuickUnionGenerator: QuestionGenerator = {
   description: tFunctional(translations, "description"),
   tags: ["union-find", "quick-find"],
   languages: ["en", "de"],
-  expectedParameters: [
-    {
-      type: "string",
-      name: "variant",
-      allowedValues: ["start"],
-    },
-  ],
+  expectedParameters: [],
 
   generate(lang, parameters, seed) {
     const permalink = serializeGeneratorCall({
