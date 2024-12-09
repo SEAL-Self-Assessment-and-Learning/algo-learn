@@ -68,6 +68,7 @@ export function ExerciseMultiTextInput({
   function checkOverallMode(currentModeIDs: { [x: string]: string }) {
     if (!question.fillOutAll) return "draft"
     // if every mode in modeID is draft, the overall mode is draft too
+    console.log(currentModeIDs)
     for (const value of Object.values(currentModeIDs)) {
       if (value === "invalid" || value === "initial") {
         return "invalid"
@@ -102,7 +103,11 @@ export function ExerciseMultiTextInput({
       setState({
         ...state,
         text: { ...state.text, [fieldID]: value },
-        mode: valid ? "draft" : "invalid",
+        modeID: {
+          ...state.modeID,
+          [fieldID]: valid ? "draft" : "invalid",
+        },
+        mode: checkOverallMode({ ...state.modeID, [fieldID]: valid ? "draft" : "invalid" }),
       })
     }
   }
