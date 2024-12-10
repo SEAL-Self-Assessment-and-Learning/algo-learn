@@ -11,6 +11,7 @@
   } from "lucide-svelte"
   import type { Language } from "@shared/api/Language"
   import { tFunction, type Translations } from "@shared/utils/translations"
+  import { redirect } from "@sveltejs/kit"
   import { VERSION } from "../config"
   import { getMuted, setMuted } from "../sound.svelte"
   import { availableThemes, getTheme, setTheme } from "../theme.svelte"
@@ -45,8 +46,10 @@
   }
 
   const lang = "en"
-  const { t } = tFunction(translations, lang)
-  const setLang = (s: Language) => s
+  const { t } = $derived(tFunction(translations, lang))
+  const setLang = (s: Language) => {
+    redirect(307, lang)
+  }
 </script>
 
 <header
