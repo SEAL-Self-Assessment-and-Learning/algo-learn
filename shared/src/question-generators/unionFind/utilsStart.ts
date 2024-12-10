@@ -71,7 +71,7 @@ export function unionFindStartQuestion({
     [unionOneBlockCombineOne, 0.25],
     [unionOneBlockCombineNone, 0.15],
   ])
-  //  && random.bool(0.7)
+
   let gapField: string
   let gapOperationValues: number[]
   if (union instanceof WeightedQuickUnionPath) {
