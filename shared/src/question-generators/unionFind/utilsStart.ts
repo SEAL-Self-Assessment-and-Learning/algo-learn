@@ -7,6 +7,8 @@ import {
   unionTwoBlocksCombineOne,
   unionTwoBlocksCombineSame,
 } from "@shared/question-generators/unionFind/utils.ts"
+import { WeightedQuickUnionPath } from "@shared/question-generators/unionFind/weightedQuickUnionPath/algorithm.ts"
+import { createChainedUnionState } from "@shared/question-generators/unionFind/weightedQuickUnionPath/utilsPath.ts"
 import {
   createArrayDisplayCodeBlock,
   createArrayDisplayCodeBlockUserInput,
@@ -69,12 +71,25 @@ export function unionFindStartQuestion({
     [unionOneBlockCombineOne, 0.25],
     [unionOneBlockCombineNone, 0.15],
   ])
-
-  const { gapField, gapOperationValues } = unionCaseGeneration({
-    random,
-    union,
-    unionSize,
-  })
+  //  && random.bool(0.7)
+  let gapField: string
+  let gapOperationValues: number[]
+  if (union instanceof WeightedQuickUnionPath) {
+    const { gapField: _gapField, gapOperationValues: _gapOperationValues } = createChainedUnionState({
+      random,
+      union,
+    })
+    gapField = _gapField
+    gapOperationValues = _gapOperationValues
+  } else {
+    const { gapField: _gapField, gapOperationValues: _gapOperationValues } = unionCaseGeneration({
+      random,
+      union,
+      unionSize,
+    })
+    gapField = _gapField
+    gapOperationValues = _gapOperationValues
+  }
 
   const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
     numberOfInputFields: union.getArray()[0].length,

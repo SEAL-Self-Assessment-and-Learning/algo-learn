@@ -10,7 +10,7 @@ export abstract class UnionFind {
     this.szList = [Array.from({ length: n }).fill(1) as number[]]
   }
 
-  protected abstract _find(id: number[], i: number): number
+  protected abstract _find(id: number[], i: number, sz: number[]): number
   protected abstract _union(
     id: number[],
     i: number,
@@ -26,7 +26,7 @@ export abstract class UnionFind {
     this.checkValueRange([i])
     const values: number[] = []
     for (let k = 0; k < this.idList.length; k++) {
-      values.push(this._find(this.idList[k], i))
+      values.push(this._find(this.idList[k], i, this.szList[k]))
     }
     return values
   }
@@ -35,7 +35,7 @@ export abstract class UnionFind {
    * Performs the union operation on each currently existing union.
    * @param i
    * @param j
-   * @param eitherDirection - if it does not matter if find(i) -> find(j) or find(j) -> find(i)
+   * @param eitherDirection - if it doesn't matter if find(i) -> find(j) or find(j) -> find(i)
    *                          and both states should be computed and stored.
    */
   union(i: number, j: number, eitherDirection: boolean = false) {
@@ -79,10 +79,59 @@ export abstract class UnionFind {
   }
 
   /**
+   * Returns the size of each union
+   */
+  getSize(): number {
+    return this.idList[0].length
+  }
+
+  /**
    * Returns the current amount of different union states
    */
   getUnionAmount(): number {
     return this.idList.length
+  }
+
+  getSzList(): number[][] {
+    return this.szList
+  }
+
+  /**
+   * Adds a union find state to the data structure
+   * @param state - the new (artificially created state)
+   * @param reset - if the current states should be clear or if the new state should be added
+   */
+  setStateArtificially(state: number[], reset: boolean = true) {
+    if (reset) {
+      this.idList = [state]
+      this.szList = [this.computeSizes(state)]
+    } else {
+      if (state.length !== this.idList[0].length || state.some((x) => x < 0 || x >= state.length)) {
+        throw new Error(
+          "By adding an artificially state to the union states, this state has to be of the same size as the other states and has to include only values from [0...length-1].",
+        )
+      }
+      this.idList.push(state)
+      this.szList.push(this.computeSizes(state))
+    }
+  }
+
+  /**
+   * Given an id - array, it computes a corresponding size array (for weighted quick union (path compression))
+   * Doesn't use _find, so the id array will not change during execution
+   * @param id
+   * @private
+   */
+  private computeSizes(id: number[]): number[] {
+    const sz = Array.from({ length: id.length }).fill(1) as number[]
+    for (let i = 0; i < id.length; i++) {
+      let helpI = i
+      while (id[helpI] !== helpI) {
+        helpI = id[helpI]
+        sz[helpI] += 1
+      }
+    }
+    return sz
   }
 
   /**

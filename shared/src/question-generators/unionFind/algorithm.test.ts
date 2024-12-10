@@ -115,3 +115,20 @@ describe("UnionFind via Weighted QuickUnion with path compression", () => {
     expect(weightedQuickUnionPath.getArray()).toContainEqual([0, 0, 6, 0, 0, 0, 0])
   })
 })
+
+describe("Union Find - Set artificial union", () => {
+  test("Set artificial", () => {
+    const union = new WeightedQuickUnion(15)
+    union.setStateArtificially([0, 1, 1, 2, 2, 4, 6, 6, 7, 9, 9, 10, 10, 12, 12], true)
+    expect(union.find(13)[0]).toEqual(9)
+    expect(union.getSzList()[0]).toEqual([1, 5, 4, 1, 2, 1, 3, 2, 1, 6, 5, 1, 3, 1, 1])
+  })
+
+  test("Set artificial - Path Compression", () => {
+    const union = new WeightedQuickUnionPath(1)
+    union.setStateArtificially([0, 1, 3, 7, 2, 3, 4, 7, 8, 8, 12, 10, 7, 11], true)
+    expect(union.getSzList()[0]).toEqual([1, 1, 3, 5, 2, 1, 1, 10, 2, 1, 3, 2, 4, 1])
+    expect(union.find(13)[0]).toEqual(7)
+    expect(union.getSzList()[0]).toEqual([1, 1, 3, 5, 2, 1, 1, 10, 2, 1, 1, 1, 1, 1])
+  })
+})

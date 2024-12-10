@@ -9,12 +9,12 @@ const translations: Translations = {
   en: {
     name: "Weighted-Quick-Union with path compression",
     description: "Determine the Weighted-Quick-Union with path compression state after Union operation",
-    task: `A state of the **Weighted-Quick-Union with path compression** data structure is given as the following array: \n{{0}}\n We call \`Union({{1}}, {{2}})\`. Provide the resulting state. {{3}}`,
+    task: `An artificially created state of the **Weighted-Quick-Union with path compression** data structure is given as the following array: \n{{0}}\n We call \`Union({{1}}, {{2}})\`. Provide the resulting state. {{3}}`,
   },
   de: {
     name: "Weighted-Quick-Union mit Pfadverkürzung",
     description: "Bestimme den Weighted-Quick-Union mit Pfadverkürzung Zustand nach Union-Operation",
-    task: `Ein Zustand der **Weighted-Quick-Union mit Pfadverkürzung** Datenstruktur ist als folgendes Array gegeben: \n{{0}}\n Wir rufen \`Union({{1}}, {{2}})\` auf. Gib den Zustand an, der dadurch entsteht. {{3}}`,
+    task: `Ein künstlich erstellter Zustand der **Weighted-Quick-Union mit Pfadverkürzung** Datenstruktur ist als folgendes Array gegeben: \n{{0}}\n Wir rufen \`Union({{1}}, {{2}})\` auf. Gib den Zustand an, der dadurch entsteht. {{3}}`,
   },
 }
 
