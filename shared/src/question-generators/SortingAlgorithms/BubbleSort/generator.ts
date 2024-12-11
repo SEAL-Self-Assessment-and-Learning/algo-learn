@@ -89,7 +89,7 @@ export const BubbleSortGenerator: QuestionGenerator = {
           numberRounds.toString(),
         ]),
         placeholder: randomNumbers.slice(0, 3).join(", "),
-        bottomText: t(translations, lang, "alreadySorted"),
+        bottomText: t(translations, lang, "alreadySorted", [numberRounds.toString()]),
         prompt: "$A=$",
         typingAid: Array.from(randomNumbersSet.keys()).map((val) => ({
           text: `$${val}$`,
