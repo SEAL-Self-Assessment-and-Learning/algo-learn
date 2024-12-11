@@ -129,7 +129,7 @@ describe("Union Find - Set artificial union", () => {
     union.setStateArtificially([0, 1, 3, 7, 2, 3, 4, 7, 8, 8, 12, 10, 7, 11], true)
     expect(union.getSzList()[0]).toEqual([1, 1, 3, 5, 2, 1, 1, 10, 2, 1, 3, 2, 4, 1])
     expect(union.find(13)[0]).toEqual(7)
-    expect(union.getSzList()[0]).toEqual([1, 1, 3, 5, 2, 1, 1, 10, 2, 1, 1, 1, 1, 1])
+    expect(union.getArray()[0]).toEqual([0, 1, 3, 7, 2, 3, 4, 7, 8, 8, 7, 7, 7, 7])
   })
 
   test("Set artificial - throws dimension error", () => {
