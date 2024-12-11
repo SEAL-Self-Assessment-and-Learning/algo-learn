@@ -6,10 +6,54 @@ export function createChainedUnionState({ random, union }: { random: Random; uni
   gapField: string
   gapOperationValues: number[]
 } {
-  return createTwoPath({ random, union })
+  return random.choice([
+    createTwoPathTree({random, union}),
+    createTwoPath({random, union}),
+    createOnePath({random, union})
+  ])
 }
 
-function createTwoPathTree({ random, union }: { random: Random; union: UnionFind }) {}
+function createTwoPathTree({ random, union }: { random: Random; union: UnionFind }) {
+  const unionSize = union.getSize()
+  const workingUnion = union.getArray()[0].map((x) => x)
+
+  const firstPathLength = random.int(2, Math.floor(unionSize / 2) - 1)
+  const secondPathLength = random.int(2, Math.floor(unionSize / 2) - 1)
+
+  const firstPathValues = random.subset(workingUnion, firstPathLength)
+  const secondPathValues = random.subset(
+    workingUnion.filter((x) => !firstPathValues.includes(x)),
+    secondPathLength,
+  )
+  const combinedStartNode = random.choice(
+    workingUnion.filter((x) => !firstPathValues.includes(x) && !secondPathValues.includes(x)),
+  )
+  firstPathValues.push(combinedStartNode)
+  secondPathValues.push(combinedStartNode)
+
+  for (let i = 0; i < firstPathLength; i++) {
+    workingUnion[firstPathValues[i]] = workingUnion[firstPathValues[i + 1]]
+  }
+
+  for (let i = 0; i < secondPathLength; i++) {
+    workingUnion[secondPathValues[i]] = workingUnion[secondPathValues[i + 1]]
+  }
+
+  const gapOperationValues: number[] = []
+  gapOperationValues.push(random.choice(firstPathValues.slice(0, firstPathLength - 1)))
+  gapOperationValues.push(random.choice(secondPathValues.slice(0, secondPathLength - 1)))
+  random.shuffle(gapOperationValues)
+
+  union.setStateArtificially(workingUnion, true)
+
+  const gapField = createArrayDisplayCodeBlock({
+    array: workingUnion,
+  })
+
+  union.union(gapOperationValues[0], gapOperationValues[1])
+
+  return { gapField, gapOperationValues }
+}
 
 function createTwoPath({ random, union }: { random: Random; union: UnionFind }) {
   const unionSize = union.getSize()

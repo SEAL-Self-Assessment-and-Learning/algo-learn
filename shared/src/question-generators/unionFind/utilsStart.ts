@@ -74,7 +74,7 @@ export function unionFindStartQuestion({
 
   let gapField: string
   let gapOperationValues: number[]
-  if (union instanceof WeightedQuickUnionPath) {
+  if (union instanceof WeightedQuickUnionPath && random.bool(0.8)) {
     const { gapField: _gapField, gapOperationValues: _gapOperationValues } = createChainedUnionState({
       random,
       union,
