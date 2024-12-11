@@ -8,6 +8,7 @@ import { generateAforAxEqualsB } from "@shared/question-generators/math/linearAl
 import { matrixToTex, vectorToTex } from "@shared/question-generators/math/linearAlgebra/tex"
 import { _ } from "@shared/utils/generics"
 import math from "@shared/utils/math"
+import { createMatrixInput } from "@shared/utils/matrixInput.ts"
 import Random from "@shared/utils/random"
 import { t, Translations } from "@shared/utils/translations"
 
@@ -49,7 +50,7 @@ export function generateVariantStartAxb(
     // rebuild an x vector from the input fields
     const userX: number[] = []
     for (let i = 0; i < matrixSize; i++) {
-      userX.push(parseFloat(text[`x_${i}`].replace(/\s/g, "")))
+      userX.push(parseFloat(text[`x_${i}_0`].replace(/\s/g, "")))
     }
     const userB = math.multiply(A, userX)
     const correct = _.isEqual(userB, updatedB)
@@ -60,7 +61,7 @@ export function generateVariantStartAxb(
     }
     return {
       correct: false,
-      correctAnswer: "$" + vectorToTex(x) + "$",
+      correctAnswer: "$x=" + vectorToTex(x) + "$",
     }
   }
 
@@ -76,17 +77,22 @@ export function generateVariantStartAxb(
     b,
   })
 
-  let inputFieldsTable = "\n|---|---|\n"
-  for (let i = 0; i < matrixSize; i++) {
-    inputFieldsTable += `|{{x_${i}#TL#$x_${i}=$##overlay}}|\n`
-  }
-  inputFieldsTable += `|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |`
+  const matrixInput = createMatrixInput({
+    rows: matrixSize,
+    cols: 1,
+    name: "$x=$",
+    elementOf: `$\\in\\mathbb{R}^${matrixSize}$`,
+  })
 
   const question: MultiFreeTextQuestion = {
     type: "MultiFreeTextQuestion",
     name: axb.name(lang),
     path: permalink,
-    text: t(translations, lang, "text", [matrixToTex(A, "r"), vectorToTex(updatedB), inputFieldsTable]),
+    text: t(translations, lang, "text", [
+      matrixToTex(A, "r"),
+      vectorToTex(updatedB),
+      matrixInput.matrixInput,
+    ]),
     checkFormat,
     feedback,
   }

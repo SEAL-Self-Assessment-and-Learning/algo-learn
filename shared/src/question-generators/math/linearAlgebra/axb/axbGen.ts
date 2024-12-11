@@ -10,7 +10,7 @@ const translations: Translations = {
     description: "Solve a linear system of equations",
     text: `Solve $Ax=b$ for $x$, given $A$ and $b$ as follows:
     \\[ A={{0}} \\quad b={{1}}\\]
-    Please provide a possible solution $\\forall x_i \\in x$.
+    What is a possible solution for $x$?
     {{2}}`,
     checkFormat: "Please only enter a number",
   },
@@ -33,7 +33,6 @@ export const axb: QuestionGenerator = {
   expectedParameters: [],
 
   generate: (lang, parameters, seed) => {
-    // first create a permalink for the question
     const permalink = serializeGeneratorCall({
       generator: axb,
       lang,
