@@ -1,0 +1,7 @@
+{
+  "name": "settings",
+  "private": true,
+  "dependencies": {
+    "shared": "workspace:*"
+  }
+}

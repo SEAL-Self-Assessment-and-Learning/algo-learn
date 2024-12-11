@@ -9,7 +9,14 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
+import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
+import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import { CRT } from "@shared/question-generators/math/crt"
+import { modFactor } from "@shared/question-generators/math/modFactorization"
+import { ModTricks } from "@shared/question-generators/math/modTricks"
+import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { axb } from "@shared/question-generators/math/linearAlgebra/axb/axbGen.ts"
 import { determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
@@ -19,6 +26,7 @@ import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
+import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF"
 
 export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
 
@@ -28,6 +36,17 @@ export const collection: QuestionCollection = [
   //   name: { de: "Beispiel", en: "Example" },
   //   contents: [ExampleQuestion],
   // },
+
+  {
+    slug: "propositional-logic",
+    name: { de: "Aussagenlogik", en: "Propositional Logic" },
+    contents: [Satisfiability, NormalForms, MinimizePropositionalLogic],
+  },
+  {
+    slug: "modular-arithmetic",
+    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
+    contents: [ModTricks, CRT, modFactor],
+  },
   {
     slug: "asymptotics",
     name: { de: "Asymptotik", en: "Asymptotics" },
@@ -47,24 +66,24 @@ export const collection: QuestionCollection = [
     image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
   },
   {
+    slug: "stack",
+    name: { de: "Stacks und Queues", en: "Stacks and Queues" },
+    contents: [stackQuestion, queueQuestion],
+  },
+  {
+    slug: "heap",
+    name: { de: "Heaps", en: "Heaps" },
+    contents: [HeapOperations, HeapVerifying, HeapNeighbours],
+  },
+  {
+    slug: "union-find",
+    name: { de: "Union-Find", en: "Union-Find" },
+    contents: [QuickFindGenerator],
+  },
+  {
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     contents: [huffmanCoding],
-  },
-  {
-    slug: "queue",
-    name: { de: "Queue", en: "Queue" },
-    contents: [queueQuestion],
-  },
-  {
-    slug: "stack",
-    name: { de: "Stack", en: "Stack" },
-    contents: [stackQuestion],
-  },
-  {
-    slug: "propositional-logic",
-    name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms],
   },
   {
     slug: "matrix",
