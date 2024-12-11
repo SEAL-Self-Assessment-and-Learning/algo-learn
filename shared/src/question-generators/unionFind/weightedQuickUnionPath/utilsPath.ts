@@ -2,17 +2,38 @@ import { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import Random from "@shared/utils/random.ts"
 
+/**
+ * Creates artificial states for union find.
+ * It ensures that the computed next union operation will perform a path compression.
+ *
+ * It has different variants to create the states:
+ * - OnePath: It is one long path and combines a value from the bottom of the path
+ *            with another value not inside the path
+ * - TwoPath: It creates two independent paths and combines two bottom values with each
+ * - TwoPathTree: Creates two paths which start at the same node.
+ *                Asks to combine two bottom values.
+ *
+ * @param random
+ * @param union
+ */
 export function createChainedUnionState({ random, union }: { random: Random; union: UnionFind }): {
   gapField: string
   gapOperationValues: number[]
 } {
   return random.choice([
-    createTwoPathTree({random, union}),
-    createTwoPath({random, union}),
-    createOnePath({random, union})
+    createTwoPathTree({ random, union }),
+    createTwoPath({ random, union }),
+    createOnePath({ random, union }),
   ])
 }
 
+/**
+ * Creates two paths which start at the same node (so a tree)
+ * Asks the user to combine values from the bottom of both paths
+ *
+ * @param random
+ * @param union
+ */
 function createTwoPathTree({ random, union }: { random: Random; union: UnionFind }) {
   const unionSize = union.getSize()
   const workingUnion = union.getArray()[0].map((x) => x)
@@ -34,7 +55,6 @@ function createTwoPathTree({ random, union }: { random: Random; union: UnionFind
   for (let i = 0; i < firstPathLength; i++) {
     workingUnion[firstPathValues[i]] = workingUnion[firstPathValues[i + 1]]
   }
-
   for (let i = 0; i < secondPathLength; i++) {
     workingUnion[secondPathValues[i]] = workingUnion[secondPathValues[i + 1]]
   }
@@ -55,6 +75,12 @@ function createTwoPathTree({ random, union }: { random: Random; union: UnionFind
   return { gapField, gapOperationValues }
 }
 
+/**
+ * Creates a union with two paths which start at different nodes
+ * Asks to combine two nodes from the bottom of each path
+ * @param random
+ * @param union
+ */
 function createTwoPath({ random, union }: { random: Random; union: UnionFind }) {
   const unionSize = union.getSize()
   const workingUnion = union.getArray()[0].map((x) => x)
@@ -92,10 +118,16 @@ function createTwoPath({ random, union }: { random: Random; union: UnionFind }) 
   return { gapField, gapOperationValues }
 }
 
+/**
+ * Creates one long path and ask to combine a value from the bottom of the path
+ * with a value not inside the path
+ * @param random
+ * @param union
+ */
 function createOnePath({ random, union }: { random: Random; union: UnionFind }) {
   const unionSize = union.getSize()
   const workingUnion = union.getArray()[0].map((x) => x)
-  // path has to contain at least 3 nodes
+
   const pathLength = random.int(3, unionSize - 2)
   const pathValues = random.subset(workingUnion, pathLength)
 

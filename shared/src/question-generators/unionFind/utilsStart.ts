@@ -74,6 +74,7 @@ export function unionFindStartQuestion({
 
   let gapField: string
   let gapOperationValues: number[]
+  // For path compression, create artificial union states
   if (union instanceof WeightedQuickUnionPath && random.bool(0.8)) {
     const { gapField: _gapField, gapOperationValues: _gapOperationValues } = createChainedUnionState({
       random,

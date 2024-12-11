@@ -103,6 +103,9 @@ export abstract class UnionFind {
    */
   setStateArtificially(state: number[], reset: boolean = true) {
     if (reset) {
+      if (state.some((x) => x < 0 || x >= state.length)) {
+        throw new Error("Values inside union state have to be within [0...length-1]")
+      }
       this.idList = [state]
       this.szList = [this.computeSizes(state)]
     } else {

@@ -131,4 +131,14 @@ describe("Union Find - Set artificial union", () => {
     expect(union.find(13)[0]).toEqual(7)
     expect(union.getSzList()[0]).toEqual([1, 1, 3, 5, 2, 1, 1, 10, 2, 1, 1, 1, 1, 1])
   })
+
+  test("Set artificial - throws dimension error", () => {
+    const union = new WeightedQuickUnionPath(1)
+    expect(() => union.setStateArtificially([0, 1], false)).toThrowError()
+  })
+
+  test("Set artificial - throws value error", () => {
+    const union = new WeightedQuickUnionPath(2)
+    expect(() => union.setStateArtificially([0, 3], true)).toThrowError()
+  })
 })
