@@ -10,7 +10,7 @@ export abstract class UnionFind {
     this.szList = [Array.from({ length: n }).fill(1) as number[]]
   }
 
-  protected abstract _find(id: number[], i: number, sz: number[]): number
+  protected abstract _find(id: number[], i: number): number
   protected abstract _union(
     id: number[],
     i: number,
@@ -26,7 +26,7 @@ export abstract class UnionFind {
     this.checkValueRange([i])
     const values: number[] = []
     for (let k = 0; k < this.idList.length; k++) {
-      values.push(this._find(this.idList[k], i, this.szList[k]))
+      values.push(this._find(this.idList[k], i))
     }
     return values
   }
