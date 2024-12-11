@@ -1,20 +1,20 @@
 import { FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
-import { determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
-import { formatFeedback } from "@shared/question-generators/math/linearAlgebra/determinant/utils.ts"
+import { Determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
+import { getFeedback } from "@shared/question-generators/math/linearAlgebra/determinant/utils.ts"
 import {
   allRandomMatrix,
   randomStandardMatrix,
 } from "@shared/question-generators/math/linearAlgebra/generations/matrix.ts"
 import { matrixToTex } from "@shared/question-generators/math/linearAlgebra/tex.ts"
 import math from "@shared/utils/math.ts"
-import Random from "@shared/utils/random.ts"
+import Random, { PrecisionValues } from "@shared/utils/random.ts"
 import { t, Translations } from "@shared/utils/translations.ts"
 
 /**
  * Generates a question for the determinant topic variant rule.
- * The goal is to generate a question where the student has to calculate the determinant of a matrix,
- * given the determinant of another matrix and a rule that was applied to the matrix.
- * Applying the rule correctly, then calculating the new determinant should be easy
+ * The student has to calculate the determinant of a matrix, by applying a
+ * det rule correctly.
+ * Provides the determinant of another matrix as a hint.
  * @param random
  * @param lang
  * @param permalink
@@ -52,7 +52,7 @@ export function generateVariantsRulesDet({
 }
 
 /**
- * This generates a question where the student has to calculate the determinant of a matrix C,
+ * Generates a question where the student has to calculate the determinant of a matrix C,
  * given the matrices A and B and the rule C = A * B.
  * Rule: det(AB)=det(A)det(B)
  * @param random
@@ -72,38 +72,30 @@ function generateVariantMulDet({
   translations: Translations
 }) {
   const matrixSize = random.int(2, 3)
-  const matrixA = allRandomMatrix({
+  const matrixSettings = {
     random,
     max: 5,
     min: -5,
     rows: matrixSize,
     cols: matrixSize,
-    precision: matrixSize === 2 ? 0.5 : 1,
-  })
-  const matrixB = allRandomMatrix({
-    random,
-    max: 5,
-    min: -5,
-    rows: matrixSize,
-    cols: matrixSize,
-    precision: matrixSize === 2 ? 0.5 : 1,
-  })
+    precision: matrixSize === 2 ? 0.5 : (1 as PrecisionValues),
+  }
+  const matrixA = allRandomMatrix(matrixSettings)
+  const matrixB = allRandomMatrix(matrixSettings)
   const detSolution = math.det(matrixA) * math.det(matrixB)
 
   const defC = `C = A \\cdot B`
   const defA = `A = ${matrixToTex(matrixA, "r")}`
   const defB = `B = ${matrixToTex(matrixB, "r")}`
-  // create def A and def B in one line with a space in between
+  // create def A and def B in one line with a space between
   const defAMulB = `${defA} \\quad ${defB}`
 
-  const _ = formatFeedback(detSolution)
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
-    name: determinant.name(lang),
+    name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "mul", [defC, defAMulB]),
-    checkFormat: _.checkFormat,
-    feedback: _.feedback,
+    feedback: getFeedback(detSolution),
   }
   return {
     question,
@@ -111,10 +103,10 @@ function generateVariantMulDet({
 }
 
 /**
- * This generates a question where the student has to calculate the determinant of a matrix B,
+ * Generates a question where the student has to calculate the determinant of a matrix B,
  * given the matrix A and the rule B = A^-1.
  * Rule: det(A^-1) = 1/det(A)
- * (The solution is rounded to 2 decimal places)
+ * (Rounds the solution to 2 decimal places)
  * @param random
  * @param lang
  * @param permalink
@@ -132,9 +124,10 @@ function generateVariantInvDet({
   translations: Translations
 }) {
   const matrixSize = random.int(3, 4)
-  let matrixA: number[][]
+  let matrix: number[][]
+  // det A != 0 since otherwise 1 / det A not calculable
   do {
-    matrixA = allRandomMatrix({
+    matrix = allRandomMatrix({
       random,
       max: 3,
       min: -3,
@@ -142,20 +135,18 @@ function generateVariantInvDet({
       cols: matrixSize,
       precision: matrixSize === 3 ? 0.5 : 1,
     })
-  } while (math.det(matrixA) === 0)
-  const detSolution = math.round(1 / math.det(matrixA), 2)
+  } while (math.det(matrix) === 0)
+  const detSolution = math.round(1 / math.det(matrix), 2)
 
-  const defA = `A = ${matrixToTex(matrixA, "r")}`
+  const defA = `A = ${matrixToTex(matrix, "r")}`
 
-  const _ = formatFeedback(detSolution)
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
-    name: determinant.name(lang),
+    name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "inv", [defA]),
     bottomText: t(translations, lang, "invBottom"),
-    checkFormat: _.checkFormat,
-    feedback: _.feedback,
+    feedback: getFeedback(detSolution),
   }
   return {
     question,
@@ -163,7 +154,7 @@ function generateVariantInvDet({
 }
 
 /**
- * This generates a question where the student has to calculate the determinant of a matrix B,
+ * Generates a question where the student has to calculate the determinant of a matrix B,
  * given the matrix A and the rule B = A^T.
  * Rule: det(A^T) = det(A)
  * @param random
@@ -192,14 +183,12 @@ function generateVariantTransDet({
 
   const defAB = `A = ${matrixToTex(matrixA, "r")} \\quad B = ${matrixToTex(math.transpose(matrixA), "r")}`
 
-  const _ = formatFeedback(detSolution)
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
-    name: determinant.name(lang),
+    name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "rowManipulation", [defAB, detSolution.toString()]),
-    checkFormat: _.checkFormat,
-    feedback: _.feedback,
+    feedback: getFeedback(detSolution),
   }
   return {
     question,
@@ -207,7 +196,7 @@ function generateVariantTransDet({
 }
 
 /**
- * This generates a question where the student has to calculate the determinant of a matrix B,
+ * Generates a question where the student has to calculate the determinant of a matrix B,
  * given the matrix A and the rule B = A with a row swap.
  * Rule: det(B) = -det(A)
  * @param random
@@ -240,18 +229,16 @@ function generateVariantRowSwapDet({
   } while (i === j)
   const swappedMatrix = math.matrix(matrix).swapRows(i, j).toArray() as number[][]
   const detSolution = math.det(matrix)
-  const detSwapped = math.det(swappedMatrix) // should be detSolution * -1
+  const detSwapped = math.det(swappedMatrix) // should be detSolution *–1
 
   const defAB = `A = ${matrixToTex(matrix, "r")} \\quad B = ${matrixToTex(swappedMatrix, "r")}`
 
-  const _ = formatFeedback(detSolution)
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
-    name: determinant.name(lang),
+    name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "rowManipulation", [defAB, detSwapped.toString()]),
-    checkFormat: _.checkFormat,
-    feedback: _.feedback,
+    feedback: getFeedback(detSolution),
   }
   return {
     question,
@@ -259,7 +246,7 @@ function generateVariantRowSwapDet({
 }
 
 /**
- * This generates a question where the student has to calculate the determinant of a matrix B,
+ * Generates a question where the student has to calculate the determinant of a matrix B,
  * given the matrix A and the rule B = A with a row multiplication.
  * Rule: det(B) = k * det(A)
  * @param random
@@ -286,10 +273,7 @@ function generateVariantRowMulDet({
   })
 
   const i = random.int(0, matrixSize - 1)
-  let k
-  do {
-    k = random.int(-5, 5)
-  } while (k === 0 || k === 1)
+  const k = random.choice([-4, -3, -2, -1, 2, 3, 4, 5])
 
   // multiply each value in row i with k
   const matrixRowMul = math
@@ -306,14 +290,12 @@ function generateVariantRowMulDet({
 
   const defAB = `A = ${matrixToTex(matrix, "r")} \\quad B = ${matrixToTex(matrixRowMul, "r")}`
 
-  const _ = formatFeedback(detSolution)
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
-    name: determinant.name(lang),
+    name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "rowManipulation", [defAB, detRowMul.toString()]),
-    checkFormat: _.checkFormat,
-    feedback: _.feedback,
+    feedback: getFeedback(detSolution),
   }
   return {
     question,
@@ -321,7 +303,7 @@ function generateVariantRowMulDet({
 }
 
 /**
- * This generates a question where the student has to calculate the determinant of a matrix B,
+ * Generates a question where the student has to calculate the determinant of a matrix B,
  * given the matrix A and the rule B = A with a k*row addition.
  * Rule: det(B) = det(A)
  * @param random
@@ -352,10 +334,7 @@ function generateVariantRowAddDet({
   do {
     j = random.int(0, matrixSize - 1)
   } while (i === j)
-  let k
-  do {
-    k = random.int(-5, 5)
-  } while (k === 0 || k === 1)
+  const k = random.choice([-4, -3, -2, -1, 2, 3, 4, 5])
 
   // add row j to row i multiplied by k
   const matrixAdd = math
@@ -372,14 +351,12 @@ function generateVariantRowAddDet({
 
   const defAB = `A = ${matrixToTex(matrixAdd, "r")} \\quad B = ${matrixToTex(matrixHelper, "r")}`
 
-  const _ = formatFeedback(detSolution)
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
-    name: determinant.name(lang),
+    name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "rowManipulation", [defAB, detHelper.toString()]),
-    checkFormat: _.checkFormat,
-    feedback: _.feedback,
+    feedback: getFeedback(detSolution),
   }
   return {
     question,

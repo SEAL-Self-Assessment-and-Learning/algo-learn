@@ -1,13 +1,7 @@
-import { FreeTextFeedbackFunction, FreeTextFormatFunction } from "@shared/api/QuestionGenerator.ts"
+import { FreeTextFeedbackFunction } from "@shared/api/QuestionGenerator.ts"
 
-export function formatFeedback(detSolution: number) {
-  const checkFormat: FreeTextFormatFunction = ({ text }) => {
-    if (text.trim() === "") return { valid: false }
-    // the determinant should be a number, but we allow all inputs
-    // to make it more difficult
-    return { valid: true, message: "" }
-  }
-  const feedback: FreeTextFeedbackFunction = ({ text }) => {
+export function getFeedback(detSolution: number): FreeTextFeedbackFunction {
+  return ({ text }) => {
     // remove all whitespaces
     text = text.replace(/\s/g, "")
 
@@ -23,6 +17,4 @@ export function formatFeedback(detSolution: number) {
       }
     }
   }
-
-  return { checkFormat, feedback }
 }

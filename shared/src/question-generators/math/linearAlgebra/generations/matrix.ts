@@ -68,6 +68,10 @@ export function allRandomMatrix({
   }
 }
 
+/**
+ * Returns the identity matrix
+ * @param size - matrix will be size x size
+ */
 export function identityMatrix(size: number): number[][] {
   return Array.from({ length: size }, (_, i) => {
     return Array.from({ length: size }, (_, j) => (i === j ? 1 : 0))
@@ -75,7 +79,7 @@ export function identityMatrix(size: number): number[][] {
 }
 
 /**
- * Generate a random standard matrix with the given parameters
+ * Generate a random matrix with the given parameters
  * @param random
  * @param rows - number of rows
  * @param cols - number of cols
@@ -232,9 +236,7 @@ export function generateUpperLeftTriangleMatrix({
  * This generates a random matrix, where its easy to compute the determinant
  * using the cofactor expansion method.
  *
- * Improvement ideas:
- * - allow a manipulated row/col with two non-zero values
- * - add precision parameter
+ * Todo: Improve this to be more random and less deterministic
  *
  * @param random
  * @param size - size of the square matrix
@@ -288,34 +290,41 @@ export function generateGoodCofactorMatrix({
   return matrix
 }
 
-// Helper function to zero out values in rows or columns
+/**
+ * In-Place helper function to zero out values in rows or columns
+ * @param matrix
+ * @param rowIndex - index in row that shouldn't be changed
+ * @param colIndex - index in col that shouldn't be changed
+ * @param target - zero out all values in col or row
+ * @param value - value to be at the specified location
+ */
 function zeroOutExceptIndex(
   matrix: number[][],
-  row: number,
-  col: number,
+  rowIndex: number,
+  colIndex: number,
   target: "row" | "col",
   value: number,
 ) {
   if (target === "row") {
     for (let j = 0; j < matrix.length; j++) {
-      matrix[row][j] = j === col ? value : 0
+      matrix[rowIndex][j] = j === colIndex ? value : 0
     }
   } else {
     for (let i = 0; i < matrix.length; i++) {
-      matrix[i][col] = i === row ? value : 0
+      matrix[i][colIndex] = i === rowIndex ? value : 0
     }
   }
 }
 
 /**
- * This function generates a matrix A given a vector x and b
+ * Generates a matrix A given a vector x and b
  * such that **Ax = b**.
  *
- * The b vector is adjusted to match the condition
+ * The b vector adjusts to match the condition
  * (such that more user-friendly values are possible)
  *
- * Given [min, max], the matrix values may be greater/smaller to satisfy the condition
- * Also b may be outside the range of [min, max]
+ * Given [min, max], the matrix values may be greater/smaller to satisfy the condition.
+ * B may be outside the range of [min, max] too.
  *
  * @param random
  * @param x - vector x
@@ -346,10 +355,12 @@ export function generateAforAxEqualsB({
   const updatedB: number[] = []
 
   for (let k = 0; k < n; k++) {
+    // initialize a with random values within [min, max]
     const a = Array.from({ length: n }, () => random.floatPrecision(min, max, precision))
 
-    // Adjust 'a' until it satisfies the condition for b[k]
+    // Adjust 'a' until it satisfies the condition a*x approx b[k]
     while (math.dot(x, a) > b[k] + minPositiveX || math.dot(x, a) < b[k] - minPositiveX) {
+      // goal is to find a such that this is 0
       const currentDistance = math.dot(x, a) - b[k]
 
       // Adjust 'a' by changing the component corresponding to the largest absolute value in x

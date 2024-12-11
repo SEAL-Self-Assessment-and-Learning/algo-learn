@@ -1,6 +1,6 @@
 import { FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
-import { determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
-import { formatFeedback } from "@shared/question-generators/math/linearAlgebra/determinant/utils.ts"
+import { Determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
+import { getFeedback } from "@shared/question-generators/math/linearAlgebra/determinant/utils.ts"
 import { randomStandardMatrix } from "@shared/question-generators/math/linearAlgebra/generations/matrix.ts"
 import { matrixToTex } from "@shared/question-generators/math/linearAlgebra/tex.ts"
 import math from "@shared/utils/math.ts"
@@ -37,16 +37,13 @@ export function generateVariantDeepDet({
   })
   const detSolution = math.det(matrix)
 
-  const _ = formatFeedback(detSolution)
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
-    name: determinant.name(lang),
+    name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "text", [matrixToTex(matrix, "r")]),
-    checkFormat: _.checkFormat,
-    feedback: _.feedback,
+    feedback: getFeedback(detSolution),
   }
-
   return {
     question,
   }

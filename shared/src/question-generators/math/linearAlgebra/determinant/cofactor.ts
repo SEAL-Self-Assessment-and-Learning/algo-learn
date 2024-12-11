@@ -1,6 +1,6 @@
 import { FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
-import { determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
-import { formatFeedback } from "@shared/question-generators/math/linearAlgebra/determinant/utils.ts"
+import { Determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
+import { getFeedback } from "@shared/question-generators/math/linearAlgebra/determinant/utils.ts"
 import {
   generateGoodCofactorMatrix,
   generateLowerLeftTriangleMatrix,
@@ -13,7 +13,7 @@ import { t, Translations } from "@shared/utils/translations.ts"
 
 /**
  * Generates a question about the determinant of a matrix using the cofactor expansion.
- * The matrix is generated randomly of 5x5 or 6x6 only using integer values [-10,10]
+ * The matrix is 5x5 or 6x6 int values in [-5,5]
  * @param random
  * @param lang
  * @param permalink
@@ -30,13 +30,13 @@ export function generateVariantCofactorDet({
   permalink: string
   translations: Translations
 }) {
-  let matrix: number[][]
-  const matrixSize = random.int(5, 6)
   const matrixType = random.weightedChoice([
     ["standard", 0.7],
     ["upperRightTriangle", 0.15],
     ["lowerLeftTriangle", 0.15],
   ])
+  const matrixSize = random.int(5, 6)
+  let matrix: number[][]
   if (matrixType === "standard") {
     matrix = generateGoodCofactorMatrix({ random, size: matrixSize, min: -5, max: 5 })
   } else if (matrixType === "upperRightTriangle") {
@@ -47,14 +47,12 @@ export function generateVariantCofactorDet({
 
   const detSolution = math.det(matrix)
 
-  const _ = formatFeedback(detSolution)
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
-    name: determinant.name(lang),
+    name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "text", [matrixToTex(matrix, "r")]),
-    checkFormat: _.checkFormat,
-    feedback: _.feedback,
+    feedback: getFeedback(detSolution),
   }
 
   return {

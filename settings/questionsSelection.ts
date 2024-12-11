@@ -14,8 +14,8 @@ import { HeapOperations } from "@shared/question-generators/heap/generatorOperat
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { CRT } from "@shared/question-generators/math/crt"
-import { axb } from "@shared/question-generators/math/linearAlgebra/axb/axbGen.ts"
-import { determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
+import { AxbGenerator } from "@shared/question-generators/math/linearAlgebra/axb/axbGen.ts"
+import { Determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
 import { modFactor } from "@shared/question-generators/math/modFactorization"
 import { ModTricks } from "@shared/question-generators/math/modTricks"
 import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
@@ -88,7 +88,7 @@ export const collection: QuestionCollection = [
   {
     slug: "matrix",
     name: { de: "Matrix", en: "Matrix" },
-    contents: [determinant, axb],
+    contents: [Determinant, AxbGenerator],
   },
 ]
 

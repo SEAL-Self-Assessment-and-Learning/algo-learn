@@ -46,7 +46,7 @@ const translations: Translations = {
   },
 }
 
-export const determinant: QuestionGenerator = {
+export const Determinant: QuestionGenerator = {
   id: "ladet",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
@@ -60,23 +60,22 @@ export const determinant: QuestionGenerator = {
   ],
 
   /**
-   * Generate a question to ask the user to compute the determinant of a matrix.
+   * Generates a question to ask the user to compute the determinant of a matrix.
    *
    * Four different variants are available:
    * - "start": A simple question to start with max 2x2 or 3x3 matrices (only integer values)
    * - "deep": A question with a 3x3 (integer and 0.5 values) or 4x4 matrix (integer values)
    * - "cofactor": A question with a 5x5 or 6x6 matrix (integer values)
-   * - "rules": A question with a 2x2 or 3x3 matrix (integer values) and a rule to apply
-   *            (knowing the rule, the determinant can be computed easily)
+   * - "rules": A question with a kxk (k [2,3,4]) matrix (integer values) and a rule to apply
+   *            (knowing the rule, the determinant can be computed)
    *
    * @param lang
    * @param parameters
    * @param seed
    */
   generate: (lang, parameters, seed) => {
-    // first create a permalink for the question
     const permalink = serializeGeneratorCall({
-      generator: determinant,
+      generator: Determinant,
       lang,
       parameters,
       seed,
