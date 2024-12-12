@@ -920,7 +920,7 @@ export function compareExpressions(expressions: SyntaxTreeNodeType[]): boolean {
 }
 
 /**
- * Checks if no two expressions are equivalent inside a list of expressions
+ * Checks if no two expressions in a list are equivalent.
  * @param expressions
  */
 export function expressionsDifferent(expressions: SyntaxTreeNodeType[]): boolean {
