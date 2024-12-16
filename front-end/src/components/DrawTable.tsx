@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef } from "react"
+import { ReactElement } from "react"
 import { Markdown } from "@/components/Markdown"
 
 /**
@@ -22,192 +22,84 @@ import { Markdown } from "@/components/Markdown"
 export function DrawTable({
   table,
 }: {
-  table: { header: string[]; content: string[][]; alignment: string[]; extraFeature: string }
+  table: {
+    content: string[][]
+    format: { header: boolean; vLines: number[]; hLines: number[]; alignment: string[] }
+  }
 }): ReactElement {
-  let parsedHeader = table.header
-  let parsedContent = table.content
-  const parsedAlignment = table.alignment
-  let extraFeature = table.extraFeature
+  const borderStyleStatic = "border-black dark:border-white"
+  const vLineStyle = `${borderStyleStatic} border-l-2`
+  const hLineStyle = `${borderStyleStatic} border-b-2`
+  const rowStyleStatic =
+    table.content.length - (table.format.header ? 1 : 0) >= 5
+      ? "even:bg-gray-100 dark:even:bg-gray-700"
+      : ""
 
-  const extraFeatureList = extraFeature.split("?")
-
-  // TODO add the tf feature
-  // transpose the table
-  if (extraFeatureList.includes("td")) {
-    parsedContent = transposeTable(parsedHeader, parsedContent).newContent
-    parsedHeader = []
+  const tHead: ReactElement[] = []
+  if (table.format.header) {
+    table.content[0].forEach((cell, i) => {
+      tHead.push(
+        <th className={table.format.vLines.includes(i) ? vLineStyle : ""}>
+          <Markdown md={cell} />
+        </th>,
+      )
+    })
   }
 
-  // split the table into two tables
-  if (extraFeatureList.includes("sd")) {
-    if (extraFeature.indexOf("sd") !== -1) {
-      extraFeature = extraFeature.replace("sd", "")
-    }
+  const tBody = []
+  for (let i = table.format.header ? 1 : 0; i < table.content.length; i++) {
+    const tRow: ReactElement[] = []
+    table.content[i].forEach((cell, col) => {
+      tRow.push(
+        <td
+          className={`px-4 py-2 align-middle text-${table.format.alignment[col]} ${table.format.vLines.includes(col) ? vLineStyle : ""}`}
+        >
+          <Markdown md={cell} />
+        </td>,
+      )
+    })
 
-    if (extraFeature.includes("td")) {
-      extraFeature = extraFeature.replace("td", "")
-    }
-
-    const half = Math.ceil(parsedHeader.length > 0 ? parsedHeader.length : parsedContent[0].length / 2)
-    const headerFirst = parsedHeader.slice(0, half)
-    const headerSecond = parsedHeader.slice(half)
-    // for every line in content split this line in half
-    const contentFirst = []
-    const contentSecond = []
-    for (let i = 0; i < parsedContent.length; i++) {
-      const line = parsedContent[i]
-      contentFirst.push(line.slice(0, half))
-      contentSecond.push(line.slice(half))
-    }
-
-    return (
-      <div>
-        <div className={`mb-2`}>
-          {DrawTable({
-            table: {
-              header: headerFirst,
-              content: contentFirst,
-              alignment: parsedAlignment,
-              extraFeature,
-            },
-          })}
-        </div>
-        {DrawTable({
-          table: {
-            header: headerSecond,
-            content: contentSecond,
-            alignment: parsedAlignment,
-            extraFeature,
-          },
-        })}
-      </div>
-    )
-  }
-
-  let borderStyle = "border"
-  let cellVerticalAlign = "align-"
-  let cellHorizontalAlign = "text-"
-
-  // create the value for the header
-  extraFeatureList.map((feature) => {
-    if (feature.startsWith("border_")) {
-      borderStyle = feature.split("_")[1]
-    }
-    if (feature.startsWith("av")) {
-      cellVerticalAlign = feature.split("_")[1]
-    }
-    if (feature.startsWith("ah")) {
-      cellHorizontalAlign += feature.split("_")[1]
-    }
-  })
-
-  if (cellVerticalAlign === "align-") {
-    cellVerticalAlign = "align-top"
-  }
-
-  const tableHeader = []
-
-  // this effect is used to add the copy event to the table
-  // it prevents copying the value with the default \t and instead with space
-  const tableRef = useRef<HTMLDivElement>(null) // Specify the type of element the ref will hold
-  useEffect(() => {
-    const tableElement = tableRef.current
-    if (!tableElement) return // Check if tableEl is not null
-
-    const handleCopy = (event: ClipboardEvent) => {
-      event.preventDefault()
-      const selection = document.getSelection()
-      if (!selection) return
-
-      const selectedText = selection.toString().replace(/\t/g, " ")
-      event.clipboardData!.setData("text/plain", selectedText)
-    }
-
-    // Type assertion to ensure tableEl is treated as an HTMLElement
-    tableElement.addEventListener("copy", handleCopy)
-    return () => {
-      tableElement.removeEventListener("copy", handleCopy)
-    }
-  }, [])
-
-  tableHeader.push(
-    <tr key={`row-0`}>
-      {parsedHeader.map((md, j) => (
-        <th key={`cell-${0}-${j}`} className={`${borderStyle} p-2`}>
-          <Markdown md={md} />
-        </th>
-      ))}
-    </tr>,
-  )
-
-  const tableContent = []
-  for (let i = 0; i < parsedContent.length; i++) {
-    tableContent.push(
-      <tr key={`row-${i}`}>
-        {parsedContent[i].map((md, j) => (
-          <td
-            key={`cell-${i}-${j}`}
-            className={`${borderStyle} p-2 text-${parsedAlignment[j]} ${cellVerticalAlign} ${cellHorizontalAlign}`}
-          >
-            <Markdown md={md} />
-          </td>
-        ))}
+    tBody.push(
+      <tr className={`${rowStyleStatic} ${table.format.hLines.includes(i) ? hLineStyle : ""}`}>
+        {tRow}
       </tr>,
     )
   }
 
-  let tableClass = ""
-  extraFeatureList.forEach((feature) => {
-    if (feature.startsWith("table_")) {
-      tableClass = feature.split("_")[1]
-    }
-  })
-
-  const tableReturnValue = (
-    <div ref={tableRef}>
-      <table className={tableClass}>
-        <thead>{tableHeader}</thead>
-        <tbody>{tableContent}</tbody>
-      </table>
-    </div>
+  return (
+    <table className="m-5 w-auto justify-self-center">
+      {table.format.header ? (
+        <thead>
+          <tr>{tHead}</tr>
+        </thead>
+      ) : null}
+      <tbody>{tBody}</tbody>
+    </table>
   )
-
-  let divClass = ""
-  extraFeatureList.forEach((feature) => {
-    if (feature.startsWith("div_")) {
-      divClass = feature.split("_")[1]
-    }
-  })
-
-  if (extraFeature.includes("div_")) {
-    return <div className={divClass}>{tableReturnValue}</div>
-  } else {
-    return tableReturnValue
-  }
 }
-
-function transposeTable(parsedHeader: string[], parsedContent: string[][]) {
-  const newContent: string[][] = []
-  // the header needs to be on the left too,
-  // so we add the header (if exists) to the first column of the content
-  // and surround each string with **
-  if (parsedHeader.length > 0) {
-    for (let i = 0; i < parsedHeader.length; i++) {
-      if (i >= newContent.length) {
-        newContent.push([`**${parsedHeader[i]}**`])
-      } else {
-        newContent[i].push(`**${parsedHeader[i]}**`)
-      }
-    }
-  }
-  // then we add the content to the newContent
-  for (let i = 0; i < parsedContent.length; i++) {
-    for (let j = 0; j < parsedContent[i].length; j++) {
-      if (j + 1 > newContent.length) {
-        newContent.push([])
-      }
-      newContent[j].push(parsedContent[i][j])
-    }
-  }
-  return { newContent }
-}
+//
+// function transposeTable(parsedHeader: string[], parsedContent: string[][]) {
+//   const newContent: string[][] = []
+//   // the header needs to be on the left too,
+//   // so we add the header (if exists) to the first column of the content
+//   // and surround each string with **
+//   if (parsedHeader.length > 0) {
+//     for (let i = 0; i < parsedHeader.length; i++) {
+//       if (i >= newContent.length) {
+//         newContent.push([`**${parsedHeader[i]}**`])
+//       } else {
+//         newContent[i].push(`**${parsedHeader[i]}**`)
+//       }
+//     }
+//   }
+//   // then we add the content to the newContent
+//   for (let i = 0; i < parsedContent.length; i++) {
+//     for (let j = 0; j < parsedContent[i].length; j++) {
+//       if (j + 1 > newContent.length) {
+//         newContent.push([])
+//       }
+//       newContent[j].push(parsedContent[i][j])
+//     }
+//   }
+//   return { newContent }
+// }

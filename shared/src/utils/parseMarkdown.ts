@@ -11,10 +11,10 @@ export const dollarRegex = /\$([^$]+)\$/
 export const boldRegex = /\*\*([^*]+)\*\*/
 export const italicRegex = /\*([^*]+)\*/
 export const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/
-export const tableRegex = /^(\|(?:[^\r\n|]*\|?)+(\r?\n\|(?:[^\r\n|]*\|?)+)*)/m
+export const tableRegex = /^(\|(?:[^\r\n|]*\|)+(?:\r?\n\|(?:[^\r\n|]*\|)+)*)/m
 export const inputRegex = /\{\{(.*?#.*?)\}\}/ // match at least on # to be an input
 export const listRegex = /^((?:\s*-\s[^*].*(\r?\n|$))+)/m
-// TODO check the regexes for the table and list again
+// TODO check the regexes for the list again
 
 /**
  * The parser converts the markdown string to a ParseTree object defined as
@@ -30,7 +30,10 @@ export type ParseTreeNode =
   | { kind: "a"; child: ParseTree; url: string }
   | {
       kind: "table"
-      child: { header: string[]; content: string[][]; alignment: string[]; extraFeature: string }
+      child: {
+        content: string[][]
+        format: { header: boolean; vLines: number[]; hLines: number[]; alignment: string[] }
+      }
     }
   | { kind: "input"; child: string }
   | { kind: "list"; child: ListItem[] }
@@ -118,145 +121,66 @@ export function parseMarkdown(md: string): ParseTree {
 }
 
 /**
- * The parseMarkdown function parses markdown-like text into arrays of content
- *
+ * Parses a markdown-like table.
+ * Supports the default Markdown table syntax and extends it the following way:
+ * - A header line can be indicated by having it followed by a line like `|====|====|`.
+ * - Lines like `|----|----|` indicate horizontal subdivisions of the tables
+ * - The frist horizontal line indicator (`|====|====|` or `|----|----|`) also supports `!` on
+ *    either side of `|` to indicate a visual vertical subdivision of the table.
+ * Example:
+ * | A | B | C |
+ * |===:|!:===:|===|
+ * | a1 | b1 | c1 |
+ * | a2 | b2 | c2 |
+ * |---|---|---|
+ * | a3 | b3 | c3 |
+ * The table has a table head, the first column is justified right, the second column is centered.
+ * There is A visual subdivision between the first and second column as well as between the second and third row.
  * @param table The markdown-like text to parse
  * @returns Header, content and alignment of the table, can also add extra Feature (not md specific) see below
  */
 export function parseTable(table: string) {
-  const rows = table.split("\n")
-  const header: string[] = []
+  const formattingRegex = /^\|(?:(?:[:!]*=+[:!]*\|)+|(?:[:!]*-+[:!]*\|)+)$/
+  const rows = table.split(/\r?\n/)
   const content: string[][] = []
-  const alignment: string[] = []
-  let extraFeature: string = ""
+  // let extraFeature: string = ""
+  const format: { header: boolean; vLines: number[]; hLines: number[]; alignment: string[] } = {
+    header: false,
+    vLines: [],
+    hLines: [],
+    alignment: [],
+  }
 
   // regex expression for extra features
-  const regexExtraFeatures: { [key: string]: RegExp } = {
-    hashtag: /^#.*#$/,
+  // const regexExtraFeatures: { [key: string]: RegExp } = {
+  //   hashtag: /^#.*#$/,
+  // }
+
+  if (formattingRegex.test(rows[1])) {
+    format.header = rows[1].includes("=")
+    const cellsOfRow = rows[1].split("|").slice(1, -1)
+    cellsOfRow.forEach((cell, i) => {
+      const [left, right] = cell.split(/[-=]+/)
+      if (left.includes("!")) format.vLines.push(i)
+      if (right.includes("!")) format.vLines.push(i + 1)
+      const alignment = (left.includes(":") ? 1 : 0) + (right.includes(":") ? 2 : 0)
+      if (alignment === 2) format.alignment.push("right")
+      else if (alignment === 3) format.alignment.push("center")
+      else format.alignment.push("left")
+    })
   }
 
-  let matchedHeader = -1
-  let separator: string[] = []
-  for (let j = 1; j >= 0; j--) {
-    separator = rows[j].split("|")
-    const headerPattern = /[ -]*-{3,}[ -]*/
-
-    for (let i = 0; i < separator.length; i++) {
-      if (separator[i] === "") {
-        if (i === 0 || i === separator.length - 1) {
-          continue
-        }
-        break
-      }
-      if (separator[i].startsWith(":") && separator[i].endsWith(":")) {
-        if (headerPattern.test(separator[i].slice(1, separator[i].length - 1))) {
-          alignment.push("center")
-        } else {
-          matchedHeader = -1
-          break
-        }
-      } else if (separator[i].startsWith(":")) {
-        if (headerPattern.test(separator[i].slice(1))) {
-          alignment.push("left")
-        } else {
-          matchedHeader = -1
-          break
-        }
-      } else if (separator[i].endsWith(":")) {
-        if (headerPattern.test(separator[i].slice(0, separator[i].length - 1))) {
-          alignment.push("right")
-        } else {
-          matchedHeader = -1
-          break
-        }
-      } else {
-        if (headerPattern.test(separator[i])) {
-          alignment.push("left")
-        } else {
-          matchedHeader = -1
-          break
-        }
-      }
-      matchedHeader = j
-      break
-    }
-    if (matchedHeader !== -1) break
-  }
-
-  if (matchedHeader === 1) {
-    const headerLine = rows[0].split("|")
-    if (headerLine.length !== separator.length) {
-      throw new Error("Header and content have different length. It's not possible to create a table.")
-    }
-    // add the content of the header to the header array
-    for (let i = 0; i < separator.length; i++) {
-      if (headerLine[i] !== "") {
-        header.push(headerLine[i].trim())
-      }
-    }
-  } else {
-    // reset the alignment for all to l
-    alignment.length = 0
-    for (let i = 0; i < separator.length; i++) {
-      alignment.push("left")
-    }
-  }
-
-  const startIndex = matchedHeader + 1
-  let maxLineLength = 0
-  for (let i = startIndex; i < rows.length; i++) {
-    const contentSplit = rows[i].split("|")
-    let contentRow: string[] = []
-    for (let j = 0; j < contentSplit.length; j++) {
-      let regexMatch = false
-      // check for an extra feature
-      for (const key in regexExtraFeatures) {
-        if (regexExtraFeatures[key].test(contentSplit[j])) {
-          if (key == "hashtag") {
-            // replace all #
-            extraFeature = contentSplit[j].replace(/#/g, "")
-          }
-          regexMatch = true
-          break
-        }
-      }
-
-      if (regexMatch) break
-      if (contentSplit[j] === "") {
-        if (j === 0 || j === contentSplit.length - 1) {
-          continue
-        }
-      }
-      contentRow.push(contentSplit[j].trim())
-    }
-    if (contentRow.length === 0) {
-      continue
-    }
-    if (contentRow.length < header.length && contentRow.length !== 0) {
-      for (let k = contentRow.length; k < header.length; k++) {
-        contentRow.push("")
-      }
-    } else if (contentRow.length > header.length) {
-      if (matchedHeader === 1) contentRow = contentRow.slice(0, header.length)
-    }
-    if (contentRow.length > maxLineLength) maxLineLength = contentRow.length
-    content.push(contentRow)
-  }
-
-  // if no matched header was found, all columns need to have the same length
-  if (matchedHeader !== -1) {
-    for (let i = 0; i < content.length; i++) {
-      while (content[i].length !== maxLineLength) {
-        content[i].push("")
-      }
+  for (let i = 0; i < rows.length; i++) {
+    if (formattingRegex.test(rows[i])) {
+      format.hLines.push(content.length - 1)
+    } else {
+      content.push(rows[i].split("|").slice(1, -1))
     }
   }
 
   return {
-    header,
     content,
-    alignment,
-    extraFeature,
+    format,
   }
 }
 

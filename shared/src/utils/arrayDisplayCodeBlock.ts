@@ -60,24 +60,24 @@ export function createArrayDisplayCodeBlockUserInput({
  * @param startingIndex
  * @param secondRowName
  */
-export function createArrayDisplayCodeBlock<T>({
+export function createArrayDisplayCodeBlock({
   array,
   startingIndex = 0,
   secondRowName = { de: "Wert", en: "Value" },
 }: {
-  array: T[]
+  array: any[]
   startingIndex?: number
   secondRowName?: SingleTranslation
 }): string {
-  const parseArrayBlock: ArrayDisplayProps<T> = {
-    array,
-    startingIndex,
-    secondRowName,
+  // todo translations
+  let indexRow = "\n| **Index** |"
+  let formattingRow = "|:---!|"
+  let dataRow = `| **${secondRowName.en}** |`
+  for (let i = 0; i < array.length; i++) {
+    indexRow += ` ${startingIndex + i} |`
+    formattingRow += ":---:|"
+    dataRow += ` ${array[i]} |`
   }
 
-  return `
-\`\`\`array
-${JSON.stringify(parseArrayBlock)}
-\`\`\`
-  `
+  return `${indexRow}\n${formattingRow}\n${dataRow}`
 }
