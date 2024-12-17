@@ -1,3 +1,4 @@
+import { Language } from "@shared/api/Language.ts"
 import {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextQuestion,
@@ -66,12 +67,14 @@ export const QuickFindGenerator: QuestionGenerator = {
 
     const { gapField, gapOperationValues } = unionCaseGeneration({
       random,
+      lang,
       union,
       unionSize,
     })
 
     const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
       numberOfInputFields: union.getArray().length,
+      lang,
     })
 
     const question: MultiFreeTextQuestion = {
@@ -89,7 +92,7 @@ export const QuickFindGenerator: QuestionGenerator = {
         gapOperationValues[1].toString(),
         arrayDisplayBlock,
       ]),
-      feedback: getFeedbackFunction(union),
+      feedback: getFeedbackFunction(union, lang),
     }
 
     return {
@@ -102,8 +105,9 @@ export const QuickFindGenerator: QuestionGenerator = {
  * Returns a simple feedback function to check if the user input is the same as
  * the solution union
  * @param solutionUnion - correct calculated union
+ * @param lang
  */
-function getFeedbackFunction(solutionUnion: QuickFind): MultiFreeTextFeedbackFunction {
+function getFeedbackFunction(solutionUnion: QuickFind, lang: Language): MultiFreeTextFeedbackFunction {
   // fieldIds form input-x x \in [0,1,2,3...]
   return ({ text }) => {
     const solutionArray = solutionUnion.getArray()
@@ -114,6 +118,7 @@ function getFeedbackFunction(solutionUnion: QuickFind): MultiFreeTextFeedbackFun
           correct: false,
           correctAnswer: createArrayDisplayCodeBlock({
             array: solutionArray,
+            lang,
           }),
         }
       }

@@ -67,7 +67,7 @@ export function DrawTable({
   }
 
   return (
-    <table className="m-5 w-auto justify-self-center">
+    <table className="m-5 w-auto border-collapse justify-self-center">
       {table.format.header ? (
         <thead>
           <tr>{tHead}</tr>

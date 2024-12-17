@@ -88,6 +88,7 @@ export function generateQueueStartElements({
     }
     queueInformationElements += createArrayDisplayCodeBlock({
       array: startElements,
+      lang,
     })
   }
 

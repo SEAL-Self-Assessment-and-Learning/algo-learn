@@ -80,6 +80,7 @@ export function generateStackStartElements({
     }
     stackElementsString += createArrayDisplayCodeBlock({
       array: stackElementsValues,
+      lang,
     })
   }
 
