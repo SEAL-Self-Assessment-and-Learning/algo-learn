@@ -35,7 +35,10 @@ export function DrawTable({
   if (table.format.header) {
     table.content[0].forEach((cell, i) => {
       tHead.push(
-        <th className={table.format.vLines.includes(i) ? vLineStyle : ""}>
+        <th
+          key={i}
+          className={`${table.format.vLines.includes(i) ? vLineStyle : ""} ${i === table.content[0].length - 1 ? "rounded-tr-md" : ""} ${i === 0 ? "rounded-tl-md" : ""} py-2`}
+        >
           <Markdown md={cell} />
         </th>,
       )
@@ -48,7 +51,8 @@ export function DrawTable({
     table.content[i].forEach((cell, col) => {
       tRow.push(
         <td
-          className={`px-4 py-2 align-middle text-${table.format.alignment[col]} ${table.format.vLines.includes(col) ? vLineStyle : ""}`}
+          key={col}
+          className={`px-4 py-2 align-middle text-${table.format.alignment[col]} ${table.format.vLines.includes(col) ? vLineStyle : ""} ${i !== 1 ? (col === 0 ? "rounded-l-sm" : col === table.content[i].length - 1 ? "rounded-r-sm" : "") : ""} ${i === 1 ? (col === 0 ? "rounded-bl-sm" : col === table.content[i].length - 1 ? "rounded-br-sm" : "") : ""}`}
         >
           <Markdown md={cell} />
         </td>,
@@ -56,7 +60,7 @@ export function DrawTable({
     })
 
     tBody.push(
-      <tr className={`${rowStyleStatic} ${table.format.hLines.includes(i) ? hLineStyle : ""}`}>
+      <tr key={i} className={`${rowStyleStatic} ${table.format.hLines.includes(i) ? hLineStyle : ""}`}>
         {tRow}
       </tr>,
     )
