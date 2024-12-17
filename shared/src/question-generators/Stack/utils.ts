@@ -103,7 +103,7 @@ export function createStackInputFields({
   lang: "en" | "de"
 }) {
   // Example input field {{test#NL#**Char: **##overlay}}
-  let inputText = `\n| Operation | ${t(translations, lang, "result")} |\n|---|:---:|\n`
+  let inputText = `\n| Operation | ${t(translations, lang, "result")} |\n|===|:===:|\n`
   const solutionDisplay: string[] = []
   let solutionIndex = 0
   const correctAnswers: { [key: string]: string } = {}

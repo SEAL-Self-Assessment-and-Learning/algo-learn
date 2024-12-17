@@ -5,11 +5,6 @@ import { Markdown } from "@/components/Markdown"
  * The List of all the possible extra features for the table
  * Separate each feature with a question mark like this: "border_solid?av_middle?ah_center"
  *
- * div_ : The class for the div that contains the table
- * table_ : The class for the table
- * border_ : The border style of the table
- * av_ : The vertical alignment of the cells
- * ah_ : The horizontal alignment of the cells
  * td/tf : Transpose the table (td --> definitive, tf --> frontend decision)
  * sd/sf : Split the table in half (sd --> definitive, sf --> frontend decision)
  *
@@ -30,9 +25,10 @@ export function DrawTable({
   const borderStyleStatic = "border-black dark:border-white"
   const vLineStyle = `${borderStyleStatic} border-l-2`
   const hLineStyle = `${borderStyleStatic} border-b-2`
+  const headerStyleStatic = `bg-goethe text-white ${hLineStyle}`
   const rowStyleStatic =
     table.content.length - (table.format.header ? 1 : 0) >= 5
-      ? "even:bg-gray-100 dark:even:bg-gray-700"
+      ? "even:bg-gray-300 dark:even:bg-gray-800"
       : ""
 
   const tHead: ReactElement[] = []
@@ -69,7 +65,7 @@ export function DrawTable({
   return (
     <table className="m-5 w-auto border-collapse justify-self-center">
       {table.format.header ? (
-        <thead>
+        <thead className={headerStyleStatic}>
           <tr>{tHead}</tr>
         </thead>
       ) : null}
