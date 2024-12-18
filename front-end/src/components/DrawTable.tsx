@@ -25,11 +25,11 @@ export function DrawTable({
   const borderStyleStatic = "border-black dark:border-white"
   const vLineStyle = `${borderStyleStatic} border-l-2`
   const hLineStyle = `${borderStyleStatic} border-b-2`
-  const headerStyleStatic = `[&>tr>th]:bg-accent [&>tr>th]:py-2 text-white first:[&>tr>th]:rounded-tl-md last:[&>tr>th]:rounded-tr-md ${hLineStyle}`
+  const headerStyleStatic = `[&_th]:bg-accent [&_th]:py-2 text-white first:[&_th]:rounded-tl-md last:[&_th]:rounded-tr-sm ${hLineStyle}`
   const rowStyleStatic =
-    "[&>td]:px-4 [&>td]:py-2 [&>td]:align-middle " +
+    "[&_td]:px-4 [&_td]:py-2 [&_td]:align-middle " +
     (table.content.length - (table.format.header ? 1 : 0) >= 5
-      ? "[&>td]:even:bg-muted first:[&>td]:even:rounded-l-sm last:[&>td]:even:rounded-r-sm"
+      ? "[&>tr:nth-child(even)>td]:bg-muted first:[&>tr:nth-child(even)>td]:rounded-l-sm last:[&>tr:nth-child(even)>td]:rounded-r-sm"
       : "")
 
   const tHead: ReactElement[] = []
@@ -58,7 +58,7 @@ export function DrawTable({
     })
 
     tBody.push(
-      <tr key={i} className={`${rowStyleStatic} ${table.format.hLines.includes(i) ? hLineStyle : ""}`}>
+      <tr key={i} className={table.format.hLines.includes(i) ? hLineStyle : ""}>
         {tRow}
       </tr>,
     )
@@ -71,7 +71,7 @@ export function DrawTable({
           <tr>{tHead}</tr>
         </thead>
       ) : null}
-      <tbody>{tBody}</tbody>
+      <tbody className={rowStyleStatic}>{tBody}</tbody>
     </table>
   )
 }
