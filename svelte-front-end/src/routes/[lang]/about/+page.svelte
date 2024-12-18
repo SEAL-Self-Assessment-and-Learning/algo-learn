@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Duolingo, Github, React } from "@designthen/svelte-icons/simple-icons"
   import { format } from "@shared/utils/format"
   import Markdown from "@/lib/components/markdown.svelte"
 
@@ -35,16 +36,16 @@
 <h2>{t("About.sourceCode.label")}</h2>
 <p>
   <Markdown md={t("About.sourceCode.text")}>
-    <SiReact className="inline" />
+    <React class="w-4" />
     {"https://reactjs.org/"}
-    <AiFillGithub className="inline" />
+    <Github class="w-4" />
     {"https://github.com/goethe-tcs/algo-learn/"}
   </Markdown>
 </p>
 <h2>{t("About.inspiration.label")}</h2>
 <p>
   <Markdown md={t("About.inspiration.text")}>
-    <SiDuolingo className="inline" />
+    <Duolingo class="w-4" />
     {"https://duolingo.com/"}
     {"https://research.duolingo.com/"}
   </Markdown>
@@ -52,5 +53,5 @@
 {" "}
 <h2>{t("About.authors.label")}</h2>
 <p>
-  <Markdown md={t("About.authors.text") ?? undefined} />
+  <Markdown md={t("About.authors.text")} />
 </p>

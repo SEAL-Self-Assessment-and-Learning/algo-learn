@@ -47,7 +47,7 @@
 
   const lang = "en"
   const { t } = $derived(tFunction(translations, lang))
-  const setLang = (s: Language) => {
+  const setLang = (lang: Language) => {
     redirect(307, lang)
   }
 </script>

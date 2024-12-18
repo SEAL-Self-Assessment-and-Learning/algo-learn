@@ -1,9 +1,15 @@
 <script lang="ts">
+  import type { Snippet } from "svelte"
+
   interface Props {
     md: string
+    children?: Snippet
   }
 
-  const props: Props = $props()
+  const { md, children }: Props = $props()
 </script>
 
-{props.md}
+{md}
+{#if children}
+  {@render children()}
+{/if}
