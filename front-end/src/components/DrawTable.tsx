@@ -25,20 +25,18 @@ export function DrawTable({
   const borderStyleStatic = "border-black dark:border-white"
   const vLineStyle = `${borderStyleStatic} border-l-2`
   const hLineStyle = `${borderStyleStatic} border-b-2`
-  const headerStyleStatic = `bg-goethe text-white ${hLineStyle}`
+  const headerStyleStatic = `[&>tr>th]:bg-accent [&>tr>th]:py-2 text-white first:[&>tr>th]:rounded-tl-md last:[&>tr>th]:rounded-tr-md ${hLineStyle}`
   const rowStyleStatic =
-    table.content.length - (table.format.header ? 1 : 0) >= 5
-      ? "even:bg-gray-300 dark:even:bg-gray-800"
-      : ""
+    "[&>td]:px-4 [&>td]:py-2 [&>td]:align-middle " +
+    (table.content.length - (table.format.header ? 1 : 0) >= 5
+      ? "[&>td]:even:bg-muted first:[&>td]:even:rounded-l-sm last:[&>td]:even:rounded-r-sm"
+      : "")
 
   const tHead: ReactElement[] = []
   if (table.format.header) {
     table.content[0].forEach((cell, i) => {
       tHead.push(
-        <th
-          key={i}
-          className={`${table.format.vLines.includes(i) ? vLineStyle : ""} ${i === table.content[0].length - 1 ? "rounded-tr-md" : ""} ${i === 0 ? "rounded-tl-md" : ""} py-2`}
-        >
+        <th key={i} className={`${table.format.vLines.includes(i) ? vLineStyle : ""}`}>
           <Markdown md={cell} />
         </th>,
       )
@@ -52,7 +50,7 @@ export function DrawTable({
       tRow.push(
         <td
           key={col}
-          className={`px-4 py-2 align-middle text-${table.format.alignment[col]} ${table.format.vLines.includes(col) ? vLineStyle : ""} ${i !== 1 ? (col === 0 ? "rounded-l-sm" : col === table.content[i].length - 1 ? "rounded-r-sm" : "") : ""} ${i === 1 ? (col === 0 ? "rounded-bl-sm" : col === table.content[i].length - 1 ? "rounded-br-sm" : "") : ""}`}
+          className={`text-${table.format.alignment[col]} ${table.format.vLines.includes(col) ? vLineStyle : ""}`}
         >
           <Markdown md={cell} />
         </td>,
@@ -77,6 +75,7 @@ export function DrawTable({
     </table>
   )
 }
+
 //
 // function transposeTable(parsedHeader: string[], parsedContent: string[][]) {
 //   const newContent: string[][] = []
