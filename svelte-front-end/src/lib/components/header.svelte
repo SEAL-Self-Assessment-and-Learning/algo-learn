@@ -132,40 +132,51 @@
       <DropdownMenu.Label>{t("menu")}</DropdownMenu.Label>
       <DropdownMenu.Separator /><DropdownMenu.Group>
         <DropdownMenu.Item>
-          <a href={`/${lang}/`} class="flex items-center">
-            <Home class="mr-2 h-4 w-4" />
-            {t("home")}
-          </a>
+          {#snippet child({ props })}
+            <a href={`/${lang}/`} class="flex items-center" {...props}>
+              <Home class="mr-2 h-4 w-4" />
+              {t("home")}
+            </a>
+          {/snippet}
         </DropdownMenu.Item>
         <DropdownMenu.Item>
-          <a href={`/${lang}/about`} class="flex items-center">
-            <Info class="mr-2 h-4 w-4" />
-            {t("About.label")}
-          </a>
+          {#snippet child({ props })}
+            <a href={`/${lang}/about`} class="flex items-center" {...props}>
+              <Info class="mr-2 h-4 w-4" />
+              {t("About.label")}
+            </a>
+          {/snippet}
         </DropdownMenu.Item>
         <DropdownMenu.Item>
-          <a href={`/${lang}/legal`} class="flex items-center">
-            <FileKey2 class="mr-2 h-4 w-4" />
-            {t("Legal.label")}
-          </a>
+          {#snippet child({ props })}
+            <a href={`/${lang}/legal`} class="flex items-center" {...props}>
+              <FileKey2 class="mr-2 h-4 w-4" />
+              {t("Legal.label")}
+            </a>
+          {/snippet}
         </DropdownMenu.Item>
         <DropdownMenu.Separator />
         {#if (VERSION as string) === "local build"}
           <DropdownMenu.Item>
-            <div class="flex items-center">
-              <WifiOff class="mr-2 h-4 w-4" />
-              {`${t("Version")}: ${VERSION}`}
-            </div>
+            {#snippet child({ props })}
+              <div class="flex items-center" {...props}>
+                <WifiOff class="mr-2 h-4 w-4" />
+                {`${t("Version")}: ${VERSION}`}
+              </div>
+            {/snippet}
           </DropdownMenu.Item>
         {:else}
           <DropdownMenu.Item>
-            <a
-              href={`https://github.com/holgerdell/algo-learn/commit/${VERSION}`}
-              class="flex items-center"
-            >
-              <GitCommitHorizontal class="mr-2 h-4 w-4" />
-              {`${t("Version")}: ${VERSION}`}
-            </a>
+            {#snippet child({ props })}
+              <a
+                href={`https://github.com/holgerdell/algo-learn/commit/${VERSION}`}
+                class="flex items-center"
+                {...props}
+              >
+                <GitCommitHorizontal class="mr-2 h-4 w-4" />
+                {`${t("Version")}: ${VERSION}`}
+              </a>
+            {/snippet}
           </DropdownMenu.Item>
         {/if}
       </DropdownMenu.Group>
