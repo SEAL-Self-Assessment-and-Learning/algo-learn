@@ -66,14 +66,17 @@
   </div>
   <DropdownMenu.Root>
     <DropdownMenu.Trigger>
-      <Button
-        variant="ghost"
-        size="icon"
-        class="bg-inherit hover:bg-primary hover:text-primary-foreground"
-        aria-label={t("menu.settings")}
-      >
-        <Settings class="h-4 w-4" />
-      </Button>
+      {#snippet child({ props })}
+        <Button
+          variant="ghost"
+          size="icon"
+          class="bg-inherit hover:bg-primary hover:text-primary-foreground"
+          aria-label={t("menu.settings")}
+          {...props}
+        >
+          <Settings class="h-4 w-4" />
+        </Button>
+      {/snippet}
     </DropdownMenu.Trigger>
     <DropdownMenu.Content class="w-56">
       <DropdownMenu.Label>{t("menu.language")}</DropdownMenu.Label>
@@ -110,14 +113,17 @@
   </DropdownMenu.Root>
   <DropdownMenu.Root>
     <DropdownMenu.Trigger>
-      <Button
-        variant="ghost"
-        size="icon"
-        class="bg-inherit hover:bg-primary hover:text-primary-foreground"
-        aria-label={t("menu")}
-      >
-        <MoreVertical class="h-4 w-4" />
-      </Button>
+      {#snippet child({ props })}
+        <Button
+          variant="ghost"
+          size="icon"
+          class="bg-inherit hover:bg-primary hover:text-primary-foreground"
+          aria-label={t("menu")}
+          {...props}
+        >
+          <MoreVertical class="h-4 w-4" />
+        </Button>
+      {/snippet}
     </DropdownMenu.Trigger>
     <DropdownMenu.Content>
       <DropdownMenu.Label>Menu</DropdownMenu.Label>
