@@ -30,6 +30,8 @@
       "theme.system": "System",
       "theme.dark": "dunkel",
       "theme.light": "hell",
+      "About.label": "Über uns",
+      "Legal.label": "Rechtliches",
     },
     en: {
       on: "On",
@@ -42,6 +44,8 @@
       "theme.system": "system",
       "theme.dark": "dark",
       "theme.light": "light",
+      "About.label": "About",
+      "Legal.label": "Legal",
     },
   }
 
