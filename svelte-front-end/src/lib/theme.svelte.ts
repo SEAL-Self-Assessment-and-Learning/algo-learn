@@ -13,11 +13,16 @@ const localStorageTheme = persisted<Themes>("theme", SYSTEM, { onChange: syncThe
 
 function derivedTheme() {
   const x = localStorageTheme.get()
-  return x === SYSTEM ? systemTheme : x
+  if (x === LIGHT) return LIGHT
+  if (x === DARK) return DARK
+  return systemTheme
 }
 
 export function getTheme() {
-  return localStorageTheme.get()
+  const x = localStorageTheme.get()
+  if (x === LIGHT) return LIGHT
+  if (x === DARK) return DARK
+  return SYSTEM
 }
 
 export function setTheme(newTheme: string) {
