@@ -6,7 +6,7 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { areCoprime, solveCRT } from "@shared/question-generators/math/utils"
+import { areCoprime, solveCRT } from "@shared/question-generators/math/modularArithmetic/utils"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
 
