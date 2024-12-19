@@ -35,9 +35,9 @@ export function toggleTheme() {
 
 function syncTheme() {
   if (!browser) return
-  document.body.classList.remove(derivedTheme() === LIGHT ? "dark" : "light")
-  document.body.classList.add(derivedTheme())
-  document.body.style.colorScheme = derivedTheme()
+  document.documentElement.classList.remove(derivedTheme() === LIGHT ? "dark" : "light")
+  document.documentElement.classList.add(derivedTheme())
+  document.documentElement.style.colorScheme = derivedTheme()
 }
 
 if (browser) {
