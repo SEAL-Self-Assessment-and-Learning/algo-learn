@@ -11,7 +11,6 @@
   } from "lucide-svelte"
   import type { Language } from "@shared/api/Language"
   import { tFunction, type Translations } from "@shared/utils/translations"
-  import { redirect } from "@sveltejs/kit"
   import { VERSION } from "../config"
   import { getMuted, setMuted } from "../sound.svelte"
   import { availableThemes, getTheme, setTheme } from "../theme.svelte"
@@ -23,6 +22,7 @@
       on: "An",
       off: "Aus",
       menu: "Menü",
+      home: "Startseite",
       "menu.settings": "Einstellungen",
       "menu.language": "Sprache",
       "menu.sound": "Ton",
@@ -37,6 +37,7 @@
       on: "On",
       off: "Off",
       menu: "Menu",
+      home: "Home",
       "menu.settings": "Settings",
       "menu.language": "Language",
       "menu.sound": "Sound",
@@ -49,11 +50,13 @@
     },
   }
 
-  const lang = "en"
-  const { t } = $derived(tFunction(translations, lang))
-  const setLang = (lang: Language) => {
-    redirect(307, lang)
+  interface Props {
+    lang: Language
+    setLang: (lang: Language) => void
   }
+
+  const { lang, setLang }: Props = $props()
+  const { t } = $derived(tFunction(translations, lang))
 </script>
 
 <header
@@ -126,12 +129,12 @@
       {/snippet}
     </DropdownMenu.Trigger>
     <DropdownMenu.Content>
-      <DropdownMenu.Label>Menu</DropdownMenu.Label>
+      <DropdownMenu.Label>{t("menu")}</DropdownMenu.Label>
       <DropdownMenu.Separator /><DropdownMenu.Group>
         <DropdownMenu.Item>
           <a href={`/${lang}/`} class="flex items-center">
             <Home class="mr-2 h-4 w-4" />
-            {t("Home")}
+            {t("home")}
           </a>
         </DropdownMenu.Item>
         <DropdownMenu.Item>

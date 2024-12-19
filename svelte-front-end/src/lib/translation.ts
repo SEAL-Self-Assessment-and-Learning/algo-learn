@@ -1,4 +1,5 @@
 import { browser } from "$app/environment"
+import { goto } from "$app/navigation"
 import { type Language } from "@shared/api/Language"
 import { tFunction, type Translations } from "@shared/utils/translations"
 import { redirect } from "@sveltejs/kit"
@@ -24,7 +25,7 @@ const globalTranslations: Translations = {
  * @returns The resolved language.
  */
 export function resolveLang(lang: string) {
-  if (SUPPORTED_LANGUAGES.includes(lang as Language)) {
+  if ((SUPPORTED_LANGUAGES as string[]).includes(lang)) {
     return lang as Language
   } else {
     return DEFAULT_LANGUAGE
@@ -76,5 +77,8 @@ export function loadI18n(lang: string, url: URL) {
   if (lang !== resolvedLang) {
     redirect(307, pathnameInLanguage(resolvedLang, url.pathname))
   }
-  return i18n(resolvedLang)
+  const setLang = (lang: Language) => {
+    goto(pathnameInLanguage(lang, url.pathname))
+  }
+  return { ...i18n(resolvedLang), setLang, url }
 }

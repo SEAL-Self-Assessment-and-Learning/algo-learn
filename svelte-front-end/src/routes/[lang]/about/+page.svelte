@@ -4,7 +4,7 @@
   import Markdown from "@/lib/components/markdown.svelte"
 
   const props = $props()
-  const { t, lang } = props.data
+  const { t, lang } = $derived(props.data)
 </script>
 
 <h1>{t("About.label")}</h1>
