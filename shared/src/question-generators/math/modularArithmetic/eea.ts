@@ -219,16 +219,20 @@ function generateEEATableSteps(
     .filter((step, index) => index === 0 || step.quotient !== null)
     .map((step, index) => {
       // first row displays known quantities a and b
-      return index === 0
-        ? `| $ ${step.dividend} $ |$=$| {{quotient${index}#TL#}} |$\\cdot$| ${step.divisor} |$+$| {{remainder${index}#TL#}} |\n`
-        : `| {{dividend${index}#TL#}} |$=$| {{quotient${index}#TL#}} |$\\cdot$| {{divisor${index}#TL#}} |$+$| {{remainder${index}#TL#}} |\n`
+      if (index === 0) {
+        return `| $ ${step.dividend} $ |$=$| {{quotient${index}#OS-2#}} |$\\cdot$| ${step.divisor} |$+$| {{remainder${index}#OS-2##r_${index + 1}}} |\n`
+      }
+      if (index === 1) {
+        return `| $ ${step.dividend} $ |$=$| {{quotient${index}#OS-2#}} |$\\cdot$| {{divisor${index}#OS-2##r_${index}}} |$+$| {{remainder${index}#OS-2##r_${index + 1}}} |\n`
+      }
+      return `| {{dividend${index}#OS-2##r_${index}}} |$=$| {{quotient${index}#OS-2#}} |$\\cdot$| {{divisor${index}#OS-2##r_${index}}} |$+$| {{remainder${index}#OS-2##r_${index + 1}}} |\n`
     })
 
   const calcTable = divisionSteps.join("")
 
   const linearCombinationPrompt = `\n${t(translations, lang, "linearCombinationPrompt")}\n`
-  const gcdRow = `| $\\text{${t(translations, lang, "gcd")}}(${a},${b})$ | $=$ | {{gcd#TL#}} | | | |\n`
-  const combinationRow = `| | $=$ | {{coefA#TL#}} | $\\cdot$ | ${a} | $+$ | {{coefB#TL#}} | $\\cdot$ | ${b} |\n`
+  const gcdRow = `| $\\text{${t(translations, lang, "gcd")}}(${a},${b})$ | $=$ | {{gcd#OS-2#}} | | | |\n`
+  const combinationRow = `| | $=$ | {{coefA#OS-2##s}} | $\\cdot$ | ${a} | $+$ | {{coefB#OS-2##t}} | $\\cdot$ | ${b} |\n`
   const additionalStyling = "|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |\n"
 
   return `${calcTable}${additionalStyling}${linearCombinationPrompt}\n${gcdRow}${combinationRow}${additionalStyling}`
