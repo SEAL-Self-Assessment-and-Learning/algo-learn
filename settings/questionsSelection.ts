@@ -13,9 +13,10 @@ import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighb
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
-import { CRT } from "@shared/question-generators/math/crt"
-import { modFactor } from "@shared/question-generators/math/modFactorization"
-import { ModTricks } from "@shared/question-generators/math/modTricks"
+import { CRT } from "@shared/question-generators/math/modularArithmetic/crt"
+import { ExtendedEuclideanAlgorithm } from "@shared/question-generators/math/modularArithmetic/eea"
+import { modFactor } from "@shared/question-generators/math/modularArithmetic/modFactorization"
+import { ModTricks } from "@shared/question-generators/math/modularArithmetic/modTricks"
 import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability.ts"
@@ -43,7 +44,7 @@ export const collection: QuestionCollection = [
   {
     slug: "modular-arithmetic",
     name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
-    contents: [ModTricks, CRT, modFactor],
+    contents: [ModTricks, CRT, modFactor, ExtendedEuclideanAlgorithm],
   },
   {
     slug: "asymptotics",

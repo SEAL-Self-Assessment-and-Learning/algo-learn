@@ -10,7 +10,7 @@ import {
   calculateModularInverse,
   gcd,
   modularExponentiation,
-} from "@shared/question-generators/math/utils"
+} from "@shared/question-generators/math/modularArithmetic/utils"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
 
