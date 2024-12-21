@@ -133,7 +133,7 @@
       <DropdownMenu.Separator /><DropdownMenu.Group>
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a href={`/${lang}/`} class="flex items-center" {...props}>
+            <a href={`/${lang}`} class="flex items-center" {...props}>
               <Home class="mr-2 h-4 w-4" />
               {t("home")}
             </a>

@@ -1,10 +1,9 @@
 <script lang="ts">
   import { Duolingo, Github, React } from "@designthen/svelte-icons/simple-icons"
-  import { format } from "@shared/utils/format"
   import Markdown from "@/lib/components/markdown.svelte"
 
   const props = $props()
-  const { t, lang } = $derived(props.data)
+  const { t } = $derived(props.data)
 </script>
 
 <h1>{t("About.label")}</h1>
@@ -13,41 +12,27 @@
 <p>{t("About.activeLearning.text")}</p>
 <h2>{t("About.spacedRepetition.label")}</h2>
 <p>
-  <Markdown
-    md={format(t("About.spacedRepetition.text"), [
-      `https://${lang}.wikipedia.org/wiki/Spaced_repetition`,
-    ])}
-  />
+  <Markdown md={t("About.spacedRepetition.text")} />
 </p>
 <h2>{t("About.individuallyAdaptive.label")}</h2>
 <p>
-  <Markdown
-    md={format(t("About.individuallyAdaptive.text"), ["https://doi.org/10.18653/v1/p16-1174"])}
-  />
+  <Markdown md={t("About.individuallyAdaptive.text")} />
 </p>
 <h2>{t("About.development.label")}</h2>
 <p>
-  <Markdown
-    md={format(t("About.development.text"), [
-      "https://cft.vanderbilt.edu/guides-sub-pages/blooms-taxonomy/",
-    ])}
-  />
+  <Markdown md={t("About.development.text")} />
 </p>
 <h2>{t("About.sourceCode.label")}</h2>
 <p>
   <Markdown md={t("About.sourceCode.text")}>
-    <React class="w-4" />
-    {"https://reactjs.org/"}
-    <Github class="w-4" />
-    {"https://github.com/goethe-tcs/algo-learn/"}
+    {#snippet child0()}<React class="w-4" />{/snippet}
+    {#snippet child1()}<Github class="w-4" />{/snippet}
   </Markdown>
 </p>
 <h2>{t("About.inspiration.label")}</h2>
 <p>
   <Markdown md={t("About.inspiration.text")}>
-    <Duolingo class="w-4" />
-    {"https://duolingo.com/"}
-    {"https://research.duolingo.com/"}
+    {#snippet child0()}<Duolingo class="w-4" />{/snippet}
   </Markdown>
 </p>
 {" "}
