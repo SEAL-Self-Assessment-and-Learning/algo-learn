@@ -14,7 +14,8 @@
   import { VERSION } from "../config"
   import { getMuted, setMuted } from "../sound.svelte"
   import { availableThemes, getTheme, setTheme } from "../theme.svelte"
-  import { NATIVE_NAME, SUPPORTED_LANGUAGES } from "../translation"
+  import { globalTranslations, NATIVE_NAME, SUPPORTED_LANGUAGES } from "../translation"
+  import FeedbackDialog from "./feedbackDialog.svelte"
   import Button from "./ui/button/button.svelte"
 
   const translations: Translations = {
@@ -56,17 +57,27 @@
   }
 
   const { lang, setLang }: Props = $props()
-  const { t } = $derived(tFunction(translations, lang))
+  const { t } = $derived(tFunction([translations, globalTranslations], lang))
 </script>
 
 <header
   class="flex flex-none flex-wrap place-items-center justify-between gap-1 border-b-2 bg-goethe p-2 text-goethe-foreground"
 >
   <div class="flex-grow">
-    <Button href="/" variant="link" class="inline text-2xl text-inherit">
-      algo learn <span class="font-mono text-sm text-yellow-200">alpha</span>
-    </Button>
+    {@render logo()}
   </div>
+  <FeedbackDialog {t} />
+  {@render settingsMenu()}
+  {@render navigationMenu()}
+</header>
+
+{#snippet logo()}
+  <Button href="/" variant="link" class="inline text-2xl text-inherit">
+    algo learn <span class="font-mono text-sm text-yellow-200">alpha</span>
+  </Button>
+{/snippet}
+
+{#snippet settingsMenu()}
   <DropdownMenu.Root>
     <DropdownMenu.Trigger>
       {#snippet child({ props })}
@@ -114,6 +125,9 @@
       </DropdownMenu.RadioGroup>
     </DropdownMenu.Content>
   </DropdownMenu.Root>
+{/snippet}
+
+{#snippet navigationMenu()}
   <DropdownMenu.Root>
     <DropdownMenu.Trigger>
       {#snippet child({ props })}
@@ -182,4 +196,4 @@
       </DropdownMenu.Group>
     </DropdownMenu.Content>
   </DropdownMenu.Root>
-</header>
+{/snippet}
