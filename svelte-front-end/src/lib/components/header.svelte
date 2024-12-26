@@ -18,46 +18,13 @@
   import FeedbackDialog from "./feedbackDialog.svelte"
   import Button from "./ui/button/button.svelte"
 
-  const translations: Translations = {
-    de: {
-      on: "An",
-      off: "Aus",
-      menu: "Menü",
-      home: "Startseite",
-      "menu.settings": "Einstellungen",
-      "menu.language": "Sprache",
-      "menu.sound": "Ton",
-      "menu.theme": "Design",
-      "theme.system": "System",
-      "theme.dark": "dunkel",
-      "theme.light": "hell",
-      "About.label": "Über uns",
-      "Legal.label": "Rechtliches",
-    },
-    en: {
-      on: "On",
-      off: "Off",
-      menu: "Menu",
-      home: "Home",
-      "menu.settings": "Settings",
-      "menu.language": "Language",
-      "menu.sound": "Sound",
-      "menu.theme": "Theme",
-      "theme.system": "system",
-      "theme.dark": "dark",
-      "theme.light": "light",
-      "About.label": "About",
-      "Legal.label": "Legal",
-    },
-  }
-
   interface Props {
     lang: Language
     setLang: (lang: Language) => void
   }
 
   const { lang, setLang }: Props = $props()
-  const { t } = $derived(tFunction([translations, globalTranslations], lang))
+  const { t } = $derived(tFunction([globalTranslations], lang))
 </script>
 
 <header
