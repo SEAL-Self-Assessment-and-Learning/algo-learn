@@ -65,7 +65,7 @@ function AlertFeedbackComp() {
 
   return (
     <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-      <AlertDialogTrigger>
+      <AlertDialogTrigger asChild>
         <Button
           variant="ghost"
           size="icon"
@@ -77,7 +77,7 @@ function AlertFeedbackComp() {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{t("About.valueFeedback")}</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogDescription asChild>
             <div className="flex flex-col space-y-4">
               <Card className="w-full cursor-pointer" onClick={openMail}>
                 <CardHeader>
