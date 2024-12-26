@@ -116,7 +116,7 @@
           {#snippet child({ props })}
             <a href={`/${lang}`} class="flex items-center" {...props}>
               <Home class="mr-2 h-4 w-4" />
-              {t("home")}
+              {t("Home")}
             </a>
           {/snippet}
         </DropdownMenu.Item>
