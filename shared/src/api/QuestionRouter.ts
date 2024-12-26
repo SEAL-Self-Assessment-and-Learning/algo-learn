@@ -1,5 +1,5 @@
 import { SingleTranslation } from "@shared/utils/translations"
-import { collection as globalCollection } from "@/listOfQuestions"
+import { collection as globalCollection } from "@settings/questionsSelection"
 import { Language } from "./Language"
 import { deserializeParameters, missingParameters, Parameters } from "./Parameters"
 import { QuestionGenerator } from "./QuestionGenerator"

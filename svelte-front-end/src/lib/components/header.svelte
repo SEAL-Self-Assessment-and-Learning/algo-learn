@@ -10,7 +10,7 @@
     WifiOff,
   } from "lucide-svelte"
   import type { Language } from "@shared/api/Language"
-  import { tFunction, type Translations } from "@shared/utils/translations"
+  import { tFunction } from "@shared/utils/translations"
   import { VERSION } from "../config"
   import { getMuted, setMuted } from "../sound.svelte"
   import { availableThemes, getTheme, setTheme } from "../theme.svelte"
