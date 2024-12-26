@@ -1,5 +1,4 @@
 import { SingleTranslation } from "@shared/utils/translations"
-import { collection as globalCollection } from "@/listOfQuestions"
 import { Language } from "./Language"
 import { deserializeParameters, missingParameters, Parameters } from "./Parameters"
 import { QuestionGenerator } from "./QuestionGenerator"
@@ -95,11 +94,11 @@ export function serializeGeneratorCall({
  *   found
  */
 export function deserializePath({
-  collection = globalCollection,
+  collection,
   path,
   expectLang,
 }: {
-  collection?: QuestionCollection
+  collection: QuestionCollection
   path: string
   expectLang?: boolean
 }):
