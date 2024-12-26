@@ -1,6 +1,6 @@
-import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm"
+import { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
-import Random from "@shared/utils/random"
+import Random from "@shared/utils/random.ts"
 
 /**
  * This function performs additional union operations outside the block/blocks
@@ -20,7 +20,7 @@ function performAdditionalUnionOperation({
   otherOperations,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
   usedElements: number[]
   otherOperations: number
@@ -47,12 +47,12 @@ function performAdditionalUnionOperation({
  */
 function findAndPerformUnionOperation(
   random: Random,
-  union: QuickFind,
+  union: UnionFind,
   blockValues: number[],
   unionSize: number,
 ) {
   const gapField = createArrayDisplayCodeBlock({
-    array: union.getArray(),
+    array: union.getArray()[0],
   })
 
   const gapOperationValues: number[] = []
@@ -63,7 +63,7 @@ function findAndPerformUnionOperation(
   )
 
   // compute the final union after combining one more element
-  union.union(gapOperationValues[0], gapOperationValues[1])
+  union.union(gapOperationValues[0], gapOperationValues[1], true)
 
   return { gapField, gapOperationValues }
 }
@@ -85,7 +85,7 @@ function generateTwoBlocks({
   otherOperation = true,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
   otherOperation?: true | false
 }) {
@@ -144,7 +144,7 @@ function generateOneBlock({
   otherOperations = 1,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
   otherOperations?: number
 }) {
@@ -190,7 +190,7 @@ export function unionTwoBlocksCombineOne({
   unionSize,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
 }) {
   const { block1Values, union: updatedUnion } = generateTwoBlocks({
@@ -216,7 +216,7 @@ export function unionTwoBlocksCombineNone({
   unionSize,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
 }) {
   let block1Values: number[] = []
@@ -233,7 +233,7 @@ export function unionTwoBlocksCombineNone({
   // The loop ensures there's at least one element outside the two blocks
 
   const gapField = createArrayDisplayCodeBlock({
-    array: union.getArray(),
+    array: union.getArray()[0],
   })
 
   // Select two values not in block1Values or block2Values
@@ -245,7 +245,7 @@ export function unionTwoBlocksCombineNone({
   )
 
   // Perform the final union operation
-  union.union(gapOperationValues[0], gapOperationValues[1])
+  union.union(gapOperationValues[0], gapOperationValues[1], true)
 
   return { gapField, gapOperationValues }
 }
@@ -263,20 +263,20 @@ export function unionTwoBlocksCombineSame({
   unionSize,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
 }) {
   const { block1Values, union: union_ } = generateTwoBlocks({ random, union, unionSize })
   union = union_
 
   const gapField = createArrayDisplayCodeBlock({
-    array: union.getArray(),
+    array: union.getArray()[0],
   })
 
   const gapOperationValues: number[] = random.subset(block1Values, 2)
 
   // compute the final union
-  union.union(gapOperationValues[0], gapOperationValues[1])
+  union.union(gapOperationValues[0], gapOperationValues[1], true)
 
   return {
     gapField,
@@ -298,7 +298,7 @@ export function unionOneBlockCombineOne({
   unionSize,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
 }) {
   const { block1Values, union: updatedUnion } = generateOneBlock({
@@ -325,7 +325,7 @@ export function unionOneBlockCombineNone({
   unionSize,
 }: {
   random: Random
-  union: QuickFind
+  union: UnionFind
   unionSize: number
 }) {
   const { block1Values, union: union_ } = generateOneBlock({
@@ -337,7 +337,7 @@ export function unionOneBlockCombineNone({
   union = union_
 
   const gapField = createArrayDisplayCodeBlock({
-    array: union.getArray(),
+    array: union.getArray()[0],
   })
 
   const gapOperationValues: number[] = random.subset(
@@ -346,7 +346,7 @@ export function unionOneBlockCombineNone({
   )
 
   // compute the final union
-  union.union(gapOperationValues[0], gapOperationValues[1])
+  union.union(gapOperationValues[0], gapOperationValues[1], true)
 
   return {
     gapField,

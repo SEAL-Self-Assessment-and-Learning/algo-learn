@@ -102,7 +102,11 @@ export function ExerciseMultiTextInput({
       setState({
         ...state,
         text: { ...state.text, [fieldID]: value },
-        mode: valid ? "draft" : "invalid",
+        modeID: {
+          ...state.modeID,
+          [fieldID]: valid ? "draft" : "invalid",
+        },
+        mode: checkOverallMode({ ...state.modeID, [fieldID]: valid ? "draft" : "invalid" }),
       })
     }
   }
