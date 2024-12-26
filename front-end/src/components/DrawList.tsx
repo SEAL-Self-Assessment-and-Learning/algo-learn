@@ -1,10 +1,6 @@
 import { ReactElement } from "react"
+import { ListItem } from "@shared/utils/parseMarkdown"
 import { Markdown } from "@/components/Markdown.tsx"
-
-export interface ListItem {
-  level: number
-  text: string
-}
 
 export function DrawList({ list }: { list: ListItem[] }): ReactElement {
   const paddingClasses = [
