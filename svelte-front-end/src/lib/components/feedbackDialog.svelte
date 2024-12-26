@@ -25,7 +25,7 @@
 
 <AlertDialog.Root bind:open={alertOpen}>
   <AlertDialog.Trigger>
-    {#snippet child(props)}
+    {#snippet child({ props })}
       <Button
         variant="ghost"
         size="icon"
