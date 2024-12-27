@@ -4,14 +4,15 @@
   import { allParameterCombinations, serializeParameters } from "@shared/api/Parameters"
   import { type QuestionGenerator } from "@shared/api/QuestionGenerator"
   import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-  import Button from "./ui/button/button.svelte"
+  import { tFunction } from "@shared/utils/translations"
+  import { globalTranslations } from "../../translation"
+  import Button from "../ui/button/button.svelte"
 
   type Props = {
     generator: QuestionGenerator
     showAllVariants?: boolean
     showDescription?: boolean
     class?: string
-    t: (key: string) => string
     lang: Language
   }
   const {
@@ -19,9 +20,10 @@
     showAllVariants = true,
     showDescription = true,
     class: class_,
-    t,
     lang,
   }: Props = $props()
+
+  const { t } = $derived(tFunction(globalTranslations, lang))
 </script>
 
 <Card.Root class={class_}>
