@@ -16,13 +16,14 @@ import type { LayoutLoad } from "./$types"
  * - url: The URL object.
  */
 export const load: LayoutLoad = ({ params, url }) => {
+  const pathname = url.pathname
   const lang = params.lang
   const resolvedLang = resolveLang(lang)
   if (lang !== resolvedLang) {
-    redirect(307, pathnameInLanguage(resolvedLang, url.pathname))
+    redirect(307, pathnameInLanguage(resolvedLang, pathname))
   }
   const setLang = (lang: Language) => {
-    goto(pathnameInLanguage(resolveLang(lang), url.pathname))
+    goto(pathnameInLanguage(resolveLang(lang), pathname))
   }
   return {
     lang,
