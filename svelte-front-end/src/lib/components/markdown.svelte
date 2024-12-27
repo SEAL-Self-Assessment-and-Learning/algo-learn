@@ -60,7 +60,7 @@
   {:else if x.kind === "list"}
     <ul>
       {#each x.child as c}
-        <li>{@render tree(c, props)}</li>
+        <li>{@render node(c.text, props)}</li>
       {/each}
     </ul>
   {:else}
