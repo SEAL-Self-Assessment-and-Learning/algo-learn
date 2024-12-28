@@ -1,4 +1,4 @@
-import {
+import type {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextQuestion,
   QuestionGenerator,
@@ -17,7 +17,7 @@ import {
   createArrayDisplayCodeBlockUserInput,
 } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import Random from "@shared/utils/random"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {

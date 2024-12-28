@@ -1,7 +1,7 @@
 import { expect, test } from "vitest"
 import { ExampleQuestion } from "@shared/question-generators/example/example"
-import { QuestionGenerator } from "./QuestionGenerator"
-import { deserializePath, QuestionCollection, serializeGeneratorCall } from "./QuestionRouter"
+import type { QuestionGenerator } from "./QuestionGenerator"
+import { deserializePath, serializeGeneratorCall, type QuestionCollection } from "./QuestionRouter"
 
 const testQuestion: QuestionGenerator = {
   id: "test",

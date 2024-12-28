@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { MultiFreeTextQuestion, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator.ts"
+import type { MultiFreeTextQuestion, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { sampleRandomSeed } from "../../utils/random.ts"

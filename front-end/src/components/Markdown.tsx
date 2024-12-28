@@ -1,6 +1,6 @@
-import { Fragment, FunctionComponent, ReactNode } from "react"
+import { Fragment, type FunctionComponent, type ReactNode } from "react"
 import { Link } from "react-router-dom"
-import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
+import { parseMarkdown, type ParseTree, type ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
 import { ArrayDisplay } from "@/components/ArrayDisplay.tsx"
 import { DrawList } from "@/components/DrawList.tsx"
 import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"

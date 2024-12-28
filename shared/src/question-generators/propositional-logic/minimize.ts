@@ -1,4 +1,4 @@
-import {
+import type {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
@@ -16,12 +16,12 @@ import {
   generateRandomExpression,
   ParserError,
   PropositionalLogicParser,
-  SyntaxTreeNodeType,
   tokenToLatex,
+  type SyntaxTreeNodeType,
 } from "@shared/utils/propositionalLogic"
 import { MinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
 import Random from "@shared/utils/random"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {

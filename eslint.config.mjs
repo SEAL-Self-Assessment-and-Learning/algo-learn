@@ -61,6 +61,8 @@ export default ts.config(
       "@typescript-eslint/naming-convention": ["error", ...namingConvention],
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/consistent-type-imports": "error",
+      "@typescript-eslint/no-import-type-side-effects": "error",
       "@typescript-eslint/unbound-method": [
         "error",
         {
