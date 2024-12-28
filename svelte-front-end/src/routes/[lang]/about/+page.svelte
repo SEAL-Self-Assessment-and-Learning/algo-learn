@@ -1,9 +1,12 @@
 <script lang="ts">
   import { Duolingo, Github, React } from "@designthen/svelte-icons/simple-icons"
+  import { tFunction } from "@shared/utils/translations"
   import Markdown from "@/lib/components/markdown.svelte"
+  import { globalTranslations } from "@/lib/translation"
+  import type { PageData } from "./$types"
 
-  const props = $props()
-  const { t } = $derived(props.data)
+  const props: { data: PageData } = $props()
+  const { t } = $derived(tFunction(globalTranslations, props.data.lang))
 </script>
 
 <h1>{t("About.label")}</h1>

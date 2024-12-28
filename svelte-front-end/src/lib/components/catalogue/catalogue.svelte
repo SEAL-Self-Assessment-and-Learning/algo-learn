@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { cn } from "$lib/utils.js"
+  import type { HTMLAttributes } from "svelte/elements"
   import { collection } from "@settings/questionsSelection"
   import type { Language } from "@shared/api/Language"
   import QuestionGeneratorCard from "./questionGeneratorCard.svelte"
@@ -7,13 +9,13 @@
   let selectedGroup: string | null = $state(null)
   let showAllVariants = $state(false)
 
-  interface Props {
+  interface Props extends HTMLAttributes<HTMLDivElement> {
     lang: Language
   }
-  const { lang }: Props = $props()
+  const { lang, ...rest }: Props = $props()
 </script>
 
-<div class="flex flex-col items-start justify-center gap-6 py-6 sm:flex-row">
+<div {...rest} class={cn("flex flex-col items-start justify-center gap-6 py-6 sm:flex-row", rest.class)}>
   <TopicSelectorSidebar
     {selectedGroup}
     setSelectedGroup={(g) => (selectedGroup = g)}

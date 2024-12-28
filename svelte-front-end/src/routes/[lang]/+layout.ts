@@ -1,8 +1,7 @@
 import { goto } from "$app/navigation"
 import type { Language } from "@shared/api/Language"
-import { tFunction } from "@shared/utils/translations"
 import { redirect } from "@sveltejs/kit"
-import { globalTranslations, pathnameInLanguage, resolveLang } from "@/lib/translation"
+import { pathnameInLanguage, resolveLang } from "@/lib/translation"
 import type { LayoutLoad } from "./$types"
 
 /**
@@ -25,10 +24,5 @@ export const load: LayoutLoad = ({ params, url }) => {
   const setLang = (lang: Language) => {
     goto(pathnameInLanguage(resolveLang(lang), pathname))
   }
-  return {
-    lang,
-    t: tFunction(globalTranslations, lang).t,
-    setLang,
-    url,
-  }
+  return { lang, setLang, url }
 }

@@ -1,11 +1,11 @@
 <script lang="ts">
   import * as Card from "$lib/components/ui/card/index.js"
+  import { cn } from "$lib/utils.js"
   import type { HTMLAttributes } from "svelte/elements"
   import { collection } from "@settings/questionsSelection"
   import type { Language } from "@shared/api/Language"
   import { tFunction } from "@shared/utils/translations"
   import { globalTranslations } from "../../translation"
-  import { cn } from "../../utils"
   import Button from "../ui/button/button.svelte"
   import Checkbox from "../ui/checkbox/checkbox.svelte"
   import Label from "../ui/label/label.svelte"
@@ -26,19 +26,13 @@
     lang: Language
   }
 
-  const {
-    class: class_,
-    selectedGroup,
-    setSelectedGroup,
-    showAllVariants,
-    setShowAllVariants,
-    lang,
-  }: Props = $props()
+  const { selectedGroup, setSelectedGroup, showAllVariants, setShowAllVariants, lang, ...rest }: Props =
+    $props()
 
   const { t } = $derived(tFunction(globalTranslations, lang))
 </script>
 
-<Card.Root class={cn("border-0 bg-secondary text-secondary-foreground", class_)}>
+<Card.Root {...rest} class={cn("border-0 bg-secondary text-secondary-foreground", rest.class)}>
   <Card.Header>
     <Card.Title>{t("Catalogue.topic")}</Card.Title>
     <Card.Description>{t("Catalogue.choose.desc")}</Card.Description>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import * as Card from "$lib/components/ui/card/index.js"
+  import type { HTMLAttributes } from "svelte/elements"
   import type { Language } from "@shared/api/Language"
   import { allParameterCombinations, serializeParameters } from "@shared/api/Parameters"
   import { type QuestionGenerator } from "@shared/api/QuestionGenerator"
@@ -8,25 +9,18 @@
   import { globalTranslations } from "../../translation"
   import Button from "../ui/button/button.svelte"
 
-  type Props = {
+  interface Props extends HTMLAttributes<HTMLDivElement> {
     generator: QuestionGenerator
     showAllVariants?: boolean
     showDescription?: boolean
-    class?: string
     lang: Language
   }
-  const {
-    generator,
-    showAllVariants = true,
-    showDescription = true,
-    class: class_,
-    lang,
-  }: Props = $props()
+  const { generator, showAllVariants = true, showDescription = true, lang, ...rest }: Props = $props()
 
   const { t } = $derived(tFunction(globalTranslations, lang))
 </script>
 
-<Card.Root class={class_}>
+<Card.Root {...rest}>
   <Card.Header class="m-0 p-3">
     <Card.Title class="text-base">{generator.name(lang)}</Card.Title>
     {#if showDescription && generator.description}

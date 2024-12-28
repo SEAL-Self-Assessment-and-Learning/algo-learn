@@ -6,5 +6,5 @@ export const prerender = true
 export const ssr = true
 
 export const load: PageLoad = () => {
-  redirect(307, `/${DEFAULT_LANGUAGE}/`)
+  redirect(307, `/${DEFAULT_LANGUAGE}`)
 }
