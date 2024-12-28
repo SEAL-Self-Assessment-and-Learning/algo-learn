@@ -3,7 +3,7 @@
   import * as Card from "$lib/components/ui/card/index.js"
   import { Mail, MessageSquareText } from "lucide-svelte"
   import { Github } from "@designthen/svelte-icons/simple-icons"
-  import { type TFunctionParameters, type TKey } from "@shared/utils/translations"
+  import type { TFunctionParameters, TKey } from "@shared/utils/translations"
   import { Button } from "./ui/button"
 
   interface Props {

@@ -3,7 +3,7 @@
   import type { HTMLAttributes } from "svelte/elements"
   import type { Language } from "@shared/api/Language"
   import { allParameterCombinations, serializeParameters } from "@shared/api/Parameters"
-  import { type QuestionGenerator } from "@shared/api/QuestionGenerator"
+  import type { QuestionGenerator } from "@shared/api/QuestionGenerator"
   import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
   import { tFunction } from "@shared/utils/translations"
   import { globalTranslations } from "../../translation"

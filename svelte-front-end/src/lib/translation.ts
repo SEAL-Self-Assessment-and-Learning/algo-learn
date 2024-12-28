@@ -1,6 +1,6 @@
 import { browser } from "$app/environment"
-import { type Language } from "@shared/api/Language"
-import { type Translations } from "@shared/utils/translations"
+import type { Language } from "@shared/api/Language"
+import type { Translations } from "@shared/utils/translations"
 import deJSON from "../../../front-end/src/locales/de.json"
 import enJSON from "../../../front-end/src/locales/en.json"
 

@@ -7,7 +7,7 @@ import react from "@eslint-react/eslint-plugin"
 import js from "@eslint/js"
 import tanstackQuery from "@tanstack/eslint-plugin-query"
 
-const namingConvention = [
+export const namingConvention = [
   {
     selector: "default",
     format: ["camelCase"],
