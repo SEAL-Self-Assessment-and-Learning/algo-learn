@@ -1,7 +1,7 @@
-import { SingleTranslation } from "@shared/utils/translations"
-import { Language } from "./Language"
-import { deserializeParameters, missingParameters, Parameters } from "./Parameters"
-import { QuestionGenerator } from "./QuestionGenerator"
+import type { SingleTranslation } from "@shared/utils/translations"
+import type { Language } from "./Language"
+import { deserializeParameters, missingParameters, type Parameters } from "./Parameters"
+import type { QuestionGenerator } from "./QuestionGenerator"
 
 /**
  * Objects of the following type describe a sequence of question collections.

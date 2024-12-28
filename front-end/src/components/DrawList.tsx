@@ -1,5 +1,5 @@
-import { ReactElement } from "react"
-import { ListItem } from "@shared/utils/parseMarkdown"
+import type { ReactElement } from "react"
+import type { ListItem } from "@shared/utils/parseMarkdown"
 import { Markdown } from "@/components/Markdown.tsx"
 
 export function DrawList({ list }: { list: ListItem[] }): ReactElement {

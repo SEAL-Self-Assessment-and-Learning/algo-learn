@@ -1,6 +1,6 @@
 import Fraction from "fraction.js"
 import math, { baseOfLog, exponentToLatex, exponentToText, log2Fraction } from "../../utils/math"
-import Random from "../../utils/random"
+import type Random from "../../utils/random"
 
 /**
  * Represents an iterated logarithm term, such as (log(log(n)))^3. It is

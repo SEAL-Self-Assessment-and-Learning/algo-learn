@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { FreeTextFeedback, FreeTextQuestion } from "@shared/api/QuestionGenerator"
+import type { FreeTextFeedback, FreeTextQuestion } from "@shared/api/QuestionGenerator"
 import { sampleRandomSeed } from "@shared/utils/random"
 import { CRT } from "./crt"
 

@@ -1,5 +1,5 @@
-import { FreeTextQuestion, MultipleChoiceQuestion, Question } from "../api/QuestionGenerator"
-import { parseMarkdown, ParseTree, ParseTreeNode } from "./parseMarkdown"
+import type { FreeTextQuestion, MultipleChoiceQuestion, Question } from "../api/QuestionGenerator"
+import { parseMarkdown, type ParseTree, type ParseTreeNode } from "./parseMarkdown"
 
 /**
  * Function to render a given markdown-like string in LaTeX

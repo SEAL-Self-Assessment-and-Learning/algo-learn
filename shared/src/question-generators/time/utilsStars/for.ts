@@ -1,19 +1,19 @@
 import {
-  BoundsOptions,
   createBasicForLine,
   createIfCondition,
-  IfOptions,
+  type BoundsOptions,
+  type IfOptions,
 } from "@shared/question-generators/time/utils"
 import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars"
 import { generateDifferentAmountOfStarPrints } from "@shared/question-generators/time/utilsStars/general"
 import {
   printStarsNew,
-  PseudoCode,
-  PseudoCodeBlock,
-  PseudoCodeFor,
-  PseudoCodeIf,
+  type PseudoCode,
+  type PseudoCodeBlock,
+  type PseudoCodeFor,
+  type PseudoCodeIf,
 } from "@shared/utils/pseudoCodeUtils"
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 /**
  * This function generates random variables for the loop

@@ -4,7 +4,7 @@ import { AiFillGithub } from "react-icons/ai"
 import { CiMail } from "react-icons/ci"
 import { VscFeedback } from "react-icons/vsc"
 import { Link, Outlet } from "react-router-dom"
-import { Language } from "@shared/api/Language"
+import type { Language } from "@shared/api/Language"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,7 +32,7 @@ import {
 import { YScroll } from "@/components/YScroll"
 import { VERSION } from "@/config"
 import { useSound } from "@/hooks/useSound"
-import { availableThemes, Themes, useTheme } from "@/hooks/useTheme"
+import { availableThemes, useTheme, type Themes } from "@/hooks/useTheme"
 import { NATIVE_NAME, SUPPORTED_LANGUAGES, useTranslation } from "@/hooks/useTranslation"
 
 const SEALMAIL = "seal@ae.cs.uni-frankfurt.de"

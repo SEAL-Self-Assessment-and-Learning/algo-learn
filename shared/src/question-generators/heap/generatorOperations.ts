@@ -1,11 +1,11 @@
-import {
+import type {
   FreeTextQuestion,
   MultiFreeTextFeedbackFunction,
   MultiFreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { Heap, MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax"
+import type { Heap, MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax"
 import { generateOperationSequence } from "@shared/question-generators/heap/utils/utilsGenerate"
 import { generateHeapOperationsFoundation } from "@shared/question-generators/heap/utils/utilsOperations"
 import {
@@ -13,7 +13,7 @@ import {
   createArrayDisplayCodeBlockUserInput,
 } from "@shared/utils/arrayDisplayCodeBlock"
 import Random from "@shared/utils/random"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translationHeapOperations: Translations = {
   en: {
