@@ -4,7 +4,8 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { getResolutionTerms, Literal } from "@shared/utils/propositionalLogic.ts"
+import { Literal } from "@shared/utils/propositionalLogic/propositionalLogic.ts"
+import { getDisjunctionTermsLevel } from "@shared/utils/propositionalLogic/resolution.ts"
 // import { variableNames } from "@shared/question-generators/propositional-logic/utils.ts"
 // import { Literal } from "@shared/utils/propositionalLogic.ts"
 // import Random from "@shared/utils/random.ts"
@@ -79,7 +80,7 @@ export const Resolution: QuestionGenerator = {
     const EF = new Literal("E", true)
     //
     const dt = [[AT, DT], [AT, DT, BF], [AT, CT, DT, ET], [CF], [BT, CT, DF, AF], [EF, DT, CF, BF]]
-    const dtl = getResolutionTerms(dt, 2)
+    const dtl = getDisjunctionTermsLevel(dt, 2)
     console.log(dtl.length)
 
     const question: MultipleChoiceQuestion = {

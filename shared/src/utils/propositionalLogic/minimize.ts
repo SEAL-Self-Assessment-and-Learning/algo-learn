@@ -5,7 +5,7 @@ import {
   Operator,
   SyntaxTreeNodeType,
   TruthTable,
-} from "@shared/utils/propositionalLogic.ts"
+} from "@shared/utils/propositionalLogic/propositionalLogic.ts"
 
 /**
  * During the Quine–McCluskey algorithm, the datatype for a truthTable can be a BinaryMix

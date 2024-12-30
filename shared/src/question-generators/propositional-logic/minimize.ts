@@ -11,6 +11,7 @@ import {
   variableNames,
 } from "@shared/question-generators/propositional-logic/utils"
 import { _ } from "@shared/utils/generics"
+import { MinimalNormalForm } from "@shared/utils/propositionalLogic/minimize.ts"
 import {
   compareExpressions,
   generateRandomExpression,
@@ -18,8 +19,7 @@ import {
   PropositionalLogicParser,
   SyntaxTreeNodeType,
   tokenToLatex,
-} from "@shared/utils/propositionalLogic"
-import { MinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
+} from "@shared/utils/propositionalLogic/propositionalLogic.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
 

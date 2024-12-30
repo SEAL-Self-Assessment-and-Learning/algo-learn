@@ -18,7 +18,7 @@ import {
   PropositionalLogicParser,
   SyntaxTreeNodeType,
   tokenToLatex,
-} from "../../utils/propositionalLogic.ts"
+} from "../../utils/propositionalLogic/propositionalLogic.ts"
 import Random from "../../utils/random.ts"
 import { t, tFunctional, Translations } from "../../utils/translations.ts"
 
