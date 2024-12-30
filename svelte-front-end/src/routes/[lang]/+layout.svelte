@@ -2,7 +2,6 @@
   import "../../app.css"
   import "katex/dist/katex.min.css"
   import Header from "@/lib/components/header.svelte"
-  import { latex } from "@/lib/latex.js"
 
   let { children, data } = $props()
 </script>
