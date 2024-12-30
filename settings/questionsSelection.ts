@@ -27,7 +27,8 @@ import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.
 import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF"
 
-export const DEFAULT_IMAGE = new URL("../../assets/images/skill-default.jpg", import.meta.url)
+const IMAGES_DIR = "../front-end/assets/images"
+export const DEFAULT_IMAGE = new URL(`${IMAGES_DIR}/skill-default.jpg`, import.meta.url)
 
 export const collection: QuestionCollection = [
   // {
@@ -50,19 +51,19 @@ export const collection: QuestionCollection = [
     slug: "asymptotics",
     name: { de: "Asymptotik", en: "Asymptotics" },
     contents: [AsymptoticsPreciseLanguage, SortTerms, LandauNotation, SimplifySum, Between],
-    image: new URL("../front-end/assets/images/skill-asymptotics.jpg", import.meta.url),
+    image: new URL(`${IMAGES_DIR}/skill-asymptotics.jpg`, import.meta.url),
   },
   {
     slug: "recursion",
     name: { de: "Rekursion", en: "Recursion" },
     contents: [RecursionFormula, RecurrenceMaster],
-    image: new URL("../front-end/assets/images/skill-recursion.jpg", import.meta.url),
+    image: new URL(`${IMAGES_DIR}/skill-recursion.jpg`, import.meta.url),
   },
   {
     slug: "time",
     name: { de: "Laufzeit", en: "Time" },
     contents: [Loops],
-    image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
+    image: new URL(`${IMAGES_DIR}/skill-time.jpg`, import.meta.url),
   },
   {
     slug: "stack",
