@@ -1,3 +1,4 @@
+import { DisjunctionTerms } from "@shared/utils/propositionalLogic/resolution.ts"
 import Random from "../random.ts"
 
 export type VariableValues = Record<string, boolean>
@@ -27,6 +28,11 @@ abstract class SyntaxTreeNode {
   public abstract eval(values: VariableValues): boolean
 
   public abstract toString(latex: boolean): string
+
+  /**
+   * Returns the disjunction terms of the expression (has to be in CNF).
+   */
+  public abstract toDisjunctionTerms(): DisjunctionTerms
 
   /**
    * Moves negation inwards to the literals
@@ -255,6 +261,10 @@ export class Literal extends SyntaxTreeNode {
 
   getNumLiterals(): number {
     return 1
+  }
+
+  toDisjunctionTerms(): DisjunctionTerms {
+    return [[this.copy()]]
   }
 }
 
@@ -613,6 +623,22 @@ export class Operator extends SyntaxTreeNode {
 
   public getNumLiterals(): number {
     return this.leftOperand.getNumLiterals() + this.rightOperand.getNumLiterals()
+  }
+
+  toDisjunctionTerms(): DisjunctionTerms {
+    if (!this.isCNF()) {
+      throw new Error("Expression has to be CNF to compute the disjunction terms.")
+    }
+    if (this.type === "\\and") {
+      return [...this.leftOperand.toDisjunctionTerms(), ...this.rightOperand.toDisjunctionTerms()]
+    } else {
+      return [
+        [
+          ...this.leftOperand.toDisjunctionTerms().flat(),
+          ...this.rightOperand.toDisjunctionTerms().flat(),
+        ],
+      ]
+    }
   }
 }
 

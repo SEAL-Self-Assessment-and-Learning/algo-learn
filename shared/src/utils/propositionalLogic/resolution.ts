@@ -1,6 +1,13 @@
 import { Literal } from "@shared/utils/propositionalLogic/propositionalLogic.ts"
 
 /**
+ * A disjunction term is a list of literals.
+ */
+export type DisjunctionTerm = Literal[]
+export type DisjunctionTerms = DisjunctionTerm[]
+export type DisjunctionTermsLevel = DisjunctionTerms[]
+
+/**
  * Computes a flat list of all possible derivable disjunction terms,
  * based on the given disjunction terms.
  * Terminates after a given number of rounds.
@@ -10,7 +17,10 @@ import { Literal } from "@shared/utils/propositionalLogic/propositionalLogic.ts"
  * @param disjunctionTerms - first base of disjunction terms
  * @param rounds
  */
-export function getDisjunctionTerms(disjunctionTerms: Literal[][], rounds: number = 10): Literal[][] {
+export function getDisjunctionTerms(
+  disjunctionTerms: DisjunctionTerms,
+  rounds: number = 10,
+): DisjunctionTerms {
   return getDisjunctionTermsLevel(disjunctionTerms, rounds).flat()
 }
 
@@ -25,9 +35,9 @@ export function getDisjunctionTerms(disjunctionTerms: Literal[][], rounds: numbe
  * @param rounds
  */
 export function getDisjunctionTermsLevel(
-  disjunctionTerms: Literal[][],
+  disjunctionTerms: DisjunctionTerms,
   rounds: number = 10,
-): Literal[][][] {
+): DisjunctionTermsLevel {
   const { varNamesIDs, varNamesIDsInverted } = getVarNamesIds(disjunctionTerms)
   const disjunctionDict: [number, number][][] = [createDisjunctionDict(disjunctionTerms, varNamesIDs)]
   const uniqueTerms: Set<string> = initializeUniqueTerms(disjunctionDict[0])
@@ -164,7 +174,7 @@ function stringifyDictTerm(disjunction: { [key: number]: number }) {
 function createLiteralFromDict(
   disjunctionDict: [number, number][][],
   varNamesIds: { [key: number]: string },
-): Literal[][][] {
+): DisjunctionTermsLevel {
   return disjunctionDict.map(createLiteralLevel.bind(null, varNamesIds))
 }
 
@@ -178,7 +188,7 @@ function createLiteralFromDict(
 function createLiteralLevel(
   varNamesIds: { [key: number]: string },
   disjunctions: [number, number][],
-): Literal[][] {
+): DisjunctionTerms {
   return disjunctions.map((disjunction) => createLiteralDisjunction(varNamesIds, disjunction))
 }
 
@@ -192,7 +202,7 @@ function createLiteralLevel(
 function createLiteralDisjunction(
   varNamesIds: { [key: number]: string },
   disjunction: [number, number],
-): Literal[] {
+): DisjunctionTerm {
   const [positive, negative] = disjunction
   const literals: Literal[] = []
 
@@ -261,4 +271,19 @@ export function literalListsEqual(ls1: Literal[], ls2: Literal[]) {
  */
 export function literalListHas(ls: Literal[], l: Literal) {
   return ls.some((l1) => l1.name === l.name && l1.negated === l.negated)
+}
+
+/**
+ * Checks if a given disjunctionTerm exists within a DTL structure.
+ * @param dtl The original DTL structure.
+ * @param disjunctionTerm The disjunctionTerm to check.
+ * @returns True if the disjunctionTerm exists, false otherwise.
+ */
+export function isDisjunctionInDTL(
+  dtl: DisjunctionTermsLevel,
+  disjunctionTerm: DisjunctionTerm,
+): boolean {
+  return dtl.some((level) =>
+    level.some((existingClause) => literalListsEqual(existingClause, disjunctionTerm)),
+  )
 }
