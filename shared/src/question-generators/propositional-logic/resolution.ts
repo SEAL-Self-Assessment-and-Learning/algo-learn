@@ -20,11 +20,23 @@ const translations: Translations = {
   en: {
     name: "Resolution",
     description: "Resolve clauses to prove logical consistency.",
-    text: `Given the following set of disjunction terms: 
-    \\[ K \\coloneqq \\bigl\\{ {{0}} \\bigr\\} \\]
-    Which of the following disjunction terms can be reached with **at most** $ {{1}} $ step(s)?`,
+    text: `Given the following set of disjunction terms $ K \\coloneqq K_0 \\cup \\dots \\cup K_{{1}}$ with: 
+    {{0}}
+    Which of the following disjunction terms can be reached with **at most** {{2}}?`,
+    _1: "**one** step",
+    _2: "**two** steps",
+    _3: "**three** steps",
   },
-  de: {},
+  de: {
+    name: "Resolution",
+    description: "Klauseln auflösen, um logische Konsistenz zu beweisen.",
+    text: `Gegeben sei die folgende Menge von Disjunktionstermen $ K \\coloneqq K_0 \\cup \\dots \\cup K_{{1}}$ mit:
+    {{0}}
+    Welche der folgenden Disjunktionsterme können mit **höchstens** {{1}} erreicht werden?`,
+    _1: "**einem** Schritt",
+    _2: "**zwei** Schritten",
+    _3: "**drei** Schritten",
+  },
 }
 
 export const Resolution: QuestionGenerator = {
@@ -86,7 +98,11 @@ export const Resolution: QuestionGenerator = {
       path: permalink,
       name: Resolution.name(lang),
       allowMultiple: true,
-      text: t(translations, lang, "text", [disjunctionTermsLatex(disjunctionTerms), rounds.toString()]),
+      text: t(translations, lang, "text", [
+        disjuntionTermsSetsLatex(disjunctionTerms),
+        (disjunctionTerms.length - 1).toString(),
+        t(translations, lang, `_${rounds}`),
+      ]),
       answers: combinedAnswers,
       feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
     }
@@ -118,7 +134,7 @@ function generateFalseOptions(
     const randomDisjunctionTerm = selectRandomDisjunctionTerm(random, dtlCopy[randomLevel])
     modifyDisjunctionTerm(random, randomDisjunctionTerm, varNames)
     if (!isDisjunctionInDTL(dtl, randomDisjunctionTerm)) {
-      const latexRepresentation = `$${disjunctionTermsLatex([randomDisjunctionTerm])}$`
+      const latexRepresentation = `$${disjunctionTermLatex(randomDisjunctionTerm)}$`
       falseAnswers.add(latexRepresentation)
     }
   }
@@ -231,7 +247,7 @@ function getCorrectOptions(random: Random, dtl: Literal[][][]): string[] {
   }
   for (let i = dtl.length - 1; i > 0; i--) {
     for (let _ = 0; _ < dtl[i].length; _++) {
-      correctAnswers.add("$" + disjunctionTermsLatex([random.choice(dtl[i])]) + "$")
+      correctAnswers.add("$" + disjunctionTermLatex(random.choice(dtl[i])) + "$")
     }
     if (correctAnswers.size > 4) {
       break
@@ -307,20 +323,26 @@ function generateUniqueVariables(random: Random, varNames: string[], count: numb
   return selectedVars
 }
 
+function disjuntionTermsSetsLatex(disjunctionTerms: Literal[][]): string {
+  let latexString = ""
+  for (let i = 0; i < disjunctionTerms.length; i++) {
+    latexString += `\\[ K_${i} \\coloneqq ${disjunctionTermLatex(disjunctionTerms[i])} \\]`
+  }
+  return latexString
+}
+
 /**
- * Converts a list of disjunction terms to a KaTeX string.
- * Maps each term into a set and this into a bigger set.
+ * Converts a disjunction term to a KaTeX string.
  * Sorts the variable names for each term.
- * @param disjunctionTerms
+ * @param disjunctionTerm
  */
-function disjunctionTermsLatex(disjunctionTerms: Literal[][]): string {
-  return disjunctionTerms
-    .map((term) => {
-      const literals = term
-        .sort()
-        .map((literal) => (literal.negated ? `\\neg ${literal.name}` : literal.name))
-        .join(", ")
-      return `\\{${literals}\\}`
-    })
-    .join(", ")
+function disjunctionTermLatex(disjunctionTerm: Literal[]): string {
+  return (
+    "\\{ " +
+    disjunctionTerm
+      .sort()
+      .map((literal) => (literal.negated ? `\\neg ${literal.name}` : literal.name))
+      .join(", ") +
+    " \\}"
+  )
 }
