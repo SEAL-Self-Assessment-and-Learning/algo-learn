@@ -1,5 +1,5 @@
-import { Language } from "@shared/api/Language"
-import { tFunction, Translations } from "@shared/utils/translations"
+import type { Language } from "@shared/api/Language"
+import { tFunction, type Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {

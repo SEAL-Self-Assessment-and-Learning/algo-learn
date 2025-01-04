@@ -1,5 +1,5 @@
-import { MathNode } from "mathjs"
-import {
+import type { MathNode } from "mathjs"
+import type {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
@@ -8,14 +8,14 @@ import {
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
 import math, { getVars } from "../../utils/math"
 import Random from "../../utils/random"
-import { tFunction, tFunctional, Translations } from "../../utils/translations"
+import { tFunction, tFunctional, type Translations } from "../../utils/translations"
 import {
   createProductTerm,
   IteratedLogarithms,
   mathNodeToSumProductTerm,
   ProductTerm,
   sampleFraction,
-  SumProductTerm,
+  type SumProductTerm,
 } from "./asymptoticsUtils"
 
 const translation: Translations = {

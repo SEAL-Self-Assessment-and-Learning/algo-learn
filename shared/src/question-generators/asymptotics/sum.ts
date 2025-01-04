@@ -1,13 +1,13 @@
 import {
   minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-  QuestionGenerator,
+  type MultipleChoiceQuestion,
+  type QuestionGenerator,
 } from "../../api/QuestionGenerator"
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
 import { format } from "../../utils/format"
 import Random from "../../utils/random"
-import { tFunction, tFunctional, Translations } from "../../utils/translations"
-import { sampleTermSet, TermSetVariants } from "./asymptoticsUtils"
+import { tFunction, tFunctional, type Translations } from "../../utils/translations"
+import { sampleTermSet, type TermSetVariants } from "./asymptoticsUtils"
 
 const translations: Translations = {
   en: {
