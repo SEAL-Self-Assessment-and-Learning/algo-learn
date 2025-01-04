@@ -1,10 +1,10 @@
 import {
-  BinaryOperatorType,
   Literal,
-  NormalForm,
   Operator,
-  SyntaxTreeNodeType,
-  TruthTable,
+  type BinaryOperatorType,
+  type NormalForm,
+  type SyntaxTreeNodeType,
+  type TruthTable,
 } from "@shared/utils/propositionalLogic/propositionalLogic.ts"
 
 /**

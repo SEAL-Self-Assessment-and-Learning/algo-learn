@@ -1,26 +1,26 @@
-import { Language } from "../../api/Language.ts"
+import type { Language } from "../../api/Language.ts"
 import {
-  FreeTextAnswer,
-  FreeTextFeedbackFunction,
-  FreeTextFormatFunction,
-  FreeTextQuestion,
   minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-  QuestionGenerator,
+  type FreeTextAnswer,
+  type FreeTextFeedbackFunction,
+  type FreeTextFormatFunction,
+  type FreeTextQuestion,
+  type MultipleChoiceQuestion,
+  type QuestionGenerator,
 } from "../../api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "../../api/QuestionRouter.ts"
 import { _ } from "../../utils/generics.ts"
 import {
-  ExpressionProperties,
   generateRandomExpression,
   numToVariableValues,
   ParserError,
   PropositionalLogicParser,
-  SyntaxTreeNodeType,
   tokenToLatex,
+  type ExpressionProperties,
+  type SyntaxTreeNodeType,
 } from "../../utils/propositionalLogic/propositionalLogic.ts"
 import Random from "../../utils/random.ts"
-import { t, tFunctional, Translations } from "../../utils/translations.ts"
+import { t, tFunctional, type Translations } from "../../utils/translations.ts"
 
 const translations: Translations = {
   en: {

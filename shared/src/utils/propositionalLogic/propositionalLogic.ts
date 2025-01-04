@@ -1,5 +1,5 @@
-import { DisjunctionTerms } from "@shared/utils/propositionalLogic/resolution.ts"
-import Random from "../random.ts"
+import type { DisjunctionTerms } from "@shared/utils/propositionalLogic/resolution.ts"
+import type Random from "@shared/utils/random"
 
 export type VariableValues = Record<string, boolean>
 export type NormalForm = "CNF" | "DNF"

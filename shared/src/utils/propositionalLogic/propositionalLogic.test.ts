@@ -4,12 +4,12 @@ import { getDisjunctionTerms, literalListsEqual } from "@shared/utils/propositio
 import Random, { sampleRandomSeed } from "../random.ts"
 import {
   associativeOperators,
-  BinaryOperatorType,
   compareExpressions,
   Literal,
   Operator,
   ParserError,
   PropositionalLogicParser,
+  type BinaryOperatorType,
 } from "./propositionalLogic.ts"
 
 const v = [new Literal("x1"), new Literal("x2"), new Literal("x3")]
