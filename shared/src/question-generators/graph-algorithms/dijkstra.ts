@@ -67,8 +67,6 @@ export const DijkstraAlgorithm: QuestionGenerator = {
     const result: DijkstraResult = runDijkstra(graph, startNode)
     const correctOrder = result.order ?? []
 
-    // console.log("Expected Order of Node Removal:", correctOrder.join(", "))
-
     const checkFormat: FreeTextFormatFunction = (answer: FreeTextAnswer) => {
       const order = parseNodeOrder(answer.text)
 

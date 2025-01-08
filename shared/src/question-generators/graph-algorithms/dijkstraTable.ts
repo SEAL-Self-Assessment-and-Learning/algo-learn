@@ -76,8 +76,6 @@ export const DijkstraTableGenerator: QuestionGenerator = {
     const feedback = getFeedbackFunction(steps, graph)
     const checkFormat = getCheckFormatFunction(lang, graph)
 
-    console.log("debug:\n", cheatForDebugging(steps, graph))
-
     const question: MultiFreeTextQuestion = {
       type: "MultiFreeTextQuestion",
       path: permalink,
@@ -94,31 +92,6 @@ export const DijkstraTableGenerator: QuestionGenerator = {
 
     return { question }
   },
-}
-
-function cheatForDebugging(
-  steps: Array<{
-    set: Set<string>
-    distances: Record<string, string>
-    predecessors: Record<string, string>
-  }>,
-  graph: Graph,
-): string {
-  return steps
-    .map((step) => {
-      const expectedSet = `{${[...step.set].join(", ")}}`
-      const nodeFeedback = graph.nodes
-        .map((node) => {
-          const nodeLabel = node.label!
-          const expectedDistance = step.distances[nodeLabel] || ""
-          const expectedPredecessor = step.predecessors[nodeLabel] || ""
-          return `${expectedDistance} | ${expectedPredecessor}`
-        })
-        .join(" | ")
-
-      return `| ${expectedSet} | ${nodeFeedback} |`
-    })
-    .join("\n")
 }
 
 function generateRandomGraphWithValidation(random: Random, size: number): DijkstraResult {
@@ -329,7 +302,6 @@ function getFeedbackFunction(
 
     // final table structure
     const completeTable = `${headerRow}\n${separatorRow}\n${feedbackDetails}`
-    //console.log("Generated Feedback Table:\n", completeTable)
 
     return {
       correct: allStepsCorrect,
