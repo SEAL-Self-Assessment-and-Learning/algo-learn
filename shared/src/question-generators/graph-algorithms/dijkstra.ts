@@ -53,7 +53,7 @@ export const DijkstraAlgorithm: QuestionGenerator = {
       name: "size",
       description: tFunctional(translations, "description"),
       type: "integer",
-      min: 2,
+      min: 4,
       max: 8,
     },
   ],

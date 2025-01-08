@@ -55,7 +55,7 @@ export const DijkstraTableGenerator: QuestionGenerator = {
     {
       name: "size",
       type: "integer",
-      min: 2,
+      min: 4,
       max: 8,
     },
   ],
