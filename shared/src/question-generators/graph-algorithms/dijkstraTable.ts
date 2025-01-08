@@ -63,7 +63,7 @@ export const DijkstraTableGenerator: QuestionGenerator = {
   generate: (lang: Language, parameters, seed) => {
     const random = new Random(seed)
 
-    const { graph, steps } = generateRandomGraphWithValidation(random, parameters.size as number)
+    const { graph, steps } = generateGraphWithSufficientSteps(random, parameters.size as number)
 
     const permalink = serializeGeneratorCall({
       generator: DijkstraTableGenerator,
@@ -94,7 +94,7 @@ export const DijkstraTableGenerator: QuestionGenerator = {
   },
 }
 
-function generateRandomGraphWithValidation(random: Random, size: number): DijkstraResult {
+function generateGraphWithSufficientSteps(random: Random, size: number): DijkstraResult {
   const maxRetries = 100
   let retries = 0
 
@@ -102,25 +102,19 @@ function generateRandomGraphWithValidation(random: Random, size: number): Dijkst
   while (retries < maxRetries) {
     const currentSize = size + Math.floor(retries / 5) // increase size every 5 retries
     const currentEdgeChance = 0.6 + (retries % 5) * 0.1 // cycle edgeChance
-  
+
     const graph = createRandomGraph(random, currentSize, currentEdgeChance)
-    const steps = validateDijkstraSteps(graph)
-    
-    if (steps && steps.length > 1) {
+    const startNode = graph.nodes[0]?.label ?? "A"
+    const { steps } = runDijkstra(graph, startNode)
+
+    if (steps.length > 1) {
       return { graph, steps }
     }
-  
+
     retries++
   }
 
-  throw new Error("Unable to generate a valid graph with more than one row after 100 retries.")
-}
-
-function validateDijkstraSteps(graph: Graph): DijkstraResult["steps"] | null {
-  const startNode = graph.nodes[0]?.label ?? "A"
-  const { steps } = runDijkstra(graph, startNode)
-  // return steps only if algorithm is long enough
-  return steps.length > 1 ? steps : null
+  throw new Error("Unable to generate a graph with sufficient Dijkstra steps after 100 retries.")
 }
 
 function getDijkstraInputTable(
