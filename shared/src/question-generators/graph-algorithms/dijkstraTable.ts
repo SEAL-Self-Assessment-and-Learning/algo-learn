@@ -6,7 +6,12 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { Graph, RandomGraph } from "@shared/utils/graph"
+import {
+  createRandomGraph,
+  DijkstraResult,
+  runDijkstra,
+} from "@shared/question-generators/graph-algorithms/utils"
+import { Graph } from "@shared/utils/graph"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
 
@@ -58,7 +63,7 @@ export const DijkstraTableGenerator: QuestionGenerator = {
   generate: (lang: Language, parameters, seed) => {
     const random = new Random(seed)
 
-    const { graph, steps } = generateRandomGraphWithSteps(random, parameters.size as number)
+    const { graph, steps } = generateRandomGraphWithValidation(random, parameters.size as number)
 
     const permalink = serializeGeneratorCall({
       generator: DijkstraTableGenerator,
@@ -116,16 +121,7 @@ function cheatForDebugging(
     .join("\n")
 }
 
-interface DijkstraResult {
-  graph: Graph
-  steps: Array<{
-    set: Set<string>
-    distances: Record<string, string>
-    predecessors: Record<string, string>
-  }>
-}
-
-function generateRandomGraphWithSteps(random: Random, size: number): DijkstraResult {
+function generateRandomGraphWithValidation(random: Random, size: number): DijkstraResult {
   const maxRetries = 100
   let retries = 0
   let edgeChance = 0.6
@@ -133,7 +129,7 @@ function generateRandomGraphWithSteps(random: Random, size: number): DijkstraRes
   // guarantee more than one row in the algorithm
   while (retries < maxRetries) {
     const graph = createRandomGraph(random, size, edgeChance)
-    const steps = getDijkstraStepsIfValid(graph)
+    const steps = validateDijkstraSteps(graph)
     if (steps && steps.length > 1) {
       return { graph, steps }
     }
@@ -147,34 +143,9 @@ function generateRandomGraphWithSteps(random: Random, size: number): DijkstraRes
   throw new Error("Unable to generate a valid graph with more than one row after 100 retries.")
 }
 
-function createRandomGraph(random: Random, size: number, edgeChance: number): Graph {
-  // calculate grid dimensions can accommodate nodes
-  const width = Math.ceil(Math.sqrt(size))
-  let height = Math.ceil(size / width)
-  while (width * height < size) height++
-
-  const graph = RandomGraph.grid(
-    random,
-    [width, height],
-    edgeChance,
-    random.choice(["square", "square-width-diagonals", "triangle"]),
-    "unique",
-    false,
-    random.bool(),
-  )
-
-  // trim excess nodes and edges to exactly match 'size'
-  graph.nodes = graph.nodes.slice(0, size)
-  graph.edges = graph.edges
-    .slice(0, size)
-    .map((edgeList) => edgeList.filter((edge) => edge.target < size))
-
-  return graph
-}
-
-function getDijkstraStepsIfValid(graph: Graph): DijkstraResult["steps"] | null {
+function validateDijkstraSteps(graph: Graph): DijkstraResult["steps"] | null {
   const startNode = graph.nodes[0]?.label ?? "A"
-  const { steps } = generateDijkstraSteps(graph, startNode)
+  const { steps } = runDijkstra(graph, startNode)
   // return steps only if algorithm is long enough
   return steps.length > 1 ? steps : null
 }
@@ -365,76 +336,4 @@ function getFeedbackFunction(
       correctAnswer: completeTable,
     }
   }
-}
-
-function generateDijkstraSteps(graph: Graph, startLabel: string) {
-  const distances: Record<string, number> = {}
-  const predecessors: Record<string, string> = {}
-  const visited = new Set<string>()
-  const priorityQueue: [string, number][] = []
-  const steps: Array<{
-    set: Set<string>
-    distances: Record<string, string>
-    predecessors: Record<string, string>
-  }> = []
-
-  graph.nodes.forEach((node) => {
-    const label = node.label ?? ""
-    distances[label] = Infinity
-    predecessors[label] = ""
-  })
-  distances[startLabel] = 0
-  priorityQueue.push([startLabel, 0])
-
-  while (priorityQueue.length > 0) {
-    priorityQueue.sort((a, b) => a[1] - b[1])
-    const [currentNode, currentDist] = priorityQueue.shift()!
-    if (visited.has(currentNode)) continue
-
-    visited.add(currentNode)
-
-    const currentDistances = mapDistances(distances)
-    const currentPredecessors = { ...predecessors }
-
-    steps.push({
-      set: new Set(visited),
-      distances: currentDistances,
-      predecessors: currentPredecessors,
-    })
-
-    updateNeighbors(graph, currentNode, currentDist, distances, predecessors, priorityQueue)
-  }
-
-  return { steps }
-}
-
-function mapDistances(distances: Record<string, number>): Record<string, string> {
-  return Object.fromEntries(
-    Object.entries(distances).map(([key, value]) => [key, value === Infinity ? "" : value.toString()]),
-  )
-}
-
-function updateNeighbors(
-  graph: Graph,
-  currentNode: string,
-  currentDist: number,
-  distances: Record<string, number>,
-  predecessors: Record<string, string>,
-  priorityQueue: [string, number][],
-): void {
-  const currentNodeIndex = graph.nodes.findIndex((n) => n.label === currentNode)
-  if (currentNodeIndex === -1) return
-
-  graph.getNeighbors(currentNodeIndex).forEach((edge) => {
-    const neighborLabel = graph.nodes[edge.target]?.label
-    if (!neighborLabel) return
-
-    const edgeWeight = edge.value ?? Infinity
-
-    if (distances[neighborLabel] > currentDist + edgeWeight) {
-      distances[neighborLabel] = currentDist + edgeWeight
-      predecessors[neighborLabel] = currentNode
-      priorityQueue.push([neighborLabel, distances[neighborLabel]])
-    }
-  })
 }

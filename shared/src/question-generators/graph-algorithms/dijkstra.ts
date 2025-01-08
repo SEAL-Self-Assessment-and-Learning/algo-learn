@@ -5,7 +5,11 @@ import {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { Graph, RandomGraph } from "@shared/utils/graph"
+import {
+  createRandomGraph,
+  DijkstraResult,
+  runDijkstra,
+} from "@shared/question-generators/graph-algorithms/utils"
 import Random from "@shared/utils/random"
 import { t, tFunctional, Translations } from "@shared/utils/translations"
 
@@ -57,29 +61,11 @@ export const DijkstraAlgorithm: QuestionGenerator = {
   generate: (lang = "en", parameters, seed) => {
     const random = new Random(seed)
     const size = parameters.size as number
-    const width = Math.ceil(Math.sqrt(size))
-    let height = Math.ceil(size / width)
-    while (width * height < size) height++
-
-    const graph = RandomGraph.grid(
-      random,
-      [width, height],
-      0.6,
-      random.choice(["square", "square-width-diagonals", "triangle"]),
-      "unique",
-      random.bool(),
-      true,
-    )
-    graph.nodeDraggable = false
-
-    // trim graph to match size
-    graph.nodes = graph.nodes.slice(0, size)
-    graph.edges = graph.edges
-      .slice(0, size)
-      .map((edgeList) => edgeList.filter((edge) => edge.target < size))
+    const graph = createRandomGraph(random, size, 0.6)
 
     const startNode = random.choice(graph.nodes.map((node) => node.label)) ?? "A" // randomized start node
-    const correctOrder = runDijkstra(graph, startNode)
+    const result: DijkstraResult = runDijkstra(graph, startNode)
+    const correctOrder = result.order ?? []
 
     // console.log("Expected Order of Node Removal:", correctOrder.join(", "))
 
@@ -142,51 +128,4 @@ export const DijkstraAlgorithm: QuestionGenerator = {
     }
     return { question }
   },
-}
-
-/**
- * Runs Dijkstra's algorithm to compute the order of node removal based on a priority queue.
- * @param graph the graph used
- * @param startLabel label of the start node
- * @returns order in which nodes are removed from the priority queue.
- */
-function runDijkstra(graph: Graph, startLabel: string): string[] {
-  const distances: Record<string, number> = {}
-  const visited: Set<string> = new Set()
-  const priorityQueue: [string, number][] = []
-
-  graph.nodes.forEach((node) => {
-    const label = node.label ?? ""
-    distances[label] = Infinity
-  })
-  distances[startLabel] = 0
-  priorityQueue.push([startLabel, 0])
-
-  const orderOfRemoval: string[] = []
-
-  while (priorityQueue.length > 0) {
-    // sort queue by distance and remove the node with the smallest distance
-    priorityQueue.sort((a, b) => a[1] - b[1])
-    const [currentNode, currentDist] = priorityQueue.shift() as [string, number]
-    if (visited.has(currentNode)) continue
-
-    visited.add(currentNode)
-    orderOfRemoval.push(currentNode)
-
-    // explore neighbors
-    const currentNodeIndex = graph.nodes.findIndex((n) => n.label === currentNode)
-
-    graph.getNeighbors(currentNodeIndex).forEach((edge) => {
-      const neighborLabel = graph.nodes[edge.target]?.label
-      if (!neighborLabel) return
-      const edgeWeight = edge.value ?? Infinity
-
-      if (distances[neighborLabel] > currentDist + edgeWeight) {
-        distances[neighborLabel] = currentDist + edgeWeight
-        priorityQueue.push([neighborLabel, distances[neighborLabel]])
-      }
-    })
-  }
-
-  return orderOfRemoval
 }
