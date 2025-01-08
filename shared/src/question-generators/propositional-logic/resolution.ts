@@ -81,8 +81,8 @@ export const Resolution: QuestionGenerator = {
     const rounds = (parameters.rounds ?? 2) as number
     const numVars = (parameters.size ?? 4) as number
     const varNames = random.choice(variableNames).slice(0, numVars)
-    let disjunctionTerms = generateDisjunctionTerms({ random, varNames })
-    let dtl: Literal[][][] = getDisjunctionTermsLevel(disjunctionTerms, rounds)
+    let disjunctionTerms: DisjunctionTerms
+    let dtl: DisjunctionTermsLevel
     do {
       disjunctionTerms = generateDisjunctionTerms({ random, varNames })
       dtl = getDisjunctionTermsLevel(disjunctionTerms, rounds)
