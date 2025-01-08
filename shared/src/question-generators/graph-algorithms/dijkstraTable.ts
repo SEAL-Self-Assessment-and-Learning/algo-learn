@@ -124,20 +124,20 @@ function cheatForDebugging(
 function generateRandomGraphWithValidation(random: Random, size: number): DijkstraResult {
   const maxRetries = 100
   let retries = 0
-  let edgeChance = 0.6
 
-  // guarantee more than one row in the algorithm
+  // find graph complex enough for the algorithm to extend passed the prefilled row
   while (retries < maxRetries) {
-    const graph = createRandomGraph(random, size, edgeChance)
+    const currentSize = size + Math.floor(retries / 5) // increase size every 5 retries
+    const currentEdgeChance = 0.6 + (retries % 5) * 0.1 // cycle edgeChance
+  
+    const graph = createRandomGraph(random, currentSize, currentEdgeChance)
     const steps = validateDijkstraSteps(graph)
+    
     if (steps && steps.length > 1) {
       return { graph, steps }
     }
-
-    // increment retries and adjust edgeChance for next attempt
+  
     retries++
-    edgeChance += 0.1 // make graph denser on retry
-    console.log("retries so far:", retries)
   }
 
   throw new Error("Unable to generate a valid graph with more than one row after 100 retries.")
