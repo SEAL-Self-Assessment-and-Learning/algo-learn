@@ -15,7 +15,7 @@ import { t, tFunctional, Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {
-    name: "Dijkstra's Algorithm",
+    name: "Dijkstra's Algorithm: Order",
     description: "Determine node prioritization in Dijkstra’s algorithm.",
     prompt: "Order of node removal:",
     invalid_node: '"{{n}}" is not a node in the graph.',

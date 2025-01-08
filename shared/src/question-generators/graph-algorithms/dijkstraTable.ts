@@ -17,7 +17,7 @@ import { t, tFunctional, Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {
-    name: "Dijkstra Table",
+    name: "Dijkstra's Algorithm: Table",
     description: "Fill in the table with distances between nodes using Dijkstra's algorithm.",
     tableQuestion:
       "Given the following undirected graph with weighted edges, determine the shortest paths from node $A$ to all other nodes using Dijkstra's algorithm.",
