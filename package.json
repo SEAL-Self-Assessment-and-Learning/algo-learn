@@ -5,7 +5,8 @@
     "front-end",
     "svelte-front-end",
     "settings",
-    "shared"
+    "shared",
+    "packages/*"
   ],
   "license": "MIT",
   "author": "Holger Dell (https://holgerdell.com)",
