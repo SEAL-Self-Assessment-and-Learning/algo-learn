@@ -1,8 +1,8 @@
 import { browser } from "$app/environment"
+import deJSON from "@react-front-end/locales/de.json"
+import enJSON from "@react-front-end/locales/en.json"
 import type { Language } from "@shared/api/Language"
 import type { Translations } from "@shared/utils/translations"
-import deJSON from "../../../front-end/src/locales/de.json"
-import enJSON from "../../../front-end/src/locales/en.json"
 
 export const SUPPORTED_LANGUAGES: ReadonlyArray<Language> = ["en", "de"]
 export const DEFAULT_LANGUAGE: Language =

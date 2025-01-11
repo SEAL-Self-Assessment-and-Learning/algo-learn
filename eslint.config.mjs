@@ -85,6 +85,11 @@ export default ts.config(
   },
   prettier,
   {
-    ignores: ["**/*.config.{js,cjs,mjs}", "node_modules", "front-end/dist", "svelte-front-end/"],
+    ignores: [
+      "**/*.config.{js,cjs,mjs}",
+      "node_modules",
+      "front-end/dist",
+      "packages/svelte-front-end/",
+    ],
   },
 )

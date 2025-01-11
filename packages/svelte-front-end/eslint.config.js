@@ -5,7 +5,7 @@ import globals from "globals"
 import ts from "typescript-eslint"
 import { includeIgnoreFile } from "@eslint/compat"
 import js from "@eslint/js"
-import { namingConvention } from "../eslint.config.mjs"
+import { namingConvention } from "../../eslint.config.mjs"
 
 const gitignorePath = fileURLToPath(new URL("./.gitignore", import.meta.url))
 

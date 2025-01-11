@@ -3,7 +3,6 @@
   "private": true,
   "workspaces": [
     "front-end",
-    "svelte-front-end",
     "settings",
     "shared",
     "packages/*"
@@ -17,8 +16,8 @@
     "build:json-schema": "$npm_execpath run ts-json-schema-generator --path 'src/**/QuestionGenerator.ts' --tsconfig ./tsconfig.ts-json-schema-generator.json --type 'Question'",
     "test": "$npm_execpath run lint && $npm_execpath run test:unit",
     "test:unit": "which bun && bun test --bail || vitest run --bail 1",
-    "lint": "eslint && tsc && prettier . --check && cd svelte-front-end && $npm_execpath run lint",
-    "format": "prettier . --write && cd svelte-front-end && $npm_execpath run format",
+    "lint": "eslint && tsc && prettier . --check && cd packages/svelte-front-end && $npm_execpath run lint",
+    "format": "prettier . --write && cd packages/svelte-front-end && $npm_execpath run format",
     "clean": "rm -rf dist/ .yarn/cache/ node_modules/ *front-end/node_modules/ settings/node_modules/ shared/node_modules/ docs/ vite-bundle-visualizer.html",
     "visualize": "$npm_execpath run vite-bundle-visualizer -o vite-bundle-visualizer.html",
     "docs": "$npm_execpath run typedoc --out docs shared/src/**/*.ts shared/src/**/*.tsx"

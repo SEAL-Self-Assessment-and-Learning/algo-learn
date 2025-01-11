@@ -27,7 +27,7 @@ import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.
 import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF"
 
-const IMAGES_DIR = "../front-end/assets/images"
+const IMAGES_DIR = "@react-front-end/../assets/images"
 export const DEFAULT_IMAGE = new URL(`${IMAGES_DIR}/skill-default.jpg`, import.meta.url)
 
 export const collection: QuestionCollection = [

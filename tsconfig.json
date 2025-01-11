@@ -31,6 +31,6 @@
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
-  "exclude": ["node_modules", "front-end/dist", "front-end/vite.config.ts", "svelte-front-end"],
+  "exclude": ["node_modules", "front-end/dist", "front-end/vite.config.ts", "packages/svelte-front-end"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
