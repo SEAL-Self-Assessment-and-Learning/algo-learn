@@ -10,7 +10,7 @@ import {
   generateRandomExpression,
   generateRandomTautology,
   type VariableValues,
-} from "../../utils/propositionalLogic.ts"
+} from "../../utils/propositionalLogic/propositionalLogic.ts"
 import Random from "../../utils/random.ts"
 import { t, tFunctional, type Translations } from "../../utils/translations.ts"
 
