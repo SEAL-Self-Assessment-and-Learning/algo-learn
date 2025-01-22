@@ -1,7 +1,7 @@
 import { Language } from "@shared/api/Language.ts"
-import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm"
+import type { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 /**
  * This function performs additional union operations outside the block/blocks

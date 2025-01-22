@@ -1,9 +1,9 @@
 import {
   minimalMultipleChoiceFeedback,
-  MultiFreeTextFeedbackFunction,
-  MultiFreeTextFormatFunction,
-  MultiFreeTextQuestion,
-  MultipleChoiceQuestion,
+  type MultiFreeTextFeedbackFunction,
+  type MultiFreeTextFormatFunction,
+  type MultiFreeTextQuestion,
+  type MultipleChoiceQuestion,
 } from "@shared/api/QuestionGenerator"
 import { generatePossibleAnswersChoice2 } from "@shared/question-generators/huffman-coding/generate/dictStructure"
 import { generateCharacterFrequencyTable } from "@shared/question-generators/huffman-coding/generate/words"
@@ -13,8 +13,8 @@ import {
   checkProvidedCode,
   convertDictToMdTable,
 } from "@shared/question-generators/huffman-coding/utils/utils"
-import Random from "@shared/utils/random"
-import { t, Translations } from "@shared/utils/translations"
+import type Random from "@shared/utils/random"
+import { t, type Translations } from "@shared/utils/translations"
 
 /**
  * This function generates the basic structure for input2 and choice2 questions

@@ -1,11 +1,11 @@
 import {
   minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-  QuestionGenerator,
+  type MultipleChoiceQuestion,
+  type QuestionGenerator,
 } from "../../api/QuestionGenerator"
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
 import Random from "../../utils/random"
-import { t, tFunctional, Translations } from "../../utils/translations"
+import { t, tFunctional, type Translations } from "../../utils/translations"
 
 /**
  * All displayed text goes into the translations object.

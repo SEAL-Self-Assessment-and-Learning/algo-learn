@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Question, questionToJSON } from "@shared/api/QuestionGenerator"
+import { questionToJSON, type Question } from "@shared/api/QuestionGenerator"
 import { ExampleQuestion } from "@shared/question-generators/example/example"
 import Random from "@shared/utils/random"
 import { questionToTex } from "@shared/utils/toLatex"

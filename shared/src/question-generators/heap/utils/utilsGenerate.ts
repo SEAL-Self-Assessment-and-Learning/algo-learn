@@ -1,7 +1,7 @@
 import { Language } from "@shared/api/Language.ts"
 import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock"
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 /**
  * Generates a random operations sequence for heap operations combine variation

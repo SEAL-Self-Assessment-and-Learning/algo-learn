@@ -1,4 +1,4 @@
-import {
+import type {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextFormatFunction,
   MultiFreeTextQuestion,
@@ -11,7 +11,7 @@ import {
   generateStackStartElements,
 } from "@shared/question-generators/Stack/utils.ts"
 import Random from "@shared/utils/random.ts"
-import { t, tFunction, tFunctional, Translations } from "@shared/utils/translations.ts"
+import { t, tFunction, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {

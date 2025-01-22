@@ -1,5 +1,5 @@
 import { mdInputField, mdTableFromData } from "@shared/utils/markdownTools.ts"
-import Random from "./random.ts"
+import type Random from "./random.ts"
 
 export type VariableValues = Record<string, boolean>
 export type NormalForm = "CNF" | "DNF"

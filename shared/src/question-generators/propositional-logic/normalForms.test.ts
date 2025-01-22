@@ -1,5 +1,5 @@
 import { expect, test } from "vitest"
-import { FreeTextFeedback, FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
+import type { FreeTextFeedback, FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
 import { NormalForms } from "./normalForms.ts"
 
 test("Normal forms with a single literal as answer", () => {

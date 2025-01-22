@@ -1,6 +1,6 @@
-import { Fragment, FunctionComponent, ReactNode } from "react"
+import { Fragment, type FunctionComponent, type ReactNode } from "react"
 import { Link } from "react-router-dom"
-import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
+import { parseMarkdown, type ParseTree, type ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
 import { DrawList } from "@/components/DrawList.tsx"
 import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
@@ -19,12 +19,14 @@ import TeX from "./TeX"
  */
 export const Markdown: FunctionComponent<{
   md?: string
-  children?: ReactNode[]
+  children?: ReactNode | ReactNode[]
 }> = ({ md, children }) => {
   if (!md) {
     return <></>
   }
-  return <MarkdownTree parseTree={parseMarkdown(md)} parameters={children} />
+  const childrenArray =
+    children !== undefined ? (Array.isArray(children) ? children : [children]) : undefined
+  return <MarkdownTree parseTree={parseMarkdown(md)} parameters={childrenArray} />
 }
 
 /**

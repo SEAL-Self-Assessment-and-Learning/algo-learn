@@ -2,7 +2,6 @@ import { describe, expect, test } from "vitest"
 import { MinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
 import {
   associativeOperators,
-  BinaryOperatorType,
   compareExpressions,
   getMdTruthTable,
   Literal,
@@ -10,6 +9,7 @@ import {
   ParserError,
   PropositionalLogicParser,
   SyntaxTreeNodeType,
+  type BinaryOperatorType,
 } from "./propositionalLogic"
 import Random, { sampleRandomSeed } from "./random.ts"
 
