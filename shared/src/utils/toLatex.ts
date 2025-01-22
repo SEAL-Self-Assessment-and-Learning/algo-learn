@@ -28,7 +28,7 @@ function replaceQuotes(text: string) {
 /**
  * Function to render a given markdown-like string in LaTeX
  *
- * @param md The markdown-like string to render
+ * @param tree tree of parsed Markdown
  * @returns The LaTeX string
  */
 export function markdownTreeToLatex(tree: ParseTree | ParseTreeNode): string {
@@ -53,14 +53,14 @@ export function markdownTreeToLatex(tree: ParseTree | ParseTreeNode): string {
   } else if (tree.kind === "a") {
     return `\\href{${tree.url}}{${markdownTreeToLatex(tree.child)}}`
   } else if (tree.kind === "table") {
-    const { header, content, alignment } = tree.child
-    const colSpec = header
-      .map((_, index) => {
-        if (alignment[index] === "left") {
+    const { content, format } = tree.child
+    const colSpec = format.alignment
+      .map((align) => {
+        if (align === "left") {
           return "l"
-        } else if (alignment[index] === "right") {
+        } else if (align === "right") {
           return "r"
-        } else if (alignment[index] === "center") {
+        } else if (align === "center") {
           return "c"
         } else {
           return "l"
@@ -68,8 +68,9 @@ export function markdownTreeToLatex(tree: ParseTree | ParseTreeNode): string {
       })
       .join("")
 
+    const [header, ...data] = content
     const headerRow = header.map((cell) => markdownTreeToLatex(cell)).join(" & ")
-    const contentRows = content
+    const contentRows = data
       .map((row) => row.map((cell) => markdownTreeToLatex(cell)).join(" & "))
       .join(" \\\\\n")
 
