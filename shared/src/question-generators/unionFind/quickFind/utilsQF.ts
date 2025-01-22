@@ -1,4 +1,4 @@
-import { Language } from "@shared/api/Language.ts"
+import type { Language } from "@shared/api/Language.ts"
 import type { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import type Random from "@shared/utils/random"

@@ -8,8 +8,8 @@ import {
   Operator,
   ParserError,
   PropositionalLogicParser,
-  SyntaxTreeNodeType,
   type BinaryOperatorType,
+  type SyntaxTreeNodeType,
 } from "./propositionalLogic"
 import Random, { sampleRandomSeed } from "./random.ts"
 

@@ -1,4 +1,4 @@
-import { Language } from "@shared/api/Language.ts"
+import type { Language } from "@shared/api/Language.ts"
 import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock"
 import type Random from "@shared/utils/random"

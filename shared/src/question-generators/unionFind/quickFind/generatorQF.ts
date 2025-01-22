@@ -1,4 +1,4 @@
-import { Language } from "@shared/api/Language.ts"
+import type { Language } from "@shared/api/Language.ts"
 import type {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextQuestion,
