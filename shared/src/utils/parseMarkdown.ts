@@ -126,7 +126,9 @@ export function parseMarkdown(md: string): ParseTree {
  * - A header line can be indicated by having it followed by a line like `|====|====|`.
  * - Lines like `|----|----|` indicate horizontal subdivisions of the tables
  * - The frist horizontal line indicator (`|====|====|` or `|----|----|`) also supports `!` on
- *    either side of `|` to indicate a visual vertical subdivision of the table.
+ *    either side of `|` to indicate a visual vertical subdivision of the table as well as an alignment indicated by `:`.
+ *    If the first horizontal line indicator is the very first line of the table, it does not result in a horizontal line
+ *    and is only used for formatting purposes.
  * Example:
  * | A | B | C |
  * |===:|!:===:|===|
@@ -134,8 +136,8 @@ export function parseMarkdown(md: string): ParseTree {
  * | a2 | b2 | c2 |
  * |---|---|---|
  * | a3 | b3 | c3 |
- * The table has a table head, the first column is justified right, the second column is centered.
- * There is A visual subdivision between the first and second column as well as between the second and third row.
+ * The table has a table header, the first column is justified right, and the second column is centered.
+ * There is a visual subdivision between the first and second column as well as between the second and third row.
  * @param table The markdown-like text to parse
  * @returns Header, content and alignment of the table, can also add extra Feature (not md specific) see below
  */
@@ -155,10 +157,17 @@ export function parseTable(table: string) {
   // const regexExtraFeatures: { [key: string]: RegExp } = {
   //   hashtag: /^#.*#$/,
   // }
+  const getCellsOfRow = (line: string) =>
+    line
+      .split("|")
+      .slice(1, -1)
+      .map((c) => c.trim())
 
-  if (formattingRegex.test(rows[1])) {
-    format.header = rows[1].includes("=")
-    const cellsOfRow = rows[1].split("|").slice(1, -1)
+  const formattingRowIndex = rows.findIndex((row) => formattingRegex.test(row))
+
+  if (formattingRowIndex >= 0) {
+    format.header = rows[formattingRowIndex].includes("=") && formattingRowIndex === 1
+    const cellsOfRow = getCellsOfRow(rows[formattingRowIndex])
     cellsOfRow.forEach((cell, i) => {
       const [left, right] = cell.split(/[-=]+/)
       if (left.includes("!")) format.vLines.push(i)
@@ -174,7 +183,7 @@ export function parseTable(table: string) {
     if (formattingRegex.test(rows[i])) {
       format.hLines.push(content.length - 1)
     } else {
-      content.push(rows[i].split("|").slice(1, -1))
+      content.push(getCellsOfRow(rows[i]))
     }
   }
 
