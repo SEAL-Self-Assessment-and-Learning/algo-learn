@@ -33,4 +33,19 @@ export const _ = {
   difference: <T>(array: T[], values: T[]): T[] => {
     return array.filter((e) => !values.includes(e))
   },
+
+  zip(...arrays: any[]): any[][] {
+    const zipped: any[][] = []
+    for (let i = 0; i < arrays[0].length; i++) {
+      const row = []
+      for (let j = 0; j < arrays.length; j++) row.push(arrays[j][i])
+
+      zipped.push(row)
+    }
+    return zipped
+  },
+
+  unzip(array: any[][]): any[][] {
+    return this.zip(...array)
+  },
 }

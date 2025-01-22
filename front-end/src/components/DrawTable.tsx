@@ -75,30 +75,3 @@ export function DrawTable({
     </table>
   )
 }
-
-//
-// function transposeTable(parsedHeader: string[], parsedContent: string[][]) {
-//   const newContent: string[][] = []
-//   // the header needs to be on the left too,
-//   // so we add the header (if exists) to the first column of the content
-//   // and surround each string with **
-//   if (parsedHeader.length > 0) {
-//     for (let i = 0; i < parsedHeader.length; i++) {
-//       if (i >= newContent.length) {
-//         newContent.push([`**${parsedHeader[i]}**`])
-//       } else {
-//         newContent[i].push(`**${parsedHeader[i]}**`)
-//       }
-//     }
-//   }
-//   // then we add the content to the newContent
-//   for (let i = 0; i < parsedContent.length; i++) {
-//     for (let j = 0; j < parsedContent[i].length; j++) {
-//       if (j + 1 > newContent.length) {
-//         newContent.push([])
-//       }
-//       newContent[j].push(parsedContent[i][j])
-//     }
-//   }
-//   return { newContent }
-// }
