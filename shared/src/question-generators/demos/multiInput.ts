@@ -1,7 +1,7 @@
-import { MultiFreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator"
+import type { MultiFreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import Random from "@shared/utils/random"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 /**
  * All displayed text goes into the translations object.
