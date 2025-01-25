@@ -1,6 +1,6 @@
 import { expect, test } from "vitest"
-import { QuestionGenerator } from "./QuestionGenerator"
-import { deserializePath, QuestionCollection, serializeGeneratorCall } from "./QuestionRouter"
+import type { QuestionGenerator } from "./QuestionGenerator"
+import { deserializePath, serializeGeneratorCall, type QuestionCollection } from "./QuestionRouter"
 
 const genTestQuestion = (id: string): QuestionGenerator => {
   return {

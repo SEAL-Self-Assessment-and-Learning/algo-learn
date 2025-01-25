@@ -1,9 +1,9 @@
 import {
   getHuffmanCodeOfTable,
   getHuffmanCodeOfWord,
-  HuffmanNode,
+  type HuffmanNode,
 } from "@shared/question-generators/huffman-coding/Huffman"
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 /**
  * This function generates a new random word by switching some random 1 to 0 and 0 to 1

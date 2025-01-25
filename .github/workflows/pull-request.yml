@@ -45,19 +45,16 @@ jobs:
           ref: ${{fromJSON(steps.pr.outputs.result).merge_commit_sha}}
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20"
-          # cache: "yarn"
+          bun-version: latest
 
-      - uses: oven-sh/setup-bun@v1
+      - name: Bun install 🔧
+        run: bun install --frozen-lockfile
 
       - name: Get a clean name of the current branch or pull request
         run: echo "CLEAN_REF=pull_request_${{github.event.pull_request.number}}" >> $GITHUB_ENV
         shell: bash
-
-      - name: Bun install 🔧
-        run: bun install --frozen-lockfile
 
       - name: Write basename and version number to front-end/src/config.ts
         run: |

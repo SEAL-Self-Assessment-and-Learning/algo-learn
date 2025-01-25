@@ -1,6 +1,7 @@
-import Random from "./random.ts"
+import type Random from "./random.ts"
 
 export type VariableValues = Record<string, boolean>
+export type NormalForm = "CNF" | "DNF"
 
 export type ExpressionProperties = {
   variables: string[]
@@ -51,6 +52,11 @@ abstract class SyntaxTreeNode {
    * returns an array containing all variable names in the expression
    */
   public abstract getVariableNames(): string[]
+
+  /**
+   * Returns the number of literals in the expression
+   */
+  public abstract getNumLiterals(): number
 
   public abstract isConjunction(): boolean
 
@@ -246,6 +252,10 @@ export class Literal extends SyntaxTreeNode {
 
     return this
   }
+
+  getNumLiterals(): number {
+    return 1
+  }
 }
 
 const negationType = "\\not"
@@ -267,7 +277,7 @@ const operatorToLatex: Record<BinaryOperatorType | NegationOperatorType, string>
 
 export function tokenToLatex(str: string) {
   for (const t in operatorToLatex) {
-    str = str.replace(t, `${operatorToLatex[t as keyof typeof operatorToLatex]} `)
+    str = str.replaceAll(t, `${operatorToLatex[t as keyof typeof operatorToLatex]} `)
   }
 
   return str
@@ -600,6 +610,10 @@ export class Operator extends SyntaxTreeNode {
 
     return this
   }
+
+  public getNumLiterals(): number {
+    return this.leftOperand.getNumLiterals() + this.rightOperand.getNumLiterals()
+  }
 }
 
 export type SyntaxTreeNodeType = Operator | Literal
@@ -877,4 +891,31 @@ export function generateRandomContradiction(
   } else {
     return new Operator(rootOperator, operand.copy().negate(), operand).shuffle(random)
   }
+}
+
+/**
+ * Checks if a list of expressions is equivalent
+ * @param expressions - list of boolean expression
+ */
+export function compareExpressions(expressions: SyntaxTreeNodeType[]): boolean {
+  if (expressions.length < 2) {
+    throw new Error("At least two expressions are required for comparison.")
+  }
+  // Collect all var names, remove duplicates and sort
+  const vars = [...new Set(expressions.flatMap((expr) => expr.getTruthTable().variableNames))].sort()
+
+  for (let i = 0; i < Math.pow(2, vars.length); i++) {
+    const truthValues = numToVariableValues(i, vars)
+    // Evaluate the first expression as the baseline comparison
+    const firstResult = expressions[0].eval(truthValues)
+
+    // compare each other expr with the base
+    for (let j = 1; j < expressions.length; j++) {
+      if (expressions[j].eval(truthValues) !== firstResult) {
+        return false
+      }
+    }
+  }
+
+  return true
 }

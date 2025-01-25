@@ -1,5 +1,5 @@
-import { ReactElement } from "react"
-import { ArrayDisplayProps } from "@shared/utils/arrayDisplayCodeBlock"
+import type { ReactElement } from "react"
+import type { ArrayDisplayProps } from "@shared/utils/arrayDisplayCodeBlock"
 import { Markdown } from "@/components/Markdown"
 import { useDeviceSize } from "@/hooks/useDeviceSize.ts"
 import { useTranslation } from "@/hooks/useTranslation"
