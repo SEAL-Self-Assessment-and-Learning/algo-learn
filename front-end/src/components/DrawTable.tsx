@@ -11,6 +11,13 @@ import { Markdown } from "@/components/Markdown"
  *
  */
 
+// Tailwind classes used for text alignment in table cells.
+const alignmentTailwind = {
+  left: "text-left",
+  center: "text-center",
+  right: "text-right",
+}
+
 /**
  * A component that returns a table
  * @param table The table to be drawn (passed as md format)
@@ -44,7 +51,7 @@ export function DrawTable({ table }: { table: TableNode }): ReactElement {
       tRow.push(
         <td
           key={col}
-          className={`text-${table.format.alignment[col]} ${table.format.vLines.includes(col) ? vLineStyle : ""}`}
+          className={`${alignmentTailwind[table.format.alignment[col]]} ${table.format.vLines.includes(col) ? vLineStyle : ""}`}
         >
           <Markdown md={cell} />
         </td>,
