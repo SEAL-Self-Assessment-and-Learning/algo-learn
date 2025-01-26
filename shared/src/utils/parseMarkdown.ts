@@ -33,14 +33,19 @@ export type ParseTreeNode =
   | { kind: "a"; child: ParseTree; url: string }
   | {
       kind: "table"
-      child: {
-        content: string[][]
-        format: { header: boolean; vLines: number[]; hLines: number[]; alignment: string[] }
-      }
+      child: TableNode
     }
   | { kind: "input"; child: string }
   | { kind: "list"; child: ListItem[] }
-
+export type TableNode = {
+  content: string[][]
+  format: {
+    header: boolean
+    vLines: number[]
+    hLines: number[]
+    alignment: ("left" | "center" | "right")[]
+  }
+}
 /**
  * The parseMarkdown function parses markdown-like text into a parse tree.
  *
@@ -128,7 +133,7 @@ export function parseMarkdown(md: string): ParseTree {
  * Supports the default Markdown table syntax and extends it the following way:
  * - A header line can be indicated by having it followed by a line like `|====|====|`.
  * - Lines like `|----|----|` indicate horizontal subdivisions of the tables
- * - The frist horizontal line indicator (`|====|====|` or `|----|----|`) also supports `!` on
+ * - The first horizontal line indicator (`|====|====|` or `|----|----|`) also supports `!` on
  *    either side of `|` to indicate a visual vertical subdivision of the table as well as an alignment indicated by `:`.
  *    If the first horizontal line indicator is the very first line of the table, it does not result in a horizontal line
  *    and is only used for formatting purposes.
@@ -144,16 +149,17 @@ export function parseMarkdown(md: string): ParseTree {
  * @param table The markdown-like text to parse
  * @returns Header, content and alignment of the table, can also add extra Feature (not md specific) see below
  */
-export function parseTable(table: string) {
+export function parseTable(table: string): TableNode {
   const formattingRegex = /^\|(?:(?:[:!]*=+[:!]*\|)+|(?:[:!]*-+[:!]*\|)+)$/
   const rows = table.split(/\r?\n/)
-  const content: string[][] = []
-  // let extraFeature: string = ""
-  const format: { header: boolean; vLines: number[]; hLines: number[]; alignment: string[] } = {
-    header: false,
-    vLines: [],
-    hLines: [],
-    alignment: [],
+  const node: TableNode = {
+    content: [],
+    format: {
+      header: false,
+      vLines: [],
+      hLines: [],
+      alignment: [],
+    },
   }
 
   // regex expression for extra features
@@ -169,31 +175,28 @@ export function parseTable(table: string) {
   const formattingRowIndex = rows.findIndex((row) => formattingRegex.test(row))
 
   if (formattingRowIndex >= 0) {
-    format.header = rows[formattingRowIndex].includes("=") && formattingRowIndex === 1
+    node.format.header = rows[formattingRowIndex].includes("=") && formattingRowIndex === 1
     const cellsOfRow = getCellsOfRow(rows[formattingRowIndex])
     cellsOfRow.forEach((cell, i) => {
       const [left, right] = cell.split(/[-=]+/)
-      if (left.includes("!")) format.vLines.push(i)
-      if (right.includes("!")) format.vLines.push(i + 1)
+      if (left.includes("!")) node.format.vLines.push(i)
+      if (right.includes("!")) node.format.vLines.push(i + 1)
       const alignment = (left.includes(":") ? 1 : 0) + (right.includes(":") ? 2 : 0)
-      if (alignment === 2) format.alignment.push("right")
-      else if (alignment === 3) format.alignment.push("center")
-      else format.alignment.push("left")
+      if (alignment === 2) node.format.alignment.push("right")
+      else if (alignment === 3) node.format.alignment.push("center")
+      else node.format.alignment.push("left")
     })
   }
 
   for (let i = 0; i < rows.length; i++) {
     if (formattingRegex.test(rows[i])) {
-      format.hLines.push(content.length - 1)
+      node.format.hLines.push(node.content.length - 1)
     } else {
-      content.push(getCellsOfRow(rows[i]))
+      node.content.push(getCellsOfRow(rows[i]))
     }
   }
 
-  return {
-    content,
-    format,
-  }
+  return node
 }
 
 function parseMarkdownList(list: string): ListItem[] {

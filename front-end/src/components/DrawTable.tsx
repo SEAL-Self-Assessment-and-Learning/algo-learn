@@ -1,4 +1,5 @@
 import type { ReactElement } from "react"
+import type { TableNode } from "@shared/utils/parseMarkdown"
 import { Markdown } from "@/components/Markdown"
 
 /**
@@ -14,14 +15,7 @@ import { Markdown } from "@/components/Markdown"
  * A component that returns a table
  * @param table The table to be drawn (passed as md format)
  */
-export function DrawTable({
-  table,
-}: {
-  table: {
-    content: string[][]
-    format: { header: boolean; vLines: number[]; hLines: number[]; alignment: string[] }
-  }
-}): ReactElement {
+export function DrawTable({ table }: { table: TableNode }): ReactElement {
   const borderStyleStatic = "border-black dark:border-white"
   const vLineStyle = `${borderStyleStatic} border-l-2`
   const hLineStyle = `${borderStyleStatic} border-b-2`
