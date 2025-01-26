@@ -1,6 +1,6 @@
 import type { ReactElement } from "react"
 import type { TableNode } from "@shared/utils/parseMarkdown"
-import { Markdown } from "@/components/Markdown"
+import { MarkdownTree } from "@/components/Markdown"
 
 /**
  * The List of all the possible extra features for the table
@@ -38,7 +38,7 @@ export function DrawTable({ table }: { table: TableNode }): ReactElement {
     table.content[0].forEach((cell, i) => {
       tHead.push(
         <th key={i} className={`${table.format.vLines.includes(i) ? vLineStyle : ""}`}>
-          <Markdown md={cell} />
+          <MarkdownTree parseTree={cell} />
         </th>,
       )
     })
@@ -53,7 +53,7 @@ export function DrawTable({ table }: { table: TableNode }): ReactElement {
           key={col}
           className={`${alignmentTailwind[table.format.alignment[col]]} ${table.format.vLines.includes(col) ? vLineStyle : ""}`}
         >
-          <Markdown md={cell} />
+          <MarkdownTree parseTree={cell} />
         </td>,
       )
     })

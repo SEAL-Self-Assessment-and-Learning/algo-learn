@@ -31,14 +31,11 @@ export type ParseTreeNode =
   | { kind: "$$" | "$"; child: string }
   | { kind: "**" | "*" | ">"; child: ParseTree }
   | { kind: "a"; child: ParseTree; url: string }
-  | {
-      kind: "table"
-      child: TableNode
-    }
+  | { kind: "table"; child: TableNode }
   | { kind: "input"; child: string }
   | { kind: "list"; child: ListItem[] }
 export type TableNode = {
-  content: string[][]
+  content: ParseTree[][]
   format: {
     header: boolean
     vLines: number[]
@@ -192,7 +189,7 @@ export function parseTable(table: string): TableNode {
     if (formattingRegex.test(rows[i])) {
       node.format.hLines.push(node.content.length - 1)
     } else {
-      node.content.push(getCellsOfRow(rows[i]))
+      node.content.push(getCellsOfRow(rows[i]).map(parseMarkdown))
     }
   }
 
