@@ -29,7 +29,7 @@
       <Button
         variant="ghost"
         size="icon"
-        class="bg-inherit hover:bg-primary hover:text-primary-foreground"
+        class="hover:bg-primary hover:text-primary-foreground bg-inherit"
         {...props}
       >
         <MessageSquareText class="h-4 w-4" />

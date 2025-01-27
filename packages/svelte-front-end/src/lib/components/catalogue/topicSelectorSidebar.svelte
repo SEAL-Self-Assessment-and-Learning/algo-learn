@@ -32,7 +32,7 @@
   const { t } = $derived(tFunction(globalTranslations, lang))
 </script>
 
-<Card.Root {...rest} class={cn("border-0 bg-secondary text-secondary-foreground", rest.class)}>
+<Card.Root {...rest} class={cn("bg-secondary text-secondary-foreground border-0", rest.class)}>
   <Card.Header>
     <Card.Title>{t("Catalogue.topic")}</Card.Title>
     <Card.Description>{t("Catalogue.choose.desc")}</Card.Description>
@@ -48,7 +48,7 @@
       </Button>
     {/each}
     {#if selectedGroup}
-      <div class="ml-2 mt-4 flex gap-2">
+      <div class="mt-4 ml-2 flex gap-2">
         <Checkbox
           id="terms1"
           checked={showAllVariants}

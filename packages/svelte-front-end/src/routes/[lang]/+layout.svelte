@@ -8,7 +8,7 @@
 
 <div class="flex h-screen flex-col">
   <Header {...data} />
-  <div class="prose mx-auto block w-full max-w-xl p-3 pt-12 dark:prose-invert">
+  <div class="prose dark:prose-invert mx-auto block w-full max-w-xl p-3 pt-12">
     {@render children()}
   </div>
 </div>

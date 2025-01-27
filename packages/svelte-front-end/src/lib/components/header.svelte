@@ -28,9 +28,9 @@
 </script>
 
 <header
-  class="flex flex-none flex-wrap place-items-center justify-between gap-1 border-b-2 bg-goethe p-2 text-goethe-foreground"
+  class="bg-goethe text-goethe-foreground flex flex-none flex-wrap place-items-center justify-between gap-1 border-b-2 p-2"
 >
-  <div class="flex-grow">
+  <div class="grow">
     {@render logo()}
   </div>
   <FeedbackDialog {t} />
@@ -51,7 +51,7 @@
         <Button
           variant="ghost"
           size="icon"
-          class="bg-inherit hover:bg-primary hover:text-primary-foreground"
+          class="hover:bg-primary hover:text-primary-foreground bg-inherit"
           aria-label={t("menu.settings")}
           {...props}
         >
@@ -101,7 +101,7 @@
         <Button
           variant="ghost"
           size="icon"
-          class="bg-inherit hover:bg-primary hover:text-primary-foreground"
+          class="hover:bg-primary hover:text-primary-foreground bg-inherit"
           aria-label={t("menu")}
           {...props}
         >
