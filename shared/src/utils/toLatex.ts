@@ -75,13 +75,12 @@ export function markdownTreeToLatex(tree: ParseTree | ParseTreeNode): string {
       .join(" \\\\\n")
 
     return `\n\n
-    \\vspace{0.5\\baselineskip}\\begin{tabular}{${colSpec}}
-  \\hline
+    \\vspace{\\baselineskip}\\hspace{1cm}\\begin{tabular}{${colSpec}}
   ${headerRow} \\\\
   \\hline
   ${contentRows} \\\\
-  \\hline
-\\end{tabular}`
+\\end{tabular}
+\\vspace{\\baselineskip}\n\n`
   } else if (tree.kind === "input") {
     return `[[ ${tree.child} ]]`
   } else if (tree.kind === "list") {
