@@ -1,6 +1,7 @@
-import type { ReactElement } from "react"
+import type { ReactNode } from "react"
 import type { TableNode } from "@shared/utils/parseMarkdown"
 import { MarkdownTree } from "@/components/Markdown"
+import { cn } from "@/lib/utils"
 
 /**
  * The List of all the possible extra features for the table
@@ -11,68 +12,94 @@ import { MarkdownTree } from "@/components/Markdown"
  *
  */
 
-// Tailwind classes used for text alignment in table cells.
-const alignmentTailwind = {
-  left: "text-left",
-  center: "text-center",
-  right: "text-right",
-}
-
 /**
  * A component that returns a table
  * @param table The table to be drawn (passed as md format)
  */
-export function DrawTable({ table }: { table: TableNode }): ReactElement {
-  const borderStyleStatic = "border-black dark:border-white"
-  const vLineStyle = `${borderStyleStatic} border-l-2`
-  const hLineStyle = `${borderStyleStatic} border-b-2`
-  const headerStyleStatic = `[&_th]:bg-accent [&_th]:py-2 text-white first:[&_th]:rounded-tl-md last:[&_th]:rounded-tr-sm ${hLineStyle}`
-  const rowStyleStatic =
-    "[&_td]:px-4 [&_td]:py-2 [&_td]:align-middle " +
-    (table.content.length - (table.format.header ? 1 : 0) >= 5
-      ? "[&>tr:nth-child(even)>td]:bg-muted first:[&>tr:nth-child(even)>td]:rounded-l-sm last:[&>tr:nth-child(even)>td]:rounded-r-sm"
-      : "")
-
-  const tHead: ReactElement[] = []
-  if (table.format.header) {
-    table.content[0].forEach((cell, i) => {
-      tHead.push(
-        <th key={i} className={`${table.format.vLines.includes(i) ? vLineStyle : ""}`}>
-          <MarkdownTree parseTree={cell} />
-        </th>,
-      )
-    })
-  }
-
-  const tBody = []
-  for (let i = table.format.header ? 1 : 0; i < table.content.length; i++) {
-    const tRow: ReactElement[] = []
-    table.content[i].forEach((cell, col) => {
-      tRow.push(
-        <td
-          key={col}
-          className={`${alignmentTailwind[table.format.alignment[col]]} ${table.format.vLines.includes(col) ? vLineStyle : ""}`}
-        >
-          <MarkdownTree parseTree={cell} />
-        </td>,
-      )
-    })
-
-    tBody.push(
-      <tr key={i} className={table.format.hLines.includes(i) ? hLineStyle : ""}>
-        {tRow}
-      </tr>,
-    )
-  }
+export function DrawTable({ table }: { table: TableNode }) {
+  const { header, vLines, hLines, alignment } = table.format
+  const headerRow = header ? table.content[0] : undefined
+  const bodyRows = header ? table.content.slice(1) : table.content
+  const hasZebra = bodyRows.length >= 5
 
   return (
     <table className="m-5 w-auto border-collapse justify-self-center">
-      {table.format.header ? (
-        <thead className={headerStyleStatic}>
-          <tr>{tHead}</tr>
+      {headerRow && (
+        <thead className="first:[&_th]:rounded-tl-md last:[&_th]:rounded-tr-sm">
+          <tr>
+            {headerRow.map((cell, j) => (
+              <TableCell
+                key={j}
+                leftBorder={vLines.includes(j)}
+                alignment={alignment[j]}
+                bottomBorder={true}
+                header={true}
+              >
+                <MarkdownTree parseTree={cell} />
+              </TableCell>
+            ))}
+          </tr>
         </thead>
-      ) : null}
-      <tbody className={rowStyleStatic}>{tBody}</tbody>
+      )}
+      <tbody
+        className={cn(
+          hasZebra &&
+            "[&>tr:nth-child(even)>td]:bg-muted first:[&>tr:nth-child(even)>td]:rounded-l-sm last:[&>tr:nth-child(even)>td]:rounded-r-sm",
+        )}
+      >
+        {bodyRows.map((row, i) => (
+          <tr key={i}>
+            {row.map((cell, j) => (
+              <TableCell
+                key={j}
+                leftBorder={vLines.includes(j)}
+                bottomBorder={hLines.includes(i + (headerRow ? 1 : 0))}
+                alignment={alignment[j]}
+              >
+                <MarkdownTree parseTree={cell} />
+              </TableCell>
+            ))}
+          </tr>
+        ))}
+      </tbody>
     </table>
+  )
+}
+
+/**
+ * A component that returns a table cell
+ * @param props
+ * @param props.header Whether the cell is a header cell
+ * @param props.leftBorder Whether the cell has a left border
+ * @param props.bottomBorder Whether the cell has a bottom border
+ * @param props.alignment The horizontal alignment within the cell
+ * @param props.children The children of the cell
+ */
+function TableCell({
+  header = false,
+  leftBorder = false,
+  bottomBorder = false,
+  alignment = "center",
+  children,
+}: {
+  header?: boolean
+  leftBorder?: boolean
+  bottomBorder?: boolean
+  alignment?: "left" | "center" | "right"
+  children: ReactNode
+}) {
+  const Tag = header ? "th" : "td"
+  return (
+    <Tag
+      className={cn(
+        "border-black px-4 py-2 align-middle dark:border-white",
+        header && "bg-accent text-white",
+        leftBorder && "border-l-2",
+        bottomBorder && "border-b-2",
+        alignment == "left" ? "text-left" : alignment == "center" ? "text-center" : "text-right",
+      )}
+    >
+      {children}
+    </Tag>
   )
 }
