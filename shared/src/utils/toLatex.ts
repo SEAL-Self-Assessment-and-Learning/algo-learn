@@ -55,34 +55,33 @@ export function markdownTreeToLatex(tree: ParseTree | ParseTreeNode): string {
   } else if (tree.kind === "table") {
     const { content, format } = tree.child
     const colSpec = format.alignment
-      .map((align) => {
-        if (align === "left") {
-          return "l"
-        } else if (align === "right") {
-          return "r"
-        } else if (align === "center") {
-          return "c"
-        } else {
-          return "l"
-        }
+      .map((align, index) => {
+        const vLine = format.hLines.includes(index) ? "|" : ""
+        const spec = { left: "l", center: "c", right: "r" }[align]
+        return `${spec}${vLine}`
       })
       .join("")
 
-    const [header, ...data] = content
-    const headerRow = header.map((cell) => markdownTreeToLatex(cell)).join(" & ")
-    const contentRows = data
-      .map((row) => row.map((cell) => markdownTreeToLatex(cell)).join(" & "))
-      .join(" \\\\\n")
+    const headerRow = format.header ? content[0] : undefined
+    const bodyRows = format.header ? content.slice(1) : content
+    const headerRowString = headerRow?.map(markdownTreeToLatex)?.join(" & ")
+    const bodyRowsString = bodyRows
+      .map((row, index) => {
+        const hLine = format.hLines.includes(index + (headerRow ? 1 : 0)) ? "\\hline\n" : ""
+        const rowString = row.map(markdownTreeToLatex).join(" & ")
+        return `${rowString} \\\\\n${hLine}`
+      })
+      .join("")
 
     return `\n\n
-    \\vspace{\\baselineskip}\\hspace{1cm}\\begin{tabular}{${colSpec}}
-  ${headerRow} \\\\
-  \\hline
-  ${contentRows} \\\\
+    \\vspace{\\baselineskip}\\hspace{1cm}
+\\begin{tabular}{${colSpec}}
+${headerRowString ? headerRowString + " \\\\\n\\hline" : ""}
+${bodyRowsString}
 \\end{tabular}
 \\vspace{\\baselineskip}\n\n`
   } else if (tree.kind === "input") {
-    return `[[ ${tree.child} ]]`
+    return `[[ ${tree.child.replaceAll("#", "\\#")} ]]`
   } else if (tree.kind === "list") {
     return `\\begin{itemize}
 ${tree.child.map((item) => "  \\item\n" + indent(markdownTreeToLatex(item.text).trim(), 4)).join("\n")}
