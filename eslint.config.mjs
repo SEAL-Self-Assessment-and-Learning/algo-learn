@@ -10,7 +10,7 @@ import tanstackQuery from "@tanstack/eslint-plugin-query"
 export const namingConvention = [
   {
     selector: "default",
-    format: ["camelCase"],
+    format: ["camelCase", "UPPER_CASE"],
     leadingUnderscore: "allow",
     trailingUnderscore: "allow",
   },
