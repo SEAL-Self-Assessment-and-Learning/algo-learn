@@ -40,9 +40,11 @@ export type TableNode = {
     header: boolean
     vLines: number[]
     hLines: number[]
-    alignment: ("left" | "center" | "right")[]
+    alignment: ColumnAlignment[]
   }
 }
+export type ColumnAlignment = "left" | "center" | "right"
+
 /**
  * The parseMarkdown function parses markdown-like text into a parse tree.
  *

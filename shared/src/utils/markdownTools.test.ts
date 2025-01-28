@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest"
-import { mdInputField, mdTableFromData, type ColumnAlignment } from "@shared/utils/markdownTools.ts"
+import { mdInputField, mdTableFromData } from "@shared/utils/markdownTools.ts"
+import type { ColumnAlignment } from "./parseMarkdown"
 
 describe("mdInputField()", () => {
   // todo test other function when added

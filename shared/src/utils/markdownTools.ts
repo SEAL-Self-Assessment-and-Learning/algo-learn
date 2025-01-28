@@ -3,6 +3,8 @@
  * In general, these function should be used in order to be able to easily update/extend markdown features.
  */
 
+import type { ColumnAlignment } from "./parseMarkdown"
+
 /**
  * Generates Markdown for an inline input field.
  * todo add all other options of the input field and add tests
@@ -11,8 +13,6 @@
 export function mdInputField(id: string): string {
   return `{{${id}####overlay}}`
 }
-
-export type ColumnAlignment = "left" | "center" | "right"
 
 /**
  * Generates Markdown table code representing the given data and settings
