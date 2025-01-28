@@ -3,9 +3,9 @@ import useLocalStorageState from "use-local-storage-state"
 
 export const LIGHT = "light"
 export const DARK = "dark"
-export const OS_DEFAULT = "OS default"
-export type Themes = typeof LIGHT | typeof DARK | typeof OS_DEFAULT
-export const availableThemes = [LIGHT, DARK, OS_DEFAULT]
+export const SYSTEM = "system"
+export type Themes = typeof LIGHT | typeof DARK | typeof SYSTEM
+export const availableThemes = [LIGHT, DARK, SYSTEM]
 
 /**
  * A hook that returns the value of the operating system's default color scheme.
@@ -40,10 +40,10 @@ export function useOSDefaultTheme() {
  */
 export function useTheme() {
   const [userTheme, setUserTheme] = useLocalStorageState<Themes>("theme", {
-    defaultValue: OS_DEFAULT,
+    defaultValue: SYSTEM,
   })
   const osDefaultTheme = useOSDefaultTheme()
-  const theme = userTheme == OS_DEFAULT ? osDefaultTheme : userTheme
+  const theme = userTheme === LIGHT ? LIGHT : userTheme === DARK ? DARK : osDefaultTheme
   const toggleTheme = () => {
     if (theme === LIGHT) {
       setUserTheme(DARK)

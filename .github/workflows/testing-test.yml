@@ -1,0 +1,37 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Run test suite when pushed to main or feat branch
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events to main and feat* branches
+  push:
+    branches:
+      - main
+      - "feat*"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Allow one concurrent test
+concurrency:
+  group: testing-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Bun install 🔧
+        run: bun install --frozen-lockfile
+
+      - name: Run test suite
+        run: bun run test

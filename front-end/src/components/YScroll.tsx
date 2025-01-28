@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useLayoutEffect } from "react"
+import { useEffect, useLayoutEffect, type ReactNode } from "react"
 import { useHistoryState } from "@/hooks/useHistoryState"
 
 /**

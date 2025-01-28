@@ -1,11 +1,13 @@
-import { Fragment, FunctionComponent, ReactNode } from "react"
+import { Fragment, type FunctionComponent, type ReactNode } from "react"
 import { Link } from "react-router-dom"
+import { parseMarkdown, type ParseTree, type ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
 import { Graph } from "@shared/utils/graph.ts"
 import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
 import { ArrayDisplay } from "@/components/ArrayDisplay.tsx"
 import { DrawList } from "@/components/DrawList.tsx"
 import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
+import { MatrixInput } from "@/components/MatrixInput.tsx"
 import { FormInputField } from "@/components/ui/FormInputField.tsx"
 import { DrawGraph } from "./DrawGraph"
 import { Format } from "./Format"
@@ -21,12 +23,14 @@ import TeX from "./TeX"
  */
 export const Markdown: FunctionComponent<{
   md?: string
-  children?: ReactNode[]
+  children?: ReactNode | ReactNode[]
 }> = ({ md, children }) => {
   if (!md) {
     return <></>
   }
-  return <MarkdownTree parseTree={parseMarkdown(md)} parameters={children} />
+  const childrenArray =
+    children !== undefined ? (Array.isArray(children) ? children : [children]) : undefined
+  return <MarkdownTree parseTree={parseMarkdown(md)} parameters={childrenArray} />
 }
 
 /**
@@ -106,6 +110,9 @@ export const MarkdownTreeNode: FunctionComponent<{
           <DrawGraph maxWidth={500} maxHeight={300} graph={Graph.parse(parseTreeNode.child)} />
         </div>
       )
+    }
+    if (parseTreeNode.language === "matrixInput") {
+      return <MatrixInput matrixObject={parseTreeNode.child} />
     }
     throw new Error("Unknown language")
   }

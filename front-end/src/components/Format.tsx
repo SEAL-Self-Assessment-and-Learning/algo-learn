@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode } from "react"
+import type { FunctionComponent, ReactNode } from "react"
 
 /**
  * `Format` is a React component that formats a template string by replacing placeholders

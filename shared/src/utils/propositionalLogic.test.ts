@@ -1,11 +1,13 @@
 import { describe, expect, test } from "vitest"
+import { MinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
 import {
   associativeOperators,
-  BinaryOperatorType,
+  compareExpressions,
   Literal,
   Operator,
   ParserError,
   PropositionalLogicParser,
+  type BinaryOperatorType,
 } from "./propositionalLogic"
 import Random, { sampleRandomSeed } from "./random.ts"
 
@@ -272,4 +274,111 @@ describe("parser", () => {
       ["((\\notA\\orB)\\and(B\\xorC))=>(D<=>E)", "((\\not A \\or B) \\and (B \\xor C)) => (D <=> E)"],
     ].forEach(inputTester)
   })
+})
+
+test("function compareExpressions (pairs)", () => {
+  const inputTester = ([expr1, expr2, value]: (string | boolean)[]) => {
+    const parse1 = PropositionalLogicParser.parse(expr1 as string)
+    const parse2 = PropositionalLogicParser.parse(expr2 as string)
+    if (parse1 instanceof ParserError || parse2 instanceof ParserError) {
+      // expect() does not narrow down the type, so "if" is used here
+      expect(parse1).not.toBeInstanceOf(ParserError)
+      expect(parse2).not.toBeInstanceOf(ParserError)
+    } else {
+      expect(compareExpressions([parse1, parse2])).toEqual(value)
+    }
+  }
+
+  ;[
+    ["\\not A \\and B", "\\not (B => A)", true],
+    ["\\not(A \\and B)", "(\\not A \\and B) \\or (\\not B \\and A) \\or (\\not A \\and \\not B)", true],
+    [
+      "\\not A \\and (B \\or C)",
+      "(\\not A \\and \\not B \\and C) \\or (\\not A \\and B \\and \\not C) \\or (\\not A \\and B \\and C)",
+      true,
+    ],
+    ["(\\not A \\or B) \\and (B \\or C)", "B \\or (\\not A \\and C)", true],
+    ["(\\not A \\or B) \\and (B \\or C)", "B \\and (\\not A \\and C)", false],
+    ["A \\and B", "A \\or B", false],
+    [
+      "(\\not A \\and B \\and C) \\or (\\not A \\and B \\and \\not C) \\or (\\not A => B \\and C)",
+      "(\\not A \\and \\not B \\and C) \\or (\\not A \\xor B \\and \\not C) \\or (\\not A <=> B \\and C)",
+      false,
+    ],
+  ].forEach(inputTester)
+})
+
+test("function compareExpressions (quadruple)", () => {
+  const inputTester = ([expr1, expr2, expr3, expr4, value]: (string | boolean)[]) => {
+    const parse1 = PropositionalLogicParser.parse(expr1 as string)
+    const parse2 = PropositionalLogicParser.parse(expr2 as string)
+    const parse3 = PropositionalLogicParser.parse(expr3 as string)
+    const parse4 = PropositionalLogicParser.parse(expr4 as string)
+    if (
+      parse1 instanceof ParserError ||
+      parse2 instanceof ParserError ||
+      parse3 instanceof ParserError ||
+      parse4 instanceof ParserError
+    ) {
+      // expect() does not narrow down the type, so "if" is used here
+      expect(parse1).not.toBeInstanceOf(ParserError)
+      expect(parse2).not.toBeInstanceOf(ParserError)
+      expect(parse3).not.toBeInstanceOf(ParserError)
+      expect(parse4).not.toBeInstanceOf(ParserError)
+    } else {
+      expect(compareExpressions([parse1, parse2, parse3, parse4])).toEqual(value)
+    }
+  }
+
+  ;[
+    ["\\not A \\and B", "\\not (B => A)", "\\not (B => A)", "\\not (B => A)", true],
+    ["\\not A \\and B", "\\not (B => A)", "\\not (B => A)", "\\not (B \\xor A)", false],
+    [
+      "A => (B \\and C)",
+      "\\not A \\or (B \\and C)",
+      "(\\not A \\and \\not  B \\and \\not C) \\or (\\not A \\and \\not B \\and C) \\or (\\not A \\and B \\and \\not C) \\or (\\not A \\and B \\and C) \\or (A \\and B \\and C)",
+      "\\not ((A \\and \\not B \\and \\not C) \\or (A \\and \\not B \\and C) \\or (A \\and B \\and \\not C))",
+      true,
+    ],
+    [
+      "A => (B \\and C)",
+      "\\not A \\or (B \\and C)",
+      "(\\not A \\and \\not  B \\and \\not C) \\or (\\not A \\and \\not B \\and C) \\or (\\not A \\and B \\and \\not C) \\or (\\not A \\and B \\and C) \\or (A \\and B \\and C)",
+      "\\not ((A \\and B \\and \\not C) \\or (A \\and \\not B \\and C) \\or (A \\and B \\and \\not C))",
+      false,
+    ],
+  ].forEach(inputTester)
+})
+
+test("minimize normal forms", () => {
+  const inputTester = ([expr, numLiteralsDNF, numLiteralsCNF]: (string | number)[]) => {
+    const parseResult = PropositionalLogicParser.parse(expr as string)
+    if (parseResult instanceof ParserError) {
+      // expect() does not narrow down the type, so "if" is used here
+      expect(parseResult).not.toBeInstanceOf(ParserError)
+    } else {
+      const minimalFormsDNF = new MinimalNormalForm(parseResult, "DNF")
+      expect(compareExpressions([minimalFormsDNF.get(), parseResult])).toBeTruthy()
+      expect(minimalFormsDNF.get().getNumLiterals()).toEqual(numLiteralsDNF)
+
+      const minimalFormsCNF = new MinimalNormalForm(parseResult, "CNF")
+      expect(compareExpressions([minimalFormsCNF.get(), parseResult])).toBeTruthy()
+      expect(minimalFormsCNF.get().getNumLiterals()).toEqual(numLiteralsCNF)
+    }
+  }
+
+  ;[
+    ["\\not A \\and B", 2, 2],
+    ["\\not(A \\and B)", 2, 2],
+    ["\\not A \\and (B \\or C)", 4, 3],
+    ["(\\not A \\or B) \\and (B \\or C)", 3, 4],
+    ["((\\notA\\orB)\\and(B\\xorC))=>(D<=>E)", 10, 18],
+    ["c \\or ((a \\or b) \\and ((\\not a \\xor b \\xor a) \\or a))", 2, 2],
+    ["\\not c \\or ((c \\or \\not a) \\and c \\and (a \\or c \\or b)) \\and b", 2, 2],
+    [
+      "(a \\xor c) \\and (((c => f) \\or e) => (\\not e \\or b \\or c)) \\and (b \\or (f \\and d)) \\and (c \\or f) \\and (a \\or e)",
+      18,
+      15,
+    ],
+  ].forEach(inputTester)
 })

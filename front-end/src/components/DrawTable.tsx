@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef } from "react"
+import { useEffect, useRef, type ReactElement } from "react"
 import { Markdown } from "@/components/Markdown"
 
 /**

@@ -1,4 +1,4 @@
-import { IfOptions } from "@shared/question-generators/time/utils"
+import type { IfOptions } from "@shared/question-generators/time/utils"
 
 interface StarCalculationParams {
   loopIteration: number

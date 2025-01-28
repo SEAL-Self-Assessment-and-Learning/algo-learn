@@ -1,12 +1,12 @@
 import {
   minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-  QuestionGenerator,
+  type MultipleChoiceQuestion,
+  type QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { generateHeapsForChoiceQuestion } from "@shared/question-generators/heap/utils/utilsGenerate"
 import Random from "@shared/utils/random"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translationsHeapVerifying: Translations = {
   en: {

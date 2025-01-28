@@ -1,4 +1,4 @@
-import { SingleTranslation } from "@shared/utils/translations"
+import type { SingleTranslation } from "@shared/utils/translations"
 
 /**
  * This type indicates the props that are needed to display an array in a code block.

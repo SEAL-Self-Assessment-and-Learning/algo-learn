@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { Language } from "@shared/api/Language"
-import { tFunction, Translations } from "@shared/utils/translations"
+import type { Language } from "@shared/api/Language"
+import { tFunction, type Translations } from "@shared/utils/translations"
 import deJSON from "../locales/de.json"
 import enJSON from "../locales/en.json"
 
@@ -41,7 +41,7 @@ export function useTranslation(additionalTranslations?: Translations) {
     if (lang !== newLang) {
       const regex = new RegExp(`^/(${SUPPORTED_LANGUAGES.join("|")})`)
       const newPath = pathname.replace(regex, `/${newLang}`)
-      navigate(newPath)
+      void navigate(newPath)
     }
   }
   function nextLang() {

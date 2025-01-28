@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
-import { FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
+import type { FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops.ts"
-import { PseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
+import type { PseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
 import { sampleRandomSeed } from "@shared/utils/random.ts"
 
 interface TestingObject {

@@ -1,19 +1,19 @@
 import Fraction from "fraction.js"
-import { MathNode } from "mathjs"
+import type { MathNode } from "mathjs"
 import {
-  FreeTextFeedbackFunction,
-  FreeTextFormatFunction,
-  FreeTextQuestion,
   minimalMultipleChoiceFeedback,
-  Question,
-  QuestionGenerator,
+  type FreeTextFeedbackFunction,
+  type FreeTextFormatFunction,
+  type FreeTextQuestion,
+  type Question,
+  type QuestionGenerator,
 } from "../../api/QuestionGenerator"
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
 import { format } from "../../utils/format"
 import math, { getVars } from "../../utils/math"
 import Random from "../../utils/random"
-import { tFunction, tFunctional, Translations } from "../../utils/translations"
-import { mathNodeToSumProductTerm, SumProductTerm } from "../asymptotics/asymptoticsUtils"
+import { tFunction, tFunctional, type Translations } from "../../utils/translations"
+import { mathNodeToSumProductTerm, type SumProductTerm } from "../asymptotics/asymptoticsUtils"
 import { sampleMasterRecursion, sampleMasterRecursionAnswers } from "./formulaUtils"
 
 const translations: Translations = {
