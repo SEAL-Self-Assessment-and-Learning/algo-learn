@@ -3,15 +3,15 @@
  */
 
 export const _ = {
-  isObject: (value: any): value is object => {
+  isObject(value: any): value is object {
     return typeof value === "object" && value !== null
   },
 
-  has: (object: object, key: string): key is keyof object => {
+  has(object: object, key: string): key is keyof object {
     return key in object
   },
 
-  isEqual: (value: any, other: any): boolean => {
+  isEqual(value: any, other: any): boolean {
     if (value === other) return true
 
     if (Array.isArray(value) && Array.isArray(other)) {
@@ -30,22 +30,21 @@ export const _ = {
     return false
   },
 
-  difference: <T>(array: T[], values: T[]): T[] => {
+  difference<T>(array: T[], values: T[]): T[] {
     return array.filter((e) => !values.includes(e))
   },
 
-  zip(...arrays: any[]): any[][] {
-    const zipped: any[][] = []
+  zip<T>(...arrays: T[][]): T[][] {
+    const zipped: T[][] = []
     for (let i = 0; i < arrays[0].length; i++) {
       const row = []
       for (let j = 0; j < arrays.length; j++) row.push(arrays[j][i])
-
       zipped.push(row)
     }
     return zipped
   },
 
-  unzip(array: any[][]): any[][] {
+  unzip<T>(array: T[][]): T[][] {
     return this.zip(...array)
   },
 }
