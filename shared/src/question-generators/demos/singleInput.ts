@@ -40,7 +40,7 @@ export const DemoSingleInput: QuestionGenerator = {
    * @param seed The seed for the random number generator
    * @returns A new MultipleChoiceQuestion question
    */
-  generate: (lang = "en", parameters, seed) => {
+  generate(lang = "en", parameters, seed) {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
 
@@ -71,12 +71,8 @@ export const DemoSingleInput: QuestionGenerator = {
 
     return {
       question,
-      // allows for unit tests
-      testing: {
-        a,
-        b,
-        correctAnswer,
-      },
+      // allows for unit tests:
+      testing: { a, b, correctAnswer },
     }
   },
 }
