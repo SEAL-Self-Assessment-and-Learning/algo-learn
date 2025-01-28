@@ -1,12 +1,12 @@
-import { MultiFreeTextFeedbackFunction, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator"
+import type { MultiFreeTextFeedbackFunction, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator"
 import { Stack } from "@shared/question-generators/Stack/Stack"
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator"
 import {
   createArrayDisplayCodeBlock,
   createArrayDisplayCodeBlockUserInput,
 } from "@shared/utils/arrayDisplayCodeBlock"
-import Random from "@shared/utils/random"
-import { t, Translations } from "@shared/utils/translations"
+import type Random from "@shared/utils/random"
+import { t, type Translations } from "@shared/utils/translations"
 
 /**
  * Generates a new Stack question for the seqStack variant
@@ -19,13 +19,13 @@ import { t, Translations } from "@shared/utils/translations"
  * @param permalink
  * @param translations
  */
-export function generateVariantSequenceStack(
+export function generateVariantArray(
   lang: "de" | "en",
   random: Random,
   permalink: string,
   translations: Translations,
 ) {
-  const { operations, stack } = generateOperationsVariantSequenceStack(random)
+  const { operations, stack } = generateOperationsVariantArray(random)
   const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
     numberOfInputFields: operations.length,
   })
@@ -63,7 +63,7 @@ export function generateVariantSequenceStack(
     type: "MultiFreeTextQuestion",
     name: stackQuestion.name(lang),
     path: permalink,
-    text: t(translations, lang, "sequenceStackText", [operations.join(", "), arrayDisplayBlock]),
+    text: t(translations, lang, "arrayStackText", [operations.join(", "), arrayDisplayBlock]),
     feedback,
   }
   return { question }
@@ -74,7 +74,7 @@ export function generateVariantSequenceStack(
  * and returns the final state of the stack
  * @param random
  */
-function generateOperationsVariantSequenceStack(random: Random) {
+function generateOperationsVariantArray(random: Random) {
   const amountOfOperations = random.int(6, 9)
   const stack = new Stack<number>()
   const operations = []

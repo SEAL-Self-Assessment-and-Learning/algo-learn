@@ -1,4 +1,4 @@
-import {
+import type {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
@@ -6,8 +6,8 @@ import {
 import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils"
 import { Stack } from "@shared/question-generators/Stack/Stack"
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator"
-import Random from "@shared/utils/random"
-import { t, Translations } from "@shared/utils/translations"
+import type Random from "@shared/utils/random"
+import { t, type Translations } from "@shared/utils/translations"
 
 /**
  * Generates a new Stack question for the seqLetter variant
@@ -20,13 +20,13 @@ import { t, Translations } from "@shared/utils/translations"
  * @param permalink
  * @param translations
  */
-export function generateVariantSequenceLetter(
+export function generateVariantPopSeq(
   lang: "de" | "en",
   random: Random,
   permalink: string,
   translations: Translations,
 ) {
-  const { sequence, popSequence } = generateOperationsVariantSequenceLetter(random)
+  const { sequence, popSequence } = generateOperationsVariantPopSeq(random)
 
   const checkFormat: FreeTextFormatFunction = ({ text }) => {
     // check if the user input only consists of letters
@@ -60,7 +60,7 @@ export function generateVariantSequenceLetter(
     type: "FreeTextQuestion",
     name: stackQuestion.name(lang),
     path: permalink,
-    text: t(translations, lang, "sequenceLetterText", [insertSpaceAfterEveryXChars(sequence, 3)]),
+    text: t(translations, lang, "popSeqText", [insertSpaceAfterEveryXChars(sequence, 3)]),
     checkFormat,
     feedback,
   }
@@ -72,9 +72,9 @@ export function generateVariantSequenceLetter(
  *
  * @param random
  */
-function generateOperationsVariantSequenceLetter(random: Random) {
+function generateOperationsVariantPopSeq(random: Random) {
   const s = new Stack<string>()
-  const possibleChars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  const possibleChars: string = random.choice(["ABCDEF", "GHIJKL", "KLMNOP", "UVWXYZ"])
 
   const amountPopOperations = random.int(4, 6)
   let seenAmountPopOperations = 0

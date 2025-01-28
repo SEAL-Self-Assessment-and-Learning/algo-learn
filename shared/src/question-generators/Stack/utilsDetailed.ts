@@ -1,7 +1,13 @@
+import type {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
+  MultiFreeTextQuestion,
+} from "@shared/api/QuestionGenerator.ts"
 import { Stack } from "@shared/question-generators/Stack/Stack.ts"
+import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import type Random from "@shared/utils/random.ts"
-import { t, type Translations } from "@shared/utils/translations.ts"
+import { t, tFunction, type Translations } from "@shared/utils/translations.ts"
 
 /**
  * This functions generates the operations performed on the stack during the question
@@ -9,7 +15,7 @@ import { t, type Translations } from "@shared/utils/translations.ts"
  * @param startingElements - starting elements inside the stack
  * @param random
  */
-export function generateOperationsVariantStart(startingElements: number[], random: Random) {
+export function generateOperationsVariantDetailed(startingElements: number[], random: Random) {
   const stack: Stack<number> = new Stack()
 
   // initialize the stack with the elements
@@ -132,7 +138,7 @@ export function createStackInputFields({
   return { inputText, solutionDisplay, correctAnswers }
 }
 
-export function generateVariantStart(
+export function generateVariantDetailed(
   lang: "de" | "en",
   random: Random,
   permalink: string,
@@ -140,9 +146,7 @@ export function generateVariantStart(
   wordTranslations: Translations,
 ) {
   const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
-    // check if the text provided is for the toString question
     if (fieldID.includes("empty")) {
-      // test if either false or true
       if (
         text[fieldID].trim().toLowerCase() !== "true" &&
         text[fieldID].trim().toLowerCase() !== "false"
@@ -191,7 +195,7 @@ export function generateVariantStart(
     translations,
     lang,
   })
-  const operations = generateOperationsVariantStart(stackElementsValues, random).operations
+  const operations = generateOperationsVariantDetailed(stackElementsValues, random).operations
 
   const { solutionDisplay, inputText, correctAnswers } = createStackInputFields({
     operations,
