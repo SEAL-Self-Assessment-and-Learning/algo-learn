@@ -2,18 +2,18 @@ import Fraction from "fraction.js"
 import { log } from "mathjs"
 import {
   printStarsNew,
-  PseudoCode,
-  PseudoCodeAssignment,
-  PseudoCodeBlock,
-  PseudoCodeCall,
-  PseudoCodeFunction,
-  PseudoCodeIf,
-  PseudoCodeReturn,
-  PseudoCodeState,
-  PseudoCodeString,
+  type PseudoCode,
+  type PseudoCodeAssignment,
+  type PseudoCodeBlock,
+  type PseudoCodeCall,
+  type PseudoCodeFunction,
+  type PseudoCodeIf,
+  type PseudoCodeReturn,
+  type PseudoCodeState,
+  type PseudoCodeString,
 } from "../../utils/pseudoCodeUtils.ts"
-import Random from "../../utils/random"
-import { createProductTerm, ProductTerm } from "../asymptotics/asymptoticsUtils"
+import type Random from "../../utils/random"
+import { createProductTerm, type ProductTerm } from "../asymptotics/asymptoticsUtils"
 
 const arithmeticOperations = ["+", "-", "*", "/"]
 

@@ -1,13 +1,7 @@
-import {
-  MultiFreeTextFeedbackFunction,
-  MultiFreeTextFormatFunction,
-  MultiFreeTextQuestion,
-} from "@shared/api/QuestionGenerator"
-import { Stack } from "@shared/question-generators/Stack/Stack"
-import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator"
-import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock"
-import Random from "@shared/utils/random"
-import { t, tFunction, Translations } from "@shared/utils/translations"
+import { Stack } from "@shared/question-generators/Stack/Stack.ts"
+import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
+import type Random from "@shared/utils/random.ts"
+import { t, type Translations } from "@shared/utils/translations.ts"
 
 /**
  * This functions generates the operations performed on the stack during the question

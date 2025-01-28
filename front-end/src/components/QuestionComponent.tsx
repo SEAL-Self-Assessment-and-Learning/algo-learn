@@ -1,5 +1,5 @@
-import { FunctionComponent } from "react"
-import { Question } from "@shared/api/QuestionGenerator"
+import type { FunctionComponent } from "react"
+import type { Question } from "@shared/api/QuestionGenerator"
 import { ExerciseMultipleChoice } from "./ExerciseMultipleChoice"
 import { ExerciseMultiTextInput } from "./ExerciseMultiTextInput.tsx"
 import { ExerciseTextInput } from "./ExerciseTextInput"

@@ -1,6 +1,9 @@
 /** This file contains functions to parse simple markdown */
 
-import { ListItem } from "@/components/DrawList.tsx"
+export type ListItem = {
+  level: number
+  text: string
+}
 
 /** First, we define the relevant regexes */
 export const codeBlockRegex = /^```(.*?)\r?\n^((?:.*(\r?\n|$))*?)^```$/m

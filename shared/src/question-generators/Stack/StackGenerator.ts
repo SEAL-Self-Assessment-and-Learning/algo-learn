@@ -1,10 +1,17 @@
-import { QuestionGenerator } from "@shared/api/QuestionGenerator"
-import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { generateVariantSequenceLetter } from "@shared/question-generators/Stack/utilsSequenceLetter"
-import { generateVariantSequenceStack } from "@shared/question-generators/Stack/utilsSequenceStack"
-import { generateVariantStart } from "@shared/question-generators/Stack/utilsStart"
-import Random from "@shared/utils/random"
-import { tFunctional, Translations } from "@shared/utils/translations"
+import type {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
+  MultiFreeTextQuestion,
+  QuestionGenerator,
+} from "@shared/api/QuestionGenerator.ts"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
+import {
+  createStackInputFields,
+  generateOperationsFreetextStack,
+  generateStackStartElements,
+} from "@shared/question-generators/Stack/utils.ts"
+import Random from "@shared/utils/random.ts"
+import { t, tFunction, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {

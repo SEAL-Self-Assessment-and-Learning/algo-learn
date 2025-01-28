@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { MultiFreeTextQuestion, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator"
+import type { MultiFreeTextQuestion, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator"
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator"
 import { sampleRandomSeed } from "@shared/utils/random"

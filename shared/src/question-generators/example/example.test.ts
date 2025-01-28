@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { MultipleChoiceQuestion } from "../../api/QuestionGenerator"
+import type { MultipleChoiceQuestion } from "../../api/QuestionGenerator"
 import { sampleRandomSeed } from "../../utils/random"
 import { ExampleQuestion } from "./example"
 
