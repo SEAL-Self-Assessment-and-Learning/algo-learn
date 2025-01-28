@@ -1,5 +1,5 @@
-import { ReactElement, useRef, useState } from "react"
-import { Graph } from "@shared/utils/graph"
+import { useRef, useState, type ReactElement } from "react"
+import type { Graph } from "@shared/utils/graph"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
 

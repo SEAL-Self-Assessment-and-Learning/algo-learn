@@ -1,4 +1,4 @@
-import {
+import type {
   FreeTextAnswer,
   FreeTextFormatFunction,
   FreeTextQuestion,
@@ -6,7 +6,7 @@ import {
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { RootedTree, traversalStrategies } from "@shared/utils/graph"
-import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 import Random from "../../utils/random"
 
 const translations: Translations = {

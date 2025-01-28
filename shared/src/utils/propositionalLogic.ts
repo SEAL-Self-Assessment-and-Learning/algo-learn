@@ -1,5 +1,5 @@
-import type Random from "./random.ts"
 import { RootedTree } from "@shared/utils/graph.ts"
+import type Random from "./random.ts"
 
 export type VariableValues = Record<string, boolean>
 export type NormalForm = "CNF" | "DNF"

@@ -1,4 +1,4 @@
-import Random from "./random"
+import type Random from "./random"
 
 type NodeId = number
 type NodeList = Node[]
