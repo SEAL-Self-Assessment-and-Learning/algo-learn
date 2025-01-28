@@ -1,5 +1,9 @@
 import { useRef, useState, type ReactElement } from "react"
+import { BsArrowsFullscreen } from "react-icons/bs"
+import { RiInputField } from "react-icons/ri"
 import type { Graph } from "@shared/utils/graph"
+import { Button } from "@/components/ui/button.tsx"
+import { useTheme } from "@/hooks/useTheme.ts"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
 
@@ -183,6 +187,8 @@ export function DrawGraph({
   maxHeight: number
   graph: Graph
 }): ReactElement {
+  const { theme } = useTheme()
+
   const svgRef = useRef(null as SVGSVGElement | null)
   const coordinateScale = 60
   const nodeScale = 20
@@ -302,38 +308,55 @@ export function DrawGraph({
   }
 
   const viewBoxAspectRatio = Math.min(maxHeight / maxWidth, viewBox.height / viewBox.width)
-
   return (
-    <svg
-      ref={svgRef}
-      width={maxWidth}
-      height={
-        viewBox.height / viewBox.width > 1 && viewBox.height < 300
-          ? viewBox.height * 0.75
-          : maxWidth * viewBoxAspectRatio
-      }
-      viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-      className="mx-auto h-auto max-w-full rounded-2xl bg-secondary"
-      onMouseMove={(e) => {
-        if (currentlyDragged === null || svgRef.current === null) return
+    <div className={`relative`}>
+      <svg
+        ref={svgRef}
+        width={maxWidth}
+        height={
+          viewBox.height / viewBox.width > 1 && viewBox.height < 300
+            ? viewBox.height * 0.75
+            : maxWidth * viewBoxAspectRatio
+        }
+        viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+        className="mx-auto h-auto max-w-full rounded-lg bg-secondary pb-2"
+        onMouseMove={(e) => {
+          if (currentlyDragged === null || svgRef.current === null) return
 
-        const pt = svgRef.current.createSVGPoint()
-        pt.x = e.clientX
-        pt.y = e.clientY
-        // The cursor point, translated into svg coordinates
-        const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
+          const pt = svgRef.current.createSVGPoint()
+          pt.x = e.clientX
+          pt.y = e.clientY
+          // The cursor point, translated into svg coordinates
+          const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
 
-        nodePositions[currentlyDragged].x = svgPos.x
-        nodePositions[currentlyDragged].y = svgPos.y
-        // react requires a new array here
-        setNodePositions([...nodePositions])
-      }}
-      onMouseUp={() => {
-        if (currentlyDragged !== null) setCurrentlyDragged(null)
-      }}
-    >
-      <g>{edges}</g>
-      <g>{nodes}</g>
-    </svg>
+          nodePositions[currentlyDragged].x = svgPos.x
+          nodePositions[currentlyDragged].y = svgPos.y
+          // react requires a new array here
+          setNodePositions([...nodePositions])
+        }}
+        onMouseUp={() => {
+          if (currentlyDragged !== null) setCurrentlyDragged(null)
+        }}
+      >
+        <g>{edges}</g>
+        <g>{nodes}</g>
+      </svg>
+      <div className="absolute -bottom-3.5 right-2 flex flex-row items-center space-x-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
+        <Button
+          size="iconSm"
+          variant="outline"
+          className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
+        >
+          <BsArrowsFullscreen />
+        </Button>
+        <Button
+          size="iconSm"
+          variant="outline"
+          className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
+        >
+          <RiInputField />
+        </Button>
+      </div>
+    </div>
   )
 }
