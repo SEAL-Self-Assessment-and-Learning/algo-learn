@@ -23,7 +23,7 @@ export type ColumnAlignment = "left" | "center" | "right"
  * @param vLines Index of the columns having a vertical line. The column index starts at 0. The lines are drawn as right-border.
  */
 export function mdTableFromData(
-  data: any[][],
+  data: string[][],
   alignment: ColumnAlignment | ColumnAlignment[] = "left",
   header?: string[],
   hLines: number[] = [],
@@ -49,7 +49,7 @@ export function mdTableFromData(
   const hLine = "|" + "---|".repeat(data[0].length) + "\n"
   let tableStr = !header && !hLines.includes(0) ? formattingLine : ""
 
-  const toRow = (line: any[]) => `| ${line.join(" | ")} |\n`
+  const toRow = (line: string[]) => `| ${line.join(" | ")} |\n`
 
   if (header) {
     tableStr += toRow(header) + formattingLine
