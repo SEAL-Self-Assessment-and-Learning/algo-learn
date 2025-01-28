@@ -14,19 +14,11 @@ export function insertSpaceAfterEveryXChars(input: string, x: number): string {
 /**
  * Creates the table for markdown
  * @param wordArray - the word arrays with frequency of each letter
- * @param extraFeature - if the table should have any extra styling (like my-5 around)
  */
-export function convertDictToMdTable(wordArray: { [key: string]: any }, extraFeature: string = "none") {
+export function convertDictToMdTable(wordArray: { [key: string]: string | number }) {
   const header = Object.keys(wordArray)
-  const middleLine = header.map(() => "---")
   const content = Object.values(wordArray)
-  // create a table format for markdown (numbers are with $$)
-  const returnValue = `\n|${header.join("|")}|\n|${middleLine.join("|")}|\n|$${content.join("$|$")}$|\n`
-  if (extraFeature !== "none") {
-    const extraFeatureLine = header.map(() => extraFeature)
-    return returnValue + `|${extraFeatureLine.join("|")}|`
-  }
-  return returnValue
+  return `\n|${header.join("|")}|\n${"|:---:".repeat(header.length)}|\n|$${content.join("$|$")}$|\n`
 }
 
 /**

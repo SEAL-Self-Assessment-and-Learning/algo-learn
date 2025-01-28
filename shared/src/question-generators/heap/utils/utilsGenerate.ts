@@ -1,3 +1,4 @@
+import type { Language } from "@shared/api/Language.ts"
 import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock"
 import type Random from "@shared/utils/random"
@@ -97,6 +98,7 @@ export function generateNeighbourOptions(random: Random) {
 export function generateHeapsForChoiceQuestion(
   heapType: "Max" | "Min",
   random: Random,
+  lang: Language,
 ): { heapStringTable: string[]; correctAnswerIndex: number[] } {
   const wrongRandomHeaps = generateRandomWrongHeaps(heapType, random)
 
@@ -109,6 +111,7 @@ export function generateHeapsForChoiceQuestion(
   const correctRandomHeapsString = correctRandomHeaps.map((heap) =>
     createArrayDisplayCodeBlock({
       array: ["-", ...heap.getHeap()],
+      lang,
     }),
   )
 
@@ -116,6 +119,7 @@ export function generateHeapsForChoiceQuestion(
     wrongRandomHeaps.map((heap) =>
       createArrayDisplayCodeBlock({
         array: ["-", ...heap.map((value) => (isNaN(value) ? "-" : value))],
+        lang,
       }),
     ),
     4 - correctRandomHeaps.length,

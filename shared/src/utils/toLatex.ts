@@ -28,7 +28,7 @@ function replaceQuotes(text: string) {
 /**
  * Function to render a given markdown-like string in LaTeX
  *
- * @param md The markdown-like string to render
+ * @param tree tree of parsed Markdown
  * @returns The LaTeX string
  */
 export function markdownTreeToLatex(tree: ParseTree | ParseTreeNode): string {
@@ -53,36 +53,35 @@ export function markdownTreeToLatex(tree: ParseTree | ParseTreeNode): string {
   } else if (tree.kind === "a") {
     return `\\href{${tree.url}}{${markdownTreeToLatex(tree.child)}}`
   } else if (tree.kind === "table") {
-    const { header, content, alignment } = tree.child
-    const colSpec = header
-      .map((_, index) => {
-        if (alignment[index] === "left") {
-          return "l"
-        } else if (alignment[index] === "right") {
-          return "r"
-        } else if (alignment[index] === "center") {
-          return "c"
-        } else {
-          return "l"
-        }
+    const { content, format } = tree.child
+    const colSpec = format.alignment
+      .map((align, index) => {
+        const vLine = format.hLines.includes(index) ? "|" : ""
+        const spec = { left: "l", center: "c", right: "r" }[align]
+        return `${spec}${vLine}`
       })
       .join("")
 
-    const headerRow = header.map((cell) => markdownTreeToLatex(cell)).join(" & ")
-    const contentRows = content
-      .map((row) => row.map((cell) => markdownTreeToLatex(cell)).join(" & "))
-      .join(" \\\\\n")
+    const headerRow = format.header ? content[0] : undefined
+    const bodyRows = format.header ? content.slice(1) : content
+    const headerRowString = headerRow?.map(markdownTreeToLatex)?.join(" & ")
+    const bodyRowsString = bodyRows
+      .map((row, index) => {
+        const hLine = format.hLines.includes(index + (headerRow ? 1 : 0)) ? "\\hline\n" : ""
+        const rowString = row.map(markdownTreeToLatex).join(" & ")
+        return `${rowString} \\\\\n${hLine}`
+      })
+      .join("")
 
     return `\n\n
-    \\vspace{0.5\\baselineskip}\\begin{tabular}{${colSpec}}
-  \\hline
-  ${headerRow} \\\\
-  \\hline
-  ${contentRows} \\\\
-  \\hline
-\\end{tabular}`
+    \\vspace{\\baselineskip}\\hspace{1cm}
+\\begin{tabular}{${colSpec}}
+${headerRowString ? headerRowString + " \\\\\n\\hline" : ""}
+${bodyRowsString}
+\\end{tabular}
+\\vspace{\\baselineskip}\n\n`
   } else if (tree.kind === "input") {
-    return `[[ ${tree.child} ]]`
+    return `[[ ${tree.child.replaceAll("#", "\\#")} ]]`
   } else if (tree.kind === "list") {
     return `\\begin{itemize}
 ${tree.child.map((item) => "  \\item\n" + indent(markdownTreeToLatex(item.text).trim(), 4)).join("\n")}

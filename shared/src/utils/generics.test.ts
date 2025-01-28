@@ -49,3 +49,23 @@ test("isEqual", () => {
     ),
   ).toBeFalsy()
 })
+
+test("zip", () => {
+  expect(_.zip([1, 2], [3, 4])).toEqual([
+    [1, 3],
+    [2, 4],
+  ])
+})
+
+test("unzip", () => {
+  expect(
+    _.unzip([
+      ["a", 1, true],
+      ["b", 2, false],
+    ]),
+  ).toEqual([
+    ["a", "b"],
+    [1, 2],
+    [true, false],
+  ])
+})

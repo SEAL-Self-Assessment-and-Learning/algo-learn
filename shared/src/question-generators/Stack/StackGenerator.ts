@@ -18,23 +18,21 @@ const translations: Translations = {
     name: "Stacks",
     description: "Perform stack operations",
     solutionFreetext: "|Index|Question|Solution|\n{{0}}",
-    performOperations: `**We perform the following operations:**{{0}}`,
     checkFormat: "Please only enter a number",
     checkFormatBool: "Please only enter *true* or *false*",
     stackEmpty: "Currently the stack is empty.",
     stackContainsValues: `The stack contains the following elements (*with the top at the highest index*):`,
-    freeTextInput: `Consider a **Stack "S"**. {{0}} **We perform the following operations:** {{1}}`,
+    freeTextInput: `Consider a **Stack "S"**. {{0}}\n\n**We perform the following operations:**\n\n{{1}}`,
   },
   de: {
     name: "Stacks",
     description: "Stack-Operationen ausführen",
     solutionFreetext: "|Index|Frage|Lösung|\n{{0}}",
-    performOperations: `**Wir führen folgende Operationen aus:**{{0}}`,
     checkFormat: "Bitte gib nur Zahlen ein.",
     checkFormatBool: "Bitte gib nur *true* oder *false* ein.",
     stackEmpty: "Der Stack ist aktuell leer.",
     stackContainsValues: `Der Stack enthält folgende Elemente (*mit dem Top-Element am höchsten Index*):`,
-    freeTextInput: `Betrachte einen **Stack "S"**. {{0}} **Wir führen nun folgende Operationen aus:** {{1}}`,
+    freeTextInput: `Betrachte einen **Stack "S"**. {{0}}\n\n**Wir führen nun folgende Operationen aus:**\n\n{{1}}`,
   },
 }
 
@@ -109,7 +107,7 @@ export const stackQuestion: QuestionGenerator = {
         const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
         if (resultMap[key].trim() !== correctAnswers[key].trim()) {
           foundError = true
-          const secondSolutionPart: string = "**" + correctAnswers[key] + "**\n"
+          const secondSolutionPart: string = "**" + correctAnswers[key] + "**|\n"
           solutionDisplay[count] = firstSolutionPart + secondSolutionPart
         }
         count++
@@ -118,7 +116,9 @@ export const stackQuestion: QuestionGenerator = {
         return {
           correct: false,
           message: tFunction(translations, lang).t("feedback.incomplete"),
-          correctAnswer: t(translations, lang, "solutionFreetext", [solutionDisplay.join("")]),
+          correctAnswer: t(translations, lang, "solutionFreetext", [
+            "|:--:|:--|:--:|\n" + solutionDisplay.join(""),
+          ]),
         }
       }
       return {

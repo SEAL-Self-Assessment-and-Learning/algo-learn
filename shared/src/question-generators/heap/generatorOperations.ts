@@ -1,3 +1,4 @@
+import type { Language } from "@shared/api/Language.ts"
 import type {
   FreeTextQuestion,
   MultiFreeTextFeedbackFunction,
@@ -85,6 +86,7 @@ export const HeapOperations: QuestionGenerator = {
 
       const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
         numberOfInputFields: solutionHeap.getSize(),
+        lang,
         inputFieldCharacters: 2,
         leadValues: ["-"],
       })
@@ -97,7 +99,7 @@ export const HeapOperations: QuestionGenerator = {
           heapElements.toString(),
           arrayDisplayBlock,
         ]),
-        feedback: getMultiFreeTextFeedback(solutionHeap),
+        feedback: getMultiFreeTextFeedback(solutionHeap, lang),
       }
       return { question }
     } else if (variant === "extract") {
@@ -106,6 +108,7 @@ export const HeapOperations: QuestionGenerator = {
       }
       const elementsTable = createArrayDisplayCodeBlock({
         array: ["-"].concat(solutionHeap.getHeap().map(String)),
+        lang,
       })
 
       const extractAmount = random.int(2, 3)
@@ -115,6 +118,7 @@ export const HeapOperations: QuestionGenerator = {
 
       const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
         numberOfInputFields: solutionHeap.getSize(),
+        lang,
         inputFieldCharacters: 2,
         leadValues: ["-"],
       })
@@ -129,13 +133,14 @@ export const HeapOperations: QuestionGenerator = {
           extractAmount.toString(),
           arrayDisplayBlock,
         ]),
-        feedback: getMultiFreeTextFeedback(solutionHeap),
+        feedback: getMultiFreeTextFeedback(solutionHeap, lang),
       }
       return { question }
     } else if (variant === "build") {
       // @deprecated variant
       const elementsTable = createArrayDisplayCodeBlock({
         array: ["-"].concat(heapElements.map(String)),
+        lang,
       })
       solutionHeap.build(heapElements)
       const question: FreeTextQuestion = {
@@ -152,6 +157,7 @@ export const HeapOperations: QuestionGenerator = {
 
       const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
         numberOfInputFields: solutionHeap.getSize(),
+        lang,
         inputFieldCharacters: 2,
         leadValues: ["-"],
       })
@@ -160,7 +166,7 @@ export const HeapOperations: QuestionGenerator = {
         name: HeapOperations.name(lang),
         path: permaLink,
         text: t(translationHeapOperations, lang, "taskCombine", [sequence, heapType, arrayDisplayBlock]),
-        feedback: getMultiFreeTextFeedback(solutionHeap),
+        feedback: getMultiFreeTextFeedback(solutionHeap, lang),
       }
       return { question }
     }
@@ -171,11 +177,11 @@ export const HeapOperations: QuestionGenerator = {
  * This function returns a feedback function for all heap operation variants
  * Comparing the solution heap with the user input
  * @param solutionHeap - the solution heap
+ * @param lang
  */
-function getMultiFreeTextFeedback(solutionHeap: Heap): MultiFreeTextFeedbackFunction {
+function getMultiFreeTextFeedback(solutionHeap: Heap, lang: Language): MultiFreeTextFeedbackFunction {
   // fieldIDs = input-x (x \in [0,1,2,3...])
   return ({ text }) => {
-    console.log(text)
     const heapArray = solutionHeap.getHeap()
     for (let i = 0; i < heapArray.length; i++) {
       const userFieldAnswer = parseFloat(text["input-" + i].trim())
@@ -184,10 +190,12 @@ function getMultiFreeTextFeedback(solutionHeap: Heap): MultiFreeTextFeedbackFunc
           correct: false,
           correctAnswer: createArrayDisplayCodeBlock({
             array: ["-", ...heapArray],
+            lang,
           }),
         }
       }
     }
+
     return {
       correct: true,
     }
