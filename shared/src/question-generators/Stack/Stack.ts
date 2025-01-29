@@ -40,6 +40,13 @@ export class Stack<T> {
   }
 
   /**
+   * Returns all stack elements as strings
+   */
+  getStackAsString(): string[] {
+    return this.stack.map((element) => String(element))
+  }
+
+  /**
    * This method returns the current stack as a String format [x,y,z,...]
    * @returns The current stack
    */
