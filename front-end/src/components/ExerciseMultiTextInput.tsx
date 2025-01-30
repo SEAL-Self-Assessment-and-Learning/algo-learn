@@ -4,7 +4,7 @@ import { inputRegex } from "@shared/utils/parseMarkdown.ts"
 import { InteractWithQuestion, type MODE } from "@/components/InteractWithQuestion.tsx"
 import { Markdown } from "@/components/Markdown.tsx"
 import type { Result } from "@/components/QuestionComponent.tsx"
-import { formContext, type TextFieldState } from "@/hooks/useFormContext.ts"
+import { formContext, type FormState, type TextFieldState } from "@/hooks/useFormContext.ts"
 import useGlobalDOMEvents from "@/hooks/useGlobalDOMEvents.ts"
 import { useSound } from "@/hooks/useSound.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
@@ -168,30 +168,44 @@ export function ExerciseMultiTextInput({
 
   const fieldValues = getInputFields(question.text ? question.text : "")
 
-  const textFieldStateValues = useMemo(() => {
+  const textFieldStateValues = useMemo<FormState>(() => {
     const textFieldStateValues: { [id: string]: TextFieldState } = {}
-    for (let i = 0; i < fieldValues.inputIds.length; i++) {
-      // first initialize every field in state
-      if (!state.text[fieldValues.inputIds[i]]) {
-        state.text[fieldValues.inputIds[i]] = ""
-        state.modeID[fieldValues.inputIds[i]] = "initial"
-        state.formatFeedback[fieldValues.inputIds[i]] = ""
+
+    function addTextFieldState(id: string) {
+      if (!state.text[id]) {
+        state.text[id] = ""
+        state.modeID[id] = "initial"
+        state.formatFeedback[id] = ""
       }
 
-      textFieldStateValues[fieldValues.inputIds[i]] = {
-        text: state.text[fieldValues.inputIds[i]],
-        type: fieldValues.inputTypes[i],
-        prompt: fieldValues.inputPrompts[i],
-        feedbackVariation: fieldValues.inputFeedbackVariations[i],
-        setText: (text: string) => setText(fieldValues.inputIds[i], text),
-        placeholder: fieldValues.inputPlaceholders[i],
-        invalid: state.modeID[fieldValues.inputIds[i]] === "invalid",
+      textFieldStateValues[id] = {
+        text: state.text[id],
+        type: fieldValues.inputTypes[fieldValues.inputIds.indexOf(id)] ?? "text", // Default to "text" if not found
+        prompt: fieldValues.inputPrompts[fieldValues.inputIds.indexOf(id)] ?? "",
+        feedbackVariation: fieldValues.inputFeedbackVariations[fieldValues.inputIds.indexOf(id)] ?? "",
+        setText: (text: string) => setText(id, text),
+        placeholder: fieldValues.inputPlaceholders[fieldValues.inputIds.indexOf(id)] ?? "",
+        invalid: state.modeID[id] === "invalid",
         disabled: mode === "correct" || mode === "incorrect",
-        feedback: state.formatFeedback[fieldValues.inputIds[i]],
-        focus: i === 0 && !isMobileOrTablet,
+        feedback: state.formatFeedback[id],
+        focus: !isMobileOrTablet,
       }
     }
-    return textFieldStateValues
+    for (let i = 0; i < fieldValues.inputIds.length; i++) {
+      addTextFieldState(fieldValues.inputIds[i])
+    }
+
+    function addTextFieldAfterwards(inputField: string) {
+      const singleFieldValues = getInputFieldValues([inputField])
+      fieldValues.inputIds.push(singleFieldValues.inputIds[0])
+      fieldValues.inputTypes.push(singleFieldValues.inputTypes[0])
+      fieldValues.inputPrompts.push(singleFieldValues.inputPrompts[0])
+      fieldValues.inputPlaceholders.push(singleFieldValues.inputPlaceholders[0])
+      fieldValues.inputFeedbackVariations.push(singleFieldValues.inputFeedbackVariations[0])
+      addTextFieldState(singleFieldValues.inputIds[0])
+    }
+
+    return [textFieldStateValues, addTextFieldAfterwards]
   }, [fieldValues, state.text, state.modeID, state.formatFeedback, mode])
 
   return (

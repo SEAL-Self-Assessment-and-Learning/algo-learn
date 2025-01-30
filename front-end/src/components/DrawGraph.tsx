@@ -1,8 +1,21 @@
 import { useRef, useState, type ReactElement } from "react"
 import { BsArrowsFullscreen } from "react-icons/bs"
 import { RiInputField } from "react-icons/ri"
+import { TbBrandGraphql } from "react-icons/tb"
 import type { Graph } from "@shared/utils/graph"
+import { Markdown } from "@/components/Markdown.tsx"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog.tsx"
 import { Button } from "@/components/ui/button.tsx"
+import { addFormField } from "@/hooks/useFormContext.ts"
 import { useTheme } from "@/hooks/useTheme.ts"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
@@ -197,6 +210,18 @@ export function DrawGraph({
     .flat()
     .filter(graph.directed ? () => true : (e) => e.source < e.target)
 
+  const [fieldsOpen, setFieldsOpen] = useState(false)
+  const nodeInputFieldMd = "node-field#NL###"
+  const edgeInputFieldMd = "edge-field#NL###"
+  if (graph.inputFields) {
+    if (graph.edgeClickType) {
+      addFormField(nodeInputFieldMd)
+    }
+    if (graph.edgeClickType) {
+      addFormField(edgeInputFieldMd)
+    }
+  }
+
   const [currentlyDragged, setCurrentlyDragged] = useState<null | number>(null)
   const [nodePositions, setNodePositions] = useState(
     graph.nodes.map((u) => {
@@ -343,19 +368,54 @@ export function DrawGraph({
       </svg>
       <div className="absolute -bottom-3.5 right-2 flex flex-row items-center space-x-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
         <Button
+          className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
           size="iconSm"
           variant="outline"
-          className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
         >
           <BsArrowsFullscreen />
         </Button>
-        <Button
-          size="iconSm"
-          variant="outline"
-          className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
-        >
-          <RiInputField />
-        </Button>
+        {graph.inputFields && (
+          <AlertDialog open={fieldsOpen} onOpenChange={setFieldsOpen}>
+            <AlertDialogTrigger asChild>
+              <Button
+                className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
+                size="iconSm"
+                variant="outline"
+                onClick={() => {}}
+              >
+                <RiInputField />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  <p className="flex items-center gap-1">
+                    Graph Input <TbBrandGraphql />
+                  </p>
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {graph.nodeClickType !== "none" && (
+                    <>
+                      <b>Node selection:</b>
+                      <Markdown md={`{{${nodeInputFieldMd}}}`} />
+                    </>
+                  )}
+                  {graph.edgeClickType !== "none" && (
+                    <>
+                      <b>Edge selection:</b>
+                      <Markdown md={`{{${edgeInputFieldMd}}}`} />
+                    </>
+                  )}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className={`m-1`} onClick={() => setFieldsOpen(false)}>
+                  Back
+                </AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
     </div>
   )

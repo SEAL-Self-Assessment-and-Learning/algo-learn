@@ -19,7 +19,7 @@ export type TextFieldState = {
 /**
  * FormState is the state of a form consisting of one or more text input fields.
  */
-export type FormState = Record<string, TextFieldState>
+export type FormState = [{ [id: string]: TextFieldState }, (id: string) => void]
 
 /**
  * FreeTextContext is the context to provide the current multiple choice form state.
@@ -42,8 +42,12 @@ export function useFormContext(): FormState {
  */
 export function useFormField(key: string): TextFieldState {
   const context = useFormContext()
-  if (!(key in context)) {
+  if (!(key in context[0])) {
     throw new Error(`key ${key} not found in the current form context`)
   }
-  return context[key]
+  return context[0][key]
+}
+
+export function addFormField(key: string) {
+  useFormContext()[1](key)
 }

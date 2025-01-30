@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState, type ReactElement } from "react"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Input } from "@/components/ui/input.tsx"
-import { useFormContext } from "@/hooks/useFormContext.ts"
+import { useFormField } from "@/hooks/useFormContext.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
 
 export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
-  const formContext = useFormContext()
-
   const {
     feedbackVariation,
     focus,
@@ -18,7 +16,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
     disabled,
     setText,
     text,
-  } = formContext[id]
+  } = useFormField(id)
 
   // To select the first created input field on the site
   const firstInputRef = useRef<HTMLInputElement | null>(null)
