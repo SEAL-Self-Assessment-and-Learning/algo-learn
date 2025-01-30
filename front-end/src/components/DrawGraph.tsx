@@ -276,6 +276,7 @@ export function DrawGraph({
                   : edgeStates[i].group + 1
             setEdgeStates([...edgeStates])
           }
+          console.log(edgeStates)
         }}
       />
     )
@@ -316,7 +317,11 @@ export function DrawGraph({
               nodeField.setText(
                 newNodeStates
                   .map((node, i) =>
-                    node.group !== null ? `(${getNodeLabel(i)},${node.group.toString()})` : "",
+                    node.group !== null
+                      ? `(${getNodeLabel(i)},${(node.group + 1).toString()})`
+                      : node.selected
+                        ? `(${getNodeLabel(i)},1)`
+                        : "",
                   )
                   .filter((x) => x !== "")
                   .join(";"),
