@@ -2,7 +2,7 @@ import { useRef, useState, type ReactElement } from "react"
 import { BsArrowsFullscreen } from "react-icons/bs"
 import { RiInputField } from "react-icons/ri"
 import { TbBrandGraphql } from "react-icons/tb"
-import type { Graph } from "@shared/utils/graph"
+import { getNodeLabel, type Graph } from "@shared/utils/graph"
 import { Markdown } from "@/components/Markdown.tsx"
 import {
   AlertDialog,
@@ -15,7 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog.tsx"
 import { Button } from "@/components/ui/button.tsx"
-import { addFormField } from "@/hooks/useFormContext.ts"
+import { addFormField, useFormField } from "@/hooks/useFormContext.ts"
 import { useTheme } from "@/hooks/useTheme.ts"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
@@ -211,8 +211,10 @@ export function DrawGraph({
     .filter(graph.directed ? () => true : (e) => e.source < e.target)
 
   const [fieldsOpen, setFieldsOpen] = useState(false)
-  const nodeInputFieldMd = "node-field#NL###"
-  const edgeInputFieldMd = "edge-field#NL###"
+  const nodeInputFieldID = "node-field"
+  const nodeInputFieldMd = `${nodeInputFieldID}#NL###`
+  const edgeInputFieldID = "edge-field"
+  const edgeInputFieldMd = `${edgeInputFieldID}#NL###`
   if (graph.inputFields) {
     if (graph.edgeClickType) {
       addFormField(nodeInputFieldMd)
@@ -221,6 +223,8 @@ export function DrawGraph({
       addFormField(edgeInputFieldMd)
     }
   }
+  const nodeField = useFormField(nodeInputFieldID)
+  const edgeField = useFormField(edgeInputFieldID)
 
   const [currentlyDragged, setCurrentlyDragged] = useState<null | number>(null)
   const [nodePositions, setNodePositions] = useState(
@@ -295,18 +299,31 @@ export function DrawGraph({
         state={nodeStates[i]}
         // todo the onClickCallback is duplicate code.
         onClickCallback={() => {
-          if (graph.nodeClickType === "select") {
-            nodeStates[i].selected = !nodeStates[i].selected
-            setEdgeStates([...nodeStates])
-          } else if (graph.nodeClickType === "group") {
-            nodeStates[i].group =
-              nodeStates[i].group === Math.min(graph.nodeGroupMax ?? maxGroups, maxGroups) - 1
-                ? null
-                : nodeStates[i].group === null
-                  ? 0
-                  : nodeStates[i].group + 1
-            setNodeStates([...nodeStates])
-          }
+          setNodeStates((prevNodeStates) => {
+            const newNodeStates = [...prevNodeStates]
+            newNodeStates[i] = { ...prevNodeStates[i] }
+            if (graph.nodeClickType === "select") {
+              newNodeStates[i].selected = !newNodeStates[i].selected
+            } else if (graph.nodeClickType === "group") {
+              newNodeStates[i].group =
+                newNodeStates[i].group === Math.min(graph.nodeGroupMax ?? maxGroups, maxGroups) - 1
+                  ? null
+                  : newNodeStates[i].group === null
+                    ? 0
+                    : newNodeStates[i].group + 1
+            }
+            if (nodeField.setText) {
+              nodeField.setText(
+                newNodeStates
+                  .map((node, i) =>
+                    node.group !== null ? `(${getNodeLabel(i)},${node.group.toString()})` : "",
+                  )
+                  .filter((x) => x !== "")
+                  .join(";"),
+              )
+            }
+            return newNodeStates
+          })
         }}
       />
     )

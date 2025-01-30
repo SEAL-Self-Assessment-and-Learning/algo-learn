@@ -234,18 +234,18 @@ export class Graph {
   }
 }
 
+export function getNodeLabel(i: number): string {
+  let label: string = ""
+  do {
+    const a = i % 26
+    i = (i - a) / 26
+    label = String.fromCharCode(65 + a) + label
+  } while (i > 0)
+
+  return label
+}
+
 export class RandomGraph {
-  public static getLabel(i: number): string {
-    let label: string = ""
-    do {
-      const a = i % 26
-      i = (i - a) / 26
-      label = String.fromCharCode(65 + a) + label
-    } while (i > 0)
-
-    return label
-  }
-
   /**
    * Generates planar grid graphs in various shapes
    * @param random
@@ -291,7 +291,7 @@ export class RandomGraph {
         const nodeId: NodeId = posToNodeId(row, col)
         vertices.push({
           // id: nodeId,
-          label: RandomGraph.getLabel(nodeId),
+          label: getNodeLabel(nodeId),
           coords: {
             x: col * scale - xOffset + shakeup(),
             y: row * scale + shakeup(),
@@ -480,7 +480,7 @@ export class RootedTree {
     const numNodes = tree.getNumNodes()
     let labels = []
     for (let i = 0; i < numNodes; i++) {
-      labels.push(RandomGraph.getLabel(i))
+      labels.push(getNodeLabel(i))
     }
     labels = random.shuffle(labels)
 
