@@ -1,9 +1,12 @@
 import type Random from "./random"
 
 type NodeId = number
-type NodeList = Node[]
-type EdgeList = Edge[][]
-type ClickEventType = "none" | "select" | "group"
+export type NodeList = Node[]
+export type EdgeList = Edge[][]
+export type ClickEventType = "none" | "select" | "group"
+
+export const nodeInputFieldID = "node-field"
+export const edgeInputFieldID = "edge-field"
 
 /**
  * A node in a graph.

@@ -2,7 +2,7 @@ import { useRef, useState, type ReactElement } from "react"
 import { BsArrowsFullscreen } from "react-icons/bs"
 import { RiInputField } from "react-icons/ri"
 import { TbBrandGraphql } from "react-icons/tb"
-import { getNodeLabel, type Graph } from "@shared/utils/graph"
+import { edgeInputFieldID, getNodeLabel, nodeInputFieldID, type Graph } from "@shared/utils/graph"
 import { Markdown } from "@/components/Markdown.tsx"
 import {
   AlertDialog,
@@ -15,7 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog.tsx"
 import { Button } from "@/components/ui/button.tsx"
-import { addFormField, useFormField } from "@/hooks/useFormContext.ts"
+import { addFormField, useFormField, type TextFieldState } from "@/hooks/useFormContext.ts"
 import { useTheme } from "@/hooks/useTheme.ts"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
@@ -211,20 +211,21 @@ export function DrawGraph({
     .filter(graph.directed ? () => true : (e) => e.source < e.target)
 
   const [fieldsOpen, setFieldsOpen] = useState(false)
-  const nodeInputFieldID = "node-field"
+
   const nodeInputFieldMd = `${nodeInputFieldID}#NL###`
-  const edgeInputFieldID = "edge-field"
   const edgeInputFieldMd = `${edgeInputFieldID}#NL###`
+  let nodeField: TextFieldState
+  let edgeField: TextFieldState
   if (graph.inputFields) {
     if (graph.edgeClickType) {
       addFormField(nodeInputFieldMd)
+      nodeField = useFormField(nodeInputFieldID)
     }
     if (graph.edgeClickType) {
       addFormField(edgeInputFieldMd)
+      edgeField = useFormField(edgeInputFieldID)
     }
   }
-  const nodeField = useFormField(nodeInputFieldID)
-  const edgeField = useFormField(edgeInputFieldID)
 
   const [currentlyDragged, setCurrentlyDragged] = useState<null | number>(null)
   const [nodePositions, setNodePositions] = useState(
@@ -277,7 +278,7 @@ export function DrawGraph({
                     ? 0
                     : newEdgeStates[i].group + 1
             }
-            if (edgeField.setText) {
+            if (edgeField !== undefined && edgeField.setText) {
               edgeField.setText(
                 newEdgeStates
                   .map((edge, i) =>
@@ -329,7 +330,7 @@ export function DrawGraph({
                     ? 0
                     : newNodeStates[i].group + 1
             }
-            if (nodeField.setText) {
+            if (nodeField !== undefined && nodeField.setText) {
               nodeField.setText(
                 newNodeStates
                   .map((node, i) =>
@@ -404,7 +405,7 @@ export function DrawGraph({
         <g>{edges}</g>
         <g>{nodes}</g>
       </svg>
-      <div className="absolute -bottom-3.5 right-2 flex flex-row items-center space-x-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
+      <div className="absolute -bottom-5 right-2 flex flex-row items-center space-x-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
         <Button
           className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
           size="iconSm"

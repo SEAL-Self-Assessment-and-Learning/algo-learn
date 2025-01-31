@@ -1,6 +1,17 @@
-import type { MultiFreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator"
+import type { Language } from "@shared/api/Language.ts"
+import type {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextQuestion,
+  QuestionGenerator,
+} from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { RandomGraph, type Graph } from "@shared/utils/graph.ts"
+import {
+  getNodeLabel,
+  nodeInputFieldID,
+  RandomGraph,
+  type Graph,
+  type Node,
+} from "@shared/utils/graph.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
@@ -12,12 +23,16 @@ const translations: Translations = {
   en: {
     name: "Graph Node Input Question",
     description: "Select specific nodes.",
-    text: "Put all nodes labeled with an vocal in one group and the rest in another group. {{0}}",
+    text: "Select all nodes that can be reached from node $ {{1}}$, including $ {{1}} $ itself. {{0}}",
+    fdToFew: "You have selected to few nodes.",
+    fdWrong: "You have selected wrong nodes.",
   },
   de: {
     name: "Graph-Knoten-Eingabefrage",
     description: "Wähle bestimmte Knoten aus.",
-    text: "Platziere alle Knoten mit einem Vokal beschriftet in eine Gruppe und die restlichen Knoten in eine andere. {{0}}",
+    text: "Wähle alle Knoten aus, die von Knoten ${{1}}$ aus erreichbar sind, einschließlich $ {{1}} $ selbst. {{0}}",
+    fdToFew: "Du hast zu wenige Knoten ausgewählt.",
+    fdWrong: "Du hast falsche Knoten ausgewählt.",
   },
 }
 
@@ -48,34 +63,98 @@ export const DemoGraphNodeInput: QuestionGenerator = {
       parameters,
       seed,
     })
-    // initialize the RNG so the question can be generated again
     const random = new Random(seed)
 
-    const graph: Graph = RandomGraph.grid(
-      random,
-      [6, 3],
-      0.7,
-      "square-width-diagonals",
-      null,
-      false,
-      false,
-    )
-    graph.nodeDraggable = false
-    graph.nodeClickType = "group"
-    graph.edgeClickType = "select"
-    graph.nodeGroupMax = 2
-    graph.inputFields = true
+    let graph: Graph
+    let reachableNodesIDs: number[]
+    let startNode: Node
+    do {
+      graph = RandomGraph.grid(random, [6, 3], 0.6, "square-width-diagonals", null, false, false)
+      graph.nodeDraggable = false
+      graph.nodeClickType = "select"
+      graph.inputFields = true
 
-    // generate the question object
+      startNode = random.choice(graph.nodes)
+      reachableNodesIDs = bfs(graph, startNode)
+    } while (reachableNodesIDs.length > 14)
+
     const question: MultiFreeTextQuestion = {
       type: "MultiFreeTextQuestion",
       name: DemoGraphNodeInput.name(lang),
       path: permaLink,
-      text: t(translations, lang, "text", [graph.toMarkdown()]),
+      text: t(translations, lang, "text", [graph.toMarkdown(), startNode.label!]),
+      // The Graph will handle checkFormat on its own
+      feedback: getFeedback(reachableNodesIDs, graph, lang),
     }
 
     return {
       question,
     }
   },
+}
+
+function getFeedback(nodeIDs: number[], graph: Graph, lang: Language): MultiFreeTextFeedbackFunction {
+  return ({ text }) => {
+    const nodeLabels: string[] = mapNumberToNodeLabel(nodeIDs)
+    for (const nodeID of nodeIDs) {
+      graph.setNodeGroup(nodeID, 1)
+    }
+    graph.inputFields = false
+    graph.nodeClickType = "none"
+    const nodeTextField = text[nodeInputFieldID]
+    const inputNodes = nodeTextField.split(";")
+    if (inputNodes.length !== nodeLabels.length) {
+      return {
+        correct: false,
+        feedbackText: t(translations, lang, "fdToFew"),
+        correctAnswer: graph.toMarkdown(),
+      }
+    }
+
+    for (const expectedNode of nodeLabels) {
+      if (!inputNodes.includes(expectedNode)) {
+        return {
+          correct: false,
+          feedbackText: t(translations, lang, "fdWrong"),
+          correctAnswer: graph.toMarkdown(),
+        }
+      }
+    }
+
+    return {
+      correct: true,
+    }
+  }
+}
+
+function mapNumberToNodeLabel(elements: number[]): string[] {
+  const nodeLabels: string[] = []
+  for (const element of elements) {
+    nodeLabels.push(getNodeLabel(element))
+  }
+  return nodeLabels
+}
+
+function bfs(graph: Graph, startNode: Node): number[] {
+  const startIndex = graph.nodes.findIndex((node) => node.label === startNode.label)
+  if (startIndex === -1) throw new Error("Start node not found in graph")
+
+  const queue: number[] = [startIndex]
+  const seen: Set<number> = new Set<number>([startIndex])
+
+  while (queue.length > 0) {
+    const nextElement = queue.shift()
+    if (nextElement === undefined) continue
+
+    const neighbors = graph.getNeighbors(nextElement)
+    for (const neighbor of neighbors) {
+      const neighborIndex = neighbor.source === nextElement ? neighbor.target : neighbor.source
+      if (!seen.has(neighborIndex)) {
+        seen.add(neighborIndex)
+        queue.push(neighborIndex)
+      }
+    }
+  }
+
+  return Array.from(seen)
 }
