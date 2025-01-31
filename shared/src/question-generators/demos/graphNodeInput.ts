@@ -16,7 +16,7 @@ import Random from "@shared/utils/random"
 import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 /**
- * All displayed text goes into the translations object.
+ * All displayed text goes into the translation object.
  * Include at least english and german.
  */
 const translations: Translations = {
@@ -72,6 +72,7 @@ export const DemoGraphNodeInput: QuestionGenerator = {
       graph = RandomGraph.grid(random, [6, 3], 0.6, "square-width-diagonals", null, false, false)
       graph.nodeDraggable = false
       graph.nodeClickType = "select"
+      graph.nodeGroupMax = 3
       graph.inputFields = true
 
       startNode = random.choice(graph.nodes)

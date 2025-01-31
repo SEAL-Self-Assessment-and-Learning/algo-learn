@@ -2,10 +2,17 @@ import { useRef, useState, type ReactElement } from "react"
 import { BsArrowsFullscreen } from "react-icons/bs"
 import { RiInputField } from "react-icons/ri"
 import { TbBrandGraphql } from "react-icons/tb"
-import { edgeInputFieldID, getNodeLabel, nodeInputFieldID, type Graph } from "@shared/utils/graph"
+import {
+  edgeInputFieldID,
+  getNodeLabel,
+  nodeInputFieldID,
+  type Edge,
+  type Graph,
+} from "@shared/utils/graph"
 import { Markdown } from "@/components/Markdown.tsx"
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -214,8 +221,8 @@ export function DrawGraph({
 
   const nodeInputFieldMd = `${nodeInputFieldID}#NL###`
   const edgeInputFieldMd = `${edgeInputFieldID}#NL###`
-  let nodeField: TextFieldState
-  let edgeField: TextFieldState
+  let nodeField: TextFieldState | undefined
+  let edgeField: TextFieldState | undefined
   if (graph.inputFields) {
     if (graph.edgeClickType) {
       addFormField(nodeInputFieldMd)
@@ -278,20 +285,7 @@ export function DrawGraph({
                     ? 0
                     : newEdgeStates[i].group + 1
             }
-            if (edgeField !== undefined && edgeField.setText) {
-              edgeField.setText(
-                newEdgeStates
-                  .map((edge, i) =>
-                    edge.group !== null
-                      ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)},${(edge.group + 1).toString()})`
-                      : edge.selected
-                        ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)})`
-                        : "",
-                  )
-                  .filter((x) => x !== "")
-                  .join(";"),
-              )
-            }
+            edgeInputSetText(edgeField, newEdgeStates, edgeListFlat)
             return newEdgeStates
           })
         }}
@@ -330,20 +324,7 @@ export function DrawGraph({
                     ? 0
                     : newNodeStates[i].group + 1
             }
-            if (nodeField !== undefined && nodeField.setText) {
-              nodeField.setText(
-                newNodeStates
-                  .map((node, i) =>
-                    node.group !== null
-                      ? `(${getNodeLabel(i)},${(node.group + 1).toString()})`
-                      : node.selected
-                        ? `${getNodeLabel(i)}`
-                        : "",
-                  )
-                  .filter((x) => x !== "")
-                  .join(";"),
-              )
-            }
+            nodeInputSetText(nodeField, newNodeStates)
             return newNodeStates
           })
         }}
@@ -448,9 +429,40 @@ export function DrawGraph({
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className={`m-1`} onClick={() => setFieldsOpen(false)}>
+                <AlertDialogCancel
+                  onClick={() => {
+                    setFieldsOpen(false)
+                    edgeInputSetText(edgeField, edgeStates, edgeListFlat)
+                    nodeInputSetText(nodeField, nodeStates)
+                  }}
+                >
+                  {/* Don't save the user input and reset to the selection on the graph */}
                   Back
                 </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    setFieldsOpen(false)
+                    const nodeCheck = checkNodeInput(nodeField?.text ?? "", graph)
+                    if (nodeCheck.parsed) {
+                      if ("selected" in nodeCheck) {
+                        updateGraphNodeSelected(graph, nodeStates, nodeCheck.selected)
+                      } else {
+                        updateGraphNodeGroup(graph, nodeStates, nodeCheck.groups)
+                      }
+                      nodeInputSetText(nodeField, nodeStates)
+                    }
+                  }}
+                  disabled={
+                    !(
+                      checkNodeInput(nodeField?.text ?? "", graph).parsed &&
+                      checkEdgeInput(edgeField?.text ?? "")
+                    )
+                  }
+                >
+                  {/* Todo: OnClick set graph correspondingly */}
+                  {/* Only save if correctly parsed */}
+                  Save
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -458,4 +470,137 @@ export function DrawGraph({
       </div>
     </div>
   )
+}
+
+function edgeInputSetText(
+  edgeField: TextFieldState | undefined,
+  edgeStates: GraphElementStateType[],
+  edgeListFlat: Edge[],
+) {
+  if (edgeField !== undefined && edgeField.setText) {
+    edgeField.setText(
+      edgeStates
+        .map((edge, i) =>
+          edge.group !== null
+            ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)},${(edge.group + 1).toString()})`
+            : edge.selected
+              ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)})`
+              : "",
+        )
+        .filter((x) => x !== "")
+        .join(";"),
+    )
+  }
+}
+
+function nodeInputSetText(nodeField: TextFieldState | undefined, nodeStates: GraphElementStateType[]) {
+  if (nodeField !== undefined && nodeField.setText) {
+    nodeField.setText(
+      nodeStates
+        .map((node, i) =>
+          node.group !== null
+            ? `(${getNodeLabel(i)},${(node.group + 1).toString()})`
+            : node.selected
+              ? `${getNodeLabel(i)}`
+              : "",
+        )
+        .filter((x) => x !== "")
+        .join(";"),
+    )
+  }
+}
+
+function updateGraphNodeSelected(graph: Graph, nodeStates: GraphElementStateType[], selected: string[]) {
+  for (let i = 0; i < graph.nodes.length; i++) {
+    nodeStates[i].selected = selected.includes(graph.nodes[i].label!)
+  }
+}
+
+function updateGraphNodeGroup(
+  graph: Graph,
+  nodeStates: GraphElementStateType[],
+  groups: { [key: number]: string[] },
+) {
+  for (let i = 0; i < graph.nodes.length; i++) {
+    nodeStates[i].group = null
+  }
+
+  for (const [group, nodes] of Object.entries(groups)) {
+    for (const node of nodes) {
+      const nodeIndex = graph.nodes.findIndex((n) => n.label === node)
+      if (nodeIndex !== -1) {
+        nodeStates[nodeIndex].group = parseInt(group) - 1
+      }
+    }
+  }
+}
+
+export type InputSelectedCheckResult = { parsed: boolean; selected: string[] }
+export type InputGroupCheckResult = { parsed: boolean; groups: { [key: number]: string[] } }
+export type InputCheckResult = InputSelectedCheckResult | InputGroupCheckResult
+
+/**
+ * Function parsing the node input fields and checking for correct input
+ * Node-String format is either (Node, Group) or Node seperated by ";"
+ *
+ * @param nodeString
+ * @param graph
+ */
+function checkNodeInput(nodeString: string, graph: Graph): InputCheckResult {
+  const nodes = nodeString.split(";")
+  return graph.nodeClickType === "select"
+    ? checkNodeInputSelect(nodes, graph)
+    : checkNodeInputGroup(nodes, graph)
+}
+
+/**
+ * Checks the input of nodes if the graph nodes can only be selected
+ * Checks:
+ *  - Input contains only uppercase letters
+ *  - Input contains only nodes that are in the graph
+ * @param nodes
+ * @param graph
+ */
+function checkNodeInputSelect(nodes: string[], graph: Graph): InputSelectedCheckResult {
+  const selected: string[] = []
+  for (let node of nodes) {
+    node = node.replace(/\s/g, "")
+    if (node === "") continue
+    if (!/^[A-Z]+$/.test(node)) return { parsed: false, selected: [] }
+    if (graph.nodes.findIndex((n) => n.label === node) === -1) return { parsed: false, selected: [] }
+    selected.push(node)
+  }
+  return { parsed: true, selected }
+}
+
+function checkNodeInputGroup(nodes: string[], graph: Graph): InputGroupCheckResult {
+  const regexNodeGroup = new RegExp(`^\\(([A-Z]+),(\\d|[0-9])\\)+$`)
+  const groups: { [key: number]: string[] } = {}
+  for (const node of nodes) {
+    const cleanNode = node.replace(/\s/g, "")
+    if (!cleanNode) continue
+
+    const match = cleanNode.match(regexNodeGroup)
+    if (!match || graph.nodes.findIndex((n) => n.label === match[1]) === -1) {
+      return { parsed: false, groups: {} }
+    }
+
+    const group = parseInt(match[2])
+    if (group > graph.nodeGroupMax || group < 1) {
+      return { parsed: false, groups: {} }
+    }
+
+    groups[group] = groups[group] || []
+    groups[group].push(match[1])
+  }
+
+  return { parsed: true, groups }
+}
+
+/**
+ * Function parsing the edge input fields and checking for correct input
+ * @param edgeString
+ */
+function checkEdgeInput(edgeString: string): boolean {
+  return edgeString.length === 0
 }
