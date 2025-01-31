@@ -128,7 +128,7 @@ function getFeedback(nodeIDs: number[], graph: Graph, lang: Language): MultiFree
   }
 }
 
-function mapNumberToNodeLabel(elements: number[]): string[] {
+export function mapNumberToNodeLabel(elements: number[]): string[] {
   const nodeLabels: string[] = []
   for (const element of elements) {
     nodeLabels.push(getNodeLabel(element))
@@ -136,7 +136,7 @@ function mapNumberToNodeLabel(elements: number[]): string[] {
   return nodeLabels
 }
 
-function bfs(graph: Graph, startNode: Node): number[] {
+export function bfs(graph: Graph, startNode: Node): number[] {
   const startIndex = graph.nodes.findIndex((node) => node.label === startNode.label)
   if (startIndex === -1) throw new Error("Start node not found in graph")
 
