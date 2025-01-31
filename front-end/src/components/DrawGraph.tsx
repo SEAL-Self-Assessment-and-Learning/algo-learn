@@ -264,19 +264,35 @@ export function DrawGraph({
         state={edgeStates[i]}
         clickable={graph.edgeClickType !== "none"}
         onClickCallback={() => {
-          if (graph.edgeClickType === "select") {
-            edgeStates[i].selected = !edgeStates[i].selected
-            setEdgeStates([...edgeStates])
-          } else if (graph.edgeClickType === "group") {
-            edgeStates[i].group =
-              edgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
-                ? null
-                : edgeStates[i].group === null
-                  ? 0
-                  : edgeStates[i].group + 1
-            setEdgeStates([...edgeStates])
-          }
-          console.log(edgeStates)
+          setEdgeStates((prevEdgeStates) => {
+            const newEdgeStates = [...prevEdgeStates]
+            newEdgeStates[i] = { ...prevEdgeStates[i] }
+            if (graph.edgeClickType === "select") {
+              newEdgeStates[i].selected = !newEdgeStates[i].selected
+            } else if (graph.edgeClickType === "group") {
+              newEdgeStates[i].group =
+                newEdgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
+                  ? null
+                  : newEdgeStates[i].group === null
+                    ? 0
+                    : newEdgeStates[i].group + 1
+            }
+            if (edgeField.setText) {
+              edgeField.setText(
+                newEdgeStates
+                  .map((edge, i) =>
+                    edge.group !== null
+                      ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)},${(edge.group + 1).toString()})`
+                      : edge.selected
+                        ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)})`
+                        : "",
+                  )
+                  .filter((x) => x !== "")
+                  .join(";"),
+              )
+            }
+            return newEdgeStates
+          })
         }}
       />
     )
@@ -320,7 +336,7 @@ export function DrawGraph({
                     node.group !== null
                       ? `(${getNodeLabel(i)},${(node.group + 1).toString()})`
                       : node.selected
-                        ? `(${getNodeLabel(i)},1)`
+                        ? `${getNodeLabel(i)}`
                         : "",
                   )
                   .filter((x) => x !== "")
