@@ -685,7 +685,7 @@ export type EdgeInputCheckResult = EdgeInputSelectedCheckResult | EdgeInputGroup
  * @param edgeString
  * @param graph
  */
-function checkEdgeInput(edgeString: string, graph: Graph): EdgeInputCheckResult {
+export function checkEdgeInput(edgeString: string, graph: Graph): EdgeInputCheckResult {
   const edges = edgeString.split(";")
   return graph.edgeClickType === "select"
     ? checkEdgeInputSelect(edges, graph)

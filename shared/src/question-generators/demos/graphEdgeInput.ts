@@ -1,9 +1,14 @@
-import type { MultiFreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator"
+import type { Language } from "@shared/api/Language.ts"
+import type {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextQuestion,
+  QuestionGenerator,
+} from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { bfs, mapNumberToNodeLabel } from "@shared/question-generators/demos/graphNodeInput.ts"
-import { RandomGraph, type Graph, type Node } from "@shared/utils/graph.ts"
+import { edgeInputFieldID, RandomGraph, type Graph, type Node } from "@shared/utils/graph.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, type Translations } from "@shared/utils/translations"
+import { checkEdgeInput } from "@/components/DrawGraph.tsx"
 
 /**
  * All displayed text goes into the translation object.
@@ -13,12 +18,16 @@ const translations: Translations = {
   en: {
     name: "Graph Edge Input Question",
     description: "Select all edges of a path.",
-    text: "Select all edges on any path starting from node $ {{1}}$ reaching node $ {{2}}$. {{0}}",
+    text: "Select all edges on a simple path starting from node $ {{1}}$ reaching node $ {{2}}$. {{0}}",
+    fdParse: "The has been an error parsing your input.",
+    fdPath: "Your answer is not a simple path or does not lead to the desired end-node,",
   },
   de: {
     name: "Graph-Kanten-Eingabefrage",
-    description: "Wähle Kanten von einem Pfad aus.",
-    text: "Wähle alle Kanten auf irgendeinem Pfad aus, der bei Knoten ${{1}}$ beginnt und bei Knoten ${{2}}$ endet. {{0}}",
+    description: "Wähle alle Kanten eines Pfads aus.",
+    text: "Wähle alle Kanten auf einem einfachen Pfad aus, der von Knoten $ {{1}}$ startet und Knoten $ {{2}}$ erreicht. {{0}}",
+    fdParse: "Es gab einen Fehler beim Parsen deiner Eingabe.",
+    fdPath: "Deine Antwort ist kein einfacher Pfad oder führt nicht zum gewünschten Endknoten."
   },
 }
 
@@ -53,32 +62,147 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
 
     let graph: Graph
     let startNode: Node
-    let reachableNodesIDs: number[]
+    let bfsNodePaths: Record<string, Node[]>
     do {
       graph = RandomGraph.grid(random, [6, 3], 0.6, "square-width-diagonals", null, false, false)
       graph.nodeDraggable = false
-      graph.edgeClickType = "group"
-      graph.edgeGroupMax = 3
+      graph.edgeClickType = "select"
       graph.inputFields = true
 
       startNode = random.choice(graph.nodes)
-      reachableNodesIDs = bfs(graph, startNode)
-    } while (reachableNodesIDs.length < 2)
+      bfsNodePaths = bfs(startNode, graph)
+    } while (Object.entries(bfsNodePaths).length > 14 || Object.entries(bfsNodePaths).length <= 2)
 
-    const reachableNodesLabels = mapNumberToNodeLabel(reachableNodesIDs)
-    const endNode = random.choice(reachableNodesLabels.filter((node) => node !== startNode.label!))
-
+    const endNode = random.choice(
+      Object.entries(bfsNodePaths).filter(([label]) => label !== startNode.label!),
+    )
     const question: MultiFreeTextQuestion = {
       type: "MultiFreeTextQuestion",
       name: DemoGraphEdgeInput.name(lang),
       path: permaLink,
-      text: t(translations, lang, "text", [graph.toMarkdown(), startNode.label!, endNode]),
+      text: t(translations, lang, "text", [graph.toMarkdown(), startNode.label!, endNode[0]]),
       // The Graph will handle checkFormat on its own
-      // feedback: getFeedback(reachableNodesIDs, graph, lang),
+      feedback: getFeedback(startNode.label!, endNode, graph, lang),
     }
 
     return {
       question,
     }
   },
+}
+
+function getFeedback(
+  startNode: string,
+  endNodePath: [string, Node[]],
+  graph: Graph,
+  lang: Language,
+): MultiFreeTextFeedbackFunction {
+  return ({ text }) => {
+    const edgeInput = checkEdgeInput(text[edgeInputFieldID], graph)
+    graph.inputFields = false
+    graph.edgeClickType = "none"
+    for (let i = 1; i < endNodePath[1].length; i++) {
+      const node1 = graph.nodes.findIndex((node) => node.label! === endNodePath[1][i - 1].label)
+      const node2 = graph.nodes.findIndex((node) => node.label! === endNodePath[1][i].label)
+      graph.setEdgeGroup(node1, node2, 1)
+    }
+    if (!edgeInput.parsed) {
+      return {
+        correct: false,
+        feedbackText: t(translations, lang, "fdParse"),
+        correctAnswer: graph.toMarkdown(),
+      }
+    }
+    if ("selected" in edgeInput) {
+      const simplePath = isSimplePath(edgeInput.selected, startNode, endNodePath[0])
+      if (!simplePath) {
+        return {
+          correct: false,
+          feedbackText: t(translations, lang, "fdPath"),
+          correctAnswer: graph.toMarkdown(),
+        }
+      }
+    } else {
+      return {
+        correct: false,
+        feedbackText: t(translations, lang, "fdParse"),
+        correctAnswer: graph.toMarkdown(),
+      }
+    }
+
+    return {
+      correct: true,
+      correctAnswer: graph.toMarkdown(),
+    }
+  }
+}
+
+function isSimplePath(edges: [string, string][], startNode: string, endNode: string): boolean {
+  const adjacencyList = new Map<string, Set<string>>()
+
+  // Build adjacency list
+  for (const [a, b] of edges) {
+    if (!adjacencyList.has(a)) adjacencyList.set(a, new Set())
+    if (!adjacencyList.has(b)) adjacencyList.set(b, new Set())
+    adjacencyList.get(a)!.add(b)
+    adjacencyList.get(b)!.add(a)
+  }
+
+  const visited = new Set<string>()
+  let current = startNode
+
+  while (visited.size < edges.length + 1) {
+    visited.add(current)
+
+    if (current === endNode) return visited.size === edges.length + 1
+
+    // Get the next node
+    const neighbors = adjacencyList.get(current)
+    if (!neighbors) return false
+
+    // Find an unvisited neighbor
+    let nextNode: string | null = null
+    for (const neighbor of neighbors) {
+      if (!visited.has(neighbor)) {
+        nextNode = neighbor
+        break
+      }
+    }
+
+    if (!nextNode) return false // No valid next move
+    current = nextNode
+  }
+
+  return false
+}
+
+function bfs(startNode: Node, graph: Graph): Record<string, Node[]> {
+  const queue: Node[] = [startNode]
+  const visited: Set<Node> = new Set()
+  const paths: Record<string, Node[]> = {}
+
+  paths[startNode.label ?? "start"] = [startNode]
+  visited.add(startNode)
+
+  while (queue.length > 0) {
+    const current = queue.shift()!
+
+    // Find neighbors
+    for (const edge of graph.edges.flat()) {
+      const neighbor =
+        graph.nodes[edge.source].label! === current.label!
+          ? graph.nodes.find((n) => n.label === graph.nodes[edge.target].label!)
+          : graph.nodes[edge.target].label! === current.label!
+            ? graph.nodes.find((n) => n.label === graph.nodes[edge.source].label!)
+            : null
+
+      if (neighbor && !visited.has(neighbor)) {
+        visited.add(neighbor)
+        queue.push(neighbor)
+        paths[neighbor.label ?? "unknown"] = [...paths[current.label ?? "start"], neighbor]
+      }
+    }
+  }
+
+  return paths
 }

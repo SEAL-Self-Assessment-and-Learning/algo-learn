@@ -76,7 +76,7 @@ export const DemoGraphNodeInput: QuestionGenerator = {
       graph.inputFields = true
 
       startNode = random.choice(graph.nodes)
-      reachableNodesIDs = bfs(graph, startNode)
+      reachableNodesIDs = reachableNodes(graph, startNode)
     } while (reachableNodesIDs.length > 14)
 
     const question: MultiFreeTextQuestion = {
@@ -136,7 +136,7 @@ export function mapNumberToNodeLabel(elements: number[]): string[] {
   return nodeLabels
 }
 
-export function bfs(graph: Graph, startNode: Node): number[] {
+function reachableNodes(graph: Graph, startNode: Node): number[] {
   const startIndex = graph.nodes.findIndex((node) => node.label === startNode.label)
   if (startIndex === -1) throw new Error("Start node not found in graph")
 
