@@ -57,7 +57,7 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
     do {
       graph = RandomGraph.grid(random, [6, 3], 0.6, "square-width-diagonals", null, false, false)
       graph.nodeDraggable = false
-      graph.edgeClickType = "select"
+      graph.edgeClickType = "group"
       graph.edgeGroupMax = 3
       graph.inputFields = true
 

@@ -462,7 +462,7 @@ export function DrawGraph({
                           edgeCheck.selected,
                         )
                       } else {
-                        //
+                        updateGraphEdgeGroup(graph.directed, edgeListFlat, edgeStates, edgeCheck.groups)
                       }
                     }
                     edgeInputSetText(edgeField, edgeStates, edgeListFlat)
@@ -573,9 +573,40 @@ function updateGraphEdgeSelected(
         ) !== -1 ||
         selected.findIndex(
           (edge) =>
-            getNodeLabel(edgeListFlat[i].target) === edge[1] &&
-            getNodeLabel(edgeListFlat[i].source) === edge[0],
+            getNodeLabel(edgeListFlat[i].target) === edge[0] &&
+            getNodeLabel(edgeListFlat[i].source) === edge[1],
         ) !== -1
+    }
+  }
+}
+
+function updateGraphEdgeGroup(
+  directed: boolean,
+  edgeListFlat: Edge[],
+  edgeStates: GraphElementStateType[],
+  group: { [key: number]: [string, string][] },
+) {
+  for (let i = 0; i < edgeListFlat.length; i++) {
+    edgeStates[i].group = null
+  }
+
+  for (const [groupIndex, edges] of Object.entries(group)) {
+    for (const edge of edges) {
+      let edgeIndex: number
+      if (directed) {
+        edgeIndex = edgeListFlat.findIndex(
+          (e) => getNodeLabel(e.source) === edge[0] && getNodeLabel(e.target) === edge[1],
+        )
+      } else {
+        edgeIndex = edgeListFlat.findIndex(
+          (e) =>
+            (getNodeLabel(e.source) === edge[0] && getNodeLabel(e.target) === edge[1]) ||
+            (getNodeLabel(e.target) === edge[0] && getNodeLabel(e.source) === edge[1]),
+        )
+      }
+      if (edgeIndex !== -1) {
+        edgeStates[edgeIndex].group = parseInt(groupIndex) - 1
+      }
     }
   }
 }
@@ -658,7 +689,43 @@ function checkEdgeInput(edgeString: string, graph: Graph): EdgeInputCheckResult 
   const edges = edgeString.split(";")
   return graph.edgeClickType === "select"
     ? checkEdgeInputSelect(edges, graph)
-    : checkEdgeInputGroup(edges)
+    : checkEdgeInputGroup(edges, graph)
+}
+
+function checkEdgeCorrectness(match: RegExpMatchArray | null, graph: Graph): { parsed: boolean } {
+  if (!match) return { parsed: false }
+  if (match[1] === match[2]) return { parsed: false }
+  // check if match[1] and match[2] are in the graph
+  if (
+    graph.nodes.findIndex((n) => n.label === match[1]) === -1 ||
+    graph.nodes.findIndex((n) => n.label === match[2]) === -1
+  ) {
+    return { parsed: false }
+  }
+  // check if the edge exists
+  if (graph.directed) {
+    if (
+      graph.edges
+        .flat()
+        .findIndex((e) => getNodeLabel(e.source) === match[1] && getNodeLabel(e.target) === match[2]) ===
+      -1
+    ) {
+      return { parsed: false }
+    }
+  } else {
+    if (
+      graph.edges
+        .flat()
+        .findIndex(
+          (e) =>
+            (getNodeLabel(e.source) === match[1] && getNodeLabel(e.target) === match[2]) ||
+            (getNodeLabel(e.source) === match[2] && getNodeLabel(e.target) === match[1]),
+        ) === -1
+    ) {
+      return { parsed: false }
+    }
+  }
+  return { parsed: true }
 }
 
 function checkEdgeInputSelect(edges: string[], graph: Graph): EdgeInputSelectedCheckResult {
@@ -668,44 +735,28 @@ function checkEdgeInputSelect(edges: string[], graph: Graph): EdgeInputSelectedC
     if (!cleanEdge) continue
     const regexEdge = new RegExp(`^\\(([A-Z]+),([A-Z]+)\\)$`)
     const match = cleanEdge.match(regexEdge)
-    if (!match) return { parsed: false, selected: [] }
-    if (match[1] === match[2]) return { parsed: false, selected: [] }
-    // check if match[1] and match[2] are in the graph
-    if (
-      graph.nodes.findIndex((n) => n.label === match[1]) === -1 ||
-      graph.nodes.findIndex((n) => n.label === match[2]) === -1
-    ) {
-      return { parsed: false, selected: [] }
-    }
-    // check if the edge exists
-    if (graph.directed) {
-      if (
-        graph.edges
-          .flat()
-          .findIndex(
-            (e) => getNodeLabel(e.source) === match[1] && getNodeLabel(e.target) === match[2],
-          ) === -1
-      ) {
-        return { parsed: false, selected: [] }
-      }
-    } else {
-      if (
-        graph.edges
-          .flat()
-          .findIndex(
-            (e) =>
-              (getNodeLabel(e.source) === match[1] && getNodeLabel(e.target) === match[2]) ||
-              (getNodeLabel(e.source) === match[2] && getNodeLabel(e.target) === match[1]),
-          ) === -1
-      ) {
-        return { parsed: false, selected: [] }
-      }
-    }
-    selected.push([match[1], match[2]])
+    const edgeCorrectness = checkEdgeCorrectness(match, graph)
+    if (!edgeCorrectness.parsed) return { parsed: false, selected: [] }
+    selected.push([match![1], match![2]])
   }
   return { parsed: true, selected }
 }
 
-function checkEdgeInputGroup(edges: string[]): EdgeInputGroupCheckResult {
-  return { parsed: false, groups: {} }
+function checkEdgeInputGroup(edges: string[], graph: Graph): EdgeInputGroupCheckResult {
+  const groups: { [key: number]: [string, string][] } = {}
+  for (const edge of edges) {
+    const cleanEdge = edge.replace(/\s/g, "")
+    if (!cleanEdge) continue
+    const regexEdge = new RegExp(`^\\(([A-Z]+),([A-Z]+),([1-9])\\)$`)
+    const match = cleanEdge.match(regexEdge)
+    const edgeCorrectness = checkEdgeCorrectness(match, graph)
+    if (!edgeCorrectness.parsed) return { parsed: false, groups: {} }
+    const group = parseInt(match![3])
+    if (group > graph.edgeGroupMax || group < 1) {
+      return { parsed: false, groups: {} }
+    }
+    groups[group] = groups[group] || []
+    groups[group].push([match![1], match![2]])
+  }
+  return { parsed: true, groups }
 }
