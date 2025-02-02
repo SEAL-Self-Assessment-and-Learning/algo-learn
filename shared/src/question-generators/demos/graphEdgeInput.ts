@@ -27,7 +27,7 @@ const translations: Translations = {
     description: "Wähle alle Kanten eines Pfads aus.",
     text: "Wähle alle Kanten auf einem einfachen Pfad aus, der von Knoten $ {{1}}$ startet und Knoten $ {{2}}$ erreicht. {{0}}",
     fdParse: "Es gab einen Fehler beim Parsen deiner Eingabe.",
-    fdPath: "Deine Antwort ist kein einfacher Pfad oder führt nicht zum gewünschten Endknoten."
+    fdPath: "Deine Antwort ist kein einfacher Pfad oder führt nicht zum gewünschten Endknoten.",
   },
 }
 
