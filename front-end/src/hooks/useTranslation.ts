@@ -6,7 +6,8 @@ import deJSON from "../locales/de.json"
 import enJSON from "../locales/en.json"
 
 export const SUPPORTED_LANGUAGES: ReadonlyArray<Language> = ["en", "de"]
-export const DEFAULT_LANGUAGE: Language = window.navigator.language.startsWith("de") ? "de" : "en"
+export const DEFAULT_LANGUAGE: Language =
+  typeof window !== "undefined" && window.navigator.language.startsWith("de") ? "de" : "en"
 export const NATIVE_NAME: Readonly<Record<Language, string>> = {
   en: "English",
   de: "Deutsch",
