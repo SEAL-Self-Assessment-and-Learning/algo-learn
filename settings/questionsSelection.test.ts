@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { allParameterCombinations } from "@shared/api/Parameters"
+import { edgeInputFieldID, nodeInputFieldID } from "@shared/utils/graph.ts"
 import { collection } from "./questionsSelection.ts"
 
 const allowedSlugsExplanation = "only lower case letters or '-'"
@@ -72,6 +73,8 @@ for (const generator of generators) {
           )
           expect(question.text).toBeDefined()
           expect(question.text).not.toBe("")
+          expect(question.text!.includes(`{{${nodeInputFieldID}#`)).toBeFalsy()
+          expect(question.text!.includes(`{{${edgeInputFieldID}#`)).toBeFalsy()
           expect(question.feedback).toBeDefined()
           if (question.type === "MultipleChoiceQuestion") {
             expect(() => question.feedback!({ choice: [0] })).not.toThrow()
