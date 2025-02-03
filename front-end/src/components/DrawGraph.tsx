@@ -9,6 +9,14 @@ import {
   type Edge,
   type Graph,
 } from "@shared/utils/graph"
+import {
+  checkEdgeInput,
+  checkNodeInput,
+  updateGraphEdgeGroup,
+  updateGraphEdgeSelected,
+  updateGraphNodeGroup,
+  updateGraphNodeSelected,
+} from "@shared/utils/graphInput.ts"
 import { Markdown } from "@/components/Markdown.tsx"
 import {
   AlertDialog,
@@ -25,7 +33,7 @@ import { Button } from "@/components/ui/button.tsx"
 import { addFormField, useFormField, type TextFieldState } from "@/hooks/useFormContext.ts"
 import { useTheme } from "@/hooks/useTheme.ts"
 
-type GraphElementStateType = { selected: boolean; group: null | number }
+export type GraphElementStateType = { selected: boolean; group: null | number }
 
 // limited by the number of colors we have. See tailwind --color-group-0,...,--color-group-7.
 const maxGroups = 8
@@ -401,6 +409,7 @@ export function DrawGraph({
                 className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
                 size="iconSm"
                 variant="outline"
+                disabled={nodeField?.disabled || edgeField?.disabled}
                 onClick={() => {}}
               >
                 <RiInputField />
@@ -420,12 +429,22 @@ export function DrawGraph({
                       <Markdown md={`{{${nodeInputFieldMd}}}`} />
                     </>
                   )}
+                  {checkNodeInput(nodeField?.text ?? "", graph).messages.map((message, index) => (
+                    <div className={`text-red-500`} key={index}>
+                      - <Markdown md={message} />
+                    </div>
+                  ))}
                   {graph.edgeClickType !== "none" && (
                     <>
                       <b>Edge selection:</b>
                       <Markdown md={`{{${edgeInputFieldMd}}}`} />
                     </>
                   )}
+                  {checkEdgeInput(edgeField?.text ?? "", graph).messages.map((message, index) => (
+                    <div className={`text-red-500`} key={index}>
+                      - <Markdown md={message} />
+                    </div>
+                  ))}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -523,240 +542,4 @@ function nodeInputSetText(nodeField: TextFieldState | undefined, nodeStates: Gra
         .join(";"),
     )
   }
-}
-
-function updateGraphNodeSelected(graph: Graph, nodeStates: GraphElementStateType[], selected: string[]) {
-  for (let i = 0; i < graph.nodes.length; i++) {
-    nodeStates[i].selected = selected.includes(graph.nodes[i].label!)
-  }
-}
-
-function updateGraphNodeGroup(
-  graph: Graph,
-  nodeStates: GraphElementStateType[],
-  groups: { [key: number]: string[] },
-) {
-  for (let i = 0; i < graph.nodes.length; i++) {
-    nodeStates[i].group = null
-  }
-
-  for (const [group, nodes] of Object.entries(groups)) {
-    for (const node of nodes) {
-      const nodeIndex = graph.nodes.findIndex((n) => n.label === node)
-      if (nodeIndex !== -1) {
-        nodeStates[nodeIndex].group = parseInt(group) - 1
-      }
-    }
-  }
-}
-
-function updateGraphEdgeSelected(
-  directed: boolean,
-  edgeListFlat: Edge[],
-  edgeStates: GraphElementStateType[],
-  selected: [string, string][],
-) {
-  for (let i = 0; i < edgeListFlat.length; i++) {
-    if (directed) {
-      edgeStates[i].selected =
-        selected.findIndex(
-          (edge) =>
-            getNodeLabel(edgeListFlat[i].source) === edge[0] &&
-            getNodeLabel(edgeListFlat[i].target) === edge[1],
-        ) !== -1
-    } else {
-      edgeStates[i].selected =
-        selected.findIndex(
-          (edge) =>
-            getNodeLabel(edgeListFlat[i].source) === edge[0] &&
-            getNodeLabel(edgeListFlat[i].target) === edge[1],
-        ) !== -1 ||
-        selected.findIndex(
-          (edge) =>
-            getNodeLabel(edgeListFlat[i].target) === edge[0] &&
-            getNodeLabel(edgeListFlat[i].source) === edge[1],
-        ) !== -1
-    }
-  }
-}
-
-function updateGraphEdgeGroup(
-  directed: boolean,
-  edgeListFlat: Edge[],
-  edgeStates: GraphElementStateType[],
-  group: { [key: number]: [string, string][] },
-) {
-  for (let i = 0; i < edgeListFlat.length; i++) {
-    edgeStates[i].group = null
-  }
-
-  for (const [groupIndex, edges] of Object.entries(group)) {
-    for (const edge of edges) {
-      let edgeIndex: number
-      if (directed) {
-        edgeIndex = edgeListFlat.findIndex(
-          (e) => getNodeLabel(e.source) === edge[0] && getNodeLabel(e.target) === edge[1],
-        )
-      } else {
-        edgeIndex = edgeListFlat.findIndex(
-          (e) =>
-            (getNodeLabel(e.source) === edge[0] && getNodeLabel(e.target) === edge[1]) ||
-            (getNodeLabel(e.target) === edge[0] && getNodeLabel(e.source) === edge[1]),
-        )
-      }
-      if (edgeIndex !== -1) {
-        edgeStates[edgeIndex].group = parseInt(groupIndex) - 1
-      }
-    }
-  }
-}
-
-export type NodeInputSelectedCheckResult = { parsed: boolean; selected: string[] }
-export type NodeInputGroupCheckResult = { parsed: boolean; groups: { [key: number]: string[] } }
-export type NodeInputCheckResult = NodeInputSelectedCheckResult | NodeInputGroupCheckResult
-
-/**
- * Function parsing the node input fields and checking for correct input
- * Node-String format is either (Node, Group) or Node seperated by ";"
- *
- * @param nodeString
- * @param graph
- */
-function checkNodeInput(nodeString: string, graph: Graph): NodeInputCheckResult {
-  const nodes = nodeString.split(";")
-  return graph.nodeClickType === "select"
-    ? checkNodeInputSelect(nodes, graph)
-    : checkNodeInputGroup(nodes, graph)
-}
-
-/**
- * Checks the input of nodes if the graph nodes can only be selected
- * Checks:
- *  - Input contains only uppercase letters
- *  - Input contains only nodes that are in the graph
- * @param nodes
- * @param graph
- */
-function checkNodeInputSelect(nodes: string[], graph: Graph): NodeInputSelectedCheckResult {
-  const selected: string[] = []
-  for (let node of nodes) {
-    node = node.replace(/\s/g, "")
-    if (node === "") continue
-    if (!/^[A-Z]+$/.test(node)) return { parsed: false, selected: [] }
-    if (graph.nodes.findIndex((n) => n.label === node) === -1) return { parsed: false, selected: [] }
-    selected.push(node)
-  }
-  return { parsed: true, selected }
-}
-
-function checkNodeInputGroup(nodes: string[], graph: Graph): NodeInputGroupCheckResult {
-  const regexNodeGroup = new RegExp(`^\\(([A-Z]+),(\\d|[0-9])\\)+$`)
-  const groups: { [key: number]: string[] } = {}
-  for (const node of nodes) {
-    const cleanNode = node.replace(/\s/g, "")
-    if (!cleanNode) continue
-
-    const match = cleanNode.match(regexNodeGroup)
-    if (!match || graph.nodes.findIndex((n) => n.label === match[1]) === -1) {
-      return { parsed: false, groups: {} }
-    }
-
-    const group = parseInt(match[2])
-    if (group > graph.nodeGroupMax || group < 1) {
-      return { parsed: false, groups: {} }
-    }
-
-    groups[group] = groups[group] || []
-    groups[group].push(match[1])
-  }
-
-  return { parsed: true, groups }
-}
-
-export type EdgeInputSelectedCheckResult = { parsed: boolean; selected: [string, string][] }
-export type EdgeInputGroupCheckResult = {
-  parsed: boolean
-  groups: { [key: number]: [string, string][] }
-}
-export type EdgeInputCheckResult = EdgeInputSelectedCheckResult | EdgeInputGroupCheckResult
-
-/**
- * Function parsing the edge input fields and checking for correct input
- * @param edgeString
- * @param graph
- */
-export function checkEdgeInput(edgeString: string, graph: Graph): EdgeInputCheckResult {
-  const edges = edgeString.split(";")
-  return graph.edgeClickType === "select"
-    ? checkEdgeInputSelect(edges, graph)
-    : checkEdgeInputGroup(edges, graph)
-}
-
-function checkEdgeCorrectness(match: RegExpMatchArray | null, graph: Graph): { parsed: boolean } {
-  if (!match) return { parsed: false }
-  if (match[1] === match[2]) return { parsed: false }
-  // check if match[1] and match[2] are in the graph
-  if (
-    graph.nodes.findIndex((n) => n.label === match[1]) === -1 ||
-    graph.nodes.findIndex((n) => n.label === match[2]) === -1
-  ) {
-    return { parsed: false }
-  }
-  // check if the edge exists
-  if (graph.directed) {
-    if (
-      graph.edges
-        .flat()
-        .findIndex((e) => getNodeLabel(e.source) === match[1] && getNodeLabel(e.target) === match[2]) ===
-      -1
-    ) {
-      return { parsed: false }
-    }
-  } else {
-    if (
-      graph.edges
-        .flat()
-        .findIndex(
-          (e) =>
-            (getNodeLabel(e.source) === match[1] && getNodeLabel(e.target) === match[2]) ||
-            (getNodeLabel(e.source) === match[2] && getNodeLabel(e.target) === match[1]),
-        ) === -1
-    ) {
-      return { parsed: false }
-    }
-  }
-  return { parsed: true }
-}
-
-function checkEdgeInputSelect(edges: string[], graph: Graph): EdgeInputSelectedCheckResult {
-  const selected: [string, string][] = []
-  for (const edge of edges) {
-    const cleanEdge = edge.replace(/\s/g, "")
-    if (!cleanEdge) continue
-    const regexEdge = new RegExp(`^\\(([A-Z]+),([A-Z]+)\\)$`)
-    const match = cleanEdge.match(regexEdge)
-    const edgeCorrectness = checkEdgeCorrectness(match, graph)
-    if (!edgeCorrectness.parsed) return { parsed: false, selected: [] }
-    selected.push([match![1], match![2]])
-  }
-  return { parsed: true, selected }
-}
-
-function checkEdgeInputGroup(edges: string[], graph: Graph): EdgeInputGroupCheckResult {
-  const groups: { [key: number]: [string, string][] } = {}
-  for (const edge of edges) {
-    const cleanEdge = edge.replace(/\s/g, "")
-    if (!cleanEdge) continue
-    const regexEdge = new RegExp(`^\\(([A-Z]+),([A-Z]+),([1-9])\\)$`)
-    const match = cleanEdge.match(regexEdge)
-    const edgeCorrectness = checkEdgeCorrectness(match, graph)
-    if (!edgeCorrectness.parsed) return { parsed: false, groups: {} }
-    const group = parseInt(match![3])
-    if (group > graph.edgeGroupMax || group < 1) {
-      return { parsed: false, groups: {} }
-    }
-    groups[group] = groups[group] || []
-    groups[group].push([match![1], match![2]])
-  }
-  return { parsed: true, groups }
 }

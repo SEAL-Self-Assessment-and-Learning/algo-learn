@@ -6,9 +6,9 @@ import type {
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { edgeInputFieldID, RandomGraph, type Graph, type Node } from "@shared/utils/graph.ts"
+import { checkEdgeInput } from "@shared/utils/graphInput.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, type Translations } from "@shared/utils/translations"
-import { checkEdgeInput } from "@/components/DrawGraph.tsx"
 
 /**
  * All displayed text goes into the translation object.
