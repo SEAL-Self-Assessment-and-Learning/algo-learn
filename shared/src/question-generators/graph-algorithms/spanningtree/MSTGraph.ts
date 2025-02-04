@@ -43,7 +43,7 @@ const translations: Translations = {
     fdNotSpanningTree: "Die ausgewählten Kanten bilden keinen Spannbaum.",
     fdWeight: "Das Gewicht der ausgewählten Kanten ist höher als das Gewicht des minimalen Spannbaums.",
   },
-};
+}
 
 export const MSTGraphGen: QuestionGenerator = {
   id: "mstgraph",
@@ -101,7 +101,7 @@ export const MSTGraphGen: QuestionGenerator = {
 function getFeedback(graph: Graph, random: Random, lang: Language): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
     const MST = random.bool()
-      ? kruskalAlgorithm(graph)
+      ? kruskalAlgorithm(graph).mst
       : primAlgorithm(graph, random.choice(graph.nodes))
     setEdgesGroup(graph, MST, 1)
     graph.inputFields = false

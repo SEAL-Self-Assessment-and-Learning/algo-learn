@@ -1,19 +1,31 @@
 import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm.ts"
 import type { Edge, Graph } from "@shared/utils/graph.ts"
 
-export function kruskalAlgorithm(graph: Graph): Edge[] {
+export function kruskalAlgorithm(graph: Graph): { mst: Edge[]; cycle: Edge[] } {
   spanningTreeBaseChecks(graph)
-  const minimumSpanningTree: Edge[] = []
+  const mst: Edge[] = []
+  const cycle: Edge[] = []
   const unionFind = new QuickFind(graph.nodes.length)
   const sortedEdges = graph.edges.flat().sort((a, b) => (a.value ?? 1) - (b.value ?? 1))
 
-  for (const edge of sortedEdges) {
+  const seen = new Set<string>()
+  const uniqueEdges = sortedEdges.filter(({ source, target, value }) => {
+    const key = source < target ? `${source}-${target}-${value}` : `${target}-${source}-${value}`
+
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+
+  for (const edge of uniqueEdges) {
     if (unionFind.find(edge.source) !== unionFind.find(edge.target)) {
-      minimumSpanningTree.push(edge)
+      mst.push(edge)
       unionFind.union(edge.source, edge.target)
+    } else {
+      cycle.push(edge)
     }
-    if (minimumSpanningTree.length === graph.nodes.length - 1) {
-      return minimumSpanningTree
+    if (mst.length === graph.nodes.length - 1) {
+      return { mst, cycle }
     }
   }
   throw new Error(

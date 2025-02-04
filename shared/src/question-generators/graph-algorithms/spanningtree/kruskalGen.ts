@@ -1,7 +1,21 @@
-import type { FreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
+import { min } from "mathjs"
+import type { Language } from "@shared/api/Language.ts"
+import type {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextQuestion,
+  QuestionGenerator,
+} from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { kruskalAlgorithm } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalAlgo.ts"
-import { RandomGraph } from "@shared/utils/graph.ts"
+import { setEdgesGroup } from "@shared/question-generators/graph-algorithms/spanningtree/utils.ts"
+import {
+  edgeInputFieldID,
+  getNodeLabel,
+  RandomGraph,
+  type Edge,
+  type Graph,
+} from "@shared/utils/graph.ts"
+import { checkEdgeInput } from "@shared/utils/graphInput.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
@@ -10,7 +24,10 @@ const translations: Translations = {
     name: "Kruskal Algorithm",
     description: "Correctly execute the Kruskal algorithm",
     param_size: "Tree size",
-    task: "Given the graph $G$: {{0}} Please provide",
+    task: "Given the graph $G$: {{0}} Select the first ${{1}}$ edges that `Kruskal`’s algorithm considers but rejects because they would form a cycle.",
+    fdParse: "Your response could not be parsed into a list of edges.",
+    fdAmount: "You have selected $ {{0}} $ edges, but should have selected $ {{1}} $ edges.",
+    fdWrong: "The selected edges are not the correct ones.",
   },
   de: {},
 }
@@ -42,17 +59,83 @@ export const Kruskal: QuestionGenerator = {
     const random = new Random(seed)
     const size = parameters.size as number
 
-    const G = RandomGraph.grid(random, [size, size], 1, "square-width-diagonals", "random", false, false)
+    let G: Graph
+    let kruskalResult: { mst: Edge[]; cycle: Edge[] }
+    do {
+      console.log("Kruskal: generate")
+      G = RandomGraph.grid(random, [size, size], 1, "square-width-diagonals", "unique", false, false)
+      kruskalResult = kruskalAlgorithm(G)
+    } while (kruskalResult.cycle.length < 2)
+
+    G.inputFields = true
+    G.edgeClickType = "select"
+    G.nodeDraggable = false
+    let numEdges: number
+    if (kruskalResult.cycle.length === 2) {
+      numEdges = 2
+    } else {
+      numEdges = random.int(2, min(4, kruskalResult.cycle.length - 1))
+    }
     kruskalAlgorithm(G)
 
-    const question: FreeTextQuestion = {
-      type: "FreeTextQuestion",
+    const question: MultiFreeTextQuestion = {
+      type: "MultiFreeTextQuestion",
       name: Kruskal.name(lang),
       path: permaLink,
-      text: t(translations, lang, "task", [G.toMarkdown()]),
-      placeholder: "A, B, C, ...",
+      text: t(translations, lang, "task", [G.toMarkdown(), numEdges.toString()]),
+      feedback: getFeedback(G, kruskalResult.cycle.slice(0, numEdges), lang),
     }
 
     return { question }
   },
+}
+
+function getFeedback(G: Graph, cycleEdges: Edge[], lang: Language): MultiFreeTextFeedbackFunction {
+  return ({ text }) => {
+    setEdgesGroup(G, cycleEdges, 1)
+    G.inputFields = false
+    const edgeInput = checkEdgeInput(text[edgeInputFieldID], G)
+    if (!edgeInput.parsed || !("selected" in edgeInput)) {
+      return {
+        correct: false,
+        correctAnswer: G.toMarkdown(),
+        feedbackText: t(translations, lang, "fdParse"),
+      }
+    }
+
+    const selectedEdges = edgeInput.selected
+    if (selectedEdges.length !== cycleEdges.length) {
+      return {
+        correct: false,
+        correctAnswer: G.toMarkdown(),
+        feedbackText: t(translations, lang, "fdEdgeAmount", [
+          selectedEdges.length.toString(),
+          cycleEdges.length.toString(),
+        ]),
+      }
+    }
+
+    // Check if the selected edges are the correct ones
+    for (const edge of cycleEdges) {
+      if (
+        !selectedEdges.some(
+          (selectedEdge) =>
+            (selectedEdge[0] === getNodeLabel(edge.source) &&
+              selectedEdge[1] === getNodeLabel(edge.target)) ||
+            (selectedEdge[1] === getNodeLabel(edge.source) &&
+              selectedEdge[0] === getNodeLabel(edge.target)),
+        )
+      ) {
+        return {
+          correct: false,
+          correctAnswer: G.toMarkdown(),
+          feedbackText: t(translations, lang, "fdWrong"),
+        }
+      }
+    }
+
+    return {
+      correct: true,
+    }
+  }
 }
