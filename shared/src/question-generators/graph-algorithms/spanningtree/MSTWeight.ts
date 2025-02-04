@@ -17,7 +17,12 @@ const translations: Translations = {
     task: "Given the graph $G$: {{0}} Compute the weight of the minimum spanning tree.",
     fdParse: "Your response could not be converted into an integer.",
   },
-  de: {},
+  de: {
+    name: "Minimaler Spannbaum (Gewicht)",
+    description: "Berechne das Gewicht eines minimalen Spannbaums",
+    task: "Gegeben ist der Graph $G$: {{0}} Berechne das Gewicht des minimalen Spannbaums.",
+    fdParse: "Deine Antwort konnte nicht in eine ganze Zahl umgewandelt werden.",
+  },
 }
 
 export const MSTWeightGen: QuestionGenerator = {
@@ -32,8 +37,8 @@ export const MSTWeightGen: QuestionGenerator = {
       name: "size",
       description: tFunctional(translations, "param_size"),
       type: "integer",
-      min: 3, // 2
-      max: 3, // 4
+      min: 2,
+      max: 4,
     },
   ],
 
@@ -47,9 +52,10 @@ export const MSTWeightGen: QuestionGenerator = {
     const random = new Random(seed)
     const size = parameters.size as number
 
-    // Todo: Change this graph something more random
+    // Todo: Change this graph to something more random
     const G = RandomGraph.grid(random, [size, size], 1, "square-width-diagonals", "random", false, false)
     G.edgeClickType = "select"
+    G.nodeDraggable = false
     const startNode = random.choice(G.nodes)
     const MST = primAlgorithm(G, startNode)
     const mstWeight = MST.reduce((acc, x) => acc + (x.value ?? 1), 0)
@@ -65,6 +71,11 @@ export const MSTWeightGen: QuestionGenerator = {
   },
 }
 
+/**
+ * Feedback function parsing the user input and checking for correctness
+ * @param mstWeight
+ * @param lang
+ */
 function getFeedback(mstWeight: number, lang: Language): FreeTextFeedbackFunction {
   return ({ text }) => {
     if (text.trim() === "") {

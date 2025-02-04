@@ -7,7 +7,18 @@ import type {
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { kruskalAlgorithm } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalAlgo.ts"
 import { primAlgorithm } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
-import { type Graph, RandomGraph } from "@shared/utils/graph.ts"
+import {
+  isSpanningTree,
+  setEdgesGroup,
+} from "@shared/question-generators/graph-algorithms/spanningtree/utils.ts"
+import {
+  edgeInputFieldID,
+  getNodeLabel,
+  RandomGraph,
+  type Edge,
+  type Graph,
+} from "@shared/utils/graph.ts"
+import { checkEdgeInput } from "@shared/utils/graphInput.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
@@ -16,11 +27,23 @@ const translations: Translations = {
     name: "Minimum Spanning Tree (Graph)",
     description: "Compute a minimum spanning tree",
     task: `Given the graph $G$: {{0}} 
-           Compute a minimum spanning tree by selecting the edges in the graph above.`,
+           Compute a minimum spanning tree for $G$ by selecting the corresponding edges in $G$.`,
+    fdParse: "Your response could not be parsed into a list of edges.",
     fdEdgeAmount: `You have selected $ {{0}} $ edges, but the minimum spanning tree includes exactly $ {{1}} $ edges.`,
+    fdNotSpanningTree: "The selected edges do not form a spanning tree.",
+    fdWeight: "The weight of the selected edges is higher than the weight of the minimum spanning tree.",
   },
-  de: {},
-}
+  de: {
+    name: "Minimaler Spannbaum (Graph)",
+    description: "Berechne einen minimalen Spannbaum",
+    task: `Gegeben ist der Graph $G$: {{0}} 
+           Berechne einen minimalen Spannbaum für $G$, indem du die entsprechenden Kanten in $G$ auswählst.`,
+    fdParse: "Deine Antwort konnte nicht als Liste von Kanten interpretiert werden.",
+    fdEdgeAmount: `Du hast $ {{0}} $ Kanten ausgewählt, aber der minimale Spannbaum enthält genau $ {{1}} $ Kanten.`,
+    fdNotSpanningTree: "Die ausgewählten Kanten bilden keinen Spannbaum.",
+    fdWeight: "Das Gewicht der ausgewählten Kanten ist höher als das Gewicht des minimalen Spannbaums.",
+  },
+};
 
 export const MSTGraphGen: QuestionGenerator = {
   id: "mstgraph",
@@ -34,8 +57,8 @@ export const MSTGraphGen: QuestionGenerator = {
       name: "size",
       description: tFunctional(translations, "param_size"),
       type: "integer",
-      min: 3, // 2
-      max: 3, // 4
+      min: 2,
+      max: 4,
     },
   ],
 
@@ -52,6 +75,8 @@ export const MSTGraphGen: QuestionGenerator = {
     // Todo: Change this graph something more random
     const G = RandomGraph.grid(random, [size, size], 1, "square-width-diagonals", "random", false, false)
     G.edgeClickType = "select"
+    G.nodeDraggable = false
+    G.inputFields = true
 
     const question: MultiFreeTextQuestion = {
       type: "MultiFreeTextQuestion",
@@ -64,12 +89,34 @@ export const MSTGraphGen: QuestionGenerator = {
   },
 }
 
+/**
+ * Function to check the user input:
+ * - Check if the input is a valid edge list
+ * - Check if the input is a valid spanning tree
+ * - Check if the input has the correct weight
+ * @param graph
+ * @param random - to choose between different correct answers
+ * @param lang
+ */
 function getFeedback(graph: Graph, random: Random, lang: Language): MultiFreeTextFeedbackFunction {
-  return () => {
+  return ({ text }) => {
     const MST = random.bool()
       ? kruskalAlgorithm(graph)
       : primAlgorithm(graph, random.choice(graph.nodes))
-    const selectedEdges = graph.edges.flat().filter((x) => x.group !== null && x.group !== undefined)
+    setEdgesGroup(graph, MST, 1)
+    graph.inputFields = false
+
+    const edgeInput = checkEdgeInput(text[edgeInputFieldID], graph)
+    if (!edgeInput.parsed || !("selected" in edgeInput)) {
+      return {
+        correct: false,
+        correctAnswer: graph.toMarkdown(),
+        feedbackText: t(translations, lang, "fdEdgeAmount"),
+      }
+    }
+
+    // All edges in .selected are in the graph
+    const selectedEdges = edgeInput.selected
     if (selectedEdges.length !== graph.getNumNodes() - 1) {
       return {
         correct: false,
@@ -81,8 +128,50 @@ function getFeedback(graph: Graph, random: Random, lang: Language): MultiFreeTex
       }
     }
 
+    const mappedEdges = mapEdgeLabelToEdge(selectedEdges, graph)
+    if (!isSpanningTree(graph.getNumNodes(), mappedEdges)) {
+      return {
+        correct: false,
+        correctAnswer: graph.toMarkdown(),
+        feedbackText: t(translations, lang, "fdNotSpanningTree"),
+      }
+    }
+
+    const userWeight = mappedEdges.reduce((acc, x) => acc + (x.value ?? 1), 0)
+    const correctWeight = MST.reduce((acc, x) => acc + (x.value ?? 1), 0)
+    if (userWeight !== correctWeight) {
+      return {
+        correct: false,
+        correctAnswer: graph.toMarkdown(),
+        feedbackText: t(translations, lang, "fdWeight"),
+      }
+    }
+
     return {
       correct: true,
     }
   }
+}
+
+/**
+ * Map the edge labels to the edges in the graph
+ * @param edgeLabels
+ * @param graph
+ */
+function mapEdgeLabelToEdge(edgeLabels: [string, string][], graph: Graph): Edge[] {
+  const edges: Edge[] = []
+  for (const label of edgeLabels) {
+    outer: for (let i = 0; i < graph.edges.length; i++) {
+      for (let j = 0; j < graph.edges[i].length; j++) {
+        if (
+          getNodeLabel(graph.edges[i][j].source) === label[0] &&
+          getNodeLabel(graph.edges[i][j].target) === label[1]
+        ) {
+          edges.push(graph.edges[i][j])
+          break outer
+        }
+      }
+    }
+  }
+  return edges
 }

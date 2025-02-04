@@ -8,6 +8,8 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { MSTGraphGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTGraph.ts"
+import { MSTWeightGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTWeight.ts"
 import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
@@ -15,8 +17,6 @@ import { Satisfiability } from "@shared/question-generators/propositional-logic/
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
 import { Loops } from "@shared/question-generators/time/loops"
-import { Kruskal } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalGen.ts"
-import { MSTWeightGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTWeight.ts"
 
 export const collection: QuestionCollection = [
   {
@@ -50,7 +50,7 @@ export const collection: QuestionCollection = [
   {
     slug: "graph",
     name: { de: "Graphen", en: "Graphs" },
-    contents: [TreeTraversal, MSTWeightGen, MSTWeightGen, Kruskal],
+    contents: [TreeTraversal, MSTWeightGen, MSTGraphGen],
   },
 ]
 
