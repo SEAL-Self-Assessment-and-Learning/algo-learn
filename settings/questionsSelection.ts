@@ -9,10 +9,10 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { AutomatonWordQuestion } from "@shared/question-generators/automaton/automatonWordProblem.ts"
 import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
-import { BFS } from "@shared/question-generators/graph-algorithms/bfs"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { CRT } from "@shared/question-generators/math/crt"
 import { modFactor } from "@shared/question-generators/math/modFactorization"
@@ -82,9 +82,9 @@ export const collection: QuestionCollection = [
     contents: [HeapOperations, HeapVerifying, HeapNeighbours],
   },
   {
-    slug: "bfs",
-    name: { de: "Breitensuche", en: "Breadth-first search" },
-    contents: [BFS],
+    slug: "automaton",
+    name: { de: "Automaten", en: "automata" },
+    contents: [AutomatonWordQuestion],
   },
 ]
 
