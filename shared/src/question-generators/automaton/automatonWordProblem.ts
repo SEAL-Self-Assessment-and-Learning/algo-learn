@@ -13,14 +13,16 @@ const translations: Translations = {
   en: {
     name: "Word Problem in Finite Automata",
     description: "Determine which words are accepted by the automaton.",
-    question: "Let $\\mathcal{A}=(Q,\\Sigma,{{startnode}},F,\\delta)$ be a NFA, where $\\\\ Q = \\{ {{states}} \\}$ is the set of states, $\\\\ \\Sigma=\\{0,1\\}$ is the input alphabet, $\\\\ F = \\{ {{endstates}} \\}$ is the set of accepting states, and $\\\\ \\delta$ is the transition function given by $\\\\ {{transitions}}$. $\\\\$Select all words that are accepted by $\\mathcal{A}$.",
+    question:
+      "Let $\\mathcal{A}=(Q,\\Sigma,{{startnode}},F,\\delta)$ be a NFA, where $\\\\ Q = \\{ {{states}} \\}$ is the set of states, $\\\\ \\Sigma=\\{0,1\\}$ is the input alphabet, $\\\\ F = \\{ {{endstates}} \\}$ is the set of accepting states, and $\\\\ \\delta$ is the transition function given by $\\\\ {{transitions}}$. $\\\\$Select all words that are accepted by $\\mathcal{A}$.",
     prompt: "Which of the following words are accepted by $\\mathcal{A}$?",
     none: "None of the above",
   },
   de: {
     name: "Wortproblem in endlichen Automaten",
     description: "Bestimme die vom Automaten akzeptierten Wörter",
-    question: "Sei $\\mathcal{A}=(Q,\\Sigma,{{startnode}},F,\\delta)$ ein NFA mit $\\\\ Q = \\{ {{states}} \\}$ ist die Menge der Zustände, $\\\\ \\Sigma=\\{0,1\\}$ ist das Eingabealphabet, $\\\\ F = \\{ {{endstates}} \\}$ ist die Menge der akzeptierenden Zustände und $\\\\ \\delta$ ist die Übergangsfunktion, gegeben durch $\\\\ {{transitions}}$. $\\\\$Wähle alle Wörter aus, die von $\\mathcal{A}$ akzeptiert werden.",
+    question:
+      "Sei $\\mathcal{A}=(Q,\\Sigma,{{startnode}},F,\\delta)$ ein NFA mit $\\\\ Q = \\{ {{states}} \\}$ ist die Menge der Zustände, $\\\\ \\Sigma=\\{0,1\\}$ ist das Eingabealphabet, $\\\\ F = \\{ {{endstates}} \\}$ ist die Menge der akzeptierenden Zustände und $\\\\ \\delta$ ist die Übergangsfunktion, gegeben durch $\\\\ {{transitions}}$. $\\\\$Wähle alle Wörter aus, die von $\\mathcal{A}$ akzeptiert werden.",
     prompt: "Welche der folgenden Wörter werden von $\\mathcal{A}$ akzeptiert?",
     none: "Keine der genannten Optionen",
   },
@@ -59,7 +61,7 @@ function isWordAccepted(automaton: Automaton, word: string): boolean {
 }
 
 export const AutomatonWordQuestion: QuestionGenerator = {
-  id: "word_automaton",
+  id: "nfaaccept",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["automaton", "word recognition"],
@@ -84,7 +86,6 @@ export const AutomatonWordQuestion: QuestionGenerator = {
     // generate options
     const words = generateWords(random, 6, 2, 6)
     const acceptedWords = words.filter((word) => isWordAccepted(automaton, word))
-    
 
     const answers = words.map((word) => ({
       key: word,
@@ -104,8 +105,8 @@ export const AutomatonWordQuestion: QuestionGenerator = {
       .flatMap((row, sourceIndex) =>
         row.map(
           (edge) =>
-            `\\delta(${automaton.nodes[sourceIndex]?.label}, ${edge.value}) = ${automaton.nodes[edge.target]?.label}`
-        )
+            `\\delta(${automaton.nodes[sourceIndex]?.label}, ${edge.value}) = ${automaton.nodes[edge.target]?.label}`,
+        ),
       )
       .join(", \\\\")
 
@@ -117,7 +118,10 @@ export const AutomatonWordQuestion: QuestionGenerator = {
       text: t(translations, lang, "question", {
         startnode: "q_0",
         states: automaton.nodes.map((n) => n.label).join(", "),
-        endstates: automaton.nodes.filter((n) => n.isEnd).map((n) => n.label).join(", "),
+        endstates: automaton.nodes
+          .filter((n) => n.isEnd)
+          .map((n) => n.label)
+          .join(", "),
         transitions,
       }),
       answers: answers.map(({ element }) => element),
