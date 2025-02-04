@@ -8,9 +8,10 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
-import { Kruskal } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalGen.ts"
+import { KruskalCycle } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalGen.ts"
 import { MSTGraphGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTGraph.ts"
 import { MSTWeightGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTWeight.ts"
+import { PrimOrder } from "@shared/question-generators/graph-algorithms/spanningtree/primGen.ts"
 import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
@@ -51,7 +52,7 @@ export const collection: QuestionCollection = [
   {
     slug: "graph",
     name: { de: "Graphen", en: "Graphs" },
-    contents: [TreeTraversal, MSTWeightGen, MSTGraphGen, Kruskal],
+    contents: [TreeTraversal, MSTWeightGen, MSTGraphGen, KruskalCycle, PrimOrder],
   },
 ]
 

@@ -7,16 +7,17 @@ import type { Edge, Graph, Node } from "@shared/utils/graph.ts"
  *              - in case unweighted edge, assumes weight 1
  * @param startNode
  */
-export function primAlgorithm(graph: Graph, startNode: Node) {
+export function primAlgorithm(graph: Graph, startNode: Node): { mst: Edge[]; nodes: Node[] } {
   spanningTreeBaseChecks(graph)
   if (!checkNodeIncluded(graph, startNode)) {
-    throw new Error()
+    throw new Error(`Start node ${startNode.label} not found in the graph.`)
   }
-  const minimumSpanningTree: Edge[] = []
+  const mst: Edge[] = []
+  const nodes: Node[] = [startNode]
   const startNodeIndex: number = graph.nodes.findIndex((node) => node.label === startNode.label)
   const seenNodes: Set<number> = new Set<number>()
   seenNodes.add(startNodeIndex)
-  while (minimumSpanningTree.length < graph.getNumNodes() - 1) {
+  while (mst.length < graph.getNumNodes() - 1) {
     const edgeOptions = graph.edges
       .flat()
       .filter(
@@ -30,11 +31,12 @@ export function primAlgorithm(graph: Graph, startNode: Node) {
         "The algorithm was not able to compute a spanning tree. The graph might not be connected.",
       )
     }
-    minimumSpanningTree.push(edgeOptions[0])
-    seenNodes.add(edgeOptions[0].source)
-    seenNodes.add(edgeOptions[0].target)
+    mst.push(edgeOptions[0])
+    const nextNode = seenNodes.has(edgeOptions[0].source) ? edgeOptions[0].target : edgeOptions[0].source
+    nodes.push(graph.nodes[nextNode])
+    seenNodes.add(nextNode)
   }
-  return minimumSpanningTree
+  return { mst, nodes }
 }
 
 function checkNodeIncluded(graph: Graph, node: Node): boolean {

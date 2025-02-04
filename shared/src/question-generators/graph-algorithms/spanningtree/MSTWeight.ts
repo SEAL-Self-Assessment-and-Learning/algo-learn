@@ -57,7 +57,7 @@ export const MSTWeightGen: QuestionGenerator = {
     G.edgeClickType = "select"
     G.nodeDraggable = false
     const startNode = random.choice(G.nodes)
-    const MST = primAlgorithm(G, startNode)
+    const MST = primAlgorithm(G, startNode).mst
     const mstWeight = MST.reduce((acc, x) => acc + (x.value ?? 1), 0)
 
     const question: FreeTextQuestion = {

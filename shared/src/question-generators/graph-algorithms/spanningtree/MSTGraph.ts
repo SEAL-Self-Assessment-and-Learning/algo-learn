@@ -100,9 +100,9 @@ export const MSTGraphGen: QuestionGenerator = {
  */
 function getFeedback(graph: Graph, random: Random, lang: Language): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
-    const MST = random.bool()
-      ? kruskalAlgorithm(graph).mst
-      : primAlgorithm(graph, random.choice(graph.nodes))
+    const MST = (
+      random.bool() ? kruskalAlgorithm(graph) : primAlgorithm(graph, random.choice(graph.nodes))
+    ).mst
     setEdgesGroup(graph, MST, 1)
     graph.inputFields = false
 

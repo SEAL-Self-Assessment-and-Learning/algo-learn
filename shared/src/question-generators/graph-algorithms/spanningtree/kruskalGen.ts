@@ -23,17 +23,23 @@ const translations: Translations = {
   en: {
     name: "Kruskal Algorithm",
     description: "Correctly execute the Kruskal algorithm",
-    param_size: "Tree size",
     task: "Given the graph $G$: {{0}} Select the first ${{1}}$ edges that `Kruskal`’s algorithm considers but rejects because they would form a cycle.",
     fdParse: "Your response could not be parsed into a list of edges.",
     fdAmount: "You have selected $ {{0}} $ edges, but should have selected $ {{1}} $ edges.",
     fdWrong: "The selected edges are not the correct ones.",
   },
-  de: {},
+  de: {
+    name: "Kruskal-Algorithmus",
+    description: "Führe den Kruskal-Algorithmus korrekt aus",
+    task: "Gegeben ist der Graph $G$: {{0}} Wähle die ersten ${{1}}$ Kanten aus, die der `Kruskal`-Algorithmus in Betracht zieht, aber verwirft, weil sie einen Zyklus bilden würden.",
+    fdParse: "Deine Antwort konnte nicht als Liste von Kanten interpretiert werden.",
+    fdAmount: "Du hast $ {{0}} $ Kanten ausgewählt, aber es sollten $ {{1}} $ sein.",
+    fdWrong: "Die ausgewählten Kanten sind nicht korrekt.",
+  },
 }
 
-export const Kruskal: QuestionGenerator = {
-  id: "kruskal",
+export const KruskalCycle: QuestionGenerator = {
+  id: "kruskalcyc",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: [],
@@ -44,14 +50,14 @@ export const Kruskal: QuestionGenerator = {
       name: "size",
       description: tFunctional(translations, "param_size"),
       type: "integer",
-      min: 3, // 2
-      max: 3, // 4
+      min: 3,
+      max: 4,
     },
   ],
 
   generate: (lang = "en", parameters, seed) => {
     const permaLink = serializeGeneratorCall({
-      generator: Kruskal,
+      generator: KruskalCycle,
       lang,
       parameters,
       seed,
@@ -62,7 +68,6 @@ export const Kruskal: QuestionGenerator = {
     let G: Graph
     let kruskalResult: { mst: Edge[]; cycle: Edge[] }
     do {
-      console.log("Kruskal: generate")
       G = RandomGraph.grid(random, [size, size], 1, "square-width-diagonals", "unique", false, false)
       kruskalResult = kruskalAlgorithm(G)
     } while (kruskalResult.cycle.length < 2)
@@ -80,7 +85,7 @@ export const Kruskal: QuestionGenerator = {
 
     const question: MultiFreeTextQuestion = {
       type: "MultiFreeTextQuestion",
-      name: Kruskal.name(lang),
+      name: KruskalCycle.name(lang),
       path: permaLink,
       text: t(translations, lang, "task", [G.toMarkdown(), numEdges.toString()]),
       feedback: getFeedback(G, kruskalResult.cycle.slice(0, numEdges), lang),
