@@ -15,6 +15,8 @@ import { Satisfiability } from "@shared/question-generators/propositional-logic/
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
 import { Loops } from "@shared/question-generators/time/loops"
+import { Kruskal } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalGen.ts"
+import { MSTWeightGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTWeight.ts"
 
 export const collection: QuestionCollection = [
   {
@@ -48,7 +50,7 @@ export const collection: QuestionCollection = [
   {
     slug: "graph",
     name: { de: "Graphen", en: "Graphs" },
-    contents: [TreeTraversal],
+    contents: [TreeTraversal, MSTWeightGen, MSTWeightGen, Kruskal],
   },
 ]
 
