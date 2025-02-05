@@ -142,7 +142,7 @@ export function updateGraphEdgeGroup(
  */
 export function checkNodeInput(nodeString: string, graph: Graph, lang: Language): NodeInputCheckResult {
   const nodes = nodeString.split(";")
-  return graph.nodeClickType === "select"
+  return graph.nodeClickType === "select" || graph.nodeClickType === "none"
     ? checkNodeInputSelect(nodes, graph, lang)
     : checkNodeInputGroup(nodes, graph, lang)
 }
@@ -219,7 +219,7 @@ function checkNodeInputGroup(nodes: string[], graph: Graph, lang: Language): Nod
  */
 export function checkEdgeInput(edgeString: string, graph: Graph, lang: Language): EdgeInputCheckResult {
   const edges = edgeString.split(";")
-  return graph.edgeClickType === "select"
+  return graph.edgeClickType === "select" || graph.edgeClickType === "none"
     ? checkEdgeInputSelect(edges, graph, lang)
     : checkEdgeInputGroup(edges, graph, lang)
 }
