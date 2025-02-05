@@ -136,6 +136,7 @@ export function mapNumberToNodeLabel(elements: number[]): string[] {
   return nodeLabels
 }
 
+// Todo: Remove this function and use the one from graph.ts
 function reachableNodes(graph: Graph, startNode: Node): number[] {
   const startIndex = graph.nodes.findIndex((node) => node.label === startNode.label)
   if (startIndex === -1) throw new Error("Start node not found in graph")

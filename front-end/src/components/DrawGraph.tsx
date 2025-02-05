@@ -32,6 +32,7 @@ import {
 import { Button } from "@/components/ui/button.tsx"
 import { addFormField, useFormField, type TextFieldState } from "@/hooks/useFormContext.ts"
 import { useTheme } from "@/hooks/useTheme.ts"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 export type GraphElementStateType = { selected: boolean; group: null | number }
 
@@ -216,6 +217,7 @@ export function DrawGraph({
   graph: Graph
 }): ReactElement {
   const { theme } = useTheme()
+  const { lang, t } = useTranslation()
 
   const svgRef = useRef(null as SVGSVGElement | null)
   const coordinateScale = 60
@@ -419,28 +421,28 @@ export function DrawGraph({
               <AlertDialogHeader>
                 <AlertDialogTitle>
                   <p className="flex items-center gap-1">
-                    Graph Input <TbBrandGraphql />
+                    {t("graphInput")} <TbBrandGraphql />
                   </p>
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   {graph.nodeClickType !== "none" && (
                     <>
-                      <b>Node selection:</b>
+                      <b>{t("nodeSelection")}</b>
                       <Markdown md={`{{${nodeInputFieldMd}}}`} />
                     </>
                   )}
-                  {checkNodeInput(nodeField?.text ?? "", graph).messages.map((message, index) => (
+                  {checkNodeInput(nodeField?.text ?? "", graph, lang).messages.map((message, index) => (
                     <div className={`text-red-500`} key={index}>
                       - <Markdown md={message} />
                     </div>
                   ))}
                   {graph.edgeClickType !== "none" && (
                     <>
-                      <b>Edge selection:</b>
+                      <b>{t("edgeSelection")}</b>
                       <Markdown md={`{{${edgeInputFieldMd}}}`} />
                     </>
                   )}
-                  {checkEdgeInput(edgeField?.text ?? "", graph).messages.map((message, index) => (
+                  {checkEdgeInput(edgeField?.text ?? "", graph, lang).messages.map((message, index) => (
                     <div className={`text-red-500`} key={index}>
                       - <Markdown md={message} />
                     </div>
@@ -455,13 +457,12 @@ export function DrawGraph({
                     nodeInputSetText(nodeField, nodeStates)
                   }}
                 >
-                  {/* Don't save the user input and reset to the selection on the graph */}
-                  Back
+                  {t("back")}
                 </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => {
                     setFieldsOpen(false)
-                    const nodeCheck = checkNodeInput(nodeField?.text ?? "", graph)
+                    const nodeCheck = checkNodeInput(nodeField?.text ?? "", graph, lang)
                     if (nodeCheck.parsed) {
                       if ("selected" in nodeCheck) {
                         updateGraphNodeSelected(graph, nodeStates, nodeCheck.selected)
@@ -471,7 +472,7 @@ export function DrawGraph({
                       nodeInputSetText(nodeField, nodeStates)
                     }
 
-                    const edgeCheck = checkEdgeInput(edgeField?.text ?? "", graph)
+                    const edgeCheck = checkEdgeInput(edgeField?.text ?? "", graph, lang)
                     if (edgeCheck.parsed) {
                       if ("selected" in edgeCheck) {
                         updateGraphEdgeSelected(
@@ -488,14 +489,12 @@ export function DrawGraph({
                   }}
                   disabled={
                     !(
-                      checkNodeInput(nodeField?.text ?? "", graph).parsed &&
-                      checkEdgeInput(edgeField?.text ?? "", graph).parsed
+                      checkNodeInput(nodeField?.text ?? "", graph, lang).parsed &&
+                      checkEdgeInput(edgeField?.text ?? "", graph, lang).parsed
                     )
                   }
                 >
-                  {/* Todo: OnClick set graph correspondingly */}
-                  {/* Only save if correctly parsed */}
-                  Save
+                  {t("save")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

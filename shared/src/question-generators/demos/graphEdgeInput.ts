@@ -98,7 +98,7 @@ function getFeedback(
   lang: Language,
 ): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
-    const edgeInput = checkEdgeInput(text[edgeInputFieldID], graph)
+    const edgeInput = checkEdgeInput(text[edgeInputFieldID], graph, lang)
     graph.inputFields = false
     graph.edgeClickType = "none"
     for (let i = 1; i < endNodePath[1].length; i++) {
@@ -176,6 +176,7 @@ function isSimplePath(edges: [string, string][], startNode: string, endNode: str
   return false
 }
 
+// Todo: Use findReachableNodes from graph.ts (by storing path too)
 function bfs(startNode: Node, graph: Graph): Record<string, Node[]> {
   const queue: Node[] = [startNode]
   const visited: Set<Node> = new Set()
