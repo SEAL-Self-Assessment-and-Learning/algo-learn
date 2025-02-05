@@ -417,12 +417,19 @@ export function DrawGraph({
                 <RiInputField />
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent
+            onKeyDown={(e) =>{
+              if (e.key === "Enter") {
+                e.preventDefault()
+                e.stopPropagation()
+                document.getElementById("dialog-save-button")?.click()
+              }
+            }}>
               <AlertDialogHeader>
                 <AlertDialogTitle>
-                  <p className="flex items-center gap-1">
+                  <div className="flex items-center gap-1">
                     {t("graphInput")} <TbBrandGraphql />
-                  </p>
+                  </div>
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   {graph.nodeClickType !== "none" && (
@@ -460,6 +467,8 @@ export function DrawGraph({
                   {t("back")}
                 </AlertDialogCancel>
                 <AlertDialogAction
+                  id="dialog-save-button"
+                  type={"submit"}
                   onClick={() => {
                     setFieldsOpen(false)
                     const nodeCheck = checkNodeInput(nodeField?.text ?? "", graph, lang)
