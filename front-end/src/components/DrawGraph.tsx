@@ -280,24 +280,26 @@ export function DrawGraph({
         weight={e.value}
         directed={graph.directed}
         state={edgeStates[i]}
-        clickable={graph.edgeClickType !== "none"}
+        clickable={graph.edgeClickType !== "none" && !edgeField?.disabled}
         onClickCallback={() => {
-          setEdgeStates((prevEdgeStates) => {
-            const newEdgeStates = [...prevEdgeStates]
-            newEdgeStates[i] = { ...prevEdgeStates[i] }
-            if (graph.edgeClickType === "select") {
-              newEdgeStates[i].selected = !newEdgeStates[i].selected
-            } else if (graph.edgeClickType === "group") {
-              newEdgeStates[i].group =
-                newEdgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
-                  ? null
-                  : newEdgeStates[i].group === null
-                    ? 0
-                    : newEdgeStates[i].group + 1
-            }
-            edgeInputSetText(edgeField, newEdgeStates, edgeListFlat)
-            return newEdgeStates
-          })
+          if (!edgeField?.disabled) {
+            setEdgeStates((prevEdgeStates) => {
+              const newEdgeStates = [...prevEdgeStates]
+              newEdgeStates[i] = { ...prevEdgeStates[i] }
+              if (graph.edgeClickType === "select") {
+                newEdgeStates[i].selected = !newEdgeStates[i].selected
+              } else if (graph.edgeClickType === "group") {
+                newEdgeStates[i].group =
+                  newEdgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
+                    ? null
+                    : newEdgeStates[i].group === null
+                      ? 0
+                      : newEdgeStates[i].group + 1
+              }
+              edgeInputSetText(edgeField, newEdgeStates, edgeListFlat)
+              return newEdgeStates
+            })
+          }
         }}
       />
     )
@@ -317,26 +319,28 @@ export function DrawGraph({
         }
         size={nodeScale}
         label={u.label ?? ""}
-        clickable={graph.nodeClickType !== "none"}
+        clickable={graph.nodeClickType !== "none" && !nodeField?.disabled}
         state={nodeStates[i]}
         // todo the onClickCallback is duplicate code.
         onClickCallback={() => {
-          setNodeStates((prevNodeStates) => {
-            const newNodeStates = [...prevNodeStates]
-            newNodeStates[i] = { ...prevNodeStates[i] }
-            if (graph.nodeClickType === "select") {
-              newNodeStates[i].selected = !newNodeStates[i].selected
-            } else if (graph.nodeClickType === "group") {
-              newNodeStates[i].group =
-                newNodeStates[i].group === Math.min(graph.nodeGroupMax ?? maxGroups, maxGroups) - 1
-                  ? null
-                  : newNodeStates[i].group === null
-                    ? 0
-                    : newNodeStates[i].group + 1
-            }
-            nodeInputSetText(nodeField, newNodeStates)
-            return newNodeStates
-          })
+          if (!nodeField?.disabled) {
+            setNodeStates((prevNodeStates) => {
+              const newNodeStates = [...prevNodeStates]
+              newNodeStates[i] = { ...prevNodeStates[i] }
+              if (graph.nodeClickType === "select") {
+                newNodeStates[i].selected = !newNodeStates[i].selected
+              } else if (graph.nodeClickType === "group") {
+                newNodeStates[i].group =
+                  newNodeStates[i].group === Math.min(graph.nodeGroupMax ?? maxGroups, maxGroups) - 1
+                    ? null
+                    : newNodeStates[i].group === null
+                      ? 0
+                      : newNodeStates[i].group + 1
+              }
+              nodeInputSetText(nodeField, newNodeStates)
+              return newNodeStates
+            })
+          }
         }}
       />
     )
@@ -418,13 +422,14 @@ export function DrawGraph({
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent
-            onKeyDown={(e) =>{
-              if (e.key === "Enter") {
-                e.preventDefault()
-                e.stopPropagation()
-                document.getElementById("dialog-save-button")?.click()
-              }
-            }}>
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  document.getElementById("dialog-save-button")?.click()
+                }
+              }}
+            >
               <AlertDialogHeader>
                 <AlertDialogTitle>
                   <div className="flex items-center gap-1">
