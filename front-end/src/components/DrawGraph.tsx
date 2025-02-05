@@ -368,7 +368,7 @@ export function DrawGraph({
 
   const viewBoxAspectRatio = Math.min(maxHeight / maxWidth, viewBox.height / viewBox.width)
   return (
-    <div className={`relative`}>
+    <div className={`relative mb-1`}>
       <svg
         ref={svgRef}
         width={maxWidth}
