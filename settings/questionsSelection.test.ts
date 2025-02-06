@@ -73,8 +73,10 @@ for (const generator of generators) {
           )
           expect(question.text).toBeDefined()
           expect(question.text).not.toBe("")
-          expect(question.text!.includes(`{{${nodeInputFieldID}#`)).toBeFalsy()
-          expect(question.text!.includes(`{{${edgeInputFieldID}#`)).toBeFalsy()
+          for (let i = 0; i < 10; i++) {
+            expect(question.text!.includes(`{{${nodeInputFieldID(i)}#`)).toBeFalsy()
+            expect(question.text!.includes(`{{${edgeInputFieldID(i)}#`)).toBeFalsy()
+          }
           expect(question.feedback).toBeDefined()
           if (question.type === "MultipleChoiceQuestion") {
             expect(() => question.feedback!({ choice: [0] })).not.toThrow()
