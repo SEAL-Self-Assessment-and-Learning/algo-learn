@@ -67,7 +67,7 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
       graph = RandomGraph.grid(random, [6, 3], 0.6, "square-width-diagonals", null, false, false)
       graph.nodeDraggable = false
       graph.edgeClickType = "select"
-      graph.inputFields = true
+      graph.inputFields = 1
 
       startNode = random.choice(graph.nodes)
       bfsNodePaths = bfs(startNode, graph)
@@ -98,8 +98,8 @@ function getFeedback(
   lang: Language,
 ): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
-    const edgeInput = checkEdgeInput(text[edgeInputFieldID], graph, lang)
-    graph.inputFields = false
+    const edgeInput = checkEdgeInput(text[edgeInputFieldID(1)], graph, lang)
+    graph.inputFields = 0
     graph.edgeClickType = "none"
     for (let i = 1; i < endNodePath[1].length; i++) {
       const node1 = graph.nodes.findIndex((node) => node.label! === endNodePath[1][i - 1].label)

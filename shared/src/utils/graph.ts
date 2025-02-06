@@ -5,8 +5,12 @@ export type NodeList = Node[]
 export type EdgeList = Edge[][]
 export type ClickEventType = "none" | "select" | "group"
 
-export const nodeInputFieldID = "node-field"
-export const edgeInputFieldID = "edge-field"
+export function nodeInputFieldID(idNum: number) {
+  return `node-field-${idNum}`
+}
+export function edgeInputFieldID(idNum: number) {
+  return `edge-field-${idNum}`
+}
 
 /**
  * A node in a graph.
@@ -44,7 +48,7 @@ export class Graph {
   edges: EdgeList
   weighted: boolean
   directed: boolean
-  public inputFields: boolean
+  public inputFields: number
   public nodeDraggable: boolean
   public nodeClickType: ClickEventType
   public edgeClickType: ClickEventType
@@ -57,7 +61,7 @@ export class Graph {
     edges: EdgeList,
     directed: boolean,
     weighted: boolean,
-    inputFields: boolean = false,
+    inputFields: number = 0,
     nodeDraggable: boolean = true,
     nodeClick: ClickEventType = "none",
     edgeClick: ClickEventType = "none",
@@ -107,7 +111,7 @@ export class Graph {
 
   public toString(): string {
     const clickTypeMapping: Record<ClickEventType, string> = { none: "0", select: "1", group: "2" }
-    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${this.inputFields ? "1" : "0"} ${this.nodeDraggable ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
+    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${this.inputFields} ${this.nodeDraggable ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
 
     for (const node of this.nodes) {
       graphStr += `${Math.round(node.coords.x * 100) / 100} ${Math.round(node.coords.y * 100) / 100} ${node.group ?? "-"} "${node.label ?? ""}"\n`
@@ -139,7 +143,7 @@ export class Graph {
     const numEdges = parseInt(graphMetaData[2])
     const directed = graphMetaData[3] === "1"
     const weighted = graphMetaData[4] === "1"
-    const inputFields = graphMetaData[5] === "1"
+    const inputFields = parseInt(graphMetaData[5])
     const nodeDraggable = graphMetaData[6] === "1"
     const clickTypeMapping: Record<string, ClickEventType> = { "0": "none", "1": "select", "2": "group" }
     const nodeClick = clickTypeMapping[graphMetaData[7]]

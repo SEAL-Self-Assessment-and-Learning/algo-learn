@@ -229,18 +229,18 @@ export function DrawGraph({
 
   const [fieldsOpen, setFieldsOpen] = useState(false)
 
-  const nodeInputFieldMd = `${nodeInputFieldID}#NL###`
-  const edgeInputFieldMd = `${edgeInputFieldID}#NL###`
+  const nodeInputFieldMd = `${nodeInputFieldID(graph.inputFields)}#NL###`
+  const edgeInputFieldMd = `${edgeInputFieldID(graph.inputFields)}#NL###`
   let nodeField: TextFieldState | undefined
   let edgeField: TextFieldState | undefined
   if (graph.inputFields) {
     if (graph.nodeClickType !== "none") {
       addFormField(nodeInputFieldMd)
-      nodeField = useFormField(nodeInputFieldID)
+      nodeField = useFormField(`${nodeInputFieldID(graph.inputFields)}`)
     }
     if (graph.edgeClickType !== "none") {
       addFormField(edgeInputFieldMd)
-      edgeField = useFormField(edgeInputFieldID)
+      edgeField = useFormField(`${edgeInputFieldID(graph.inputFields)}`)
     }
   }
 
@@ -408,7 +408,7 @@ export function DrawGraph({
         >
           <BsArrowsFullscreen />
         </Button>
-        {graph.inputFields && (
+        {graph.inputFields !== 0 && (
           <AlertDialog open={fieldsOpen} onOpenChange={setFieldsOpen}>
             <AlertDialogTrigger asChild>
               <Button

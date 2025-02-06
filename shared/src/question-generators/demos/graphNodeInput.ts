@@ -73,7 +73,7 @@ export const DemoGraphNodeInput: QuestionGenerator = {
       graph.nodeDraggable = false
       graph.nodeClickType = "select"
       graph.nodeGroupMax = 3
-      graph.inputFields = true
+      graph.inputFields = 1
 
       startNode = random.choice(graph.nodes)
       reachableNodesIDs = reachableNodes(graph, startNode)
@@ -100,9 +100,9 @@ function getFeedback(nodeIDs: number[], graph: Graph, lang: Language): MultiFree
     for (const nodeID of nodeIDs) {
       graph.setNodeGroup(nodeID, 1)
     }
-    graph.inputFields = false
+    graph.inputFields = 0
     graph.nodeClickType = "none"
-    const nodeTextField = text[nodeInputFieldID]
+    const nodeTextField = text[nodeInputFieldID(1)]
     const inputNodes = nodeTextField.split(";")
     if (inputNodes.length !== nodeLabels.length) {
       return {
