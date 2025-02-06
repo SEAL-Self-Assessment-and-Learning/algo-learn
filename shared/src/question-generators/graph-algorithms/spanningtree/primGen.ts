@@ -71,14 +71,14 @@ export const PrimOrder: QuestionGenerator = {
       path: permaLink,
       text: t(translations, lang, "task", [G.toMarkdown(), startNode.label!]),
       checkFormat: getCheckFormat(G, lang),
-      feedback: getFeedback(primResult.nodes, G),
+      feedback: getFeedback(primResult.nodes, G, lang),
     }
 
     return { question }
   },
 }
 
-function inputTextNodeCheck(text: { [p: string]: string }, G: Graph) {
+function inputTextNodeCheck(text: { [p: string]: string }, G: Graph, lang: Language) {
   let nodes = text["primorder"]
     .toUpperCase()
     .replace(/\s/g, "")
@@ -88,12 +88,12 @@ function inputTextNodeCheck(text: { [p: string]: string }, G: Graph) {
   nodes = nodes.filter(function (item, pos) {
     return nodes.indexOf(item) === pos
   })
-  return checkNodeInput(nodes.join(";"), G)
+  return checkNodeInput(nodes.join(";"), G, lang)
 }
 
 function getCheckFormat(G: Graph, lang: Language): MultiFreeTextFormatFunction {
   return ({ text }) => {
-    const nodeCheck = inputTextNodeCheck(text, G)
+    const nodeCheck = inputTextNodeCheck(text, G, lang)
     if (!("selected" in nodeCheck)) {
       return { valid: false }
     }
@@ -113,9 +113,9 @@ function getCheckFormat(G: Graph, lang: Language): MultiFreeTextFormatFunction {
   }
 }
 
-function getFeedback(nodeOrder: Node[], G: Graph): MultiFreeTextFeedbackFunction {
+function getFeedback(nodeOrder: Node[], G: Graph, lang: Language): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
-    const nodeCheck = inputTextNodeCheck(text, G)
+    const nodeCheck = inputTextNodeCheck(text, G, lang)
     if (!("selected" in nodeCheck)) {
       return { correct: false }
     }
