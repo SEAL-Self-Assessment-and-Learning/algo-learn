@@ -5,8 +5,12 @@ export type NodeList = Node[]
 export type EdgeList = Edge[][]
 export type ClickEventType = "none" | "select" | "group"
 
-export const nodeInputFieldID = "node-field"
-export const edgeInputFieldID = "edge-field"
+export function nodeInputFieldID(idNum: number) {
+  return `node-field-${idNum}`
+}
+export function edgeInputFieldID(idNum: number) {
+  return `edge-field-${idNum}`
+}
 
 /**
  * A node in a graph.
@@ -44,7 +48,7 @@ export class Graph {
   edges: EdgeList
   weighted: boolean
   directed: boolean
-  public inputFields: boolean
+  public inputFields: number
   public nodeDraggable: boolean
   public nodeClickType: ClickEventType
   public edgeClickType: ClickEventType
@@ -57,7 +61,7 @@ export class Graph {
     edges: EdgeList,
     directed: boolean,
     weighted: boolean,
-    inputFields: boolean = false,
+    inputFields: number = 0,
     nodeDraggable: boolean = true,
     nodeClick: ClickEventType = "none",
     edgeClick: ClickEventType = "none",
@@ -107,7 +111,7 @@ export class Graph {
 
   public toString(): string {
     const clickTypeMapping: Record<ClickEventType, string> = { none: "0", select: "1", group: "2" }
-    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${this.inputFields ? "1" : "0"} ${this.nodeDraggable ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
+    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${this.inputFields} ${this.nodeDraggable ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
 
     for (const node of this.nodes) {
       graphStr += `${Math.round(node.coords.x * 100) / 100} ${Math.round(node.coords.y * 100) / 100} ${node.group ?? "-"} "${node.label ?? ""}"\n`
@@ -139,7 +143,7 @@ export class Graph {
     const numEdges = parseInt(graphMetaData[2])
     const directed = graphMetaData[3] === "1"
     const weighted = graphMetaData[4] === "1"
-    const inputFields = graphMetaData[5] === "1"
+    const inputFields = parseInt(graphMetaData[5])
     const nodeDraggable = graphMetaData[6] === "1"
     const clickTypeMapping: Record<string, ClickEventType> = { "0": "none", "1": "select", "2": "group" }
     const nodeClick = clickTypeMapping[graphMetaData[7]]
@@ -235,6 +239,19 @@ export class Graph {
     this.getEdge(u, v).group = group
     if (!this.directed) this.getEdge(v, u).group = group
   }
+
+  public getReachableNodes(u: NodeId) {
+    return findReachableNodes(u, this.getNumNodes(), this.edges)
+  }
+
+  public isStronglyConnected(): boolean {
+    const loopEnd = this.directed ? this.nodes.length : 1
+    for (let u = 0; u < loopEnd; u++) {
+      if (this.getReachableNodes(u).unreachable.length > 0) return false
+    }
+
+    return true
+  }
 }
 
 export function getNodeLabel(i: number): string {
@@ -258,7 +275,9 @@ export class RandomGraph {
    * @param shape
    * @param weights
    * @param directed
-   * @param shakeUpNodePosition
+   * @param shakeUpNodePosition Randomizes the coordinates of the nodes to break up the strict grid look.
+   * @param ensureStronglyConnected If true, the generated graph is guaranteed to be strongly connected.
+   *                                The result may violate the p parameter.
    */
   public static grid(
     random: Random,
@@ -268,6 +287,7 @@ export class RandomGraph {
     weights: "random" | "unique" | null,
     directed: boolean = false,
     shakeUpNodePosition: boolean = false,
+    ensureStronglyConnected: boolean = false,
   ): Graph {
     const scale = 3
     const vertices: NodeList = []
@@ -308,11 +328,8 @@ export class RandomGraph {
 
       const [row, col] = nodeIdToPos(u)
 
-      if (directed) {
-        if (col > 0) neighbors.push(posToNodeId(row, col - 1))
-        if (row > 0) neighbors.push(posToNodeId(row - 1, col))
-      }
-
+      if (col > 0) neighbors.push(posToNodeId(row, col - 1))
+      if (row > 0) neighbors.push(posToNodeId(row - 1, col))
       if (col < width - 1) neighbors.push(posToNodeId(row, col + 1))
       if (row < height - 1) neighbors.push(posToNodeId(row + 1, col))
 
@@ -325,11 +342,11 @@ export class RandomGraph {
       const [row, col] = nodeIdToPos(u)
 
       if (isOdd(row) && col > 0) {
-        if (directed && row > 0) neighbors.push(posToNodeId(row - 1, col - 1))
-        if (row > height - 1) neighbors.push(posToNodeId(row + 1, col - 1))
+        if (row > 0) neighbors.push(posToNodeId(row - 1, col - 1))
+        if (row < height - 1) neighbors.push(posToNodeId(row + 1, col - 1))
       } else if (!isOdd(row) && col < width - 1) {
-        if (directed && row > 0) neighbors.push(posToNodeId(row - 1, col + 1))
-        if (row > height - 1) neighbors.push(posToNodeId(row + 1, col + 1))
+        if (row > 0) neighbors.push(posToNodeId(row - 1, col + 1))
+        if (row < height - 1) neighbors.push(posToNodeId(row + 1, col + 1))
       }
 
       return neighbors
@@ -344,7 +361,7 @@ export class RandomGraph {
 
       const [row, col] = nodeIdToPos(u)
 
-      if (directed && row > 0) {
+      if (row > 0) {
         if (col > 0 && diagonalDirections[posToNodeId(row - 1, col - 1)] === 1)
           neighbors.push(posToNodeId(row - 1, col - 1))
         if (col < width - 1 && diagonalDirections[posToNodeId(row - 1, col)] === 0)
@@ -367,18 +384,32 @@ export class RandomGraph {
           ? getSquareWDiagonalsNeighbors
           : getSquareNeighbors
 
+    // for undirected graphs, this prevents drawing edges twice
+    const filteredPossibleNeighbors = directed
+      ? getPossibleNeighbors
+      : (u: NodeId) => getPossibleNeighbors(u).filter((i) => i > u)
+
     let numEdges = 0
 
+    // add random edges to the graph
     const links: EdgeList = Array.from(Array(vertices.length), () => [])
-    links.forEach((outEdges, u: NodeId) => {
-      getPossibleNeighbors(u).forEach((v: NodeId) => {
+    links.forEach((_, u: NodeId) => {
+      filteredPossibleNeighbors(u).forEach((v: NodeId) => {
         if (random.bool(p)) {
           numEdges++
-          outEdges.push({ source: u, target: v })
-          if (!directed) links[v].push({ source: v, target: u })
+          RandomGraph.addEdge(u, v, directed, links)
         }
       })
     })
+
+    if (ensureStronglyConnected)
+      numEdges += RandomGraph.ensureConnectivity(
+        width * height,
+        links,
+        getPossibleNeighbors,
+        directed,
+        random,
+      )
 
     const graph = new Graph(vertices, links, directed, weights !== null)
 
@@ -411,9 +442,108 @@ export class RandomGraph {
     return graph
   }
 
-  // public static tree(depth: number, minDegree: number, maxDegree: number = minDegree): Graph {}
+  /**
+   * Adds the edge (u,v) to links.
+   * @param u
+   * @param v
+   * @param directed
+   * @param links is modified by the function
+   * @param invert inverts the edge bevor adding it.
+   * @private
+   */
+  private static addEdge(
+    u: NodeId,
+    v: NodeId,
+    directed: boolean,
+    links: EdgeList,
+    invert: boolean = false,
+  ): void {
+    if (invert) [u, v] = [v, u]
 
-  // public static bipartite: Graph {}
+    links[u].push({ source: u, target: v })
+    if (!directed) links[v].push({ source: v, target: u })
+  }
+
+  /**
+   * Ensures the graph to be strongly connected by finding connected components and adding random edges connecting the
+   * components with respect to the possible neighbor function
+   * @param numNodes
+   * @param links
+   * @param getPossibleNeighbors
+   * @param directed
+   * @param random
+   * @private
+   */
+  private static ensureConnectivity(
+    numNodes: number,
+    links: EdgeList,
+    getPossibleNeighbors: (u: NodeId) => NodeId[],
+    directed: boolean,
+    random: Random,
+  ): number {
+    const nodeIds = [...Array(numNodes).keys()]
+    const nodes: NodeId[] = random.shuffle(nodeIds)
+    let connected = false
+    let currentNodeId = 0
+    let numEdgesAdded = 0
+    do {
+      const { reachable, unreachable } = findReachableNodes(nodes[currentNodeId], numNodes, links)
+      if (unreachable.length === 0) {
+        connected = !directed || currentNodeId === numNodes - 1
+        currentNodeId++
+        continue
+      }
+
+      let a = reachable
+      let b = unreachable
+      let invertEdge = false
+      if (reachable.length > unreachable.length) {
+        ;[a, b] = [b, a]
+        invertEdge = true
+      }
+
+      random.shuffle(a)
+
+      for (const u of a) {
+        const possibleNeighbors = getPossibleNeighbors(u).filter((v) => b.includes(v))
+        if (possibleNeighbors.length === 0) continue
+        RandomGraph.addEdge(u, random.choice(possibleNeighbors), directed, links, invertEdge)
+        numEdgesAdded++
+        break
+      }
+    } while (!connected)
+
+    return numEdgesAdded
+  }
+}
+
+function findReachableNodes(
+  startNode: NodeId,
+  numNodes: number,
+  links: EdgeList,
+): { reachable: NodeId[]; unreachable: NodeId[] } {
+  const visited = Array(numNodes).fill(false) as boolean[]
+  visited[startNode] = true
+  // walk the graph in dfs order
+  const todo: NodeId[] = [startNode]
+  while (todo.length > 0) {
+    const nextNode: NodeId = todo.pop() as NodeId
+    for (const edge of links[nextNode]) {
+      if (visited[edge.target]) continue
+
+      todo.push(edge.target)
+      visited[edge.target] = true
+    }
+  }
+
+  const reachable: NodeId[] = []
+  const unreachable: NodeId[] = []
+  for (let i = 0; i < numNodes; i++) {
+    if (visited[i]) reachable.push(i)
+    else unreachable.push(i)
+  }
+
+  return { reachable, unreachable }
 }
 
 export const traversalStrategies = ["pre", "in", "post"] as const

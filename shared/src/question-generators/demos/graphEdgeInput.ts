@@ -20,7 +20,7 @@ const translations: Translations = {
     description: "Select all edges of a path.",
     text: "Select all edges on a simple path starting from node $ {{1}}$ reaching node $ {{2}}$. {{0}}",
     fdParse: "The has been an error parsing your input.",
-    fdPath: "Your answer is not a simple path or does not lead to the desired end-node,",
+    fdPath: "Your answer is not a simple path or does not lead to the desired end-node.",
   },
   de: {
     name: "Graph-Kanten-Eingabefrage",
@@ -67,7 +67,7 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
       graph = RandomGraph.grid(random, [6, 3], 0.6, "square-width-diagonals", null, false, false)
       graph.nodeDraggable = false
       graph.edgeClickType = "select"
-      graph.inputFields = true
+      graph.inputFields = 1
 
       startNode = random.choice(graph.nodes)
       bfsNodePaths = bfs(startNode, graph)
@@ -98,8 +98,8 @@ function getFeedback(
   lang: Language,
 ): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
-    const edgeInput = checkEdgeInput(text[edgeInputFieldID], graph)
-    graph.inputFields = false
+    const edgeInput = checkEdgeInput(text[edgeInputFieldID(1)], graph, lang)
+    graph.inputFields = 0
     graph.edgeClickType = "none"
     for (let i = 1; i < endNodePath[1].length; i++) {
       const node1 = graph.nodes.findIndex((node) => node.label! === endNodePath[1][i - 1].label)
@@ -176,6 +176,7 @@ function isSimplePath(edges: [string, string][], startNode: string, endNode: str
   return false
 }
 
+// Todo: Use findReachableNodes from graph.ts (by storing path too)
 function bfs(startNode: Node, graph: Graph): Record<string, Node[]> {
   const queue: Node[] = [startNode]
   const visited: Set<Node> = new Set()

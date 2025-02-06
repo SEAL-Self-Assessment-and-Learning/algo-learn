@@ -32,6 +32,7 @@ import {
 import { Button } from "@/components/ui/button.tsx"
 import { addFormField, useFormField, type TextFieldState } from "@/hooks/useFormContext.ts"
 import { useTheme } from "@/hooks/useTheme.ts"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 export type GraphElementStateType = { selected: boolean; group: null | number }
 
@@ -216,6 +217,7 @@ export function DrawGraph({
   graph: Graph
 }): ReactElement {
   const { theme } = useTheme()
+  const { lang, t } = useTranslation()
 
   const svgRef = useRef(null as SVGSVGElement | null)
   const coordinateScale = 60
@@ -227,18 +229,18 @@ export function DrawGraph({
 
   const [fieldsOpen, setFieldsOpen] = useState(false)
 
-  const nodeInputFieldMd = `${nodeInputFieldID}#NL###`
-  const edgeInputFieldMd = `${edgeInputFieldID}#NL###`
+  const nodeInputFieldMd = `${nodeInputFieldID(graph.inputFields)}#NL###`
+  const edgeInputFieldMd = `${edgeInputFieldID(graph.inputFields)}#NL###`
   let nodeField: TextFieldState | undefined
   let edgeField: TextFieldState | undefined
   if (graph.inputFields) {
     if (graph.nodeClickType !== "none") {
       addFormField(nodeInputFieldMd)
-      nodeField = useFormField(nodeInputFieldID)
+      nodeField = useFormField(`${nodeInputFieldID(graph.inputFields)}`)
     }
     if (graph.edgeClickType !== "none") {
       addFormField(edgeInputFieldMd)
-      edgeField = useFormField(edgeInputFieldID)
+      edgeField = useFormField(`${edgeInputFieldID(graph.inputFields)}`)
     }
   }
 
@@ -278,24 +280,26 @@ export function DrawGraph({
         weight={e.value}
         directed={graph.directed}
         state={edgeStates[i]}
-        clickable={graph.edgeClickType !== "none"}
+        clickable={graph.edgeClickType !== "none" && !edgeField?.disabled}
         onClickCallback={() => {
-          setEdgeStates((prevEdgeStates) => {
-            const newEdgeStates = [...prevEdgeStates]
-            newEdgeStates[i] = { ...prevEdgeStates[i] }
-            if (graph.edgeClickType === "select") {
-              newEdgeStates[i].selected = !newEdgeStates[i].selected
-            } else if (graph.edgeClickType === "group") {
-              newEdgeStates[i].group =
-                newEdgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
-                  ? null
-                  : newEdgeStates[i].group === null
-                    ? 0
-                    : newEdgeStates[i].group + 1
-            }
-            edgeInputSetText(edgeField, newEdgeStates, edgeListFlat)
-            return newEdgeStates
-          })
+          if (!edgeField?.disabled) {
+            setEdgeStates((prevEdgeStates) => {
+              const newEdgeStates = [...prevEdgeStates]
+              newEdgeStates[i] = { ...prevEdgeStates[i] }
+              if (graph.edgeClickType === "select") {
+                newEdgeStates[i].selected = !newEdgeStates[i].selected
+              } else if (graph.edgeClickType === "group") {
+                newEdgeStates[i].group =
+                  newEdgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
+                    ? null
+                    : newEdgeStates[i].group === null
+                      ? 0
+                      : newEdgeStates[i].group + 1
+              }
+              edgeInputSetText(edgeField, newEdgeStates, edgeListFlat)
+              return newEdgeStates
+            })
+          }
         }}
       />
     )
@@ -315,26 +319,28 @@ export function DrawGraph({
         }
         size={nodeScale}
         label={u.label ?? ""}
-        clickable={graph.nodeClickType !== "none"}
+        clickable={graph.nodeClickType !== "none" && !nodeField?.disabled}
         state={nodeStates[i]}
         // todo the onClickCallback is duplicate code.
         onClickCallback={() => {
-          setNodeStates((prevNodeStates) => {
-            const newNodeStates = [...prevNodeStates]
-            newNodeStates[i] = { ...prevNodeStates[i] }
-            if (graph.nodeClickType === "select") {
-              newNodeStates[i].selected = !newNodeStates[i].selected
-            } else if (graph.nodeClickType === "group") {
-              newNodeStates[i].group =
-                newNodeStates[i].group === Math.min(graph.nodeGroupMax ?? maxGroups, maxGroups) - 1
-                  ? null
-                  : newNodeStates[i].group === null
-                    ? 0
-                    : newNodeStates[i].group + 1
-            }
-            nodeInputSetText(nodeField, newNodeStates)
-            return newNodeStates
-          })
+          if (!nodeField?.disabled) {
+            setNodeStates((prevNodeStates) => {
+              const newNodeStates = [...prevNodeStates]
+              newNodeStates[i] = { ...prevNodeStates[i] }
+              if (graph.nodeClickType === "select") {
+                newNodeStates[i].selected = !newNodeStates[i].selected
+              } else if (graph.nodeClickType === "group") {
+                newNodeStates[i].group =
+                  newNodeStates[i].group === Math.min(graph.nodeGroupMax ?? maxGroups, maxGroups) - 1
+                    ? null
+                    : newNodeStates[i].group === null
+                      ? 0
+                      : newNodeStates[i].group + 1
+              }
+              nodeInputSetText(nodeField, newNodeStates)
+              return newNodeStates
+            })
+          }
         }}
       />
     )
@@ -362,7 +368,7 @@ export function DrawGraph({
 
   const viewBoxAspectRatio = Math.min(maxHeight / maxWidth, viewBox.height / viewBox.width)
   return (
-    <div className={`relative`}>
+    <div className={`relative mb-1`}>
       <svg
         ref={svgRef}
         width={maxWidth}
@@ -402,7 +408,7 @@ export function DrawGraph({
         >
           <BsArrowsFullscreen />
         </Button>
-        {graph.inputFields && (
+        {graph.inputFields !== 0 && (
           <AlertDialog open={fieldsOpen} onOpenChange={setFieldsOpen}>
             <AlertDialogTrigger asChild>
               <Button
@@ -415,32 +421,40 @@ export function DrawGraph({
                 <RiInputField />
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  document.getElementById("dialog-save-button")?.click()
+                }
+              }}
+            >
               <AlertDialogHeader>
                 <AlertDialogTitle>
-                  <p className="flex items-center gap-1">
-                    Graph Input <TbBrandGraphql />
-                  </p>
+                  <div className="flex items-center gap-1">
+                    {t("graphInput")} <TbBrandGraphql />
+                  </div>
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   {graph.nodeClickType !== "none" && (
                     <>
-                      <b>Node selection:</b>
+                      <b>{t("nodeSelection")}</b>
                       <Markdown md={`{{${nodeInputFieldMd}}}`} />
                     </>
                   )}
-                  {checkNodeInput(nodeField?.text ?? "", graph).messages.map((message, index) => (
+                  {checkNodeInput(nodeField?.text ?? "", graph, lang).messages.map((message, index) => (
                     <div className={`text-red-500`} key={index}>
                       - <Markdown md={message} />
                     </div>
                   ))}
                   {graph.edgeClickType !== "none" && (
                     <>
-                      <b>Edge selection:</b>
+                      <b>{t("edgeSelection")}</b>
                       <Markdown md={`{{${edgeInputFieldMd}}}`} />
                     </>
                   )}
-                  {checkEdgeInput(edgeField?.text ?? "", graph).messages.map((message, index) => (
+                  {checkEdgeInput(edgeField?.text ?? "", graph, lang).messages.map((message, index) => (
                     <div className={`text-red-500`} key={index}>
                       - <Markdown md={message} />
                     </div>
@@ -455,13 +469,14 @@ export function DrawGraph({
                     nodeInputSetText(nodeField, nodeStates)
                   }}
                 >
-                  {/* Don't save the user input and reset to the selection on the graph */}
-                  Back
+                  {t("back")}
                 </AlertDialogCancel>
                 <AlertDialogAction
+                  id="dialog-save-button"
+                  type={"submit"}
                   onClick={() => {
                     setFieldsOpen(false)
-                    const nodeCheck = checkNodeInput(nodeField?.text ?? "", graph)
+                    const nodeCheck = checkNodeInput(nodeField?.text ?? "", graph, lang)
                     if (nodeCheck.parsed) {
                       if ("selected" in nodeCheck) {
                         updateGraphNodeSelected(graph, nodeStates, nodeCheck.selected)
@@ -471,7 +486,7 @@ export function DrawGraph({
                       nodeInputSetText(nodeField, nodeStates)
                     }
 
-                    const edgeCheck = checkEdgeInput(edgeField?.text ?? "", graph)
+                    const edgeCheck = checkEdgeInput(edgeField?.text ?? "", graph, lang)
                     if (edgeCheck.parsed) {
                       if ("selected" in edgeCheck) {
                         updateGraphEdgeSelected(
@@ -488,14 +503,12 @@ export function DrawGraph({
                   }}
                   disabled={
                     !(
-                      checkNodeInput(nodeField?.text ?? "", graph).parsed &&
-                      checkEdgeInput(edgeField?.text ?? "", graph).parsed
+                      checkNodeInput(nodeField?.text ?? "", graph, lang).parsed &&
+                      checkEdgeInput(edgeField?.text ?? "", graph, lang).parsed
                     )
                   }
                 >
-                  {/* Todo: OnClick set graph correspondingly */}
-                  {/* Only save if correctly parsed */}
-                  Save
+                  {t("save")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

@@ -1,4 +1,6 @@
+import type { Language } from "@shared/api/Language.ts"
 import { getNodeLabel, type Edge, type Graph } from "@shared/utils/graph.ts"
+import { t, type Translations } from "@shared/utils/translations.ts"
 import type { GraphElementStateType } from "@/components/DrawGraph.tsx"
 
 export type NodeInputSelectedCheckResult = { parsed: boolean; messages: string[]; selected: string[] }
@@ -20,6 +22,25 @@ export type EdgeInputGroupCheckResult = {
   groups: { [key: number]: [string, string][] }
 }
 export type EdgeInputCheckResult = EdgeInputSelectedCheckResult | EdgeInputGroupCheckResult
+
+const parseFdTranslations: Translations = {
+  en: {
+    validNodeName: `"**{{0}}**" is not a valid node label.`,
+    validGroup: `"**{{0}}**" is not a valid group.`,
+    edgeFormat: "{{0}}: Invalid edge format.",
+    selfLoop: "No self loops allowed.",
+    edgeNodeMissing: "Edge connects a node that is not in the graph",
+    edgeMissing: "Edge does not exist in the graph.",
+  },
+  de: {
+    validNodeName: `"**{{0}}**" ist kein gültiger Knotenname.`,
+    validGroup: `"**{{0}}**" ist keine gültige Gruppe.`,
+    edgeFormat: "{{0}}: Ungültiges Kantenformat.",
+    selfLoop: "Keine Schleifen erlaubt.",
+    edgeNodeMissing: "Die Kante verbindet einen Knoten, der nicht im Graphen existiert.",
+    edgeMissing: "Die Kante existiert nicht im Graphen.",
+  },
+}
 
 export function updateGraphNodeSelected(
   graph: Graph,
@@ -117,12 +138,13 @@ export function updateGraphEdgeGroup(
  *
  * @param nodeString
  * @param graph
+ * @param lang
  */
-export function checkNodeInput(nodeString: string, graph: Graph): NodeInputCheckResult {
-  const nodes = nodeString.split(";")
-  return graph.nodeClickType === "select"
-    ? checkNodeInputSelect(nodes, graph)
-    : checkNodeInputGroup(nodes, graph)
+export function checkNodeInput(nodeString: string, graph: Graph, lang: Language): NodeInputCheckResult {
+  const nodes = nodeString.toUpperCase().split(";")
+  return graph.nodeClickType === "select" || graph.nodeClickType === "none"
+    ? checkNodeInputSelect(nodes, graph, lang)
+    : checkNodeInputGroup(nodes, graph, lang)
 }
 
 /**
@@ -132,8 +154,13 @@ export function checkNodeInput(nodeString: string, graph: Graph): NodeInputCheck
  *  - Input contains only nodes that are in the graph
  * @param nodes
  * @param graph
+ * @param lang
  */
-function checkNodeInputSelect(nodes: string[], graph: Graph): NodeInputSelectedCheckResult {
+function checkNodeInputSelect(
+  nodes: string[],
+  graph: Graph,
+  lang: Language,
+): NodeInputSelectedCheckResult {
   const selected: string[] = []
   const messages: string[] = []
   let parsed: boolean = true
@@ -142,12 +169,12 @@ function checkNodeInputSelect(nodes: string[], graph: Graph): NodeInputSelectedC
     if (!cleanNode) continue
     if (!/^[A-Z]+$/.test(cleanNode)) {
       parsed = false
-      messages.push(`"**${cleanNode}**" is not a valid node label. Please use uppercase letters only.`)
+      messages.push(t(parseFdTranslations, lang, "validNodeName", [cleanNode]))
       continue
     }
     if (graph.nodes.findIndex((n) => n.label === cleanNode) === -1) {
       parsed = false
-      messages.push(`"**${cleanNode}**" is not a valid node label. Please select a node from the graph.`)
+      messages.push(t(parseFdTranslations, lang, "validNodeName", [cleanNode]))
       continue
     }
     selected.push(cleanNode)
@@ -155,7 +182,7 @@ function checkNodeInputSelect(nodes: string[], graph: Graph): NodeInputSelectedC
   return { parsed, messages, selected }
 }
 
-function checkNodeInputGroup(nodes: string[], graph: Graph): NodeInputGroupCheckResult {
+function checkNodeInputGroup(nodes: string[], graph: Graph, lang: Language): NodeInputGroupCheckResult {
   const regexNodeGroup = new RegExp(`^\\(([A-Z]+),(\\d|[0-9])\\)+$`)
   const groups: { [key: number]: string[] } = {}
   const messages: string[] = []
@@ -167,16 +194,14 @@ function checkNodeInputGroup(nodes: string[], graph: Graph): NodeInputGroupCheck
     const match = cleanNode.match(regexNodeGroup)
     if (!match || graph.nodes.findIndex((n) => n.label === match[1]) === -1) {
       parsed = false
-      messages.push(`"**${cleanNode}**" is not a valid node label. Please select a node from the graph.`)
+      messages.push(t(parseFdTranslations, lang, "validNodeName", [cleanNode]))
       continue
     }
 
     const group = parseInt(match[2])
     if (group > graph.nodeGroupMax || group < 1) {
       parsed = false
-      messages.push(
-        `"**${cleanNode}**" is not a valid group number. Please select a group between 1 and ${graph.nodeGroupMax}.`,
-      )
+      messages.push(t(parseFdTranslations, lang, "validGroup", [group.toString()]))
     }
 
     groups[group] = groups[group] || []
@@ -190,26 +215,28 @@ function checkNodeInputGroup(nodes: string[], graph: Graph): NodeInputGroupCheck
  * Function parsing the edge input fields and checking for correct input
  * @param edgeString
  * @param graph
+ * @param lang
  */
-export function checkEdgeInput(edgeString: string, graph: Graph): EdgeInputCheckResult {
-  const edges = edgeString.split(";")
-  return graph.edgeClickType === "select"
-    ? checkEdgeInputSelect(edges, graph)
-    : checkEdgeInputGroup(edges, graph)
+export function checkEdgeInput(edgeString: string, graph: Graph, lang: Language): EdgeInputCheckResult {
+  const edges = edgeString.toUpperCase().split(";")
+  return graph.edgeClickType === "select" || graph.edgeClickType === "none"
+    ? checkEdgeInputSelect(edges, graph, lang)
+    : checkEdgeInputGroup(edges, graph, lang)
 }
 
 function checkEdgeCorrectness(
   match: RegExpMatchArray | null,
   edge: string,
   graph: Graph,
+  lang: Language,
 ): { parsed: boolean; message: string } {
-  if (!match) return { parsed: false, message: `**${edge}**: Invalid edge format` }
-  if (match[1] === match[2]) return { parsed: false, message: "Edge cannot connect a node to itself" }
+  if (!match) return { parsed: false, message: t(parseFdTranslations, lang, "edgeFormat", [edge]) }
+  if (match[1] === match[2]) return { parsed: false, message: t(parseFdTranslations, lang, "selfLoop") }
   if (
     graph.nodes.findIndex((n) => n.label === match[1]) === -1 ||
     graph.nodes.findIndex((n) => n.label === match[2]) === -1
   ) {
-    return { parsed: false, message: "Edge connects a node that is not in the graph" }
+    return { parsed: false, message: t(parseFdTranslations, lang, "edgeNodeMissing") }
   }
   // check if the edge exists
   if (graph.directed) {
@@ -219,7 +246,7 @@ function checkEdgeCorrectness(
         .findIndex((e) => getNodeLabel(e.source) === match[1] && getNodeLabel(e.target) === match[2]) ===
       -1
     ) {
-      return { parsed: false, message: "Edge does not exist in the graph" }
+      return { parsed: false, message: t(parseFdTranslations, lang, "edgeMissing") }
     }
   } else {
     if (
@@ -231,13 +258,17 @@ function checkEdgeCorrectness(
             (getNodeLabel(e.source) === match[2] && getNodeLabel(e.target) === match[1]),
         ) === -1
     ) {
-      return { parsed: false, message: "Edge does not exist in the graph" }
+      return { parsed: false, message: t(parseFdTranslations, lang, "edgeMissing") }
     }
   }
   return { parsed: true, message: "" }
 }
 
-function checkEdgeInputSelect(edges: string[], graph: Graph): EdgeInputSelectedCheckResult {
+function checkEdgeInputSelect(
+  edges: string[],
+  graph: Graph,
+  lang: Language,
+): EdgeInputSelectedCheckResult {
   const selected: [string, string][] = []
   const messages: string[] = []
   let parsed: boolean = true
@@ -246,7 +277,7 @@ function checkEdgeInputSelect(edges: string[], graph: Graph): EdgeInputSelectedC
     if (!cleanEdge) continue
     const regexEdge = new RegExp(`^\\(([A-Z]+),([A-Z]+)\\)$`)
     const match = cleanEdge.match(regexEdge)
-    const edgeCorrectness = checkEdgeCorrectness(match, cleanEdge, graph)
+    const edgeCorrectness = checkEdgeCorrectness(match, cleanEdge, graph, lang)
     if (!edgeCorrectness.parsed) {
       messages.push(edgeCorrectness.message)
       parsed = false
@@ -257,7 +288,7 @@ function checkEdgeInputSelect(edges: string[], graph: Graph): EdgeInputSelectedC
   return { parsed, messages, selected }
 }
 
-function checkEdgeInputGroup(edges: string[], graph: Graph): EdgeInputGroupCheckResult {
+function checkEdgeInputGroup(edges: string[], graph: Graph, lang: Language): EdgeInputGroupCheckResult {
   const groups: { [key: number]: [string, string][] } = {}
   const messages: string[] = []
   let parsed: boolean = true
@@ -266,7 +297,7 @@ function checkEdgeInputGroup(edges: string[], graph: Graph): EdgeInputGroupCheck
     if (!cleanEdge) continue
     const regexEdge = new RegExp(`^\\(([A-Z]+),([A-Z]+),([1-9])\\)$`)
     const match = cleanEdge.match(regexEdge)
-    const edgeCorrectness = checkEdgeCorrectness(match, cleanEdge, graph)
+    const edgeCorrectness = checkEdgeCorrectness(match, cleanEdge, graph, lang)
     if (!edgeCorrectness.parsed) {
       messages.push(edgeCorrectness.message)
       parsed = false
@@ -275,9 +306,7 @@ function checkEdgeInputGroup(edges: string[], graph: Graph): EdgeInputGroupCheck
     const group = parseInt(match![3])
     if (group > graph.edgeGroupMax || group < 1) {
       parsed = false
-      messages.push(
-        `"**${cleanEdge}**" is not a valid group number. Please select a group between 1 and ${graph.edgeGroupMax}.`,
-      )
+      messages.push(t(parseFdTranslations, lang, "validGroup", [group.toString()]))
       continue
     }
     groups[group] = groups[group] || []
