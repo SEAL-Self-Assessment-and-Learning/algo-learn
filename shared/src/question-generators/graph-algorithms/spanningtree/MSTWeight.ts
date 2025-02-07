@@ -5,7 +5,7 @@ import type {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { primAlgorithm } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
+import { computeAllMST } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
 import { RandomGraph } from "@shared/utils/graph.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
@@ -57,7 +57,7 @@ export const MSTWeightGen: QuestionGenerator = {
     G.edgeClickType = "select"
     G.nodeDraggable = false
     const startNode = random.choice(G.nodes)
-    const MST = primAlgorithm(G, startNode).mst
+    const MST = computeAllMST(G, startNode)[0].mst
     const mstWeight = MST.reduce((acc, x) => acc + (x.value ?? 1), 0)
 
     const question: FreeTextQuestion = {

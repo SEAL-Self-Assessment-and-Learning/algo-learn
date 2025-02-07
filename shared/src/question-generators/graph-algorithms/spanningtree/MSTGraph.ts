@@ -6,7 +6,7 @@ import type {
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { kruskalAlgorithm } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalAlgo.ts"
-import { primAlgorithm } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
+import { computeAllMST } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
 import {
   isSpanningTree,
   setEdgesGroup,
@@ -101,7 +101,7 @@ export const MSTGraphGen: QuestionGenerator = {
 function getFeedback(graph: Graph, random: Random, lang: Language): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
     const MST = (
-      random.bool() ? kruskalAlgorithm(graph) : primAlgorithm(graph, random.choice(graph.nodes))
+      random.bool() ? kruskalAlgorithm(graph) : computeAllMST(graph, random.choice(graph.nodes))[0]
     ).mst
     setEdgesGroup(graph, MST, 1)
     graph.inputFields = 0

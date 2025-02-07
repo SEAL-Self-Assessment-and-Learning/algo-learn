@@ -6,7 +6,7 @@ import type {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { primAlgorithm } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
+import { computeAllMST } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
 import { RandomGraph, type Graph, type Node } from "@shared/utils/graph.ts"
 import { checkNodeInput } from "@shared/utils/graphInput.ts"
 import Random from "@shared/utils/random.ts"
@@ -63,7 +63,7 @@ export const PrimOrder: QuestionGenerator = {
     G.edgeClickType = "select"
     G.nodeClickType = "select"
     const startNode = random.choice(G.nodes)
-    const primResult = primAlgorithm(G, startNode)
+    const primResult = computeAllMST(G, startNode)[0]
 
     const question: MultiFreeTextQuestion = {
       type: "MultiFreeTextQuestion",
