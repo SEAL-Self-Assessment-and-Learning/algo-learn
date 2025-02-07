@@ -43,7 +43,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
   if (feedbackVariation === "below") {
     additionalClasses = "focus:outline-none"
   } else {
-    additionalClasses = "mb-1 w-full focus:outline-none"
+    additionalClasses = "w-full focus:outline-none"
   }
   if (type === "NL") {
     spacing = <br />
@@ -160,7 +160,7 @@ const FeedbackComponent = ({
     )
   } else {
     feedbackBackgroundColor = formatFeedback ? (!invalid ? "bg-green-400" : "bg-red-400") : ""
-    className = `absolute left-0 top-full z-10 ${feedbackBackgroundColor} border border-gray-300 dark:border-gray-700 shadow-md p-2 mt-1 rounded-md`
+    className = `mt-1 absolute left-0 top-full z-10 ${feedbackBackgroundColor} border border-gray-300 dark:border-gray-700 shadow-md p-2 mt-1 rounded-md`
     // remove text-left to make the feedback align center
     return (
       <div className={`${className} text-left`}>

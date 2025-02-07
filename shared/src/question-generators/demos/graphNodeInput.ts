@@ -23,7 +23,9 @@ const translations: Translations = {
   en: {
     name: "Graph Node Input Question",
     description: "Select specific nodes.",
-    text: "Select all nodes that can be reached from node $ {{1}}$, including $ {{1}} $ itself. {{0}}",
+    text:
+      "Select all nodes that can be reached from node $ {{1}}$, including $ {{1}} $ itself. {{0}} " +
+      "For testing purpose, some text to see how the pop op of the input field/s affects the text below.",
     fdToFew: "You have selected to few nodes.",
     fdWrong: "You have selected wrong nodes.",
   },

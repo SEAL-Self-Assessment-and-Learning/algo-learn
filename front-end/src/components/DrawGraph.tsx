@@ -1,7 +1,8 @@
 import { useRef, useState, type ReactElement } from "react"
 import { BsArrowsFullscreen } from "react-icons/bs"
-import { RiInputField } from "react-icons/ri"
-import { TbBrandGraphql } from "react-icons/tb"
+import { FaRegSave } from "react-icons/fa"
+import { RiArrowGoBackFill, RiInputField } from "react-icons/ri"
+import type { Language } from "@shared/api/Language.ts"
 import {
   edgeInputFieldID,
   getNodeLabel,
@@ -18,18 +19,8 @@ import {
   updateGraphNodeSelected,
 } from "@shared/utils/graphInput.ts"
 import { Markdown } from "@/components/Markdown.tsx"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog.tsx"
 import { Button } from "@/components/ui/button.tsx"
+import { Toggle } from "@/components/ui/toggle.tsx"
 import { addFormField, useFormField, type TextFieldState } from "@/hooks/useFormContext.ts"
 import { useTheme } from "@/hooks/useTheme.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
@@ -229,8 +220,8 @@ export function DrawGraph({
 
   const [fieldsOpen, setFieldsOpen] = useState(false)
 
-  const nodeInputFieldMd = `${nodeInputFieldID(graph.inputFields)}#NL###`
-  const edgeInputFieldMd = `${edgeInputFieldID(graph.inputFields)}#NL###`
+  const nodeInputFieldMd = `${nodeInputFieldID(graph.inputFields)}#TL###`
+  const edgeInputFieldMd = `${edgeInputFieldID(graph.inputFields)}#TL###`
   let nodeField: TextFieldState | undefined
   let edgeField: TextFieldState | undefined
   if (graph.inputFields) {
@@ -368,153 +359,122 @@ export function DrawGraph({
 
   const viewBoxAspectRatio = Math.min(maxHeight / maxWidth, viewBox.height / viewBox.width)
   return (
-    <div className={`relative mb-1`}>
-      <svg
-        ref={svgRef}
-        width={maxWidth}
-        height={
-          viewBox.height / viewBox.width > 1 && viewBox.height < 300
-            ? viewBox.height * 0.75
-            : maxWidth * viewBoxAspectRatio
-        }
-        viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-        className="mx-auto h-auto max-w-full rounded-lg bg-secondary pb-2"
-        onMouseMove={(e) => {
-          if (currentlyDragged === null || svgRef.current === null) return
+    <div className={`mb-8`}>
+      <div className={`relative`}>
+        <svg
+          ref={svgRef}
+          width={maxWidth}
+          height={
+            viewBox.height / viewBox.width > 1 && viewBox.height < 300
+              ? viewBox.height * 0.75
+              : maxWidth * viewBoxAspectRatio
+          }
+          viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+          className="mx-auto h-auto max-w-full rounded-lg bg-secondary pb-2"
+          onMouseMove={(e) => {
+            if (currentlyDragged === null || svgRef.current === null) return
 
-          const pt = svgRef.current.createSVGPoint()
-          pt.x = e.clientX
-          pt.y = e.clientY
-          // The cursor point, translated into svg coordinates
-          const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
+            const pt = svgRef.current.createSVGPoint()
+            pt.x = e.clientX
+            pt.y = e.clientY
+            // The cursor point, translated into svg coordinates
+            const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
 
-          nodePositions[currentlyDragged].x = svgPos.x
-          nodePositions[currentlyDragged].y = svgPos.y
-          // react requires a new array here
-          setNodePositions([...nodePositions])
-        }}
-        onMouseUp={() => {
-          if (currentlyDragged !== null) setCurrentlyDragged(null)
-        }}
-      >
-        <g>{edges}</g>
-        <g>{nodes}</g>
-      </svg>
-      <div className="absolute -bottom-5 right-2 flex flex-row items-center space-x-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
-        <Button
-          className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
-          size="iconSm"
-          variant="outline"
+            nodePositions[currentlyDragged].x = svgPos.x
+            nodePositions[currentlyDragged].y = svgPos.y
+            // react requires a new array here
+            setNodePositions([...nodePositions])
+          }}
+          onMouseUp={() => {
+            if (currentlyDragged !== null) setCurrentlyDragged(null)
+          }}
         >
-          <BsArrowsFullscreen />
-        </Button>
-        {graph.inputFields !== 0 && (
-          <AlertDialog open={fieldsOpen} onOpenChange={setFieldsOpen}>
-            <AlertDialogTrigger asChild>
-              <Button
-                className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
-                size="iconSm"
-                variant="outline"
-                disabled={nodeField?.disabled || edgeField?.disabled}
-                onClick={() => {}}
-              >
-                <RiInputField />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  document.getElementById("dialog-save-button")?.click()
-                }
+          <g>{edges}</g>
+          <g>{nodes}</g>
+        </svg>
+        <div className="absolute -bottom-5 right-2 flex flex-row items-center space-x-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
+          <Button
+            className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
+            size="iconSm"
+            variant="outline"
+          >
+            <BsArrowsFullscreen />
+          </Button>
+          {graph.inputFields !== 0 && (
+            <Toggle
+              className={`${theme === "dark" ? "text-white" : "text-black"}`}
+              size="sm"
+              variant="bg"
+              disabled={nodeField?.disabled || edgeField?.disabled}
+              onClick={() => setFieldsOpen(!fieldsOpen)}
+            >
+              <RiInputField />
+            </Toggle>
+          )}
+        </div>
+      </div>
+      {graph.nodeClickType !== "none" && fieldsOpen && (
+        <div className={`mt-1`}>
+          <div className={`mb-1`}>
+            <b>{t("nodeSelection")}</b>
+          </div>
+          <div className="flex w-full flex-row items-center justify-center space-x-1">
+            <div className="mr-0.5 flex-grow">
+              <Markdown md={`{{${nodeInputFieldMd}}}`} />
+            </div>
+            <Button
+              size="iconSm"
+              disabled={
+                !checkNodeInput(nodeField?.text ?? "", graph, lang).parsed ||
+                nodeField?.text === parseNodeText(nodeStates)
+              }
+              onClick={() => saveNodeInput(nodeField, nodeStates, graph, lang)}
+            >
+              <FaRegSave />
+            </Button>
+            <Button
+              size="iconSm"
+              disabled={nodeField?.text === parseNodeText(nodeStates)}
+              onClick={() => {
+                nodeInputSetText(nodeField, nodeStates)
               }}
             >
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  <div className="flex items-center gap-1">
-                    {t("graphInput")} <TbBrandGraphql />
-                  </div>
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  {graph.nodeClickType !== "none" && (
-                    <>
-                      <b>{t("nodeSelection")}</b>
-                      <Markdown md={`{{${nodeInputFieldMd}}}`} />
-                    </>
-                  )}
-                  {checkNodeInput(nodeField?.text ?? "", graph, lang).messages.map((message, index) => (
-                    <div className={`text-red-500`} key={index}>
-                      - <Markdown md={message} />
-                    </div>
-                  ))}
-                  {graph.edgeClickType !== "none" && (
-                    <>
-                      <b>{t("edgeSelection")}</b>
-                      <Markdown md={`{{${edgeInputFieldMd}}}`} />
-                    </>
-                  )}
-                  {checkEdgeInput(edgeField?.text ?? "", graph, lang).messages.map((message, index) => (
-                    <div className={`text-red-500`} key={index}>
-                      - <Markdown md={message} />
-                    </div>
-                  ))}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel
-                  onClick={() => {
-                    setFieldsOpen(false)
-                    edgeInputSetText(edgeField, edgeStates, edgeListFlat)
-                    nodeInputSetText(nodeField, nodeStates)
-                  }}
-                >
-                  {t("back")}
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  id="dialog-save-button"
-                  type={"submit"}
-                  onClick={() => {
-                    setFieldsOpen(false)
-                    const nodeCheck = checkNodeInput(nodeField?.text ?? "", graph, lang)
-                    if (nodeCheck.parsed) {
-                      if ("selected" in nodeCheck) {
-                        updateGraphNodeSelected(graph, nodeStates, nodeCheck.selected)
-                      } else {
-                        updateGraphNodeGroup(graph, nodeStates, nodeCheck.groups)
-                      }
-                      nodeInputSetText(nodeField, nodeStates)
-                    }
-
-                    const edgeCheck = checkEdgeInput(edgeField?.text ?? "", graph, lang)
-                    if (edgeCheck.parsed) {
-                      if ("selected" in edgeCheck) {
-                        updateGraphEdgeSelected(
-                          graph.directed,
-                          edgeListFlat,
-                          edgeStates,
-                          edgeCheck.selected,
-                        )
-                      } else {
-                        updateGraphEdgeGroup(graph.directed, edgeListFlat, edgeStates, edgeCheck.groups)
-                      }
-                    }
-                    edgeInputSetText(edgeField, edgeStates, edgeListFlat)
-                  }}
-                  disabled={
-                    !(
-                      checkNodeInput(nodeField?.text ?? "", graph, lang).parsed &&
-                      checkEdgeInput(edgeField?.text ?? "", graph, lang).parsed
-                    )
-                  }
-                >
-                  {t("save")}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-      </div>
+              <RiArrowGoBackFill />
+            </Button>
+          </div>
+        </div>
+      )}
+      {graph.edgeClickType !== "none" && fieldsOpen && (
+        <div className={`mt-1`}>
+          <div className={`mb-1`}>
+            <b>{t("nodeSelection")}</b>
+          </div>
+          <div className="flex w-full flex-row items-center justify-center space-x-1">
+            <div className="mr-0.5 flex-grow">
+              <Markdown md={`{{${edgeInputFieldMd}}}`} />
+            </div>
+            <Button
+              size="iconSm"
+              disabled={
+                !checkEdgeInput(edgeField?.text ?? "", graph, lang).parsed ||
+                edgeField?.text === parseEdgeText(edgeStates, edgeListFlat)
+              }
+              onClick={() => saveEdgeInput(edgeField, edgeStates, edgeListFlat, graph, lang)}
+            >
+              <FaRegSave />
+            </Button>
+            <Button
+              size="iconSm"
+              disabled={edgeField?.text === parseEdgeText(edgeStates, edgeListFlat)}
+              onClick={() => {
+                edgeInputSetText(edgeField, edgeStates, edgeListFlat)
+              }}
+            >
+              <RiArrowGoBackFill />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -525,34 +485,73 @@ function edgeInputSetText(
   edgeListFlat: Edge[],
 ) {
   if (edgeField !== undefined && edgeField.setText) {
-    edgeField.setText(
-      edgeStates
-        .map((edge, i) =>
-          edge.group !== null
-            ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)},${(edge.group + 1).toString()})`
-            : edge.selected
-              ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)})`
-              : "",
-        )
-        .filter((x) => x !== "")
-        .join(";"),
-    )
+    edgeField.setText(parseEdgeText(edgeStates, edgeListFlat))
   }
+}
+
+function parseEdgeText(edgeStates: GraphElementStateType[], edgeListFlat: Edge[]) {
+  return edgeStates
+    .map((edge, i) =>
+      edge.group !== null
+        ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)},${(edge.group + 1).toString()})`
+        : edge.selected
+          ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)})`
+          : "",
+    )
+    .filter((x) => x !== "")
+    .join(";")
 }
 
 function nodeInputSetText(nodeField: TextFieldState | undefined, nodeStates: GraphElementStateType[]) {
   if (nodeField !== undefined && nodeField.setText) {
-    nodeField.setText(
-      nodeStates
-        .map((node, i) =>
-          node.group !== null
-            ? `(${getNodeLabel(i)},${(node.group + 1).toString()})`
-            : node.selected
-              ? `${getNodeLabel(i)}`
-              : "",
-        )
-        .filter((x) => x !== "")
-        .join(";"),
-    )
+    nodeField.setText(parseNodeText(nodeStates))
   }
+}
+
+function parseNodeText(nodeStates: GraphElementStateType[]) {
+  return nodeStates
+    .map((node, i) =>
+      node.group !== null
+        ? `(${getNodeLabel(i)},${(node.group + 1).toString()})`
+        : node.selected
+          ? `${getNodeLabel(i)}`
+          : "",
+    )
+    .filter((x) => x !== "")
+    .join(";")
+}
+
+function saveNodeInput(
+  nodeField: TextFieldState | undefined,
+  nodeStates: GraphElementStateType[],
+  graph: Graph,
+  lang: Language,
+) {
+  const nodeCheck = checkNodeInput(nodeField?.text ?? "", graph, lang)
+  if (nodeCheck.parsed) {
+    if ("selected" in nodeCheck) {
+      updateGraphNodeSelected(graph, nodeStates, nodeCheck.selected)
+    } else {
+      updateGraphNodeGroup(graph, nodeStates, nodeCheck.groups)
+    }
+    nodeInputSetText(nodeField, nodeStates)
+  }
+}
+
+function saveEdgeInput(
+  edgeField: TextFieldState | undefined,
+  edgeStates: GraphElementStateType[],
+  edgeListFlat: Edge[],
+  graph: Graph,
+  lang: Language,
+) {
+  const edgeCheck = checkEdgeInput(edgeField?.text ?? "", graph, lang)
+  if (edgeCheck.parsed) {
+    if ("selected" in edgeCheck) {
+      updateGraphEdgeSelected(graph.directed, edgeListFlat, edgeStates, edgeCheck.selected)
+    } else {
+      updateGraphEdgeGroup(graph.directed, edgeListFlat, edgeStates, edgeCheck.groups)
+    }
+  }
+  edgeInputSetText(edgeField, edgeStates, edgeListFlat)
 }
