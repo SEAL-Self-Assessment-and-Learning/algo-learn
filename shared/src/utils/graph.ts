@@ -53,7 +53,7 @@ export class Graph {
     edges: EdgeList,
     directed: boolean,
     weighted: boolean,
-    nodeDraggable: boolean = true,
+    nodeDraggable: boolean = false,
     nodeClick: ClickEventType = "none",
     edgeClick: ClickEventType = "none",
     nodeGroupMax: number = 0,
@@ -212,6 +212,21 @@ export class Graph {
     for (const neighbors of this.edges) numEdges += neighbors.length
 
     return numEdges
+  }
+
+  public setNodeClickType(type: ClickEventType): this {
+    this.nodeClickType = type
+    return this
+  }
+
+  public setEdgeClickType(type: ClickEventType): this {
+    this.edgeClickType = type
+    return this
+  }
+
+  public setDraggable(on: boolean): this {
+    this.nodeDraggable = on
+    return this
   }
 
   public setEdgeWeight(u: NodeId, v: NodeId, weight: number): void {
