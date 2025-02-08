@@ -4,15 +4,6 @@ import { MarkdownTree } from "@/components/Markdown"
 import { cn } from "@/lib/utils"
 
 /**
- * The List of all the possible extra features for the table
- * Separate each feature with a question mark like this: "border_solid?av_middle?ah_center"
- *
- * td/tf : Transpose the table (td --> definitive, tf --> frontend decision)
- * sd/sf : Split the table in half (sd --> definitive, sf --> frontend decision)
- *
- */
-
-/**
  * A component that returns a table
  * @param table The table to be drawn (passed as md format)
  */
