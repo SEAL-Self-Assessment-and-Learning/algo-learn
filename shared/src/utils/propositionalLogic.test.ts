@@ -3,11 +3,13 @@ import { MinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
 import {
   associativeOperators,
   compareExpressions,
+  getMdTruthTable,
   Literal,
   Operator,
   ParserError,
   PropositionalLogicParser,
   type BinaryOperatorType,
+  type SyntaxTreeNodeType,
 } from "./propositionalLogic"
 import Random, { sampleRandomSeed } from "./random.ts"
 
@@ -381,4 +383,70 @@ test("minimize normal forms", () => {
       15,
     ],
   ].forEach(inputTester)
+})
+
+describe("getMdTruthTable()", () => {
+  const formula1 = PropositionalLogicParser.parse("A \\and B")
+  const formula2 = PropositionalLogicParser.parse("A \\or B")
+  const formula3 = PropositionalLogicParser.parse("A \\xor C")
+
+  test("single formula", () => {
+    const expectedTable = `| $A$ | $B$ | $A \\wedge B$ |
+|:===:|:===:!|:===:|
+| $0$ | $0$ | $0$ |
+| $1$ | $0$ | $0$ |
+| $0$ | $1$ | $0$ |
+| $1$ | $1$ | $1$ |
+`
+    expect(getMdTruthTable([formula1 as SyntaxTreeNodeType]).mdTable).toStrictEqual(expectedTable)
+  })
+
+  test("multiple formulas", () => {
+    const expectedTable = `| $A$ | $B$ | $A \\wedge B$ | $A \\vee B$ |
+|:===:|:===:!|:===:|:===:|
+| $0$ | $0$ | $0$ | $0$ |
+| $1$ | $0$ | $0$ | $1$ |
+| $0$ | $1$ | $0$ | $1$ |
+| $1$ | $1$ | $1$ | $1$ |
+`
+    expect(
+      getMdTruthTable([formula1 as SyntaxTreeNodeType, formula2 as SyntaxTreeNodeType]).mdTable,
+    ).toStrictEqual(expectedTable)
+  })
+
+  test("multiple formulas with different variables", () => {
+    const expectedTable = `| $A$ | $B$ | $C$ | $A \\wedge B$ | $A \\oplus C$ |
+|:===:|:===:|:===:!|:===:|:===:|
+| $0$ | $0$ | $0$ | $0$ | $0$ |
+| $1$ | $0$ | $0$ | $0$ | $1$ |
+| $0$ | $1$ | $0$ | $0$ | $0$ |
+| $1$ | $1$ | $0$ | $1$ | $1$ |
+| $0$ | $0$ | $1$ | $0$ | $1$ |
+| $1$ | $0$ | $1$ | $0$ | $0$ |
+| $0$ | $1$ | $1$ | $0$ | $1$ |
+| $1$ | $1$ | $1$ | $1$ | $0$ |
+`
+    expect(
+      getMdTruthTable([formula1 as SyntaxTreeNodeType, formula3 as SyntaxTreeNodeType]).mdTable,
+    ).toStrictEqual(expectedTable)
+  })
+
+  test("multiple formulas some with short names", () => {
+    const expectedTable = `| $A$ | $B$ | $A \\wedge B$ | $\\phi$ |
+|:===:|:===:!|:===:|:===:|
+| $0$ | $0$ | $0$ | $0$ |
+| $1$ | $0$ | $0$ | $1$ |
+| $0$ | $1$ | $0$ | $1$ |
+| $1$ | $1$ | $1$ | $1$ |
+`
+    expect(
+      getMdTruthTable([
+        formula1 as SyntaxTreeNodeType,
+        {
+          formula: formula2 as SyntaxTreeNodeType,
+          shortName: "$\\phi$",
+        },
+      ]).mdTable,
+    ).toStrictEqual(expectedTable)
+  })
 })

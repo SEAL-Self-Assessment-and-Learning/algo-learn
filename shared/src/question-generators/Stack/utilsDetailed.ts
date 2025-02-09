@@ -86,6 +86,7 @@ export function generateStackStartElements({
     }
     stackElementsString += createArrayDisplayCodeBlock({
       array: stackElementsValues,
+      lang,
     })
   }
 
@@ -108,7 +109,7 @@ export function createStackInputFields({
   lang: "en" | "de"
 }) {
   // Example input field {{test#NL#**Char: **##overlay}}
-  let inputText = `\n| Operation | ${t(translations, lang, "result")} |\n| --- | --- |\n`
+  let inputText = `\n| Operation | ${t(translations, lang, "result")} |\n|===|:===:|\n`
   const solutionDisplay: string[] = []
   let solutionIndex = 0
   const correctAnswers: { [key: string]: string } = {}
@@ -132,8 +133,8 @@ export function createStackInputFields({
     index++
   }
 
-  solutionDisplay.push("|#div_my-5?table_w-full#| |")
-  inputText += `|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |`
+  // solutionDisplay.push("|#div_my-5?table_w-full#| |")
+  // inputText += `|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |`
 
   return { inputText, solutionDisplay, correctAnswers }
 }

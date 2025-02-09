@@ -1,7 +1,6 @@
 import { Fragment, type FunctionComponent, type ReactNode } from "react"
 import { Link } from "react-router-dom"
 import { parseMarkdown, type ParseTree, type ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
-import { ArrayDisplay } from "@/components/ArrayDisplay.tsx"
 import { DrawList } from "@/components/DrawList.tsx"
 import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
@@ -95,9 +94,6 @@ export const MarkdownTreeNode: FunctionComponent<{
     )
   }
   if (parseTreeNode.kind === "```") {
-    if (parseTreeNode.language === "array") {
-      return <ArrayDisplay arrayObject={parseTreeNode.child} />
-    }
     if (parseTreeNode.language === "pseudoCode") {
       return <DrawPseudoCode displayCode={parseTreeNode.child} />
     }

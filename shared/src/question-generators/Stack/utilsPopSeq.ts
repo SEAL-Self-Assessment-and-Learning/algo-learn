@@ -28,6 +28,7 @@ export function generateVariantArray(
   const { operations, stack } = generateOperationsVariantArray(random)
   const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
     numberOfInputFields: operations.length,
+    lang,
   })
 
   const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
@@ -38,6 +39,7 @@ export function generateVariantArray(
           ...stack.getStackAsString(),
           ...(Array(operations.length - stack.getSize()).fill("") as string[]),
         ],
+        lang,
       }),
     }
     const allKeys: Set<string> = new Set<string>(Object.keys(text))
