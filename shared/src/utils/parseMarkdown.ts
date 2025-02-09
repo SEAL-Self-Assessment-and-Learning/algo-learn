@@ -146,7 +146,7 @@ export function parseMarkdown(md: string): ParseTree {
  * The table has a table header, the first column is justified right, and the second column is centered.
  * There is a visual subdivision between the first and second column as well as between the second and third row.
  * @param table The markdown-like text to parse
- * @returns Header, content and alignment of the table, can also add extra Feature (not md specific) see below
+ * @returns TableNode
  */
 export function parseTable(table: string): TableNode {
   const formattingRegex = /^\|(?:(?:[:!]*=+[:!]*\|)+|(?:[:!]*-+[:!]*\|)+)$/
@@ -161,10 +161,6 @@ export function parseTable(table: string): TableNode {
     },
   }
 
-  // regex expression for extra features
-  // const regexExtraFeatures: { [key: string]: RegExp } = {
-  //   hashtag: /^#.*#$/,
-  // }
   const getCellsOfRow = (line: string) =>
     line
       .split("|")
@@ -178,8 +174,8 @@ export function parseTable(table: string): TableNode {
     const cellsOfRow = getCellsOfRow(rows[formattingRowIndex])
     cellsOfRow.forEach((cell, i) => {
       const [left, right] = cell.split(/[-=]+/)
-      if (left.includes("!")) node.format.vLines.push(i)
-      if (right.includes("!")) node.format.vLines.push(i + 1)
+      if (left.includes("!") && i > 0) node.format.vLines.push(i - 1)
+      if (right.includes("!")) node.format.vLines.push(i)
       const alignment = (left.includes(":") ? 1 : 0) + (right.includes(":") ? 2 : 0)
       if (alignment === 2) node.format.alignment.push("right")
       else if (alignment === 3) node.format.alignment.push("center")

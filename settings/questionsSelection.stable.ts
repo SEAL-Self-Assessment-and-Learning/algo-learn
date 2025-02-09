@@ -16,6 +16,7 @@ import { CRT } from "@shared/question-generators/math/modularArithmetic/crt.ts"
 import { ExtendedEuclideanAlgorithm } from "@shared/question-generators/math/modularArithmetic/eea.ts"
 import { modFactor } from "@shared/question-generators/math/modularArithmetic/modFactorization.ts"
 import { ModTricks } from "@shared/question-generators/math/modularArithmetic/modTricks.ts"
+import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
@@ -26,6 +27,16 @@ import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF.ts"
 
 export const collection: QuestionCollection = [
+  {
+    slug: "propositional-logic",
+    name: { de: "Aussagenlogik", en: "Propositional Logic" },
+    contents: [Satisfiability, NormalForms, MinimizePropositionalLogic],
+  },
+  {
+    slug: "modular-arithmetic",
+    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
+    contents: [ModTricks, CRT, modFactor, ExtendedEuclideanAlgorithm],
+  },
   {
     slug: "asymptotics",
     name: { de: "Asymptotik", en: "Asymptotics" },
@@ -39,25 +50,10 @@ export const collection: QuestionCollection = [
     image: new URL("../front-end/assets/images/skill-recursion.jpg", import.meta.url),
   },
   {
-    slug: "modular-arithmetic",
-    name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
-    contents: [ModTricks, CRT, modFactor, ExtendedEuclideanAlgorithm],
-  },
-  {
     slug: "time",
     name: { de: "Laufzeit", en: "Time" },
     contents: [Loops],
     image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
-  },
-  {
-    slug: "huffmancoding",
-    name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
-    contents: [huffmanCoding],
-  },
-  {
-    slug: "propositional-logic",
-    name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms],
   },
   {
     slug: "stack",
@@ -73,6 +69,16 @@ export const collection: QuestionCollection = [
     slug: "union-find",
     name: { de: "Union-Find", en: "Union-Find" },
     contents: [QuickFindGenerator],
+  },
+  {
+    slug: "huffmancoding",
+    name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
+    contents: [huffmanCoding],
+  },
+  {
+    slug: "propositional-logic",
+    name: { de: "Aussagenlogik", en: "Propositional Logic" },
+    contents: [Satisfiability, NormalForms],
   },
 ]
 

@@ -76,7 +76,10 @@ export const queueQuestion: QuestionGenerator = {
     const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
       if (fieldID.includes("empty")) {
         // check if either "true" or "false"
-        if (text[fieldID].trim() !== "true" && text[fieldID].trim() !== "false") {
+        if (
+          text[fieldID].trim().toLowerCase() !== "true" &&
+          text[fieldID].trim().toLowerCase() !== "false"
+        ) {
           return { valid: false, message: t(translations, lang, "checkFormatBool") }
         }
         return { valid: true, message: "" }
@@ -97,7 +100,7 @@ export const queueQuestion: QuestionGenerator = {
       let count = 0
       for (const key in resultMap) {
         const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
-        if (resultMap[key].trim() !== correctAnswers[key].trim()) {
+        if (resultMap[key].trim().toLowerCase() !== correctAnswers[key].trim()) {
           foundError = true
           const secondSolutionPart: string = "**" + correctAnswers[key] + "**\n"
           solutionDisplay[count] = firstSolutionPart + secondSolutionPart
