@@ -53,7 +53,11 @@ export const HeapVerifying: QuestionGenerator = {
     const random = new Random(seed)
 
     const heapType: "Max" | "Min" = random.choice(["Max", "Min"])
-    const { heapStringTable, correctAnswerIndex } = generateHeapsForChoiceQuestion(heapType, random)
+    const { heapStringTable, correctAnswerIndex } = generateHeapsForChoiceQuestion(
+      heapType,
+      random,
+      lang,
+    )
 
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",

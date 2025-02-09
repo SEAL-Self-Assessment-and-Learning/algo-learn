@@ -1,3 +1,5 @@
+import { mdInputField, mdTableFromData } from "@shared/utils/markdownTools.ts"
+import type Random from "./random.ts"
 import type { DisjunctionTerms } from "@shared/utils/propositionalLogic/resolution.ts"
 import type Random from "@shared/utils/random"
 
@@ -944,4 +946,77 @@ export function compareExpressions(expressions: SyntaxTreeNodeType[]): boolean {
   }
 
   return true
+}
+
+export function getMdTruthTable(
+  formulas: (
+    | SyntaxTreeNodeType
+    | {
+        formula: SyntaxTreeNodeType
+        shortName?: string
+        input?: boolean
+      }
+  )[],
+): { mdTable: string; inputFieldIds: string[] } {
+  const variables: string[] = []
+  formulas.forEach((f) => {
+    const formula = "formula" in f ? f.formula : f
+    variables.push(...formula.getVariableNames())
+  })
+
+  const uniqueVars = [...new Set(variables)].sort()
+
+  // generate table header
+  const inputFieldIds: string[] = []
+  const header: string[] = []
+  const rows: string[][] = []
+  const vLines: number[] = [uniqueVars.length - 1]
+
+  uniqueVars.forEach((v) => {
+    header.push(`$${v}$`)
+  })
+
+  formulas.forEach((f) => {
+    let colName: string
+    if ("formula" in f) {
+      if ("shortName" in f && f.shortName) colName = f.shortName
+      else colName = `$${f.formula.toString(true)}$`
+    } else {
+      colName = `$${f.toString(true)}$`
+    }
+
+    header.push(`${colName}`)
+  })
+
+  // generate table rows
+  const numRows = 1 << uniqueVars.length
+  for (let rowId = 0; rowId < numRows; rowId++) {
+    const row: string[] = []
+
+    const varValues = numToVariableValues(rowId, uniqueVars)
+    uniqueVars.forEach((v) => {
+      row.push(`$${varValues[v] ? 1 : 0}$`)
+    })
+
+    formulas.forEach((f, colId) => {
+      let val: boolean
+      if ("formula" in f) {
+        if ("input" in f && f.input) {
+          const fieldId = `ti-${rowId}-${colId}`
+          inputFieldIds.push(fieldId)
+          row.push(mdInputField(fieldId))
+          return // works like continue in forEach()
+        }
+        val = f.formula.eval(varValues)
+      } else {
+        val = f.eval(varValues)
+      }
+
+      row.push(`$${val ? 1 : 0}$`)
+    })
+
+    rows.push(row)
+  }
+
+  return { mdTable: mdTableFromData(rows, "center", header, [], vLines), inputFieldIds }
 }
