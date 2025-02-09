@@ -1,5 +1,4 @@
 import type { ReactNode } from "react"
-import { UAParser } from "ua-parser-js"
 import type { TableNode } from "@shared/utils/parseMarkdown"
 import { MarkdownTree } from "@/components/Markdown"
 import { cn } from "@/lib/utils"
@@ -13,13 +12,10 @@ export function DrawTable({ table }: { table: TableNode }) {
   const headerRow = header ? table.content[0] : undefined
   const bodyRows = header ? table.content.slice(1) : table.content
   const hasZebra = bodyRows.length >= 5
-  const { device } = UAParser(window.navigator.userAgent)
 
   return (
-    <div
-      className={`w-full ${device.is("mobile") || device.is("tablet") ? "overflow-scroll" : "overflow-visible"}`}
-    >
-      <table className="m-5 w-auto border-collapse justify-self-center">
+    <div className="overflow-x-scroll">
+      <table className="my-5 w-auto border-collapse">
         {headerRow && (
           <thead className="first:[&_th]:rounded-tl-sm last:[&_th]:rounded-tr-sm">
             <tr>
