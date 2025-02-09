@@ -75,11 +75,6 @@ export const collection: QuestionCollection = [
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     contents: [huffmanCoding],
   },
-  {
-    slug: "propositional-logic",
-    name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms],
-  },
 ]
 
 export const oldPathToGenerator = {
