@@ -54,7 +54,7 @@ export const DemoGraphs: QuestionGenerator = {
         0.3,
         random.choice(["square", "triangle", "square-width-diagonals"]),
         random.choice(["random", "unique", null]),
-        random.bool(),
+        false,
         random.bool(),
         random.bool(),
       ).toMarkdown(),
@@ -64,7 +64,7 @@ export const DemoGraphs: QuestionGenerator = {
         0.3,
         random.choice(["square", "triangle", "square-width-diagonals"]),
         random.choice(["random", "unique", null]),
-        true,
+        random.bool(),
         random.bool(),
         random.bool(),
       )
