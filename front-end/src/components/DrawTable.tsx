@@ -16,7 +16,7 @@ export function DrawTable({ table }: { table: TableNode }) {
   return (
     <table className="m-5 w-auto border-collapse justify-self-center">
       {headerRow && (
-        <thead className="first:[&_th]:rounded-tl-md last:[&_th]:rounded-tr-sm">
+        <thead className="first:[&_th]:rounded-tl-sm last:[&_th]:rounded-tr-sm">
           <tr>
             {headerRow.map((cell, j) => (
               <TableCell
