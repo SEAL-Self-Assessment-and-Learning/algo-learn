@@ -115,7 +115,7 @@ export function createQueueInputFields({
   lang: "en" | "de"
 }) {
   // create the operations table
-  let inputText = `\n| Operation | ${t(translations, lang, "result")} |\n|---|:---:|\n`
+  let inputText = `\n| Operation | ${t(translations, lang, "result")} |\n|===|:===:|\n`
   const correctAnswers: { [key: string]: string } = {}
   const solutionDisplay: string[] = []
   let solutionIndex = 0
