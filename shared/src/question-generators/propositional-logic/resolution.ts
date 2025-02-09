@@ -161,7 +161,7 @@ function cloneDTL(dtl: DisjunctionTermsLevel): DisjunctionTermsLevel {
  * @returns The index of a selected level.
  */
 function selectRandomLevel(random: Random, dtlCopy: DisjunctionTermsLevel): number {
-  const validLevels = Array.from({ length: dtlCopy.length }, (_, i) => i).filter(
+  const validLevels = [...Array(dtlCopy.length).keys()].filter(
     (levelIndex) => levelIndex !== 0 && dtlCopy[levelIndex].length > 0,
   )
   return random.choice(validLevels)
