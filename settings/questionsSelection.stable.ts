@@ -18,6 +18,7 @@ import { modFactor } from "@shared/question-generators/math/modularArithmetic/mo
 import { ModTricks } from "@shared/question-generators/math/modularArithmetic/modTricks.ts"
 import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
+import { Resolution } from "@shared/question-generators/propositional-logic/resolution.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
@@ -30,7 +31,7 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms, MinimizePropositionalLogic],
+    contents: [Satisfiability, NormalForms, Resolution, MinimizePropositionalLogic],
   },
   {
     slug: "modular-arithmetic",

@@ -103,7 +103,7 @@ export const Resolution: QuestionGenerator = {
       name: Resolution.name(lang),
       allowMultiple: true,
       text: t(translations, lang, "text", [
-        disjuntionTermsSetsLatex(disjunctionTerms),
+        disjunctionTermsSetsLatex(disjunctionTerms),
         (disjunctionTerms.length - 1).toString(),
         t(translations, lang, `_${rounds}`),
       ]),
@@ -327,7 +327,7 @@ function generateUniqueVariables(random: Random, varNames: string[], count: numb
   return selectedVars
 }
 
-function disjuntionTermsSetsLatex(disjunctionTerms: Literal[][]): string {
+function disjunctionTermsSetsLatex(disjunctionTerms: Literal[][]): string {
   let latexString = ""
   for (let i = 0; i < disjunctionTerms.length; i++) {
     latexString += `\\[ K_${i} \\coloneqq ${disjunctionTermLatex(disjunctionTerms[i])} \\]`
