@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { questionToJSON, type Question } from "@shared/api/QuestionGenerator"
-import { ExampleQuestion } from "@shared/question-generators/example/example"
+import { DemoMultipleChoice } from "@shared/question-generators/demos/multipleChoice.ts"
 import Random from "@shared/utils/random"
 import { questionToTex } from "@shared/utils/toLatex"
 import { Label } from "@/components/ui/label"
@@ -17,7 +17,7 @@ export function TestSimpleMC() {
   const [{ question }, setQuestion] = useState<{ question?: Question }>({})
 
   if (!question) {
-    void Promise.resolve(ExampleQuestion.generate(lang, {}, seed)).then(setQuestion)
+    void Promise.resolve(DemoMultipleChoice.generate(lang, {}, seed)).then(setQuestion)
     return <></>
   }
   return (
