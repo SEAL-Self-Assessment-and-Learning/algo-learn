@@ -174,8 +174,8 @@ export function parseTable(table: string): TableNode {
     const cellsOfRow = getCellsOfRow(rows[formattingRowIndex])
     cellsOfRow.forEach((cell, i) => {
       const [left, right] = cell.split(/[-=]+/)
-      if (left.includes("!")) node.format.vLines.push(i)
-      if (right.includes("!")) node.format.vLines.push(i + 1)
+      if (left.includes("!") && i > 0) node.format.vLines.push(i - 1)
+      if (right.includes("!")) node.format.vLines.push(i)
       const alignment = (left.includes(":") ? 1 : 0) + (right.includes(":") ? 2 : 0)
       if (alignment === 2) node.format.alignment.push("right")
       else if (alignment === 3) node.format.alignment.push("center")

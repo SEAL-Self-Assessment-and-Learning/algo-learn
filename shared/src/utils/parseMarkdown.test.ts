@@ -37,6 +37,6 @@ describe("tables", () => {
     expect(parsedTable.format.alignment).toEqual(["left", "center", "right"])
     expect(parsedTable.format.header).toBeTruthy()
     expect(parsedTable.format.hLines).toEqual([0, 3])
-    expect(parsedTable.format.vLines).toEqual([1])
+    expect(parsedTable.format.vLines).toEqual([0])
   })
 })
