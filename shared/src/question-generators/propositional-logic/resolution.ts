@@ -20,22 +20,26 @@ const translations: Translations = {
   en: {
     name: "Resolution",
     description: "Resolve clauses to prove logical consistency.",
-    text: `Given the following set of disjunction terms $ K \\coloneqq K_0 \\cup \\dots \\cup K_{{1}}$ with: 
+    text: `Given the following set of disjunction terms $K \\coloneqq \\{ K_0, \\dots, K_{{{1}}} \\}$ with: 
     {{0}}
     Which of the following disjunction terms can be reached with **at most** {{2}}?`,
     _1: "**one** step",
     _2: "**two** steps",
     _3: "**three** steps",
+    rounds: "Maximum depth of resolution tree",
+    size: "The number of variables used",
   },
   de: {
     name: "Resolution",
     description: "Klauseln auflösen, um logische Konsistenz zu beweisen.",
-    text: `Gegeben sei die folgende Menge von Disjunktionstermen $ K \\coloneqq K_0 \\cup \\dots \\cup K_{{1}}$ mit:
+    text: `Gegeben sei die folgende Menge von Disjunktionstermen $K \\coloneqq \\{ K_0, \\dots, K_{{{1}}} \\}$ mit:
     {{0}}
-    Welche der folgenden Disjunktionsterme können mit **höchstens** {{1}} erreicht werden?`,
+    Welche der folgenden Disjunktionsterme können mit **höchstens** {{2}} erreicht werden?`,
     _1: "**einem** Schritt",
     _2: "**zwei** Schritten",
     _3: "**drei** Schritten",
+    rounds: "Maximale Tiefe des Resolutionsbaumes",
+    size: "Die Anzahl der verwendeten Variablen",
   },
 }
 
@@ -55,7 +59,7 @@ export const Resolution: QuestionGenerator = {
   expectedParameters: [
     {
       name: "rounds",
-      description: tFunctional(translations, "size"),
+      description: tFunctional(translations, "rounds"),
       type: "integer",
       min: 1,
       max: 3,
