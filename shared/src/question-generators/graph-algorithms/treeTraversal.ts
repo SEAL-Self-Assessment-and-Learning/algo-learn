@@ -14,7 +14,7 @@ const translations: Translations = {
     name: "Tree Taversal",
     description: "Compute a traversal order of the nodes in a tree.",
     param_size: "Tree size",
-    text: `Given the following tree compute **{{t}} traversal** of the nodes. {{g}}`,
+    text: `Given the following tree, compute **{{t}} traversal** of the nodes. {{g}}`,
     freetext_prompt: "Node order:",
     check_unknown_node: '"{{n}}" is not a node in the tree.',
     feedback_num_nodes:

@@ -14,11 +14,11 @@ const translations: Translations = {
     name: "Reading Syntax Trees",
     description: "Read and evaluate a given syntax tree.",
     param_size: "The size of the syntax tree.",
-    freetext_question: `Given the following propositional logic formular as syntax tree, compute a variable assignment such that the formular is **{{t}}**. {{g}}`,
+    freetext_question: `Given the following propositional logic formula as syntax tree, compute a variable assignment such that the formula is **{{t}}**. {{g}}`,
     target_satisfied: "satisfied",
     target_falsified: "falsified",
     check_invalid: "Input invalid",
-    feedback_wrong: "The provided values evaluate the formular to **{{0}}** instead of **{{1}}**.",
+    feedback_wrong: "The provided values evaluate the formula to **{{0}}** instead of **{{1}}**.",
   },
   de: {
     name: "Syntaxbäume lesen",
