@@ -32,7 +32,7 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms, MinimizePropositionalLogic],
+    contents: [ReadingSyntaxTrees, Satisfiability, NormalForms, MinimizePropositionalLogic],
   },
   {
     slug: "modular-arithmetic",
@@ -76,11 +76,6 @@ export const collection: QuestionCollection = [
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     contents: [huffmanCoding],
-  },
-  {
-    slug: "propositional-logic",
-    name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms, ReadingSyntaxTrees],
   },
   {
     slug: "graphs",
