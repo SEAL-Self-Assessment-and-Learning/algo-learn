@@ -308,7 +308,7 @@ export function DrawGraph({
       ref={svgRef}
       width={maxWidth}
       height={
-        viewBox.height / viewBox.width > 1 && viewBox.height < 300
+        viewBox.height / viewBox.width > 1 && viewBox.height < maxHeight
           ? viewBox.height * 0.75
           : maxWidth * viewBoxAspectRatio
       }
