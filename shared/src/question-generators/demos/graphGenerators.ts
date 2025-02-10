@@ -70,7 +70,7 @@ export const DemoGraphs: QuestionGenerator = {
       )
         .setDraggable(true)
         .toMarkdown(),
-      tree: RootedTree.random({ min: 2, max: 4 }, { min: 2, max: 3 }, random).toGraph().toMarkdown(),
+      tree: RootedTree.random({ min: 2, max: 3 }, { min: 2, max: 3 }, random).toGraph().toMarkdown(),
     }
 
     const question: MultiFreeTextQuestion = {
