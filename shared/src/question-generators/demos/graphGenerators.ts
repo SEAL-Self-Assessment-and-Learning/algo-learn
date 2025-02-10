@@ -1,4 +1,4 @@
-import type { FreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator"
+import type { MultiFreeTextQuestion, QuestionGenerator} from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { RandomGraph, RootedTree } from "@shared/utils/graph.ts"
 import Random from "@shared/utils/random"
@@ -73,8 +73,8 @@ export const DemoGraphs: QuestionGenerator = {
       tree: RootedTree.random({ min: 2, max: 4 }, { min: 2, max: 3 }, random).toGraph().toMarkdown(),
     }
 
-    const question: FreeTextQuestion = {
-      type: "FreeTextQuestion",
+    const question: MultiFreeTextQuestion = {
+      type: "MultiFreeTextQuestion",
       name: DemoGraphs.name(lang),
       path: serializeGeneratorCall({
         generator: DemoGraphs,
