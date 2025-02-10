@@ -1,13 +1,13 @@
-import type { QuestionGenerator } from "../../api/QuestionGenerator.ts"
-import { serializeGeneratorCall } from "../../api/QuestionRouter.ts"
+import type { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import {
   generateRandomExpression,
   numToVariableValues,
   type ExpressionProperties,
   type SyntaxTreeNodeType,
-} from "../../utils/propositionalLogic.ts"
-import Random from "../../utils/random.ts"
-import { t, tFunctional, type Translations } from "../../utils/translations.ts"
+} from "@shared/utils/propositionalLogic.ts"
+import Random from "@shared/utils/random.ts"
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
