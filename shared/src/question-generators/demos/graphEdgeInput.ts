@@ -1,8 +1,9 @@
 import type { Language } from "@shared/api/Language.ts"
 import type {
-  MultiFreeTextFeedbackFunction, MultiFreeTextFormatFunction,
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
   MultiFreeTextQuestion,
-  QuestionGenerator
+  QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { edgeInputFieldID, RandomGraph, type Graph, type Node } from "@shared/utils/graph.ts"

@@ -1,8 +1,7 @@
-import type { Language } from "@shared/api/Language.ts";
-import { getNodeLabel, type Edge, type Graph } from "@shared/utils/graph.ts";
-import { t, type Translations } from "@shared/utils/translations.ts";
-import type { GraphElementStateType } from "@/components/DrawGraph.tsx";
-
+import type { Language } from "@shared/api/Language.ts"
+import { getNodeLabel, type Edge, type Graph } from "@shared/utils/graph.ts"
+import { t, type Translations } from "@shared/utils/translations.ts"
+import type { GraphElementStateType } from "@/components/DrawGraph.tsx"
 
 export type NodeInputSelectedCheckResult = { parsed: boolean; messages: string[]; selected: string[] }
 export type NodeInputGroupCheckResult = {
