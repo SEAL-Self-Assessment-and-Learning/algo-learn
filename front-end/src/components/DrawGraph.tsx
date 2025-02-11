@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactElement } from "react"
+import { useEffect, useRef, useState, type ReactElement } from "react"
 import { BsArrowsFullscreen } from "react-icons/bs"
 import { FaRegSave } from "react-icons/fa"
 import { RiArrowGoBackFill, RiInputField } from "react-icons/ri"
@@ -261,6 +261,10 @@ export function DrawGraph({
     }),
   )
 
+  useEffect(() => {
+    saveNodeInput(nodeField, nodeStates, graph, lang)
+  }, [nodeField?.text])
+
   const edges = edgeListFlat.map((e, i) => {
     return (
       <Edge
@@ -422,25 +426,6 @@ export function DrawGraph({
             <div className="mr-0.5 flex-grow">
               <Markdown md={`{{${nodeInputFieldMd}}}`} />
             </div>
-            <Button
-              size="iconSm"
-              disabled={
-                !checkNodeInput(nodeField?.text ?? "", graph, lang).parsed ||
-                nodeField?.text === parseNodeText(nodeStates)
-              }
-              onClick={() => saveNodeInput(nodeField, nodeStates, graph, lang)}
-            >
-              <FaRegSave />
-            </Button>
-            <Button
-              size="iconSm"
-              disabled={nodeField?.text === parseNodeText(nodeStates)}
-              onClick={() => {
-                nodeInputSetText(nodeField, nodeStates)
-              }}
-            >
-              <RiArrowGoBackFill />
-            </Button>
           </div>
         </div>
       )}
@@ -456,8 +441,7 @@ export function DrawGraph({
             <Button
               size="iconSm"
               disabled={
-                !checkEdgeInput(edgeField?.text ?? "", graph, lang).parsed ||
-                edgeField?.text === parseEdgeText(edgeStates, edgeListFlat)
+                edgeField?.invalid || edgeField?.text === parseEdgeText(edgeStates, edgeListFlat)
               }
               onClick={() => saveEdgeInput(edgeField, edgeStates, edgeListFlat, graph, lang)}
             >
@@ -534,7 +518,6 @@ function saveNodeInput(
     } else {
       updateGraphNodeGroup(graph, nodeStates, nodeCheck.groups)
     }
-    nodeInputSetText(nodeField, nodeStates)
   }
 }
 
