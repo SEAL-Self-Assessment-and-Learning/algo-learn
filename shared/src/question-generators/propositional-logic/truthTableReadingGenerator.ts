@@ -5,6 +5,11 @@ import type {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
+import {
+  getTypingAids,
+  getTypingAidsVars,
+  variableNames,
+} from "@shared/question-generators/propositional-logic/utils.ts"
 import { _ } from "@shared/utils/generics"
 import math from "@shared/utils/math.ts"
 import {
@@ -22,48 +27,23 @@ import { t, tFunctional, type Translations } from "@shared/utils/translations.ts
 const translations: Translations = {
   en: {
     name: "Reading Truth Tables",
-    description: "Correct interpreting of truth tables",
+    description: "Correctly interpret truth tables",
     anyForm:
       "Given the following truth table: \n{{0}} Provide a corresponding expression for $\\varPhi$.",
     dcnf: "Given the following truth table: \n{{0}} Provide a corresponding expression in **{{1}}** for $\\varPhi$.",
     freetext_bottom_text: "Use the following buttons for easier input",
     freetext_feedback_no_normal_form: "Your answer is not a {{0}}.",
-    "aria.left-parenthesis": "left parenthesis",
-    "aria.right-parenthesis": "right parenthesis",
-    "aria.or": "logical or",
-    "aria.and": "logical and",
-    "aria.not": "negation",
-    "aria.xor": "logical xor",
-    "aria.implies": "logical implication",
-    "aria.biimplies": "logical bi-implication",
-    "aria.variable": "variable {{0}}",
   },
   de: {
     name: "Wahrheitstabellen lesen",
     description: "Korrektes interpretieren von Wahrheitstabellen",
     anyForm:
-      "Gegeben sei die folgende Wahrheitstabelle: \n{{0}} Gib eine passende Ausdruck für $\\varPhi$ an.",
+      "Gegeben sei die folgende Wahrheitstabelle: \n{{0}} Gib einen passenden Ausdruck für $\\varPhi$ an.",
     dcnf: "Gegeben sei die folgende Wahrheitstabelle: \n{{0}} Gib einen passenden Ausdruck in **{{1}}** für $\\varPhi$ an.",
     freetext_bottom_text: "Verwende die folgenden Buttons als Eingabehilfe.",
     freetext_feedback_no_normal_form: "Deine Antwort ist keine {{0}}.",
-    "aria.left-parenthesis": "Klammer auf",
-    "aria.right-parenthesis": "Klammer zu",
-    "aria.or": "logisches Oder",
-    "aria.and": "logisches Und",
-    "aria.not": "Negation",
-    "aria.xor": "logisches xor",
-    "aria.implies": "Logische Implikation",
-    "aria.biimplies": "Logische Biimplikation",
-    "aria.variable": "Variable {{0}}",
   },
 }
-
-/** List of possible variable name combinations */
-const variableNames = [
-  ["x_1", "x_2", "x_3"],
-  ["A", "B", "C"],
-  ["u", "v", "w"],
-]
 
 export const TruthTableReadingGenerator: QuestionGenerator = {
   id: "ttr",
@@ -83,7 +63,7 @@ export const TruthTableReadingGenerator: QuestionGenerator = {
     {
       type: "string",
       name: "variant",
-      allowedValues: ["start", "dnf", "cnf"],
+      allowedValues: ["any", "dnf", "cnf"],
     },
   ],
 
@@ -95,10 +75,10 @@ export const TruthTableReadingGenerator: QuestionGenerator = {
       seed,
     })
     const random = new Random(seed)
-    const variant = parameters.variant as "start" | "dnf" | "cnf"
+    const variant = parameters.variant as "any" | "dnf" | "cnf"
 
-    if (variant === "start") {
-      return generateVariantStart(random, lang, permalink)
+    if (variant === "any") {
+      return generateVariantAny(random, lang, permalink)
     } else if (variant === "dnf" || variant === "cnf") {
       return generateVariantCDnf(variant, random, lang, permalink)
     } else {
@@ -108,14 +88,14 @@ export const TruthTableReadingGenerator: QuestionGenerator = {
 }
 
 /**
- * Creates the questions for variant start.
+ * Creates the questions for variant any.
  * User has to create an expression based on the truth table,
  * the expression can be in any format.
  * @param random
  * @param lang
  * @param permalink
  */
-function generateVariantStart(random: Random, lang: "de" | "en", permalink: string) {
+function generateVariantAny(random: Random, lang: "de" | "en", permalink: string) {
   const numVariables = random.int(2, 3)
   const vars = random.choice(variableNames).slice(0, numVariables)
   const numLeaves = random.int(3, 7)
@@ -123,6 +103,7 @@ function generateVariantStart(random: Random, lang: "de" | "en", permalink: stri
 
   const truthTable = getMdTruthTable([{ formula: randomExpression, shortName: "$\\varPhi$" }]).mdTable
 
+  const typingsAids = getTypingAids(lang)
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
     name: TruthTableReadingGenerator.name(lang),
@@ -131,21 +112,17 @@ function generateVariantStart(random: Random, lang: "de" | "en", permalink: stri
     prompt: "$\\varPhi =$",
     bottomText: t(translations, lang, "freetext_bottom_text"),
     typingAid: [
-      { text: "$($", input: "(", label: t(translations, lang, "aria.left-parenthesis") },
-      { text: "$)$", input: ")", label: t(translations, lang, "aria.right-parenthesis") },
-      { text: "$\\vee$", input: "\\or", label: t(translations, lang, "aria.or") },
-      { text: "$\\wedge$", input: "\\and", label: t(translations, lang, "aria.and") },
-      { text: "$\\neg$", input: "\\not", label: t(translations, lang, "aria.not") },
-      { text: "$\\oplus$", input: "\\xor", label: t(translations, lang, "aria.xor") },
-      { text: "$\\Rightarrow$", input: "=>", label: t(translations, lang, "aria.implies") },
-      { text: "$\\Leftrightarrow$", input: "<=>", label: t(translations, lang, "aria.biimplies") },
-    ].concat(
-      vars.map((v) => {
-        return { text: `$${v}$`, input: ` ${v}`, label: t(translations, lang, "aria.variable", [v]) }
-      }),
-    ),
+      typingsAids.leftParenthesis,
+      typingsAids.rightParenthesis,
+      typingsAids.logicalOr,
+      typingsAids.logicalAnd,
+      typingsAids.logicalNot,
+      typingsAids.logicalXor,
+      typingsAids.logicalImpl,
+      typingsAids.logicalBi,
+    ].concat(getTypingAidsVars(lang, randomExpression.getVariableNames()).typingAidVars),
     checkFormat: getCheckFormat(vars),
-    feedback: getFeedback(randomExpression, "none", lang),
+    feedback: getFeedback(randomExpression, "any", lang),
   }
 
   return { question }
@@ -170,7 +147,7 @@ function generateVariantCDnf(
   const vars = random.choice(variableNames).slice(0, numVariables)
   const numLeaves = random.int(3, 5)
   let randomExpression: SyntaxTreeNodeType
-  // don't get a not satisfiable or falsifiable solution
+  // don't get a not satisfiable or not falsifiable solution
   // also not to many 1's so input won't be too long
   do {
     randomExpression = generateRandomExpression(random, numLeaves, vars)
@@ -186,6 +163,7 @@ function generateVariantCDnf(
 
   const truthTable = getMdTruthTable([{ formula: randomExpression, shortName: "$\\varPhi$" }]).mdTable
 
+  const typingsAids = getTypingAids(lang)
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
     name: TruthTableReadingGenerator.name(lang),
@@ -194,16 +172,12 @@ function generateVariantCDnf(
     prompt: "$\\varPhi =$",
     bottomText: t(translations, lang, "freetext_bottom_text"),
     typingAid: [
-      { text: "$($", input: "(", label: t(translations, lang, "aria.left-parenthesis") },
-      { text: "$)$", input: ")", label: t(translations, lang, "aria.right-parenthesis") },
-      { text: "$\\vee$", input: "\\or", label: t(translations, lang, "aria.or") },
-      { text: "$\\wedge$", input: "\\and", label: t(translations, lang, "aria.and") },
-      { text: "$\\neg$", input: "\\not", label: t(translations, lang, "aria.not") },
-    ].concat(
-      vars.map((v) => {
-        return { text: `$${v}$`, input: ` ${v}`, label: t(translations, lang, "aria.variable", [v]) }
-      }),
-    ),
+      typingsAids.leftParenthesis,
+      typingsAids.rightParenthesis,
+      typingsAids.logicalOr,
+      typingsAids.logicalAnd,
+      typingsAids.logicalNot,
+    ].concat(getTypingAidsVars(lang, randomExpression.getVariableNames()).typingAidVars),
     checkFormat: getCheckFormat(vars),
     feedback: getFeedback(randomExpression, format, lang),
   }
@@ -239,7 +213,7 @@ function getCheckFormat(vars: string[]): FreeTextFormatFunction {
  */
 function getFeedback(
   solExpression: SyntaxTreeNodeType,
-  format: "none" | "dnf" | "cnf",
+  format: "any" | "dnf" | "cnf",
   lang: "en" | "de",
 ): FreeTextFeedbackFunction {
   const standardFalseReturn = {
@@ -253,8 +227,8 @@ function getFeedback(
     if (answer instanceof ParserError) {
       return standardFalseReturn
     }
-    // checks if format is either dnf or cnf if asked for
-    if (format !== "none") {
+
+    if (format !== "any") {
       if (format === "dnf" ? !answer.isDNF() : !answer.isCNF()) {
         return {
           correct: false,
@@ -270,8 +244,7 @@ function getFeedback(
         .getTruthTable()
         .truthTable.some(
           (expResult, index) =>
-            answer.eval(numToVariableValues(index, solExpression.getProperties().variables)) !==
-            expResult,
+            answer.eval(numToVariableValues(index, solExpression.getVariableNames())) !== expResult,
         )
     ) {
       return standardFalseReturn

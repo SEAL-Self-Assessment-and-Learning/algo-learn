@@ -5,6 +5,7 @@ import type {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
+import { variableNames } from "@shared/question-generators/propositional-logic/utils.ts"
 import {
   generateRandomExpression,
   getMdTruthTable,
@@ -17,15 +18,15 @@ import { t, tFunctional, type Translations } from "@shared/utils/translations.ts
 const translations: Translations = {
   en: {
     name: "Filling Truth Tables",
-    description: "Correct filling of truth table",
+    description: "Correctly fill truth tables",
     fillOut:
-      "You are given the following function: \\[\\varPhi={{0}}\\] Please fill out the corresponding truth table: \n{{1}}",
+      "You are given the following function: \\[\\varPhi={{0}}\\] Fill out the corresponding truth table: \n{{1}}",
   },
   de: {
     name: "Wahrheitstabellen ausfüllen",
     description: "Korrektes Ausfüllen von Wahrheitstabellen",
     fillOut:
-      "Du erhältst folgende Formel: \\[\\varPhi={{0}}\\] Bitte fülle die entsprechende Wahrheitstabelle aus: \n{{1}}",
+      "Du hast folgende Formel: \\[\\varPhi={{0}}\\] Fülle die entsprechende Wahrheitstabelle aus: \n{{1}}",
   },
 }
 
@@ -43,13 +44,7 @@ export const TruthTableFillingGenerator: QuestionGenerator = {
     "truth table",
   ],
   languages: ["en", "de"],
-  expectedParameters: [
-    {
-      type: "string",
-      name: "variant",
-      allowedValues: ["start"],
-    },
-  ],
+  expectedParameters: [],
 
   generate: (lang = "en", parameters, seed) => {
     const permalink = serializeGeneratorCall({
@@ -59,39 +54,30 @@ export const TruthTableFillingGenerator: QuestionGenerator = {
       seed,
     })
     const random = new Random(seed)
-    const variant = parameters.variant as "start"
 
-    if (variant === "start") {
-      return generateVariantStart(random, permalink, lang)
-    } else {
-      throw new Error("Unknown variant")
+    const numberOfVariables = random.int(2, 3)
+    const varNames = random.choice(variableNames).slice(0, numberOfVariables)
+    const numLeaves = random.int(3, 6)
+    const randomFormula = generateRandomExpression(random, numLeaves, varNames)
+    const truthTableMd = getMdTruthTable([
+      { formula: randomFormula, shortName: "$\\varPhi$", input: true },
+    ]).mdTable
+
+    const question: MultiFreeTextQuestion = {
+      type: "MultiFreeTextQuestion",
+      name: TruthTableFillingGenerator.name(lang),
+      path: permalink,
+      fillOutAll: true,
+      text: t(translations, lang, "fillOut", [randomFormula.toString(true), truthTableMd]),
+      checkFormat: dumbCheckFormat(),
+      feedback: getFeedback(randomFormula),
     }
+    return { question }
   },
 }
 
-function generateVariantStart(random: Random, permalink: string, lang: "en" | "de") {
-  const numberOfVariables = random.int(2, 3)
-  const varNames = random.subset(["x", "y", "z"], numberOfVariables)
-  const numLeaves = random.int(3, 6)
-  const randomFormula = generateRandomExpression(random, numLeaves, varNames)
-  const truthTableMd = getMdTruthTable([
-    { formula: randomFormula, shortName: "$\\varPhi$", input: true },
-  ]).mdTable
-
-  const question: MultiFreeTextQuestion = {
-    type: "MultiFreeTextQuestion",
-    name: TruthTableFillingGenerator.name(lang),
-    path: permalink,
-    fillOutAll: true,
-    text: t(translations, lang, "fillOut", [randomFormula.toString(true), truthTableMd]),
-    checkFormat: dumbCheckFormat(),
-    feedback: feedbackVariantStart(randomFormula),
-  }
-  return { question }
-}
-
 /**
- * Just a workaround s.t. fillOutAll works until fixed in ExerciseMultiTextInput
+ * Just a workaround such that fillOutAll works until fixed in ExerciseMultiTextInput
  */
 function dumbCheckFormat(): MultiFreeTextFormatFunction {
   return ({ text }, fieldID) => {
@@ -106,13 +92,11 @@ function dumbCheckFormat(): MultiFreeTextFormatFunction {
   }
 }
 
-function feedbackVariantStart(formula: SyntaxTreeNodeType): MultiFreeTextFeedbackFunction {
+function getFeedback(formula: SyntaxTreeNodeType): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
     for (let i = 0; i < formula.getTruthTable().truthTable.length; i++) {
       const userAnswer = text["ti-" + i + "-0"] === "1"
-      if (
-        userAnswer !== formula.eval(numToVariableValues(i, formula.getProperties().variables.sort()))
-      ) {
+      if (userAnswer !== formula.eval(numToVariableValues(i, formula.getVariableNames().sort()))) {
         return {
           correct: false,
           correctAnswer: getMdTruthTable([formula]).mdTable,
