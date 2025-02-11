@@ -18,24 +18,21 @@ const translations: Translations = {
     name: "Queues",
     description: "Perform queue operations",
     solutionFreetext: `|Index|Question|Solution|\n{{0}}`,
-    performOperations: `**We perform the following operations:**{{0}}`,
     checkFormat: "Please only enter a number.",
     checkFormatBool: "Please only enter *false* or *true*",
     queueEmpty: "Currently the queue is empty.",
     queueContainsValues: `The queue currently contains the following elements (*with the front at the lowest index*):`,
-    freeTextInput: `Consider a **Queue "Q"**. ` + `{{0}} **We perform the following operations:** {{1}}`,
+    freeTextInput: `Consider a **Queue "Q"**. {{0}} **We perform the following operations:**\n\n{{1}}`,
   },
   de: {
     name: "Queues",
     description: "Queue-Operationen ausführen",
     solutionFreetext: `|Index|Frage|Lösung|\n{{0}}`,
-    performOperations: `**Wir führen nun folgende Operationen aus:**{{0}}`,
     checkFormat: "Bitte gib nur Zahlen ein.",
     checkFormatBool: "Bitte gib nur *false* oder *true* ein.",
     queueEmpty: "Die Queue ist aktuell leer.",
     queueContainsValues: `Die Queue enthält aktuell folgende Elemente (*mit dem Front-Element am niedrigsten Index*):`,
-    freeTextInput:
-      `Betrachte eine **Queue "Q"**. ` + `{{0}} **Wir führen die folgenden Operationen aus:** {{1}}`,
+    freeTextInput: `Betrachte eine **Queue "Q"**. {{0}}\n\n**Wir führen die folgenden Operationen aus:**\n\n{{1}}`,
   },
 }
 
@@ -79,7 +76,10 @@ export const queueQuestion: QuestionGenerator = {
     const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
       if (fieldID.includes("empty")) {
         // check if either "true" or "false"
-        if (text[fieldID].trim() !== "true" && text[fieldID].trim() !== "false") {
+        if (
+          text[fieldID].trim().toLowerCase() !== "true" &&
+          text[fieldID].trim().toLowerCase() !== "false"
+        ) {
           return { valid: false, message: t(translations, lang, "checkFormatBool") }
         }
         return { valid: true, message: "" }
@@ -100,7 +100,7 @@ export const queueQuestion: QuestionGenerator = {
       let count = 0
       for (const key in resultMap) {
         const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
-        if (resultMap[key].trim() !== correctAnswers[key].trim()) {
+        if (resultMap[key].trim().toLowerCase() !== correctAnswers[key].trim()) {
           foundError = true
           const secondSolutionPart: string = "**" + correctAnswers[key] + "**\n"
           solutionDisplay[count] = firstSolutionPart + secondSolutionPart
