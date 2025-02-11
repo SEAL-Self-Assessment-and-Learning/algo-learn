@@ -1,5 +1,5 @@
-import { ReactElement } from "react"
-import { MatrixInputProps } from "@shared/utils/matrixInput.ts"
+import type { ReactElement } from "react"
+import type { MatrixInputProps } from "@shared/utils/matrixInput.ts"
 import { Markdown } from "@/components/Markdown.tsx"
 import { useTheme } from "@/hooks/useTheme.ts"
 

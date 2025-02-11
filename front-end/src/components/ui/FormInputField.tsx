@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState, type ReactElement } from "react"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Input } from "@/components/ui/input.tsx"
 import { useFormContext } from "@/hooks/useFormContext.ts"
@@ -151,7 +151,7 @@ const FeedbackComponent = ({
     )
   } else {
     feedbackBackgroundColor = formatFeedback ? (!invalid ? "bg-green-400" : "bg-red-400") : ""
-    className = `absolute left-0 top-full z-10 ${feedbackBackgroundColor} border border-gray-300 dark:border-gray-700 shadow-md p-2 mt-1 rounded-md`
+    className = `absolute left-0 top-full z-10 ${feedbackBackgroundColor} border border-gray-300 dark:border-gray-700 shadow-md p-2 mt-2 rounded-md`
     // remove text-left to make the feedback align center
     return (
       <div className={`${className} text-left`}>

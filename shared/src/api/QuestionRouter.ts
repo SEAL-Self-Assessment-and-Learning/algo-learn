@@ -1,8 +1,7 @@
-import { SingleTranslation } from "@shared/utils/translations"
-import { collection as globalCollection } from "@/listOfQuestions"
-import { Language } from "./Language"
-import { deserializeParameters, missingParameters, Parameters } from "./Parameters"
-import { QuestionGenerator } from "./QuestionGenerator"
+import type { SingleTranslation } from "@shared/utils/translations"
+import type { Language } from "./Language"
+import { deserializeParameters, missingParameters, type Parameters } from "./Parameters"
+import type { QuestionGenerator } from "./QuestionGenerator"
 
 /**
  * Objects of the following type describe a sequence of question collections.
@@ -95,11 +94,11 @@ export function serializeGeneratorCall({
  *   found
  */
 export function deserializePath({
-  collection = globalCollection,
+  collection,
   path,
   expectLang,
 }: {
-  collection?: QuestionCollection
+  collection: QuestionCollection
   path: string
   expectLang?: boolean
 }):

@@ -1,9 +1,9 @@
 import {
-  BoundsOptions,
   createIfCondition,
   createWhileChangeValues,
   createWhileLine,
-  IfOptions,
+  type BoundsOptions,
+  type IfOptions,
 } from "@shared/question-generators/time/utils"
 import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars"
 import { generateDifferentAmountOfStarPrints } from "@shared/question-generators/time/utilsStars/general"
@@ -11,11 +11,11 @@ import { conditionCheck } from "@shared/question-generators/time/utilsStars/whil
 import { computeStartEndVarsWhile } from "@shared/question-generators/time/utilsStars/whileVarValues"
 import {
   printStarsNew,
-  PseudoCode,
-  PseudoCodeBlock,
-  PseudoCodeWhile,
+  type PseudoCode,
+  type PseudoCodeBlock,
+  type PseudoCodeWhile,
 } from "@shared/utils/pseudoCodeUtils"
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 /**
  *

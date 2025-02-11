@@ -1,11 +1,11 @@
 import {
   minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-  QuestionGenerator,
-} from "../../api/QuestionGenerator"
-import { serializeGeneratorCall } from "../../api/QuestionRouter"
-import Random from "../../utils/random"
-import { t, tFunctional, Translations } from "../../utils/translations"
+  type MultipleChoiceQuestion,
+  type QuestionGenerator,
+} from "@shared/api/QuestionGenerator"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import Random from "@shared/utils/random"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 /**
  * All displayed text goes into the translations object.
@@ -13,12 +13,12 @@ import { t, tFunctional, Translations } from "../../utils/translations"
  */
 const translations: Translations = {
   en: {
-    name: "Compute a sum",
+    name: "Multiple Choice Question",
     description: "Compute the sum of two integers",
     text: "Let ${{0}}$ and ${{1}}$ be two natural numbers. What is the **sum** ${{0}}+{{1}}$?",
   },
   de: {
-    name: "Summe berechnen",
+    name: "Multiple Choice Frage",
     description: "Berechne die Summe zweier Zahlen",
     text: "Seien ${{0}}$ und ${{1}}$ zwei natürliche Zahlen. Was ist die **Summe** ${{0}}+{{1}}$?",
   },
@@ -40,15 +40,13 @@ function generateWrongAnswers(random: Random, correctAnswer: number): Array<stri
 /**
  * This question generator generates a simple multiple choice question.
  */
-export const ExampleQuestion: QuestionGenerator = {
-  id: "example",
+export const DemoMultipleChoice: QuestionGenerator = {
+  id: "demomc",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
-  tags: ["calculus", "sum"],
+  tags: ["demo"],
   languages: ["en", "de"],
-  author: "Max Mustermann",
   license: "MIT",
-  link: "https://example.com",
   expectedParameters: [],
 
   /**
@@ -79,9 +77,9 @@ export const ExampleQuestion: QuestionGenerator = {
     // generate the question object
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
-      name: ExampleQuestion.name(lang),
+      name: DemoMultipleChoice.name(lang),
       path: serializeGeneratorCall({
-        generator: ExampleQuestion,
+        generator: DemoMultipleChoice,
         lang,
         parameters,
         seed,

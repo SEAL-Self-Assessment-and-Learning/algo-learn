@@ -1,15 +1,15 @@
 import {
   printStarsNew,
-  PseudoCodeAssignment,
-  PseudoCodeBlock,
-  PseudoCodeFor,
-  PseudoCodeForAll,
-  PseudoCodeIf,
-  PseudoCodeString,
-  PseudoCodeVariable,
-  PseudoCodeWhile,
+  type PseudoCodeAssignment,
+  type PseudoCodeBlock,
+  type PseudoCodeFor,
+  type PseudoCodeForAll,
+  type PseudoCodeIf,
+  type PseudoCodeString,
+  type PseudoCodeVariable,
+  type PseudoCodeWhile,
 } from "@shared/utils/pseudoCodeUtils"
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 export type AdditionOption = { type: "add"; value: number }
 export type MultiplicationOption = { type: "mult"; value: number }

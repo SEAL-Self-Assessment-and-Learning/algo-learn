@@ -1,7 +1,7 @@
-import { ReactElement, useState } from "react"
+import { useState, type ReactElement } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { allParameterCombinations, deserializeParameters, Parameters } from "@shared/api/Parameters"
-import { QuestionGenerator } from "@shared/api/QuestionGenerator"
+import { allParameterCombinations, deserializeParameters, type Parameters } from "@shared/api/Parameters"
+import type { QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import Random, { sampleRandomSeed } from "@shared/utils/random"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,7 @@ import { sortByStrength, useLearningAnalytics } from "../hooks/useLearningAnalyt
 import { useTranslation } from "../hooks/useTranslation"
 import { ViewSingleQuestion } from "../routes/ViewSingleQuestion"
 import { ScreenCenteredDiv } from "./CenteredDivs"
-import { Result } from "./QuestionComponent"
+import type { Result } from "./QuestionComponent"
 
 const great = {
   en: [
@@ -175,7 +175,7 @@ export function QuizSession({
       const key = e.key
       if (key === "Enter" && status !== "running") {
         e.preventDefault()
-        navigate(`/${lang}`)
+        void navigate(`/${lang}`)
       }
     },
   })

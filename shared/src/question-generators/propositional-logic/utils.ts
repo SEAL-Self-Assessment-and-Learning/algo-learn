@@ -1,5 +1,5 @@
-import { numToVariableValues, SyntaxTreeNodeType } from "@shared/utils/propositionalLogic.ts"
-import { t, Translations } from "@shared/utils/translations"
+import { t, type Translations } from "@shared/utils/translations"
+import { numToVariableValues, type SyntaxTreeNodeType } from "@shared/utils/propositionalLogic.ts"
 
 /** Standard variable names for boolean expressions */
 export const variableNames = [

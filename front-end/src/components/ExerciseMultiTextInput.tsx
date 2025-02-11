@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react"
-import { FreeTextFeedback, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
+import type { FreeTextFeedback, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
 import { inputRegex } from "@shared/utils/parseMarkdown.ts"
-import { InteractWithQuestion, MODE } from "@/components/InteractWithQuestion.tsx"
+import { InteractWithQuestion, type MODE } from "@/components/InteractWithQuestion.tsx"
 import { Markdown } from "@/components/Markdown.tsx"
-import { Result } from "@/components/QuestionComponent.tsx"
-import { formContext, TextFieldState } from "@/hooks/useFormContext.ts"
+import type { Result } from "@/components/QuestionComponent.tsx"
+import { formContext, type TextFieldState } from "@/hooks/useFormContext.ts"
 import useGlobalDOMEvents from "@/hooks/useGlobalDOMEvents.ts"
 import { useSound } from "@/hooks/useSound.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
@@ -14,7 +14,7 @@ import { isMobileOrTablet } from "@/utils/deviceInformation.ts"
  * This component is used to create a question with multiple input fields
  *
  * The input fields are defined in the Markdown text using the following syntax:
- * {{id#style#promt#placeholder#checkformat}}
+ * {{id#style#prompt#placeholder#checkformat}}
  * - id: a unique identifier for the input field
  * - type: the type of the input field
  *          NL: new line (places a line break before and after the input field)
@@ -98,7 +98,7 @@ export function ExerciseMultiTextInput({
         })
       })
     } else {
-      const valid = value.trim().length > 0
+      const valid = value.trim().length > 0 || !question.fillOutAll
       setState({
         ...state,
         text: { ...state.text, [fieldID]: value },
