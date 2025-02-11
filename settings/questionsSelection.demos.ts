@@ -4,8 +4,8 @@
  */
 import type { QuestionCollection } from "@shared/api/QuestionRouter"
 import { DemoGraphEdgeInput } from "@shared/question-generators/demos/graphEdgeInput.ts"
-import { DemoGraphNodeInput } from "@shared/question-generators/demos/graphNodeInput.ts"
 import { DemoGraphs } from "@shared/question-generators/demos/graphGenerators"
+import { DemoGraphNodeInput } from "@shared/question-generators/demos/graphNodeInput.ts"
 import { DemoMultiInput } from "@shared/question-generators/demos/multiInput"
 import { DemoMultipleChoice } from "@shared/question-generators/demos/multipleChoice"
 import { DemoSingleInput } from "@shared/question-generators/demos/singleInput"
@@ -22,7 +22,7 @@ export const collection: QuestionCollection = [
       DemoSingleInput,
       DemoMultiInput,
       DemoGraphs,
-      DemoTables
+      DemoTables,
     ],
   },
 ]
