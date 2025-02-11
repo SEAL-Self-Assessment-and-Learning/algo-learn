@@ -20,6 +20,7 @@ import { MinimizePropositionalLogic } from "@shared/question-generators/proposit
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability"
 import { TruthTableFillingGenerator } from "@shared/question-generators/propositional-logic/truthTableFillingGenerator.ts"
+import { TruthTableReadingGenerator } from "@shared/question-generators/propositional-logic/truthTableReadingGenerator.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
@@ -31,7 +32,13 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms, TruthTableFillingGenerator, MinimizePropositionalLogic],
+    contents: [
+      Satisfiability,
+      NormalForms,
+      TruthTableReadingGenerator,
+      TruthTableFillingGenerator,
+      MinimizePropositionalLogic,
+    ],
   },
   {
     slug: "modular-arithmetic",

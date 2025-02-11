@@ -1,31 +1,31 @@
-import {
+import type {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { getCellValues } from "@shared/question-generators/propositional-logic/utils.ts"
 import { _ } from "@shared/utils/generics"
 import math from "@shared/utils/math.ts"
 import {
   generateRandomExpression,
+  getMdTruthTable,
   numToVariableValues,
   ParserError,
   PropositionalLogicParser,
-  SyntaxTreeNodeType,
   tokenToLatex,
+  type SyntaxTreeNodeType,
 } from "@shared/utils/propositionalLogic.ts"
 import Random from "@shared/utils/random.ts"
-import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
-import { createTruthTableProps } from "@shared/utils/truthTableBlock.ts"
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
     name: "Reading Truth Tables",
     description: "Correct interpreting of truth tables",
-    anyForm: "Given the following truth table: {{0}} Provide a corresponding expression for $\\varPhi$.",
-    dcnf: "Given the following truth table: {{0}} Provide a corresponding expression in **{{1}}** for $\\varPhi$.",
+    anyForm:
+      "Given the following truth table: \n{{0}} Provide a corresponding expression for $\\varPhi$.",
+    dcnf: "Given the following truth table: \n{{0}} Provide a corresponding expression in **{{1}}** for $\\varPhi$.",
     freetext_bottom_text: "Use the following buttons for easier input",
     freetext_feedback_no_normal_form: "Your answer is not a {{0}}.",
     "aria.left-parenthesis": "left parenthesis",
@@ -42,8 +42,8 @@ const translations: Translations = {
     name: "Wahrheitstabellen lesen",
     description: "Korrektes interpretieren von Wahrheitstabellen",
     anyForm:
-      "Gegeben sei die folgende Wahrheitstabelle: {{0}} Gib eine passende Ausdruck für $\\varPhi$ an.",
-    dcnf: "Gegeben sei die folgende Wahrheitstabelle: {{0}} Gib einen passenden Ausdruck in **{{1}}** für $\\varPhi$ an.",
+      "Gegeben sei die folgende Wahrheitstabelle: \n{{0}} Gib eine passende Ausdruck für $\\varPhi$ an.",
+    dcnf: "Gegeben sei die folgende Wahrheitstabelle: \n{{0}} Gib einen passenden Ausdruck in **{{1}}** für $\\varPhi$ an.",
     freetext_bottom_text: "Verwende die folgenden Buttons als Eingabehilfe.",
     freetext_feedback_no_normal_form: "Deine Antwort ist keine {{0}}.",
     "aria.left-parenthesis": "Klammer auf",
@@ -121,11 +121,7 @@ function generateVariantStart(random: Random, lang: "de" | "en", permalink: stri
   const numLeaves = random.int(3, 7)
   const randomExpression = generateRandomExpression(random, numLeaves, vars)
 
-  const truthTable = createTruthTableProps({
-    variables: randomExpression.getVariableNames(),
-    valuesHeader: ["$\\varPhi$"],
-    values: getCellValues(randomExpression, randomExpression.getVariableNames()),
-  })
+  const truthTable = getMdTruthTable([{ formula: randomExpression, shortName: "$\\varPhi$" }]).mdTable
 
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",
@@ -188,11 +184,7 @@ function generateVariantCDnf(
 
   randomExpression = format === "dnf" ? randomExpression.toDNF() : randomExpression.toCNF()
 
-  const truthTable = createTruthTableProps({
-    variables: randomExpression.getVariableNames(),
-    valuesHeader: ["$\\varPhi$"],
-    values: getCellValues(randomExpression, randomExpression.getVariableNames()),
-  })
+  const truthTable = getMdTruthTable([{ formula: randomExpression, shortName: "$\\varPhi$" }]).mdTable
 
   const question: FreeTextQuestion = {
     type: "FreeTextQuestion",

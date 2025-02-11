@@ -1,4 +1,3 @@
-import { numToVariableValues, type SyntaxTreeNodeType } from "@shared/utils/propositionalLogic.ts"
 import { t, type Translations } from "@shared/utils/translations"
 
 /** Standard variable names for boolean expressions */
@@ -7,22 +6,6 @@ export const variableNames = [
   ["A", "B", "C", "D", "E"],
   ["u", "v", "w", "x", "y"],
 ]
-
-/**
- * Evaluates a function based on any variables passed in
- * @param expr - function to evaluate
- * @param vars - those can extend expr.variables(), but expr.variables has to be a subset
- */
-export function getCellValues(expr: SyntaxTreeNodeType, vars: string[]) {
-  if (expr.getVariableNames().some((x) => !vars.includes(x))) {
-    throw new Error("expr.variables has to be a subset of vars")
-  }
-  const cellValues: string[][] = []
-  for (let i = 0; i < Math.pow(2, vars.length); i++) {
-    cellValues.push(expr.eval(numToVariableValues(i, vars)) ? ["$1$"] : ["$0$"])
-  }
-  return cellValues
-}
 
 /**
  * Translations for typing aids for propositional logic

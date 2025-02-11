@@ -111,8 +111,7 @@ function feedbackVariantStart(formula: SyntaxTreeNodeType): MultiFreeTextFeedbac
     for (let i = 0; i < formula.getTruthTable().truthTable.length; i++) {
       const userAnswer = text["ti-" + i + "-0"] === "1"
       if (
-        userAnswer !==
-        formula.eval(numToVariableValues(i, formula.getProperties().variables.sort()))
+        userAnswer !== formula.eval(numToVariableValues(i, formula.getProperties().variables.sort()))
       ) {
         return {
           correct: false,
