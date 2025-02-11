@@ -5,7 +5,6 @@ import { DrawList } from "@/components/DrawList.tsx"
 import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
 import { MatrixInput } from "@/components/MatrixInput.tsx"
-import { TruthTableComp } from "@/components/TruthTableComp.tsx"
 import { FormInputField } from "@/components/ui/FormInputField.tsx"
 import { Format } from "./Format"
 import TeX from "./TeX"
@@ -97,9 +96,6 @@ export const MarkdownTreeNode: FunctionComponent<{
   if (parseTreeNode.kind === "```") {
     if (parseTreeNode.language === "pseudoCode") {
       return <DrawPseudoCode displayCode={parseTreeNode.child} />
-    }
-    if (parseTreeNode.language === "truthTable") {
-      return <TruthTableComp truthTableObject={parseTreeNode.child} />
     }
     if (parseTreeNode.language === "matrixInput") {
       return <MatrixInput matrixObject={parseTreeNode.child} />

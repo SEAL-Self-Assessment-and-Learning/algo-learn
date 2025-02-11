@@ -1,32 +1,31 @@
-import {
+import type {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextFormatFunction,
   MultiFreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { getCellValues } from "@shared/question-generators/propositional-logic/utils.ts"
 import {
   generateRandomExpression,
+  getMdTruthTable,
   numToVariableValues,
-  SyntaxTreeNodeType,
+  type SyntaxTreeNodeType,
 } from "@shared/utils/propositionalLogic.ts"
 import Random from "@shared/utils/random.ts"
-import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
-import { createTruthTableInputFields, createTruthTableProps } from "@shared/utils/truthTableBlock.ts"
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
     name: "Filling Truth Tables",
     description: "Correct filling of truth table",
     fillOut:
-      "You are given the following function: \\[\\varPhi={{0}}\\] Please fill out the corresponding truth table: {{1}}",
+      "You are given the following function: \\[\\varPhi={{0}}\\] Please fill out the corresponding truth table: \n{{1}}",
   },
   de: {
     name: "Wahrheitstabellen ausfüllen",
     description: "Korrektes Ausfüllen von Wahrheitstabellen",
     fillOut:
-      "Du erhältst folgende Formel: \\[\\varPhi={{0}}\\] Bitte fülle die entsprechende Wahrheitstabelle aus: {{1}}",
+      "Du erhältst folgende Formel: \\[\\varPhi={{0}}\\] Bitte fülle die entsprechende Wahrheitstabelle aus: \n{{1}}",
   },
 }
 
@@ -75,20 +74,16 @@ function generateVariantStart(random: Random, permalink: string, lang: "en" | "d
   const varNames = random.subset(["x", "y", "z"], numberOfVariables)
   const numLeaves = random.int(3, 6)
   const randomFormula = generateRandomExpression(random, numLeaves, varNames)
-  const truthTableText = createTruthTableProps({
-    variables: randomFormula.getVariableNames(),
-    valuesHeader: ["$\\varPhi$"],
-    values: createTruthTableInputFields(Math.pow(2, numberOfVariables)).inputFields.map((value) => [
-      value,
-    ]),
-  })
+  const truthTableMd = getMdTruthTable([
+    { formula: randomFormula, shortName: "$\\varPhi$", input: true },
+  ]).mdTable
 
   const question: MultiFreeTextQuestion = {
     type: "MultiFreeTextQuestion",
     name: TruthTableFillingGenerator.name(lang),
     path: permalink,
     fillOutAll: true,
-    text: t(translations, lang, "fillOut", [randomFormula.toString(true), truthTableText]),
+    text: t(translations, lang, "fillOut", [randomFormula.toString(true), truthTableMd]),
     checkFormat: dumbCheckFormat(),
     feedback: feedbackVariantStart(randomFormula),
   }
@@ -96,7 +91,7 @@ function generateVariantStart(random: Random, permalink: string, lang: "en" | "d
 }
 
 /**
- * Just a workaround s.t. fillOutAll works properly until fixed in ExerciseMultiTextInput
+ * Just a workaround s.t. fillOutAll works until fixed in ExerciseMultiTextInput
  */
 function dumbCheckFormat(): MultiFreeTextFormatFunction {
   return ({ text }, fieldID) => {
@@ -114,19 +109,14 @@ function dumbCheckFormat(): MultiFreeTextFormatFunction {
 function feedbackVariantStart(formula: SyntaxTreeNodeType): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
     for (let i = 0; i < formula.getTruthTable().truthTable.length; i++) {
-      const userAnswer = text["truthInput-" + i] === "1"
+      const userAnswer = text["ti-" + i + "-0"] === "1"
       if (
         userAnswer !==
-        formula.eval(numToVariableValues(i, formula.getProperties().variables.sort().reverse()))
+        formula.eval(numToVariableValues(i, formula.getProperties().variables.sort()))
       ) {
         return {
           correct: false,
-          correctAnswer: createTruthTableProps({
-            variables: formula.getVariableNames(),
-            valuesHeader: ["$\\varPhi$"],
-            values: getCellValues(formula, formula.getVariableNames()),
-            inFeedbackPart: true,
-          }),
+          correctAnswer: getMdTruthTable([formula]).mdTable,
         }
       }
     }
