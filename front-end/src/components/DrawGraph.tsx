@@ -1,25 +1,18 @@
 import { useEffect, useRef, useState, type ReactElement } from "react"
-import { BsArrowsFullscreen } from "react-icons/bs"
-import { FaRegSave } from "react-icons/fa"
-import { RiArrowGoBackFill, RiInputField } from "react-icons/ri"
+import { RiInputField } from "react-icons/ri"
 import type { Language } from "@shared/api/Language.ts"
-import {
-  edgeInputFieldID,
-  getNodeLabel,
-  nodeInputFieldID,
-  type Edge,
-  type Graph,
-} from "@shared/utils/graph"
+import { edgeInputFieldID, nodeInputFieldID, type Edge, type Graph } from "@shared/utils/graph"
 import {
   checkEdgeInput,
   checkNodeInput,
+  parseEdgeText,
+  parseNodeText,
   updateGraphEdgeGroup,
   updateGraphEdgeSelected,
   updateGraphNodeGroup,
   updateGraphNodeSelected,
 } from "@shared/utils/graphInput.ts"
 import { Markdown } from "@/components/Markdown.tsx"
-import { Button } from "@/components/ui/button.tsx"
 import { Toggle } from "@/components/ui/toggle.tsx"
 import { addFormField, useFormField, type TextFieldState } from "@/hooks/useFormContext.ts"
 import { useTheme } from "@/hooks/useTheme.ts"
@@ -265,6 +258,10 @@ export function DrawGraph({
     saveNodeInput(nodeField, nodeStates, graph, lang)
   }, [nodeField?.text])
 
+  useEffect(() => {
+    saveEdgeInput(edgeField, edgeStates, edgeListFlat, graph, lang)
+  }, [edgeField?.text])
+
   const edges = edgeListFlat.map((e, i) => {
     return (
       <Edge
@@ -397,13 +394,6 @@ export function DrawGraph({
           <g>{nodes}</g>
         </svg>
         <div className="absolute -bottom-5 right-2 flex flex-row items-center space-x-1 rounded-lg dark:border-gray-700 dark:bg-gray-800">
-          <Button
-            className={`${theme === "dark" ? "text-white hover:text-black" : "text-black hover:text-white"}`}
-            size="iconSm"
-            variant="outline"
-          >
-            <BsArrowsFullscreen />
-          </Button>
           {graph.inputFields !== 0 && (
             <Toggle
               className={`${theme === "dark" ? "text-white" : "text-black"}`}
@@ -432,30 +422,12 @@ export function DrawGraph({
       {graph.edgeClickType !== "none" && fieldsOpen && (
         <div className={`mt-1`}>
           <div className={`mb-1`}>
-            <b>{t("nodeSelection")}</b>
+            <b>{t("edgeSelection")}</b>
           </div>
           <div className="flex w-full flex-row items-center justify-center space-x-1">
             <div className="mr-0.5 flex-grow">
               <Markdown md={`{{${edgeInputFieldMd}}}`} />
             </div>
-            <Button
-              size="iconSm"
-              disabled={
-                edgeField?.invalid || edgeField?.text === parseEdgeText(edgeStates, edgeListFlat)
-              }
-              onClick={() => saveEdgeInput(edgeField, edgeStates, edgeListFlat, graph, lang)}
-            >
-              <FaRegSave />
-            </Button>
-            <Button
-              size="iconSm"
-              disabled={edgeField?.text === parseEdgeText(edgeStates, edgeListFlat)}
-              onClick={() => {
-                edgeInputSetText(edgeField, edgeStates, edgeListFlat)
-              }}
-            >
-              <RiArrowGoBackFill />
-            </Button>
           </div>
         </div>
       )}
@@ -473,36 +445,10 @@ function edgeInputSetText(
   }
 }
 
-function parseEdgeText(edgeStates: GraphElementStateType[], edgeListFlat: Edge[]) {
-  return edgeStates
-    .map((edge, i) =>
-      edge.group !== null
-        ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)},${(edge.group + 1).toString()})`
-        : edge.selected
-          ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)})`
-          : "",
-    )
-    .filter((x) => x !== "")
-    .join(";")
-}
-
 function nodeInputSetText(nodeField: TextFieldState | undefined, nodeStates: GraphElementStateType[]) {
   if (nodeField !== undefined && nodeField.setText) {
     nodeField.setText(parseNodeText(nodeStates))
   }
-}
-
-function parseNodeText(nodeStates: GraphElementStateType[]) {
-  return nodeStates
-    .map((node, i) =>
-      node.group !== null
-        ? `(${getNodeLabel(i)},${(node.group + 1).toString()})`
-        : node.selected
-          ? `${getNodeLabel(i)}`
-          : "",
-    )
-    .filter((x) => x !== "")
-    .join(";")
 }
 
 function saveNodeInput(
@@ -536,5 +482,4 @@ function saveEdgeInput(
       updateGraphEdgeGroup(graph.directed, edgeListFlat, edgeStates, edgeCheck.groups)
     }
   }
-  edgeInputSetText(edgeField, edgeStates, edgeListFlat)
 }
