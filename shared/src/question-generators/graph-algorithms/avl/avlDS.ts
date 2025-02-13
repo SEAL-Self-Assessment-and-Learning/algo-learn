@@ -2,7 +2,10 @@
 // https://files.tcs.uni-frankfurt.de/algo1/binarysearchtrees.pdf
 // Do we write sources for the code we use? I'm not sure if this is necessary since it's a common algorithm
 
-import { AVLTreeRotations } from "@shared/question-generators/avl/utils/utils.ts"
+// https://www.javaguides.net/2023/09/typescript-implement-avl-tree.html
+// https://files.tcs.uni-frankfurt.de/algo1/binarysearchtrees.pdf
+// Do we write sources for the code we use? I'm not sure if this is necessary since it's a common algorithm
+import type { AVLTreeRotations } from "@shared/question-generators/graph-algorithms/avl/utils/utils.ts"
 import { RootedTree } from "@shared/utils/graph.ts"
 
 /**

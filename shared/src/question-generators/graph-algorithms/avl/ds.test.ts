@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { AVLTree } from "@shared/question-generators/avl/avlDS.ts"
+import { AVLTree } from "@shared/question-generators/graph-algorithms/avl/avlDS.ts"
 
 describe("AVL Tree", () => {
   test("Insertion", () => {

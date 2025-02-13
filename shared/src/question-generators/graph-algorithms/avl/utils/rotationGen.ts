@@ -1,11 +1,11 @@
-import { FreeTextFeedbackFunction } from "@shared/api/QuestionGenerator.ts"
-import { AVLTree } from "@shared/question-generators/avl/avlDS.ts"
+import type { FreeTextFeedbackFunction } from "@shared/api/QuestionGenerator.ts"
+import type { AVLTree } from "@shared/question-generators/graph-algorithms/avl/avlDS.ts"
 import {
-  AVLTreeRotations,
   avlTreeWeightedRotations,
-} from "@shared/question-generators/avl/utils/utils.ts"
-import Random from "@shared/utils/random.ts"
-import { t, Translations } from "@shared/utils/translations.ts"
+  type AVLTreeRotations,
+} from "@shared/question-generators/graph-algorithms/avl/utils/utils.ts"
+import type Random from "@shared/utils/random.ts"
+import { t, type Translations } from "@shared/utils/translations.ts"
 
 /**
  * Maps an AVL tree rotation option to its corresponding index.

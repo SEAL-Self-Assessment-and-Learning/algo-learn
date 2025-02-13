@@ -1,5 +1,5 @@
-import { AVLTree } from "@shared/question-generators/avl/avlDS.ts"
-import Random from "@shared/utils/random.ts"
+import { AVLTree } from "@shared/question-generators/graph-algorithms/avl/avlDS.ts"
+import type Random from "@shared/utils/random.ts"
 
 /**
  * All the possible avl tree rotations

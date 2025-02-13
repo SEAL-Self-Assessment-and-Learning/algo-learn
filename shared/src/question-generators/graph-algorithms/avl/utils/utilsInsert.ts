@@ -1,14 +1,14 @@
-import { AVLTree } from "@shared/question-generators/avl/avlDS.ts"
+import type { AVLTree } from "@shared/question-generators/graph-algorithms/avl/avlDS.ts"
 import {
   assignUniqueIDsToTrees,
-  AVLTreeHelper,
-  AVLTreeRotations,
   checkAVLNull,
   convertAVLHelperToRandomAVLTree,
   generateAllAVLTrees,
   getStandardNextRandInt,
-} from "@shared/question-generators/avl/utils/utils.ts"
-import Random from "@shared/utils/random.ts"
+  type AVLTreeHelper,
+  type AVLTreeRotations,
+} from "@shared/question-generators/graph-algorithms/avl/utils/utils.ts"
+import type Random from "@shared/utils/random.ts"
 
 /**
  * This function generates an AVL and a value to insert into the tree

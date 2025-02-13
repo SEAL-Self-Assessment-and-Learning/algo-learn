@@ -1,18 +1,18 @@
 import {
-  FreeTextQuestion,
   minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-  QuestionGenerator,
+  type FreeTextQuestion,
+  type MultipleChoiceQuestion,
+  type QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import {
   getAVLRotationBase,
   getReverseFeedback,
   getRotationIndex,
-} from "@shared/question-generators/avl/utils/rotationGen.ts"
-import { generateAVLTreeInsert } from "@shared/question-generators/avl/utils/utilsInsert.ts"
+} from "@shared/question-generators/graph-algorithms/avl/utils/rotationGen.ts"
+import { generateAVLTreeInsert } from "@shared/question-generators/graph-algorithms/avl/utils/utilsInsert.ts"
 import Random from "@shared/utils/random.ts"
-import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
