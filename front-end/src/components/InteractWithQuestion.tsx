@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 import { HorizontallyCenteredDiv } from "./CenteredDivs"
 import { QuestionFooter } from "./QuestionFooter"
 import { QuestionHeader } from "./QuestionHeader"

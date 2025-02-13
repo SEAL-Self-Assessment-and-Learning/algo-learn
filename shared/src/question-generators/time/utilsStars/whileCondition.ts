@@ -1,4 +1,4 @@
-import { BoundsOptions } from "@shared/question-generators/time/utils"
+import type { BoundsOptions } from "@shared/question-generators/time/utils"
 
 /**
  * This function compare two values for var1 and var2 inside a while loop

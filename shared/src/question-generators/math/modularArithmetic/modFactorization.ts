@@ -1,13 +1,16 @@
-import { Language } from "@shared/api/Language"
-import {
+import type { Language } from "@shared/api/Language"
+import type {
   FreeTextFeedbackFunction,
   FreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { generateFactors, modularExponentiation } from "@shared/question-generators/math/utils"
+import {
+  generateFactors,
+  modularExponentiation,
+} from "@shared/question-generators/math/modularArithmetic/utils"
 import Random from "@shared/utils/random"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {

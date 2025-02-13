@@ -1,8 +1,8 @@
 import { ChevronRight } from "lucide-react"
-import { HTMLAttributes } from "react"
+import type { HTMLAttributes } from "react"
 import { Link } from "react-router-dom"
 import { allParameterCombinations, serializeParameters } from "@shared/api/Parameters"
-import { QuestionGenerator } from "@shared/api/QuestionGenerator"
+import type { QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { badgeVariants } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -129,7 +129,7 @@ function QuestionGeneratorCard({
 }) {
   const { t, lang } = useTranslation()
   return (
-    <Card className={cn("border-4", className)}>
+    <Card className={className}>
       <CardHeader className="m-0 p-3">
         <CardTitle className="text-base">{generator.name(lang)}</CardTitle>
         {showDescription && generator.description && (
@@ -137,7 +137,7 @@ function QuestionGeneratorCard({
         )}
       </CardHeader>
       <CardFooter className="m-0 flex flex-wrap items-center gap-2 p-3">
-        <Button asChild variant="secondary" size="sm">
+        <Button asChild variant="rightAnswer" size="sm">
           <Link to={`/${lang}/practice/${generator.id}`}>
             {t("Catalogue.practice")} <ChevronRight className="ml-1 h-4 w-4" />
           </Link>

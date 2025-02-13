@@ -1,15 +1,15 @@
 import { stringifyPseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
 import {
-  FreeTextFeedbackFunction,
-  FreeTextFormatFunction,
   minimalMultipleChoiceFeedback,
-  Question,
-  QuestionGenerator,
+  type FreeTextFeedbackFunction,
+  type FreeTextFormatFunction,
+  type Question,
+  type QuestionGenerator,
 } from "../../api/QuestionGenerator"
 import { serializeGeneratorCall } from "../../api/QuestionRouter"
 import { format } from "../../utils/format"
 import Random from "../../utils/random"
-import { tFunction, tFunctional, Translations } from "../../utils/translations"
+import { tFunction, tFunctional, type Translations } from "../../utils/translations"
 import { parseRecursiveFunction, sampleRecurrenceAnswers, sampleRecursiveFunction } from "./formulaUtils"
 
 const translations: Translations = {

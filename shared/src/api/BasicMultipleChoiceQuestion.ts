@@ -1,12 +1,12 @@
 import { format } from "../utils/format"
 import Random from "../utils/random"
-import { DeepTranslations, getValidLanguage } from "../utils/translations"
-import { Language } from "./Language"
-import { ExpectedParameters, Parameters } from "./Parameters"
+import { getValidLanguage, type DeepTranslations } from "../utils/translations"
+import type { Language } from "./Language"
+import type { ExpectedParameters, Parameters } from "./Parameters"
 import {
   minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-  QuestionGenerator,
+  type MultipleChoiceQuestion,
+  type QuestionGenerator,
 } from "./QuestionGenerator"
 import { serializeGeneratorCall } from "./QuestionRouter"
 
