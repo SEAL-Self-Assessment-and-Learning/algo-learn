@@ -814,6 +814,7 @@ export class CycleGraph {
     weights: "random" | "unique" | null,
     directed: boolean = false,
     shakeUpNodePosition: boolean = false,
+    ensureBidirectional: boolean = false,
   ): Graph {
     const nodes: NodeList = []
     const edges: EdgeList = Array.from(Array(size), () => [])
@@ -840,7 +841,20 @@ export class CycleGraph {
       const next = (i + 1) % size
       const weight = weights === "random" ? random.int(1, 20) : i + 1
       edges[i].push({ source: i, target: next, value: weights ? weight : undefined })
-      if (!directed) edges[next].push({ source: next, target: i, value: weights ? weight : undefined })
+
+      if (directed) {
+        // directed graphs
+        if (ensureBidirectional) {
+          // always add reverse edge
+          edges[next].push({ source: next, target: i, value: weights ? weight : undefined })
+        } else if (random.bool(0.5)) {
+          // 50% chance to add reverse edge
+          edges[next].push({ source: next, target: i, value: weights ? weight : undefined })
+        }
+      } else {
+        // undirected: Always add reverse edge
+        edges[next].push({ source: next, target: i, value: weights ? weight : undefined })
+      }
     }
 
     return new Graph(nodes, edges, directed, !!weights)
