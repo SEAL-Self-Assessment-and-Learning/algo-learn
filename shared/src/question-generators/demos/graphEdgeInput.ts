@@ -1,6 +1,7 @@
 import type { Language } from "@shared/api/Language.ts"
 import type {
   MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
   MultiFreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
@@ -81,7 +82,7 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
       name: DemoGraphEdgeInput.name(lang),
       path: permaLink,
       text: t(translations, lang, "text", [graph.toMarkdown(), startNode.label!, endNode[0]]),
-      // The Graph will handle checkFormat on its own
+      checkFormat: getCheckFormat(graph, lang),
       feedback: getFeedback(startNode.label!, endNode, graph, lang),
     }
 
@@ -89,6 +90,22 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
       question,
     }
   },
+}
+
+function getCheckFormat(graph: Graph, lang: Language): MultiFreeTextFormatFunction {
+  return ({ text }, fieldID) => {
+    const edgeCheck = checkEdgeInput(text[fieldID], graph, lang)
+    console.log(edgeCheck.messages)
+    if (!edgeCheck.parsed) {
+      return {
+        valid: false,
+        message: "- " + edgeCheck.messages.join("\n- "),
+      }
+    }
+    return {
+      valid: true,
+    }
+  }
 }
 
 function getFeedback(
@@ -176,7 +193,6 @@ function isSimplePath(edges: [string, string][], startNode: string, endNode: str
   return false
 }
 
-// Todo: Use findReachableNodes from graph.ts (by storing path too)
 function bfs(startNode: Node, graph: Graph): Record<string, Node[]> {
   const queue: Node[] = [startNode]
   const visited: Set<Node> = new Set()

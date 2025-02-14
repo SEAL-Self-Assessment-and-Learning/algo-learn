@@ -1,6 +1,7 @@
 import type { Language } from "@shared/api/Language.ts"
 import type {
   MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
   MultiFreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
@@ -12,6 +13,7 @@ import {
   type Graph,
   type Node,
 } from "@shared/utils/graph.ts"
+import { checkNodeInput } from "@shared/utils/graphInput.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
@@ -23,9 +25,12 @@ const translations: Translations = {
   en: {
     name: "Graph Node Input Question",
     description: "Select specific nodes.",
-    text: "Select all nodes that can be reached from node $ {{1}}$, including $ {{1}} $ itself. {{0}}",
+    text:
+      "Select all nodes that can be reached from node $ {{1}}$, including $ {{1}} $ itself. {{0}} " +
+      "For testing purpose, some text to see how the pop up of the input field/s affects the text below.",
     fdToFew: "You have selected to few nodes.",
     fdWrong: "You have selected wrong nodes.",
+    fdParse: "Error parsing input.",
   },
   de: {
     name: "Graph-Knoten-Eingabefrage",
@@ -33,6 +38,7 @@ const translations: Translations = {
     text: "Wähle alle Knoten aus, die von Knoten ${{1}}$ aus erreichbar sind, einschließlich $ {{1}} $ selbst. {{0}}",
     fdToFew: "Du hast zu wenige Knoten ausgewählt.",
     fdWrong: "Du hast falsche Knoten ausgewählt.",
+    fdParse: "Fehler beim Parsen der Eingabe.",
   },
 }
 
@@ -84,7 +90,7 @@ export const DemoGraphNodeInput: QuestionGenerator = {
       name: DemoGraphNodeInput.name(lang),
       path: permaLink,
       text: t(translations, lang, "text", [graph.toMarkdown(), startNode.label!]),
-      // The Graph will handle checkFormat on its own
+      checkFormat: getCheckFormat(graph, lang),
       feedback: getFeedback(reachableNodesIDs, graph, lang),
     }
 
@@ -92,6 +98,21 @@ export const DemoGraphNodeInput: QuestionGenerator = {
       question,
     }
   },
+}
+
+function getCheckFormat(graph: Graph, lang: Language): MultiFreeTextFormatFunction {
+  return ({ text }, fieldID) => {
+    const checkNode = checkNodeInput(text[fieldID], graph, lang)
+    if (!checkNode.parsed) {
+      return {
+        valid: false,
+        message: "- " + checkNode.messages.join("\n- "),
+      }
+    }
+    return {
+      valid: true,
+    }
+  }
 }
 
 function getFeedback(nodeIDs: number[], graph: Graph, lang: Language): MultiFreeTextFeedbackFunction {
@@ -103,8 +124,15 @@ function getFeedback(nodeIDs: number[], graph: Graph, lang: Language): MultiFree
     graph.inputFields = 0
     graph.nodeClickType = "none"
     const nodeTextField = text[nodeInputFieldID(1)]
-    const inputNodes = nodeTextField.split(";")
-    if (inputNodes.length !== nodeLabels.length) {
+    const parsedNodeTextField = checkNodeInput(nodeTextField, graph, lang)
+    if (!("selected" in parsedNodeTextField)) {
+      return {
+        correct: false,
+        feedbackText: t(translations, lang, "fdParse"),
+        correctAnswer: graph.toMarkdown(),
+      }
+    }
+    if (parsedNodeTextField.selected.length !== nodeLabels.length) {
       return {
         correct: false,
         feedbackText: t(translations, lang, "fdToFew"),
@@ -113,7 +141,7 @@ function getFeedback(nodeIDs: number[], graph: Graph, lang: Language): MultiFree
     }
 
     for (const expectedNode of nodeLabels) {
-      if (!inputNodes.includes(expectedNode)) {
+      if (!parsedNodeTextField.selected.includes(expectedNode)) {
         return {
           correct: false,
           feedbackText: t(translations, lang, "fdWrong"),

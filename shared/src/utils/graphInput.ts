@@ -27,7 +27,7 @@ const parseFdTranslations: Translations = {
   en: {
     validNodeName: `"**{{0}}**" is not a valid node label.`,
     validGroup: `"**{{0}}**" is not a valid group.`,
-    edgeFormat: "{{0}}: Invalid edge format.",
+    edgeFormat: `"**{{0}}**" Invalid edge format.`,
     selfLoop: "No self loops allowed.",
     edgeNodeMissing: "Edge connects a node that is not in the graph",
     edgeMissing: "Edge does not exist in the graph.",
@@ -313,4 +313,30 @@ function checkEdgeInputGroup(edges: string[], graph: Graph, lang: Language): Edg
     groups[group].push([match![1], match![2]])
   }
   return { parsed, messages, groups }
+}
+
+export function parseEdgeText(edgeStates: GraphElementStateType[], edgeListFlat: Edge[]) {
+  return edgeStates
+    .map((edge, i) =>
+      edge.group !== null
+        ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)},${(edge.group + 1).toString()})`
+        : edge.selected
+          ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)})`
+          : "",
+    )
+    .filter((x) => x !== "")
+    .join(";")
+}
+
+export function parseNodeText(nodeStates: GraphElementStateType[]) {
+  return nodeStates
+    .map((node, i) =>
+      node.group !== null
+        ? `(${getNodeLabel(i)},${(node.group + 1).toString()})`
+        : node.selected
+          ? `${getNodeLabel(i)}`
+          : "",
+    )
+    .filter((x) => x !== "")
+    .join(";")
 }

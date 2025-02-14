@@ -17,6 +17,7 @@
     "test": "$npm_execpath run lint && $npm_execpath run test:unit",
     "test:unit": "which bun && bun test --bail || vitest run --bail 1",
     "lint": "eslint && tsc && prettier . --check",
+    "lint-fix": "eslint --fix",
     "format": "prettier . --write",
     "clean": "rm -rf dist/ .yarn/cache/ node_modules/ front-end/node_modules settings/node_modules/ shared/node_modules/ docs/ vite-bundle-visualizer.html",
     "visualize": "$npm_execpath run vite-bundle-visualizer -o vite-bundle-visualizer.html",
