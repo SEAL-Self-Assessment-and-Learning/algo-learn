@@ -5,30 +5,30 @@ import type {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { computeAllMST } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
-import { RandomGraph } from "@shared/utils/graph.ts"
+import { getNumOfAllMST } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
+import { RandomGraph, type Graph } from "@shared/utils/graph.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
-    name: "Minimum Spanning Tree (Weight)",
-    description: "Compute the weight of a minimum spanning tree",
-    task: "Given the graph $G$: {{0}} Compute the weight of the minimum spanning tree.",
+    name: "Unique MSTs",
+    description: "Compute the number of unique minimum spanning trees",
+    task: "Given the graph $G$: {{0}} Compute the number of unique minimum spanning trees.",
     fdParse: "Your response could not be converted into an integer.",
     param_size: "Size of the graph",
   },
   de: {
-    name: "Minimaler Spannbaum (Gewicht)",
-    description: "Berechne das Gewicht eines minimalen Spannbaums",
-    task: "Gegeben ist der Graph $G$: {{0}} Berechne das Gewicht des minimalen Spannbaums.",
+    name: "Eindeutige MSTs",
+    description: "Berechne die Anzahl der eindeutigen minimalen Spannbäume",
+    task: "Gegeben ist der Graph $G$: {{0}} Berechne die Anzahl der eindeutigen minimalen Spannbäume.",
     fdParse: "Deine Antwort konnte nicht in eine ganze Zahl umgewandelt werden.",
     param_size: "Größe des Graphen",
   },
 }
 
-export const MSTWeightGen: QuestionGenerator = {
-  id: "mstweight",
+export const UniqueMSTGen: QuestionGenerator = {
+  id: "mstunique",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["MST"],
@@ -39,14 +39,14 @@ export const MSTWeightGen: QuestionGenerator = {
       name: "size",
       description: tFunctional(translations, "param_size"),
       type: "integer",
-      min: 2,
+      min: 3,
       max: 4,
     },
   ],
 
   generate: (lang = "en", parameters, seed) => {
     const permaLink = serializeGeneratorCall({
-      generator: MSTWeightGen,
+      generator: UniqueMSTGen,
       lang,
       parameters,
       seed,
@@ -54,27 +54,34 @@ export const MSTWeightGen: QuestionGenerator = {
     const random = new Random(seed)
     const size = parameters.size as number
 
-    const G = RandomGraph.grid(
-      random,
-      [size, size],
-      1,
-      random.choice(["square", "square-width-diagonals", "triangle"]),
-      "random",
-      false,
-      random.bool(),
-    )
-    G.edgeClickType = "select"
-    G.nodeDraggable = false
-    const startNode = random.choice(G.nodes)
-    const MST = computeAllMST(G, startNode)[0].mst
-    const mstWeight = MST.reduce((acc, x) => acc + (x.value ?? 1), 0)
+    let G: Graph
+    let numUniqueMST: number
+    let rounds = 0
+    let threshold = 2
+    do {
+      G = RandomGraph.grid(
+        random,
+        [size, size],
+        1,
+        random.choice(["square", "square-width-diagonals", "triangle"]),
+        "random",
+        false,
+        random.bool(),
+      )
+      numUniqueMST = getNumOfAllMST(G)
+      rounds++
+      if (rounds > 10) {
+        threshold--
+        rounds = 0
+      }
+    } while (numUniqueMST <= threshold)
 
     const question: FreeTextQuestion = {
       type: "FreeTextQuestion",
-      name: MSTWeightGen.name(lang),
+      name: UniqueMSTGen.name(lang),
       path: permaLink,
       text: t(translations, lang, "task", [G.toMarkdown()]),
-      feedback: getFeedback(mstWeight, lang),
+      feedback: getFeedback(numUniqueMST, lang),
     }
     return { question }
   },
@@ -82,13 +89,13 @@ export const MSTWeightGen: QuestionGenerator = {
 
 /**
  * Feedback function parsing the user input and checking for correctness
- * @param mstWeight
+ * @param numUniqueMST
  * @param lang
  */
-function getFeedback(mstWeight: number, lang: Language): FreeTextFeedbackFunction {
+function getFeedback(numUniqueMST: number, lang: Language): FreeTextFeedbackFunction {
   return ({ text }) => {
     if (text.trim() === "") {
-      return { correct: false, correctAnswer: mstWeight.toString() }
+      return { correct: false, correctAnswer: numUniqueMST.toString() }
     }
     const answer = text.replaceAll(" ", "")
     const answerValue = Number.parseInt(answer, 10)
@@ -96,12 +103,12 @@ function getFeedback(mstWeight: number, lang: Language): FreeTextFeedbackFunctio
     if (Number.isNaN(answerValue)) {
       return {
         correct: false,
-        correctAnswer: mstWeight.toString(),
+        correctAnswer: numUniqueMST.toString(),
         feedbackText: t(translations, lang, "fdParse"),
       }
     }
-    if (answerValue !== mstWeight) {
-      return { correct: false, correctAnswer: mstWeight.toString() }
+    if (answerValue !== numUniqueMST) {
+      return { correct: false, correctAnswer: numUniqueMST.toString() }
     }
 
     return {

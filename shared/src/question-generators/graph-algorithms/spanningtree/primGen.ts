@@ -64,7 +64,7 @@ export const PrimOrder: QuestionGenerator = {
       [size, size],
       1,
       random.choice(["square", "square-width-diagonals", "triangle"]),
-      "unique",
+      "random",
       false,
       random.bool(),
     )

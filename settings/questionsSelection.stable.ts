@@ -12,6 +12,7 @@ import { KruskalCycle } from "@shared/question-generators/graph-algorithms/spann
 import { MSTGraphGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTGraph.ts"
 import { MSTWeightGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTWeight.ts"
 import { PrimOrder } from "@shared/question-generators/graph-algorithms/spanningtree/primGen.ts"
+import { UniqueMSTGen } from "@shared/question-generators/graph-algorithms/spanningtree/uniqueMST.ts"
 import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
@@ -84,7 +85,7 @@ export const collection: QuestionCollection = [
   {
     slug: "graphs",
     name: { de: "Graphen", en: "Graphs" },
-    contents: [TreeTraversal, MSTWeightGen, MSTGraphGen, KruskalCycle, PrimOrder],
+    contents: [TreeTraversal, MSTWeightGen, MSTGraphGen, KruskalCycle, PrimOrder, UniqueMSTGen],
   },
 ]
 
