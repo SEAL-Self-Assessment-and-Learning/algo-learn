@@ -750,6 +750,7 @@ export class KNMGraphGenerator {
     nodesInPartB: number,
     weights: "random" | "unique" | null,
     directed: boolean = false,
+    ensureBidirectional: boolean = false,
   ): Graph {
     const nodes: NodeList = []
     const edges: EdgeList = Array.from(Array(nodesInPartA + nodesInPartB), () => [])
@@ -782,8 +783,23 @@ export class KNMGraphGenerator {
     for (let a = 0; a < nodesInPartA; a++) {
       for (let b = nodesInPartA; b < nodesInPartA + nodesInPartB; b++) {
         const weight = weights === "random" ? random.int(1, 20) : a + b
+
+        // edge from A to B
         edges[a].push({ source: a, target: b, value: weights ? weight : undefined })
-        if (!directed) edges[b].push({ source: b, target: a, value: weights ? weight : undefined })
+
+        // directed graphs
+        if (directed) {
+          if (ensureBidirectional) {
+            // always add both directions
+            edges[b].push({ source: b, target: a, value: weights ? weight : undefined })
+          } else if (random.bool(0.5)) {
+            // 50% chance to add reverse edge
+            edges[b].push({ source: b, target: a, value: weights ? weight : undefined })
+          }
+        } else {
+          // undirected: always add reverse edge
+          edges[b].push({ source: b, target: a, value: weights ? weight : undefined })
+        }
       }
     }
 
