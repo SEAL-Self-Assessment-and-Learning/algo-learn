@@ -373,69 +373,6 @@ export class RandomGraph {
       })
     })
 
-    // function ensureConnectedGraph(edges: EdgeList, nodes: NodeList, directed: boolean): void {
-    //   const numNodes = nodes.length
-    //   const visited = new Array(numNodes).fill(false)
-    //   const components: NodeId[][] = []
-
-    //   // DFS and mark connected nodes
-    //   const dfs = (node: NodeId, component: NodeId[]) => {
-    //     visited[node] = true
-    //     component.push(node)
-    //     edges[node].forEach((edge) => {
-    //       if (!visited[edge.target]) dfs(edge.target, component)
-    //     })
-    //   }
-
-    //   // identify all connected components
-    //   for (let i = 0; i < numNodes; i++) {
-    //     if (!visited[i]) {
-    //       const component: NodeId[] = []
-    //       dfs(i, component)
-    //       components.push(component)
-    //     }
-    //   }
-
-    //   // connect isolated components to form a single connected component
-    //   for (let i = 1; i < components.length; i++) {
-    //     const prevComponent = components[i - 1]
-    //     const currentComponent = components[i]
-
-    //     // pick random node from previous component
-    //     const source = prevComponent[Math.floor(Math.random() * prevComponent.length)]
-
-    //     // find closest neighbor in current component
-    //     let closestNode = currentComponent[0]
-    //     let minDistance = Infinity
-
-    //     for (const target of currentComponent) {
-    //       const dist = Math.hypot(
-    //         nodes[source].coords.x - nodes[target].coords.x,
-    //         nodes[source].coords.y - nodes[target].coords.y,
-    //       )
-    //       if (dist < minDistance) {
-    //         minDistance = dist
-    //         closestNode = target
-    //       }
-    //     }
-
-    //     // add edge to bridge components
-    //     edges[source].push({ source, target: closestNode })
-    //     if (!directed) {
-    //       edges[closestNode].push({ source: closestNode, target: source })
-    //     }
-
-    //     // log new edge
-    //     console.log(
-    //       `Connected component ${i - 1} to component ${i} by adding edge from ${source} to ${closestNode}`,
-    //     )
-    //   }
-    // }
-
-    // if (connected) {
-    //   ensureConnectedGraph(links, vertices, directed)
-    // }
-
     const graph = new Graph(vertices, links, directed, weights !== null)
 
     if (weights === null) return graph
@@ -769,6 +706,7 @@ export class KNMGraphGenerator {
     size: number,
     weights: "random" | "unique" | null,
     directed: boolean = false,
+    ensureBidirectional: boolean = false,
   ): Graph {
     const nodes: NodeList = []
     const edges: EdgeList = Array.from(Array(size), () => [])
@@ -788,9 +726,18 @@ export class KNMGraphGenerator {
     // connect nodes
     for (let i = 0; i < size; i++) {
       for (let j = i + 1; j < size; j++) {
-        const weight = weights === "random" ? random.int(1, 20) : i + j + 1
+        const weight = weights === "random" ? random.int(1, 20) : i + j
         edges[i].push({ source: i, target: j, value: weights ? weight : undefined })
-        if (!directed) edges[j].push({ source: j, target: i, value: weights ? weight : undefined })
+
+        if (directed) {
+          if (ensureBidirectional) {
+            edges[j].push({ source: j, target: i, value: weights ? weight : undefined })
+          } else if (random.bool(0.5)) {
+            edges[j].push({ source: j, target: i, value: weights ? weight : undefined })
+          }
+        } else {
+          edges[j].push({ source: j, target: i, value: weights ? weight : undefined })
+        }
       }
     }
 
@@ -808,19 +755,26 @@ export class KNMGraphGenerator {
     const edges: EdgeList = Array.from(Array(nodesInPartA + nodesInPartB), () => [])
     const yOffset = 3
 
+    // calculate for centering
+    const maxNodes = Math.max(nodesInPartA, nodesInPartB)
+    const minNodes = Math.min(nodesInPartA, nodesInPartB)
+    const offset = ((maxNodes - minNodes) * 2) / 2
+
     // create nodes for partition A
+    const partitionAStartX = nodesInPartA < nodesInPartB ? offset : 0
     for (let i = 0; i < nodesInPartA; i++) {
       nodes.push({
         label: RandomGraph.getLabel(i),
-        coords: { x: i * 2, y: -yOffset },
+        coords: { x: i * 2 + partitionAStartX, y: -yOffset },
       })
     }
 
     // create nodes for partition B
+    const partitionBStartX = nodesInPartB < nodesInPartA ? offset : 0
     for (let j = 0; j < nodesInPartB; j++) {
       nodes.push({
         label: RandomGraph.getLabel(nodesInPartA + j),
-        coords: { x: j * 2, y: yOffset },
+        coords: { x: j * 2 + partitionBStartX, y: yOffset },
       })
     }
 
