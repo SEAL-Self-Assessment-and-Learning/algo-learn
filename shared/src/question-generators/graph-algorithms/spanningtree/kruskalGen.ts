@@ -68,7 +68,15 @@ export const KruskalCycle: QuestionGenerator = {
     let G: Graph
     let kruskalResult: { mst: Edge[]; cycle: Edge[] }
     do {
-      G = RandomGraph.grid(random, [size, size], 1, "square-width-diagonals", "unique", false, false)
+      G = RandomGraph.grid(
+        random,
+        [size, size],
+        1,
+        random.choice(["square", "square-width-diagonals", "triangle"]),
+        "unique",
+        false,
+        random.bool(),
+      )
       kruskalResult = kruskalAlgorithm(G)
     } while (kruskalResult.cycle.length < 2)
 

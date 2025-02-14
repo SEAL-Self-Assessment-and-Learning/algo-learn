@@ -53,7 +53,15 @@ export const MSTWeightGen: QuestionGenerator = {
     const size = parameters.size as number
 
     // Todo: Change this graph to something more random
-    const G = RandomGraph.grid(random, [size, size], 1, "square-width-diagonals", "random", false, false)
+    const G = RandomGraph.grid(
+      random,
+      [size, size],
+      1,
+      random.choice(["square", "square-width-diagonals", "triangle"]),
+      "unique",
+      false,
+      random.bool(),
+    )
     G.edgeClickType = "select"
     G.nodeDraggable = false
     const startNode = random.choice(G.nodes)

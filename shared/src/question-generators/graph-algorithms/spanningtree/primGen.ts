@@ -59,7 +59,15 @@ export const PrimOrder: QuestionGenerator = {
     const size = parameters.size as number
 
     // Maximum of 26 nodes allowed
-    const G = RandomGraph.grid(random, [size, size], 1, "square-width-diagonals", "unique", false, false)
+    const G = RandomGraph.grid(
+      random,
+      [size, size],
+      1,
+      random.choice(["square", "square-width-diagonals", "triangle"]),
+      "unique",
+      false,
+      random.bool(),
+    )
     G.edgeClickType = "select"
     G.nodeClickType = "select"
     const startNode = random.choice(G.nodes)
