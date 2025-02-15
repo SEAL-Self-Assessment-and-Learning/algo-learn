@@ -11,7 +11,7 @@ describe("Resolution - enough answers", () => {
       const { question: q } = Resolution.generate(
         "en",
         {
-          rounds: random.int(1, 3),
+          depth: random.int(1, 3),
           size: random.int(3, 5),
         },
         seed,

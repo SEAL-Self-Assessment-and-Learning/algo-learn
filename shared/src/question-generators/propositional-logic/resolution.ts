@@ -26,7 +26,7 @@ const translations: Translations = {
     _1: "**one** step",
     _2: "**two** steps",
     _3: "**three** steps",
-    rounds: "Maximum depth of resolution tree",
+    depth: "Maximum depth of resolution tree",
     size: "The number of variables used",
   },
   de: {
@@ -38,7 +38,7 @@ const translations: Translations = {
     _1: "**einem** Schritt",
     _2: "**zwei** Schritten",
     _3: "**drei** Schritten",
-    rounds: "Maximale Tiefe des Resolutionsbaumes",
+    depth: "Maximale Tiefe des Resolutionsbaumes",
     size: "Die Anzahl der verwendeten Variablen",
   },
 }
@@ -58,8 +58,8 @@ export const Resolution: QuestionGenerator = {
   languages: ["en", "de"],
   expectedParameters: [
     {
-      name: "rounds",
-      description: tFunctional(translations, "rounds"),
+      name: "depth",
+      description: tFunctional(translations, "depth"),
       type: "integer",
       min: 1,
       max: 3,
@@ -82,14 +82,14 @@ export const Resolution: QuestionGenerator = {
     })
     const random = new Random(seed)
 
-    const rounds = (parameters.rounds ?? 2) as number
+    const depth = (parameters.depth ?? 2) as number
     const numVars = (parameters.size ?? 4) as number
     const varNames = random.choice(variableNames).slice(0, numVars)
     let disjunctionTerms: DisjunctionTerms
     let dtl: DisjunctionTermsLevel
     do {
       disjunctionTerms = generateDisjunctionTerms({ random, varNames })
-      dtl = getDisjunctionTermsLevel(disjunctionTerms, rounds)
+      dtl = getDisjunctionTermsLevel(disjunctionTerms, depth)
     } while (dtl[1].length < 2)
 
     const correctAnswers = getCorrectOptions(random, dtl)
@@ -105,7 +105,7 @@ export const Resolution: QuestionGenerator = {
       text: t(translations, lang, "text", [
         disjunctionTermsSetsLatex(disjunctionTerms),
         (disjunctionTerms.length - 1).toString(),
-        t(translations, lang, `_${rounds}`),
+        t(translations, lang, `_${depth}`),
       ]),
       answers: combinedAnswers,
       feedback: minimalMultipleChoiceFeedback({ correctAnswerIndex }),
