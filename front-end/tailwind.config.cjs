@@ -50,6 +50,18 @@ module.exports = {
           DEFAULT: "hsl(var(--goethe))",
           foreground: "hsl(var(--goethe-foreground))",
         },
+        // color groups, used wherever items need to be separated by color.
+        cg: {
+          foreground: "hsl(var(--color-group-foreground))",
+          0: "var(--color-group-0)",
+          1: "var(--color-group-1)",
+          2: "var(--color-group-2)",
+          3: "var(--color-group-3)",
+          4: "var(--color-group-4)",
+          5: "var(--color-group-5)",
+          6: "var(--color-group-6)",
+          7: "var(--color-group-7)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -72,6 +84,12 @@ module.exports = {
       },
     },
   },
+  safelist: [
+    {
+      // These classes are assigned dynamically, so tailwind thinks they are not used and removes them from the css file.
+      pattern: /(fill|stroke)-(cg|primary|secondary)(-([0-7]|foreground))?/,
+    },
+  ],
   future: {
     hoverOnlyWhenSupported: true,
   },

@@ -8,6 +8,7 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
@@ -18,6 +19,7 @@ import { modFactor } from "@shared/question-generators/math/modularArithmetic/mo
 import { ModTricks } from "@shared/question-generators/math/modularArithmetic/modTricks.ts"
 import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
+import { ReadingSyntaxTrees } from "@shared/question-generators/propositional-logic/readingSyntaxTrees.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
@@ -30,7 +32,7 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [Satisfiability, NormalForms, MinimizePropositionalLogic],
+    contents: [ReadingSyntaxTrees, Satisfiability, NormalForms, MinimizePropositionalLogic],
   },
   {
     slug: "modular-arithmetic",
@@ -74,6 +76,11 @@ export const collection: QuestionCollection = [
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     contents: [huffmanCoding],
+  },
+  {
+    slug: "graphs",
+    name: { de: "Graphen", en: "Graphs" },
+    contents: [TreeTraversal],
   },
 ]
 
