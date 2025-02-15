@@ -19,7 +19,7 @@ const typingAidTranslations: Translations = {
     "aria.not": "negation",
     "aria.xor": "logical xor",
     "aria.implies": "logical implication",
-    "aria.biimplies": "logical bi-implication",
+    "aria.equivalent": "logical equivalent",
     "aria.variable": "variable {{0}}",
   },
   de: {
@@ -30,7 +30,7 @@ const typingAidTranslations: Translations = {
     "aria.not": "Negation",
     "aria.xor": "logisches xor",
     "aria.implies": "Logische Implikation",
-    "aria.biimplies": "Logische Biimplikation",
+    "aria.equivalent": "Logische Equivalenz",
     "aria.variable": "Variable {{0}}",
   },
 }
@@ -72,7 +72,7 @@ export function getTypingAids(lang: "en" | "de") {
     input: "=>",
     label: t(typingAidTranslations, lang, "aria.implies"),
   }
-  const logicalBi = {
+  const logicalEquivalence = {
     text: "$\\Leftrightarrow$",
     input: "<=>",
     label: t(typingAidTranslations, lang, "aria.biimplies"),
@@ -86,7 +86,7 @@ export function getTypingAids(lang: "en" | "de") {
     logicalNot,
     logicalXor,
     logicalImpl,
-    logicalBi,
+    logicalEquivalence,
   }
 }
 

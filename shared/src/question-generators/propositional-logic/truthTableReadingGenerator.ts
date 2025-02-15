@@ -119,7 +119,7 @@ function generateVariantAny(random: Random, lang: "de" | "en", permalink: string
       typingsAids.logicalNot,
       typingsAids.logicalXor,
       typingsAids.logicalImpl,
-      typingsAids.logicalBi,
+      typingsAids.logicalEquivalence,
     ].concat(getTypingAidsVars(lang, randomExpression.getVariableNames()).typingAidVars),
     checkFormat: getCheckFormat(vars),
     feedback: getFeedback(randomExpression, "any", lang),

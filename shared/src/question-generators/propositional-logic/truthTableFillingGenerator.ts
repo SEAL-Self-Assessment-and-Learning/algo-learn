@@ -19,14 +19,13 @@ const translations: Translations = {
   en: {
     name: "Filling Truth Tables",
     description: "Correctly fill truth tables",
-    fillOut:
-      "You are given the following function: \\[\\varPhi={{0}}\\] Fill out the corresponding truth table: \n{{1}}",
+    fillOut: "Given the function: \\[\\varPhi={{0}}\\] Fill out the corresponding truth table: \n{{1}}",
   },
   de: {
     name: "Wahrheitstabellen ausfüllen",
     description: "Korrektes Ausfüllen von Wahrheitstabellen",
     fillOut:
-      "Du hast folgende Formel: \\[\\varPhi={{0}}\\] Fülle die entsprechende Wahrheitstabelle aus: \n{{1}}",
+      "Gegeben sei die Formel: \\[\\varPhi={{0}}\\] Fülle die entsprechende Wahrheitstabelle aus: \n{{1}}",
   },
 }
 
@@ -99,7 +98,7 @@ function getFeedback(formula: SyntaxTreeNodeType): MultiFreeTextFeedbackFunction
       if (userAnswer !== formula.eval(numToVariableValues(i, formula.getVariableNames().sort()))) {
         return {
           correct: false,
-          correctAnswer: getMdTruthTable([formula]).mdTable,
+          correctAnswer: getMdTruthTable([{ formula, shortName: "$\\varPhi$" }]).mdTable,
         }
       }
     }
