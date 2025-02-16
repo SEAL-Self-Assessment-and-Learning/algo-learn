@@ -30,7 +30,7 @@ const typingAidTranslations: Translations = {
     "aria.not": "Negation",
     "aria.xor": "logisches xor",
     "aria.implies": "Logische Implikation",
-    "aria.equivalent": "Logische Equivalenz",
+    "aria.equivalent": "Logische Äquivalenz",
     "aria.variable": "Variable {{0}}",
   },
 }
