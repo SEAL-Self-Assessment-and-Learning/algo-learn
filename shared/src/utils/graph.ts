@@ -768,6 +768,7 @@ export class KNMGraphGenerator {
     weights: "random" | "unique" | null,
     directed: boolean = false,
     ensureBidirectional: boolean = false,
+    edgeProbability: number = 1.0, // Default: complete bipartite graph
   ): Graph {
     const nodes: NodeList = []
     const edges: EdgeList = Array.from(Array(nodesInPartA + nodesInPartB), () => [])
@@ -786,8 +787,11 @@ export class KNMGraphGenerator {
 
     for (let a = 0; a < nodesInPartA; a++) {
       for (let b = nodesInPartA; b < nodesInPartA + nodesInPartB; b++) {
-        const weight = weights === "random" ? random.int(1, 20) : a + b
-        addEdge(edges, a, b, weight, directed, ensureBidirectional, random)
+        if (random.bool(edgeProbability)) {
+          // add edge with probability
+          const weight = weights === "random" ? random.int(1, 20) : a + b
+          addEdge(edges, a, b, weight, directed, ensureBidirectional, random)
+        }
       }
     }
 
