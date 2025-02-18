@@ -700,6 +700,33 @@ export class RootedTree {
   }
 }
 
+function addEdge(
+  edges: EdgeList,
+  source: NodeId,
+  target: NodeId,
+  weight: number | undefined,
+  directed: boolean,
+  ensureBidirectional: boolean,
+  random: Random,
+): void {
+  edges[source].push({ source, target, value: weight })
+
+  if (directed) {
+    if (ensureBidirectional || random.bool(0.5)) {
+      edges[target].push({ source: target, target: source, value: weight })
+    }
+  } else {
+    edges[target].push({ source: target, target: source, value: weight })
+  }
+}
+
+function centerPartition(nodes: NodeList, partitionSize: number, totalSize: number): void {
+  const offset = ((totalSize - partitionSize) * 2) / 2
+  for (let i = 0; i < partitionSize; i++) {
+    nodes[i].coords.x += offset
+  }
+}
+
 export class KNMGraphGenerator {
   public static completeGraph(
     random: Random,
@@ -727,17 +754,7 @@ export class KNMGraphGenerator {
     for (let i = 0; i < size; i++) {
       for (let j = i + 1; j < size; j++) {
         const weight = weights === "random" ? random.int(1, 20) : i + j
-        edges[i].push({ source: i, target: j, value: weights ? weight : undefined })
-
-        if (directed) {
-          if (ensureBidirectional) {
-            edges[j].push({ source: j, target: i, value: weights ? weight : undefined })
-          } else if (random.bool(0.5)) {
-            edges[j].push({ source: j, target: i, value: weights ? weight : undefined })
-          }
-        } else {
-          edges[j].push({ source: j, target: i, value: weights ? weight : undefined })
-        }
+        addEdge(edges, i, j, weight, directed, ensureBidirectional, random)
       }
     }
 
@@ -756,50 +773,21 @@ export class KNMGraphGenerator {
     const edges: EdgeList = Array.from(Array(nodesInPartA + nodesInPartB), () => [])
     const yOffset = 3
 
-    // calculate for centering
-    const maxNodes = Math.max(nodesInPartA, nodesInPartB)
-    const minNodes = Math.min(nodesInPartA, nodesInPartB)
-    const offset = ((maxNodes - minNodes) * 2) / 2
-
-    // create nodes for partition A
-    const partitionAStartX = nodesInPartA < nodesInPartB ? offset : 0
+    // create partitions
     for (let i = 0; i < nodesInPartA; i++) {
-      nodes.push({
-        label: RandomGraph.getLabel(i),
-        coords: { x: i * 2 + partitionAStartX, y: -yOffset },
-      })
+      nodes.push({ label: RandomGraph.getLabel(i), coords: { x: i * 2, y: -yOffset } })
     }
-
-    // create nodes for partition B
-    const partitionBStartX = nodesInPartB < nodesInPartA ? offset : 0
     for (let j = 0; j < nodesInPartB; j++) {
-      nodes.push({
-        label: RandomGraph.getLabel(nodesInPartA + j),
-        coords: { x: j * 2 + partitionBStartX, y: yOffset },
-      })
+      nodes.push({ label: RandomGraph.getLabel(nodesInPartA + j), coords: { x: j * 2, y: yOffset } })
     }
 
-    // connect each node in partition A to every node in partition B
+    centerPartition(nodes.slice(0, nodesInPartA), nodesInPartA, nodesInPartA + nodesInPartB)
+    centerPartition(nodes.slice(nodesInPartA), nodesInPartB, nodesInPartA + nodesInPartB)
+
     for (let a = 0; a < nodesInPartA; a++) {
       for (let b = nodesInPartA; b < nodesInPartA + nodesInPartB; b++) {
         const weight = weights === "random" ? random.int(1, 20) : a + b
-
-        // edge from A to B
-        edges[a].push({ source: a, target: b, value: weights ? weight : undefined })
-
-        // directed graphs
-        if (directed) {
-          if (ensureBidirectional) {
-            // always add both directions
-            edges[b].push({ source: b, target: a, value: weights ? weight : undefined })
-          } else if (random.bool(0.5)) {
-            // 50% chance to add reverse edge
-            edges[b].push({ source: b, target: a, value: weights ? weight : undefined })
-          }
-        } else {
-          // undirected: always add reverse edge
-          edges[b].push({ source: b, target: a, value: weights ? weight : undefined })
-        }
+        addEdge(edges, a, b, weight, directed, ensureBidirectional, random)
       }
     }
 
@@ -840,21 +828,8 @@ export class CycleGraph {
     for (let i = 0; i < size; i++) {
       const next = (i + 1) % size
       const weight = weights === "random" ? random.int(1, 20) : i + 1
-      edges[i].push({ source: i, target: next, value: weights ? weight : undefined })
 
-      if (directed) {
-        // directed graphs
-        if (ensureBidirectional) {
-          // always add reverse edge
-          edges[next].push({ source: next, target: i, value: weights ? weight : undefined })
-        } else if (random.bool(0.5)) {
-          // 50% chance to add reverse edge
-          edges[next].push({ source: next, target: i, value: weights ? weight : undefined })
-        }
-      } else {
-        // undirected: Always add reverse edge
-        edges[next].push({ source: next, target: i, value: weights ? weight : undefined })
-      }
+      addEdge(edges, i, next, weight, directed, ensureBidirectional, random)
     }
 
     return new Graph(nodes, edges, directed, !!weights)
