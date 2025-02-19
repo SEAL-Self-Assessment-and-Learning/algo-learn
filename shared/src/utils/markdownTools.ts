@@ -9,9 +9,10 @@ import type { ColumnAlignment } from "./parseMarkdown"
  * Generates Markdown for an inline input field.
  * todo add all other options of the input field and add tests
  * @param id The id the input can be checked under
+ * @param type The type of the input field
  */
-export function mdInputField(id: string): string {
-  return `{{${id}####overlay}}`
+export function mdInputField(id: string, type?: "NL" | "MAT" | "TTABLE"): string {
+  return `{{${id}#${type ? type : ""}###overlay}}`
 }
 
 /**
