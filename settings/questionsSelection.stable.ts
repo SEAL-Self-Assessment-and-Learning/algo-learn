@@ -18,6 +18,7 @@ import { modFactor } from "@shared/question-generators/math/modularArithmetic/mo
 import { ModTricks } from "@shared/question-generators/math/modularArithmetic/modTricks.ts"
 import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
+import { Resolution } from "@shared/question-generators/propositional-logic/resolution.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability"
 import { TruthTableFillingGenerator } from "@shared/question-generators/propositional-logic/truthTableFillingGenerator.ts"
 import { TruthTableReadingGenerator } from "@shared/question-generators/propositional-logic/truthTableReadingGenerator.ts"
@@ -37,6 +38,7 @@ export const collection: QuestionCollection = [
       NormalForms,
       TruthTableReadingGenerator,
       TruthTableFillingGenerator,
+      Resolution,
       MinimizePropositionalLogic,
     ],
   },
