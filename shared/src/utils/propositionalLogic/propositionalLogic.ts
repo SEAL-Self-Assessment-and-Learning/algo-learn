@@ -1003,7 +1003,7 @@ export function getMdTruthTable(
         if ("input" in f && f.input) {
           const fieldId = `ti-${rowId}-${colId}`
           inputFieldIds.push(fieldId)
-          row.push(mdInputField(fieldId))
+          row.push(mdInputField(fieldId, "TTABLE"))
           return // works like continue in forEach()
         }
         val = f.formula.eval(varValues)
