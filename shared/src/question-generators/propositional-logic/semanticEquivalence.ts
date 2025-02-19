@@ -66,7 +66,7 @@ export const SemanticEquivalence: QuestionGenerator = {
     })
     const random: Random = new Random(seed)
 
-    const exprNames = ["A", "B", "C", "D", "E", "F"]
+    const exprNames = ["A", "B", "C", "D", "E"]
     const equivBool = random.bool()
 
     const numDiffExpr = random.int(2, 3)
@@ -103,7 +103,7 @@ export const SemanticEquivalence: QuestionGenerator = {
 }
 
 /**
- * Creates six answers, combining true and not true statements.
+ * Creates five answers, combining true and not true statements.
  * Computes the indices for the correct answers.
  * @param random
  * @param equivStatements - all possible true equivalences
