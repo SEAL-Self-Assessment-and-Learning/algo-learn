@@ -20,6 +20,7 @@ import { MinimizePropositionalLogic } from "@shared/question-generators/proposit
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
 import { Resolution } from "@shared/question-generators/propositional-logic/resolution.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability"
+import { SemanticEquivalence } from "@shared/question-generators/propositional-logic/semanticEquivalence.ts"
 import { TruthTableFillingGenerator } from "@shared/question-generators/propositional-logic/truthTableFillingGenerator.ts"
 import { TruthTableReadingGenerator } from "@shared/question-generators/propositional-logic/truthTableReadingGenerator.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
@@ -36,6 +37,7 @@ export const collection: QuestionCollection = [
     contents: [
       Satisfiability,
       NormalForms,
+      SemanticEquivalence,
       TruthTableReadingGenerator,
       TruthTableFillingGenerator,
       Resolution,

@@ -1,8 +1,8 @@
 import { max, min } from "mathjs"
 import {
   minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-  QuestionGenerator,
+  type MultipleChoiceQuestion,
+  type QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { variableNames } from "@shared/question-generators/propositional-logic/utils.ts"
@@ -10,10 +10,10 @@ import {
   compareExpressions,
   expressionsDifferent,
   generateRandomExpression,
-  SyntaxTreeNodeType,
-} from "@shared/utils/propositionalLogic.ts"
+  type SyntaxTreeNodeType,
+} from "@shared/utils/propositionalLogic/propositionalLogic.ts"
 import Random from "@shared/utils/random.ts"
-import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
