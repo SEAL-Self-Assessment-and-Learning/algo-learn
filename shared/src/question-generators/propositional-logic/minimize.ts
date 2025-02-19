@@ -1,4 +1,4 @@
-import {
+import type {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
@@ -11,17 +11,17 @@ import {
   variableNames,
 } from "@shared/question-generators/propositional-logic/utils"
 import { _ } from "@shared/utils/generics"
+import { MinimalNormalForm } from "@shared/utils/propositionalLogic/minimize.ts"
 import {
   compareExpressions,
   generateRandomExpression,
   ParserError,
   PropositionalLogicParser,
-  SyntaxTreeNodeType,
   tokenToLatex,
-} from "@shared/utils/propositionalLogic"
-import { MinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
+  type SyntaxTreeNodeType,
+} from "@shared/utils/propositionalLogic/propositionalLogic.ts"
 import Random from "@shared/utils/random"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {

@@ -1,4 +1,4 @@
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 /**
  * Computes the greatest common divisor (GCD) of two numbers.

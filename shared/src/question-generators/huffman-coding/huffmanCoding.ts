@@ -1,6 +1,6 @@
 // TODO: check if the table could be to wide to be represented as possible answer (mobile)
 
-import { QuestionGenerator } from "@shared/api/QuestionGenerator"
+import type { QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import {
   generateChoice2Question,
@@ -11,7 +11,7 @@ import {
   generateInputQuestion,
 } from "@shared/question-generators/huffman-coding/utils/utilsWord.ts"
 import Random from "@shared/utils/random"
-import { tFunctional, Translations } from "@shared/utils/translations"
+import { tFunctional, type Translations } from "@shared/utils/translations"
 
 /**
  * All text displayed text goes into the translation object.

@@ -1,18 +1,18 @@
 import {
   minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
-  QuestionGenerator,
+  type MultipleChoiceQuestion,
+  type QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { Language } from "../../api/Language.ts"
+import type { Language } from "../../api/Language.ts"
 import {
   generateRandomContradiction,
   generateRandomExpression,
   generateRandomTautology,
-  VariableValues,
-} from "../../utils/propositionalLogic.ts"
+  type VariableValues,
+} from "../../utils/propositionalLogic/propositionalLogic.ts"
 import Random from "../../utils/random.ts"
-import { t, tFunctional, Translations } from "../../utils/translations.ts"
+import { t, tFunctional, type Translations } from "../../utils/translations.ts"
 
 const translations: Translations = {
   en: {

@@ -1,11 +1,11 @@
 import {
-  BinaryOperatorType,
   Literal,
-  NormalForm,
   Operator,
-  SyntaxTreeNodeType,
-  TruthTable,
-} from "@shared/utils/propositionalLogic.ts"
+  type BinaryOperatorType,
+  type NormalForm,
+  type SyntaxTreeNodeType,
+  type TruthTable,
+} from "@shared/utils/propositionalLogic/propositionalLogic.ts"
 
 /**
  * During the Quine–McCluskey algorithm, the datatype for a truthTable can be a BinaryMix
