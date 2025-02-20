@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import type { TableNode } from "@shared/utils/parseMarkdown"
 import { MarkdownTree } from "@/components/Markdown"
 import { cn } from "@/lib/utils"
+import { isMobileOrTablet } from "@/utils/deviceInformation.ts"
 
 /**
  * A component that returns a table
@@ -14,7 +15,7 @@ export function DrawTable({ table }: { table: TableNode }) {
   const hasZebra = bodyRows.length >= 5
 
   return (
-    <div className="overflow-x-scroll">
+    <div className={`${isMobileOrTablet ? "overflow-x-scroll" : ""}`}>
       <table className="my-5 w-auto border-collapse">
         {headerRow && (
           <thead className="first:[&_th]:rounded-tl-sm last:[&_th]:rounded-tr-sm">
