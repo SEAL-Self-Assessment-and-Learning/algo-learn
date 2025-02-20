@@ -950,11 +950,7 @@ export function compareExpressions(expressions: SyntaxTreeNodeType[]): boolean {
  * Checks if no two expressions in a list are equivalent.
  * @param expressions
  */
-export function expressionsDifferent(expressions: SyntaxTreeNodeType[]): boolean {
-  if (expressions.length < 2) {
-    throw new Error("At least two expressions are required for comparison.")
-  }
-
+export function arePairwiseInequivalent(expressions: SyntaxTreeNodeType[]): boolean {
   for (let i = 0; i < expressions.length; i++) {
     for (let j = i + 1; j < expressions.length; j++) {
       if (compareExpressions([expressions[i], expressions[j]])) return false

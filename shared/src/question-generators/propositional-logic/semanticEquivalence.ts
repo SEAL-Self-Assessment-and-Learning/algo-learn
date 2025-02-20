@@ -7,8 +7,8 @@ import {
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { variableNames } from "@shared/question-generators/propositional-logic/utils.ts"
 import {
+  arePairwiseInequivalent,
   compareExpressions,
-  expressionsDifferent,
   generateRandomExpression,
   type SyntaxTreeNodeType,
 } from "@shared/utils/propositionalLogic/propositionalLogic.ts"
@@ -18,17 +18,17 @@ import { t, tFunctional, type Translations } from "@shared/utils/translations.ts
 const translations: Translations = {
   en: {
     name: "Semantic Equivalence",
-    description: "Determine which expression are equivalent",
-    size: "The size of the generated expression",
-    text: "Given the following boolean expressions: {{0}} Determine which **equivalences** are `{{1}}`:",
+    description: "Determine which formulas are equivalent",
+    size: "Number of variables",
+    text: "Given the following propositional logic formulas: {{0}} Decide which of the following semantic equivalences are `{{1}}`:",
     true: "true",
     false: "false",
   },
   de: {
     name: "Semantische Äquivalenz",
-    description: "Bestimme welche Formeln äquivalent sind",
-    size: "Die Größe des erzeugten Ausdrucks.",
-    text: "Bestimme welche der folgenden Äquivalenzen `{{0}}` sind:",
+    description: "Bestimme, welche Formeln äquivalent sind",
+    size: "Anzahl der Variablen",
+    text: "Gegeben sind die folgenden aussagenlogischen Formeln: {{0}} Entscheide, welche der folgenden semantischen Äquivalenzen `{{1}}` sind:",
     true: "wahr",
     false: "falsch",
   },
@@ -162,17 +162,15 @@ function getRandomExpressions(
   numDiffExpr: number,
   numExpr: number,
 ) {
-  const expr: SyntaxTreeNodeType[] = [
-    generateRandomExpression(random, numLeaves + random.int(-1, 2), varNames.slice(0, numVars)),
-  ]
-  for (let i = 1; i < numDiffExpr; i++) {
+  const expr: SyntaxTreeNodeType[] = []
+  for (let i = 0; i < numDiffExpr; i++) {
     do {
       expr[i] = generateRandomExpression(
         random,
         numLeaves + random.int(-1, 2),
         varNames.slice(0, numVars),
       )
-    } while (!expressionsDifferent(expr))
+    } while (!arePairwiseInequivalent(expr))
   }
   for (let i = 0; i < numExpr - numDiffExpr; i++) {
     // Choose a statement and shuffle it uniquely
