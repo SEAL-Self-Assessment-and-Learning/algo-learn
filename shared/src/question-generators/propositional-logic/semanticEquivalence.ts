@@ -1,4 +1,3 @@
-import { max, min } from "mathjs"
 import {
   minimalMultipleChoiceFeedback,
   type MultipleChoiceQuestion,
@@ -120,7 +119,7 @@ function getAnswers(
   // Otherwise, include enough equivalences and fill with non-equivalences.
   const answers = random.subset(
     equivStatements,
-    min(equivStatements.length, random.int(max(5 - notEquivStatements.length, 1), 4)),
+    Math.min(equivStatements.length, random.int(Math.max(5 - notEquivStatements.length, 1), 4)),
   )
   answers.push(...random.subset(notEquivStatements, 5 - answers.length))
   random.shuffle(answers)
