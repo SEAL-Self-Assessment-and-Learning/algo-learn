@@ -943,7 +943,19 @@ export function compareExpressions(expressions: SyntaxTreeNodeType[]): boolean {
       }
     }
   }
+  return true
+}
 
+/**
+ * Checks if no two expressions in a list are equivalent.
+ * @param expressions
+ */
+export function arePairwiseInequivalent(expressions: SyntaxTreeNodeType[]): boolean {
+  for (let i = 0; i < expressions.length; i++) {
+    for (let j = i + 1; j < expressions.length; j++) {
+      if (compareExpressions([expressions[i], expressions[j]])) return false
+    }
+  }
   return true
 }
 
