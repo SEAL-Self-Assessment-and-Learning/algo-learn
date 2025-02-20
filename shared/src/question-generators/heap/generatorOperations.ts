@@ -28,7 +28,6 @@ const translationHeapOperations: Translations = {
       "(Not included at the moment) Consider the following **Array**: {{0}} Enter the state of the Heap after **Build-{{1}}-Heap** on the above array. {{2}}",
     taskCombine:
       "Consider the following sequence of operations, where a **number** represents **inserting** this number into the **{{1}}-Heap** and $*$ represents an `Extract{{1}}` operation. \\[{{0}}\\] Enter the final state of the Heap as an array. Initially the Heap is empty. {{2}}",
-    checkFormat: "Please only enter Integer seperated by commas.",
   },
   de: {
     name: "Heap-Operationen",
@@ -41,7 +40,6 @@ const translationHeapOperations: Translations = {
       "(Not included at the moment) Betrachte das folgende Array: {{0}} Gib den Heap nach **Build-{{1}}-Heap** auf dem obigen Array an. {{2}}",
     taskCombine:
       "Betrachte die folgende Sequenz von Operationen, wobei eine **Zahl** das **Einfügen** dieser Zahl in den **{{1}}-Heap** repräsentiert und $*$ eine `Extract{{1}}` Operation. \\[{{0}}\\] Gib den finalen Zustand des Heaps als Array an. Anfänglich ist der Heap leer. {{2}}",
-    checkFormat: "Bitte nur ganze Zahlen durch Komma getrennt eingeben.",
   },
 }
 

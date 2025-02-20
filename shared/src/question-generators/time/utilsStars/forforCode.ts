@@ -285,7 +285,7 @@ function createStepValuesSet({
         rowEndNumber += stepValue
       }
       const difference = rowEndNumber - endValue * endManipulationLoop.value
-      stepSet += `${endValue}\\cdot${endManipulationLoop.value} ${difference < 0 ? difference.toString() : ""}\\}`
+      stepSet += `${endValue} \\cdot ${endManipulationLoop.value} ${difference < 0 ? difference.toString() : ""}\\}`
     } else {
       throw new Error("No other manipulation for endFirstManipulation")
     }

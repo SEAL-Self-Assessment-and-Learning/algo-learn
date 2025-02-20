@@ -69,7 +69,9 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
         <div className="flex flex-col">
           <div className="flex flex-row items-center">
             {promptElement}
-            <div className={`relative flex h-full w-full items-center justify-center`}>
+            <div
+              className={`relative flex h-full ${fieldWidth ? "" : "w-full"} items-center justify-center`}
+            >
               <Input
                 ref={focus ? firstInputRef : null}
                 key={`newline-input-${id}`}
@@ -95,7 +97,9 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
         {spacing}
         <div className="flex flex-row items-center">
           {promptElement}
-          <div className={`relative flex h-full w-full items-center justify-center`}>
+          <div
+            className={`relative flex h-full ${fieldWidth ? "" : "w-full"} items-center justify-center`}
+          >
             <Input
               ref={focus ? firstInputRef : null}
               key={`newline-input-${id}`}
@@ -174,7 +178,6 @@ function getExtraStyles(style: string, feedbackVariation: string) {
   let spacing
   let additionalClassnames: string = ""
   let fieldWidth: number | null = null
-
   if (style === "NL") {
     spacing = <br />
   } else if (style === "TTABLE") {
@@ -189,7 +192,8 @@ function getExtraStyles(style: string, feedbackVariation: string) {
     } else {
       additionalClassnames = "mb-1 w-full focus:outline-none"
     }
-  } else if (style.startsWith("OS")) {
+  }
+  if (style.startsWith("OS")) {
     fieldWidth = Number.parseInt(style.slice(3)) * 3
   }
   return { spacing, additionalClassnames, fieldWidth }

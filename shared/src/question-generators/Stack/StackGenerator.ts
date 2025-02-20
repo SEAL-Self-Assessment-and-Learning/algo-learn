@@ -1,8 +1,8 @@
 import type { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { generateVariantPopSeq } from "@shared/question-generators/Stack/utilsArray.ts"
+import { generateVariantArray } from "@shared/question-generators/Stack/utilsArray.ts"
 import { generateVariantDetailed } from "@shared/question-generators/Stack/utilsDetailed.ts"
-import { generateVariantArray } from "@shared/question-generators/Stack/utilsPopSeq.ts"
+import { generateVariantPopSeq } from "@shared/question-generators/Stack/utilsPopSeq.ts"
 import Random from "@shared/utils/random.ts"
 import { tFunctional, type Translations } from "@shared/utils/translations.ts"
 
@@ -10,7 +10,7 @@ const translations: Translations = {
   en: {
     name: "Stacks",
     description: "Perform stack operations",
-    solutionFreetext: "|Index|Question|Solution|\n{{0}}",
+    solutionFreetext: "|**Index**|**Question**|**Solution**|\n|===|===|===|\n{{0}}",
     performOperations: `**We perform the following operations:**{{0}}`,
     checkFormat: "Please only enter numbers",
     checkFormatSeqLetter: "Please only enter letters",
@@ -26,7 +26,7 @@ const translations: Translations = {
   de: {
     name: "Stacks",
     description: "Stack-Operationen ausführen",
-    solutionFreetext: "|Index|Frage|Lösung|\n{{0}}",
+    solutionFreetext: "|**Index**|**Frage**|**Lösung**|\n|===|===|===|\n{{0}}",
     performOperations: `**Wir führen folgende Operationen aus:**{{0}}`,
     checkFormat: "Bitte gib nur Zahlen ein.",
     checkFormatSeqLetter: "Bitte gib nur Buchstaben ein.",

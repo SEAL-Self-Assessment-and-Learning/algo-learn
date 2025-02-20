@@ -14,18 +14,12 @@ const translationsHeapVerifying: Translations = {
     description: "Verify basic heap properties",
     taskCorrectness:
       "Which of the following arrays satisfy all **heap properties** for a **{{0}}-Heap**?",
-    taskNeighbours:
-      "We consider a **Heap** implemented as array $[1,\\dots,n]$. What is the index of the **{{0}}** of the element at **index {{1}}**?",
-    checkFormatPermutations: "Please only enter an integer.",
   },
   de: {
     name: "Heap-Verständnis",
     description: "Überprüfe grundlegende Heap-Eigenschaften",
     taskCorrectness:
       "Welche der folgenden Arrays erfüllen alle **Heap-Eigenschaften** für einen **{{0}}-Heap**?",
-    taskNeighbours:
-      "Wir betrachten einen **Heap** der als Array $[1,\\dots,n]$ implementiert ist. Was ist der Index des **{{0}}** des Elements an **Index {{1}}*?",
-    checkFormatPermutations: "Bitte etwas ganzzahliges eingeben.",
   },
 }
 
