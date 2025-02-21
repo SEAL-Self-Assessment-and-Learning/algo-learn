@@ -1,4 +1,4 @@
-import {
+import type {
   FreeTextAnswer,
   FreeTextFormatFunction,
   FreeTextQuestion,
@@ -6,7 +6,7 @@ import {
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { RootedTree, traversalStrategies } from "@shared/utils/graph"
-import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 import Random from "../../utils/random"
 
 const translations: Translations = {
@@ -14,7 +14,7 @@ const translations: Translations = {
     name: "Tree Taversal",
     description: "Compute a traversal order of the nodes in a tree.",
     param_size: "Tree size",
-    text: `Given the following tree compute **{{t}} traversal** of the nodes. {{g}}`,
+    text: `Given the following tree, compute **{{t}} traversal** of the nodes. {{g}}`,
     freetext_prompt: "Node order:",
     check_unknown_node: '"{{n}}" is not a node in the tree.',
     feedback_num_nodes:

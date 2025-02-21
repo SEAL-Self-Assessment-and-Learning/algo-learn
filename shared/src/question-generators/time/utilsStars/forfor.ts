@@ -1,8 +1,8 @@
-import { BoundsOptions, IfOptions } from "@shared/question-generators/time/utils"
+import type { BoundsOptions, IfOptions } from "@shared/question-generators/time/utils"
 import { calculateNumberOfStars } from "@shared/question-generators/time/utilsStars/calculateNumberOfStars"
 import { createPseudoCodeForForLoop } from "@shared/question-generators/time/utilsStars/forforCode"
 import { generateDifferentAmountOfStarPrints } from "@shared/question-generators/time/utilsStars/general"
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 /**
  * This computes the end value of the first loop based on the manipulation

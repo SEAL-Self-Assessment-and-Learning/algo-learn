@@ -1,5 +1,5 @@
 import { GripHorizontal } from "lucide-react"
-import { memo, ReactNode } from "react"
+import { memo, type ReactNode } from "react"
 import { FaArrowDown, FaArrowUp } from "react-icons/fa"
 import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable"

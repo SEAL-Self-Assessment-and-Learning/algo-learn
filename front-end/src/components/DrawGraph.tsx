@@ -1,5 +1,5 @@
-import { ReactElement, useRef, useState } from "react"
-import { Graph } from "@shared/utils/graph"
+import { useRef, useState, type ReactElement } from "react"
+import type { Graph } from "@shared/utils/graph"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
 
@@ -308,7 +308,7 @@ export function DrawGraph({
       ref={svgRef}
       width={maxWidth}
       height={
-        viewBox.height / viewBox.width > 1 && viewBox.height < 300
+        viewBox.height / viewBox.width > 1 && viewBox.height < maxHeight
           ? viewBox.height * 0.75
           : maxWidth * viewBoxAspectRatio
       }

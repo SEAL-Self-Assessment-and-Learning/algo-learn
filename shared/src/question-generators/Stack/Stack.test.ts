@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { Stack } from "../Stack/Stack.ts"
+import { Stack } from "@shared/question-generators/Stack/Stack"
 
 describe("test for Stack class main", () => {
   let stack: Stack<number>

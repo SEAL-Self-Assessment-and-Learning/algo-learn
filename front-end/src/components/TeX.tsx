@@ -1,5 +1,5 @@
 import "katex/dist/katex.min.css"
-import { ReactElement, ReactNode } from "react"
+import type { ReactElement, ReactNode } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import ReactTeX from "@matejmazur/react-katex"
 
