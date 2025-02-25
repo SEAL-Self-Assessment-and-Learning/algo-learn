@@ -6,16 +6,14 @@ import type {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import type {
-  DijkstraResult} from "@shared/question-generators/graph-algorithms/utils";
 import {
   createRandomGraph,
   runDijkstra,
+  type DijkstraResult,
 } from "@shared/question-generators/graph-algorithms/utils"
 import type { Graph } from "@shared/utils/graph"
 import Random from "@shared/utils/random"
-import type { Translations } from "@shared/utils/translations";
-import { t, tFunctional } from "@shared/utils/translations"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {

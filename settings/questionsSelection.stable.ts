@@ -8,6 +8,8 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { DijkstraAlgorithm } from "@shared/question-generators/graph-algorithms/dijkstra"
+import { DijkstraTableGenerator } from "@shared/question-generators/graph-algorithms/dijkstraTable"
 import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
@@ -27,8 +29,6 @@ import { RecurrenceMaster } from "@shared/question-generators/recursion/recurren
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF.ts"
-import { DijkstraAlgorithm } from "@shared/question-generators/graph-algorithms/dijkstra"
-import { DijkstraTableGenerator } from "@shared/question-generators/graph-algorithms/dijkstraTable"
 
 export const collection: QuestionCollection = [
   {
@@ -87,7 +87,7 @@ export const collection: QuestionCollection = [
   {
     slug: "dijkstra",
     name: { de: "Dijkstra", en: "Dijkstra" },
-    contents: [DijkstraAlgorithm,DijkstraTableGenerator],
+    contents: [DijkstraAlgorithm, DijkstraTableGenerator],
   },
 ]
 
