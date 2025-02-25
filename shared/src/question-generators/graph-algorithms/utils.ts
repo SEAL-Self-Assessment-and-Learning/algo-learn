@@ -1,5 +1,6 @@
-import { Graph, RandomGraph } from "@shared/utils/graph"
-import Random from "@shared/utils/random"
+import type { Graph} from "@shared/utils/graph";
+import { RandomGraph } from "@shared/utils/graph"
+import type Random from "@shared/utils/random"
 
 /**
  * Interface for graphs and their Dijkstra's algorithm results

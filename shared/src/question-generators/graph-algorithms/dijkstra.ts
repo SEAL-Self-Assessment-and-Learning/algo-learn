@@ -1,17 +1,19 @@
-import {
+import type {
   FreeTextAnswer,
   FreeTextFormatFunction,
   FreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
+import type {
+  DijkstraResult} from "@shared/question-generators/graph-algorithms/utils";
 import {
   createRandomGraph,
-  DijkstraResult,
   runDijkstra,
 } from "@shared/question-generators/graph-algorithms/utils"
 import Random from "@shared/utils/random"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
+import type { Translations } from "@shared/utils/translations";
+import { t, tFunctional } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {

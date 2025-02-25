@@ -27,6 +27,8 @@ import { RecurrenceMaster } from "@shared/question-generators/recursion/recurren
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF.ts"
+import { DijkstraAlgorithm } from "@shared/question-generators/graph-algorithms/dijkstra"
+import { DijkstraTableGenerator } from "@shared/question-generators/graph-algorithms/dijkstraTable"
 
 export const collection: QuestionCollection = [
   {
@@ -81,6 +83,11 @@ export const collection: QuestionCollection = [
     slug: "graphs",
     name: { de: "Graphen", en: "Graphs" },
     contents: [TreeTraversal],
+  },
+  {
+    slug: "dijkstra",
+    name: { de: "Dijkstra", en: "Dijkstra" },
+    contents: [DijkstraAlgorithm,DijkstraTableGenerator],
   },
 ]
 
