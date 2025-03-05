@@ -12,7 +12,6 @@
     "lint": "prettier --check . && eslint ."
   },
   "devDependencies": {
-    "@designthen/svelte-icons": "^5.0.0-next.1",
     "@eslint/compat": "^1.2.5",
     "@sveltejs/adapter-auto": "^4.0.0",
     "@sveltejs/adapter-static": "^3.0.8",
@@ -30,7 +29,7 @@
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
-    "svelte": "^5.19.3",
+    "svelte": "^5.19.4",
     "svelte-check": "^4.1.4",
     "tailwind-merge": "^2.6.0",
     "tailwind-variants": "^0.3.1",
@@ -41,6 +40,7 @@
     "vite": "^6.0.11"
   },
   "dependencies": {
+    "@icons-pack/svelte-simple-icons": "^4.0.1",
     "@tailwindcss/typography": "^0.5.16",
     "bits-ui": "^1.0.0-next.78",
     "katex": "^0.16.21"

@@ -1,14 +1,12 @@
 <script lang="ts">
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js"
-  import {
-    FileKey2,
-    GitCommitHorizontal,
-    Home,
-    Info,
-    MoreVertical,
-    Settings,
-    WifiOff,
-  } from "lucide-svelte"
+  import FileKey2 from "lucide-svelte/icons/file-key-2"
+  import GitCommitHorizontal from "lucide-svelte/icons/git-commit-horizontal"
+  import Home from "lucide-svelte/icons/home"
+  import Info from "lucide-svelte/icons/info"
+  import MoreVertical from "lucide-svelte/icons/more-vertical"
+  import Settings from "lucide-svelte/icons/settings"
+  import WifiOff from "lucide-svelte/icons/wifi-off"
   import type { Language } from "@shared/api/Language"
   import { tFunction } from "@shared/utils/translations"
   import { VERSION } from "../config"

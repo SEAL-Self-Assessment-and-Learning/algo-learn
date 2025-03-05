@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { Duolingo, Github, React } from "@designthen/svelte-icons/simple-icons"
+  import Duolingo from "@icons-pack/svelte-simple-icons/icons/SiDuolingo"
+  import Github from "@icons-pack/svelte-simple-icons/icons/SiGithub"
+  import React from "@icons-pack/svelte-simple-icons/icons/SiReact"
   import { tFunction } from "@shared/utils/translations"
   import Markdown from "@/lib/components/markdown.svelte"
   import { globalTranslations } from "@/lib/translation"

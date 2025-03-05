@@ -1,8 +1,9 @@
 <script lang="ts">
   import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js"
   import * as Card from "$lib/components/ui/card/index.js"
-  import { Mail, MessageSquareText } from "lucide-svelte"
-  import { Github } from "@designthen/svelte-icons/simple-icons"
+  import Mail from "lucide-svelte/icons/mail"
+  import MessageSquareText from "lucide-svelte/icons/message-square-text"
+  import Github from "@icons-pack/svelte-simple-icons/icons/SiGithub"
   import type { TFunctionParameters, TKey } from "@shared/utils/translations"
   import { Button } from "./ui/button"
 
