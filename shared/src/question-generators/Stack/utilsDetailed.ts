@@ -1,7 +1,13 @@
+import type {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
+  MultiFreeTextQuestion,
+} from "@shared/api/QuestionGenerator.ts"
 import { Stack } from "@shared/question-generators/Stack/Stack.ts"
+import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
 import type Random from "@shared/utils/random.ts"
-import { t, type Translations } from "@shared/utils/translations.ts"
+import { t, tFunction, type Translations } from "@shared/utils/translations.ts"
 
 /**
  * This functions generates the operations performed on the stack during the question
@@ -9,7 +15,7 @@ import { t, type Translations } from "@shared/utils/translations.ts"
  * @param startingElements - starting elements inside the stack
  * @param random
  */
-export function generateOperationsFreetextStack(startingElements: number[], random: Random) {
+export function generateOperationsVariantDetailed(startingElements: number[], random: Random) {
   const stack: Stack<number> = new Stack()
 
   // initialize the stack with the elements
@@ -80,6 +86,7 @@ export function generateStackStartElements({
     }
     stackElementsString += createArrayDisplayCodeBlock({
       array: stackElementsValues,
+      lang,
     })
   }
 
@@ -102,7 +109,7 @@ export function createStackInputFields({
   lang: "en" | "de"
 }) {
   // Example input field {{test#NL#**Char: **##overlay}}
-  let inputText = `\n| Operation | ${t(translations, lang, "result")} |\n| --- | --- |\n`
+  let inputText = `\n| Operation | ${t(translations, lang, "result")} |\n|===|:===:|\n`
   const solutionDisplay: string[] = []
   let solutionIndex = 0
   const correctAnswers: { [key: string]: string } = {}
@@ -126,8 +133,86 @@ export function createStackInputFields({
     index++
   }
 
-  solutionDisplay.push("|#div_my-5?table_w-full#| |")
-  inputText += `|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |`
+  // solutionDisplay.push("|#div_my-5?table_w-full#| |")
+  // inputText += `|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |`
 
   return { inputText, solutionDisplay, correctAnswers }
+}
+
+export function generateVariantDetailed(
+  lang: "de" | "en",
+  random: Random,
+  permalink: string,
+  translations: Translations,
+  wordTranslations: Translations,
+) {
+  const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
+    if (fieldID.includes("empty")) {
+      if (
+        text[fieldID].trim().toLowerCase() !== "true" &&
+        text[fieldID].trim().toLowerCase() !== "false"
+      ) {
+        return { valid: false, message: t(translations, lang, "checkFormatBool") }
+      }
+      return { valid: true, message: "" }
+    }
+    // else check if the text only contains numbers
+    if (!/^\d+$/.test(text[fieldID])) {
+      return { valid: false, message: t(translations, lang, "checkFormat") }
+    }
+    return { valid: true, message: "" }
+  }
+
+  const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
+    // renaming for better understanding
+    const resultMap: { [key: string]: string } = text
+
+    let foundError = false
+    let count = 0
+    for (const key in resultMap) {
+      const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
+      if (resultMap[key].trim().toLowerCase() !== correctAnswers[key].trim()) {
+        foundError = true
+        const secondSolutionPart: string = "**" + correctAnswers[key] + "**|\n"
+        solutionDisplay[count] = firstSolutionPart + secondSolutionPart
+      }
+      count++
+    }
+    if (foundError) {
+      return {
+        correct: false,
+        message: tFunction(translations, lang).t("feedback.incomplete"),
+        correctAnswer: t(translations, lang, "solutionFreetext", [solutionDisplay.join("")]),
+      }
+    }
+    return {
+      correct: true,
+      message: tFunction(translations, lang).t("feedback.correct"),
+    }
+  }
+
+  const { stackElementsString, stackElementsValues } = generateStackStartElements({
+    random,
+    translations,
+    lang,
+  })
+  const operations = generateOperationsVariantDetailed(stackElementsValues, random).operations
+
+  const { solutionDisplay, inputText, correctAnswers } = createStackInputFields({
+    operations,
+    lang,
+    translations: wordTranslations,
+  })
+
+  const question: MultiFreeTextQuestion = {
+    type: "MultiFreeTextQuestion",
+    name: stackQuestion.name(lang),
+    path: permalink,
+    fillOutAll: true,
+    text: t(translations, lang, "freeTextInput", [stackElementsString, inputText]),
+    checkFormat,
+    feedback,
+  }
+  const testing = { correctAnswer: correctAnswers }
+  return { question, testing }
 }

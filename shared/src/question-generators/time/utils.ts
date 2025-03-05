@@ -204,11 +204,11 @@ export function createBoundsString(
   let endPseudoCodeString: PseudoCodeString = [value]
   if (boundsManipulation !== "none") {
     if (boundsManipulation.type === "mult") {
-      endPseudoCodeString = [`${boundsManipulation.value} \\cdot`, value]
+      endPseudoCodeString = [`${boundsManipulation.value} \\cdot `, value]
     }
     if (boundsManipulation.type === "square") {
       if (timeOrStars === "stars" && boundsManipulation.abs) {
-        endPseudoCodeString = [value, " \\cdot ", value]
+        endPseudoCodeString = [value, " \\cdot \\left| ", value, " \\right| "]
       } else {
         endPseudoCodeString = [value, "^2"]
       }
@@ -382,7 +382,7 @@ export function createWhileChangeValues({
     if (changeCode) firstChangeValue = random.int(2, 3)
     assignments.push({
       assignment: firstVariableName,
-      value: [{ variable: firstVariableName }, "*", firstChangeValue.toString()],
+      value: [{ variable: firstVariableName }, " \\cdot ", firstChangeValue.toString()],
     })
     changeFirstVariable *= firstChangeValue
   } else if (cOption === "xSquare") {
@@ -449,7 +449,7 @@ export function createWhileChangeValues({
   } else if (cOption === "xMultY") {
     assignments.push({
       assignment: firstVariableName,
-      value: [{ variable: firstVariableName }, "*", { variable: secondVariableName }],
+      value: [{ variable: firstVariableName }, " \\cdot ", { variable: secondVariableName }],
     })
     changeFirstVariable *= changeSecondVariable
   } else if (cOption === "xMinusYPlus") {
@@ -508,7 +508,7 @@ export function createWhileChangeValues({
     if (changeCode) secondChangeValue = random.int(2, 3)
     assignments.push({
       assignment: secondVariableName,
-      value: [{ variable: secondVariableName }, "*", secondChangeValue.toString()],
+      value: [{ variable: secondVariableName }, " \\cdot ", secondChangeValue.toString()],
     })
     changeFirstVariable = Math.floor(changeFirstVariable / firstChangeValue)
     changeSecondVariable *= secondChangeValue
@@ -578,11 +578,11 @@ export function createWhileChangeValues({
     }
     assignments.push({
       assignment: firstVariableName,
-      value: [{ variable: firstVariableName }, "*", firstChangeValue.toString()],
+      value: [{ variable: firstVariableName }, " \\cdot ", firstChangeValue.toString()],
     })
     assignments.push({
       assignment: secondVariableName,
-      value: [{ variable: secondVariableName }, "*", secondChangeValue.toString()],
+      value: [{ variable: secondVariableName }, " \\cdot ", secondChangeValue.toString()],
     })
     changeFirstVariable *= firstChangeValue
     changeSecondVariable *= secondChangeValue

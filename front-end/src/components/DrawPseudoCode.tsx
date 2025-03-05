@@ -104,9 +104,7 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
                 <MdContentCopy className="h-4 w-4" />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
-              {(recentlyCopied ? t("copyLinkCopied") : t("copyLinkTooltip")) || ""}
-            </TooltipContent>
+            <TooltipContent>{recentlyCopied ? t("copyLinkCopied") : t("copyCodeLatex")}</TooltipContent>
           </Tooltip>
         </div>
       </div>

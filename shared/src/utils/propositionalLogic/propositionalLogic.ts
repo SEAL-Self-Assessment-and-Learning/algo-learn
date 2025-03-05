@@ -1,4 +1,6 @@
-import type Random from "./random.ts"
+import { mdInputField, mdTableFromData } from "@shared/utils/markdownTools.ts"
+import type { DisjunctionTerms } from "@shared/utils/propositionalLogic/resolution.ts"
+import type Random from "@shared/utils/random"
 
 export type VariableValues = Record<string, boolean>
 export type NormalForm = "CNF" | "DNF"
@@ -27,6 +29,11 @@ abstract class SyntaxTreeNode {
   public abstract eval(values: VariableValues): boolean
 
   public abstract toString(latex: boolean): string
+
+  /**
+   * Returns the disjunction terms of the expression (has to be in CNF).
+   */
+  public abstract toDisjunctionTerms(): DisjunctionTerms
 
   /**
    * Moves negation inwards to the literals
@@ -255,6 +262,10 @@ export class Literal extends SyntaxTreeNode {
 
   getNumLiterals(): number {
     return 1
+  }
+
+  toDisjunctionTerms(): DisjunctionTerms {
+    return [[this.copy()]]
   }
 }
 
@@ -614,6 +625,22 @@ export class Operator extends SyntaxTreeNode {
   public getNumLiterals(): number {
     return this.leftOperand.getNumLiterals() + this.rightOperand.getNumLiterals()
   }
+
+  toDisjunctionTerms(): DisjunctionTerms {
+    if (!this.isCNF()) {
+      throw new Error("Expression has to be CNF to compute the disjunction terms.")
+    }
+    if (this.type === "\\and") {
+      return [...this.leftOperand.toDisjunctionTerms(), ...this.rightOperand.toDisjunctionTerms()]
+    } else {
+      return [
+        [
+          ...this.leftOperand.toDisjunctionTerms().flat(),
+          ...this.rightOperand.toDisjunctionTerms().flat(),
+        ],
+      ]
+    }
+  }
 }
 
 export type SyntaxTreeNodeType = Operator | Literal
@@ -916,6 +943,91 @@ export function compareExpressions(expressions: SyntaxTreeNodeType[]): boolean {
       }
     }
   }
-
   return true
+}
+
+/**
+ * Checks if no two expressions in a list are equivalent.
+ * @param expressions
+ */
+export function arePairwiseInequivalent(expressions: SyntaxTreeNodeType[]): boolean {
+  for (let i = 0; i < expressions.length; i++) {
+    for (let j = i + 1; j < expressions.length; j++) {
+      if (compareExpressions([expressions[i], expressions[j]])) return false
+    }
+  }
+  return true
+}
+
+export function getMdTruthTable(
+  formulas: (
+    | SyntaxTreeNodeType
+    | {
+        formula: SyntaxTreeNodeType
+        shortName?: string
+        input?: boolean
+      }
+  )[],
+): { mdTable: string; inputFieldIds: string[] } {
+  const variables: string[] = []
+  formulas.forEach((f) => {
+    const formula = "formula" in f ? f.formula : f
+    variables.push(...formula.getVariableNames())
+  })
+
+  const uniqueVars = [...new Set(variables)].sort()
+
+  // generate table header
+  const inputFieldIds: string[] = []
+  const header: string[] = []
+  const rows: string[][] = []
+  const vLines: number[] = [uniqueVars.length - 1]
+
+  uniqueVars.forEach((v) => {
+    header.push(`$${v}$`)
+  })
+
+  formulas.forEach((f) => {
+    let colName: string
+    if ("formula" in f) {
+      if ("shortName" in f && f.shortName) colName = f.shortName
+      else colName = `$${f.formula.toString(true)}$`
+    } else {
+      colName = `$${f.toString(true)}$`
+    }
+
+    header.push(`${colName}`)
+  })
+
+  // generate table rows
+  const numRows = 1 << uniqueVars.length
+  for (let rowId = 0; rowId < numRows; rowId++) {
+    const row: string[] = []
+
+    const varValues = numToVariableValues(rowId, uniqueVars)
+    uniqueVars.forEach((v) => {
+      row.push(`$${varValues[v] ? 1 : 0}$`)
+    })
+
+    formulas.forEach((f, colId) => {
+      let val: boolean
+      if ("formula" in f) {
+        if ("input" in f && f.input) {
+          const fieldId = `ti-${rowId}-${colId}`
+          inputFieldIds.push(fieldId)
+          row.push(mdInputField(fieldId, "TTABLE"))
+          return // works like continue in forEach()
+        }
+        val = f.formula.eval(varValues)
+      } else {
+        val = f.eval(varValues)
+      }
+
+      row.push(`$${val ? 1 : 0}$`)
+    })
+
+    rows.push(row)
+  }
+
+  return { mdTable: mdTableFromData(rows, "center", header, [], vLines), inputFieldIds }
 }

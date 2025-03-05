@@ -49,13 +49,7 @@ export const HeapNeighbours: QuestionGenerator = {
   description: tFunctional(translationsHeapNeighbours, "description"),
   tags: ["heap", "priority-queue"],
   languages: ["en", "de"],
-  expectedParameters: [
-    {
-      type: "string",
-      name: "variant",
-      allowedValues: ["neighbour"],
-    },
-  ],
+  expectedParameters: [],
 
   generate: (lang = "en", parameters, seed) => {
     const permaLink = serializeGeneratorCall({
