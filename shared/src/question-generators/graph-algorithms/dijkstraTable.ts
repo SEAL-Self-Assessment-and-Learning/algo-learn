@@ -148,17 +148,15 @@ function getDijkstraInputTable(
       }
 
       const nodeFields = nodes
-        .map((node) => `{{step${stepIndex}_${node}_d#TL#}} | {{step${stepIndex}_${node}_p#TL#}}`)
+        .map((node) => `{{step${stepIndex}_${node}_d#OS-2#}} | {{step${stepIndex}_${node}_p#OS-2#}}`)
         .join(" | ")
 
-      return `| $\\cup$ | $\\{$ | {{${setField}#TL#}} | $\\}$ | ${nodeFields} |`
+      return `| $\\cup$ | $\\{$ | {{${setField}#OS-2#}} | $\\}$ | ${nodeFields} |`
     })
     .filter(Boolean) // ensure no undefined rows
     .join("\n")
 
-  const additionalStyling = "|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |\n"
-
-  return `${headerRow}${subHeaderRow}${rows}${additionalStyling}`
+  return `${headerRow}${subHeaderRow}${rows}`
 }
 
 function getCheckFormatFunction(lang: Language, graph: Graph): MultiFreeTextFormatFunction {
