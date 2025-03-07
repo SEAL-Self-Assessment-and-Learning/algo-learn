@@ -188,16 +188,18 @@
   userGaveCorrectAnswer: boolean,
   hidden: boolean,
 )}
-  <Tooltip.Root>
-    <Tooltip.Trigger>
-      {@render FeedbackIcon(isCorrectAnswer, hidden)}
-    </Tooltip.Trigger>
-    <Tooltip.Content>
-      {isCorrectAnswer ? t("answer.correct") : t("answer.wrong")}
-      <br />
-      {userGaveCorrectAnswer ? t("choice.correct") : t("choice.wrong")}
-    </Tooltip.Content>
-  </Tooltip.Root>
+  <Tooltip.Provider>
+    <Tooltip.Root>
+      <Tooltip.Trigger>
+        {@render FeedbackIcon(isCorrectAnswer, hidden)}
+      </Tooltip.Trigger>
+      <Tooltip.Content>
+        {isCorrectAnswer ? t("answer.correct") : t("answer.wrong")}
+        <br />
+        {userGaveCorrectAnswer ? t("choice.correct") : t("choice.wrong")}
+      </Tooltip.Content>
+    </Tooltip.Root>
+  </Tooltip.Provider>
 {/snippet}
 
 {#snippet FeedbackIcon(correct: boolean, hidden: boolean)}
