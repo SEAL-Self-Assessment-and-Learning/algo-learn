@@ -130,6 +130,7 @@
     {regenerate}
     footerMode={questionState.mode}
     footerMessage={messages}
+    {lang}
     handleFooterClick={handleClick}
   >
     <Markdown md={question.text ?? ""} />
