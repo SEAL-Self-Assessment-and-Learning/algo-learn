@@ -1,17 +1,20 @@
 <script lang="ts">
+  import ExerciseMultipleChoice from "$lib/components/ExerciseMultipleChoice.svelte"
   import type { Result } from "$lib/components/types.ts"
+  import type { Language } from "@shared/api/Language.ts"
   import type { Question } from "@shared/api/QuestionGenerator.ts"
 
   interface Props {
     question: Question
     onResult?: (result: Result) => void
     regenerate?: () => void
+    lang: Language
   }
-  const { question }: Props = $props()
+  const { question, onResult, regenerate, lang }: Props = $props()
 </script>
 
 {#if question.type === "MultipleChoiceQuestion"}
-  {question.text}
+  <ExerciseMultipleChoice {question} permalink={question.path} {onResult} {regenerate} {lang} />
 {:else if question.type === "FreeTextQuestion"}
   {question.text}
 {:else if question.type === "MultiFreeTextQuestion"}

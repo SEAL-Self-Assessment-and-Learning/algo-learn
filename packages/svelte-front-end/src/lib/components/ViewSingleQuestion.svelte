@@ -29,5 +29,5 @@
   <Loading {lang} />
 {:else}
   <!-- Todo: Missing useFormat() -->
-  <QuestionComponent question={$questionQuery.data.question} {onResult} />
+  <QuestionComponent question={$questionQuery.data.question} {onResult} {lang} />
 {/if}
