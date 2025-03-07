@@ -26,7 +26,7 @@
   />
   <div class="w-full">
     {#if selectedGroup}
-      <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-4">
         {#each collection as e}
           {#if e.slug === selectedGroup}
             {#each e.contents as x}
