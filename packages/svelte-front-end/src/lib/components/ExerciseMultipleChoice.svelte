@@ -22,8 +22,7 @@
 
   const { question, permalink, onResult, regenerate, lang }: Props = $props()
   const { t } = $derived(tFunction([globalTranslations], lang))
-
-  let questionState: {
+  const questionState: {
     mode: MODE
     choice: Array<number>
     feedbackObject?: MultipleChoiceFeedback
@@ -79,7 +78,9 @@
         )
       }
     } else if (questionState.mode === "correct" || questionState.mode === "incorrect") {
-      if (onResult) onResult(questionState.mode)
+      if (onResult) {
+        onResult(questionState.mode)
+      }
     }
   }
 
@@ -122,7 +123,7 @@
     {lang}
     handleFooterClick={handleClick}
   >
-    <Markdown md={question.text ?? ""} />
+    {question.path}<Markdown md={question.text ?? ""} />
     <div class="flex flex-col flex-wrap gap-4 p-4">
       {#each question.answers as answer, index}
         <div class="flex items-center space-x-2">
@@ -151,7 +152,17 @@
   </InteractWithQuestion>
 {:else}
   <!-- Todo: Sorting Questions -->
-  Not implemented
+  <InteractWithQuestion
+    {permalink}
+    name={question.name}
+    {regenerate}
+    footerMode={questionState.mode}
+    footerMessage={messageList}
+    {lang}
+    handleFooterClick={handleClick}
+  >
+    <Markdown md={question.text ?? ""} />
+  </InteractWithQuestion>
 {/if}
 
 {#snippet messageList()}
@@ -159,19 +170,22 @@
     {#if messageListIncludes.correct}
       {@render correct()}
     {:else if questionState.feedbackObject?.correctChoice}
-      {@render correctSolution()}
+      {#if !question.sorting}
+        {@render correctSolution()}
+      {:else}
+        {@render correctSolutionSort()}
+      {/if}
     {:else}
       {@render incorrect()}
     {/if}
     {#if messageListIncludes.feedback}
-      <br />
       {@render feedbackText()}
     {/if}
   </div>
 {/snippet}
 
 {#snippet correct()}
-  <b class="text-2xl">Correct!</b>
+  <b class="text-2xl">{t("feedback.correct")}</b>
 {/snippet}
 
 {#snippet incorrect()}
@@ -185,6 +199,17 @@
 
 {#snippet feedbackText()}
   <Markdown md={questionState.feedbackObject?.feedbackText ?? ""} />
+{/snippet}
+
+{#snippet correctSolutionSort()}
+  <b class="text-xl">{t("feedback.correct-order")}:</b>
+  &nbsp;
+  <Markdown
+    md={t("feedback.correct-order", [
+      `${questionState.feedbackObject?.correctChoice?.map((i) => "\n|" + question.answers[i] + "|").join("")}\n`,
+    ])}
+  />
+  <br />
 {/snippet}
 
 {#snippet FeedbackIconAndTooltip(

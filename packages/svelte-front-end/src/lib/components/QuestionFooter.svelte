@@ -24,7 +24,6 @@
   const textColor: string = $derived(
     mode === "correct" ? "text-green-900" : mode === "incorrect" ? "text-red-900" : "",
   )
-  console.log(message)
 </script>
 
 <div class={backgroundColor}>
@@ -34,7 +33,6 @@
     <div class="flex place-items-center self-center text-left {textColor}">
       {#if mode === "correct" || mode === "incorrect"}
         {@render icon()}
-        <br />
         {@render message?.()}
       {/if}
     </div>

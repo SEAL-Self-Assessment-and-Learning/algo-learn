@@ -116,7 +116,7 @@
 
   const generator = gen.generator
 
-  const generatorCalls: {
+  let generatorCalls: {
     generator: QuestionGenerator
     parameters: Parameters
   }[] = []
@@ -140,14 +140,18 @@
     numIncorrect: 0,
     aborted: false,
   })
+
   const random = new Random(`${sessionSeed}${questionState.numCorrect + questionState.numIncorrect}`)
-  const currSeed = random.base36string(7)
 
-  const currObj = generatorCalls.pop()
-  if (!currObj) throw new Error("Generator and params have to be defined.")
+  random.shuffle(generatorCalls)
 
+  let currSeed = $state(random.base36string(7))
+  const currObj = $derived(generatorCalls[questionState.numCorrect + questionState.numIncorrect])
   let status: "running" | "finished" | "aborted" = $state("running")
-  status = questionState.aborted ? "aborted" : generatorCalls.length === -1 ? "finished" : "running"
+
+  function updateStatus() {
+    status = questionState.aborted ? "aborted" : generatorCalls.length === (questionState.numCorrect + questionState.numIncorrect) ? "finished" : "running"
+  }
 
   const msgList =
     questionState.numIncorrect == 0
@@ -160,10 +164,12 @@
   const handleResult = (result: Result) => {
     if (result === "correct") {
       questionState.numCorrect += 1
+      updateStatus()
     } else if (result === "incorrect") {
-      questionState.numCorrect -= 1
+      questionState.numIncorrect += 1
+      updateStatus()
     } else if (result === "abort" || result === "timeout") {
-      questionState.aborted = false
+      questionState.aborted = true
     }
   }
 </script>

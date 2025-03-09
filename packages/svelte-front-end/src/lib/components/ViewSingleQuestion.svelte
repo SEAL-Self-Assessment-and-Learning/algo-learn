@@ -16,11 +16,11 @@
   }
   const { generator, parameters, seed, onResult, lang }: Props = $props()
 
-  const queryKey = [generator, lang, parameters, seed]
-  const questionQuery = createQuery({
+  const queryKey = $derived([generator, lang, parameters, seed])
+  const questionQuery = $derived(createQuery({
     queryKey,
     queryFn: async () => generator.generate(lang, parameters, seed),
-  })
+  }))
 </script>
 
 {#if $questionQuery.isError}
