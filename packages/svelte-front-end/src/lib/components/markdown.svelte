@@ -1,4 +1,5 @@
 <script lang="ts">
+  import TeX from "$lib/components/TeX.svelte"
   import type { Snippet } from "svelte"
   import { parseMarkdown, type ParseTree, type ParseTreeNode } from "@shared/utils/parseMarkdown"
 
@@ -47,8 +48,7 @@
     <!-- TODO -->
     <pre class="block">{x}</pre>
   {:else if x.kind === "$$" || x.kind === "$"}
-    <!-- TODO -->
-    {x.kind}{x}{x.kind}
+    <TeX expr={x.child} displayMode={x.kind === "$$"} />
   {:else if x.kind === "**"}
     <strong>{@render tree(x.child, props)}</strong>
   {:else if x.kind === "*"}

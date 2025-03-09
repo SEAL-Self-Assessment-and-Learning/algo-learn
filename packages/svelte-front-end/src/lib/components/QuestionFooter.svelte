@@ -39,7 +39,7 @@
     <Button
       variant={mode === "incorrect" ? "wrongAnswer" : mode === "correct" ? "rightAnswer" : "default"}
       onclick={buttonClick}
-      class="self-end sm:self-center"
+      class="cursor-pointer self-end sm:self-center"
       disabled={mode === "invalid" || mode === "submitted"}
     >
       {@render footerButtonText()}

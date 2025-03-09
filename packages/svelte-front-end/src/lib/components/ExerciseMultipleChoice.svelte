@@ -123,7 +123,7 @@
     {lang}
     handleFooterClick={handleClick}
   >
-    {question.path}<Markdown md={question.text ?? ""} />
+    <Markdown md={question.text ?? ""} />
     <div class="flex flex-col flex-wrap gap-4 p-4">
       {#each question.answers as answer, index}
         <div class="flex items-center space-x-2">

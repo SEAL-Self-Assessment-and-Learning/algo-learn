@@ -150,7 +150,11 @@
   let status: "running" | "finished" | "aborted" = $state("running")
 
   function updateStatus() {
-    status = questionState.aborted ? "aborted" : generatorCalls.length === (questionState.numCorrect + questionState.numIncorrect) ? "finished" : "running"
+    status = questionState.aborted
+      ? "aborted"
+      : generatorCalls.length === questionState.numCorrect + questionState.numIncorrect
+        ? "finished"
+        : "running"
   }
 
   const msgList =
