@@ -18,9 +18,7 @@
 
 <div class="flex h-screen flex-col">
   <Header {...data} />
-  <div class="prose dark:prose-invert mx-auto block w-full max-w-3xl p-3 pt-12">
-    <QueryClientProvider client={queryClient}>
-      {@render children()}
-    </QueryClientProvider>
-  </div>
+  <QueryClientProvider client={queryClient}>
+    {@render children()}
+  </QueryClientProvider>
 </div>

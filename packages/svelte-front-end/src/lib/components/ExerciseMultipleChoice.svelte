@@ -8,7 +8,6 @@
   import { globalTranslations } from "$lib/translation.ts"
   import { Tooltip } from "bits-ui"
   import { CheckCheck, XCircle } from "lucide-svelte"
-  import type { Snippet } from "svelte"
   import type { Language } from "@shared/api/Language.ts"
   import type { MultipleChoiceFeedback, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator.ts"
   import { tFunction } from "@shared/utils/translations.ts"
@@ -32,7 +31,7 @@
     mode: question.sorting ? "draft" : "invalid",
     choice: question.sorting ? [...Array(question.answers.length).keys()] : [],
   })
-  const disabled: boolean = $state(
+  const disabled: boolean = $derived(
     questionState.mode === "correct" || questionState.mode === "incorrect",
   )
 
@@ -41,9 +40,9 @@
    *
    * @param newChoice The new choice array
    */
-  function setChoice(newChoice: Array<number>): void {
-    questionState.choice = newChoice
-  }
+  // function setChoice(newChoice: Array<number>): void {
+  //   questionState.choice = newChoice
+  // }
 
   /**
    * SetChoiceEntry sets the choice for a single entry.
@@ -107,20 +106,10 @@
   //     }
   //   },
   // })
-
-  const messages: Array<Snippet> = []
-  if (!question.sorting) {
-    if (questionState.mode === "correct") {
-      // Todo: Check if this is an error or WebStorm just sucks???
-      messages.push(correct())
-    } else if (questionState.mode === "incorrect") {
-      messages.push(questionState.feedbackObject?.correctChoice ? correctSolution() : incorrect())
-    }
-    if (questionState.feedbackObject?.feedbackText)
-      messages.push(feedbackText(questionState.feedbackObject.feedbackText))
-  } else {
-    // Todo: Missing sorting
-  }
+  const messageListIncludes: { correct: boolean; feedback: boolean } = $state({
+    correct: questionState.mode === "correct",
+    feedback: questionState.feedbackObject?.feedbackText !== "",
+  })
 </script>
 
 {#if !question.sorting}
@@ -129,7 +118,7 @@
     name={question.name}
     {regenerate}
     footerMode={questionState.mode}
-    footerMessage={messages}
+    footerMessage={messageList}
     {lang}
     handleFooterClick={handleClick}
   >
@@ -165,6 +154,22 @@
   Not implemented
 {/if}
 
+{#snippet messageList()}
+  <div class="flex-col">
+    {#if messageListIncludes.correct}
+      {@render correct()}
+    {:else if questionState.feedbackObject?.correctChoice}
+      {@render correctSolution()}
+    {:else}
+      {@render incorrect()}
+    {/if}
+    {#if messageListIncludes.feedback}
+      <br />
+      {@render feedbackText()}
+    {/if}
+  </div>
+{/snippet}
+
 {#snippet correct()}
   <b class="text-2xl">Correct!</b>
 {/snippet}
@@ -174,14 +179,12 @@
 {/snippet}
 
 {#snippet correctSolution()}
-  <b class="text-xl">{t("correct.solution")}:</b>
-  <br />
-  {t("see.above")}
+  <b class="text-xl">{t("correct.solution")}:</b>&nbsp;{t("see.above")}
   <br />
 {/snippet}
 
-{#snippet feedbackText(text: string)}
-  <Markdown md={text} />
+{#snippet feedbackText()}
+  <Markdown md={questionState.feedbackObject?.feedbackText ?? ""} />
 {/snippet}
 
 {#snippet FeedbackIconAndTooltip(
@@ -207,6 +210,6 @@
   {#if correct}
     <CheckCheck class={"h-4 w-4 text-green-700" + (hidden ? " invisible" : "")} />
   {:else}
-    <XCircle class={"h-4 w-4 text-green-700" + (hidden ? " invisible" : "")} />
+    <XCircle class={"h-4 w-4 text-red-700" + (hidden ? " invisible" : "")} />
   {/if}
 {/snippet}

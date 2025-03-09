@@ -1,4 +1,5 @@
 <script lang="ts">
+  import QuestionFooter from "$lib/components/QuestionFooter.svelte"
   import QuestionsHeader from "$lib/components/QuestionsHeader.svelte"
   import type { MODE } from "$lib/components/types.ts"
   import type { Snippet } from "svelte"
@@ -10,7 +11,7 @@
     name: string
     regenerate?: () => void
     footerMode: MODE
-    footerMessage: Snippet[]
+    footerMessage: Snippet<[]>
     handleFooterClick: () => void
     lang: Language
     children: Snippet
@@ -32,4 +33,4 @@
   <QuestionsHeader {permalink} title={name} {regenerate} {lang} />
   <div>{@render children?.()}</div>
 </CenteredDivs>
-Some footer
+<QuestionFooter mode={footerMode} message={footerMessage} buttonClick={handleFooterClick} {lang} />
