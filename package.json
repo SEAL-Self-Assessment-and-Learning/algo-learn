@@ -10,8 +10,8 @@
   "license": "MIT",
   "author": "Holger Dell (https://holgerdell.com)",
   "scripts": {
-    "dev": "cd front-end; $npm_execpath run dev",
-    "build": "cd front-end; $npm_execpath run build",
+    "dev": "cd packages/svelte-front-end; $npm_execpath run dev",
+    "build": "cd packages/svelte-front-end; $npm_execpath run build",
     "preview": "cd front-end; $npm_execpath run preview",
     "build:json-schema": "$npm_execpath run ts-json-schema-generator --path 'src/**/QuestionGenerator.ts' --tsconfig ./tsconfig.ts-json-schema-generator.json --type 'Question'",
     "test": "$npm_execpath run lint && $npm_execpath run test:unit",
