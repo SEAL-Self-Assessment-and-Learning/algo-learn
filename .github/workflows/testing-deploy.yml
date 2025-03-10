@@ -35,6 +35,7 @@ jobs:
           bun-version: latest
 
       - name: Bun install 🔧
+        working-directory: ${{ github.ref == 'refs/heads/feat-svelte' && 'packages/svelte-front-end' || '.' }}
         run: bun install --frozen-lockfile
 
       # See https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables for a definition of GITHUB_REF.
@@ -49,6 +50,7 @@ jobs:
           sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" front-end/src/config.ts
 
       - name: Build 🔧
+        working-directory: ${{ github.ref == 'refs/heads/feat-svelte' && 'packages/svelte-front-end' || '.' }}
         run: bun run build --mode staging --base /algo-learn-testing/$CLEAN_REF/
 
       - name: Deploy to server 🚀
