@@ -145,7 +145,7 @@
 
   random.shuffle(generatorCalls)
 
-  let currSeed = $state(random.base36string(7))
+  const currSeed = $state(random.base36string(7))
   const currObj = $derived(generatorCalls[questionState.numCorrect + questionState.numIncorrect])
   let status: "running" | "finished" | "aborted" = $state("running")
 

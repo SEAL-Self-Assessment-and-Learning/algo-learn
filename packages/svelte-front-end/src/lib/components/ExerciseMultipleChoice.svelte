@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SortableList, { type Item } from "$lib/components/DnD/SortableList.svelte"
   import InteractWithQuestion from "$lib/components/InteractWithQuestion.svelte"
   import Markdown from "$lib/components/markdown.svelte"
   import type { MODE, Result } from "$lib/components/types.ts"
@@ -39,9 +40,9 @@
    *
    * @param newChoice The new choice array
    */
-  // function setChoice(newChoice: Array<number>): void {
-  //   questionState.choice = newChoice
-  // }
+  function setChoice(newChoice: Array<number>): void {
+    questionState.choice = newChoice
+  }
 
   /**
    * SetChoiceEntry sets the choice for a single entry.
@@ -111,6 +112,17 @@
     correct: questionState.mode === "correct",
     feedback: questionState.feedbackObject?.feedbackText !== "",
   })
+
+  const initItems: Item[] = $derived(
+    questionState.choice.map((position) => {
+      return {
+        id: "u" + position,
+        position,
+        content: question.answers[position],
+      }
+    }),
+  )
+  const onChange = (newItems: Array<Item>) => setChoice(newItems.map((item) => item.position))
 </script>
 
 {#if !question.sorting}
@@ -162,6 +174,7 @@
     handleFooterClick={handleClick}
   >
     <Markdown md={question.text ?? ""} />
+    <SortableList {initItems} {onChange} {disabled} />
   </InteractWithQuestion>
 {/if}
 
