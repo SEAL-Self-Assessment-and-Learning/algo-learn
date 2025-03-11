@@ -12,14 +12,14 @@
   "scripts": {
     "dev": "cd packages/svelte-front-end; $npm_execpath run dev",
     "build": "cd packages/svelte-front-end; $npm_execpath run build",
-    "preview": "cd front-end; $npm_execpath run preview",
+    "preview": "cd packages/svelte-front-end; $npm_execpath run preview",
     "build:json-schema": "$npm_execpath run ts-json-schema-generator --path 'src/**/QuestionGenerator.ts' --tsconfig ./tsconfig.ts-json-schema-generator.json --type 'Question'",
     "test": "$npm_execpath run lint && $npm_execpath run test:unit",
     "test:unit": "which bun && bun test --bail || vitest run --bail 1",
     "lint": "eslint && tsc && prettier . --check && cd packages/svelte-front-end && $npm_execpath run lint",
     "lint-fix": "eslint --fix && cd packages/svelte-front-end && $npm_execpath run eslint --fix",
     "format": "prettier . --write && cd packages/svelte-front-end && $npm_execpath run format",
-    "clean": "rm -rf dist/ .yarn/cache/ node_modules/ *front-end/node_modules/ settings/node_modules/ shared/node_modules/ docs/ vite-bundle-visualizer.html",
+    "clean": "rm -rf dist/ .yarn/cache/ node_modules/ *front-end/node_modules/ settings/node_modules/ shared/node_modules/ packages/svelte-front-end/node_modules/ docs/ vite-bundle-visualizer.html",
     "visualize": "$npm_execpath run vite-bundle-visualizer -o vite-bundle-visualizer.html",
     "docs": "$npm_execpath run typedoc --out docs shared/src/**/*.ts shared/src/**/*.tsx"
   },

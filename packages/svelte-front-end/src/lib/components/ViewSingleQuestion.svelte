@@ -30,8 +30,6 @@
 {:else if $questionQuery.isLoading || !$questionQuery.isSuccess}
   <Loading {lang} />
 {:else}
-  {console.log("test")}
-  {console.log("Question data:", $questionQuery.data)}
   <!-- Todo: Missing useFormat() -->
   <QuestionComponent question={$questionQuery.data.question} {onResult} {lang} />
 {/if}

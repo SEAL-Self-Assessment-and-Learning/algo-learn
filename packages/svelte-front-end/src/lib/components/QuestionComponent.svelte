@@ -1,5 +1,6 @@
 <script lang="ts">
   import ExerciseMultipleChoice from "$lib/components/ExerciseMultipleChoice.svelte"
+  import ExerciseTextInput from "$lib/components/ExerciseTextInput.svelte"
   import type { Result } from "$lib/components/types.ts"
   import type { Language } from "@shared/api/Language.ts"
   import type { Question } from "@shared/api/QuestionGenerator.ts"
@@ -16,7 +17,7 @@
 {#if question.type === "MultipleChoiceQuestion"}
   <ExerciseMultipleChoice {question} permalink={question.path} {onResult} {regenerate} {lang} />
 {:else if question.type === "FreeTextQuestion"}
-  {question.text}
+  <ExerciseTextInput {question} permalink={question.path} {onResult} {regenerate} {lang} />
 {:else if question.type === "MultiFreeTextQuestion"}
   {question.text}
 {:else}

@@ -7,7 +7,7 @@
   }
   const { expr, displayMode }: Props = $props()
 
-  const r = katex.renderToString(expr, { displayMode })
+  const r = $derived(katex.renderToString(expr, { displayMode }))
 </script>
 
 <span>
