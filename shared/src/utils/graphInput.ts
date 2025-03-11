@@ -42,6 +42,7 @@ const parseFdTranslations: Translations = {
   },
 }
 
+// Quick comment test
 export function updateGraphNodeSelected(
   graph: Graph,
   nodeStates: GraphElementStateType[],
