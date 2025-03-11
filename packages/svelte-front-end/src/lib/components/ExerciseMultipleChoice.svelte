@@ -86,28 +86,28 @@
   }
 
   // Todo: Add some equivalent svelte
-  // useGlobalDOMEvents({
-  //   keydown(e: Event) {
-  //     if (!(e instanceof KeyboardEvent)) return
-  //     if (e.ctrlKey || e.metaKey || e.altKey) return
-  //     if (e.key === "Enter") {
-  //       e.preventDefault()
-  //       handleClick()
-  //       return
-  //     }
-  //     if (state.mode === "correct" || state.mode === "incorrect") return
-  //
-  //     if (!question.sorting) {
-  //       const num = parseInt(e.key)
-  //       if (!Number.isNaN(num) && num >= 1 && num <= question.answers.length) {
-  //         e.preventDefault()
-  //         const id = num - 1 // answers[num - 1].key
-  //         setChoiceEntry(id, !state.choice.includes(id))
-  //         return
-  //       }
-  //     }
-  //   },
-  // })
+
+  function onKeyDown(e: Event) {
+    if (!(e instanceof KeyboardEvent)) return
+    if (e.ctrlKey || e.metaKey || e.altKey) return
+    if (e.key === "Enter") {
+      e.preventDefault()
+      handleClick()
+      return
+    }
+    if (questionState.mode === "correct" || questionState.mode === "incorrect") return
+
+    if (!question.sorting) {
+      const num = parseInt(e.key)
+      if (!Number.isNaN(num) && num >= 1 && num <= question.answers.length) {
+        e.preventDefault()
+        const id = num - 1 // answers[num - 1].key
+        setChoiceEntry(id, !questionState.choice.includes(id))
+        return
+      }
+    }
+  }
+
   const messageListIncludes: { correct: boolean; feedback: boolean } = $state({
     correct: questionState.mode === "correct",
     feedback: questionState.feedbackObject?.feedbackText !== "",
@@ -236,9 +236,11 @@
         {@render FeedbackIcon(isCorrectAnswer, hidden)}
       </Tooltip.Trigger>
       <Tooltip.Content>
-        {isCorrectAnswer ? t("answer.correct") : t("answer.wrong")}
-        <br />
-        {userGaveCorrectAnswer ? t("choice.correct") : t("choice.wrong")}
+        {#if questionState.mode === "correct" || questionState.mode === "incorrect"}
+          {isCorrectAnswer ? t("answer.correct") : t("answer.wrong")}
+          <br />
+          {userGaveCorrectAnswer ? t("choice.correct") : t("choice.wrong")}
+        {/if}
       </Tooltip.Content>
     </Tooltip.Root>
   </Tooltip.Provider>
@@ -251,3 +253,5 @@
     <XCircle class={"h-4 w-4 text-red-700" + (hidden ? " invisible" : "")} />
   {/if}
 {/snippet}
+
+<svelte:window on:keydown={onKeyDown} />

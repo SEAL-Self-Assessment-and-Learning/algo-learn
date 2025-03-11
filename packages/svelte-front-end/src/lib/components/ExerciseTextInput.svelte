@@ -101,18 +101,16 @@
     }
   }
 
-  // useGlobalDOMEvents({
-  //   keydown(e: Event) {
-  //     if (!(e instanceof KeyboardEvent)) {
-  //       return
-  //     }
-  //     const key = e.key
-  //     if (key === "Enter") {
-  //       e.preventDefault()
-  //       handleClick()
-  //     }
-  //   },
-  // })
+  function onKeyDown(e: Event) {
+    if (!(e instanceof KeyboardEvent)) {
+      return
+    }
+    const key = e.key
+    if (key === "Enter") {
+      e.preventDefault()
+      handleClick()
+    }
+  }
 
   const msgColor = $derived(
     questionState.mode === "draft"
@@ -201,3 +199,5 @@
   <br />
   <Markdown md={questionState.feedbackObject?.correctAnswer ?? ""} />
 {/snippet}
+
+<svelte:window on:keydown={onKeyDown} />

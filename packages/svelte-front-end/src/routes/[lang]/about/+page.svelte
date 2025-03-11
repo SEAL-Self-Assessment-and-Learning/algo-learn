@@ -29,9 +29,9 @@
   <p>
     <Markdown md={t("About.development.text")} />
   </p>
-  <h2>{t("About.sourceCode.label")}</h2>
+  <h2>{t("About.opensource.label")}</h2>
   <p>
-    <Markdown md={t("About.sourceCode.text")}>
+    <Markdown md={t("About.opensource.text")}>
       {#snippet child0()}<React />{/snippet}
       {#snippet child1()}<Github />{/snippet}
     </Markdown>
