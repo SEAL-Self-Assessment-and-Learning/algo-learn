@@ -1,5 +1,6 @@
 <script lang="ts">
   import TeX from "$lib/components/TeX.svelte"
+  import FormInputField from "$lib/components/ui/MultiInput/FormInputField.svelte"
   import type { Snippet } from "svelte"
   import { parseMarkdown, type ParseTree, type ParseTreeNode } from "@shared/utils/parseMarkdown"
 
@@ -63,6 +64,8 @@
         <li>{@render node(c.text, props)}</li>
       {/each}
     </ul>
+  {:else if x.kind === "input"}
+    <FormInputField id={x.child.split("#")[0]} />
   {:else}
     TODO: Rendering of Markdown nodes <pre>{x.kind}</pre>
     is not yet implemented.
