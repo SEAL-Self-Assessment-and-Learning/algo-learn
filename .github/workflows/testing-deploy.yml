@@ -34,8 +34,10 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Bun install 🔧
-        run: bun install --frozen-lockfile
+      - name: Navigate to subfolder and install dependencies 🔧
+        run: |
+          packages/svelte-front-end
+          bun install --frozen-lockfile
 
       # See https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables for a definition of GITHUB_REF.
       # The GITHUB_REF is in the form of refs/heads/<branch_name> or refs/pull/<pull_request_number>/merge. We replace the slashes with underscores.
