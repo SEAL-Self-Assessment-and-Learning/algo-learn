@@ -36,7 +36,7 @@ jobs:
 
       - name: Navigate to subfolder and install dependencies 🔧
         run: |
-          packages/svelte-front-end
+          cd packages/svelte-front-end
           bun install --frozen-lockfile
 
       # See https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables for a definition of GITHUB_REF.
