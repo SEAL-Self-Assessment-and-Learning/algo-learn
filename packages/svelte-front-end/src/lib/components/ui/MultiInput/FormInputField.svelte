@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Markdown from "$lib/components/markdown.svelte"
+  import Markdown from "$lib/components/markdown/markdown.svelte"
   import type { TextFieldState } from "$lib/components/types.ts"
   import { inputClass } from "$lib/components/ui/input/cnInput.js"
   import FeedbackComp from "$lib/components/ui/MultiInput/FeedbackComp.svelte"

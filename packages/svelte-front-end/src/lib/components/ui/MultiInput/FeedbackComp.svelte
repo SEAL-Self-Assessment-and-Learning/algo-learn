@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Markdown from "$lib/components/markdown.svelte"
+  import Markdown from "$lib/components/markdown/markdown.svelte"
 
   interface Props {
     formatFeedback: string

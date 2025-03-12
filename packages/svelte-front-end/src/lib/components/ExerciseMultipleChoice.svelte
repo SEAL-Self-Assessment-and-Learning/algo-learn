@@ -1,7 +1,7 @@
 <script lang="ts">
   import SortableList, { type Item } from "$lib/components/DnD/SortableList.svelte"
   import InteractWithQuestion from "$lib/components/InteractWithQuestion.svelte"
-  import Markdown from "$lib/components/markdown.svelte"
+  import Markdown from "$lib/components/markdown/markdown.svelte"
   import type { MODE, Result } from "$lib/components/types.ts"
   import { Checkbox } from "$lib/components/ui/checkbox"
   import { Label } from "$lib/components/ui/label"

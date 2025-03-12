@@ -1,10 +1,10 @@
 <script lang="ts">
+  import Markdown from "$lib/components/markdown/markdown.svelte"
   import Duolingo from "@icons-pack/svelte-simple-icons/icons/SiDuolingo"
   import Github from "@icons-pack/svelte-simple-icons/icons/SiGithub"
   import React from "@icons-pack/svelte-simple-icons/icons/SiReact"
   import { tFunction } from "@shared/utils/translations"
   import CenteredDivs from "@/lib/components/centeredDivs.svelte"
-  import Markdown from "@/lib/components/markdown.svelte"
   import { globalTranslations } from "@/lib/translation"
   import type { PageData } from "./$types"
 

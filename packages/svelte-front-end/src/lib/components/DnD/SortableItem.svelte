@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Markdown from "$lib/components/markdown.svelte"
+  import Markdown from "$lib/components/markdown/markdown.svelte"
   import { GripVertical } from "lucide-svelte"
   import type { UniqueIdentifier } from "@dnd-kit-svelte/core"
   import { useSortable } from "@dnd-kit-svelte/sortable"

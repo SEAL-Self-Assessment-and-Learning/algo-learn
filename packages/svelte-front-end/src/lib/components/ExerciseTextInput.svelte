@@ -1,6 +1,6 @@
 <script lang="ts">
   import InteractWithQuestion from "$lib/components/InteractWithQuestion.svelte"
-  import Markdown from "$lib/components/markdown.svelte"
+  import Markdown from "$lib/components/markdown/markdown.svelte"
   import type { MODE, Result } from "$lib/components/types.ts"
   import { Button } from "$lib/components/ui/button"
   import { inputClass } from "$lib/components/ui/input/cnInput.ts"

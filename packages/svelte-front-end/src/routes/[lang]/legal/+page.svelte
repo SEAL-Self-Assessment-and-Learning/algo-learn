@@ -1,6 +1,6 @@
 <script lang="ts">
+  import Markdown from "$lib/components/markdown/markdown.svelte"
   import { tFunction } from "@shared/utils/translations"
-  import Markdown from "@/lib/components/markdown.svelte"
   import { globalTranslations } from "@/lib/translation"
   import type { PageData } from "./$types"
 

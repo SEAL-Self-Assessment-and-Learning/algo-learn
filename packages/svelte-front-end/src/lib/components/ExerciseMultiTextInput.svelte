@@ -1,6 +1,6 @@
 <script lang="ts">
   import InteractWithQuestion from "$lib/components/InteractWithQuestion.svelte"
-  import Markdown from "$lib/components/markdown.svelte"
+  import Markdown from "$lib/components/markdown/markdown.svelte"
   import type { MODE, Result, TextFieldState } from "$lib/components/types.ts"
   import { playSound } from "$lib/sound.svelte.ts"
   import { globalTranslations } from "$lib/translation.ts"
