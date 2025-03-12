@@ -1,11 +1,12 @@
 <script lang="ts">
   import Markdown from "$lib/components/markdown/markdown.svelte"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
+  import type { Language } from "@shared/api/Language.ts"
   import { tFunction } from "@shared/utils/translations"
   import { globalTranslations } from "@/lib/translation"
-  import type { PageData } from "./$types"
 
-  const props: { data: PageData } = $props()
-  const { t } = $derived(tFunction(globalTranslations, props.data.lang))
+  const lang: Language = $derived(getLanguage())
+  const { t } = $derived(tFunction(globalTranslations, lang))
 </script>
 
 <h1>{t("Legal.label")}</h1>

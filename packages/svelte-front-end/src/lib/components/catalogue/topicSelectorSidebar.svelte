@@ -1,6 +1,7 @@
 <script lang="ts">
   import * as Card from "$lib/components/ui/card/index.js"
   import { cn } from "$lib/utils.js"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { HTMLAttributes } from "svelte/elements"
   import { collection } from "@settings/questionsSelection"
   import type { Language } from "@shared/api/Language"
@@ -23,12 +24,11 @@
     setSelectedGroup: (s: string) => void
     showAllVariants: boolean
     setShowAllVariants: (b: boolean) => void
-    lang: Language
   }
 
-  const { selectedGroup, setSelectedGroup, showAllVariants, setShowAllVariants, lang, ...rest }: Props =
+  const { selectedGroup, setSelectedGroup, showAllVariants, setShowAllVariants, ...rest }: Props =
     $props()
-
+  const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction(globalTranslations, lang))
 </script>
 

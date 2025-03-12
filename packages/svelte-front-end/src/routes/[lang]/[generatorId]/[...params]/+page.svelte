@@ -3,6 +3,7 @@
   import { Button } from "$lib/components/ui/button"
   import ViewSingleQuestion from "$lib/components/ViewSingleQuestion.svelte"
   import { globalTranslations } from "$lib/translation.ts"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { collection } from "@react-front-end/listOfQuestions.ts"
   import {
     allParameterCombinations,
@@ -105,11 +106,11 @@
   const generatorId = data.generatorId
   const parametersPath = data.params
   const sessionSeed = sampleRandomSeed()
-  const { t } = $derived(tFunction([globalTranslations], data.lang))
+  const { t } = $derived(tFunction([globalTranslations], getLanguage()))
 
   const gen = deserializePath({
     collection,
-    path: `${data.lang}/${generatorId}/${parametersPath}`,
+    path: `${getLanguage()}/${generatorId}/${parametersPath}`,
     expectLang: true,
   })
   if (!gen) throw new Error("Parsing the url went wrong!")
@@ -163,7 +164,7 @@
       : questionState.numCorrect / (questionState.numCorrect + questionState.numIncorrect) >= 0.75
         ? good
         : meh
-  const msg = random.choice(msgList[data.lang])
+  const msg = random.choice(msgList[getLanguage()])
 
   const handleResult = (result: Result) => {
     if (result === "correct") {
@@ -183,7 +184,7 @@
   <CenteredDivs variant="screen">
     {t("quiz-session-aborted")}
     <Button variant="rightAnswer">
-      <a href={`/${data.lang}`}>
+      <a href={`/${getLanguage()}`}>
         {t("Continue")}
       </a>
     </Button>
@@ -195,7 +196,6 @@
     parameters={currObj.parameters}
     seed={currSeed}
     onResult={handleResult}
-    lang={data.lang}
   />
 {:else}
   <!-- Todo: Improve this design -->
@@ -203,7 +203,7 @@
     <div class="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
       <div class="font-serif italic">{msg}</div>
       <Button variant="rightAnswer" class="mt-12 ml-auto block max-w-max">
-        <a href={`/${data.lang}`}>
+        <a href={`/${getLanguage()}`}>
           {t("Continue")}
         </a>
       </Button>

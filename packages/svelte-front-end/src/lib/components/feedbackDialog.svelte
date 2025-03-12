@@ -1,16 +1,17 @@
 <script lang="ts">
   import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js"
   import * as Card from "$lib/components/ui/card/index.js"
+  import { globalTranslations } from "$lib/translation.ts"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import Mail from "lucide-svelte/icons/mail"
   import MessageSquareText from "lucide-svelte/icons/message-square-text"
   import Github from "@icons-pack/svelte-simple-icons/icons/SiGithub"
-  import type { TFunctionParameters, TKey } from "@shared/utils/translations"
+  import type { Language } from "@shared/api/Language.ts"
+  import { tFunction } from "@shared/utils/translations"
   import { Button } from "./ui/button"
 
-  interface Props {
-    t: (key: TKey, parameters?: TFunctionParameters) => string
-  }
-  const { t }: Props = $props()
+  const lang: Language = $derived(getLanguage())
+  const { t } = $derived(tFunction(globalTranslations, lang))
   let alertOpen = $state(false)
 
   const openMail = () => {

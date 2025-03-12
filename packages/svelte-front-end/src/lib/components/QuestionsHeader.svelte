@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Button } from "$lib/components/ui/button"
   import { globalTranslations } from "$lib/translation.ts"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { Tooltip } from "bits-ui"
   import { Link, RefreshCwIcon } from "lucide-svelte"
   // import { prefixURL } from "@react-front-end/config.ts"
@@ -11,10 +12,10 @@
     title?: string
     regenerate?: () => void
     permalink?: string
-    lang: Language
   }
 
-  const { title, regenerate, permalink, lang }: Props = $props()
+  const { title, regenerate, permalink }: Props = $props()
+  const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
   let recentlyCopied: boolean = $state(false)
   function setRecentlyCopied(newValue: boolean) {

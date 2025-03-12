@@ -7,6 +7,7 @@
   import { playSound } from "$lib/sound.svelte.ts"
   import { globalTranslations } from "$lib/translation.ts"
   import { isMobileOrTablet } from "$lib/utils/deviceInformation.ts"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { onMount } from "svelte"
   import type { Language } from "@shared/api/Language.ts"
   import type { FreeTextFeedback, FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
@@ -17,9 +18,9 @@
     permalink?: string
     onResult?: (result: Result) => void
     regenerate?: () => void
-    lang: Language
   }
-  const { question, permalink, onResult, regenerate, lang }: Props = $props()
+  const { question, permalink, onResult, regenerate }: Props = $props()
+  const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
 
   let questionState: {

@@ -4,6 +4,7 @@
   import type { MODE, Result, TextFieldState } from "$lib/components/types.ts"
   import { playSound } from "$lib/sound.svelte.ts"
   import { globalTranslations } from "$lib/translation.ts"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { getInputFields } from "$lib/utils/MultiTextInput.ts"
   import { setContext } from "svelte"
   import { isMobileOrTablet } from "@react-front-end/utils/deviceInformation.ts"
@@ -16,9 +17,9 @@
     permalink?: string
     onResult?: (result: Result) => void
     regenerate?: () => void
-    lang: Language
   }
-  const { question, permalink, onResult, regenerate, lang }: Props = $props()
+  const { question, permalink, onResult, regenerate }: Props = $props()
+  const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
 
   const questionState: {

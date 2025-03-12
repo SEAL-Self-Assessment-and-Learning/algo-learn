@@ -1,5 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils.js"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { HTMLAttributes } from "svelte/elements"
   import { collection } from "@settings/questionsSelection"
   import type { Language } from "@shared/api/Language"
@@ -13,7 +14,8 @@
   interface Props extends HTMLAttributes<HTMLDivElement> {
     lang: Language
   }
-  const { lang, ...rest }: Props = $props()
+  const { ...rest }: Props = $props()
+  const lang: Language = $derived(getLanguage())
 </script>
 
 <CenteredDivs variant="horizontal">
@@ -26,7 +28,6 @@
       setSelectedGroup={(g) => (selectedGroup = g)}
       {showAllVariants}
       setShowAllVariants={(s) => (showAllVariants = s)}
-      {lang}
       class="mx-auto sm:mx-0"
     />
     <div class="w-full">

@@ -29,7 +29,6 @@
   } = $derived(textFieldStateValues()[id])
 
   let firstInputRef: HTMLInputElement | null = $state(null)
-  // Todo: Check if a changing parameter is needed in tsx it's [id]
   $effect(() => {
     if (firstInputRef && focus) {
       firstInputRef.focus({ preventScroll: true })

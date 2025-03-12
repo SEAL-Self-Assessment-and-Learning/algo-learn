@@ -1,15 +1,16 @@
 <script lang="ts">
   import Markdown from "$lib/components/markdown/markdown.svelte"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import Duolingo from "@icons-pack/svelte-simple-icons/icons/SiDuolingo"
   import Github from "@icons-pack/svelte-simple-icons/icons/SiGithub"
   import React from "@icons-pack/svelte-simple-icons/icons/SiReact"
+  import type { Language } from "@shared/api/Language.ts"
   import { tFunction } from "@shared/utils/translations"
   import CenteredDivs from "@/lib/components/centeredDivs.svelte"
   import { globalTranslations } from "@/lib/translation"
-  import type { PageData } from "./$types"
 
-  const props: { data: PageData } = $props()
-  const { t } = $derived(tFunction(globalTranslations, props.data.lang))
+  const lang: Language = $derived(getLanguage())
+  const { t } = $derived(tFunction(globalTranslations, lang))
 </script>
 
 <CenteredDivs variant="horizontal">

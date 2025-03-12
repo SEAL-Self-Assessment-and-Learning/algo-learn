@@ -1,5 +1,4 @@
-import { goto } from "$app/navigation"
-import type { Language } from "@shared/api/Language"
+import { setLanguage } from "$lib/utils/langState.svelte.ts"
 import { redirect } from "@sveltejs/kit"
 import { pathnameInLanguage, resolveLang } from "@/lib/translation"
 import type { LayoutLoad } from "./$types"
@@ -21,8 +20,6 @@ export const load: LayoutLoad = ({ params, url }) => {
   if (lang !== resolvedLang) {
     redirect(307, pathnameInLanguage(resolvedLang, pathname))
   }
-  const setLang = (lang: Language) => {
-    goto(pathnameInLanguage(resolveLang(lang), pathname))
-  }
-  return { lang, setLang, url }
+  setLanguage(lang)
+  return { url }
 }

@@ -1,14 +1,11 @@
 <script lang="ts">
   import { globalTranslations } from "$lib/translation.ts"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { Language } from "@shared/api/Language.ts"
   import { tFunction } from "@shared/utils/translations.ts"
   import CenteredDivs from "./centeredDivs.svelte"
 
-  interface Props {
-    lang: Language
-  }
-
-  const { lang }: Props = $props()
+  const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
 </script>
 

@@ -2,6 +2,7 @@
   import type { MODE } from "$lib/components/types.ts"
   import { Button } from "$lib/components/ui/button"
   import { globalTranslations } from "$lib/translation.ts"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { CheckCheck, CircleX } from "lucide-svelte"
   import ChevronRight from "lucide-svelte/icons/chevron-right"
   import type { Snippet } from "svelte"
@@ -12,10 +13,10 @@
     mode?: MODE
     message?: Snippet<[]>
     buttonClick: () => void
-    lang: Language
   }
 
-  const { mode, message, buttonClick, lang }: Props = $props()
+  const { mode, message, buttonClick }: Props = $props()
+  const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
 
   const backgroundColor: string = $derived(

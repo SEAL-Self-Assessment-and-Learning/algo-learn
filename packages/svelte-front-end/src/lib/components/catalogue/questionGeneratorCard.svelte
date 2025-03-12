@@ -1,5 +1,6 @@
 <script lang="ts">
   import * as Card from "$lib/components/ui/card/index.js"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { HTMLAttributes } from "svelte/elements"
   import type { Language } from "@shared/api/Language"
   import { allParameterCombinations, serializeParameters } from "@shared/api/Parameters"
@@ -13,10 +14,10 @@
     generator: QuestionGenerator
     showAllVariants?: boolean
     showDescription?: boolean
-    lang: Language
   }
-  const { generator, showAllVariants = true, showDescription = true, lang, ...rest }: Props = $props()
+  const { generator, showAllVariants = true, showDescription = true, ...rest }: Props = $props()
 
+  const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction(globalTranslations, lang))
 </script>
 

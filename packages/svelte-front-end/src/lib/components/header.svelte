@@ -1,5 +1,6 @@
 <script lang="ts">
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js"
+  import { getLanguage, setLanguage } from "$lib/utils/langState.svelte.ts"
   import FileKey2 from "lucide-svelte/icons/file-key-2"
   import GitCommitHorizontal from "lucide-svelte/icons/git-commit-horizontal"
   import Home from "lucide-svelte/icons/home"
@@ -16,13 +17,11 @@
   import FeedbackDialog from "./feedbackDialog.svelte"
   import Button from "./ui/button/button.svelte"
 
-  interface Props {
-    lang: Language
-    setLang: (lang: Language) => void
-  }
-
-  const { lang, setLang }: Props = $props()
+  const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
+  function setLang(s: string) {
+    setLanguage(s as Language)
+  }
 </script>
 
 <header
@@ -31,7 +30,7 @@
   <div class="grow">
     {@render logo()}
   </div>
-  <FeedbackDialog {t} />
+  <FeedbackDialog />
   {@render settingsMenu()}
   {@render navigationMenu()}
 </header>
@@ -59,7 +58,7 @@
     </DropdownMenu.Trigger>
     <DropdownMenu.Content class="w-56">
       <DropdownMenu.Label>{t("menu.language")}</DropdownMenu.Label>
-      <DropdownMenu.RadioGroup value={lang} onValueChange={(s) => setLang(s as Language)}>
+      <DropdownMenu.RadioGroup value={lang} onValueChange={(s) => setLang(s)}>
         {#each SUPPORTED_LANGUAGES as lng}
           <DropdownMenu.RadioItem value={lng} closeOnSelect={false}>
             {NATIVE_NAME[lng]}
