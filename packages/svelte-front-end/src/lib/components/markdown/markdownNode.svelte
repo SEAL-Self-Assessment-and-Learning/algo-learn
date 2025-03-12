@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DrawTable from "$lib/components/DrawTable.svelte"
+  import DrawTable from "$lib/components/table/DrawTable.svelte"
   import TeX from "$lib/components/TeX.svelte"
   import FormInputField from "$lib/components/ui/MultiInput/FormInputField.svelte"
   import type { Snippet } from "svelte"
