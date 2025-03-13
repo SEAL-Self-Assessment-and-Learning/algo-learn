@@ -45,7 +45,7 @@ jobs:
         run: echo "CLEAN_REF=$(echo "$GITHUB_REF" | sed -e 's/\//_/g')" >> $GITHUB_ENV
         shell: bash
 
-      - name: Write basename and version number to packages/svelte-front-end/src/config.ts
+      - name: Write basename and version number to packages/svelte-front-end/src/lib/config.ts
         run: |
           sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$CLEAN_REF\"/g" packages/svelte-front-end/src/lib/config.ts
           sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" packages/svelte-front-end/src/lib/config.ts

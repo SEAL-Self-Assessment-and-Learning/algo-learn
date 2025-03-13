@@ -1,6 +1,8 @@
 import adapter from "@sveltejs/adapter-static"
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte"
 
+const CLEAN_REF = process.env.CLEAN_REF || ""
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   // Consult https://svelte.dev/docs/kit/integrations
@@ -9,7 +11,23 @@ const config = {
 
   kit: {
     prerender: {
-      entries: ["*", "/en/about", "/en/legal", "/de/about", "/de/legal"],
+      entries: [
+        "*",
+        "/en/about",
+        "/en/legal",
+        "/de/about",
+        "/de/legal",
+        "/en/pls",
+        "/de/pls",
+        "/en/demomc",
+        "/de/demomc",
+        "/en/demosi",
+        "/de/demosi",
+        "/en/demomi",
+        "/de/demomi",
+        "/en/demo-t",
+        "/de/demo-t",
+      ],
     },
     // adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
     // If your environment is not supported, or you settled on a specific environment, switch out the adapter.
@@ -18,6 +36,9 @@ const config = {
       pages: "build",
       fallback: "200.html",
     }),
+    paths: {
+      base: CLEAN_REF ? `/algo-learn-testing/${CLEAN_REF}` : "",
+    },
     alias: {
       "@/*": "./src/*",
       "@react-front-end/*": "../../front-end/src/*",
