@@ -16,7 +16,7 @@ const config = {
     // See https://svelte.dev/docs/kit/adapters for more information about adapters.
     adapter: adapter({
       pages: "build",
-      fallback: "200.html"
+      fallback: "200.html",
     }),
     alias: {
       "@/*": "./src/*",

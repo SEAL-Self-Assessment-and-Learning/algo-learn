@@ -1,9 +1,11 @@
 <script lang="ts">
+  import DrawPeuseoCode from "$lib/components/PseudoCode/DrawPseudoCode.svelte"
   import DrawTable from "$lib/components/table/DrawTable.svelte"
   import TeX from "$lib/components/TeX.svelte"
   import FormInputField from "$lib/components/ui/MultiInput/FormInputField.svelte"
   import type { Snippet } from "svelte"
   import type { ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
+  import Markdown from "./markdown.svelte"
   import MarkdownNode from "./markdownNode.svelte"
   import MarkdownTree from "./markdownTree.svelte"
 
@@ -40,10 +42,15 @@
     {/if}
   {/each}
 {:else if x.kind === "`"}
-  <span class="rounded-sm bg-gray-200 px-2 py-1 font-mono dark:bg-gray-700">{x}</span>
+  <span class="rounded-sm bg-gray-200 px-2 py-1 font-mono dark:bg-gray-700">
+    <Markdown md={x.child} />
+  </span>
 {:else if x.kind === "```"}
-  <!-- TODO -->
-  <pre class="block">{x}</pre>
+  {#if x.language === "pseudoCode"}
+    <DrawPeuseoCode displayCode={x.child} />
+  {:else}
+    <pre class="block">{x}</pre>
+  {/if}
 {:else if x.kind === "$$" || x.kind === "$"}
   <TeX expr={x.child} displayMode={x.kind === "$$"} />
 {:else if x.kind === "**"}
