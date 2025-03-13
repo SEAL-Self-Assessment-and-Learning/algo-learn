@@ -1,15 +1,15 @@
 import adapter from "@sveltejs/adapter-static"
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte"
 
-const CLEAN_REF = process.env.CLEAN_REF || ""
-
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   // Consult https://svelte.dev/docs/kit/integrations
   // for more information about preprocessors
   preprocess: vitePreprocess(),
-
   kit: {
+    path: {
+      base: "algo-learn-testing/refs_heads_feat-tableScroll/",
+    },
     prerender: {
       entries: [
         "*",
@@ -36,11 +36,6 @@ const config = {
       pages: "build",
       fallback: "200.html",
     }),
-    paths: {
-      base: CLEAN_REF
-        ? `/algo-learn-testing/${CLEAN_REF}`
-        : "tcs.uni-frankfurt.de/algo-learn-testing/refs_heads_feat-svelte/",
-    },
     alias: {
       "@/*": "./src/*",
       "@react-front-end/*": "../../front-end/src/*",
