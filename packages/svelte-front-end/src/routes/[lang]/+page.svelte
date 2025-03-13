@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import Catalogue from "@/lib/components/catalogue/catalogue.svelte"
 
-  const { data } = $props()
+  const lang = $derived(getLanguage())
 </script>
 
-<Catalogue lang={data.lang} />
+<Catalogue {lang} />
