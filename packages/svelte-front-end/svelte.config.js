@@ -17,16 +17,16 @@ const config = {
         "/en/legal",
         "/de/about",
         "/de/legal",
-        "/en/pls",
-        "/de/pls",
-        "/en/demomc",
-        "/de/demomc",
-        "/en/demosi",
-        "/de/demosi",
-        "/en/demomi",
-        "/de/demomi",
-        "/en/demo-t",
-        "/de/demo-t",
+        // "/en/pls",
+        // "/de/pls",
+        // "/en/demomc",
+        // "/de/demomc",
+        // "/en/demosi",
+        // "/de/demosi",
+        // "/en/demomi",
+        // "/de/demomi",
+        // "/en/demo-t",
+        // "/de/demo-t",
       ],
     },
     // adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
@@ -37,7 +37,9 @@ const config = {
       fallback: "200.html",
     }),
     paths: {
-      base: CLEAN_REF ? `/algo-learn-testing/${CLEAN_REF}` : "",
+      base: CLEAN_REF
+        ? `/algo-learn-testing/${CLEAN_REF}`
+        : "tcs.uni-frankfurt.de/algo-learn-testing/refs_heads_feat-svelte/",
     },
     alias: {
       "@/*": "./src/*",
