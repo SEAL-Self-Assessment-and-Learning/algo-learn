@@ -7,9 +7,6 @@ const config = {
   // for more information about preprocessors
   preprocess: vitePreprocess(),
   kit: {
-    path: {
-      base: "algo-learn-testing/refs_heads_feat-tableScroll/",
-    },
     prerender: {
       entries: [
         "*",
@@ -36,6 +33,9 @@ const config = {
       pages: "build",
       fallback: "200.html",
     }),
+    base: {
+      path: "algo-learn-testing/refs_heads_feat-tableScroll/",
+    },
     alias: {
       "@/*": "./src/*",
       "@react-front-end/*": "../../front-end/src/*",
