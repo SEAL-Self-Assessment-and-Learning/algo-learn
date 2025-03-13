@@ -33,8 +33,8 @@ const config = {
       pages: "build",
       fallback: "200.html",
     }),
-    base: {
-      path: "algo-learn-testing/refs_heads_feat-tableScroll/",
+    paths: {
+      base: "algo-learn-testing/refs_heads_feat-tableScroll/",
     },
     alias: {
       "@/*": "./src/*",
