@@ -34,7 +34,7 @@ const config = {
       fallback: "200.html",
     }),
     paths: {
-      base: "algo-learn-testing/refs_heads_feat-tableScroll/",
+      base: "/algo-learn-testing/refs_heads_feat-svelte",
     },
     alias: {
       "@/*": "./src/*",
