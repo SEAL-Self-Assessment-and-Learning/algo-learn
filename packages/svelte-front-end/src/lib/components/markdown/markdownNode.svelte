@@ -66,7 +66,7 @@
     <MarkdownTree t={x.child} {children} />
   </blockquote>
 {:else if x.kind === "a"}
-  <a href={x.url}>
+  <a href={x.url} class="underline">
     <MarkdownTree t={x.child} {children} />
   </a>
 {:else if x.kind === "list"}
