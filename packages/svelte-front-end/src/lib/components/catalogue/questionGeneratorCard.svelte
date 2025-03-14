@@ -40,7 +40,7 @@
         {@const path = serializeGeneratorCall({ lang, generator, parameters })}
         {@const params = serializeParameters(parameters, generator.expectedParameters)}
         {#if params}
-          <a href={`/${path}`}> {params}</a>
+          <a href={`/algo-learn-testing/refs_heads_feat-svelte/${path}`}> {params}</a>
         {/if}
       {/each}
     {/if}

@@ -36,7 +36,11 @@
 </header>
 
 {#snippet logo()}
-  <Button href="/" variant="link" class="inline text-2xl text-inherit">
+  <Button
+    href="/algo-learn-testing/refs_heads_feat-svelte/"
+    variant="link"
+    class="inline text-2xl text-inherit"
+  >
     algo learn <span class="font-mono text-sm text-yellow-200">alpha</span>
   </Button>
 {/snippet}
@@ -111,7 +115,11 @@
       <DropdownMenu.Separator /><DropdownMenu.Group>
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a href={`/${lang}`} class="flex items-center" {...props}>
+            <a
+              href={`/algo-learn-testing/refs_heads_feat-svelte/${lang}`}
+              class="flex items-center"
+              {...props}
+            >
               <Home class="mr-2 h-4 w-4" />
               {t("Home")}
             </a>
@@ -119,7 +127,11 @@
         </DropdownMenu.Item>
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a href={`/${lang}/about`} class="flex items-center" {...props}>
+            <a
+              href={`/algo-learn-testing/refs_heads_feat-svelte/${lang}/about`}
+              class="flex items-center"
+              {...props}
+            >
               <Info class="mr-2 h-4 w-4" />
               {t("About.label")}
             </a>
@@ -127,7 +139,11 @@
         </DropdownMenu.Item>
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a href={`/${lang}/legal`} class="flex items-center" {...props}>
+            <a
+              href={`/algo-learn-testing/refs_heads_feat-svelte/${lang}/legal`}
+              class="flex items-center"
+              {...props}
+            >
               <FileKey2 class="mr-2 h-4 w-4" />
               {t("Legal.label")}
             </a>
