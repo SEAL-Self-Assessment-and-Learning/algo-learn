@@ -77,27 +77,25 @@
   <div class="pl-2 text-4xl font-extrabold">
     {t("About.label")}
   </div>
-  {@render dsep()}
+  {@render sep()}
   <div class="mb-4 px-2 leading-relaxed dark:text-gray-200">
     {t("About.text")}
   </div>
 {/snippet}
 
 {#snippet activeLearning()}
-  <div class="-mb-2 pt-3 pl-2 text-2xl font-bold">
+  <div class="pt-3 pb-1 pl-2 text-2xl font-bold">
     {t("About.activeLearning.label")}
   </div>
-  {@render sep()}
   <div class="mb-4 px-2 leading-relaxed dark:text-gray-200">
     {t("About.activeLearning.text")}
   </div>
 {/snippet}
 
 {#snippet inspiration()}
-  <div class="-mb-2 pt-3 pl-2 text-2xl font-bold">
+  <div class="pt-3 pb-1 pl-2 text-2xl font-bold">
     {t("About.inspiration.label")}
   </div>
-  {@render sep()}
   <p class="mb-4 px-2 leading-relaxed dark:text-gray-200">
     <Markdown md={t("About.inspiration.text")}>
       {#snippet child0()}<div class="inline-block pl-1 align-middle"><Duolingo /></div>{/snippet}
@@ -109,17 +107,16 @@
   <div class="pt-8 pl-2 text-4xl font-extrabold">
     {t("About.development.label")}
   </div>
-  {@render dsep()}
+  {@render sep()}
   <div class="mb-4 px-2 leading-relaxed dark:text-gray-200">
     <Markdown md={t("About.development.text")} />
   </div>
 {/snippet}
 
 {#snippet openSource()}
-  <div class="-mb-2 pt-3 pl-2 text-2xl font-bold">
+  <div class="pt-3 pb-1 pl-2 text-2xl font-bold">
     {t("About.opensource.label")}
   </div>
-  {@render sep()}
   <p class="mb-4 px-2 leading-relaxed dark:text-gray-200">
     <Markdown md={t("About.opensource.text")}>
       {#snippet child0()}<div class="inline-block pl-1 align-middle">
@@ -131,9 +128,8 @@
 {/snippet}
 
 {#snippet teamMembers()}
-  <div class="-mb-2 pt-3 pl-2 text-2xl font-bold">Team</div>
-  {@render sep()}
-  <div class="flex flex-wrap justify-center gap-6">
+  <div class="flex justify-center py-5 pl-2 text-2xl font-bold">Team</div>
+  <div class="flex flex-wrap justify-center gap-6 pb-3">
     {#each team as member}
       <div
         role="button"
@@ -158,7 +154,7 @@
 {/snippet}
 
 {#snippet contributors()}
-  <div class="-mb-2 flex flex-row gap-2 pt-5 pl-2 text-2xl font-bold">
+  <div class="flex flex-row justify-center gap-2 py-5 pl-2 text-2xl font-bold">
     <div
       role="button"
       tabindex="0"
@@ -171,7 +167,6 @@
     </div>
     Contributors
   </div>
-  {@render sep()}
   <div class="flex flex-wrap justify-center gap-6">
     {#each contris as contributor}
       <div

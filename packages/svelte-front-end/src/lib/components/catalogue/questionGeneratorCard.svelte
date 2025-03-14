@@ -31,7 +31,12 @@
     {/if}
   </Card.Header>
   <Card.Footer class="m-0 flex flex-wrap items-center gap-2 p-3">
-    <Button size="sm" href={`/${lang}/${generator.id}`} class="no-underline" variant="rightAnswer">
+    <Button
+      size="sm"
+      href={`/algo-learn-testing/refs_heads_feat-svelte/${lang}/${generator.id}`}
+      class="no-underline"
+      variant="rightAnswer"
+    >
       {t("Catalogue.practice")}
       ›
     </Button>
