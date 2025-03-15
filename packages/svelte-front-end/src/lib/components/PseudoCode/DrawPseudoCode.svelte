@@ -7,7 +7,7 @@
   import { cn } from "$lib/utils.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { Toggle, Tooltip } from "bits-ui"
-  import { Copy, ListOrdered, Palette } from "lucide-svelte"
+  import { Copy, ListOrdered, PaintBucket } from "lucide-svelte"
   import type { PseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
   import { tFunction } from "@shared/utils/translations.ts"
 
@@ -77,7 +77,7 @@
                 "hover:cursor-pointer",
               )}
             >
-              <ListOrdered />
+              <ListOrdered size={26} strokeWidth={1.5} absoluteStrokeWidth />
             </Toggle.Root>
           </Tooltip.Trigger>
           <Tooltip.Content>
@@ -100,7 +100,7 @@
                 "hover:cursor-pointer",
               )}
             >
-              <Palette />
+              <PaintBucket size={26} strokeWidth={1.5} absoluteStrokeWidth />
             </Toggle.Root>
           </Tooltip.Trigger>
           <Tooltip.Content>
@@ -123,7 +123,7 @@
               }}
               class="ring-offset-background hover:bg-muted hover:text-muted-foreground focus-visible:ring-ring data-[state=on]:bg-accent data-[state=on]:text-accent-foreground inline-flex h-8 items-center justify-center rounded-md px-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
             >
-              <Copy class="h-4 w-4" />
+              <Copy size={20} strokeWidth={1.5} absoluteStrokeWidth />
             </div>
           </Tooltip.Trigger>
           <Tooltip.Content>
