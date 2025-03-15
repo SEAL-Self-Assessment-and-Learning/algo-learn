@@ -1,4 +1,4 @@
-import base from "$app/environment"
+import { base } from "$app/paths"
 import { redirect } from "@sveltejs/kit"
 import { DEFAULT_LANGUAGE } from "@/lib/translation"
 import type { PageLoad } from "./$types"
