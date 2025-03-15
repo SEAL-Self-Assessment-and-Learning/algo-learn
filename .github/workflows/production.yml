@@ -39,7 +39,7 @@ jobs:
       - name: Bun install 🔧
         run: bun install --frozen-lockfile
 
-      - name: Write basename and version number to front-end/src/config.ts
+      - name: Write basename and version number to front-end/src/config.js
         run: |
           sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn\"/g" front-end/src/config.ts
           sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short $GITHUB_SHA)\"/g" front-end/src/config.ts

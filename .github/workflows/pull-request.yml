@@ -56,7 +56,7 @@ jobs:
         run: echo "CLEAN_REF=pull_request_${{github.event.pull_request.number}}" >> $GITHUB_ENV
         shell: bash
 
-      - name: Write basename and version number to front-end/src/config.ts
+      - name: Write basename and version number to front-end/src/config.js
         run: |
           sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$CLEAN_REF\"/g" front-end/src/config.ts
           sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" front-end/src/config.ts
