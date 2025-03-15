@@ -11,7 +11,7 @@
   import WifiOff from "lucide-svelte/icons/wifi-off"
   import type { Language } from "@shared/api/Language"
   import { tFunction } from "@shared/utils/translations"
-  import { VERSION } from "../config"
+  import { VERSION } from "../config.js"
   import { getMuted, setMuted } from "../sound.svelte"
   import { availableThemes, getTheme, setTheme } from "../theme.svelte"
   import { globalTranslations, NATIVE_NAME, SUPPORTED_LANGUAGES } from "../translation"

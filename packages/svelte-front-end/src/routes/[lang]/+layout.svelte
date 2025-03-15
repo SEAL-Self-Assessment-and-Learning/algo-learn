@@ -5,7 +5,7 @@
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query"
   import Header from "@/lib/components/header.svelte"
 
-  let { children, data } = $props()
+  let { children } = $props()
 
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -17,7 +17,7 @@
 </script>
 
 <div class="flex h-screen flex-col">
-  <Header {...data} />
+  <Header />
   <QueryClientProvider client={queryClient}>
     {@render children()}
   </QueryClientProvider>
