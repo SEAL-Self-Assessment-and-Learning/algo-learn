@@ -16,6 +16,7 @@
   import { globalTranslations, NATIVE_NAME, SUPPORTED_LANGUAGES } from "../translation"
   import FeedbackDialog from "./feedbackDialog.svelte"
   import Button from "./ui/button/button.svelte"
+  import { base } from "$app/paths"
 
   const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
@@ -37,7 +38,7 @@
 
 {#snippet logo()}
   <Button
-    href="/algo-learn-testing/refs_heads_feat-svelte/"
+    href={`${base}/`}
     variant="link"
     class="inline text-2xl text-inherit"
   >
@@ -116,7 +117,7 @@
         <DropdownMenu.Item>
           {#snippet child({ props })}
             <a
-              href={`/algo-learn-testing/refs_heads_feat-svelte/${lang}`}
+              href={`${base}/${lang}`}
               class="flex items-center"
               {...props}
             >
@@ -128,7 +129,7 @@
         <DropdownMenu.Item>
           {#snippet child({ props })}
             <a
-              href={`/algo-learn-testing/refs_heads_feat-svelte/${lang}/about`}
+              href={`${base}/${lang}/about`}
               class="flex items-center"
               {...props}
             >
@@ -140,7 +141,7 @@
         <DropdownMenu.Item>
           {#snippet child({ props })}
             <a
-              href={`/algo-learn-testing/refs_heads_feat-svelte/${lang}/legal`}
+              href={`${base}/${lang}/legal`}
               class="flex items-center"
               {...props}
             >

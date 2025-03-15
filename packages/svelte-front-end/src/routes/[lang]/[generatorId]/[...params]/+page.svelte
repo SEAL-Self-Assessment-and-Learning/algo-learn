@@ -16,6 +16,7 @@
   import { tFunction } from "@shared/utils/translations.ts"
   import CenteredDivs from "@/lib/components/centeredDivs.svelte"
   import type { PageProps } from "./$types"
+  import { base } from "$app/paths"
 
   const great = {
     en: [
@@ -184,7 +185,7 @@
   <CenteredDivs variant="screen">
     {t("quiz-session-aborted")}
     <Button variant="rightAnswer">
-      <a href={`/${getLanguage()}`}>
+      <a href={`${base}/${getLanguage()}`}>
         {t("Continue")}
       </a>
     </Button>
@@ -203,7 +204,7 @@
     <div class="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
       <div class="font-serif italic">{msg}</div>
       <Button variant="rightAnswer" class="mt-12 ml-auto block max-w-max">
-        <a href={`/${getLanguage()}`}>
+        <a href={`${base}/${getLanguage()}`}>
           {t("Continue")}
         </a>
       </Button>

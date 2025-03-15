@@ -9,6 +9,7 @@
   import { tFunction } from "@shared/utils/translations"
   import { globalTranslations } from "../../translation"
   import Button from "../ui/button/button.svelte"
+  import { base } from "$app/paths"
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     generator: QuestionGenerator
@@ -33,7 +34,7 @@
   <Card.Footer class="m-0 flex flex-wrap items-center gap-2 p-3">
     <Button
       size="sm"
-      href={`/algo-learn-testing/refs_heads_feat-svelte/${lang}/${generator.id}`}
+      href={`${base}/${lang}/${generator.id}`}
       class="no-underline"
       variant="rightAnswer"
     >
@@ -45,7 +46,7 @@
         {@const path = serializeGeneratorCall({ lang, generator, parameters })}
         {@const params = serializeParameters(parameters, generator.expectedParameters)}
         {#if params}
-          <a href={`/algo-learn-testing/refs_heads_feat-svelte/${path}`}> {params}</a>
+          <a href={`${base}/${path}`}> {params}</a>
         {/if}
       {/each}
     {/if}
