@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from "$app/paths"
   import type { Result } from "$lib/components/types.ts"
   import { Button } from "$lib/components/ui/button"
   import ViewSingleQuestion from "$lib/components/ViewSingleQuestion.svelte"
@@ -16,7 +17,6 @@
   import { tFunction } from "@shared/utils/translations.ts"
   import CenteredDivs from "@/lib/components/centeredDivs.svelte"
   import type { PageProps } from "./$types"
-  import { base } from "$app/paths"
 
   const great = {
     en: [

@@ -3,8 +3,8 @@
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { Language } from "@shared/api/Language.ts"
   import { tFunction } from "@shared/utils/translations"
+  import CenteredDivs from "@/lib/components/centeredDivs.svelte"
   import { globalTranslations } from "@/lib/translation"
-  import CenteredDivs from "@/lib/components/centeredDivs.svelte";
 
   const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction(globalTranslations, lang))

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from "$app/paths"
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js"
   import { getLanguage, setLanguage } from "$lib/utils/langState.svelte.ts"
   import FileKey2 from "lucide-svelte/icons/file-key-2"
@@ -16,7 +17,6 @@
   import { globalTranslations, NATIVE_NAME, SUPPORTED_LANGUAGES } from "../translation"
   import FeedbackDialog from "./feedbackDialog.svelte"
   import Button from "./ui/button/button.svelte"
-  import { base } from "$app/paths"
 
   const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
@@ -37,11 +37,7 @@
 </header>
 
 {#snippet logo()}
-  <Button
-    href={`${base}/`}
-    variant="link"
-    class="inline text-2xl text-inherit"
-  >
+  <Button href={`${base}/`} variant="link" class="inline text-2xl text-inherit">
     algo learn <span class="font-mono text-sm text-yellow-200">alpha</span>
   </Button>
 {/snippet}
@@ -116,11 +112,7 @@
       <DropdownMenu.Separator /><DropdownMenu.Group>
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a
-              href={`${base}/${lang}`}
-              class="flex items-center"
-              {...props}
-            >
+            <a href={`${base}/${lang}`} class="flex items-center" {...props}>
               <Home class="mr-2 h-4 w-4" />
               {t("Home")}
             </a>
@@ -128,11 +120,7 @@
         </DropdownMenu.Item>
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a
-              href={`${base}/${lang}/about`}
-              class="flex items-center"
-              {...props}
-            >
+            <a href={`${base}/${lang}/about`} class="flex items-center" {...props}>
               <Info class="mr-2 h-4 w-4" />
               {t("About.label")}
             </a>
@@ -140,11 +128,7 @@
         </DropdownMenu.Item>
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a
-              href={`${base}/${lang}/legal`}
-              class="flex items-center"
-              {...props}
-            >
+            <a href={`${base}/${lang}/legal`} class="flex items-center" {...props}>
               <FileKey2 class="mr-2 h-4 w-4" />
               {t("Legal.label")}
             </a>

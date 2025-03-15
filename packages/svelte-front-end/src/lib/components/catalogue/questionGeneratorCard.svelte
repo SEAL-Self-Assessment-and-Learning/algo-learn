@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from "$app/paths"
   import * as Card from "$lib/components/ui/card/index.js"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { HTMLAttributes } from "svelte/elements"
@@ -9,7 +10,6 @@
   import { tFunction } from "@shared/utils/translations"
   import { globalTranslations } from "../../translation"
   import Button from "../ui/button/button.svelte"
-  import { base } from "$app/paths"
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     generator: QuestionGenerator

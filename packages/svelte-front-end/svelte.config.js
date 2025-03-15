@@ -1,5 +1,6 @@
 import adapter from "@sveltejs/adapter-static"
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte"
+import { BASENAME } from "./src/lib/config.ts"
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -34,7 +35,7 @@ const config = {
       fallback: "200.html",
     }),
     paths: {
-      base: "/algo-learn-testing/refs_heads_feat-svelte",
+      base: BASENAME,
     },
     alias: {
       "@/*": "./src/*",
