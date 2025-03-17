@@ -22,7 +22,7 @@
         class="[&_tr:first-child_>_th:first-child]:rounded-tl-sm [&_tr:first-child_>_th:last-child]:rounded-tr-sm"
       >
         <tr>
-          {#each headerRow as cell, j}
+          {#each headerRow as cell, j (j)}
             <TableCell
               rightBorder={vLines.includes(j)}
               alignment={alignment[j]}
@@ -41,9 +41,9 @@
           "[&>tr:nth-child(even)>td]:bg-muted [&>tr:nth-child(even)>td:first-child]:rounded-l-sm [&>tr:nth-child(even)>td:last-child]:rounded-r-sm",
       )}
     >
-      {#each bodyRows as row, i}
+      {#each bodyRows as row, i (i)}
         <tr>
-          {#each row as cell, j}
+          {#each row as cell, j (j)}
             <TableCell
               rightBorder={vLines.includes(j)}
               bottomBorder={hLines.includes(i + (headerRow ? 1 : 0))}

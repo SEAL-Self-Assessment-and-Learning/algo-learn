@@ -9,23 +9,7 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     prerender: {
-      entries: [
-        "*",
-        "/en/about",
-        "/en/legal",
-        "/de/about",
-        "/de/legal",
-        // "/en/pls",
-        // "/de/pls",
-        // "/en/demomc",
-        // "/de/demomc",
-        // "/en/demosi",
-        // "/de/demosi",
-        // "/en/demomi",
-        // "/de/demomi",
-        // "/en/demo-t",
-        // "/de/demo-t",
-      ],
+      entries: ["*", "/en/about", "/en/legal", "/de/about", "/de/legal"],
     },
     // adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
     // If your environment is not supported, or you settled on a specific environment, switch out the adapter.

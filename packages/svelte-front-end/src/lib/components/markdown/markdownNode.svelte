@@ -24,7 +24,7 @@
 </script>
 
 {#if typeof x === "string"}
-  {#each x.split(/(\{\{\d+\}\})/) as y}
+  {#each x.split(/(\{\{\d+\}\})/) as y (y)}
     {#if y === "{{0}}"}
       {@render children?.child0?.()}
     {:else if y === "{{1}}"}
@@ -71,7 +71,7 @@
   </a>
 {:else if x.kind === "list"}
   <ul>
-    {#each x.child as c}
+    {#each x.child as c (c)}
       <li>
         <MarkdownNode x={c.text} {children} />
       </li>

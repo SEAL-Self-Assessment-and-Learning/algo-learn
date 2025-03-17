@@ -42,7 +42,7 @@
       ›
     </Button>
     {#if showAllVariants}
-      {#each allParameterCombinations(generator.expectedParameters) as parameters}
+      {#each allParameterCombinations(generator.expectedParameters) as parameters (parameters)}
         {@const path = serializeGeneratorCall({ lang, generator, parameters })}
         {@const params = serializeParameters(parameters, generator.expectedParameters)}
         {#if params}

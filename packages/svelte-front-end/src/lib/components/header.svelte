@@ -12,8 +12,8 @@
   import type { Language } from "@shared/api/Language"
   import { tFunction } from "@shared/utils/translations"
   import { VERSION } from "../config.js"
-  import { getMuted, setMuted } from "../sound.svelte"
-  import { availableThemes, getTheme, setTheme } from "../theme.svelte"
+  import { getMuted, setMuted } from "../sound.svelte.js"
+  import { availableThemes, getTheme, setTheme } from "../theme.svelte.js"
   import { globalTranslations, NATIVE_NAME, SUPPORTED_LANGUAGES } from "../translation"
   import FeedbackDialog from "./feedbackDialog.svelte"
   import Button from "./ui/button/button.svelte"
@@ -60,7 +60,7 @@
     <DropdownMenu.Content class="w-56">
       <DropdownMenu.Label>{t("menu.language")}</DropdownMenu.Label>
       <DropdownMenu.RadioGroup value={lang} onValueChange={(s) => setLang(s)}>
-        {#each SUPPORTED_LANGUAGES as lng}
+        {#each SUPPORTED_LANGUAGES as lng (lng)}
           <DropdownMenu.RadioItem value={lng} closeOnSelect={false}>
             {NATIVE_NAME[lng]}
           </DropdownMenu.RadioItem>
@@ -82,7 +82,7 @@
       <DropdownMenu.Separator />
       <DropdownMenu.Label>{t("menu.theme")}</DropdownMenu.Label>
       <DropdownMenu.RadioGroup value={getTheme()} onValueChange={setTheme}>
-        {#each availableThemes as thm}
+        {#each availableThemes as thm (thm)}
           <DropdownMenu.RadioItem value={thm} closeOnSelect={false}>
             {t("theme." + thm)}
           </DropdownMenu.RadioItem>

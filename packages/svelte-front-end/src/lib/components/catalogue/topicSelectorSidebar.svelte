@@ -38,7 +38,7 @@
     <Card.Description>{t("Catalogue.choose.desc")}</Card.Description>
   </Card.Header>
   <Card.Content class="flex flex-col flex-wrap gap-1">
-    {#each collection as g}
+    {#each collection as g (g.slug)}
       <Button
         onclick={() => setSelectedGroup(g.slug)}
         variant={selectedGroup === g.slug ? "default" : "ghost"}

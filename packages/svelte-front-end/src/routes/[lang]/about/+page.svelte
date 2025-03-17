@@ -130,7 +130,7 @@
 {#snippet teamMembers()}
   <div class="flex justify-center py-5 pl-2 text-2xl font-bold">Team</div>
   <div class="flex flex-wrap justify-center gap-6 pb-3">
-    {#each team as member}
+    {#each team as member (member)}
       <div
         role="button"
         tabindex="0"
@@ -168,7 +168,7 @@
     Contributors
   </div>
   <div class="flex flex-wrap justify-center gap-6">
-    {#each contris as contributor}
+    {#each contris as contributor (contributor)}
       <div
         role="button"
         tabindex="0"

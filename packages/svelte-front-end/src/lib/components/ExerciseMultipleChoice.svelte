@@ -133,12 +133,11 @@
     {regenerate}
     footerMode={questionState.mode}
     footerMessage={messageList}
-    {lang}
     handleFooterClick={handleClick}
   >
     <Markdown md={question.text ?? ""} />
     <div class="flex flex-col flex-wrap gap-4 p-4">
-      {#each question.answers as answer, index}
+      {#each question.answers as answer, index (index)}
         <div class="flex items-center space-x-2">
           {@render FeedbackIconAndTooltip(
             true === questionState.feedbackObject?.correctChoice?.includes(index),

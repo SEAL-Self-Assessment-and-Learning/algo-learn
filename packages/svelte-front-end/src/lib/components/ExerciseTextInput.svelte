@@ -126,7 +126,6 @@
   {regenerate}
   footerMode={questionState.mode}
   footerMessage={messageList}
-  {lang}
   handleFooterClick={handleClick}
 >
   <Markdown md={question.text ?? ""} />
@@ -153,7 +152,7 @@
     <Markdown md={question.bottomText ?? ""} />
   </div>
   <div class="flex flex-wrap gap-2">
-    {#each question.typingAid ?? [] as el}
+    {#each question.typingAid ?? [] as el (el.label)}
       <Button
         variant="secondary"
         onclick={() => insertText(el.input)}

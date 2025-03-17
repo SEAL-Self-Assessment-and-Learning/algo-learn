@@ -33,9 +33,9 @@
     <div class="w-full">
       {#if selectedGroup}
         <div class="flex flex-col gap-4">
-          {#each collection as e}
+          {#each collection as e (e.slug)}
             {#if e.slug === selectedGroup}
-              {#each e.contents as x}
+              {#each e.contents as x (x.name)}
                 <QuestionGeneratorCard generator={x} {showAllVariants} class="w-full" {lang} />
               {/each}
             {/if}

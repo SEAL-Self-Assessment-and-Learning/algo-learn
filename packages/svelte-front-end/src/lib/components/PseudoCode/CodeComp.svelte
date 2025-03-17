@@ -10,7 +10,7 @@
   const { currentCode, toggleStateLines, numCodeLines }: Props = $props()
 </script>
 
-{#each currentCode as cd, index}
+{#each currentCode as cd, index (index)}
   <div>
     <span
       class={`text-right ${numCodeLines > 9 ? "min-w-8" : "min-w-6"} inline-block pr-1 ${toggleStateLines ? "text-gray-400 dark:text-gray-600" : "text-transparent"} no-select`}

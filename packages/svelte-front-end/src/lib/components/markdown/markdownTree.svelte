@@ -17,6 +17,6 @@
   const { t, children }: Props = $props()
 </script>
 
-{#each t as n}
+{#each t as n (n)}
   <MarkdownNode x={n} {children} />
 {/each}
