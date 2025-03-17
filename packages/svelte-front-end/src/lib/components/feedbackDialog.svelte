@@ -55,7 +55,7 @@
           <Card.Root class="w-full cursor-pointer" onclick={openGithubIssue}>
             <Card.Header>
               <Card.Title>
-                <div class="mr-2 inline-block w-6 align-top" ><Github /></div>
+                <div class="mr-2 inline-block w-6 align-top"><Github /></div>
                 {t("About.reportBug")}
               </Card.Title>
             </Card.Header>
