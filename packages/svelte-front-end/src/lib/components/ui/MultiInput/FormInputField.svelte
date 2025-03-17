@@ -127,7 +127,7 @@
 
 {#snippet promptSnippet()}
   {#if prompt}
-    <div class={`mr-2 whitespace-nowrap`}>
+    <div class="mr-2 whitespace-nowrap">
       <Markdown md={prompt} />
     </div>
   {/if}

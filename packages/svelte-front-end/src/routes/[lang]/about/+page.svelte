@@ -160,7 +160,7 @@
       tabindex="0"
       onclick={() => window.open(sealGitHub, "_blank")}
       onkeydown={(e) => (e.key === "Enter" || e.key === " ") && window.open(sealGitHub, "_blank")}
-      aria-label={`SEAL GitHub`}
+      aria-label="SEAL GitHub"
       class="mt-0.5"
     >
       <Github />
