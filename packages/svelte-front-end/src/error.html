@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Error Page</title>
+    <style>
+      .error-page {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        height: 85vh;
+        color: oklch(0.396 0.141 25.723);
+        text-align: center;
+      }
+
+      .error-container {
+        border-radius: 10px;
+        background-color: oklch(0.885 0.062 18.334);
+        padding: 20px;
+        max-width: 768px;
+      }
+
+      .error-message {
+        margin-bottom: 40px;
+        font-size: 1.5rem;
+      }
+
+      .button {
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background-color: oklch(0.396 0.141 25.723);
+        padding: 10px 20px;
+        color: white;
+        font-size: 1rem;
+      }
+
+      .button:hover {
+        background-color: oklch(0.35 0.126 25.898);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="error-page">
+      <div class="error-container">
+        <p class="error-message">%sveltekit.error.message%</p>
+        <button class="button" onclick="handleGoto()">Go to Start Page</button>
+      </div>
+    </div>
+
+    <script>
+      import { base } from "$app/paths"
+      import { DEFAULT_LANGUAGE } from "$lib/translation.js"
+
+      function handleGoto() {
+        window.location.href = `${base}/${DEFAULT_LANGUAGE}`
+      }
+    </script>
+  </body>
+</html>
