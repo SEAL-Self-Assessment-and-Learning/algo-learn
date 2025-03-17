@@ -55,7 +55,7 @@
           <Card.Root class="w-full cursor-pointer" onclick={openGithubIssue}>
             <Card.Header>
               <Card.Title>
-                <Github class="mr-2 inline w-6 align-top" />
+                <div class="mr-2 inline-block w-6 align-top"><Github /></div>
                 {t("About.reportBug")}
               </Card.Title>
             </Card.Header>
@@ -73,7 +73,7 @@
         {t("About.contactMail")}
       </AlertDialog.Action>
       <AlertDialog.Action class="flex items-center" onclick={openGithubIssue}>
-        <Github class="mr-2 w-2" />
+        <div class="mr-2 w-2"><Github /></div>
         {t("About.openIssue")}
       </AlertDialog.Action>
       <AlertDialog.Cancel class="m-1" onclick={() => (alertOpen = false)}>
