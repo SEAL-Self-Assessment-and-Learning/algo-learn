@@ -23,11 +23,15 @@
       queryFn: async () => generator.generate(lang, parameters, seed),
     }),
   )
+
+  $effect(() => {
+    if ($questionQuery.isError) {
+      throw new Error(`${$questionQuery.error}`)
+    }
+  })
 </script>
 
-{#if $questionQuery.isError}
-  {$questionQuery.error}
-{:else if $questionQuery.isLoading || !$questionQuery.isSuccess}
+{#if $questionQuery.isLoading || !$questionQuery.isSuccess}
   <Loading />
 {:else}
   <!-- Todo: Missing useFormat() -->

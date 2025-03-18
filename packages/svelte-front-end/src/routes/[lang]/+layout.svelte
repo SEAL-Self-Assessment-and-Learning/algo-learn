@@ -2,14 +2,11 @@
   import "../../app.css"
   import "katex/dist/katex.min.css"
   import { browser } from "$app/environment"
+  import ErrorPage from "$lib/components/ErrorPage.svelte"
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query"
   import Header from "@/lib/components/header.svelte"
 
   let { children } = $props()
-
-  function handleError() {
-    console.log("Testing ... ")
-  }
 
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -20,11 +17,15 @@
   })
 </script>
 
-<svelte:window onerror={handleError} />
+<svelte:boundary>
+  <div class="flex h-screen flex-col">
+    <Header />
+    <QueryClientProvider client={queryClient}>
+      {@render children()}
+    </QueryClientProvider>
+  </div>
 
-<div class="flex h-screen flex-col">
-  <Header />
-  <QueryClientProvider client={queryClient}>
-    {@render children()}
-  </QueryClientProvider>
-</div>
+  {#snippet failed(error: any, reset: () => void)}
+    <ErrorPage mg={error.message} {reset} />
+  {/snippet}
+</svelte:boundary>
