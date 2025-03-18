@@ -10,7 +10,7 @@
     content: string
   }
 
-  let { task, disabled }: { task: Item; disabled: boolean } = $props()
+  let { task, disabled }: { task: Item; disabled?: boolean } = $props()
 
   const { attributes, listeners, node, transform, transition, isDragging, isSorting } = useSortable({
     id: task.id,
