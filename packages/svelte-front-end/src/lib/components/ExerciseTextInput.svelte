@@ -23,6 +23,10 @@
   const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
 
+  function handleError() {
+    console.log("Testing error page ...")
+  }
+
   let questionState: {
     mode: MODE
     text: string
@@ -200,4 +204,4 @@
   <Markdown md={questionState.feedbackObject?.correctAnswer ?? ""} />
 {/snippet}
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window on:keydown={onKeyDown} onerror={handleError} onunhandledrejection={handleError} />

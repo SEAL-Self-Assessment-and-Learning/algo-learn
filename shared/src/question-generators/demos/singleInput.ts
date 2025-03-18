@@ -45,7 +45,7 @@ export const DemoSingleInput: QuestionGenerator = {
     const random = new Random(seed)
 
     // generate the question values
-    const a = random.int(5, 15)
+    const a = random.int(5, 1)
     const b = random.int(5, 15)
     const correctAnswer = a + b
 

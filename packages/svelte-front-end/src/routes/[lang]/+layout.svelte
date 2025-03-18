@@ -7,6 +7,10 @@
 
   let { children } = $props()
 
+  function handleError() {
+    console.log("Testing ... ")
+  }
+
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -15,6 +19,8 @@
     },
   })
 </script>
+
+<svelte:window onerror={handleError} />
 
 <div class="flex h-screen flex-col">
   <Header />
