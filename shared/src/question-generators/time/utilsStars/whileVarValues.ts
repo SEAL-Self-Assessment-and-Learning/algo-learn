@@ -1,11 +1,11 @@
 import {
   allWhileCases,
-  BoundsOptions,
   getCompare,
-  WhileCompareOptions,
-  WhileOrderOptions,
+  type BoundsOptions,
+  type WhileCompareOptions,
+  type WhileOrderOptions,
 } from "@shared/question-generators/time/utils"
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 function computeOptionXPlus(random: Random) {
   const variableOrder: "xy" | "yx" | "xn" = random.choice(["xy", "yx", "xn"])

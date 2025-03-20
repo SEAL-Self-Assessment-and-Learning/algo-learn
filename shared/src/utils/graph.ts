@@ -1,4 +1,4 @@
-import Random from "./random"
+import type Random from "./random"
 
 type NodeId = number
 type NodeList = Node[]
@@ -41,6 +41,7 @@ export class Graph {
   edges: EdgeList
   weighted: boolean
   directed: boolean
+  public nodeDraggable: boolean
   public nodeClickType: ClickEventType
   public edgeClickType: ClickEventType
   // groups are counted from 0 to [node|edge]GroupMax -1
@@ -52,6 +53,7 @@ export class Graph {
     edges: EdgeList,
     directed: boolean,
     weighted: boolean,
+    nodeDraggable: boolean = false,
     nodeClick: ClickEventType = "none",
     edgeClick: ClickEventType = "none",
     nodeGroupMax: number = 0,
@@ -61,6 +63,7 @@ export class Graph {
     this.edges = edges
     this.directed = directed
     this.weighted = weighted
+    this.nodeDraggable = nodeDraggable
     this.nodeClickType = nodeClick
     this.edgeClickType = edgeClick
     this.nodeGroupMax = nodeGroupMax
@@ -98,7 +101,7 @@ export class Graph {
 
   public toString(): string {
     const clickTypeMapping: Record<ClickEventType, string> = { none: "0", select: "1", group: "2" }
-    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
+    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${this.nodeDraggable ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
 
     for (const node of this.nodes) {
       graphStr += `${Math.round(node.coords.x * 100) / 100} ${Math.round(node.coords.y * 100) / 100} ${node.group ?? "-"} "${node.label ?? ""}"\n`
@@ -115,20 +118,27 @@ export class Graph {
     return graphStr
   }
 
+  public toMarkdown(): string {
+    return `\n\`\`\`graph\n${this.toString()}\n\`\`\`\n`
+  }
+
   public static parse(graphStr: string): Graph {
     const lines = graphStr.split("\n")
-    const graphMetaData = lines[0].match(/^(\d+) (\d+) ([01]) ([01]) ([012]) ([012]) (\d+) (\d+)$/)
+    const graphMetaData = lines[0].match(
+      /^(\d+) (\d+) ([01]) ([01]) ([01]) ([012]) ([012]) (\d+) (\d+)$/,
+    )
 
-    if (graphMetaData === null) throw Error("Input error: graph data has invalid meta data")
+    if (graphMetaData === null) throw Error(`Input error: graph data has invalid meta data: ${lines[0]}`)
     const numNodes = parseInt(graphMetaData[1])
     const numEdges = parseInt(graphMetaData[2])
     const directed = graphMetaData[3] === "1"
     const weighted = graphMetaData[4] === "1"
+    const nodeDraggable = graphMetaData[5] === "1"
     const clickTypeMapping: Record<string, ClickEventType> = { "0": "none", "1": "select", "2": "group" }
-    const nodeClick = clickTypeMapping[graphMetaData[5]]
-    const edgeClick = clickTypeMapping[graphMetaData[6]]
-    const nodeGroupMax = parseInt(graphMetaData[7])
-    const edgeGroupMax = parseInt(graphMetaData[8])
+    const nodeClick = clickTypeMapping[graphMetaData[6]]
+    const edgeClick = clickTypeMapping[graphMetaData[7]]
+    const nodeGroupMax = parseInt(graphMetaData[8])
+    const edgeGroupMax = parseInt(graphMetaData[9])
 
     if (lines.length < numNodes + numEdges + 1) throw Error("Input error: graph data is incomplete")
     if (nodeClick === undefined || edgeClick === undefined)
@@ -165,7 +175,17 @@ export class Graph {
       })
     }
 
-    return new Graph(nodes, edges, directed, weighted, nodeClick, edgeClick, nodeGroupMax, edgeGroupMax)
+    return new Graph(
+      nodes,
+      edges,
+      directed,
+      weighted,
+      nodeDraggable,
+      nodeClick,
+      edgeClick,
+      nodeGroupMax,
+      edgeGroupMax,
+    )
   }
 
   public getNeighbors(u: NodeId) {
@@ -194,6 +214,21 @@ export class Graph {
     return numEdges
   }
 
+  public setNodeClickType(type: ClickEventType): this {
+    this.nodeClickType = type
+    return this
+  }
+
+  public setEdgeClickType(type: ClickEventType): this {
+    this.edgeClickType = type
+    return this
+  }
+
+  public setDraggable(on: boolean): this {
+    this.nodeDraggable = on
+    return this
+  }
+
   public setEdgeWeight(u: NodeId, v: NodeId, weight: number): void {
     this.getEdge(u, v).value = weight
     if (!this.directed) this.getEdge(v, u).value = weight
@@ -207,10 +242,23 @@ export class Graph {
     this.getEdge(u, v).group = group
     if (!this.directed) this.getEdge(v, u).group = group
   }
+
+  public getReachableNodes(u: NodeId) {
+    return findReachableNodes(u, this.getNumNodes(), this.edges)
+  }
+
+  public isStronglyConnected(): boolean {
+    const loopEnd = this.directed ? this.nodes.length : 1
+    for (let u = 0; u < loopEnd; u++) {
+      if (this.getReachableNodes(u).unreachable.length > 0) return false
+    }
+
+    return true
+  }
 }
 
 export class RandomGraph {
-  private static getLabel(i: number): string {
+  public static getLabel(i: number): string {
     let label: string = ""
     do {
       const a = i % 26
@@ -230,7 +278,9 @@ export class RandomGraph {
    * @param shape
    * @param weights
    * @param directed
-   * @param shakeUpNodePosition
+   * @param shakeUpNodePosition Randomizes the coordinates of the nodes to break up the strict grid look.
+   * @param ensureStronglyConnected If true, the generated graph is guaranteed to be strongly connected.
+   *                                The result may violate the p parameter.
    */
   public static grid(
     random: Random,
@@ -240,6 +290,7 @@ export class RandomGraph {
     weights: "random" | "unique" | null,
     directed: boolean = false,
     shakeUpNodePosition: boolean = false,
+    ensureStronglyConnected: boolean = false,
   ): Graph {
     const scale = 3
     const vertices: NodeList = []
@@ -280,11 +331,8 @@ export class RandomGraph {
 
       const [row, col] = nodeIdToPos(u)
 
-      if (directed) {
-        if (col > 0) neighbors.push(posToNodeId(row, col - 1))
-        if (row > 0) neighbors.push(posToNodeId(row - 1, col))
-      }
-
+      if (col > 0) neighbors.push(posToNodeId(row, col - 1))
+      if (row > 0) neighbors.push(posToNodeId(row - 1, col))
       if (col < width - 1) neighbors.push(posToNodeId(row, col + 1))
       if (row < height - 1) neighbors.push(posToNodeId(row + 1, col))
 
@@ -297,11 +345,11 @@ export class RandomGraph {
       const [row, col] = nodeIdToPos(u)
 
       if (isOdd(row) && col > 0) {
-        if (directed && row > 0) neighbors.push(posToNodeId(row - 1, col - 1))
-        if (row > height - 1) neighbors.push(posToNodeId(row + 1, col - 1))
+        if (row > 0) neighbors.push(posToNodeId(row - 1, col - 1))
+        if (row < height - 1) neighbors.push(posToNodeId(row + 1, col - 1))
       } else if (!isOdd(row) && col < width - 1) {
-        if (directed && row > 0) neighbors.push(posToNodeId(row - 1, col + 1))
-        if (row > height - 1) neighbors.push(posToNodeId(row + 1, col + 1))
+        if (row > 0) neighbors.push(posToNodeId(row - 1, col + 1))
+        if (row < height - 1) neighbors.push(posToNodeId(row + 1, col + 1))
       }
 
       return neighbors
@@ -316,7 +364,7 @@ export class RandomGraph {
 
       const [row, col] = nodeIdToPos(u)
 
-      if (directed && row > 0) {
+      if (row > 0) {
         if (col > 0 && diagonalDirections[posToNodeId(row - 1, col - 1)] === 1)
           neighbors.push(posToNodeId(row - 1, col - 1))
         if (col < width - 1 && diagonalDirections[posToNodeId(row - 1, col)] === 0)
@@ -339,18 +387,32 @@ export class RandomGraph {
           ? getSquareWDiagonalsNeighbors
           : getSquareNeighbors
 
+    // for undirected graphs, this prevents drawing edges twice
+    const filteredPossibleNeighbors = directed
+      ? getPossibleNeighbors
+      : (u: NodeId) => getPossibleNeighbors(u).filter((i) => i > u)
+
     let numEdges = 0
 
+    // add random edges to the graph
     const links: EdgeList = Array.from(Array(vertices.length), () => [])
-    links.forEach((outEdges, u: NodeId) => {
-      getPossibleNeighbors(u).forEach((v: NodeId) => {
+    links.forEach((_, u: NodeId) => {
+      filteredPossibleNeighbors(u).forEach((v: NodeId) => {
         if (random.bool(p)) {
           numEdges++
-          outEdges.push({ source: u, target: v })
-          if (!directed) links[v].push({ source: v, target: u })
+          RandomGraph.addEdge(u, v, directed, links)
         }
       })
     })
+
+    if (ensureStronglyConnected)
+      numEdges += RandomGraph.ensureConnectivity(
+        width * height,
+        links,
+        getPossibleNeighbors,
+        directed,
+        random,
+      )
 
     const graph = new Graph(vertices, links, directed, weights !== null)
 
@@ -383,6 +445,397 @@ export class RandomGraph {
     return graph
   }
 
-  // public static tree(): Graph {}
-  // public static bipartite: Graph {}
+  /**
+   * Adds the edge (u,v) to links.
+   * @param u
+   * @param v
+   * @param directed
+   * @param links is modified by the function
+   * @param invert inverts the edge bevor adding it.
+   * @private
+   */
+  private static addEdge(
+    u: NodeId,
+    v: NodeId,
+    directed: boolean,
+    links: EdgeList,
+    invert: boolean = false,
+  ): void {
+    if (invert) [u, v] = [v, u]
+
+    links[u].push({ source: u, target: v })
+    if (!directed) links[v].push({ source: v, target: u })
+  }
+
+  /**
+   * Ensures the graph to be strongly connected by finding connected components and adding random edges connecting the
+   * components with respect to the possible neighbor function
+   * @param numNodes
+   * @param links
+   * @param getPossibleNeighbors
+   * @param directed
+   * @param random
+   * @private
+   */
+  private static ensureConnectivity(
+    numNodes: number,
+    links: EdgeList,
+    getPossibleNeighbors: (u: NodeId) => NodeId[],
+    directed: boolean,
+    random: Random,
+  ): number {
+    const nodeIds = [...Array(numNodes).keys()]
+    const nodes: NodeId[] = random.shuffle(nodeIds)
+    let connected = false
+    let currentNodeId = 0
+    let numEdgesAdded = 0
+    do {
+      const { reachable, unreachable } = findReachableNodes(nodes[currentNodeId], numNodes, links)
+      if (unreachable.length === 0) {
+        connected = !directed || currentNodeId === numNodes - 1
+        currentNodeId++
+        continue
+      }
+
+      let a = reachable
+      let b = unreachable
+      let invertEdge = false
+      if (reachable.length > unreachable.length) {
+        ;[a, b] = [b, a]
+        invertEdge = true
+      }
+
+      random.shuffle(a)
+
+      for (const u of a) {
+        const possibleNeighbors = getPossibleNeighbors(u).filter((v) => b.includes(v))
+        if (possibleNeighbors.length === 0) continue
+        RandomGraph.addEdge(u, random.choice(possibleNeighbors), directed, links, invertEdge)
+        numEdgesAdded++
+        break
+      }
+    } while (!connected)
+
+    return numEdgesAdded
+  }
+}
+
+function findReachableNodes(
+  startNode: NodeId,
+  numNodes: number,
+  links: EdgeList,
+): { reachable: NodeId[]; unreachable: NodeId[] } {
+  const visited = Array(numNodes).fill(false) as boolean[]
+  visited[startNode] = true
+  // walk the graph in dfs order
+  const todo: NodeId[] = [startNode]
+  while (todo.length > 0) {
+    const nextNode: NodeId = todo.pop() as NodeId
+    for (const edge of links[nextNode]) {
+      if (visited[edge.target]) continue
+
+      todo.push(edge.target)
+      visited[edge.target] = true
+    }
+  }
+
+  const reachable: NodeId[] = []
+  const unreachable: NodeId[] = []
+  for (let i = 0; i < numNodes; i++) {
+    if (visited[i]) reachable.push(i)
+    else unreachable.push(i)
+  }
+
+  return { reachable, unreachable }
+}
+
+export const traversalStrategies = ["pre", "in", "post"] as const
+type TraversalStrategies = (typeof traversalStrategies)[number]
+
+export class RootedTree {
+  root: string
+  children: RootedTree[] // left to right
+  coordinates: { x: number; y: number; mod: number; index: number; parent: RootedTree | null } = {
+    x: 0,
+    y: 0,
+    mod: 0,
+    index: 0,
+    parent: null,
+  }
+
+  nodeDistX: number = 1
+  nodeDistY: number = 1.5
+  siblingDist: number = 0
+  treeDist: number = 0
+
+  constructor(root: string, children: RootedTree[] = []) {
+    this.root = root
+    this.children = children
+  }
+
+  public getNumNodes(): number {
+    // if (this.children.length === 0) return 1
+
+    return this.children.reduce((acc: number, node: RootedTree) => acc + node.getNumNodes(), 1)
+  }
+
+  public getTraversalOrder(type: TraversalStrategies): string[] {
+    let order: string[] = []
+    if (type === "pre") {
+      order.push(this.root)
+      this.children.forEach((child) => {
+        order = order.concat(child.getTraversalOrder(type))
+      })
+    } else if (type === "post") {
+      this.children.forEach((child) => {
+        order = order.concat(child.getTraversalOrder(type))
+      })
+      order.push(this.root)
+    } else if (type === "in") {
+      if (this.children.length > 0) order = order.concat(this.children[0].getTraversalOrder(type))
+      order.push(this.root)
+      for (let i = 1; i < this.children.length; i++) {
+        order = order.concat(this.children[i].getTraversalOrder(type))
+      }
+    }
+
+    return order
+  }
+
+  public static random(
+    depth: number | { min: number; max: number },
+    degree:
+      | number
+      | {
+          min: number
+          max: number
+        },
+    random: Random,
+  ): RootedTree {
+    const tree = RootedTree.rnd(depth, degree, random)
+    const numNodes = tree.getNumNodes()
+    let labels = []
+    for (let i = 0; i < numNodes; i++) {
+      labels.push(RandomGraph.getLabel(i))
+    }
+    labels = random.shuffle(labels)
+
+    RootedTree.relable(tree, labels)
+    return tree
+  }
+
+  private static rnd(
+    depth: number | { min: number; max: number },
+    degree:
+      | number
+      | {
+          min: number
+          max: number
+        },
+    random: Random,
+  ): RootedTree {
+    // assert(typeof depth === "number" || depth.min < depth.max)
+
+    if (typeof depth !== "number" && depth.min === 0) depth = random.int(depth.min, depth.max)
+
+    if (depth === 0) return new RootedTree("", [])
+
+    const newDepth = typeof depth === "number" ? depth - 1 : { min: depth.min - 1, max: depth.max - 1 }
+    const children: RootedTree[] = []
+    const numChildren = typeof degree === "number" ? degree : random.int(degree.min, degree.max)
+    for (let i = 0; i < numChildren; i++) {
+      children.push(RootedTree.rnd(newDepth, degree, random))
+    }
+
+    return new RootedTree("", children) //{ root: "", children: children }
+  }
+
+  private static relable(tree: RootedTree, labels: string[]): void {
+    if (labels.length === 0) throw new Error("Not enough labels")
+    tree.root = labels.pop()! // pop cannot return undefined since the array is not empty at this point
+
+    for (let i = 0; i < tree.children.length; i++) {
+      this.relable(tree.children[i], labels)
+    }
+  }
+
+  public toGraph(): Graph {
+    const nodes: NodeList = []
+    const edges: EdgeList = []
+
+    this.computeNodeCoordinates()
+    this.collectNodesAndEdges(nodes, edges)
+
+    return new Graph(nodes, edges, false, false)
+  }
+
+  private collectNodesAndEdges(
+    nodes: NodeList,
+    edges: EdgeList,
+    parentNodeId: number | null = null,
+  ): void {
+    const currentNodeId = nodes.length
+    nodes.push({ label: this.root, coords: { x: this.coordinates.x, y: this.coordinates.y } })
+    edges.push([])
+
+    if (parentNodeId !== null) {
+      edges[parentNodeId].push({ source: parentNodeId, target: currentNodeId })
+    }
+
+    this.children.forEach((child) => {
+      child.collectNodesAndEdges(nodes, edges, currentNodeId)
+    })
+  }
+
+  /**
+   * Reingold-Tilford algorithm for laying out trees.
+   */
+  private computeNodeCoordinates() {
+    this.initCoordinateComputation()
+    this.computeInitialX()
+    this.computeFinalNodeCoordinates()
+  }
+
+  /**
+   * Initializes the coordinates object for each node. It links each node with its parent and tells it
+   * its index in the parents child array. The depth is already set to the correct value.
+   */
+  private initCoordinateComputation(
+    depth: number = 0,
+    index: number = 0,
+    parent: RootedTree | null = null,
+  ): void {
+    this.coordinates = { x: 0, y: depth, mod: 0, index: index, parent: parent }
+
+    this.children.forEach((child, i) => {
+      child.initCoordinateComputation(depth + 1, i, this)
+    })
+  }
+
+  /**
+   * Computes initial x values for each node.
+   */
+  private computeInitialX(): void {
+    this.children.forEach((child) => {
+      child.computeInitialX()
+    })
+
+    // if this node is a leaf
+    if (this.children.length === 0) {
+      if (this.coordinates.index > 0) {
+        // place the node just right of its left sibling
+        this.coordinates.x = this.getPreviousSiblingX() + this.nodeDistX + this.siblingDist
+      }
+      // else x = 0 (initialization value)
+    } else {
+      // place the node in the center over its children
+      const center =
+        (this.children[0].coordinates.x + this.children[this.children.length - 1].coordinates.x) * 0.5
+
+      if (this.coordinates.index === 0) {
+        this.coordinates.x = center
+      } else {
+        this.coordinates.x = this.getPreviousSiblingX() + this.nodeDistX + this.siblingDist
+        this.coordinates.mod = this.coordinates.x - center
+      }
+
+      if (this.coordinates.index > 0) this.checkForOverlappingSubtrees()
+    }
+  }
+
+  private checkForOverlappingSubtrees(): void {
+    const minDistance = this.treeDist + this.nodeDistX
+    let shiftValue = 0
+
+    const nodeContour = this.getLeftContour()
+
+    // iterate all siblings to the left
+    for (let i = 0; i < this.coordinates.index; i++) {
+      const sibling = this.coordinates.parent!.children[i] // since the node has siblings it also has a parent.
+      const siblingContour = sibling.getRightContour()
+      for (
+        let y = this.coordinates.y + 1;
+        y <=
+        Math.min(
+          Math.max(...Object.keys(nodeContour).map(Number)),
+          Math.max(...Object.keys(siblingContour).map(Number)),
+        );
+        y++
+      ) {
+        const dist = nodeContour[y] - siblingContour[y]
+        if (dist + shiftValue < minDistance) shiftValue = minDistance - dist
+      }
+
+      if (shiftValue > 0) {
+        this.coordinates.x += shiftValue
+        this.coordinates.mod += shiftValue
+
+        this.centerNodes(sibling)
+
+        shiftValue = 0
+      }
+    }
+  }
+
+  private centerNodes(leftSibling: RootedTree): void {
+    const leftIndex = leftSibling.coordinates.index
+    const rightIndex = this.coordinates.index
+    const nodeSpan = rightIndex - leftIndex - 1
+
+    if (nodeSpan > 0) {
+      const nodeDist = (this.coordinates.x - leftSibling.coordinates.x) / (nodeSpan + 1)
+
+      for (let i = 1; i < rightIndex; i++) {
+        const middleNode = this.coordinates.parent!.children[leftIndex + i] // since the nod has siblings it has a parent
+        const offset = leftSibling.coordinates.x + nodeDist * i - middleNode.coordinates.x
+        middleNode.coordinates.x += offset
+        middleNode.coordinates.mod += offset
+      }
+
+      this.checkForOverlappingSubtrees() // todo is this correct?
+    }
+  }
+
+  private getLeftContour(): Record<number, number> {
+    const contours = {}
+    this.getContour(0, contours, Math.min)
+    return contours
+  }
+
+  private getRightContour(): Record<number, number> {
+    const contours = {}
+    this.getContour(0, contours, Math.max)
+    return contours
+  }
+
+  private getContour(
+    modSum: number,
+    contours: Record<number, number>,
+    m: (a: number, b: number) => number,
+  ): void {
+    contours[this.coordinates.y] = m(
+      contours[this.coordinates.y] ?? this.coordinates.x + modSum,
+      this.coordinates.x + modSum,
+    )
+
+    modSum += this.coordinates.mod
+    this.children.forEach((child) => {
+      child.getContour(modSum, contours, m)
+    })
+  }
+
+  private getPreviousSiblingX(): number {
+    if (this.coordinates.index > 0)
+      return this.coordinates.parent!.children[this.coordinates.index - 1].coordinates.x // since the nod has siblings it has a parent
+
+    return 0
+  }
+
+  private computeFinalNodeCoordinates(modSum: number = 0) {
+    this.coordinates.x += modSum
+    this.coordinates.y *= this.nodeDistY
+    modSum += this.coordinates.mod
+
+    this.children.forEach((child) => child.computeFinalNodeCoordinates(modSum))
+  }
 }

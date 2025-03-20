@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
-  content: ["./front-end/src/**/*.{html,js,ts,jsx,tsx}"],
+  content: ["./src/**/*.{html,js,ts,jsx,tsx}"],
   prefix: "",
   theme: {
     container: {
@@ -51,7 +51,7 @@ module.exports = {
           foreground: "hsl(var(--goethe-foreground))",
         },
         // color groups, used wherever items need to be separated by color.
-        cg:{
+        cg: {
           foreground: "hsl(var(--color-group-foreground))",
           0: "var(--color-group-0)",
           1: "var(--color-group-1)",

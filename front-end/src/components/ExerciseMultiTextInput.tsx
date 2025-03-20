@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react"
-import { FreeTextFeedback, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
+import type { FreeTextFeedback, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
 import { inputRegex } from "@shared/utils/parseMarkdown.ts"
-import { InteractWithQuestion, MODE } from "@/components/InteractWithQuestion.tsx"
+import { InteractWithQuestion, type MODE } from "@/components/InteractWithQuestion.tsx"
 import { Markdown } from "@/components/Markdown.tsx"
-import { Result } from "@/components/QuestionComponent.tsx"
-import { formContext, TextFieldState } from "@/hooks/useFormContext.ts"
+import type { Result } from "@/components/QuestionComponent.tsx"
+import { formContext, type TextFieldState } from "@/hooks/useFormContext.ts"
 import useGlobalDOMEvents from "@/hooks/useGlobalDOMEvents.ts"
 import { useSound } from "@/hooks/useSound.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
@@ -14,11 +14,13 @@ import { isMobileOrTablet } from "@/utils/deviceInformation.ts"
  * This component is used to create a question with multiple input fields
  *
  * The input fields are defined in the Markdown text using the following syntax:
- * {{id#align#promt#placeholder#checkformat}}
+ * {{id#style#prompt#placeholder#checkformat}}
  * - id: a unique identifier for the input field
- * - align: the alignment of the input field
+ * - type: the type of the input field
  *          NL: new line (places a line break before and after the input field)
- *          -: default (no linebreaks)
+ *          MAT: input field for a matrix input
+ *          TTABLE: input field for truth table
+ *          -: nothing (default)
  * - prompt: text displayed before the input field
  * - placeholder: the placeholder text inside the input field
  * - checkFormat: determines how feedback on the format of the userinput is displayed
@@ -96,7 +98,7 @@ export function ExerciseMultiTextInput({
         })
       })
     } else {
-      const valid = value.trim().length > 0
+      const valid = value.trim().length > 0 || !question.fillOutAll
       setState({
         ...state,
         text: { ...state.text, [fieldID]: value },
@@ -138,20 +140,31 @@ export function ExerciseMultiTextInput({
     },
   })
 
-  const message =
-    mode === "correct" ? (
-      <b className="text-2xl">{t("feedback.correct")}</b>
-    ) : mode === "incorrect" ? (
-      feedbackObject?.correctAnswer ? (
+  // todo identical to ExerciseTextInput. Maybe move this into a function to reuse the code.
+  const message = []
+  if (mode === "correct") {
+    message.push(<b className="text-2xl">{t("feedback.correct")}</b>)
+  } else if (mode === "incorrect") {
+    if (feedbackObject?.feedbackText) {
+      message.push(
+        <>
+          <Markdown md={feedbackObject.feedbackText} />
+          <br />
+        </>,
+      )
+    }
+    if (feedbackObject?.correctAnswer) {
+      message.push(
         <>
           <b className="text-xl">{t("feedback.possible-correct-solution")}:</b>
           <br />
           <Markdown md={feedbackObject.correctAnswer} />
-        </>
-      ) : (
-        <b className="text-2xl">{t("feedback.incorrect")}</b>
+        </>,
       )
-    ) : null
+    } else {
+      message.push(<b className="text-2xl">{t("feedback.incorrect")}</b>)
+    }
+  }
 
   const fieldValues = getInputFields(question.text ? question.text : "")
 
@@ -167,7 +180,7 @@ export function ExerciseMultiTextInput({
 
       textFieldStateValues[fieldValues.inputIds[i]] = {
         text: state.text[fieldValues.inputIds[i]],
-        align: fieldValues.inputAligns[i],
+        type: fieldValues.inputTypes[i],
         prompt: fieldValues.inputPrompts[i],
         feedbackVariation: fieldValues.inputFeedbackVariations[i],
         setText: (text: string) => setText(fieldValues.inputIds[i], text),
@@ -204,7 +217,7 @@ export function ExerciseMultiTextInput({
  */
 function getInputFields(text: string): {
   inputIds: string[]
-  inputAligns: string[]
+  inputTypes: string[]
   inputPrompts: string[]
   inputPlaceholders: string[]
   inputFeedbackVariations: string[]
@@ -219,7 +232,7 @@ function getInputFields(text: string): {
   if (matches.length === 0) {
     return {
       inputIds: [],
-      inputAligns: [],
+      inputTypes: [],
       inputPrompts: [],
       inputPlaceholders: [],
       inputFeedbackVariations: [],
@@ -239,13 +252,13 @@ function getInputFields(text: string): {
  */
 function getInputFieldValues(inputFields: string[]): {
   inputIds: string[]
-  inputAligns: string[]
+  inputTypes: string[]
   inputPrompts: string[]
   inputPlaceholders: string[]
   inputFeedbackVariations: string[]
 } {
   const inputIds: string[] = []
-  const inputAligns: string[] = []
+  const inputTypes: string[] = []
   const inputPrompts: string[] = []
   const inputPlaceholders: string[] = []
   const inputFeedbackVariations: string[] = []
@@ -253,11 +266,11 @@ function getInputFieldValues(inputFields: string[]): {
   for (const inputField of inputFields) {
     const inputFieldSplit = inputField.split("#")
     inputIds.push(inputFieldSplit[0])
-    inputAligns.push(inputFieldSplit[1])
+    inputTypes.push(inputFieldSplit[1])
     inputPrompts.push(inputFieldSplit[2])
     inputPlaceholders.push(inputFieldSplit[3])
     inputFeedbackVariations.push(inputFieldSplit[4])
   }
 
-  return { inputIds, inputAligns, inputPrompts, inputPlaceholders, inputFeedbackVariations }
+  return { inputIds, inputTypes, inputPrompts, inputPlaceholders, inputFeedbackVariations }
 }

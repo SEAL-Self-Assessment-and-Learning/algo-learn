@@ -1,7 +1,10 @@
-import { ReactElement, useRef, useState } from "react"
-import { Graph } from "@shared/utils/graph"
+import { useRef, useState, type ReactElement } from "react"
+import type { Graph } from "@shared/utils/graph"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
+
+// limited by the number of colors we have. See tailwind --color-group-0,...,--color-group-7.
+const maxGroups = 8
 
 const Node = ({
   pos,
@@ -13,22 +16,20 @@ const Node = ({
   onClickCallback,
 }: {
   pos: { x: number; y: number }
-  setDragged: () => void
+  setDragged: (() => void) | undefined
   size: number
   label?: string
   clickable: boolean
   state: GraphElementStateType
   onClickCallback: () => void
 }) => {
-  const nodeStyle = `${state.selected ? "cg-4" : state.group !== null ? `cg-${state.group}` : "primary"}${clickable ? " cursor-pointer" : "group-hover:fill-accent"}`
+  const nodeStyle = `${state.selected ? "cg-4" : state.group !== null ? `cg-${state.group}` : "primary"} ${clickable ? "cursor-pointer" : "group-hover:fill-accent"}`
 
   return (
     <g
       className="group"
       transform={`translate(${pos.x},${pos.y})`}
-      onMouseDown={() => {
-        setDragged()
-      }}
+      onMouseDown={setDragged}
       onClick={onClickCallback}
     >
       <circle className={`fill-${nodeStyle} stroke-secondary`} r={size} strokeWidth="6" />
@@ -169,21 +170,21 @@ const Edge = ({
 
 /**
  * A component that returns an SVG element representing a graph.
- * @param width - The width of the svg.
- * @param height - The height of the svg.
+ * @param maxWidth - The maximum width of the svg.
+ * @param maxHeight - The maximum height of the svg.
  * @param graph - The graph to draw.
  */
 export function DrawGraph({
-  width,
-  height,
+  maxWidth,
+  maxHeight,
   graph,
 }: {
-  width: number
-  height: number
+  maxWidth: number
+  maxHeight: number
   graph: Graph
 }): ReactElement {
   const svgRef = useRef(null as SVGSVGElement | null)
-  const coordinateScale = 50
+  const coordinateScale = 60
   const nodeScale = 20
 
   const edgeListFlat = graph.edges
@@ -233,15 +234,11 @@ export function DrawGraph({
             setEdgeStates([...edgeStates])
           } else if (graph.edgeClickType === "group") {
             edgeStates[i].group =
-              // todo currently at most 8 color groups are supported. This should somehow be encoded in a central
-              //  place to avoid inconsistent magic numbers all over the place
-              edgeStates[i].group === Math.min(graph.edgeGroupMax ?? 8, 8) - 1
+              edgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
                 ? null
                 : edgeStates[i].group === null
                   ? 0
-                  : // todo we literally just checkt if edgeStates[i].group is null but typescript complains.
-                    //  Maybe it is better with typescript 5.5? Until then the `!` seems to be needed.
-                    edgeStates[i].group! + 1
+                  : edgeStates[i].group + 1
             setEdgeStates([...edgeStates])
           }
         }}
@@ -254,9 +251,13 @@ export function DrawGraph({
       <Node
         key={`n${i}`}
         pos={nodePositions[i]}
-        setDragged={() => {
-          if (currentlyDragged === null) setCurrentlyDragged(i)
-        }}
+        setDragged={
+          graph.nodeDraggable
+            ? () => {
+                if (currentlyDragged === null) setCurrentlyDragged(i)
+              }
+            : undefined
+        }
         size={nodeScale}
         label={u.label ?? ""}
         clickable={graph.nodeClickType !== "none"}
@@ -268,15 +269,11 @@ export function DrawGraph({
             setEdgeStates([...nodeStates])
           } else if (graph.nodeClickType === "group") {
             nodeStates[i].group =
-              // todo currently at most 8 color groups are supported. This should somehow be encoded in a central
-              //  place to avoid inconsistent magic numbers all over the place
-              nodeStates[i].group === Math.min(graph.nodeGroupMax ?? 8, 8) - 1
+              nodeStates[i].group === Math.min(graph.nodeGroupMax ?? maxGroups, maxGroups) - 1
                 ? null
                 : nodeStates[i].group === null
                   ? 0
-                  : // todo we literally just checkt if edgeStates[i].group is null but typescript complains.
-                    //  Maybe it is better with typescript 5.5? Until then the `!` seems to be needed.
-                    nodeStates[i].group! + 1
+                  : nodeStates[i].group + 1
             setNodeStates([...nodeStates])
           }
         }}
@@ -285,13 +282,37 @@ export function DrawGraph({
   })
 
   const dimensions = graph.getDimensions()
+  const margin = 0.7
+  const viewBox = {
+    x: (dimensions.minX - margin) * coordinateScale,
+    y: (dimensions.minY - margin) * coordinateScale,
+    width: (dimensions.width + 2 * margin) * coordinateScale,
+    height: (dimensions.height + 2 * margin) * coordinateScale,
+  }
+
+  const minViewBox = { width: 100, height: 100 }
+  if (viewBox.width < minViewBox.width) {
+    viewBox.x -= (minViewBox.width - viewBox.width) * 0.5
+    viewBox.width = minViewBox.width
+  }
+
+  if (viewBox.height < minViewBox.height) {
+    viewBox.y -= (minViewBox.height - viewBox.height) * 0.5
+    viewBox.height = minViewBox.height
+  }
+
+  const viewBoxAspectRatio = Math.min(maxHeight / maxWidth, viewBox.height / viewBox.width)
 
   return (
     <svg
       ref={svgRef}
-      width={width}
-      height={height}
-      viewBox={`${(dimensions.minX - dimensions.width * 0.2) * coordinateScale} ${(dimensions.minY - dimensions.height * 0.2) * coordinateScale} ${dimensions.width * 1.4 * coordinateScale} ${dimensions.height * 1.4 * coordinateScale}`}
+      width={maxWidth}
+      height={
+        viewBox.height / viewBox.width > 1 && viewBox.height < maxHeight
+          ? viewBox.height * 0.75
+          : maxWidth * viewBoxAspectRatio
+      }
+      viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
       className="mx-auto h-auto max-w-full rounded-2xl bg-secondary"
       onMouseMove={(e) => {
         if (currentlyDragged === null || svgRef.current === null) return

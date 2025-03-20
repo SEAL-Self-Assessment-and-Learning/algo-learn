@@ -1,6 +1,9 @@
-import Random from "./random.ts"
+import { RootedTree } from "@shared/utils/graph.ts"
+import { mdInputField, mdTableFromData } from "@shared/utils/markdownTools.ts"
+import type Random from "./random.ts"
 
 export type VariableValues = Record<string, boolean>
+export type NormalForm = "CNF" | "DNF"
 
 export type ExpressionProperties = {
   variables: string[]
@@ -51,6 +54,11 @@ abstract class SyntaxTreeNode {
    * returns an array containing all variable names in the expression
    */
   public abstract getVariableNames(): string[]
+
+  /**
+   * Returns the number of literals in the expression
+   */
+  public abstract getNumLiterals(): number
 
   public abstract isConjunction(): boolean
 
@@ -169,6 +177,8 @@ abstract class SyntaxTreeNode {
       invert: false,
     })
   }
+
+  public abstract toRootedTree(): RootedTree
 }
 
 export class Literal extends SyntaxTreeNode {
@@ -246,6 +256,15 @@ export class Literal extends SyntaxTreeNode {
 
     return this
   }
+
+  getNumLiterals(): number {
+    return 1
+  }
+
+  public toRootedTree(): RootedTree {
+    if (this.negated) return new RootedTree(`${operatorToUnicode[negationType]}${this.name}`)
+    else return new RootedTree(this.name)
+  }
 }
 
 const negationType = "\\not"
@@ -263,6 +282,15 @@ const operatorToLatex: Record<BinaryOperatorType | NegationOperatorType, string>
   "\\xor": "\\oplus",
   "=>": "\\Rightarrow",
   "<=>": "\\Leftrightarrow",
+}
+
+const operatorToUnicode: Record<BinaryOperatorType | NegationOperatorType, string> = {
+  "\\not": "¬",
+  "\\and": "∧",
+  "\\or": "∨",
+  "\\xor": "⊕",
+  "=>": "⇒",
+  "<=>": "⇔",
 }
 
 export function tokenToLatex(str: string) {
@@ -600,6 +628,20 @@ export class Operator extends SyntaxTreeNode {
 
     return this
   }
+
+  public getNumLiterals(): number {
+    return this.leftOperand.getNumLiterals() + this.rightOperand.getNumLiterals()
+  }
+
+  toRootedTree(): RootedTree {
+    let op = new RootedTree(operatorToUnicode[this.type], [
+      this.leftOperand.toRootedTree(),
+      this.rightOperand.toRootedTree(),
+    ])
+    if (this.negated) op = new RootedTree(operatorToUnicode[negationType], [op])
+
+    return op
+  }
 }
 
 export type SyntaxTreeNodeType = Operator | Literal
@@ -877,4 +919,104 @@ export function generateRandomContradiction(
   } else {
     return new Operator(rootOperator, operand.copy().negate(), operand).shuffle(random)
   }
+}
+
+/**
+ * Checks if a list of expressions is equivalent
+ * @param expressions - list of boolean expression
+ */
+export function compareExpressions(expressions: SyntaxTreeNodeType[]): boolean {
+  if (expressions.length < 2) {
+    throw new Error("At least two expressions are required for comparison.")
+  }
+  // Collect all var names, remove duplicates and sort
+  const vars = [...new Set(expressions.flatMap((expr) => expr.getTruthTable().variableNames))].sort()
+
+  for (let i = 0; i < Math.pow(2, vars.length); i++) {
+    const truthValues = numToVariableValues(i, vars)
+    // Evaluate the first expression as the baseline comparison
+    const firstResult = expressions[0].eval(truthValues)
+
+    // compare each other expr with the base
+    for (let j = 1; j < expressions.length; j++) {
+      if (expressions[j].eval(truthValues) !== firstResult) {
+        return false
+      }
+    }
+  }
+
+  return true
+}
+
+export function getMdTruthTable(
+  formulas: (
+    | SyntaxTreeNodeType
+    | {
+        formula: SyntaxTreeNodeType
+        shortName?: string
+        input?: boolean
+      }
+  )[],
+): { mdTable: string; inputFieldIds: string[] } {
+  const variables: string[] = []
+  formulas.forEach((f) => {
+    const formula = "formula" in f ? f.formula : f
+    variables.push(...formula.getVariableNames())
+  })
+
+  const uniqueVars = [...new Set(variables)].sort()
+
+  // generate table header
+  const inputFieldIds: string[] = []
+  const header: string[] = []
+  const rows: string[][] = []
+  const vLines: number[] = [uniqueVars.length - 1]
+
+  uniqueVars.forEach((v) => {
+    header.push(`$${v}$`)
+  })
+
+  formulas.forEach((f) => {
+    let colName: string
+    if ("formula" in f) {
+      if ("shortName" in f && f.shortName) colName = f.shortName
+      else colName = `$${f.formula.toString(true)}$`
+    } else {
+      colName = `$${f.toString(true)}$`
+    }
+
+    header.push(`${colName}`)
+  })
+
+  // generate table rows
+  const numRows = 1 << uniqueVars.length
+  for (let rowId = 0; rowId < numRows; rowId++) {
+    const row: string[] = []
+
+    const varValues = numToVariableValues(rowId, uniqueVars)
+    uniqueVars.forEach((v) => {
+      row.push(`$${varValues[v] ? 1 : 0}$`)
+    })
+
+    formulas.forEach((f, colId) => {
+      let val: boolean
+      if ("formula" in f) {
+        if ("input" in f && f.input) {
+          const fieldId = `ti-${rowId}-${colId}`
+          inputFieldIds.push(fieldId)
+          row.push(mdInputField(fieldId))
+          return // works like continue in forEach()
+        }
+        val = f.formula.eval(varValues)
+      } else {
+        val = f.eval(varValues)
+      }
+
+      row.push(`$${val ? 1 : 0}$`)
+    })
+
+    rows.push(row)
+  }
+
+  return { mdTable: mdTableFromData(rows, "center", header, [], vLines), inputFieldIds }
 }
