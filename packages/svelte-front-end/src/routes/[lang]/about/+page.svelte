@@ -16,6 +16,7 @@
   import FabianStw from "@/routes/[lang]/about/images/FabianStwGitHub.jpeg"
   import GoetheLogo from "@/routes/[lang]/about/images/GoetheTCS.svg"
   import HolgerDell from "@/routes/[lang]/about/images/HolgerDell.jpg"
+  import JanetteWelker from "@/routes/[lang]/about/images/JanetteWelker.png"
 
   const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction(globalTranslations, lang))
@@ -28,7 +29,12 @@
       image: AlexSchickedanz,
       link: "https://ae.cs.uni-frankfurt.de/staff/alex_schickedanz.html",
     },
-    { name: "Janette Welker", role: "Scientific Staff", link: "https://github.com/welkerje" },
+    {
+      name: "Janette Welker",
+      role: "Scientific Staff",
+      image: JanetteWelker,
+      link: "https://github.com/welkerje",
+    },
     {
       name: "Fabian Stiewe",
       role: "Student Assistant",
