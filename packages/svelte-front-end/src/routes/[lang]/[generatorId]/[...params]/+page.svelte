@@ -184,15 +184,16 @@
 {#if status === "aborted"}
   <!-- Todo: Improve this design -->
   <CenteredDivs variant="screen">
-    {t("quiz-session-aborted")}
-    <Button variant="rightAnswer">
-      <a href={`${base}/${getLanguage()}`}>
-        {t("Continue")}
-      </a>
-    </Button>
+    <div class="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
+      <div class="font-serif text-red-500 italic">{t("quiz-session-aborted")}</div>
+      <Button variant="rightAnswer" class="mt-12 ml-auto block max-w-max">
+        <a href={`${base}/${getLanguage()}`}>
+          {t("Continue")}
+        </a>
+      </Button>
+    </div>
   </CenteredDivs>
 {:else if status === "running"}
-  <!-- Something with language -->
   <ViewSingleQuestion
     generator={currObj.generator}
     parameters={currObj.parameters}
@@ -213,3 +214,13 @@
     </div>
   </CenteredDivs>
 {/if}
+
+<svelte:window
+  onkeydown={(e) => {
+    if (e.key === "Enter") {
+      if (status !== "running") {
+        window.location.href = `${base}/${getLanguage()}`
+      }
+    }
+  }}
+/>
