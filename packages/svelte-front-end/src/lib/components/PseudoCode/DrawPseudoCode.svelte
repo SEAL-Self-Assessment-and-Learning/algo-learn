@@ -2,6 +2,7 @@
   import { browser } from "$app/environment"
   import CodeComp from "$lib/components/PseudoCode/CodeComp.svelte"
   import { pseudoCodeToString } from "$lib/components/PseudoCode/renderPseudoCode.ts"
+  import MyTooltip from "$lib/components/ui/MyTooltip.svelte"
   import { toggleVariants } from "$lib/components/ui/toggle"
   import { globalTranslations } from "$lib/translation.ts"
   import { cn } from "$lib/utils.ts"
@@ -38,6 +39,9 @@
         recentlyCopied = true
       })
   }
+  function mouseLeave() {
+    recentlyCopied = false
+  }
 </script>
 
 <div class="my-5">
@@ -63,8 +67,8 @@
       class="absolute top-1 right-1 flex flex-col items-center space-y-1 rounded-lg dark:border-gray-700 dark:bg-gray-800"
     >
       <Tooltip.Provider>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
+        <MyTooltip contentProps={{ side: "left", sideOffset: 5 }}>
+          {#snippet trigger()}
             <Toggle.Root
               pressed={toggleStateLines}
               onPressedChange={() => {
@@ -77,17 +81,15 @@
                 "hover:cursor-pointer",
               )}
             >
-              <ListOrdered size={26} strokeWidth={1.5} absoluteStrokeWidth />
+              <ListOrdered size={22} strokeWidth={1.5} absoluteStrokeWidth />
             </Toggle.Root>
-          </Tooltip.Trigger>
-          <Tooltip.Content>
-            {t("lineNumberTooltip")}
-          </Tooltip.Content>
-        </Tooltip.Root>
+          {/snippet}
+          {t("lineNumberTooltip")}
+        </MyTooltip>
       </Tooltip.Provider>
       <Tooltip.Provider>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
+        <MyTooltip contentProps={{ side: "left", sideOffset: 5 }}>
+          {#snippet trigger()}
             <Toggle.Root
               pressed={toggleStateColor}
               onPressedChange={() => {
@@ -100,36 +102,28 @@
                 "hover:cursor-pointer",
               )}
             >
-              <PaintBucket size={26} strokeWidth={1.5} absoluteStrokeWidth />
+              <PaintBucket size={22} strokeWidth={1.5} absoluteStrokeWidth />
             </Toggle.Root>
-          </Tooltip.Trigger>
-          <Tooltip.Content>
-            {t("colorHighlightingTooltip")}
-          </Tooltip.Content>
-        </Tooltip.Root>
+          {/snippet}
+          {t("colorHighlightingTooltip")}
+        </MyTooltip>
       </Tooltip.Provider>
       <Tooltip.Provider>
-        <Tooltip.Root>
-          <Tooltip.Trigger>
+        <MyTooltip open={recentlyCopied} contentProps={{ side: "left", sideOffset: 5 }}>
+          {#snippet trigger()}
             <div
               role="button"
               tabindex="0"
               onclick={handleClickCopyIcon}
+              onmouseleave={mouseLeave}
               onkeydown={(e) => (e.key === "Enter" || e.key === " ") && handleClickCopyIcon()}
-              onmouseleave={() => {
-                setTimeout(() => {
-                  recentlyCopied = false
-                }, 500)
-              }}
               class="ring-offset-background hover:bg-muted hover:text-muted-foreground focus-visible:ring-ring data-[state=on]:bg-accent data-[state=on]:text-accent-foreground inline-flex h-8 items-center justify-center rounded-md px-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
             >
-              <Copy size={20} strokeWidth={1.5} absoluteStrokeWidth />
+              <Copy size={18} strokeWidth={1.3} absoluteStrokeWidth />
             </div>
-          </Tooltip.Trigger>
-          <Tooltip.Content>
-            {recentlyCopied ? t("copyLinkCopied") : t("copyCodeLatex")}
-          </Tooltip.Content>
-        </Tooltip.Root>
+          {/snippet}
+          {recentlyCopied ? t("copyLinkCopied") : t("copyCodeLatex")}
+        </MyTooltip>
       </Tooltip.Provider>
     </div>
   </div>

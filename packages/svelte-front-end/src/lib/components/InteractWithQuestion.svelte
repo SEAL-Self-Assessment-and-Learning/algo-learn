@@ -1,6 +1,6 @@
 <script lang="ts">
   import QuestionFooter from "$lib/components/QuestionFooter.svelte"
-  import QuestionsHeader from "$lib/components/QuestionsHeader.svelte"
+  import QuestionsHeader from "$lib/components/QuestionHeader.svelte"
   import type { MODE } from "$lib/components/types.ts"
   import type { Snippet } from "svelte"
   import CenteredDivs from "./centeredDivs.svelte"

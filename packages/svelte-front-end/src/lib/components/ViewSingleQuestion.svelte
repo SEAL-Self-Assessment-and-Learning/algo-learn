@@ -29,11 +29,14 @@
       throw new Error(`${$questionQuery.error}`)
     }
   })
+  function regenerate() {
+    console.log("Regenerating question")
+  }
 </script>
 
 {#if $questionQuery.isLoading || !$questionQuery.isSuccess}
   <Loading />
 {:else}
   <!-- Todo: Missing useFormat() -->
-  <QuestionComponent question={$questionQuery.data.question} {onResult} />
+  <QuestionComponent question={$questionQuery.data.question} {onResult} {regenerate} />
 {/if}
