@@ -1,6 +1,7 @@
-import { Edge } from "@shared/utils/graph"
-import Random from "@shared/utils/random"
-import { Automaton, AutomatonNode } from "./automaton"
+import type { Edge } from "@shared/utils/graph"
+import type Random from "@shared/utils/random"
+import type { AutomatonNode } from "./automaton";
+import { Automaton } from "./automaton"
 
 export function generateAutomaton(
   random: Random,

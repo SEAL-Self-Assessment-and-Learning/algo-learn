@@ -1,13 +1,15 @@
-import {
-  minimalMultipleChoiceFeedback,
+import type {
   MultipleChoiceQuestion,
-  QuestionGenerator,
+  QuestionGenerator} from "@shared/api/QuestionGenerator";
+import {
+  minimalMultipleChoiceFeedback
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { Automaton } from "@shared/question-generators/automaton/automaton"
+import type { Automaton } from "@shared/question-generators/automaton/automaton"
 import { generateAutomaton } from "@shared/question-generators/automaton/automatonGenerator"
 import Random from "@shared/utils/random"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
+import type { Translations } from "@shared/utils/translations";
+import { t, tFunctional } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {

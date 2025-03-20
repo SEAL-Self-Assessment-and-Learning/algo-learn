@@ -1,4 +1,5 @@
-import { Edge, Graph, Node } from "@shared/utils/graph"
+import type { Edge, Node } from "@shared/utils/graph";
+import { Graph } from "@shared/utils/graph"
 
 export interface AutomatonNode extends Node {
   isStart?: boolean
