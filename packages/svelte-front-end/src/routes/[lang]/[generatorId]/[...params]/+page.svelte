@@ -6,11 +6,7 @@
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { collection } from "@react-front-end/listOfQuestions.ts"
-  import {
-    allParameterCombinations,
-    deserializeParameters,
-    type Parameters,
-  } from "@shared/api/Parameters.ts"
+  import { allParameterCombinations, type Parameters } from "@shared/api/Parameters.ts"
   import type { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
   import { deserializePath } from "@shared/api/QuestionRouter.ts"
   import Random, { sampleRandomSeed } from "@shared/utils/random.ts"
@@ -104,29 +100,30 @@
   }
 
   const { data }: PageProps = $props()
-  const generatorId = data.generatorId
-  const parametersPath = data.params
-  const sessionSeed = sampleRandomSeed()
-  const { t } = $derived(tFunction([globalTranslations], getLanguage()))
-
-  const gen = deserializePath({
+  const lang = $derived(getLanguage())
+  const { t } = $derived(tFunction([globalTranslations], lang))
+  const path = data.url
+    .toString()
+    .split(/\/(de|en)\//)
+    .slice(1)
+    .join("/")
+  const dePath = deserializePath({
     collection,
-    path: `${getLanguage()}/${generatorId}/${parametersPath}`,
+    path,
     expectLang: true,
   })
-  if (!gen) throw new Error("Parsing the url went wrong!")
+  if (!dePath) throw new Error("Parsing the url went wrong!")
 
-  const generator = gen.generator
+  const generator = dePath.generator
 
   let generatorCalls: {
     generator: QuestionGenerator
     parameters: Parameters
   }[] = []
-  if (parametersPath) {
-    const parameters = deserializeParameters(parametersPath, generator.expectedParameters)
+  if (dePath.parameters) {
     generatorCalls.push({
       generator,
-      parameters,
+      parameters: dePath.parameters,
     })
   } else {
     allParameterCombinations(generator.expectedParameters).map((parameters) => {
@@ -143,11 +140,14 @@
     aborted: false,
   })
 
-  const random = new Random(`${sessionSeed}${questionState.numCorrect + questionState.numIncorrect}`)
-
+  const random = new Random(`${sampleRandomSeed()}`)
   random.shuffle(generatorCalls)
 
-  const currSeed = $state(random.base36string(7))
+  let sessionSeed = $state(sampleRandomSeed())
+  function nextSeed() {
+    sessionSeed = dePath!.seed ? dePath!.seed : sampleRandomSeed()
+  }
+  const currSeed = $derived(dePath.seed ? dePath.seed : sessionSeed)
   const currObj = $derived(generatorCalls[questionState.numCorrect + questionState.numIncorrect])
   let status: "running" | "finished" | "aborted" = $state("running")
 
@@ -177,6 +177,7 @@
     } else if (result === "abort" || result === "timeout") {
       questionState.aborted = true
     }
+    nextSeed()
   }
 </script>
 
@@ -197,6 +198,7 @@
     parameters={currObj.parameters}
     seed={currSeed}
     onResult={handleResult}
+    regenerate={nextSeed}
   />
 {:else}
   <!-- Todo: Improve this design -->

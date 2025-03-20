@@ -13,8 +13,9 @@
     parameters: Parameters
     seed: string
     onResult: ((result: Result) => void) | undefined
+    regenerate: () => void
   }
-  const { generator, parameters, seed, onResult }: Props = $props()
+  const { generator, parameters, seed, onResult, regenerate }: Props = $props()
   const lang: Language = $derived(getLanguage())
   const queryKey = $derived([generator, lang, parameters, seed])
   const questionQuery = $derived(
@@ -29,9 +30,6 @@
       throw new Error(`${$questionQuery.error}`)
     }
   })
-  function regenerate() {
-    console.log("Regenerating question")
-  }
 </script>
 
 {#if $questionQuery.isLoading || !$questionQuery.isSuccess}
