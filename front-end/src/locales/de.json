@@ -83,7 +83,7 @@
   "detailed-learning-progress-text": "Wahrscheinlich mehr Details, als Du wissen willst.",
   "even": "gerade",
   "feedback.correct": "Richtig!",
-  "feedback.correct-order": "Du wirst mit der Zeit besser. \n|Korrekte Reihenfolge:|\n|---|{{0}}",
+  "feedback.correct-order": "\n|Korrekte Reihenfolge:|\n|===|{{0}}",
   "feedback.enter-an-expression": "Gib eine Formel ein",
   "feedback.expected": "Erwartet",
   "feedback.incomplete": "Nicht vollständig oder zu komplex",

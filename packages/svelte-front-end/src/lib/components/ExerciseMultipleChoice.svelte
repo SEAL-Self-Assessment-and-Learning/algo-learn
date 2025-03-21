@@ -214,7 +214,7 @@
 {/snippet}
 
 {#snippet correctSolutionSort()}
-  <b class="text-xl">{t("feedback.correct-order")}:</b>
+  <b class="text-xl">{t("feedback.thats-ok")}:</b>
   &nbsp;
   <Markdown
     md={t("feedback.correct-order", [
