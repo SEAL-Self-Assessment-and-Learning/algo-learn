@@ -42,7 +42,6 @@
     "@dnd-kit-svelte/sortable": "^0.0.8",
     "@icons-pack/svelte-simple-icons": "^5.0.0",
     "@tailwindcss/typography": "^0.5.16",
-    "@tanstack/svelte-query": "^5.68.0",
     "bits-ui": "^1.3.13",
     "katex": "^0.16.21"
   }

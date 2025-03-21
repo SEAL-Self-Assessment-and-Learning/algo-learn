@@ -30,11 +30,11 @@
   function handleDragEnd({ active, over }: DragEndEvent) {
     if (!over) return
 
-    const overTodo = $state.snapshot(items.find((todo) => todo.id === over?.id))
-    if (!overTodo || activeId === overTodo.id) return
+    const overItem = $state.snapshot(items.find((item) => item.id === over?.id))
+    if (!overItem || activeId === overItem.id) return
 
-    const oldIndex = items.findIndex((todo) => todo.id === active.id)
-    const newIndex = items.findIndex((todo) => todo.id === over.id)
+    const oldIndex = items.findIndex((item) => item.id === active.id)
+    const newIndex = items.findIndex((item) => item.id === over.id)
     onChange(arrayMove(items, oldIndex, newIndex))
 
     activeId = null

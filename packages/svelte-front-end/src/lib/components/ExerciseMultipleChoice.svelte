@@ -109,7 +109,7 @@
     }
   }
 
-  const messageListIncludes: { correct: boolean; feedback: boolean } = $state({
+  const messageListIncludes: { correct: boolean; feedback: boolean } = $derived({
     correct: questionState.mode === "correct",
     feedback: questionState.feedbackObject?.feedbackText !== "",
   })
@@ -163,7 +163,6 @@
     </div>
   </InteractWithQuestion>
 {:else}
-  <!-- Todo: Sorting Questions -->
   <InteractWithQuestion
     {permalink}
     name={question.name}

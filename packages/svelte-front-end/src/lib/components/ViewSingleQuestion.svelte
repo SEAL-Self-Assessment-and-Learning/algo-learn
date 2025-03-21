@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ErrorPage from "$lib/components/ErrorPage.svelte"
   import Loading from "$lib/components/Loading.svelte"
   import QuestionComponent from "$lib/components/QuestionComponent.svelte"
   import type { Result } from "$lib/components/types.ts"
@@ -6,7 +7,6 @@
   import type { Language } from "@shared/api/Language.ts"
   import type { Parameters } from "@shared/api/Parameters"
   import type { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
-  import { createQuery } from "@tanstack/svelte-query"
 
   interface Props {
     generator: QuestionGenerator
@@ -17,24 +17,19 @@
   }
   const { generator, parameters, seed, onResult, regenerate }: Props = $props()
   const lang: Language = $derived(getLanguage())
-  const queryKey = $derived([generator, lang, parameters, seed])
-  const questionQuery = $derived(
-    createQuery({
-      queryKey,
-      queryFn: async () => generator.generate(lang, parameters, seed),
-    }),
-  )
-
-  $effect(() => {
-    if ($questionQuery.isError) {
-      throw new Error(`${$questionQuery.error}`)
-    }
-  })
+  const question = $derived(fetchQuestion())
+  async function fetchQuestion() {
+    return generator.generate(lang, parameters, seed)
+  }
 </script>
 
-{#if $questionQuery.isLoading || !$questionQuery.isSuccess}
+{#await question}
   <Loading />
-{:else}
+{:then question}
   <!-- Todo: Missing useFormat() -->
-  <QuestionComponent question={$questionQuery.data.question} {onResult} {regenerate} />
-{/if}
+  {#key question}
+    <QuestionComponent question={question.question} {onResult} {regenerate} />
+  {/key}
+{:catch err}
+  <ErrorPage mg={err.message} reset={regenerate} />
+{/await}

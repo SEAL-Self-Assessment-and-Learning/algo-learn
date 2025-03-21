@@ -35,7 +35,7 @@
   <!-- Original element - becomes invisible during drag but maintains dimensions -->
   <div
     class={[
-      `flex w-auto items-center rounded-md bg-gray-200 p-4 hover:bg-gray-300 dark:bg-gray-700 hover:dark:bg-gray-600`,
+      `flex w-auto items-center rounded-md bg-gray-200 p-4 dark:bg-gray-700`,
       { invisible: isDragging.current },
     ]}
   >
