@@ -32,7 +32,7 @@
   }
 </script>
 
-<h1 class="text-3xl font-bold">
+<h1 class="text-2xl font-semibold">
   {title !== undefined && title + " "}
   {#if permalink}
     <Tooltip.Provider>
@@ -48,7 +48,6 @@
       </MyTooltip>
     </Tooltip.Provider>
   {/if}
-  <!-- Todo: Check if regenerate works -->
   {#if regenerate}
     <Tooltip.Provider>
       <MyTooltip contentProps={{ sideOffset: 5 }} triggerProps={{ onclick: regenerate }}>

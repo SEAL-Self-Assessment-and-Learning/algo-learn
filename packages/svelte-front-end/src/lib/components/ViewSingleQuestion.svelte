@@ -26,7 +26,6 @@
 {#await question}
   <Loading />
 {:then question}
-  <!-- Todo: Missing useFormat() -->
   {#key question}
     <QuestionComponent question={question.question} {onResult} {regenerate} />
   {/key}
