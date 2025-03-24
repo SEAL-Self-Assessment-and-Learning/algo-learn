@@ -14,8 +14,13 @@ import { t, tFunctional, type Translations } from "@shared/utils/translations"
 const translations: Translations = {
   en: {
     name: "Sorting Question",
-    description: "Sorting the equations based on their values.",
+    description: "Sorting the equations based on their sum.",
     text: "Sort the following sums in ascending order.",
+  },
+  de: {
+    name: "Sortierfrage",
+    description: "Sortiere die Gleichungen basierend auf ihrer Summe.",
+    text: "Sortiere die folgenden Summen in aufsteigender Reihenfolge.",
   },
 }
 
@@ -27,7 +32,7 @@ const translations: Translations = {
  *
  * @returns A list of unique number pairs.
  */
-function generateAdditionEquations(random: Random): [number, number][] {
+function generateSumPairs(random: Random): [number, number][] {
   const pairs: [number, number][] = []
   const sums = new Set<number>()
 
@@ -45,7 +50,7 @@ function generateAdditionEquations(random: Random): [number, number][] {
 }
 
 /**
- * This question generator generates a simple multiple choice question.
+ * This question generator generates a sorting choice question.
  */
 export const DemoSortingChoice: QuestionGenerator = {
   id: "demos",
@@ -67,7 +72,7 @@ export const DemoSortingChoice: QuestionGenerator = {
   generate: (lang = "en", parameters, seed) => {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
-    const pairs = generateAdditionEquations(random)
+    const sumPairs = generateSumPairs(random)
 
     // generate the question object
     const question: MultipleChoiceQuestion = {
@@ -81,9 +86,9 @@ export const DemoSortingChoice: QuestionGenerator = {
       }),
       sorting: true,
       text: t(translations, lang, "text"),
-      answers: pairs.map(([a, b]) => `$${a} + ${b}$`),
+      answers: sumPairs.map(([a, b]) => `$${a} + ${b}$`),
       feedback: minimalMultipleChoiceFeedback({
-        correctAnswerIndex: pairs
+        correctAnswerIndex: sumPairs
           .map((pair, index) => ({ index, sum: pair[0] + pair[1] }))
           .sort((a, b) => a.sum - b.sum)
           .map(({ index }) => index),
