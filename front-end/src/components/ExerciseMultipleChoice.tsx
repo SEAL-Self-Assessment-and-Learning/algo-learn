@@ -199,7 +199,7 @@ export function ExerciseMultipleChoice({
           <br />
           <Markdown
             md={t("feedback.correct-order", [
-              `${state.feedbackObject?.correctChoice?.map((i) => "\n|" + question.answers[i] + "|").join("")}\n|#div_my-5#|\n`,
+              `${state.feedbackObject?.correctChoice?.map((i) => "\n|" + question.answers[i] + "|").join("")}\n`,
             ])}
           />
         </>
