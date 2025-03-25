@@ -27,6 +27,7 @@ import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
+import { LoopsAsymptotic } from "@shared/question-generators/time/asymptoticLoops.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF.ts"
 
@@ -64,7 +65,7 @@ export const collection: QuestionCollection = [
   {
     slug: "time",
     name: { de: "Laufzeit", en: "Time" },
-    contents: [Loops],
+    contents: [Loops, LoopsAsymptotic],
     image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
   },
   {
