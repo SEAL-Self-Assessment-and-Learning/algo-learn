@@ -42,7 +42,7 @@
     {/if}
   {/each}
 {:else if x.kind === "`"}
-  <span class="rounded-sm bg-gray-200 px-2 py-1 font-mono dark:bg-gray-700">
+  <span class="rounded-sm bg-gray-200 px-2 py-0.5 font-mono dark:bg-gray-700">
     <Markdown md={x.child} />
   </span>
 {:else if x.kind === "```"}

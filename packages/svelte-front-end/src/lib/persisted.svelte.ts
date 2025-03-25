@@ -4,6 +4,8 @@ import { browser } from "$app/environment"
  * Create a reactive store that persists its value in localStorage.
  * @param key - The key to use in localStorage.
  * @param defaultValue - The default value to use if the key is not set.
+ * @param syncTabs
+ * @param onChange
  */
 export function persisted<T extends string>(
   key: string,

@@ -86,8 +86,6 @@
     }
   }
 
-  // Todo: Add some equivalent svelte
-
   function onKeyDown(e: Event) {
     if (!(e instanceof KeyboardEvent)) return
     if (e.ctrlKey || e.metaKey || e.altKey) return

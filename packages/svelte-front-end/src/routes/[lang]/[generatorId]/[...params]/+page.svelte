@@ -107,23 +107,23 @@
     .split(/\/(de|en)\//)
     .slice(1)
     .join("/")
-  const dePath = deserializePath({
+  const deserializedPath = deserializePath({
     collection,
     path,
     expectLang: true,
   })
-  if (!dePath) throw new Error("Parsing the url went wrong!")
+  if (!deserializedPath) throw new Error("Parsing the url went wrong!")
 
-  const generator = dePath.generator
+  const generator = deserializedPath.generator
 
   let generatorCalls: {
     generator: QuestionGenerator
     parameters: Parameters
   }[] = []
-  if (dePath.parameters) {
+  if (deserializedPath.parameters) {
     generatorCalls.push({
       generator,
-      parameters: dePath.parameters,
+      parameters: deserializedPath.parameters,
     })
   } else {
     allParameterCombinations(generator.expectedParameters).map((parameters) => {
@@ -145,9 +145,9 @@
 
   let sessionSeed = $state(sampleRandomSeed())
   function nextSeed() {
-    sessionSeed = dePath!.seed ? dePath!.seed : sampleRandomSeed()
+    sessionSeed = deserializedPath!.seed ? deserializedPath!.seed : sampleRandomSeed()
   }
-  const currSeed = $derived(dePath.seed ? dePath.seed : sessionSeed)
+  const currSeed = $derived(deserializedPath.seed ? deserializedPath.seed : sessionSeed)
   const currObj = $derived(generatorCalls[questionState.numCorrect + questionState.numIncorrect])
   let status: "running" | "finished" | "aborted" = $state("running")
 
@@ -159,13 +159,14 @@
         : "running"
   }
 
-  const msgList =
+  const msgList = $derived(
     questionState.numIncorrect == 0
       ? great
       : questionState.numCorrect / (questionState.numCorrect + questionState.numIncorrect) >= 0.75
         ? good
-        : meh
-  const msg = random.choice(msgList[getLanguage()])
+        : meh,
+  )
+  const msg = $derived(random.choice(msgList[getLanguage()]))
 
   const handleResult = (result: Result) => {
     if (result === "correct") {
@@ -182,7 +183,6 @@
 </script>
 
 {#if status === "aborted"}
-  <!-- Todo: Improve this design -->
   <CenteredDivs variant="screen">
     <div class="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
       <div class="font-serif text-red-500 italic">{t("quiz-session-aborted")}</div>
@@ -202,7 +202,6 @@
     regenerate={nextSeed}
   />
 {:else}
-  <!-- Todo: Improve this design -->
   <CenteredDivs variant="screen">
     <div class="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
       <div class="font-serif italic">{msg}</div>

@@ -58,8 +58,8 @@
 
 {#snippet icon()}
   {#if mode === "correct"}
-    <CheckCheck class="mr-5 inline-block text-7xl" />
+    <CheckCheck class="mr-5 inline-block text-8xl" />
   {:else}
-    <CircleX class="mr-5 inline-block text-6xl" />
+    <CircleX class="mr-5 inline-block text-7xl" />
   {/if}
 {/snippet}

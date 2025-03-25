@@ -1,6 +1,6 @@
 <script lang="ts">
   import Markdown from "$lib/components/markdown/markdown.svelte"
-  import { GripVertical } from "lucide-svelte"
+  import { GripHorizontal } from "lucide-svelte"
   import type { UniqueIdentifier } from "@dnd-kit-svelte/core"
   import { useSortable } from "@dnd-kit-svelte/sortable"
   import { CSS, styleObjectToString } from "@dnd-kit-svelte/utilities"
@@ -33,13 +33,10 @@
   {...attributes.current}
 >
   <!-- Original element - becomes invisible during drag but maintains dimensions -->
-  <div
-    class={[
-      `flex w-auto items-center rounded-md bg-gray-200 p-4 dark:bg-gray-700`,
-      { invisible: isDragging.current },
-    ]}
-  >
-    <GripVertical class={`mr-4 ${disabled ? "" : "hover:cursor-pointer"}`} />
-    <Markdown md={task.content} />
+  <div class={[`flex w-auto items-center`, { invisible: isDragging.current }]}>
+    <GripHorizontal class={`mr-4 ${disabled ? "" : "hover:cursor-pointer"}`} />
+    <div class="hover:bg-goethe rounded-md border-1 border-gray-200 px-4 py-2 dark:border-gray-800">
+      <Markdown md={task.content} />
+    </div>
   </div>
 </div>
