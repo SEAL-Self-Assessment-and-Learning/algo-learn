@@ -419,7 +419,7 @@ export function createWhileChangeValues({
   } else if (cOption === "xLog") {
     assignments.push({
       assignment: firstVariableName,
-      value: ["\\lceil ", "log_2(", firstVariableName, ")", "\\rceil"],
+      value: ["\\lceil ", "log_2(", { variable: firstVariableName }, ")", "\\rceil"],
     })
     changeFirstVariable = Math.ceil(Math.log2(changeFirstVariable))
   } else if (cOption === "xMinusY") {
