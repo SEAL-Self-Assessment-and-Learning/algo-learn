@@ -13,7 +13,7 @@ import type Random from "@shared/utils/random"
 
 export type AdditionOption = { type: "add"; value: number }
 export type MultiplicationOption = { type: "mult"; value: number }
-export type DivisionOption = { type: "div"; value: number }
+export type DivisionOption = { type: "div"; valueD: number; valueU?: number }
 export type SquareOption = { type: "square"; abs: boolean }
 export type CubeOption = { type: "cube" }
 export type LogOption = { type: "log"; value: number }
@@ -106,7 +106,7 @@ export function createBasicForLine({
   variableName: string
   startValueLoop: string | PseudoCodeVariable
   startManipulation?: BoundsOptions
-  endValueLoop: string
+  endValueLoop: string | PseudoCodeVariable
   endManipulation?: BoundsOptions
   timeOrStars?: "time" | "stars"
 }): PseudoCodeFor {
@@ -236,9 +236,17 @@ export function createBoundsString(
     }
     if (boundsManipulation.type === "div") {
       if (timeOrStars === "stars") {
-        endPseudoCodeString = [`\\lfloor \\frac{`, value, `}{${boundsManipulation.value}} \\rfloor`]
+        endPseudoCodeString = [
+          `\\lfloor \\frac{${boundsManipulation.valueU ? boundsManipulation.valueU + " \\cdot " : ""}`,
+          value,
+          `}{${boundsManipulation.valueD}} \\rfloor`,
+        ]
       } else {
-        endPseudoCodeString = [`\\frac{`, value, `}{${boundsManipulation.value}}`]
+        endPseudoCodeString = [
+          `\\frac{${boundsManipulation.valueU ? boundsManipulation.valueU + " \\cdot " : ""}`,
+          value,
+          `}{${boundsManipulation.valueD}}`,
+        ]
       }
     }
     if (boundsManipulation.type === "pow") {
