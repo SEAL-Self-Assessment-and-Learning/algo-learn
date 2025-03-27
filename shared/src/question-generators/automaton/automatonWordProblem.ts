@@ -1,47 +1,60 @@
-import type {
-  MultipleChoiceQuestion,
-  QuestionGenerator} from "@shared/api/QuestionGenerator";
 import {
-  minimalMultipleChoiceFeedback
+  minimalMultipleChoiceFeedback,
+  type MultipleChoiceQuestion,
+  type QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import type { Automaton } from "@shared/question-generators/automaton/automaton"
-import { generateAutomaton } from "@shared/question-generators/automaton/automatonGenerator"
+import { generateDFA, generateNFA } from "@shared/question-generators/automaton/automatonGenerator"
 import Random from "@shared/utils/random"
-import type { Translations } from "@shared/utils/translations";
-import { t, tFunctional } from "@shared/utils/translations"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {
     name: "Word Problem in Finite Automata",
     description: "Determine which words are accepted by the automaton.",
     question:
-      "Let $\\mathcal{A}=(Q,\\Sigma,{{startnode}},F,\\delta)$ be a NFA, where $\\\\ Q = \\{ {{states}} \\}$ is the set of states, $\\\\ \\Sigma=\\{0,1\\}$ is the input alphabet, $\\\\ F = \\{ {{endstates}} \\}$ is the set of accepting states, and $\\\\ \\delta$ is the transition function given by $\\\\ {{transitions}}$. $\\\\$Select all words that are accepted by $\\mathcal{A}$.",
+      "Let $\\mathcal{A}=(Q,\\Sigma,{{startnodes}},F,\\delta)$ be a {{type}}, where $\\\\ Q = \\{ {{states}} \\}$ is the set of states, $\\\\ \\Sigma=\\{ {{alphabet}} \\}$ is the input alphabet, $\\\\ F = \\{ {{endstates}} \\}$ is the set of accepting states, and $\\\\ \\delta$ is the transition function given by $\\\\ {{transitions}}$. $\\\\$Select all words that are accepted by $\\mathcal{A}$.",
     prompt: "Which of the following words are accepted by $\\mathcal{A}$?",
     none: "None of the above",
   },
   de: {
     name: "Wortproblem in endlichen Automaten",
-    description: "Bestimme die vom Automaten akzeptierten Wörter",
+    description: "Bestimme die vom Automaten akzeptierten Wörter.",
     question:
-      "Sei $\\mathcal{A}=(Q,\\Sigma,{{startnode}},F,\\delta)$ ein NFA mit $\\\\ Q = \\{ {{states}} \\}$ ist die Menge der Zustände, $\\\\ \\Sigma=\\{0,1\\}$ ist das Eingabealphabet, $\\\\ F = \\{ {{endstates}} \\}$ ist die Menge der akzeptierenden Zustände und $\\\\ \\delta$ ist die Übergangsfunktion, gegeben durch $\\\\ {{transitions}}$. $\\\\$Wähle alle Wörter aus, die von $\\mathcal{A}$ akzeptiert werden.",
+      "Sei $\\mathcal{A}=(Q,\\Sigma,{{startnodes}},F,\\delta)$ ein {{type}}, wobei $\\\\ Q = \\{ {{states}} \\}$ die Menge der Zustände ist, $\\\\ \\Sigma=\\{ {{alphabet}} \\}$ das Eingabealphabet ist, $\\\\ F = \\{ {{endstates}} \\}$ die Menge der akzeptierenden Zustände ist und $\\\\ \\delta$ die Übergangsfunktion ist, gegeben durch $\\\\ {{transitions}}$. $\\\\$Wähle alle Wörter aus, die von $\\mathcal{A}$ akzeptiert werden.",
     prompt: "Welche der folgenden Wörter werden von $\\mathcal{A}$ akzeptiert?",
     none: "Keine der genannten Optionen",
   },
 }
 
-function generateWords(random: Random, count: number, minLength: number, maxLength: number): string[] {
+/**
+ * Generates random words from the given alphabet.
+ */
+function generateWords(
+  random: Random,
+  count: number,
+  minLength: number,
+  maxLength: number,
+  alphabet: string[],
+): string[] {
   return Array.from({ length: count }, () =>
-    Array.from({ length: random.int(minLength, maxLength) }, () => random.int(0, 1)).join(""),
+    Array.from({ length: random.int(minLength, maxLength) }, () => random.choice(alphabet)).join(""),
   )
 }
 
+/**
+ * Simulates the automaton to determine whether a word is accepted.
+ */
 function isWordAccepted(automaton: Automaton, word: string): boolean {
   let currentStates = new Set<string>()
-  const startNode = automaton.nodes.find((n) => n.isStart)
-  if (!startNode || !startNode.label) throw new Error("No start state found.")
+  const startNodes = automaton.nodes
+    .filter((n) => n.isStart && n.label !== undefined)
+    .map((n) => n.label as string) // Ensure no undefined values
 
-  currentStates.add(startNode.label)
+  if (startNodes.length === 0) throw new Error("No start states found.")
+
+  startNodes.forEach((state) => currentStates.add(state))
 
   for (const char of word) {
     const nextStates = new Set<string>()
@@ -62,8 +75,11 @@ function isWordAccepted(automaton: Automaton, word: string): boolean {
   return [...currentStates].some((state) => automaton.nodes.find((n) => n.label === state)?.isEnd)
 }
 
+/**
+ * Question Generator for the Automaton Word Problem (NFA and DFA Variants).
+ */
 export const AutomatonWordQuestion: QuestionGenerator = {
-  id: "nfaaccept",
+  id: "automatonaccept",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["automaton", "word recognition"],
@@ -77,16 +93,28 @@ export const AutomatonWordQuestion: QuestionGenerator = {
       min: 3,
       max: 6,
     },
+    {
+      name: "type",
+      description: (lang) =>
+        lang === "en" ? "Type of automaton (NFA or DFA)." : "Typ des Automaten (NFA oder DFA).",
+      type: "string",
+      allowedValues: ["NFA", "DFA"],
+    },
   ],
 
   generate: (lang: "en" | "de", parameters, seed) => {
     const random = new Random(seed)
     const size = parameters.size as number
+    const type = parameters.type as "NFA" | "DFA"
+    const alphabet = ["0", "1"]
 
-    const automaton = generateAutomaton(random, size, 0.6, 0.3)
+    const automaton =
+      type === "NFA"
+        ? generateNFA(random, size, alphabet, 0.5, 0.2, 0.1, 0.3, true)
+        : generateDFA(random, size, alphabet, 0.2, true)
 
     // generate options
-    const words = generateWords(random, 6, 2, 6)
+    const words = generateWords(random, 6, 2, 6, alphabet)
     const acceptedWords = words.filter((word) => isWordAccepted(automaton, word))
 
     const answers = words.map((word) => ({
@@ -105,10 +133,10 @@ export const AutomatonWordQuestion: QuestionGenerator = {
     // format transitions
     const transitions = automaton.edges
       .flatMap((row, sourceIndex) =>
-        row.map(
-          (edge) =>
-            `\\delta(${automaton.nodes[sourceIndex]?.label}, ${edge.value}) = ${automaton.nodes[edge.target]?.label}`,
-        ),
+        row.map((edge) => {
+          const input = edge.value === undefined ? "\\varepsilon" : edge.value
+          return `\\delta(${automaton.nodes[sourceIndex]?.label}, ${input}) = ${automaton.nodes[edge.target]?.label}`
+        }),
       )
       .join(", \\\\")
 
@@ -118,12 +146,17 @@ export const AutomatonWordQuestion: QuestionGenerator = {
       path: serializeGeneratorCall({ generator: AutomatonWordQuestion, lang, parameters, seed }),
       allowMultiple: true,
       text: t(translations, lang, "question", {
-        startnode: "q_0",
+        type,
+        startnodes: automaton.nodes
+          .filter((n) => n.isStart)
+          .map((n) => n.label)
+          .join(", "),
         states: automaton.nodes.map((n) => n.label).join(", "),
         endstates: automaton.nodes
           .filter((n) => n.isEnd)
           .map((n) => n.label)
           .join(", "),
+        alphabet: alphabet.join(", "),
         transitions,
       }),
       answers: answers.map(({ element }) => element),

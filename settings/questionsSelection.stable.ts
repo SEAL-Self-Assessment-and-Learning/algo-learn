@@ -8,6 +8,7 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { AutomatonWordQuestion } from "@shared/question-generators/automaton/automatonWordProblem"
 import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
@@ -27,7 +28,6 @@ import { RecurrenceMaster } from "@shared/question-generators/recursion/recurren
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF.ts"
-import { AutomatonWordQuestion } from "@shared/question-generators/automaton/automatonWordProblem"
 
 export const collection: QuestionCollection = [
   {
@@ -87,7 +87,7 @@ export const collection: QuestionCollection = [
     slug: "automaton",
     name: { de: "Automaten", en: "Automata" },
     contents: [AutomatonWordQuestion],
-  }
+  },
 ]
 
 export const oldPathToGenerator = {
