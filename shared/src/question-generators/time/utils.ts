@@ -218,10 +218,10 @@ export function createBoundsString(
     }
     if (boundsManipulation.type === "log") {
       if (timeOrStars === "stars") {
-        endPseudoCodeString = [`\\lceil log_${boundsManipulation.value}(`, value, `) \\rceil`]
+        endPseudoCodeString = [`\\lceil log_{${boundsManipulation.value}}(`, value, `) \\rceil`]
       } else {
         endPseudoCodeString = [
-          `log${boundsManipulation.value === 0 ? "" : "_" + boundsManipulation.value}(`,
+          `log${boundsManipulation.value === 0 ? "" : "_{" + boundsManipulation.value + "}"}(`,
           value,
           `)`,
         ]

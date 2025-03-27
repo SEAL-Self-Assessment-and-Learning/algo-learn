@@ -427,7 +427,6 @@ function pseudoCodePrintToString(print: PseudoCodePrint): {
   printLatex: string
 } {
   const { psString, psStringColor, psStringLatex } = pseudoCodeStringToString(print.print, true)
-  console.log(print.print)
   const printNormal = `\\text{print}\\left(${psString}\\right)`
   const printColor = `\\text{print}\\left(${psStringColor}\\right)`
   const printLatex = `print$\\left(${psStringLatex}\\right)$`
@@ -514,7 +513,6 @@ function pseudoCodeStringToString(
       psStringLatex += pseudoString[i] as string
     } else if (isPseudoCodeVariable(pseudoString[i])) {
       const { variable } = pseudoString[i] as PseudoCodeVariable
-      console.log(variable)
       psString += variable
       psStringColor += `{\\color{${variableColor}}${variable}}`
       psStringLatex += variable

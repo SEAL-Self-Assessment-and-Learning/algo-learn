@@ -10,8 +10,21 @@ const runtimeLinear = createProductTerm({
 })
 
 export function getLoopLinearTime(random: Random): LoopAsymptoticVariant {
-  return linearVariant1(random)
+  return random.choice([linearVariant1, linearVariant2])(random)
 }
+
+const vn = { variable: "n" }
+const vi = { variable: "i" }
+
+const printStatement = (random: Random) =>
+  random.choice([
+    printStarsNew(random.int(1, 3)),
+    {
+      state: {
+        print: [vi],
+      },
+    },
+  ])
 
 /**
  * Variant 1: Linear loop with:
@@ -27,7 +40,7 @@ function linearVariant1(random: Random): LoopAsymptoticVariant {
   const forLine: PseudoCodeFor = createBasicForLine({
     variableName: "i",
     startValueLoop: random.int(0, 10).toString(),
-    endValueLoop: { variable: "n" },
+    endValueLoop: vn,
     endManipulation: random.weightedChoice([
       [{ type: "add", value: valueU }, 1 / 3],
       [{ type: "mult", value: valueD }, 1 / 3],
@@ -36,14 +49,41 @@ function linearVariant1(random: Random): LoopAsymptoticVariant {
     ]),
     timeOrStars: "time",
   })
-  forLine.for.do = random.choice([
-    printStarsNew(random.int(1, 3)),
-    {
-      state: {
-        print: [{ variable: "i" }],
-      },
-    },
-  ])
+  forLine.for.do = printStatement(random)
+
+  return {
+    code: [{ block: [forLine] }],
+    runtime: runtimeLinear,
+  }
+}
+
+/**
+ * Variant 2: Linear loop with:
+ * - different start manipulations
+ * - end manipulation (add, mult)
+ * - steos of 1
+ * @param random
+ */
+function linearVariant2(random: Random): LoopAsymptoticVariant {
+  const valueD = random.choice([2, 5, 10, 20, 50, 100])
+  const valueEnd = random.choice([2, 5, 10, 20, 50, 100].filter((v) => v !== valueD))
+
+  const forLine: PseudoCodeFor = createBasicForLine({
+    variableName: "i",
+    startValueLoop: vn,
+    startManipulation: random.weightedChoice([
+      [{ type: "div", valueD: valueD }, 0.5],
+      [{ type: "log", value: random.choice([0, 2, 10, 50]) }, 0.5],
+    ]),
+    endValueLoop: vn,
+    endManipulation: random.weightedChoice([
+      [undefined, 0.5],
+      [{ type: "add", value: valueEnd }, 0.25],
+      [{ type: "mult", value: valueEnd }, 0.25],
+    ]),
+    timeOrStars: "time",
+  })
+  forLine.for.do = printStatement(random)
 
   return {
     code: [{ block: [forLine] }],
