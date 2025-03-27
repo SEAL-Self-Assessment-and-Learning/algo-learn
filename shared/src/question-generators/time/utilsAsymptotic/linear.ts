@@ -4,6 +4,11 @@ import type { LoopAsymptoticVariant } from "@shared/question-generators/time/uti
 import { printStarsNew, type PseudoCodeFor } from "@shared/utils/pseudoCodeUtils.ts"
 import type Random from "@shared/utils/random.ts"
 
+const runtimeLinear = createProductTerm({
+  coefficient: 1,
+  polyexponent: 1,
+})
+
 export function getLoopLinearTime(random: Random): LoopAsymptoticVariant {
   return linearVariant1(random)
 }
@@ -31,13 +36,17 @@ function linearVariant1(random: Random): LoopAsymptoticVariant {
     ]),
     timeOrStars: "time",
   })
-  forLine.for.do = printStarsNew(random.int(1, 3))
+  forLine.for.do = random.choice([
+    printStarsNew(random.int(1, 3)),
+    {
+      state: {
+        print: [{ variable: "i" }],
+      },
+    },
+  ])
 
   return {
     code: [{ block: [forLine] }],
-    runtime: createProductTerm({
-      coefficient: 1,
-      polyexponent: 1,
-    }),
+    runtime: runtimeLinear,
   }
 }

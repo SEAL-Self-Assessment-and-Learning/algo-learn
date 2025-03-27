@@ -1,10 +1,7 @@
-export type PseudoCodeString = Array<
-  string | PseudoCodeVariable | PseudoCodeFunctionName | PseudoCodePrintString
->
+export type PseudoCodeString = Array<string | PseudoCodeVariable | PseudoCodeFunctionName>
 
 export type PseudoCodeVariable = { variable: string }
 export type PseudoCodeFunctionName = { functionName: string }
-export type PseudoCodePrintString = { printString: string }
 
 export type PseudoCodePrint = { print: PseudoCodeString }
 export type PseudoCodeCall = { functionName: string; args: Array<PseudoCodeString> }
@@ -82,7 +79,7 @@ export type PseudoCode = Array<PseudoCodeFunction | PseudoCodeBlock | PseudoCode
 
 export function printStarsNew(stars: number): PseudoCodeState {
   const printStarsString: PseudoCodePrint = {
-    print: [{ printString: `\\texttt{"${"*".repeat(stars)}"}` }],
+    print: [`\\texttt{"${"*".repeat(stars)}"}`],
   }
   return { state: printStarsString }
 }

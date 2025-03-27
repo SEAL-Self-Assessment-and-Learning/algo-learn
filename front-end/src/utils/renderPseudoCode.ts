@@ -9,7 +9,6 @@ import type {
   PseudoCodeFunctionName,
   PseudoCodeIf,
   PseudoCodePrint,
-  PseudoCodePrintString,
   PseudoCodeReturn,
   PseudoCodeState,
   PseudoCodeString,
@@ -427,7 +426,8 @@ function pseudoCodePrintToString(print: PseudoCodePrint): {
   printColor: string
   printLatex: string
 } {
-  const { psString, psStringColor, psStringLatex } = pseudoCodeStringToString(print.print)
+  const { psString, psStringColor, psStringLatex } = pseudoCodeStringToString(print.print, true)
+  console.log(print.print)
   const printNormal = `\\text{print}\\left(${psString}\\right)`
   const printColor = `\\text{print}\\left(${psStringColor}\\right)`
   const printLatex = `print$\\left(${psStringLatex}\\right)$`
@@ -492,7 +492,10 @@ function pseudoCodeCallToString(call: PseudoCodeCall): {
   return { callNormal, callColor, callLatex }
 }
 
-function pseudoCodeStringToString(pseudoString: PseudoCodeString): {
+function pseudoCodeStringToString(
+  pseudoString: PseudoCodeString,
+  colorString: boolean = false,
+): {
   psString: string
   psStringColor: string
   psStringLatex: string
@@ -503,10 +506,15 @@ function pseudoCodeStringToString(pseudoString: PseudoCodeString): {
   for (let i = 0; i < pseudoString.length; i++) {
     if (typeof pseudoString[i] === "string") {
       psString += pseudoString[i] as string
-      psStringColor += pseudoString[i] as string
+      if (colorString) {
+        psStringColor += `{\\color{${printStatementColor}}${pseudoString[i] as string}}`
+      } else {
+        psStringColor += pseudoString[i] as string
+      }
       psStringLatex += pseudoString[i] as string
     } else if (isPseudoCodeVariable(pseudoString[i])) {
       const { variable } = pseudoString[i] as PseudoCodeVariable
+      console.log(variable)
       psString += variable
       psStringColor += `{\\color{${variableColor}}${variable}}`
       psStringLatex += variable
@@ -515,11 +523,6 @@ function pseudoCodeStringToString(pseudoString: PseudoCodeString): {
       psString += functionName
       psStringColor += `{\\color{${functionColor}}${functionName}}`
       psStringLatex += functionName
-    } else if (isPseudoCodePrintString(pseudoString[i])) {
-      const { printString } = pseudoString[i] as PseudoCodePrintString
-      psString += printString
-      psStringColor += `{\\color{${printStatementColor}}${printString}}`
-      psStringLatex += printString
     }
   }
 
@@ -527,21 +530,15 @@ function pseudoCodeStringToString(pseudoString: PseudoCodeString): {
 }
 
 function isPseudoCodeVariable(
-  pseudoString: string | PseudoCodeVariable | PseudoCodeFunctionName | PseudoCodePrintString,
+  pseudoString: string | PseudoCodeVariable | PseudoCodeFunctionName,
 ): boolean {
   return typeof pseudoString === "object" && "variable" in pseudoString
 }
 
 function isPseudoCodeFunctionName(
-  pseudoString: string | PseudoCodeVariable | PseudoCodeFunctionName | PseudoCodePrintString,
+  pseudoString: string | PseudoCodeVariable | PseudoCodeFunctionName,
 ): boolean {
   return typeof pseudoString === "object" && "functionName" in pseudoString
-}
-
-function isPseudoCodePrintString(
-  pseudoString: string | PseudoCodeVariable | PseudoCodeFunctionName | PseudoCodePrintString,
-): boolean {
-  return typeof pseudoString === "object" && "printString" in pseudoString
 }
 
 function leadingWhitespace(indent: number): string {
