@@ -7,19 +7,22 @@
   }
   const { expr, displayMode }: Props = $props()
 
-  const r = $derived(katex.renderToString(expr))
+  let span: HTMLSpanElement
+  $effect(() => {
+    katex.render(expr, span, { displayMode })
+  })
 </script>
 
-{#if displayMode}
-  <div class="p-4">
-    <!-- Pretty sure this html as we render LaTeX -->
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-    {@html r}
-  </div>
-{:else}
-  <span>
-    <!-- Pretty sure this html as we render LaTeX -->
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-    {@html r}
-  </span>
-{/if}
+<span bind:this={span}></span>
+
+<style>
+  :global(.katex-display > .katex) {
+    white-space: normal;
+  }
+  :global(.katex-display > .base) {
+    margin: 0.25em 0;
+  }
+  :global(.katex-display) {
+    margin: 0.5em 0;
+  }
+</style>
