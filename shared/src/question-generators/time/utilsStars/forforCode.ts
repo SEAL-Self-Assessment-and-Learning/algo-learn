@@ -51,7 +51,7 @@ function createFirstForLine(
     })
     firstForLoop = createForLineWithStepSet({
       variableName: firstVariableName,
-      stepValuesSet,
+      stepValuesSet: [stepValuesSet],
     })
     leadingPseudoCodeBlock.block.push(firstForLoop)
   }
@@ -112,7 +112,7 @@ function createSecondForLine(
     })
     secondForStatement = createForLineWithStepSet({
       variableName: secondVariableName,
-      stepValuesSet: stepSet,
+      stepValuesSet: [stepSet],
     })
     firstForBlock.block.push(secondForStatement)
   }

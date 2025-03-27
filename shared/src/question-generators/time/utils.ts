@@ -132,12 +132,12 @@ export function createForLineWithStepSet({
   stepValuesSet,
 }: {
   variableName: string
-  stepValuesSet: string
+  stepValuesSet: PseudoCodeString
 }): PseudoCodeForAll {
   return {
     forAll: {
       variable: variableName,
-      set: [stepValuesSet],
+      set: stepValuesSet,
       do: null,
     },
   }

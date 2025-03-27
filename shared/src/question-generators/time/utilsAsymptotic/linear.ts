@@ -1,7 +1,11 @@
 import { createProductTerm } from "@shared/question-generators/asymptotics/asymptoticsUtils.ts"
-import { createBasicForLine } from "@shared/question-generators/time/utils.ts"
+import { createBasicForLine, createForLineWithStepSet } from "@shared/question-generators/time/utils.ts"
 import type { LoopAsymptoticVariant } from "@shared/question-generators/time/utilsAsymptotic/utils.ts"
-import { printStarsNew, type PseudoCodeFor } from "@shared/utils/pseudoCodeUtils.ts"
+import {
+  printStarsNew,
+  type PseudoCodeFor,
+  type PseudoCodeForAll,
+} from "@shared/utils/pseudoCodeUtils.ts"
 import type Random from "@shared/utils/random.ts"
 
 const runtimeLinear = createProductTerm({
@@ -10,7 +14,7 @@ const runtimeLinear = createProductTerm({
 })
 
 export function getLoopLinearTime(random: Random): LoopAsymptoticVariant {
-  return random.choice([linearVariant1, linearVariant2])(random)
+  return random.choice([linearVariant1, linearVariant2, linearVariant3])(random)
 }
 
 const vn = { variable: "n" }
@@ -84,6 +88,42 @@ function linearVariant2(random: Random): LoopAsymptoticVariant {
     timeOrStars: "time",
   })
   forLine.for.do = printStatement(random)
+
+  return {
+    code: [{ block: [forLine] }],
+    runtime: runtimeLinear,
+  }
+}
+
+function linearVariant3(random: Random): LoopAsymptoticVariant {
+  const set = random.choice([
+    ["1,2,3,\\ldots,", vn],
+    [`1,2,3,\\ldots, ${random.int(2, 9)}`, vn],
+    [`1,2,3,\\ldots, ${random.int(3, 9)}^${random.int(5, 9)} \\cdot `, vn],
+    [vn, ", ", vn, " - 1,", vn, ` - 2, \\ldots, 1`],
+    [vn, ", ", vn, " - 1,", vn, ` - 2, \\ldots, \\frac{`, vn, `}{${random.int(2, 5).toString()}}`],
+    [`2,4,6,\\ldots, ${random.choice([2, 4, 6, 8])} \\cdot `, vn],
+    [`1,3,5,\\ldots, (${random.choice([2, 4, 6, 8])} \\cdot `, vn, " - 1)"],
+    [`1,2,4,8,\\ldots, 2^{`, vn, "}"],
+    [`1,2,4,8,\\ldots, 2^{ ${random.int(2, 9)} \\cdot `, vn, "}"],
+    [`3,9,27,\\ldots, 3^{`, vn, "}"],
+    [`3,9,27,\\ldots, 3^{ ${random.int(2, 9)} \\cdot `, vn, "}"],
+    [`1^2,2^2,3^2,\\ldots, `, vn, "^2"],
+    [`1^2,2^2,3^2,\\ldots, (${random.int(2, 5)} \\cdot`, vn, ")^2"],
+    [`1^2,2^2,3^2,\\ldots, (${random.int(5, 9)}^${random.int(5, 9)} \\cdot`, vn, ")^2"],
+    [`1!,2!,3!,\\ldots, `, vn, "!"],
+    [`1!,2!,3!,\\ldots, (${random.int(2, 5)} \\cdot`, vn, ")!"],
+    [`0,-1,2,-3,\\ldots, (-1)^{`, vn, "} \\cdot ", vn],
+    [`0,1,-2,3,-4,\\ldots, (-1)^{`, vn, "} \\cdot ", vn, " + 1"],
+  ])
+  set.splice(0, 0, "\\{")
+  set.push("\\}")
+
+  const forLine: PseudoCodeForAll = createForLineWithStepSet({
+    variableName: "i",
+    stepValuesSet: set,
+  })
+  forLine.forAll.do = printStatement(random)
 
   return {
     code: [{ block: [forLine] }],
