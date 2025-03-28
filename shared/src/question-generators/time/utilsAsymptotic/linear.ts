@@ -5,6 +5,9 @@ import {
   printStarsNew,
   type PseudoCodeFor,
   type PseudoCodeForAll,
+  type PseudoCodeIf,
+  type PseudoCodeString,
+  type PseudoCodeVariable,
 } from "@shared/utils/pseudoCodeUtils.ts"
 import type Random from "@shared/utils/random.ts"
 
@@ -14,7 +17,7 @@ const runtimeLinear = createProductTerm({
 })
 
 export function getLoopLinearTime(random: Random): LoopAsymptoticVariant {
-  return random.choice([linearVariant1, linearVariant2, linearVariant3])(random)
+  return random.choice([linearVariant1, linearVariant2, linearVariant3, linearVariant4])(random)
 }
 
 const vn = { variable: "n" }
@@ -95,6 +98,11 @@ function linearVariant2(random: Random): LoopAsymptoticVariant {
   }
 }
 
+/**
+ * Variant 3: Linear loop with:
+ * - iterating through sets with O(n) elements
+ * @param random
+ */
 function linearVariant3(random: Random): LoopAsymptoticVariant {
   const set = random.choice([
     ["1,2,3,\\ldots,", vn],
@@ -124,6 +132,57 @@ function linearVariant3(random: Random): LoopAsymptoticVariant {
     stepValuesSet: set,
   })
   forLine.forAll.do = printStatement(random)
+
+  return {
+    code: [{ block: [forLine] }],
+    runtime: runtimeLinear,
+  }
+}
+
+export function linearVariant4(random: Random): LoopAsymptoticVariant {
+  const variableCondition = (variable: PseudoCodeVariable) =>
+    random.choice([
+      [variable],
+      [`${random.int(2, 5)} \\cdot `, variable],
+      ["\\frac{", variable, `}{${random.int(2, 4)}}`],
+    ])
+  const condition: PseudoCodeString = random.bool()
+    ? [...variableCondition(vi), random.bool() ? " > " : " \\geq ", ...variableCondition(vn)]
+    : [...variableCondition(vn), random.bool() ? " < " : " \\leq ", ...variableCondition(vi)]
+  const forLine: PseudoCodeFor = createBasicForLine({
+    variableName: "i",
+    startValueLoop: random.int(0, 9).toString(),
+    endValueLoop: vn,
+    endManipulation: random.bool() ? { type: "square", abs: false } : { type: "cube" },
+    timeOrStars: "time",
+  })
+  const ifBlock: PseudoCodeIf = {
+    if: {
+      condition: condition,
+      then: {
+        block: [
+          {
+            state: {
+              assignment: "i",
+              value: [vi, `^${random.int(2, 5)}`],
+            },
+          },
+        ],
+      },
+    },
+  }
+  switch (random.int(0, 2)) {
+    case 0:
+      ifBlock.if.else = printStatement(random)
+      break
+    case 1:
+      ;(ifBlock.if.then as { block: any[] }).block.push(printStatement(random))
+      break
+    case 2:
+      break
+  }
+
+  forLine.for.do = { block: [ifBlock] }
 
   return {
     code: [{ block: [forLine] }],
