@@ -1,5 +1,11 @@
 import { cubeFor1 } from "@shared/question-generators/time/utilsAsymptotic/blocks/cubeFor.ts"
 import {
+  ifConstant1,
+  ifConstant2,
+  ifConstant3,
+  ifConstant4,
+} from "@shared/question-generators/time/utilsAsymptotic/blocks/ifConstant.ts"
+import {
   linearFor1,
   linearFor2,
   linearForALl1,
@@ -22,7 +28,7 @@ import type {
 import type Random from "@shared/utils/random.ts"
 
 export function getLoopLinearTime(random: Random): LoopAsymptoticVariant {
-  return random.choice([linearVariant1, linearVariant2, linearVariant3])(random, 0, 0)
+  return random.choice([linearVariant1, linearVariant2, linearVariant3, linearVariant4])(random, 0, 0)
 }
 
 export function linearVariant1(
@@ -118,6 +124,28 @@ export function linearVariant3(
   }
   return {
     code: [whileBlock],
+    runtime: runtimeLinear,
+  }
+}
+
+export function linearVariant4(
+  random: Random,
+  iterDepth: number,
+  finalDepth: number,
+): LoopAsymptoticVariant {
+  const forLine = random.choice([
+    linearFor1(random, iterDepth, finalDepth),
+    linearFor2(random, iterDepth, finalDepth),
+  ])
+
+  forLine.for.do = {
+    block: [
+      random.choice([ifConstant1, ifConstant2, ifConstant3, ifConstant4])(random, iterDepth, finalDepth),
+    ],
+  }
+
+  return {
+    code: [{ block: [forLine] }],
     runtime: runtimeLinear,
   }
 }
