@@ -13,6 +13,7 @@ import {
   type SumProductTerm,
 } from "@shared/question-generators/asymptotics/asymptoticsUtils.ts"
 import { getLoopLinearTime } from "@shared/question-generators/time/utilsAsymptotic/linear.ts"
+import { getLoopSquareTime } from "@shared/question-generators/time/utilsAsymptotic/square.ts"
 import math, { getVars } from "@shared/utils/math.ts"
 import { stringifyPseudoCode } from "@shared/utils/pseudoCodeUtils"
 import Random from "@shared/utils/random"
@@ -56,7 +57,7 @@ export const LoopsAsymptotic: QuestionGenerator = {
     })
 
     const random = new Random(seed)
-    const { code, runtime } = getLoopLinearTime(random)
+    const { code, runtime } = random.choice([getLoopLinearTime, getLoopSquareTime])(random)
 
     const question: FreeTextQuestion = {
       type: "FreeTextQuestion",

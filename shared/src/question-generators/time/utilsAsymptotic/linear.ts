@@ -1,62 +1,46 @@
-import { createProductTerm } from "@shared/question-generators/asymptotics/asymptoticsUtils.ts"
-import { createBasicForLine, createForLineWithStepSet } from "@shared/question-generators/time/utils.ts"
-import type { LoopAsymptoticVariant } from "@shared/question-generators/time/utilsAsymptotic/utils.ts"
+import { cubeFor1 } from "@shared/question-generators/time/utilsAsymptotic/blocks/cubeFor.ts"
 import {
-  printStarsNew,
-  type PseudoCodeFor,
-  type PseudoCodeForAll,
-  type PseudoCodeIf,
-  type PseudoCodeString,
-  type PseudoCodeVariable,
+  linearFor1,
+  linearFor2,
+  linearForALl1,
+} from "@shared/question-generators/time/utilsAsymptotic/blocks/linearFor.ts"
+import { linearWhile1 } from "@shared/question-generators/time/utilsAsymptotic/blocks/linearWhile.ts"
+import { squareFor1 } from "@shared/question-generators/time/utilsAsymptotic/blocks/squareFor.ts"
+import {
+  finalValue,
+  iterator,
+  printStatement,
+  runtimeLinear,
+  type LoopAsymptoticVariant,
+} from "@shared/question-generators/time/utilsAsymptotic/utils.ts"
+import { linearWhileIncrements } from "@shared/question-generators/time/utilsAsymptotic/whileIncrements.ts"
+import type {
+  PseudoCodeIf,
+  PseudoCodeString,
+  PseudoCodeVariable,
 } from "@shared/utils/pseudoCodeUtils.ts"
 import type Random from "@shared/utils/random.ts"
 
-const runtimeLinear = createProductTerm({
-  coefficient: 1,
-  polyexponent: 1,
-})
-
 export function getLoopLinearTime(random: Random): LoopAsymptoticVariant {
-  return random.choice([linearVariant1, linearVariant2, linearVariant3, linearVariant4])(random)
+  return random.choice([linearVariant1, linearVariant2, linearVariant3])(random, 0, 0)
 }
 
-const vn = { variable: "n" }
-const vi = { variable: "i" }
-
-const printStatement = (random: Random) =>
-  random.choice([
-    printStarsNew(random.int(1, 3)),
-    {
-      state: {
-        print: [vi],
-      },
-    },
+export function linearVariant1(
+  random: Random,
+  iterDepth: number,
+  finalDepth: number,
+): LoopAsymptoticVariant {
+  const forLine = random.choice([
+    linearForALl1(random, iterDepth, finalDepth),
+    linearFor1(random, iterDepth, finalDepth),
+    linearFor2(random, iterDepth, finalDepth),
   ])
 
-/**
- * Variant 1: Linear loop with:
- * - no start manipulation
- * - different end manipulations
- * - steps of 1
- * @param random
- */
-function linearVariant1(random: Random): LoopAsymptoticVariant {
-  const valueU = random.choice([10, 20, 50, 100])
-  const valueD = random.choice([0.01, 0.01, 0.5, 10, 50, 100].filter((v) => v !== valueU))
-
-  const forLine: PseudoCodeFor = createBasicForLine({
-    variableName: "i",
-    startValueLoop: random.int(0, 10).toString(),
-    endValueLoop: vn,
-    endManipulation: random.weightedChoice([
-      [{ type: "add", value: valueU }, 1 / 3],
-      [{ type: "mult", value: valueD }, 1 / 3],
-      [{ type: "div", valueD }, 1 / 6],
-      [{ type: "div", valueD, valueU }, 1 / 6],
-    ]),
-    timeOrStars: "time",
-  })
-  forLine.for.do = printStatement(random)
+  if ("forAll" in forLine) {
+    forLine.forAll.do = printStatement(random, iterDepth)
+  } else {
+    forLine.for.do = printStatement(random, iterDepth)
+  }
 
   return {
     code: [{ block: [forLine] }],
@@ -64,98 +48,31 @@ function linearVariant1(random: Random): LoopAsymptoticVariant {
   }
 }
 
-/**
- * Variant 2: Linear loop with:
- * - different start manipulations
- * - end manipulation (add, mult)
- * - steos of 1
- * @param random
- */
-function linearVariant2(random: Random): LoopAsymptoticVariant {
-  const valueD = random.choice([2, 5, 10, 20, 50, 100])
-  const valueEnd = random.choice([2, 5, 10, 20, 50, 100].filter((v) => v !== valueD))
-
-  const forLine: PseudoCodeFor = createBasicForLine({
-    variableName: "i",
-    startValueLoop: vn,
-    startManipulation: random.weightedChoice([
-      [{ type: "div", valueD: valueD }, 0.5],
-      [{ type: "log", value: random.choice([0, 2, 10, 50]) }, 0.5],
-    ]),
-    endValueLoop: vn,
-    endManipulation: random.weightedChoice([
-      [undefined, 0.5],
-      [{ type: "add", value: valueEnd }, 0.25],
-      [{ type: "mult", value: valueEnd }, 0.25],
-    ]),
-    timeOrStars: "time",
-  })
-  forLine.for.do = printStatement(random)
-
-  return {
-    code: [{ block: [forLine] }],
-    runtime: runtimeLinear,
-  }
-}
-
-/**
- * Variant 3: Linear loop with:
- * - iterating through sets with O(n) elements
- * @param random
- */
-function linearVariant3(random: Random): LoopAsymptoticVariant {
-  const set = random.choice([
-    ["1,2,3,\\ldots,", vn],
-    [`1,2,3,\\ldots, ${random.int(2, 9)}`, vn],
-    [`1,2,3,\\ldots, ${random.int(3, 9)}^${random.int(5, 9)} \\cdot `, vn],
-    [vn, ", ", vn, " - 1,", vn, ` - 2, \\ldots, 1`],
-    [vn, ", ", vn, " - 1,", vn, ` - 2, \\ldots, \\frac{`, vn, `}{${random.int(2, 5).toString()}}`],
-    [`2,4,6,\\ldots, ${random.choice([2, 4, 6, 8])} \\cdot `, vn],
-    [`1,3,5,\\ldots, (${random.choice([2, 4, 6, 8])} \\cdot `, vn, " - 1)"],
-    [`1,2,4,8,\\ldots, 2^{`, vn, "}"],
-    [`1,2,4,8,\\ldots, 2^{ ${random.int(2, 9)} \\cdot `, vn, "}"],
-    [`3,9,27,\\ldots, 3^{`, vn, "}"],
-    [`3,9,27,\\ldots, 3^{ ${random.int(2, 9)} \\cdot `, vn, "}"],
-    [`1^2,2^2,3^2,\\ldots, `, vn, "^2"],
-    [`1^2,2^2,3^2,\\ldots, (${random.int(2, 5)} \\cdot`, vn, ")^2"],
-    [`1^2,2^2,3^2,\\ldots, (${random.int(5, 9)}^${random.int(5, 9)} \\cdot`, vn, ")^2"],
-    [`1!,2!,3!,\\ldots, `, vn, "!"],
-    [`1!,2!,3!,\\ldots, (${random.int(2, 5)} \\cdot`, vn, ")!"],
-    [`0,-1,2,-3,\\ldots, (-1)^{`, vn, "} \\cdot ", vn],
-    [`0,1,-2,3,-4,\\ldots, (-1)^{`, vn, "} \\cdot ", vn, " + 1"],
-  ])
-  set.splice(0, 0, "\\{")
-  set.push("\\}")
-
-  const forLine: PseudoCodeForAll = createForLineWithStepSet({
-    variableName: "i",
-    stepValuesSet: set,
-  })
-  forLine.forAll.do = printStatement(random)
-
-  return {
-    code: [{ block: [forLine] }],
-    runtime: runtimeLinear,
-  }
-}
-
-export function linearVariant4(random: Random): LoopAsymptoticVariant {
+export function linearVariant2(
+  random: Random,
+  iterDepth: number,
+  finalDepth: number,
+): LoopAsymptoticVariant {
+  const forLine = random.bool()
+    ? squareFor1(random, iterDepth, finalDepth)
+    : cubeFor1(random, iterDepth, finalDepth)
   const variableCondition = (variable: PseudoCodeVariable) =>
     random.choice([
       [variable],
       [`${random.int(2, 5)} \\cdot `, variable],
-      ["\\frac{", variable, `}{${random.int(2, 4)}}`],
+      ["\\frac{", variable, `}{${random.int(2, 5)}}`],
     ])
   const condition: PseudoCodeString = random.bool()
-    ? [...variableCondition(vi), random.bool() ? " > " : " \\geq ", ...variableCondition(vn)]
-    : [...variableCondition(vn), random.bool() ? " < " : " \\leq ", ...variableCondition(vi)]
-  const forLine: PseudoCodeFor = createBasicForLine({
-    variableName: "i",
-    startValueLoop: random.int(0, 9).toString(),
-    endValueLoop: vn,
-    endManipulation: random.bool() ? { type: "square", abs: false } : { type: "cube" },
-    timeOrStars: "time",
-  })
+    ? [
+        ...variableCondition(iterator[iterDepth]),
+        random.bool() ? " > " : " \\geq ",
+        ...variableCondition(finalValue[finalDepth]),
+      ]
+    : [
+        ...variableCondition(finalValue[finalDepth]),
+        random.bool() ? " < " : " \\leq ",
+        ...variableCondition(iterator[iterDepth]),
+      ]
   const ifBlock: PseudoCodeIf = {
     if: {
       condition: condition,
@@ -163,8 +80,8 @@ export function linearVariant4(random: Random): LoopAsymptoticVariant {
         block: [
           {
             state: {
-              assignment: "i",
-              value: [vi, `^${random.int(2, 5)}`],
+              assignment: iterator[iterDepth].variable,
+              value: [iterator[iterDepth], `^${random.int(2, 4)}`],
             },
           },
         ],
@@ -173,10 +90,10 @@ export function linearVariant4(random: Random): LoopAsymptoticVariant {
   }
   switch (random.int(0, 2)) {
     case 0:
-      ifBlock.if.else = printStatement(random)
+      ifBlock.if.else = printStatement(random, iterDepth)
       break
     case 1:
-      ;(ifBlock.if.then as { block: any[] }).block.push(printStatement(random))
+      ;(ifBlock.if.then as { block: any[] }).block.push(printStatement(random, iterDepth))
       break
     case 2:
       break
@@ -186,6 +103,21 @@ export function linearVariant4(random: Random): LoopAsymptoticVariant {
 
   return {
     code: [{ block: [forLine] }],
+    runtime: runtimeLinear,
+  }
+}
+
+export function linearVariant3(
+  random: Random,
+  iterDepth: number,
+  finalDepth: number,
+): LoopAsymptoticVariant {
+  const whileBlock = linearWhile1(random, iterDepth, finalDepth)
+  if ("while" in whileBlock.block[1]) {
+    whileBlock.block[1].while.do = { block: [linearWhileIncrements(random, iterDepth, finalDepth)] }
+  }
+  return {
+    code: [whileBlock],
     runtime: runtimeLinear,
   }
 }
