@@ -28,7 +28,11 @@ import type {
 import type Random from "@shared/utils/random.ts"
 
 export function getLoopLinearTime(random: Random): LoopAsymptoticVariant {
-  return random.choice([linearVariant1, linearVariant2, linearVariant3, linearVariant4])(random, 0, 0)
+  return random.choice([linearVariant1, linearVariant2, linearVariant3, linearVariant4, linearVariant5])(
+    random,
+    0,
+    0,
+  )
 }
 
 export function linearVariant1(
@@ -118,21 +122,6 @@ export function linearVariant3(
   iterDepth: number,
   finalDepth: number,
 ): LoopAsymptoticVariant {
-  const whileBlock = linearWhile1(random, iterDepth, finalDepth)
-  if ("while" in whileBlock.block[1]) {
-    whileBlock.block[1].while.do = { block: [linearWhileIncrements(random, iterDepth, finalDepth)] }
-  }
-  return {
-    code: [whileBlock],
-    runtime: runtimeLinear,
-  }
-}
-
-export function linearVariant4(
-  random: Random,
-  iterDepth: number,
-  finalDepth: number,
-): LoopAsymptoticVariant {
   const forLine = random.choice([
     linearFor1(random, iterDepth, finalDepth),
     linearFor2(random, iterDepth, finalDepth),
@@ -146,6 +135,45 @@ export function linearVariant4(
 
   return {
     code: [{ block: [forLine] }],
+    runtime: runtimeLinear,
+  }
+}
+
+export function linearVariant4(
+  random: Random,
+  iterDepth: number,
+  finalDepth: number,
+): LoopAsymptoticVariant {
+  const whileBlock = linearWhile1(random, iterDepth, finalDepth)
+  if ("while" in whileBlock.block[1]) {
+    whileBlock.block[1].while.do = { block: [linearWhileIncrements(random, iterDepth, finalDepth)] }
+  }
+  return {
+    code: [whileBlock],
+    runtime: runtimeLinear,
+  }
+}
+
+export function linearVariant5(
+  random: Random,
+  iterDepth: number,
+  finalDepth: number,
+): LoopAsymptoticVariant {
+  const whileBlock = linearWhile1(random, iterDepth, finalDepth)
+  if ("while" in whileBlock.block[1]) {
+    whileBlock.block[1].while.do = {
+      block: [
+        linearWhileIncrements(random, iterDepth, finalDepth, [1, 1, 1, 0, 0]),
+        random.choice([ifConstant1, ifConstant2, ifConstant3, ifConstant4])(
+          random,
+          iterDepth,
+          finalDepth,
+        ),
+      ],
+    }
+  }
+  return {
+    code: [whileBlock],
     runtime: runtimeLinear,
   }
 }

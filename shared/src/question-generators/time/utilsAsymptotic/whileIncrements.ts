@@ -50,7 +50,7 @@ export function linearWhileIncrements(
           ],
         },
       },
-      weights ? (weights[0] ?? 1) : 1,
+      weights ? (weights[1] ?? 1) : 1,
     ],
     [
       {
@@ -66,7 +66,7 @@ export function linearWhileIncrements(
           ],
         },
       },
-      weights ? (weights[0] ?? 1) : 1,
+      weights ? (weights[2] ?? 1) : 1,
     ],
     [
       {
@@ -86,7 +86,7 @@ export function linearWhileIncrements(
           },
         },
       },
-      weights ? (weights[0] ?? 1) : 1,
+      weights ? (weights[3] ?? 1) : 1,
     ],
     [
       {
@@ -121,7 +121,7 @@ export function linearWhileIncrements(
           },
         },
       },
-      weights ? (weights[0] ?? 1) : 1,
+      weights ? (weights[4] ?? 1) : 1,
     ],
   ])
 }
