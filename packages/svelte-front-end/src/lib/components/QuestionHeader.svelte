@@ -1,7 +1,7 @@
 <script lang="ts">
   import { browser } from "$app/environment"
   import MyTooltip from "$lib/components/ui/MyTooltip.svelte"
-  import { prefixURL } from "$lib/config.js"
+  import { BASENAME } from "$lib/config.js"
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { Tooltip } from "bits-ui"
@@ -22,7 +22,7 @@
 
   function handleClick() {
     if (!browser) return
-    void navigator.clipboard.writeText(prefixURL + "/" + permalink).then(() => {
+    void navigator.clipboard.writeText(window.location.host + BASENAME + "/" + permalink).then(() => {
       recentlyCopied = true
     })
   }
