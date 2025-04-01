@@ -42,7 +42,7 @@ export const linearFor2 = (random: Random, iterDepth: number, finalDepth: number
   })
 }
 
-export const linearForALl1 = (
+export const linearForAll1 = (
   random: Random,
   iterDepth: number,
   finalDepth: number,

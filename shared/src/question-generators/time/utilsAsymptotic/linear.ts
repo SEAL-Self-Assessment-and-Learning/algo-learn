@@ -8,7 +8,7 @@ import {
 import {
   linearFor1,
   linearFor2,
-  linearForALl1,
+  linearForAll1,
 } from "@shared/question-generators/time/utilsAsymptotic/blocks/linearFor.ts"
 import { linearWhile1 } from "@shared/question-generators/time/utilsAsymptotic/blocks/linearWhile.ts"
 import { squareFor1 } from "@shared/question-generators/time/utilsAsymptotic/blocks/squareFor.ts"
@@ -41,7 +41,7 @@ export function linearVariant1(
   finalDepth: number,
 ): LoopAsymptoticVariant {
   const forLine = random.choice([
-    linearForALl1(random, iterDepth, finalDepth),
+    linearForAll1(random, iterDepth, finalDepth),
     linearFor1(random, iterDepth, finalDepth),
     linearFor2(random, iterDepth, finalDepth),
   ])

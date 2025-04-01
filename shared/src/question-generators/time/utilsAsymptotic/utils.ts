@@ -17,8 +17,8 @@ export const runtimeSquare = createProductTerm({
   coefficient: 1,
   polyexponent: 2,
 })
-export const finalValue = [{ variable: "n" }, { variable: "m" }]
-export const iterator = [{ variable: "i" }, { variable: "j" }]
+export const finalValue = [{ variable: "n" }, { variable: "m" }, { variable: "p" }, { variable: "q" }]
+export const iterator = [{ variable: "i" }, { variable: "j" }, { variable: "k" }, { variable: "l" }]
 export const printStatement = (random: Random, iterDepth: number) =>
   random.choice([
     printStarsNew(random.int(1, 3)),
