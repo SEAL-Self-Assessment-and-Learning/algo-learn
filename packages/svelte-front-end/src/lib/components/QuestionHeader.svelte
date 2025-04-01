@@ -1,11 +1,11 @@
 <script lang="ts">
   import { browser } from "$app/environment"
   import MyTooltip from "$lib/components/ui/MyTooltip.svelte"
+  import { prefixURL } from "$lib/config.js"
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { Tooltip } from "bits-ui"
   import { Link, RefreshCwIcon } from "lucide-svelte"
-  import { prefixURL } from "@react-front-end/config.ts"
   import type { Language } from "@shared/api/Language.ts"
   import { tFunction } from "@shared/utils/translations.ts"
 

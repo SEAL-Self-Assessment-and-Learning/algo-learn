@@ -10,4 +10,4 @@ export const VERSION = "local build" // Note: This is set in the CI pipeline!
 
 // The URL to the backend. This is used to prefix all URLs.
 // prettier-ignore
-// export const prefixURL = window.location.host + BASENAME
+export const prefixURL = window.location.host + BASENAME
