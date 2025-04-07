@@ -14,7 +14,10 @@ import type { LayoutLoad } from "./$types"
  * - url: The URL object.
  */
 export const load: LayoutLoad = ({ params, url }) => {
-  const pathname = url.pathname
+  let pathname = url.pathname
+  if (pathname.endsWith("/")) {
+    pathname = pathname.slice(0, -1)
+  }
   const lang = params.lang
   const resolvedLang = resolveLang(lang)
   if (lang !== resolvedLang) {
