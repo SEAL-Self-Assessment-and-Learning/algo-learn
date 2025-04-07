@@ -1,10 +1,11 @@
 import { Automaton, type AutomatonNode } from "./automaton"
+import type Random from "@shared/utils/random"
 
 /**
  * Converts NFA to equivalent DFA using powerset construction.
  */
 export function convertNFAtoDFA(nfa: Automaton, alphabet: string[] = ["0", "1"]): Automaton {
-  const stateMap = new Map<string, number>() // maps state set key to index in DFA
+  const stateMap = new Map<string, number>()
   const dfaNodes: AutomatonNode[] = []
   const dfaEdges: Automaton["edges"] = []
   const queue: string[][] = []
@@ -150,4 +151,53 @@ function getTargetState(dfa: Automaton, fromLabel: string, input: string): strin
   const edges = dfa.edges[fromIndex] ?? []
   const target = edges.find((e) => e.value?.toString() === input)
   return dfa.nodes[target?.target ?? -1]?.label
+}
+
+/**
+ * Generates random words from the given alphabet.
+ */
+export function generateWords(
+  random: Random,
+  count: number,
+  minLength: number,
+  maxLength: number,
+  alphabet: string[],
+): string[] {
+  return Array.from({ length: count }, () =>
+    Array.from({ length: random.int(minLength, maxLength) }, () => random.choice(alphabet)).join("")
+  )
+}
+
+/**
+ * Simulates the automaton to determine whether a word is accepted.
+ */
+export function isWordAccepted(automaton: Automaton, word: string): boolean {
+  let currentStates = new Set<string>()
+  const startNodes = automaton.nodes
+    .filter((n) => n.isStart && n.label !== undefined)
+    .map((n) => n.label as string)
+
+  if (startNodes.length === 0) throw new Error("No start states found.")
+
+  startNodes.forEach((state) => currentStates.add(state))
+
+  for (const char of word) {
+    const nextStates = new Set<string>()
+    for (const state of currentStates) {
+      const stateIndex = automaton.nodes.findIndex((n) => n.label === state)
+      if (stateIndex !== -1 && automaton.edges[stateIndex]) {
+        for (const edge of automaton.edges[stateIndex]) {
+          if (edge.value !== undefined && edge.value.toString() === char) {
+            const targetLabel = automaton.nodes[edge.target]?.label
+            if (targetLabel) nextStates.add(targetLabel)
+          }
+        }
+      }
+    }
+    currentStates = nextStates
+  }
+
+  return [...currentStates].some((state) =>
+    automaton.nodes.find((n) => n.label === state)?.isEnd
+  )
 }

@@ -2,8 +2,8 @@ import type { FreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGe
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import Random from "@shared/utils/random"
 import { t, tFunctional, type Translations } from "@shared/utils/translations"
-import { generateDFA, generateNFA } from "./automatonGenerator"
-import { convertNFAtoDFA, minimizeDFA } from "./automatonUtil"
+import { generateDFA, generateNFA } from "./generate/automatonGenerator"
+import { convertNFAtoDFA, minimizeDFA } from "./generate/automatonUtil"
 
 const translations: Translations = {
   en: {
