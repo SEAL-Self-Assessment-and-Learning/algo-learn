@@ -1,5 +1,6 @@
 <script lang="ts">
   import { base } from "$app/paths"
+  import { page } from "$app/state"
   import type { Result } from "$lib/components/types.ts"
   import { Button } from "$lib/components/ui/button"
   import ViewSingleQuestion from "$lib/components/ViewSingleQuestion.svelte"
@@ -12,7 +13,6 @@
   import Random, { sampleRandomSeed } from "@shared/utils/random.ts"
   import { tFunction } from "@shared/utils/translations.ts"
   import CenteredDivs from "@/lib/components/centeredDivs.svelte"
-  import type { PageProps } from "./$types"
 
   const great = {
     en: [
@@ -99,14 +99,9 @@
     ],
   }
 
-  const { data }: PageProps = $props()
   const lang = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
-  const path = data.url
-    .toString()
-    .split(/\/(de|en)\//)
-    .slice(1)
-    .join("/")
+  const path = page.params.lang + "/" + page.params.generatorId + "/" + page.params.params
   const deserializedPath = deserializePath({
     collection,
     path,
