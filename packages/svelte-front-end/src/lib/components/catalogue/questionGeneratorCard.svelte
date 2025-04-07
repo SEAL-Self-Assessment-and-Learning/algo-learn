@@ -46,7 +46,7 @@
         {@const path = serializeGeneratorCall({ lang, generator, parameters })}
         {@const params = serializeParameters(parameters, generator.expectedParameters)}
         {#if params}
-          <a href={`${base}/${path}`}> {params}</a>
+          <Button size="xsm" variant="secondary" href={`${base}/${path}`}>{params}</Button>
         {/if}
       {/each}
     {/if}
