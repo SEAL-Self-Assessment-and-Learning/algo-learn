@@ -20,7 +20,6 @@ const config = {
     }),
     paths: {
       base: BASENAME,
-      relative: false,
     },
     alias: {
       "@/*": "./src/*",
