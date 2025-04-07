@@ -101,7 +101,11 @@
 
   const lang = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
-  const path = page.params.lang + "/" + page.params.generatorId + "/" + page.params.params
+  const path =
+    page.params.lang +
+    "/" +
+    page.params.generatorId +
+    (page.params.params ? "/" + page.params.params : "")
   const deserializedPath = deserializePath({
     collection,
     path,
