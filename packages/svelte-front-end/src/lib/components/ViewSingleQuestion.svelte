@@ -12,7 +12,7 @@
     generator: QuestionGenerator
     parameters: Parameters
     seed: string
-    onResult: ((result: Result) => void) | undefined
+    onResult: ((result: Result, finished: boolean) => void) | undefined
     regenerate: () => void
   }
   const { generator, parameters, seed, onResult, regenerate }: Props = $props()

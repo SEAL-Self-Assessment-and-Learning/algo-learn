@@ -15,7 +15,7 @@
   interface Props {
     question: MultiFreeTextQuestion
     permalink?: string
-    onResult?: (result: Result) => void
+    onResult?: (result: Result, finished: boolean) => void
     regenerate?: () => void
   }
   const { question, permalink, onResult, regenerate }: Props = $props()
@@ -73,7 +73,7 @@
     }
   }
 
-  function handleClick() {
+  function handleClick(finished: boolean) {
     if (questionState.mode === "draft") {
       if (question.feedback !== undefined) {
         void Promise.resolve(question.feedback({ text: questionState.text })).then((feedbackObject) => {
@@ -90,7 +90,7 @@
         })
       }
     } else if (questionState.mode === "correct" || questionState.mode === "incorrect") {
-      if (onResult) onResult(questionState.mode)
+      if (onResult) onResult(questionState.mode, finished)
     }
   }
 
@@ -101,7 +101,7 @@
     const key = e.key
     if (key === "Enter") {
       e.preventDefault()
-      handleClick()
+      handleClick(false)
     }
   }
 

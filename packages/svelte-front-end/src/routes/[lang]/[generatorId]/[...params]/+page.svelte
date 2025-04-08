@@ -115,23 +115,10 @@
 
   const generator = deserializedPath.generator
 
-  let generatorCalls: {
+  const generatorCalls: {
     generator: QuestionGenerator
     parameters: Parameters
   }[] = []
-  if (deserializedPath.parameters) {
-    generatorCalls.push({
-      generator,
-      parameters: deserializedPath.parameters,
-    })
-  } else {
-    allParameterCombinations(generator.expectedParameters).map((parameters) => {
-      generatorCalls.push({
-        generator,
-        parameters,
-      })
-    })
-  }
 
   const questionState = $state({
     numCorrect: 0,
@@ -147,16 +134,32 @@
     sessionSeed = deserializedPath!.seed ? deserializedPath!.seed : sampleRandomSeed()
   }
   const currSeed = $derived(deserializedPath.seed ? deserializedPath.seed : sessionSeed)
-  const currObj = $derived(generatorCalls[questionState.numCorrect + questionState.numIncorrect])
   let status: "running" | "finished" | "aborted" = $state("running")
 
-  function updateStatus() {
-    status = questionState.aborted
-      ? "aborted"
-      : generatorCalls.length === questionState.numCorrect + questionState.numIncorrect
-        ? "finished"
-        : "running"
+  function updateStatus(finished: boolean) {
+    status = questionState.aborted ? "aborted" : finished ? "finished" : "running"
   }
+
+  function updateCallList() {
+    if (status === "running") {
+      if (generatorCalls.length === questionState.numCorrect + questionState.numIncorrect) {
+        if (deserializedPath!.parameters) {
+          generatorCalls.push({
+            generator,
+            parameters: deserializedPath!.parameters,
+          })
+        } else {
+          random.shuffle(allParameterCombinations(generator.expectedParameters)).map((parameters) => {
+            generatorCalls.push({
+              generator,
+              parameters,
+            })
+          })
+        }
+      }
+    }
+  }
+  updateCallList()
 
   const msgList = $derived(
     questionState.numIncorrect == 0
@@ -167,18 +170,21 @@
   )
   const msg = $derived(random.choice(msgList[getLanguage()]))
 
-  const handleResult = (result: Result) => {
+  const handleResult = (result: Result, finished: boolean) => {
     if (result === "correct") {
       questionState.numCorrect += 1
-      updateStatus()
+      updateStatus(finished)
     } else if (result === "incorrect") {
       questionState.numIncorrect += 1
-      updateStatus()
+      updateStatus(finished)
     } else if (result === "abort" || result === "timeout") {
       questionState.aborted = true
     }
     nextSeed()
+    updateCallList()
   }
+
+  const currObj = $derived(generatorCalls[questionState.numCorrect + questionState.numIncorrect])
 </script>
 
 {#if status === "aborted"}

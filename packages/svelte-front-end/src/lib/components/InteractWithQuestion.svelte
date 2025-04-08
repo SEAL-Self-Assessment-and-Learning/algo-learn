@@ -11,7 +11,7 @@
     regenerate?: () => void
     footerMode: MODE
     footerMessage: Snippet<[]>
-    handleFooterClick: () => void
+    handleFooterClick: (finished: boolean) => void
     children: Snippet
   }
 

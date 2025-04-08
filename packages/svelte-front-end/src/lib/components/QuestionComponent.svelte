@@ -7,7 +7,7 @@
 
   interface Props {
     question: Question
-    onResult?: (result: Result) => void
+    onResult?: (result: Result, finished: boolean) => void
     regenerate?: () => void
   }
   const { question, onResult, regenerate }: Props = $props()

@@ -17,7 +17,7 @@
   interface Props {
     question: MultipleChoiceQuestion
     permalink?: string
-    onResult?: (result: Result) => void
+    onResult?: (result: Result, finished: boolean) => void
     regenerate?: () => void
   }
 
@@ -60,7 +60,7 @@
     questionState.choice = newChoice.sort()
   }
 
-  function handleClick() {
+  function handleClick(finished: boolean) {
     if (questionState.mode === "draft") {
       if (question.feedback !== undefined) {
         questionState.mode = "submitted"
@@ -81,7 +81,7 @@
       }
     } else if (questionState.mode === "correct" || questionState.mode === "incorrect") {
       if (onResult) {
-        onResult(questionState.mode)
+        onResult(questionState.mode, finished)
       }
     }
   }
@@ -91,7 +91,7 @@
     if (e.ctrlKey || e.metaKey || e.altKey) return
     if (e.key === "Enter") {
       e.preventDefault()
-      handleClick()
+      handleClick(false)
       return
     }
     if (questionState.mode === "correct" || questionState.mode === "incorrect") return
