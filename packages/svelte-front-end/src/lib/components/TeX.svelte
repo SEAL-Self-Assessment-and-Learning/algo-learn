@@ -9,7 +9,7 @@
 
   let span: HTMLSpanElement
   $effect(() => {
-    katex.render(expr, span, { displayMode })
+    katex.render(expr, span, { displayMode, throwOnError: false })
   })
 </script>
 
