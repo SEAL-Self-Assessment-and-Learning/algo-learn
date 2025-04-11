@@ -19,10 +19,7 @@
 </script>
 
 <CenteredDivs variant="horizontal">
-  <div
-    {...rest}
-    class={cn("flex flex-col items-start justify-center gap-6 py-6 sm:flex-row", rest.class)}
-  >
+  <div {...rest} class={cn("flex flex-col items-start justify-center gap-2 sm:flex-row", rest.class)}>
     <TopicSelectorSidebar
       {selectedGroup}
       setSelectedGroup={(g) => (selectedGroup = g)}

@@ -42,7 +42,7 @@
         triggerProps={{ onclick: handleClick, onmouseleave: mouseLeave }}
       >
         {#snippet trigger()}
-          <Link class="pl-1" />
+          <Link class="-mb-0.5 pl-1" size={22} strokeWidth={1.5} absoluteStrokeWidth />
         {/snippet}
         {(recentlyCopied ? t("copyLinkCopied") : t("copyLinkTooltip")) || ""}
       </MyTooltip>
@@ -52,7 +52,7 @@
     <Tooltip.Provider>
       <MyTooltip contentProps={{ sideOffset: 5 }} triggerProps={{ onclick: regenerate }}>
         {#snippet trigger()}
-          <RefreshCwIcon class="pl-1" size={20} strokeWidth={1.5} absoluteStrokeWidth />
+          <RefreshCwIcon class="-mb-0.5 pl-1" size={22} strokeWidth={1.5} absoluteStrokeWidth />
         {/snippet}
         {t("generate-new-exercise-of-same-type")}
       </MyTooltip>
