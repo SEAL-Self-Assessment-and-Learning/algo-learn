@@ -1,5 +1,5 @@
-import { Automaton, type AutomatonNode } from "./automaton"
 import type Random from "@shared/utils/random"
+import { Automaton, type AutomatonNode } from "./automaton"
 
 /**
  * Converts NFA to equivalent DFA using powerset construction.
@@ -164,7 +164,7 @@ export function generateWords(
   alphabet: string[],
 ): string[] {
   return Array.from({ length: count }, () =>
-    Array.from({ length: random.int(minLength, maxLength) }, () => random.choice(alphabet)).join("")
+    Array.from({ length: random.int(minLength, maxLength) }, () => random.choice(alphabet)).join(""),
   )
 }
 
@@ -197,7 +197,5 @@ export function isWordAccepted(automaton: Automaton, word: string): boolean {
     currentStates = nextStates
   }
 
-  return [...currentStates].some((state) =>
-    automaton.nodes.find((n) => n.label === state)?.isEnd
-  )
+  return [...currentStates].some((state) => automaton.nodes.find((n) => n.label === state)?.isEnd)
 }

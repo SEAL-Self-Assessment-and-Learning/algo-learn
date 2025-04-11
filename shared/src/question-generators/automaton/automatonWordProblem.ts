@@ -5,9 +5,15 @@ import {
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import type { Automaton } from "@shared/question-generators/automaton/generate/automaton"
-import { generateDFA, generateNFA } from "@shared/question-generators/automaton/generate/automatonGenerator"
+import {
+  generateDFA,
+  generateNFA,
+} from "@shared/question-generators/automaton/generate/automatonGenerator"
+import {
+  generateWords,
+  isWordAccepted,
+} from "@shared/question-generators/automaton/generate/automatonUtil"
 import Random from "@shared/utils/random"
-import {generateWords, isWordAccepted} from "@shared/question-generators/automaton/generate/automatonUtil"
 import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
@@ -119,4 +125,3 @@ export const AutomatonWordQuestion: QuestionGenerator = {
     return { question }
   },
 }
-
