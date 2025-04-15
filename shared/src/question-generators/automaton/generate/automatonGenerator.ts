@@ -54,32 +54,53 @@ function generateFiniteAutomaton(
   // add transitions
   for (let i = 0; i < size; i++) {
     if (isDFA) {
-      // ensure exactly one transition per input symbol
+      // ensure exactly one transition per symbol
       const availableTargets = random.shuffle([...Array(size).keys()].filter((j) => j !== i))
       for (const symbol of alphabet) {
-        edges[i].push({ source: i, target: availableTargets.pop() ?? i, value: parseInt(symbol) })
+        edges[i].push({
+          source: i,
+          target: availableTargets.pop() ?? i,
+          value: parseInt(symbol),
+        })
       }
     } else {
-      // allow multiple transitions for the same input symbol
+      // NFA: add transitions with edgeChance
       for (let j = 0; j < size; j++) {
         if (i !== j && random.float(0, 1) < edgeChance) {
-          edges[i].push({ source: i, target: j, value: parseInt(random.choice(alphabet)) })
+          edges[i].push({
+            source: i,
+            target: j,
+            value: parseInt(random.choice(alphabet)),
+          })
         }
       }
 
-      // add ε-transitions with probability
+      // ε-transitions
       if (random.float(0, 1) < epsilonTransitionChance) {
-        edges[i].push({ source: i, target: random.int(0, size - 1), value: undefined }) // ε-transition
+        edges[i].push({
+          source: i,
+          target: random.int(0, size - 1),
+          value: undefined,
+        })
       }
     }
 
-    // add self-loops
+    // add self-loops (replacement transition if DFA)
     if (random.float(0, 1) < selfLoopChance) {
-      edges[i].push({ source: i, target: i, value: parseInt(random.choice(alphabet)) })
+      const loopSymbol = parseInt(random.choice(alphabet))
+
+      if (isDFA) {
+        const index = edges[i].findIndex((e) => e.value === loopSymbol)
+        if (index !== -1) {
+          edges[i][index] = { source: i, target: i, value: loopSymbol }
+        }
+      } else {
+        edges[i].push({ source: i, target: i, value: loopSymbol })
+      }
     }
   }
 
-  const automaton = new Automaton(nodes, edges, true, true)
+  const automaton = new Automaton(nodes, edges, true, true, isDFA)
   return pruneUnreachable ? pruneUnreachableStates(automaton) : automaton
 }
 
@@ -178,5 +199,11 @@ export function pruneUnreachableStates(automaton: Automaton): Automaton {
       }))
   })
 
-  return new Automaton(filteredNodes, filteredEdges, automaton.directed, automaton.weighted)
+  return new Automaton(
+    filteredNodes,
+    filteredEdges,
+    automaton.directed,
+    automaton.weighted,
+    automaton.isDFA,
+  )
 }

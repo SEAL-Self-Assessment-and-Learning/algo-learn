@@ -3,26 +3,20 @@ import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import Random from "@shared/utils/random"
 import { t, tFunctional, type Translations } from "@shared/utils/translations"
 import { generateDFA, generateNFA } from "./generate/automatonGenerator"
-import { convertNFAtoDFA, minimizeDFA } from "./generate/automatonUtil"
+import { convertNFAtoDFA, minimizeDFA, writeAutomatonDefinition } from "./generate/automatonUtil"
 
 const translations: Translations = {
   en: {
     name: "Minimal DFA State Count",
     description: "Determine how many states the minimal DFA has.",
-    questionNFA:
-      "Let $\\mathcal{A}=(Q,\\Sigma,{{startnodes}},F,\\delta)$ be a NFA, where $\\\\ Q = \\{ {{states}} \\}$ is the set of states, $\\\\ F = \\{ {{endstates}} \\}$ is the set of accepting states, and $\\\\ \\delta$ is the transition function given by  $\\\\ {{transitions}}$. $\\\\$How many states does the minimal DFA equivalent to $\\mathcal{A}$ have?",
-    questionDFA:
-      "Let $\\mathcal{A}=(Q,\\Sigma,{{startnodes}},F,\\delta)$ be a DFA, where $\\\\ Q = \\{ {{states}} \\}$ is the set of states, $\\\\ F = \\{ {{endstates}} \\}$ is the set of accepting states, and $\\\\ \\delta$ is the transition function given by $\\\\ {{transitions}}$. $\\\\$How many states does the minimal DFA equivalent to $\\mathcal{A}$ have?",
     prompt: "Number of states:",
+    Question: "How many states does the minimal DFA equivalent to $\\mathcal{A}$ have?",
   },
   de: {
     name: "Minimale DFA Zustandsanzahl",
     description: "Bestimme wie viele Zustände der minimale DFA hat.",
-    questionNFA:
-      "Sei $\\mathcal{A}=(Q,\\Sigma,{{startnodes}},F,\\delta)$ ein NFA mit $\\\\ Q = \\{ {{states}} \\}$ die Menge der Zustände, $\\\\ F = \\{ {{endstates}} \\}$ die Menge der akzeptierenden Zustände und $\\\\ \\delta$ ist die Übergangsfunktion gegeben durch $\\\\ {{transitions}}$. $\\\\$Wie viele Zustände hat der minimale DFA, der äquivalent zu $\\mathcal{A}$ ist?",
-    questionDFA:
-      "Sei $\\mathcal{A}=(Q,\\Sigma,{{startnodes}},F,\\delta)$ ein DFA mit $\\\\ Q = \\{ {{states}} \\}$ die Menge der Zustände, $\\\\ F = \\{ {{endstates}} \\}$ die Menge der akzeptierenden Zustände und $\\\\ \\delta$ ist die Übergangsfunktion gegeben durch $\\\\ {{transitions}}$. $\\\\$Wie viele Zustände hat der minimale DFA, der äquivalent zu $\\mathcal{A}$ ist?",
     prompt: "Anzahl Zustände:",
+    Question: "Wie viele Zustände hat der zu $\\mathcal{A}$ äquivalente minimale DFA?",
   },
 }
 
@@ -64,27 +58,9 @@ export const MinimalDFAStateCount: QuestionGenerator = {
     const minimized = minimizeDFA(dfa, alphabet)
     const stateCount = minimized.nodes.length
 
-    const transitions = original.edges
-      .flatMap((row, i) =>
-        row.map((edge) => {
-          const label = edge.value === undefined ? "\\varepsilon" : edge.value.toString()
-          return `\\delta(${original.nodes[i].label}, ${label}) = ${original.nodes[edge.target]?.label}`
-        }),
-      )
-      .join(", \\\\")
+    const automatonDescription = writeAutomatonDefinition(lang, original, alphabet)
 
-    const text = t(translations, lang, type === "NFA" ? "questionNFA" : "questionDFA", {
-      startnodes: original
-        .getStartNodes()
-        .map((n) => n.label)
-        .join(", "),
-      states: original.nodes.map((n) => n.label).join(", "),
-      endstates: original.nodes
-        .filter((n) => n.isEnd)
-        .map((n) => n.label)
-        .join(", "),
-      transitions,
-    })
+    const text = [automatonDescription, "", t(translations, lang, "Question")].join(" $\\\\$ ")
 
     const path = serializeGeneratorCall({ generator: MinimalDFAStateCount, lang, parameters, seed })
 

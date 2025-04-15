@@ -6,10 +6,18 @@ export interface AutomatonNode extends Node {
 }
 export class Automaton extends Graph {
   nodes: AutomatonNode[]
+  isDFA: boolean
 
-  constructor(nodes: AutomatonNode[], edges: Edge[][], directed: boolean, weighted: boolean) {
+  constructor(
+    nodes: AutomatonNode[],
+    edges: Edge[][],
+    directed: boolean,
+    weighted: boolean,
+    isDFA: boolean = false,
+  ) {
     super(nodes, edges, directed, weighted)
     this.nodes = nodes
+    this.isDFA = isDFA
   }
 
   /** Returns all start nodes */
