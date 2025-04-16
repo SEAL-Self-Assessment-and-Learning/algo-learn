@@ -10,6 +10,7 @@ import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { AutomatonWordQuestion } from "@shared/question-generators/automaton/automatonWordProblem"
 import { Congruence } from "@shared/question-generators/automaton/congruence"
+import { DFAMinimizationTable } from "@shared/question-generators/automaton/minimization.ts"
 import { MinimalDFAStateCount } from "@shared/question-generators/automaton/stateCount"
 import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
@@ -88,7 +89,7 @@ export const collection: QuestionCollection = [
   {
     slug: "automaton",
     name: { de: "Automaten", en: "Automata" },
-    contents: [AutomatonWordQuestion, MinimalDFAStateCount, Congruence],
+    contents: [AutomatonWordQuestion, MinimalDFAStateCount, Congruence, DFAMinimizationTable],
   },
 ]
 
