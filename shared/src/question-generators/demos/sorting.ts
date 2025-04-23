@@ -14,39 +14,14 @@ import { t, tFunctional, type Translations } from "@shared/utils/translations"
 const translations: Translations = {
   en: {
     name: "Sorting Question",
-    description: "Sorting the equations based on their sum.",
-    text: "Sort the following sums in ascending order.",
+    description: "Sort numbers",
+    text: "Sort the following numbers in ascending order.",
   },
   de: {
     name: "Sortierfrage",
-    description: "Sortiere die Gleichungen basierend auf ihrer Summe.",
-    text: "Sortiere die folgenden Summen in aufsteigender Reihenfolge.",
+    description: "Zahlen sortieren",
+    text: "Sortiere die folgenden Zahlen in aufsteigender Reihenfolge.",
   },
-}
-
-/**
- * Generates a list of number pairs that need to be sorted based on their sum.
- * Each pair's sum determines its correct order, ensuring that:
- * - No two pairs have the same sum.
- * - The sorting is uniquely defined by the sums.
- *
- * @returns A list of unique number pairs.
- */
-function generateSumPairs(random: Random): [number, number][] {
-  const pairs: [number, number][] = []
-  const sums = new Set<number>()
-
-  while (pairs.length < 5) {
-    const a = random.int(1, 20)
-    const b = random.int(1, 20)
-    const sum = a + b
-    if (!sums.has(sum)) {
-      pairs.push([a, b])
-      sums.add(sum)
-    }
-  }
-
-  return pairs
 }
 
 /**
@@ -72,7 +47,10 @@ export const DemoSortingChoice: QuestionGenerator = {
   generate: (lang = "en", parameters, seed) => {
     // initialize the RNG so the question can be generated again
     const random = new Random(seed)
-    const sumPairs = generateSumPairs(random)
+    const uniqueNumbers = random.subset(
+      Array.from({ length: 50 }, (_, i) => i + 1),
+      5,
+    )
 
     // generate the question object
     const question: MultipleChoiceQuestion = {
@@ -86,11 +64,11 @@ export const DemoSortingChoice: QuestionGenerator = {
       }),
       sorting: true,
       text: t(translations, lang, "text"),
-      answers: sumPairs.map(([a, b]) => `$${a} + ${b}$`),
+      answers: uniqueNumbers.map((x) => `$${x}$`),
       feedback: minimalMultipleChoiceFeedback({
-        correctAnswerIndex: sumPairs
-          .map((pair, index) => ({ index, sum: pair[0] + pair[1] }))
-          .sort((a, b) => a.sum - b.sum)
+        correctAnswerIndex: uniqueNumbers
+          .map((x, index) => ({ index, x }))
+          .sort((a, b) => a.x - b.x)
           .map(({ index }) => index),
         sorting: true,
       }),
