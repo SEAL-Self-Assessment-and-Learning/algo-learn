@@ -6,6 +6,8 @@ export function sampleRandomSeed(): string {
   return new Random(Math.random()).base36string(SEED_LENGTH)
 }
 
+export type PrecisionValues = 1 | 0.5 | 0.25 | 0.2 | 0.1
+
 /** Class for generating random numbers from a given seed. */
 export default class Random {
   /**
@@ -44,6 +46,19 @@ export default class Random {
    */
   float(min: number, max: number): number {
     return this.uniform() * (max - min) + min
+  }
+
+  /**
+   * Returns a random number with given precision.
+   * Precision is the smallest possible difference between two numbers.
+   * e.g., precision 0.1 could return 0.9, 1.0, 1.1, 1.2, 1.3, ...
+   *
+   * @param min - The minimum number.
+   * @param max - The maximum number.
+   * @param precision
+   */
+  floatPrecision(min: number, max: number, precision: PrecisionValues): number {
+    return Math.round(this.float(min, max) * (1 / precision)) / (1 / precision)
   }
 
   /**
