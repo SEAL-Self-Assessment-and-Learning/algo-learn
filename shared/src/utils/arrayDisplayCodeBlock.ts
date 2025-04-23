@@ -1,40 +1,38 @@
-import { SingleTranslation } from "@shared/utils/translations"
+import type { Language } from "@shared/api/Language.ts"
+import { t, type Translations } from "@shared/utils/translations"
 
-/**
- * This type indicates the props that are needed to display an array in a code block.
- *
- * @param array The array that should be displayed.
- * @param startingIndex The index to in the top row to start with
- *                      (default is 0, mostly either 0 or 1)
- * @param secondRowName The name of the second row (default is ST "Value")
- */
-export type ArrayDisplayProps<T> = {
-  array: T[]
-  startingIndex: number
-  secondRowName: SingleTranslation
-  inputFieldSize?: number
+const translations: Translations = {
+  en: {
+    index: "Index",
+    value: "Value",
+  },
+  de: {
+    index: "Index",
+    value: "Wert",
+  },
 }
 
 /**
  * This function creates an array display code block with user input fields.
  * @param numberOfInputFields - (more than nine input fields may be too large)
  * @param startingIndex
- * @param secondRowName
  * @param inputFieldSize - the max number of characters necessary to fill the input field
  * @param leadValues - the lead values are values in the columns in front of the input fields
  */
 export function createArrayDisplayCodeBlockUserInput({
   numberOfInputFields,
+  lang,
   startingIndex = 0,
-  secondRowName = { de: "Wert", en: "Value" },
   inputFieldCharacters = 2,
   leadValues = [],
+  labelTranslations,
 }: {
   numberOfInputFields: number
+  lang: Language
   startingIndex?: number
-  secondRowName?: SingleTranslation
   inputFieldCharacters?: number
   leadValues?: string[]
+  labelTranslations?: Translations
 }) {
   // create as many input fields as needed
   const inputFields: string[] = leadValues
@@ -48,8 +46,9 @@ export function createArrayDisplayCodeBlockUserInput({
     fieldIDs,
     arrayDisplayBlock: createArrayDisplayCodeBlock({
       array: inputFields,
+      lang,
       startingIndex,
-      secondRowName,
+      labelTranslations,
     }),
   }
 }
@@ -60,24 +59,25 @@ export function createArrayDisplayCodeBlockUserInput({
  * @param startingIndex
  * @param secondRowName
  */
-export function createArrayDisplayCodeBlock<T>({
+export function createArrayDisplayCodeBlock({
   array,
+  lang,
   startingIndex = 0,
-  secondRowName = { de: "Wert", en: "Value" },
+  labelTranslations = translations,
 }: {
-  array: T[]
+  array: any[]
+  lang: Language
   startingIndex?: number
-  secondRowName?: SingleTranslation
+  labelTranslations?: Translations
 }): string {
-  const parseArrayBlock: ArrayDisplayProps<T> = {
-    array,
-    startingIndex,
-    secondRowName,
+  let indexRow = `\n| **${t(labelTranslations, lang, "index")}** |`
+  let formattingRow = "|:---!|"
+  let dataRow = `| **${t(labelTranslations, lang, "value")}** |`
+  for (let i = 0; i < array.length; i++) {
+    indexRow += ` ${startingIndex + i} |`
+    formattingRow += ":---:|"
+    dataRow += ` ${array[i]} |`
   }
 
-  return `
-\`\`\`array
-${JSON.stringify(parseArrayBlock)}
-\`\`\`
-  `
+  return `${indexRow}\n${formattingRow}\n${dataRow}`
 }

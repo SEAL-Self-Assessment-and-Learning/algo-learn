@@ -7,9 +7,12 @@ import {
   switchLetters,
 } from "@shared/question-generators/huffman-coding/generate/answerOptions"
 import { generateString } from "@shared/question-generators/huffman-coding/generate/words"
-import { getHuffmanCodeOfWord, HuffmanNode } from "@shared/question-generators/huffman-coding/Huffman"
+import {
+  getHuffmanCodeOfWord,
+  type HuffmanNode,
+} from "@shared/question-generators/huffman-coding/Huffman"
 import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils"
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 /**
  * This function generates the foundation for input and choice question

@@ -1,7 +1,6 @@
 import Fraction from "fraction.js"
 import {
   addDependencies,
-  ConfigOptions,
   create,
   divideDependencies,
   formatDependencies,
@@ -14,6 +13,7 @@ import {
   powDependencies,
   simplifyDependencies,
   subtractDependencies,
+  type ConfigOptions,
   transposeDependencies,
 } from "mathjs"
 

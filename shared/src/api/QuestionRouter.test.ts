@@ -1,42 +1,46 @@
 import { expect, test } from "vitest"
-import { ExampleQuestion } from "@shared/question-generators/example/example"
-import { QuestionGenerator } from "./QuestionGenerator"
-import { deserializePath, QuestionCollection, serializeGeneratorCall } from "./QuestionRouter"
+import type { QuestionGenerator } from "./QuestionGenerator"
+import { deserializePath, serializeGeneratorCall, type QuestionCollection } from "./QuestionRouter"
 
-const testQuestion: QuestionGenerator = {
-  id: "test",
-  name: () => "Test Question",
-  languages: ["en", "de"],
-  expectedParameters: [
-    {
-      name: "difficulty",
-      type: "integer",
-      min: 1,
-      max: 3,
-    },
-    {
-      name: "focus",
-      type: "string",
-      allowedValues: ["addition", "subtraction"],
-    },
-  ],
-  generate: (lang, parameters, seed) => {
-    return {
-      question: {
-        path: serializeGeneratorCall({
-          generator: testQuestion,
-          parameters,
-          seed,
-          lang,
-        }),
-        type: "MultipleChoiceQuestion",
-        name: "Test Question",
-        text: "What is 1 + 1?",
-        answers: ["1", "2", "3", "4"],
+const genTestQuestion = (id: string): QuestionGenerator => {
+  return {
+    id,
+    name: () => "Test Question",
+    languages: ["en", "de"],
+    expectedParameters: [
+      {
+        name: "difficulty",
+        type: "integer",
+        min: 1,
+        max: 3,
       },
-    }
-  },
+      {
+        name: "focus",
+        type: "string",
+        allowedValues: ["addition", "subtraction"],
+      },
+    ],
+    generate: (lang, parameters, seed) => {
+      return {
+        question: {
+          path: serializeGeneratorCall({
+            generator: testQuestion,
+            parameters,
+            seed,
+            lang,
+          }),
+          type: "MultipleChoiceQuestion",
+          name: "Test Question",
+          text: "What is 1 + 1?",
+          answers: ["1", "2", "3", "4"],
+        },
+      }
+    },
+  }
 }
+
+const testQuestion = genTestQuestion("test")
+const exampleQuestion = genTestQuestion("example")
 
 test("serializeGeneratorCall", () => {
   expect(
@@ -76,7 +80,7 @@ const exampleCollection: QuestionCollection = [
   {
     slug: "test2",
     name: { en: "Test2", de: "Test2" },
-    contents: [ExampleQuestion],
+    contents: [exampleQuestion],
   },
 ]
 
@@ -96,7 +100,7 @@ test("deserializePath", () => {
   ret = deserializePath({ collection: exampleCollection, path: "de/example" })
   expect(ret).toBeDefined()
   expect(ret!.lang).toBe("de")
-  expect(ret!.generator).toBe(ExampleQuestion)
+  expect(ret!.generator).toBe(exampleQuestion)
   expect(ret!.parameters).toBeUndefined()
   expect(ret!.seed).toBeUndefined()
 

@@ -1,14 +1,14 @@
 import { CheckCheck, XCircle } from "lucide-react"
 import { useState } from "react"
-import { MultipleChoiceFeedback, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator"
+import type { MultipleChoiceFeedback, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import useGlobalDOMEvents from "../hooks/useGlobalDOMEvents"
 import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
-import { InteractWithQuestion, MODE } from "./InteractWithQuestion"
+import { InteractWithQuestion, type MODE } from "./InteractWithQuestion"
 import { Markdown } from "./Markdown"
-import { Result } from "./QuestionComponent"
-import { BaseItem, SortableList } from "./SortableList"
+import type { Result } from "./QuestionComponent"
+import { SortableList, type BaseItem } from "./SortableList"
 import { Checkbox } from "./ui/checkbox"
 import { Label } from "./ui/label"
 
@@ -199,7 +199,7 @@ export function ExerciseMultipleChoice({
           <br />
           <Markdown
             md={t("feedback.correct-order", [
-              `${state.feedbackObject?.correctChoice?.map((i) => "\n|" + question.answers[i] + "|").join("")}\n|#div_my-5#|\n`,
+              `${state.feedbackObject?.correctChoice?.map((i) => "\n|" + question.answers[i] + "|").join("")}\n`,
             ])}
           />
         </>

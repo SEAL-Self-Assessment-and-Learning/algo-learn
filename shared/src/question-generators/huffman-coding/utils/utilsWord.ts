@@ -1,9 +1,9 @@
 import {
-  FreeTextFeedbackFunction,
-  FreeTextFormatFunction,
-  FreeTextQuestion,
   minimalMultipleChoiceFeedback,
-  MultipleChoiceQuestion,
+  type FreeTextFeedbackFunction,
+  type FreeTextFormatFunction,
+  type FreeTextQuestion,
+  type MultipleChoiceQuestion,
 } from "@shared/api/QuestionGenerator"
 import {
   generateChoice1Question,
@@ -11,8 +11,8 @@ import {
 } from "@shared/question-generators/huffman-coding/generate/stringStructure"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils"
-import Random from "@shared/utils/random"
-import { t, Translations } from "@shared/utils/translations"
+import type Random from "@shared/utils/random"
+import { t, type Translations } from "@shared/utils/translations"
 
 /**
  * This function generates a multiple choice question

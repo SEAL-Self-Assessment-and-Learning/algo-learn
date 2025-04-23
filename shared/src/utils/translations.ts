@@ -1,4 +1,4 @@
-import { Language } from "../api/Language"
+import type { Language } from "../api/Language"
 import { format } from "./format"
 
 /** Type for keys in translations objects */

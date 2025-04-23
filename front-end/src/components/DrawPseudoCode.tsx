@@ -1,8 +1,8 @@
-import { ReactElement, useState } from "react"
+import { useState, type ReactElement } from "react"
 import { IoColorPaletteOutline } from "react-icons/io5"
 import { MdContentCopy } from "react-icons/md"
 import { TbListNumbers } from "react-icons/tb"
-import { PseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
+import type { PseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Toggle } from "@/components/ui/toggle.tsx"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -104,9 +104,7 @@ export function DrawPseudoCode({ displayCode }: { displayCode: string }): ReactE
                 <MdContentCopy className="h-4 w-4" />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
-              {(recentlyCopied ? t("copyLinkCopied") : t("copyLinkTooltip")) || ""}
-            </TooltipContent>
+            <TooltipContent>{recentlyCopied ? t("copyLinkCopied") : t("copyCodeLatex")}</TooltipContent>
           </Tooltip>
         </div>
       </div>

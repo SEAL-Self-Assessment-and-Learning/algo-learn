@@ -1,5 +1,5 @@
 import { MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax"
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 /**
  * Generates a random unique list of numbers for heap operations foundation

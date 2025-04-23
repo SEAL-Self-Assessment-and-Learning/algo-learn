@@ -1,7 +1,6 @@
-import { Fragment, FunctionComponent, ReactNode } from "react"
+import { Fragment, type FunctionComponent, type ReactNode } from "react"
 import { Link } from "react-router-dom"
-import { parseMarkdown, ParseTree, ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
-import { ArrayDisplay } from "@/components/ArrayDisplay.tsx"
+import { parseMarkdown, type ParseTree, type ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
 import { DrawList } from "@/components/DrawList.tsx"
 import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
@@ -20,12 +19,14 @@ import TeX from "./TeX"
  */
 export const Markdown: FunctionComponent<{
   md?: string
-  children?: ReactNode[]
+  children?: ReactNode | ReactNode[]
 }> = ({ md, children }) => {
   if (!md) {
     return <></>
   }
-  return <MarkdownTree parseTree={parseMarkdown(md)} parameters={children} />
+  const childrenArray =
+    children !== undefined ? (Array.isArray(children) ? children : [children]) : undefined
+  return <MarkdownTree parseTree={parseMarkdown(md)} parameters={childrenArray} />
 }
 
 /**
@@ -87,15 +88,12 @@ export const MarkdownTreeNode: FunctionComponent<{
   }
   if (parseTreeNode.kind === "`") {
     return (
-      <span className="rounded-sm bg-gray-200 px-2 py-1 font-mono dark:bg-gray-700">
+      <span className="rounded-sm bg-gray-200 px-2 py-0.5 font-mono dark:bg-gray-700">
         {format(parseTreeNode.child, parameters)}
       </span>
     )
   }
   if (parseTreeNode.kind === "```") {
-    if (parseTreeNode.language === "array") {
-      return <ArrayDisplay arrayObject={parseTreeNode.child} />
-    }
     if (parseTreeNode.language === "pseudoCode") {
       return <DrawPseudoCode displayCode={parseTreeNode.child} />
     }

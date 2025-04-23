@@ -1,4 +1,4 @@
-import {
+import type {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
@@ -7,7 +7,7 @@ import {
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { generateNeighbourOptions } from "@shared/question-generators/heap/utils/utilsGenerate"
 import Random from "@shared/utils/random"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translationsHeapNeighbours: Translations = {
   en: {
@@ -49,13 +49,7 @@ export const HeapNeighbours: QuestionGenerator = {
   description: tFunctional(translationsHeapNeighbours, "description"),
   tags: ["heap", "priority-queue"],
   languages: ["en", "de"],
-  expectedParameters: [
-    {
-      type: "string",
-      name: "variant",
-      allowedValues: ["neighbour"],
-    },
-  ],
+  expectedParameters: [],
 
   generate: (lang = "en", parameters, seed) => {
     const permaLink = serializeGeneratorCall({
