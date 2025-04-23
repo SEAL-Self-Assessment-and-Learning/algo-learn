@@ -1,4 +1,4 @@
-import { FreeTextFeedbackFunction } from "@shared/api/QuestionGenerator.ts"
+import type { FreeTextFeedbackFunction } from "@shared/api/QuestionGenerator.ts"
 
 export function getFeedback(detSolution: number): FreeTextFeedbackFunction {
   return ({ text }) => {

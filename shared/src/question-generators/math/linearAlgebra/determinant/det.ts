@@ -1,11 +1,11 @@
-import { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
+import type { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { generateVariantCofactorDet } from "@shared/question-generators/math/linearAlgebra/determinant/cofactor.ts"
 import { generateVariantDeepDet } from "@shared/question-generators/math/linearAlgebra/determinant/deep.ts"
 import { generateVariantsRulesDet } from "@shared/question-generators/math/linearAlgebra/determinant/rules.ts"
 import { generateVariantStartDet } from "@shared/question-generators/math/linearAlgebra/determinant/start.ts"
 import Random from "@shared/utils/random.ts"
-import { tFunctional, Translations } from "@shared/utils/translations.ts"
+import { tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {

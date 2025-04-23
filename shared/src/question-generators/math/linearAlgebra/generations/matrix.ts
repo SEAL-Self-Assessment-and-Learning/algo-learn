@@ -1,5 +1,6 @@
 import math from "@shared/utils/math.ts"
-import Random, { PrecisionValues } from "@shared/utils/random.ts"
+import type Random from "@shared/utils/random.ts"
+import type { PrecisionValues } from "@shared/utils/random.ts"
 
 /**
  * All different types of matrices that can be generated

@@ -1,11 +1,11 @@
-import { FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
+import type { FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
 import { Determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
 import { getFeedback } from "@shared/question-generators/math/linearAlgebra/determinant/utils.ts"
 import { allRandomMatrix } from "@shared/question-generators/math/linearAlgebra/generations/matrix.ts"
 import { matrixToTex } from "@shared/question-generators/math/linearAlgebra/tex.ts"
 import math from "@shared/utils/math.ts"
-import Random from "@shared/utils/random.ts"
-import { t, Translations } from "@shared/utils/translations.ts"
+import type Random from "@shared/utils/random.ts"
+import { t, type Translations } from "@shared/utils/translations.ts"
 
 /**
  * Generates a question for the determinant of a random matrix.

@@ -1,8 +1,8 @@
-import { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
+import type { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { generateVariantStartAxb } from "@shared/question-generators/math/linearAlgebra/axb/start.ts"
 import Random from "@shared/utils/random.ts"
-import { tFunctional, Translations } from "@shared/utils/translations.ts"
+import { tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
