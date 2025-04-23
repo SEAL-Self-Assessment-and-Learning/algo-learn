@@ -173,7 +173,6 @@ export function generateLowerLeftTriangleMatrix({
   precision?: PrecisionValues
 }) {
   const mat = generateUpperRightTriangleMatrix({ random, size, min, max, precision })
-  console.log(mat)
   return math.transpose(mat)
 }
 
