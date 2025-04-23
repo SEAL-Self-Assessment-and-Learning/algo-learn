@@ -1,12 +1,12 @@
-import { MultiFreeTextFeedbackFunction, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator"
+import type { MultiFreeTextFeedbackFunction, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator"
 import { AxbGenerator } from "@shared/question-generators/math/linearAlgebra/axb/axbGen"
 import { generateAforAxEqualsB } from "@shared/question-generators/math/linearAlgebra/generations/matrix"
 import { matrixToTex, vectorToTex } from "@shared/question-generators/math/linearAlgebra/tex"
 import { _ } from "@shared/utils/generics"
 import math from "@shared/utils/math"
 import { createMatrixInput } from "@shared/utils/matrixInput.ts"
-import Random from "@shared/utils/random"
-import { t, Translations } from "@shared/utils/translations"
+import type Random from "@shared/utils/random"
+import { t, type Translations } from "@shared/utils/translations"
 
 /**
  * This function generates a question for the start variant of the Ax=b question
@@ -57,7 +57,7 @@ export function generateVariantStartAxb(
     rows: matrixSize,
     cols: 1,
     name: "$x=$",
-    elementOf: `$\\in\\mathbb{R}^${matrixSize}$`,
+    elementOf: `$\\in\\mathbb{Z}^${matrixSize}$`,
   })
 
   const question: MultiFreeTextQuestion = {
