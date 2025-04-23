@@ -12,6 +12,8 @@ import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighb
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import { AxbGenerator } from "@shared/question-generators/math/linearAlgebra/axb/axbGen.ts"
+import { Determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
 import { CRT } from "@shared/question-generators/math/modularArithmetic/crt.ts"
 import { ExtendedEuclideanAlgorithm } from "@shared/question-generators/math/modularArithmetic/eea.ts"
 import { modFactor } from "@shared/question-generators/math/modularArithmetic/modFactorization.ts"
@@ -86,6 +88,11 @@ export const collection: QuestionCollection = [
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     contents: [huffmanCoding],
+  },
+  {
+    slug: "linear-algebra",
+    name: { de: "Lineare Algebra", en: "Linear Algebra" },
+    contents: [Determinant, AxbGenerator],
   },
 ]
 

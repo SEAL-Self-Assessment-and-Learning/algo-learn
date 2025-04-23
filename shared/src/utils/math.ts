@@ -13,8 +13,8 @@ import {
   powDependencies,
   simplifyDependencies,
   subtractDependencies,
-  type ConfigOptions,
   transposeDependencies,
+  type ConfigOptions,
 } from "mathjs"
 
 const config: ConfigOptions = {
