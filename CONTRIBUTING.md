@@ -24,9 +24,25 @@ Bigger refactorings should be discussed first.
 
 Please write meaningful commit messages. Commit messages can also have more than just a short title if needed.
 
-## Writing generators
+### Adding a New Generator
 
-Question generators are located in `shared/src/question-generators`.
-Each generator should have its own folder containing the generator as well as unit tests. You can find an example in `example/example`
+To add a new generator to the website, follow these steps:
 
-To access a new generator though the website you need to set a path to the generator in `settings/questionSelections.ts`. If the chosen path has no common prefix path with the other generators, you can add human-readable names for the new generator group in `settings/generator-locales` and an image in `settings/questionSelections.ts`
+1. **Determine the Type**  
+   Decide whether the generator is for:
+  - **Demo**: Showcases a feature.  
+    -  Add it to `packages/settings/questionSelection.demo.ts`.
+  - **Stable**: Tests the student's knowledge on a specific topic.  
+    - Add it to `packages/settings/questionSelection.stable.ts`.
+
+2. **Choose or Create a Topic**  
+   If the generator fits an existing topic (`slug`), simply add it to that topic’s `contents` list.  
+   If not, create a new topic entry like this:
+
+   ```typescript
+   {
+     slug: "example-slug",
+     name: { de: "Beispiel Generator", en: "Example Generator" },
+     contents: [Example1, Example2],
+   }
+   ```

@@ -46,6 +46,12 @@ In principle, you're now in position to start development. However, we strongly 
 - optional: [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
 - optional: [Atom One Dark Theme](https://marketplace.visualstudio.com/items?itemName=akamud.vscode-theme-onedark)
 
+### Run format
+To format the code according to the project’s settings, run:
+```bash
+bun run format
+```
+
 ### Run tests
 
 Run all tests (format checker, unit tests, linter, type checker):
@@ -68,7 +74,7 @@ bun run build
 
 ### Major libraries used
 
-- [React](https://reactjs.org/)
+- [Svelte](https://svelte.dev/)
 - [Tailwind CSS](https://tailwindcss.com/)
 
 ### Staging and Deployment
