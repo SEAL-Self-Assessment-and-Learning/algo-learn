@@ -40,7 +40,11 @@
       <div class="text-right">
         {#if mode !== "initial" && mode !== "draft" && mode !== "invalid"}
           <Button
-            variant="destructive"
+            variant={mode === "incorrect"
+              ? "wrongAnswer"
+              : mode === "correct"
+                ? "rightAnswer"
+                : "default"}
             onclick={() => buttonClick(false)}
             class="cursor-pointer self-end sm:self-center"
           >
