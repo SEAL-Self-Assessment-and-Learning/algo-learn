@@ -4,14 +4,11 @@
 			"@/*": [
 				"../src/*"
 			],
-			"@react-front-end/*": [
-				"../../../front-end/src/*"
-			],
 			"@shared/*": [
-				"../../../shared/src/*"
+				"../../shared/src/*"
 			],
 			"@settings/*": [
-				"../../../settings/*"
+				"../../settings/*"
 			],
 			"$lib": [
 				"../src/lib"

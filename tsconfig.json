@@ -25,12 +25,11 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["front-end/src/*"],
-      "@shared/*": ["shared/src/*"],
-      "@settings/*": ["settings/*"]
+      "@shared/*": ["packages/shared/src/*"],
+      "@settings/*": ["packages/settings/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
-  "exclude": ["node_modules", "front-end/dist", "front-end/vite.config.ts", "packages/svelte-front-end"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "./vite-env.d.ts"],
+  "exclude": ["packages/svelte-front-end"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

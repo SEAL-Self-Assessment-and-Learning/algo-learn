@@ -23,9 +23,8 @@ const config = {
     },
     alias: {
       "@/*": "./src/*",
-      "@react-front-end/*": "../../front-end/src/*",
-      "@shared/*": "../../shared/src/*",
-      "@settings/*": "../../settings/*",
+      "@shared/*": "./../shared/src/*",
+      "@settings/*": "./../settings/*",
     },
   },
 }

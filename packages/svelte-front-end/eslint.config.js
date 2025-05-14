@@ -5,9 +5,39 @@ import globals from "globals"
 import ts from "typescript-eslint"
 import { includeIgnoreFile } from "@eslint/compat"
 import js from "@eslint/js"
-import { namingConvention } from "../../eslint.config.mjs"
 
 const gitignorePath = fileURLToPath(new URL("./.gitignore", import.meta.url))
+
+export const namingConvention = [
+  {
+    selector: "default",
+    format: ["camelCase", "UPPER_CASE"],
+    leadingUnderscore: "allow",
+    trailingUnderscore: "allow",
+  },
+  {
+    selector: "import",
+    format: null,
+  },
+  {
+    selector: "variable",
+    format: ["camelCase", "PascalCase", "UPPER_CASE"],
+    leadingUnderscore: "allow",
+    trailingUnderscore: "allow",
+  },
+  {
+    selector: "function",
+    format: ["camelCase", "PascalCase"],
+  },
+  {
+    selector: "typeLike",
+    format: ["PascalCase"],
+  },
+  {
+    selector: "objectLiteralProperty",
+    format: null,
+  },
+]
 
 export default ts.config(
   includeIgnoreFile(gitignorePath),

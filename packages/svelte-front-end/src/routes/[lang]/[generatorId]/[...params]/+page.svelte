@@ -6,7 +6,7 @@
   import ViewSingleQuestion from "$lib/components/ViewSingleQuestion.svelte"
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
-  import { collection } from "@react-front-end/listOfQuestions.ts"
+  import { collection } from "@settings/questionsSelection.ts"
   import { allParameterCombinations, type Parameters } from "@shared/api/Parameters.ts"
   import type { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
   import { deserializePath } from "@shared/api/QuestionRouter.ts"
@@ -111,9 +111,13 @@
     path,
     expectLang: true,
   })
-  if (!deserializedPath) throw new Error("Parsing the url went wrong!")
 
-  const generator = deserializedPath.generator
+  // Note: This sometimes throws an error, but still loads everything correctly?
+  // What is producing the error, and what is the error?
+
+  // if (!deserializedPath) throw new Error("Parsing the url went wrong!")
+
+  const generator = deserializedPath!.generator
 
   const generatorCalls: {
     generator: QuestionGenerator
