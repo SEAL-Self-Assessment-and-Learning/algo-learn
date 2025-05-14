@@ -114,10 +114,9 @@
 
   // Note: This sometimes throws an error, but still loads everything correctly?
   // What is producing the error, and what is the error?
+  if (!deserializedPath) throw new Error("Parsing the url went wrong!")
 
-  // if (!deserializedPath) throw new Error("Parsing the url went wrong!")
-
-  const generator = deserializedPath!.generator
+  const generator = deserializedPath.generator
 
   const generatorCalls: {
     generator: QuestionGenerator
