@@ -30,10 +30,11 @@ To add a new generator to the website, follow these steps:
 
 1. **Determine the Type**  
    Decide whether the generator is for:
-  - **Demo**: Showcases a feature.  
-    -  Add it to `packages/settings/questionSelection.demo.ts`.
-  - **Stable**: Tests the student's knowledge on a specific topic.  
-    - Add it to `packages/settings/questionSelection.stable.ts`.
+
+- **Demo**: Showcases a feature.
+  - Add it to `packages/settings/questionSelection.demo.ts`.
+- **Stable**: Tests the student's knowledge on a specific topic.
+  - Add it to `packages/settings/questionSelection.stable.ts`.
 
 2. **Choose or Create a Topic**  
    If the generator fits an existing topic (`slug`), simply add it to that topic’s `contents` list.  

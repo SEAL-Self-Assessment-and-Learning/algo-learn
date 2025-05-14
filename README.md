@@ -47,7 +47,9 @@ In principle, you're now in position to start development. However, we strongly 
 - optional: [Atom One Dark Theme](https://marketplace.visualstudio.com/items?itemName=akamud.vscode-theme-onedark)
 
 ### Run format
+
 To format the code according to the project’s settings, run:
+
 ```bash
 bun run format
 ```
