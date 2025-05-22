@@ -69,7 +69,6 @@ describe("Resolution", () => {
     expect(dtl.some((x) => literalListsEqual(x, [CF, CT, ET, AF]))).toBeTruthy()
     expect(dtl.some((x) => literalListsEqual(x, [BT, ET]))).toBeFalsy()
     expect(dtl.some((x) => literalListsEqual(x, [AT, ET, BF]))).toBeFalsy()
-    // Note: Next line changed
     expect(dtl.some((x) => literalListsEqual(x, [ET, AF]))).toBeFalsy()
     expect(dtl.some((x) => literalListsEqual(x, [DF, DT, ET, AF]))).toBeTruthy()
   })
@@ -82,9 +81,7 @@ describe("Resolution", () => {
     expect(dtl.some((x) => literalListsEqual(x, [AT, DF, AF]))).toBeTruthy()
     expect(dtl.some((x) => literalListsEqual(x, [AT, EF, DF, CF]))).toBeTruthy()
     expect(dtl.some((x) => literalListsEqual(x, [AT, BF, DF, CF, AF]))).toBeTruthy()
-    // Note flipped next line
     expect(dtl.some((x) => literalListsEqual(x, [BT, ET, BF, DF, AF]))).toBeFalsy()
-    // Note flipped next line
     expect(dtl.some((x) => literalListsEqual(x, [ET, EF, DF, CF, BF]))).toBeFalsy()
     expect(dtl.some((x) => literalListsEqual(x, [AT, EF, DT, CF]))).toBeFalsy()
     expect(dtl.some((x) => literalListsEqual(x, [CF, BT, DT, ET]))).toBeFalsy()
@@ -112,9 +109,7 @@ describe("Resolution", () => {
     expect(dtl.some((x) => literalListsEqual(x, [CT, DT, EF, DF, CF, AF]))).toBeTruthy()
     expect(dtl.some((x) => literalListsEqual(x, [AT, BT, ET, BF, EF, AF]))).toBeTruthy()
     expect(dtl.some((x) => literalListsEqual(x, [AT, EF, BF]))).toBeFalsy()
-    // Note flipped next line
     expect(dtl.some((x) => literalListsEqual(x, [AT, CT, ET, AF, EF, BF]))).toBeFalsy()
-    // Note flipped next line
     expect(dtl.some((x) => literalListsEqual(x, [BT, CT, EF, CF, AF]))).toBeFalsy()
     expect(dtl.some((x) => literalListsEqual(x, [AT, BT, CT, DT, BF, CF, AF]))).toBeTruthy()
     expect(dtl.some((x) => literalListsEqual(x, [AT, CT, DT, ET, EF, AF]))).toBeTruthy()
