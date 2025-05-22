@@ -69,7 +69,6 @@ function createSolutionTable(correctAnswerDict: Record<string, string>) {
   for (const key in correctAnswerDict) {
     solutionDisplay += `|**${key}**|$${correctAnswerDict[key]}$|\n`
   }
-  solutionDisplay += "|#table_w-full?td?sd?ah_center?div_my-5#| |"
   return solutionDisplay
 }
 
