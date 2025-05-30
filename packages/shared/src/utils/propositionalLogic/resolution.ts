@@ -123,9 +123,13 @@ function computeNewTerms(
   let position = 0
   while (intersection > 0) {
     if (intersection & 1) {
+      const mask = 1 << position
+      // logical OR; if both bits at position are 1 keep, otherwise set to 0
       const newDictTerm = [
-        (firstDisjunction[0] | secondDisjunction[0]) ^ (2 ** position),
-        (firstDisjunction[1] | secondDisjunction[1]) ^ (2 ** position),
+        ((firstDisjunction[0] | secondDisjunction[0]) & ~mask) |
+          (firstDisjunction[0] & secondDisjunction[0] & mask),
+        ((firstDisjunction[1] | secondDisjunction[1]) & ~mask) |
+          (firstDisjunction[1] & secondDisjunction[1] & mask),
       ]
       const newDictTermString = stringifyDictTerm(newDictTerm)
       if (!uniqueTerms.has(newDictTermString)) {
