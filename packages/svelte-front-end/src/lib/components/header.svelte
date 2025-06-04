@@ -16,6 +16,7 @@
   import { availableThemes, getTheme, setTheme } from "../theme.svelte.js"
   import { globalTranslations, NATIVE_NAME, SUPPORTED_LANGUAGES } from "../translation"
   import FeedbackDialog from "./feedbackDialog.svelte"
+  import LogoHorizontalWhite from "./logo/seal-logo-text-horizontal-white.svg"
   import Button from "./ui/button/button.svelte"
 
   const lang: Language = $derived(getLanguage())
@@ -37,8 +38,8 @@
 </header>
 
 {#snippet logo()}
-  <Button href={`${base}/`} variant="link" class="inline text-2xl text-inherit">
-    algo learn <span class="font-mono text-sm text-yellow-200">alpha</span>
+  <Button href={`${base}/`} variant="link" class="inline p-0">
+    <img src={LogoHorizontalWhite} alt="Logo" class="w-32 font-mono" />
   </Button>
 {/snippet}
 
