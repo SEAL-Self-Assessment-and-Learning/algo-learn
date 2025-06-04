@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/environment"
   import InteractWithQuestion from "$lib/components/InteractWithQuestion.svelte"
   import Markdown from "$lib/components/markdown/markdown.svelte"
   import type { MODE, Result } from "$lib/components/types.ts"
@@ -34,11 +35,13 @@
   })
 
   let userInputRef: HTMLInputElement | null = $state(null)
-  onMount(() => {
-    if (!isMobileOrTablet) {
-      userInputRef!.focus({ preventScroll: true })
-    }
-  })
+  if (browser) {
+    onMount(() => {
+      if (!isMobileOrTablet) {
+        userInputRef!.focus({ preventScroll: true })
+      }
+    })
+  }
 
   function handleChange(event: Event) {
     setText((event.target as HTMLInputElement).value)

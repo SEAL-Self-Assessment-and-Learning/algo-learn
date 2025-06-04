@@ -39,7 +39,8 @@
     "tailwind-variants": "^1.0.0",
     "tailwindcss": "^4.0.14",
     "tailwindcss-animate": "^1.0.7",
-    "typescript-eslint": "^8.32.1"
+    "typescript-eslint": "^8.32.1",
+    "vite-plugin-devtools-json": "^0.1.0"
   },
   "dependencies": {
     "@dnd-kit-svelte/core": "^0.0.8",
