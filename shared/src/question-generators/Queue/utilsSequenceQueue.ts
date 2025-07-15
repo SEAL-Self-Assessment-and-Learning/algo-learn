@@ -1,5 +1,6 @@
 import type {
   MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
   MultiFreeTextQuestion,
 } from "@shared/api/QuestionGenerator.ts"
 import { Queue } from "@shared/question-generators/Queue/Queue.ts"
@@ -66,12 +67,27 @@ export function generateVariantSequenceQueue(
     }
   }
 
+  const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
+    // check if the user input only consists of letters
+    const userInput = text[fieldID].replace(/\s/g, "")
+    if (!/^[0-9]*$/.test(userInput)) {
+      return {
+        valid: false,
+        message: t(translations, lang, "checkFormatSeqQueue"),
+      }
+    }
+    return {
+      valid: true,
+    }
+  }
+
   const question: MultiFreeTextQuestion = {
     type: "MultiFreeTextQuestion",
     name: queueQuestion.name(lang),
     path: permalink,
     text: t(translations, lang, "sequenceQueueText", [operations.join(", "), arrayDisplayBlock]),
     feedback,
+    checkFormat,
   }
   return { question }
 }
