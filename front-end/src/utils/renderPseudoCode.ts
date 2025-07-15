@@ -1,4 +1,4 @@
-import {
+import type {
   PseudoCode,
   PseudoCodeAssignment,
   PseudoCodeBlock,
@@ -33,7 +33,7 @@ export function pseudoCodeToString(pseudoCode: PseudoCode): {
   const pseudoCodeStringColor: string[] = []
   const pseudoCodeStringLatex: string[] = [
     "\\begin{algorithm}[h]",
-    "\\caption{NAME?}",
+    "\\caption{AlgoLearn}",
     "\\begin{algorithmic}[1]",
   ]
   for (const code of pseudoCode) {

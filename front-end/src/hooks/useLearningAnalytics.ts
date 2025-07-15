@@ -1,12 +1,16 @@
 import { useMemo } from "react"
 import { collection } from "@settings/questionsSelection"
-import { allParameterCombinations, Parameters } from "@shared/api/Parameters"
-import { QuestionGenerator } from "@shared/api/QuestionGenerator"
+import { allParameterCombinations, type Parameters } from "@shared/api/Parameters"
+import type { QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { min } from "@shared/utils/math"
-import Random from "@shared/utils/random"
-import { BasicSkillFeatures, computeStrength, SkillFeaturesAndPredictions } from "@/utils/memoryModel"
-import { LogEntryV2, useLearningLog } from "./useLearningLog"
+import type Random from "@shared/utils/random"
+import {
+  computeStrength,
+  type BasicSkillFeatures,
+  type SkillFeaturesAndPredictions,
+} from "@/utils/memoryModel"
+import { useLearningLog, type LogEntryV2 } from "./useLearningLog"
 
 /** Return the progress of the user */
 export function useLearningAnalytics() {

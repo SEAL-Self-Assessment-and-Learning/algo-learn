@@ -1,9 +1,9 @@
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 import { GiPlayButton } from "react-icons/gi"
 import { SiCheckmarx, SiIfixit } from "react-icons/si"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "../hooks/useTranslation"
-import { MODE } from "./InteractWithQuestion"
+import type { MODE } from "./InteractWithQuestion"
 
 /**
  * QuestionFooter is the footer of a question. It contains a message and a

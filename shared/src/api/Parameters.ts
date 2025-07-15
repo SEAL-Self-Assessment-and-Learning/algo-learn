@@ -1,4 +1,4 @@
-import { Language } from "./Language"
+import type { Language } from "./Language"
 
 /** Utility type to enforce a non-empty string */
 // export type NonEmptyString

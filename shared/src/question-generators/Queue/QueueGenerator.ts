@@ -10,8 +10,7 @@ const translations: Translations = {
   en: {
     name: "Queues",
     description: "Perform queue operations",
-    solutionFreetext: `|Index|Question|Solution|\n{{0}}`,
-    performOperations: `**We perform the following operations:**{{0}}`,
+    solutionFreetext: `\n|**Index**|**Question**|**Solution**|\n|===|===|===|\n{{0}}`,
     checkFormat: "Please only enter a number.",
     checkFormatSeqLetter: "Please only enter letters",
     checkFormatBool: "Please only enter *false* or *true*",
@@ -26,8 +25,7 @@ const translations: Translations = {
   de: {
     name: "Queues",
     description: "Queue-Operationen ausführen",
-    solutionFreetext: `|Index|Frage|Lösung|\n{{0}}`,
-    performOperations: `**Wir führen nun folgende Operationen aus:**{{0}}`,
+    solutionFreetext: `|**Index**|**Frage**|**Lösung**|\n|===|===|===|\n{{0}}`,
     checkFormat: "Bitte gib nur Zahlen ein.",
     checkFormatSeqLetter: "Bitte gib nur Buchstaben ein.",
     checkFormatBool: "Bitte gib nur *false* oder *true* ein.",

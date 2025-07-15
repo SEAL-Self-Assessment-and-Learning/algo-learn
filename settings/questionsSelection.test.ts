@@ -1,27 +1,39 @@
 import { describe, expect, test } from "vitest"
 import { allParameterCombinations } from "@shared/api/Parameters"
-import { collection } from "./listOfQuestions"
+import { collection } from "./questionsSelection.ts"
+
+const allowedSlugsExplanation = "only lower case letters or '-'"
+const allowedSlugs = /^[a-z-]+$/
+
+describe(`slugs of collection`, () => {
+  const slugs = new Set<string>()
+  for (const { slug } of collection) {
+    test(`slug ${slug} contains ${allowedSlugsExplanation}`, () => {
+      expect(slug).toMatch(allowedSlugs)
+    })
+    test(`slug ${slug} is unique`, () => {
+      expect(slugs.has(slug)).toBe(false)
+      slugs.add(slug)
+    })
+  }
+})
 
 const generators = collection.flatMap((x) => x.contents)
 
 describe(`IDs of question generators`, () => {
   const ids = new Set<string>()
   for (const generator of generators) {
-    test(`id is non-empty`, () => {
-      expect(generator.id.length).toBeTruthy()
-      expect(generator.id.length).toBeGreaterThan(0)
-    })
-    test(`id ${generator.id} contains only lower case letters`, () => {
-      expect(generator.id).toMatch(/^[a-z]+$/)
+    test(`id ${generator.id} contains ${allowedSlugsExplanation}`, () => {
+      expect(generator.id).toMatch(allowedSlugs)
     })
     test(`id ${generator.id} has length at most 10`, () => {
       expect(generator.id.length).toBeLessThanOrEqual(10)
     })
-    ids.add(generator.id)
+    test(`id ${generator.id} is unique`, () => {
+      expect(ids.has(generator.id)).toBe(false)
+      ids.add(generator.id)
+    })
   }
-  test("All IDs are unique", () => {
-    expect(ids.size).toBe(generators.length)
-  })
 })
 for (const generator of generators) {
   describe(`Sanity-checks for question generator "${generator.id}"`, () => {

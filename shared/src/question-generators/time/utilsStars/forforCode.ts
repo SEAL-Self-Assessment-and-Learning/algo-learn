@@ -1,17 +1,17 @@
 import {
-  BoundsOptions,
   createBasicForLine,
   createForLineWithStepSet,
   createIfCondition,
-  IfOptions,
+  type BoundsOptions,
+  type IfOptions,
 } from "@shared/question-generators/time/utils"
 import {
   printStarsNew,
-  PseudoCode,
-  PseudoCodeBlock,
-  PseudoCodeFor,
-  PseudoCodeForAll,
-  PseudoCodeVariable,
+  type PseudoCode,
+  type PseudoCodeBlock,
+  type PseudoCodeFor,
+  type PseudoCodeForAll,
+  type PseudoCodeVariable,
 } from "@shared/utils/pseudoCodeUtils"
 
 /**
@@ -285,7 +285,7 @@ function createStepValuesSet({
         rowEndNumber += stepValue
       }
       const difference = rowEndNumber - endValue * endManipulationLoop.value
-      stepSet += `${endValue}\\cdot${endManipulationLoop.value} ${difference < 0 ? difference.toString() : ""}\\}`
+      stepSet += `${endValue} \\cdot ${endManipulationLoop.value} ${difference < 0 ? difference.toString() : ""}\\}`
     } else {
       throw new Error("No other manipulation for endFirstManipulation")
     }

@@ -1,7 +1,8 @@
 import { describe, expect, test } from "vitest"
-import { MultiFreeTextQuestion, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator.ts"
-import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
-import { sampleRandomSeed } from "../../utils/random.ts"
+import type { MultiFreeTextQuestion, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator"
+import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator"
+import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator"
+import { sampleRandomSeed } from "@shared/utils/random"
 
 interface TestingObjectFreetext {
   question: MultipleChoiceQuestion | MultiFreeTextQuestion
@@ -16,7 +17,20 @@ describe("StackQueueGenerator - Correctness", () => {
       const { question: q, testing: t } = stackQuestion.generate(
         "en", // language not relevant
         {
-          variant: "input",
+          variant: "detailed",
+        },
+        sampleRandomSeed(),
+      ) as TestingObjectFreetext
+
+      expect(q.type).toEqual("MultiFreeTextQuestion")
+      expect(Object.keys(t.correctAnswer).length).toBeGreaterThanOrEqual(0)
+    })
+
+    test(`${i}. FreeText - random Queue-Generator question`, () => {
+      const { question: q, testing: t } = queueQuestion.generate(
+        "en", // language not relevant
+        {
+          variant: "detailed",
         },
         sampleRandomSeed(),
       ) as TestingObjectFreetext
@@ -35,14 +49,38 @@ describe("StackQueueGenerator - Reproducible", () => {
       const { question: q1, testing: t1 } = stackQuestion.generate(
         "en", // language not relevant
         {
-          variant: "input",
+          variant: "detailed",
         },
         seed,
       ) as TestingObjectFreetext
       const { question: q2, testing: t2 } = stackQuestion.generate(
         "de", // language not relevant
         {
-          variant: "input",
+          variant: "detailed",
+        },
+        seed,
+      ) as TestingObjectFreetext
+
+      expect(q1.type).toEqual("MultiFreeTextQuestion")
+      expect(q1.type).toEqual(q2.type)
+
+      for (const key in t1.correctAnswer) {
+        expect(t1.correctAnswer[key]).toEqual(t2.correctAnswer[key])
+      }
+    })
+
+    test(`${i}. FreeText - Queue-Generator question`, () => {
+      const { question: q1, testing: t1 } = queueQuestion.generate(
+        "en", // language not relevant
+        {
+          variant: "detailed",
+        },
+        seed,
+      ) as TestingObjectFreetext
+      const { question: q2, testing: t2 } = queueQuestion.generate(
+        "de", // language not relevant
+        {
+          variant: "detailed",
         },
         seed,
       ) as TestingObjectFreetext

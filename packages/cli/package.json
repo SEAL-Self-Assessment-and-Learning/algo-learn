@@ -1,0 +1,12 @@
+{
+  "name": "algo-learn-cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@commander-js/extra-typings": "^13.0.0",
+    "fuse.js": "^7.0.0",
+    "settings": "workspace:*",
+    "shared": "workspace:*"
+  }
+}

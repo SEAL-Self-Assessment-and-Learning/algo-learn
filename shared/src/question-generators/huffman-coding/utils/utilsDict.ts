@@ -1,9 +1,9 @@
 import {
   minimalMultipleChoiceFeedback,
-  MultiFreeTextFeedbackFunction,
-  MultiFreeTextFormatFunction,
-  MultiFreeTextQuestion,
-  MultipleChoiceQuestion,
+  type MultiFreeTextFeedbackFunction,
+  type MultiFreeTextFormatFunction,
+  type MultiFreeTextQuestion,
+  type MultipleChoiceQuestion,
 } from "@shared/api/QuestionGenerator"
 import { generatePossibleAnswersChoice2 } from "@shared/question-generators/huffman-coding/generate/dictStructure"
 import { generateCharacterFrequencyTable } from "@shared/question-generators/huffman-coding/generate/words"
@@ -13,8 +13,8 @@ import {
   checkProvidedCode,
   convertDictToMdTable,
 } from "@shared/question-generators/huffman-coding/utils/utils"
-import Random from "@shared/utils/random"
-import { t, Translations } from "@shared/utils/translations"
+import type Random from "@shared/utils/random"
+import { t, type Translations } from "@shared/utils/translations"
 
 /**
  * This function generates the basic structure for input2 and choice2 questions
@@ -25,7 +25,7 @@ function generateDictFoundations({ random }: { random: Random }) {
   const characterFrequencies = generateCharacterFrequencyTable(numDifferentCharacters, random)
   // only temporary displaying the word array
   // add some spacing to table in the question text using extra feature div_my-5
-  const displayTable = convertDictToMdTable(characterFrequencies, "#div_my-5#")
+  const displayTable = convertDictToMdTable(characterFrequencies)
   const correctAnswerTreeNode = getHuffmanCodeOfTable(characterFrequencies)
   const correctAnswerDict = correctAnswerTreeNode.getEncodingTable()
 
@@ -43,20 +43,20 @@ function generateDictFoundations({ random }: { random: Random }) {
  * @param characterFrequencies
  */
 function createInputFields(characterFrequencies: { [p: string]: number }) {
-  let inputFields = ""
+  let inputFields = "|"
   const fieldIDCharMap: { [key: string]: string } = {}
   // iterate through the wordArray to create the input fields
   let i = 0
   for (const key in characterFrequencies) {
     const fieldID = `index-${i}-${key}` // this is the unique ID for the input field
     fieldIDCharMap[fieldID] = key
-    inputFields += "|{{" + fieldID + "#TL#" + key + ": ##overlay}}"
+    inputFields += `${key}:|{{${fieldID}#TL###overlay}}|`
     if (i % 2 == 1) {
-      inputFields += "|\n"
+      inputFields += "\n|"
     }
     i++
   }
-  inputFields += "|\n|#border_none?table_w-full#||"
+
   return inputFields
 }
 
@@ -69,7 +69,6 @@ function createSolutionTable(correctAnswerDict: Record<string, string>) {
   for (const key in correctAnswerDict) {
     solutionDisplay += `|**${key}**|$${correctAnswerDict[key]}$|\n`
   }
-  solutionDisplay += "|#table_w-full?td?sd?ah_center?div_my-5#| |"
   return solutionDisplay
 }
 

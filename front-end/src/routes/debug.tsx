@@ -1,4 +1,4 @@
-import { Translations } from "@shared/utils/translations"
+import type { Translations } from "@shared/utils/translations"
 import { HorizontallyCenteredDiv } from "../components/CenteredDivs"
 import { useDebug, useFormat } from "../hooks/useDebug"
 import { useTranslation } from "../hooks/useTranslation"
