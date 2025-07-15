@@ -27,7 +27,7 @@ describe("StackQueueGenerator - Correctness", () => {
     })
 
     test(`${i}. FreeText - random Queue-Generator question`, () => {
-      const { question: q, testing: t } = queueQuestion.generate(
+      const { question: q } = queueQuestion.generate(
         "en", // language not relevant
         {
           variant: "detailed",
@@ -36,7 +36,6 @@ describe("StackQueueGenerator - Correctness", () => {
       ) as TestingObjectFreetext
 
       expect(q.type).toEqual("MultiFreeTextQuestion")
-      expect(Object.keys(t.correctAnswer).length).toBeGreaterThanOrEqual(0)
     })
   }
 })
@@ -70,15 +69,15 @@ describe("StackQueueGenerator - Reproducible", () => {
     })
 
     test(`${i}. FreeText - Queue-Generator question`, () => {
-      const { question: q1, testing: t1 } = queueQuestion.generate(
+      const { question: q1 } = queueQuestion.generate(
         "en", // language not relevant
         {
           variant: "detailed",
         },
         seed,
       ) as TestingObjectFreetext
-      const { question: q2, testing: t2 } = queueQuestion.generate(
-        "de", // language not relevant
+      const { question: q2 } = queueQuestion.generate(
+        "en", // language not relevant
         {
           variant: "detailed",
         },
@@ -87,10 +86,7 @@ describe("StackQueueGenerator - Reproducible", () => {
 
       expect(q1.type).toEqual("MultiFreeTextQuestion")
       expect(q1.type).toEqual(q2.type)
-
-      for (const key in t1.correctAnswer) {
-        expect(t1.correctAnswer[key]).toEqual(t2.correctAnswer[key])
-      }
+      expect(q1.text).toEqual(q2.text)
     })
   }
 })

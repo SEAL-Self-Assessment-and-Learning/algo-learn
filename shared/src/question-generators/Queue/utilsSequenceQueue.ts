@@ -1,12 +1,15 @@
-import { MultiFreeTextFeedbackFunction, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
+import type {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextQuestion,
+} from "@shared/api/QuestionGenerator.ts"
 import { Queue } from "@shared/question-generators/Queue/Queue.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import {
   createArrayDisplayCodeBlock,
   createArrayDisplayCodeBlockUserInput,
 } from "@shared/utils/arrayDisplayCodeBlock.ts"
-import Random from "@shared/utils/random.ts"
-import { t, Translations } from "@shared/utils/translations.ts"
+import type Random from "@shared/utils/random.ts"
+import { t, type Translations } from "@shared/utils/translations.ts"
 
 /**
  * Generates a new Queue question for the seqQueue variant
@@ -30,6 +33,7 @@ export function generateVariantSequenceQueue(
   const { operations, queue } = generateOperationsVariantSequenceStack(random)
   const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
     numberOfInputFields: operations.length,
+    lang,
   })
 
   const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
@@ -40,6 +44,7 @@ export function generateVariantSequenceQueue(
           ...queue.getQueueAsString(),
           ...(Array(operations.length - queue.getCurrentNumberOfElements()).fill("") as string[]),
         ],
+        lang,
       }),
     }
     const allKeys: Set<string> = new Set<string>(Object.keys(text))

@@ -1,4 +1,4 @@
-import {
+import type {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
   FreeTextQuestion,
@@ -6,8 +6,8 @@ import {
 import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils.ts"
 import { Queue } from "@shared/question-generators/Queue/Queue.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
-import Random from "@shared/utils/random.ts"
-import { t, Translations } from "@shared/utils/translations.ts"
+import type Random from "@shared/utils/random.ts"
+import { t, type Translations } from "@shared/utils/translations.ts"
 
 /**
  * Generates a new Queue question for the seqLetter variant

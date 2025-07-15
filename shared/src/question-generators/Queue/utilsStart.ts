@@ -1,8 +1,13 @@
+import type {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
+  MultiFreeTextQuestion,
+} from "@shared/api/QuestionGenerator.ts"
 import { Queue } from "@shared/question-generators/Queue/Queue.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
-import Random from "@shared/utils/random.ts"
-import { t, tFunction, Translations } from "@shared/utils/translations.ts"
+import type Random from "@shared/utils/random.ts"
+import { t, tFunction, type Translations } from "@shared/utils/translations.ts"
 
 /**
  * Function to generate the operations for the queue (FREETEXT option)
