@@ -53,6 +53,7 @@ export function generateVariantPopSeq(
     return {
       correct: false,
       correctAnswer: popSequence,
+      feedbackText: buildDetailedFeedback(sequence),
     }
   }
 
@@ -108,4 +109,30 @@ function generateOperationsVariantPopSeq(random: Random) {
     sequence,
     popSequence,
   }
+}
+
+function buildDetailedFeedback(popSequence: string): string {
+  const header = "|#|Operation|Stack|Output|\n"
+  const separator = "|===|===|===|===|\n"
+  let feedback = ""
+
+  const stack: Stack<string> = new Stack<string>()
+  let output = ""
+
+  for (let i = 0; i < popSequence.length; i++) {
+    let operation = popSequence[i] === "*" ? "pop" : "push"
+    let stackStatus = ""
+    if (operation === "push") {
+      operation += `(**${popSequence[i]}**)`
+      stack.push(popSequence[i])
+      stackStatus = stack.toString() || ""
+    } else {
+      operation += `()`
+      output += stack.getTop()
+      stackStatus = stack.toString() || ""
+    }
+    feedback += `|${i + 1}|${operation}|${stackStatus}|${output}|\n`
+  }
+
+  return header + separator + feedback
 }

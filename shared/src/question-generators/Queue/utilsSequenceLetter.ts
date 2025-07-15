@@ -53,6 +53,7 @@ export function generateVariantSequenceLetter(
     return {
       correct: false,
       correctAnswer: popSequence,
+      feedbackText: buildDetailedFeedback(sequence),
     }
   }
 
@@ -82,7 +83,7 @@ function generateOperationsVariantSequenceLetter(random: Random) {
   let sequence = ""
   let popSequence = ""
 
-  while (seenAmountPopOperations < amountPopOperations) {
+  while (seenAmountPopOperations < amountPopOperations && sequence.length < 14) {
     let currentOperation: "enqueue" | "dequeue" = random.weightedChoice(
       ["enqueue", "dequeue"],
       [0.6, 0.4],
@@ -109,4 +110,30 @@ function generateOperationsVariantSequenceLetter(random: Random) {
     sequence,
     popSequence,
   }
+}
+
+function buildDetailedFeedback(popSequence: string): string {
+  const header = "|#|Operation|Queue|Output|\n"
+  const separator = "|===|===|===|===|\n"
+  let feedback = ""
+
+  const queue: Queue<string> = new Queue<string>()
+  let output = ""
+
+  for (let i = 0; i < popSequence.length; i++) {
+    let operation = popSequence[i] === "*" ? "dequeue" : "enqueue"
+    let queueStatus = ""
+    if (operation === "enqueue") {
+      operation += `(**${popSequence[i]}**)`
+      queue.enqueue(popSequence[i])
+      queueStatus = queue.toString() || ""
+    } else {
+      operation += "()"
+      output += queue.dequeue()
+      queueStatus = queue.toString() || ""
+    }
+    feedback += `|${i + 1}|${operation}|${queueStatus}|${output}|\n`
+  }
+
+  return header + separator + feedback
 }
