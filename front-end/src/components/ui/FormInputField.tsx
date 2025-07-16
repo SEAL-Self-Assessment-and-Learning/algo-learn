@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState, type ReactElement } from "react"
 import { Markdown } from "@/components/Markdown.tsx"
 import { Input } from "@/components/ui/input.tsx"
 import { useFormContext } from "@/hooks/useFormContext.ts"
@@ -11,7 +11,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
     feedbackVariation,
     focus,
     feedback,
-    align,
+    type,
     placeholder,
     prompt,
     invalid,
@@ -28,6 +28,16 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
     }
   }, [id])
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (setText) {
+      if (type === "TTABLE" && e.target.value !== "0" && e.target.value !== "1") {
+        setText("")
+      } else {
+        setText(e.target.value)
+      }
+    }
+  }
+
   const inputBorderColor = invalid ? "border-red-500 focus:border-red-500" : ""
 
   let promptElement: ReactElement = <></>
@@ -39,13 +49,7 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
     )
   }
 
-  let spacing
-  let fieldWidth: number | null = null
-  if (align === "NL") {
-    spacing = <br />
-  } else if (align.startsWith("OS")) {
-    fieldWidth = Number.parseInt(align.slice(3)) * 3
-  }
+  const { spacing, additionalClassnames, fieldWidth } = getExtraStyles(type, feedbackVariation)
 
   const feedbackElement: ReactElement = (
     <FeedbackComponent
@@ -65,19 +69,18 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
         <div className="flex flex-col">
           <div className="flex flex-row items-center">
             {promptElement}
-            <div className={`relative h-full w-full`}>
+            <div
+              className={`relative flex h-full ${fieldWidth ? "" : "w-full"} items-center justify-center`}
+            >
               <Input
                 ref={focus ? firstInputRef : null}
                 key={`newline-input-${id}`}
                 disabled={disabled}
                 value={text || ""}
-                onChange={(e) => {
-                  if (setText) {
-                    setText(e.target.value)
-                  }
-                }}
+                onChange={handleChange}
+                maxLength={type === "TTABLE" ? 1 : undefined}
                 type="text"
-                className={`${inputBorderColor} focus:outline-none`}
+                className={`${inputBorderColor} ${additionalClassnames} focus:outline-none`}
                 style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
                 placeholder={placeholder || ""}
               />
@@ -94,21 +97,20 @@ export const FormInputField: React.FC<{ id: string }> = ({ id }) => {
         {spacing}
         <div className="flex flex-row items-center">
           {promptElement}
-          <div className={`relative h-full w-full`}>
+          <div
+            className={`relative flex h-full ${fieldWidth ? "" : "w-full"} items-center justify-center`}
+          >
             <Input
               ref={focus ? firstInputRef : null}
               key={`newline-input-${id}`}
               disabled={disabled}
               value={text || ""}
-              onChange={(e) => {
-                if (setText) {
-                  setText(e.target.value)
-                }
-              }}
+              onChange={handleChange}
+              maxLength={type === "TTABLE" ? 1 : undefined}
               onFocus={() => setIsInputFocused(true)}
               onBlur={() => setIsInputFocused(false)}
               type="text"
-              className={`${inputBorderColor} mb-1 focus:outline-none`}
+              className={`${inputBorderColor} ${additionalClassnames} `}
               style={fieldWidth ? { width: `${fieldWidth}ch` } : {}}
               placeholder={placeholder || ""}
             />
@@ -153,7 +155,7 @@ const FeedbackComponent = ({
     )
   } else {
     feedbackBackgroundColor = formatFeedback ? (!invalid ? "bg-green-400" : "bg-red-400") : ""
-    className = `absolute left-0 top-full z-10 ${feedbackBackgroundColor} border border-gray-300 dark:border-gray-700 shadow-md p-2 mt-1 rounded-md`
+    className = `absolute left-0 top-full z-10 ${feedbackBackgroundColor} border border-gray-300 dark:border-gray-700 shadow-md p-2 mt-2 rounded-md`
     // remove text-left to make the feedback align center
     return (
       <div className={`${className} text-left`}>
@@ -165,4 +167,34 @@ const FeedbackComponent = ({
       </div>
     )
   }
+}
+
+/**
+ * Function to extract extra styles depending on passed arguments for the input field
+ * @param style - passed style option
+ * @param feedbackVariation -
+ */
+function getExtraStyles(style: string, feedbackVariation: string) {
+  let spacing
+  let additionalClassnames: string = ""
+  let fieldWidth: number | null = null
+  if (style === "NL") {
+    spacing = <br />
+  } else if (style === "TTABLE") {
+    additionalClassnames =
+      "focus:outline-none w-10 py-0.5 px-1 h-8 mx-0.5 my-0.5 focus-visible:ring-1 focus-visible:ring-offset-0 text-center"
+  } else if (style === "MAT") {
+    additionalClassnames = `w-12 p-2 mx-0.5 focus-visible:ring-1 focus-visible:ring-offset-0`
+  }
+  if (additionalClassnames === "") {
+    if (feedbackVariation === "below") {
+      additionalClassnames = "focus:outline-none"
+    } else {
+      additionalClassnames = "mb-1 w-full focus:outline-none"
+    }
+  }
+  if (style.startsWith("OS")) {
+    fieldWidth = Number.parseInt(style.slice(3)) * 3
+  }
+  return { spacing, additionalClassnames, fieldWidth }
 }

@@ -1,0 +1,66 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build and deploy to testing when pushed to main or feat branch
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events to main and feat* branches
+  push:
+    branches:
+      - main
+      - "feat*"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Allow one concurrent deployment
+concurrency:
+  group: testing-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Bun install 🔧
+        run: bun install --frozen-lockfile
+
+      # See https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables for a definition of GITHUB_REF.
+      # The GITHUB_REF is in the form of refs/heads/<branch_name> or refs/pull/<pull_request_number>/merge. We replace the slashes with underscores.
+      - name: Get a clean name of the current branch or pull request
+        run: echo "CLEAN_REF=$(echo "$GITHUB_REF" | sed -e 's/\//_/g')" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Write basename and version number to front-end/src/config.ts
+        run: |
+          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$CLEAN_REF\"/g" front-end/src/config.ts
+          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" front-end/src/config.ts
+
+      - name: Build 🔧
+        run: bun run build --mode staging --base /algo-learn-testing/$CLEAN_REF/
+
+      - name: Deploy to server 🚀
+        id: deploy
+        uses: Pendect/action-rsyncer@v2.0.0
+        env:
+          DEPLOY_KEY: ${{secrets.DEPLOY_KEY}}
+        with:
+          options: ""
+          ssh_options: ""
+          src: "front-end/dist/"
+          dest: "dell-from-github@tcs.uni-frankfurt.de:/var/www/html/algo-learn-testing/$CLEAN_REF/"
+
+      - name: Display status from deploy
+        run: echo "${{ steps.deploy.outputs.status }}"

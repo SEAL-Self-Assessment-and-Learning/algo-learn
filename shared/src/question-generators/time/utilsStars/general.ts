@@ -1,8 +1,8 @@
 import { generateForLoopQuestion } from "@shared/question-generators/time/utilsStars/for"
 import { createForForLoop } from "@shared/question-generators/time/utilsStars/forfor"
 import { createWhileLoop } from "@shared/question-generators/time/utilsStars/while"
-import { PseudoCode } from "@shared/utils/pseudoCodeUtils"
-import Random from "@shared/utils/random"
+import type { PseudoCode } from "@shared/utils/pseudoCodeUtils"
+import type Random from "@shared/utils/random"
 
 /**
  * Sample the source code of a loop that prints stars

@@ -2,18 +2,18 @@ import Fraction from "fraction.js"
 import { log } from "mathjs"
 import {
   printStarsNew,
-  PseudoCode,
-  PseudoCodeAssignment,
-  PseudoCodeBlock,
-  PseudoCodeCall,
-  PseudoCodeFunction,
-  PseudoCodeIf,
-  PseudoCodeReturn,
-  PseudoCodeState,
-  PseudoCodeString,
+  type PseudoCode,
+  type PseudoCodeAssignment,
+  type PseudoCodeBlock,
+  type PseudoCodeCall,
+  type PseudoCodeFunction,
+  type PseudoCodeIf,
+  type PseudoCodeReturn,
+  type PseudoCodeState,
+  type PseudoCodeString,
 } from "../../utils/pseudoCodeUtils.ts"
-import Random from "../../utils/random"
-import { createProductTerm, ProductTerm } from "../asymptotics/asymptoticsUtils"
+import type Random from "../../utils/random"
+import { createProductTerm, type ProductTerm } from "../asymptotics/asymptoticsUtils"
 
 const arithmeticOperations = ["+", "-", "*", "/"]
 
@@ -579,7 +579,7 @@ function generateOperationsArithmetic(stars: number, random: Random) {
     }
     const currentNumber = random.int(1, 9)
     if (operation === "*") {
-      operation = "\\cdot"
+      operation = "\\cdot "
     } else if (operation === "/") {
       lastOperationWasFraction = true
       equationString = equationString.trim()
@@ -619,7 +619,7 @@ function generateRecursiveReturnArithmetic({
     }
     if (i < numRecCalls - 1) {
       const chooseOperation = random.choice(arithmeticOperations.filter((op) => op !== "/"))
-      returnString.push(`${chooseOperation === "*" ? "\\cdot" : chooseOperation} `)
+      returnString.push(`${chooseOperation === "*" ? "\\cdot " : chooseOperation} `)
     }
   }
   return { returnString }

@@ -1,11 +1,12 @@
-import {
+import type { Language } from "@shared/api/Language.ts"
+import type {
   FreeTextQuestion,
   MultiFreeTextFeedbackFunction,
   MultiFreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
-import { Heap, MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax"
+import type { Heap, MaxHeap, MinHeap } from "@shared/question-generators/heap/heapMinMax"
 import { generateOperationSequence } from "@shared/question-generators/heap/utils/utilsGenerate"
 import { generateHeapOperationsFoundation } from "@shared/question-generators/heap/utils/utilsOperations"
 import {
@@ -13,7 +14,7 @@ import {
   createArrayDisplayCodeBlockUserInput,
 } from "@shared/utils/arrayDisplayCodeBlock"
 import Random from "@shared/utils/random"
-import { t, tFunctional, Translations } from "@shared/utils/translations"
+import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translationHeapOperations: Translations = {
   en: {
@@ -27,7 +28,6 @@ const translationHeapOperations: Translations = {
       "(Not included at the moment) Consider the following **Array**: {{0}} Enter the state of the Heap after **Build-{{1}}-Heap** on the above array. {{2}}",
     taskCombine:
       "Consider the following sequence of operations, where a **number** represents **inserting** this number into the **{{1}}-Heap** and $*$ represents an `Extract{{1}}` operation. \\[{{0}}\\] Enter the final state of the Heap as an array. Initially the Heap is empty. {{2}}",
-    checkFormat: "Please only enter Integer seperated by commas.",
   },
   de: {
     name: "Heap-Operationen",
@@ -40,7 +40,6 @@ const translationHeapOperations: Translations = {
       "(Not included at the moment) Betrachte das folgende Array: {{0}} Gib den Heap nach **Build-{{1}}-Heap** auf dem obigen Array an. {{2}}",
     taskCombine:
       "Betrachte die folgende Sequenz von Operationen, wobei eine **Zahl** das **Einfügen** dieser Zahl in den **{{1}}-Heap** repräsentiert und $*$ eine `Extract{{1}}` Operation. \\[{{0}}\\] Gib den finalen Zustand des Heaps als Array an. Anfänglich ist der Heap leer. {{2}}",
-    checkFormat: "Bitte nur ganze Zahlen durch Komma getrennt eingeben.",
   },
 }
 
@@ -85,6 +84,7 @@ export const HeapOperations: QuestionGenerator = {
 
       const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
         numberOfInputFields: solutionHeap.getSize(),
+        lang,
         inputFieldCharacters: 2,
         leadValues: ["-"],
       })
@@ -97,7 +97,7 @@ export const HeapOperations: QuestionGenerator = {
           heapElements.toString(),
           arrayDisplayBlock,
         ]),
-        feedback: getMultiFreeTextFeedback(solutionHeap),
+        feedback: getMultiFreeTextFeedback(solutionHeap, lang),
       }
       return { question }
     } else if (variant === "extract") {
@@ -106,6 +106,7 @@ export const HeapOperations: QuestionGenerator = {
       }
       const elementsTable = createArrayDisplayCodeBlock({
         array: ["-"].concat(solutionHeap.getHeap().map(String)),
+        lang,
       })
 
       const extractAmount = random.int(2, 3)
@@ -115,6 +116,7 @@ export const HeapOperations: QuestionGenerator = {
 
       const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
         numberOfInputFields: solutionHeap.getSize(),
+        lang,
         inputFieldCharacters: 2,
         leadValues: ["-"],
       })
@@ -129,13 +131,14 @@ export const HeapOperations: QuestionGenerator = {
           extractAmount.toString(),
           arrayDisplayBlock,
         ]),
-        feedback: getMultiFreeTextFeedback(solutionHeap),
+        feedback: getMultiFreeTextFeedback(solutionHeap, lang),
       }
       return { question }
     } else if (variant === "build") {
       // @deprecated variant
       const elementsTable = createArrayDisplayCodeBlock({
         array: ["-"].concat(heapElements.map(String)),
+        lang,
       })
       solutionHeap.build(heapElements)
       const question: FreeTextQuestion = {
@@ -152,6 +155,7 @@ export const HeapOperations: QuestionGenerator = {
 
       const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
         numberOfInputFields: solutionHeap.getSize(),
+        lang,
         inputFieldCharacters: 2,
         leadValues: ["-"],
       })
@@ -160,7 +164,7 @@ export const HeapOperations: QuestionGenerator = {
         name: HeapOperations.name(lang),
         path: permaLink,
         text: t(translationHeapOperations, lang, "taskCombine", [sequence, heapType, arrayDisplayBlock]),
-        feedback: getMultiFreeTextFeedback(solutionHeap),
+        feedback: getMultiFreeTextFeedback(solutionHeap, lang),
       }
       return { question }
     }
@@ -171,11 +175,11 @@ export const HeapOperations: QuestionGenerator = {
  * This function returns a feedback function for all heap operation variants
  * Comparing the solution heap with the user input
  * @param solutionHeap - the solution heap
+ * @param lang
  */
-function getMultiFreeTextFeedback(solutionHeap: Heap): MultiFreeTextFeedbackFunction {
+function getMultiFreeTextFeedback(solutionHeap: Heap, lang: Language): MultiFreeTextFeedbackFunction {
   // fieldIDs = input-x (x \in [0,1,2,3...])
   return ({ text }) => {
-    console.log(text)
     const heapArray = solutionHeap.getHeap()
     for (let i = 0; i < heapArray.length; i++) {
       const userFieldAnswer = parseFloat(text["input-" + i].trim())
@@ -184,10 +188,12 @@ function getMultiFreeTextFeedback(solutionHeap: Heap): MultiFreeTextFeedbackFunc
           correct: false,
           correctAnswer: createArrayDisplayCodeBlock({
             array: ["-", ...heapArray],
+            lang,
           }),
         }
       }
     }
+
     return {
       correct: true,
     }
