@@ -23,7 +23,7 @@ const translations: Translations = {
 {{5}} 
     Enter the final state of the hash table.
 {{6}}`,
-    checkFormat: "Please enter a list of number seperated by '-' or '->'",
+    checkFormat: "Please enter a list of number separated by '-' or '->'",
   },
   de: {
     name: "Hashing",
