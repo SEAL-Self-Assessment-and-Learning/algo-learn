@@ -28,7 +28,7 @@ function createSolutionViewLinkedHashing(
   lang: "en" | "de",
 ) {
   const keyList = hashMap.keysList()
-  let tableString = `\n|Index|${t(translations, lang, "Values")}|\n`
+  let tableString = `\n|Index|${t(translations, lang, "Values")}|\n|===|===|\n`
   for (let i = 0; i < keyList.length; i++) {
     if (keyList[i].length === 0) {
       tableString += `|${i}| |\n`
@@ -41,7 +41,6 @@ function createSolutionViewLinkedHashing(
       tableString += `|${i}|${valueString}|\n`
     }
   }
-  tableString += "|#div_my-5#||"
   return tableString
 }
 
@@ -218,11 +217,10 @@ export function generateQuestionLinkedHashing(
   }
 
   // create a table with two columns and for as many rows as the hashMap is long
-  let inputTableString = `\n|Index|${t(translations, lang, "Values")}|\n|---|---|\n`
+  let inputTableString = `\n|Index|${t(translations, lang, "Values")}|\n|===!|!===|\n`
   for (let i = 0; i < hashMap.getSize(); i++) {
     inputTableString += `|${i}|{{row-${i}#TL###overlay}}|\n`
   }
-  inputTableString += "|#div_my-5?border_none?av_middle?ah_center?table_w-full#||"
 
   return {
     tableSize,
