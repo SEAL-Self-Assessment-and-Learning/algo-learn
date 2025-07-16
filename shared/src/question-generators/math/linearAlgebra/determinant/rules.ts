@@ -96,7 +96,7 @@ function generateVariantMulDet({
     name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "mul", [defC, defAMulB]),
-    feedback: getFeedback(detSolution),
+    feedback: getFeedback(detSolution, translations, lang, "mulFeedback"),
   }
   return {
     question,
@@ -147,7 +147,7 @@ function generateVariantInvDet({
     path: permalink,
     text: t(translations, lang, "inv", [defA]),
     bottomText: t(translations, lang, "invBottom"),
-    feedback: getFeedback(detSolution),
+    feedback: getFeedback(detSolution, translations, lang, "invFeedback"),
   }
   return {
     question,
@@ -189,7 +189,7 @@ function generateVariantTransDet({
     name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "rowManipulation", [defAB, detSolution.toString()]),
-    feedback: getFeedback(detSolution),
+    feedback: getFeedback(detSolution, translations, lang, "transFeedback"),
   }
   return {
     question,
@@ -239,7 +239,7 @@ function generateVariantRowSwapDet({
     name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "rowManipulation", [defAB, detSwapped.toString()]),
-    feedback: getFeedback(detSolution),
+    feedback: getFeedback(detSolution, translations, lang, "rowSwapFeedback"),
   }
   return {
     question,
@@ -296,7 +296,7 @@ function generateVariantRowMulDet({
     name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "rowManipulation", [defAB, detRowMul.toString()]),
-    feedback: getFeedback(detSolution),
+    feedback: getFeedback(detSolution, translations, lang, "rowMulFeedback"),
   }
   return {
     question,
@@ -357,7 +357,7 @@ function generateVariantRowAddDet({
     name: Determinant.name(lang),
     path: permalink,
     text: t(translations, lang, "rowManipulation", [defAB, detHelper.toString()]),
-    feedback: getFeedback(detSolution),
+    feedback: getFeedback(detSolution, translations, lang, "rowAddFeedback"),
   }
   return {
     question,

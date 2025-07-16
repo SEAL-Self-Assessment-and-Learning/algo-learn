@@ -11,7 +11,7 @@ const translations: Translations = {
   en: {
     name: "Determinant",
     description: "Compute the determinant of a matrix",
-    text: `Compute the determiant of the matrix 
+    text: `Compute the determinant of the matrix 
     $ A = {{0}} $.`,
     mul: `The Matrix $C$ is defined as follows: 
     \\[ {{0}} \\]
@@ -25,6 +25,12 @@ const translations: Translations = {
     \\[ {{0}} \\]
     Given det $B = {{1}} $.
     **Compute** det $A$.`,
+    mulFeedback: `Please consider the rule for the determinant of a product: $\\det(AB) = \\det(A)\\cdot\\det(B)$.`,
+    invFeedback: `Please consider the rule for the determinant of an inverse: $\\det(A^{-1}) = \\frac{1}{\\det(A)}$.`,
+    transFeedback: `Please consider the rule for the determinant of a transpose: $\\det(A^\\top) = \\det(A)$.`,
+    rowSwapFeedback: `Please consider how swapping two rows affects the determinant.`,
+    rowMulFeedback: `Please consider how multiplying a row by a scalar affects the determinant.`,
+    rowAddFeedback: `Please consider how adding a multiple of one row to another affects the determinant.`,
   },
   de: {
     name: "Determinante",
@@ -43,6 +49,12 @@ const translations: Translations = {
     \\[ {{0}} \\]
     Gegeben ist det $B = {{1}} $.
     **Berechne** det $A$.`,
+    mulFeedback: `Bitte beachte die Regel für die Determinante eines Produkts: $\\det(AB) = \\det(A)\\cdot\\det(B)$.`,
+    invFeedback: `Bitte beachte die Regel für die Determinante einer Inversen: $\\det(A^{-1}) = \\frac{1}{\\det(A)}$.`,
+    transFeedback: `Bitte beachte die Regel für die Determinante einer Transponierten: $\\det(A^\\top) = \\det(A)$.`,
+    rowSwapFeedback: `Bitte beachte, wie sich das Vertauschen von zwei Zeilen auf die Determinante auswirkt.`,
+    rowMulFeedback: `Bitte beachte, wie sich das Multiplizieren einer Zeile mit einem Skalar auf die Determinante auswirkt.`,
+    rowAddFeedback: `Bitte beachte, wie sich das Addieren eines Vielfachen einer Zeile zu einer anderen auf die Determinante auswirkt.`,
   },
 }
 
