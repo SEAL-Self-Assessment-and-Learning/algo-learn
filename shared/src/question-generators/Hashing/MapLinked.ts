@@ -1,4 +1,4 @@
-import { HashFunction } from "@shared/question-generators/Hashing/MapLinProbing"
+import type { HashFunction } from "@shared/question-generators/Hashing/MapLinProbing"
 
 /**
  * This is a hash map implementation using linked list to handle collisions

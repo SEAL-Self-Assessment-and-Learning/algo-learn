@@ -8,6 +8,7 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { hashingGenerator } from "@shared/question-generators/Hashing/Hashing.ts"
 import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
@@ -81,6 +82,11 @@ export const collection: QuestionCollection = [
     slug: "union-find",
     name: { de: "Union-Find", en: "Union-Find" },
     contents: [QuickFindGenerator],
+  },
+  {
+    slug: "hashing",
+    name: { de: "Hashing", en: "Hashing" },
+    contents: [hashingGenerator],
   },
   {
     slug: "huffmancoding",

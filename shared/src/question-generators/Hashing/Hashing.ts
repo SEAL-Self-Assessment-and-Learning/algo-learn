@@ -1,11 +1,11 @@
-import { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
+import type { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import {
   generateQuestionLinearDoubleProbing,
   generateQuestionLinkedHashing,
 } from "@shared/question-generators/Hashing/utils.ts"
 import Random from "@shared/utils/random.ts"
-import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {

@@ -1,6 +1,6 @@
-import { DoubleHashFunction, HashFunction } from "@shared/question-generators/Hashing/MapLinProbing"
+import type { DoubleHashFunction, HashFunction } from "@shared/question-generators/Hashing/MapLinProbing"
 import primesJSON from "@shared/utils/primes.json"
-import Random from "@shared/utils/random"
+import type Random from "@shared/utils/random"
 
 /**
  * The type of the hash function generator

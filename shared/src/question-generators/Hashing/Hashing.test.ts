@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { MapLinked } from "./MapLinked.ts"
-import { DoubleHashFunction, HashFunction, MapLinProbing } from "./MapLinProbing.ts"
+import { MapLinProbing, type DoubleHashFunction, type HashFunction } from "./MapLinProbing.ts"
 
 function createHashMap<T extends MapLinked | MapLinProbing>(
   type: new (size: number) => T,

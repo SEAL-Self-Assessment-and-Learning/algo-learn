@@ -1,20 +1,20 @@
-import {
+import type {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextFormatFunction,
 } from "@shared/api/QuestionGenerator"
 import { generateHashFunction } from "@shared/question-generators/Hashing/Functions"
 import { MapLinked } from "@shared/question-generators/Hashing/MapLinked"
 import {
-  DoubleHashFunction,
-  HashFunction,
   MapLinProbing,
+  type DoubleHashFunction,
+  type HashFunction,
 } from "@shared/question-generators/Hashing/MapLinProbing"
 import {
   createArrayDisplayCodeBlock,
   createArrayDisplayCodeBlockUserInput,
 } from "@shared/utils/arrayDisplayCodeBlock"
-import Random from "@shared/utils/random"
-import { t, Translations } from "@shared/utils/translations"
+import type Random from "@shared/utils/random"
+import { t, type Translations } from "@shared/utils/translations"
 
 /**
  * This function creates the view to create a better readable solution for the user
@@ -253,7 +253,7 @@ export function generateQuestionLinearDoubleProbing(
 
   const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
     numberOfInputFields: tableSize,
-    transpose: true,
+    lang,
   })
 
   const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
@@ -263,6 +263,7 @@ export function generateQuestionLinearDoubleProbing(
       correct: false,
       correctAnswer: createArrayDisplayCodeBlock({
         array: solutionMap.map((x) => (x === null ? " " : x)),
+        lang,
       }),
     }
     for (let i = 0; i < solutionMap.length; i++) {
