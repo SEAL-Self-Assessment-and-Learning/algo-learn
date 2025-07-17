@@ -147,11 +147,9 @@ export function generateReverseLinear(random: Random, translations: Translations
 
 export function generateReverseDouble(random: Random, translations: Translations, lang: Language) {
   const { hashMap, toInsert, hashFunction } = generateQuestionBase(random, "double")
-  console.log(hashFunction.hashFunctionString)
   const secondHashMap = hashMap.copy()
   for (const value of toInsert) {
     secondHashMap.insert(value)
-    console.log(secondHashMap)
   }
 
   const firstMap = createArrayDisplayCodeBlock({
@@ -196,7 +194,6 @@ export function generateReverseDouble(random: Random, translations: Translations
 
     const userMapList = userMap.keysList().map((x) => (x === null ? " " : x))
     const secondMapList = secondHashMap.keysList().map((x) => (x === null ? " " : x))
-    console.log(userMapList, secondMapList)
     if (userMapList.toString() !== secondMapList.toString()) {
       return {
         correct: false,
