@@ -43,7 +43,11 @@ export function generateQuestionBase(random: Random, variant: "linear" | "double
     variant === "linear" ? "universal" : "double",
     random,
   )()
-  const { hashMap, userInsertions } = generateOperationsHashMap(random, tableSize, hashFunction.hashFunction)
+  const { hashMap, userInsertions } = generateOperationsHashMap(
+    random,
+    tableSize,
+    hashFunction.hashFunction,
+  )
   return {
     hashMap,
     userInsertions,
