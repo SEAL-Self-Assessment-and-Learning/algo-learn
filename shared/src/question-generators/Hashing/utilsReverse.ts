@@ -13,6 +13,99 @@ import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock
 import type Random from "@shared/utils/random.ts"
 import { t, type Translations } from "@shared/utils/translations.ts"
 
+function createHashDisplay(map: MapLinProbing, lang: Language) {
+  return createArrayDisplayCodeBlock({
+    array: map.keysList().map((x) => (x === null ? " " : x)),
+    lang,
+  })
+}
+
+function generateFeedbackLinear(
+  hashMap: MapLinProbing,
+  secondMapList: (number | string)[],
+  userInsertions: number[],
+  hashFunctionString: string,
+  translations: Translations,
+  lang: Language,
+): MultiFreeTextFeedbackFunction {
+  return ({ text }) => {
+    const a = parseInt(text["value-a"]?.trim())
+    const b = parseInt(text["value-b"]?.trim())
+    const p = parseInt(text["value-p"]?.trim())
+    const m = parseInt(text["value-m"]?.trim())
+
+    if ([a, b, p, m].some((x) => isNaN(x))) {
+      return {
+        correct: false,
+        feedbackText: t(translations, lang, "invalidInputLinear"),
+      }
+    }
+
+    if (m !== hashMap.getSize()) {
+      return {
+        correct: false,
+        feedbackText: t(translations, lang, "invalidInputSize", [m.toString()]),
+      }
+    }
+
+    const userMap = hashMap.copy()
+    userMap.replaceHashFunction((key: number, size: number) => ((a * key + b) % p) % size)
+    userInsertions.forEach((v) => userMap.insert(v))
+
+    const userList = userMap.keysList().map((x) => (x === null ? " " : x))
+    return {
+      correct: userList.toString() === secondMapList.toString(),
+      ...(userList.toString() !== secondMapList.toString() && {
+        correctAnswer: hashFunctionString,
+      }),
+    }
+  }
+}
+
+function generateFeedbackDouble(
+  hashMap: MapLinProbing,
+  secondMapList: (number | string)[],
+  userInsertions: number[],
+  hashFunctionString: string,
+  translations: Translations,
+  lang: Language,
+): MultiFreeTextFeedbackFunction {
+  return ({ text }) => {
+    const a = parseInt(text["value-a"]?.trim())
+    const m = parseInt(text["value-m"]?.trim())
+
+    if ([a, m].some((x) => isNaN(x))) {
+      return {
+        correct: false,
+        feedbackText: t(translations, lang, "invalidInputLinear"),
+      }
+    }
+
+    if (m !== hashMap.getSize()) {
+      return {
+        correct: false,
+        feedbackText: t(translations, lang, "invalidInputSize", [m.toString()]),
+      }
+    }
+
+    const userMap = hashMap.copy()
+    userMap.replaceHashFunction((key, i, size) => {
+      const f = (a * key) % size
+      const g = m - (key % (m - 1)) - 1
+      return (f + i * g) % size
+    })
+    userInsertions.forEach((v) => userMap.insert(v))
+
+    const userList = userMap.keysList().map((x) => (x === null ? " " : x))
+    return {
+      correct: userList.toString() === secondMapList.toString(),
+      ...(userList.toString() !== secondMapList.toString() && {
+        correctAnswer: hashFunctionString,
+      }),
+    }
+  }
+}
+
 export function generateOperationsHashMap(
   random: Random,
   tableSize: number,
@@ -75,69 +168,43 @@ const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
   }
 }
 
-export function generateReverseLinear(random: Random, translations: Translations, lang: Language) {
-  const { hashMap, userInsertions, hashFunction } = generateQuestionBase(random, "linear")
+function generateReverseCommon(
+  random: Random,
+  translations: Translations,
+  lang: Language,
+  variant: "linear" | "double",
+) {
+  const isLinear = variant === "linear"
+  const { hashMap, userInsertions, hashFunction } = generateQuestionBase(random, variant)
+
   const secondHashMap = hashMap.copy()
-  for (const value of userInsertions) {
-    secondHashMap.insert(value)
-  }
+  userInsertions.forEach((v) => secondHashMap.insert(v))
 
-  const firstMap = createArrayDisplayCodeBlock({
-    array: hashMap.keysList().map((x) => (x === null ? " " : x)),
-    lang,
-  })
-  const secondMap = createArrayDisplayCodeBlock({
-    array: secondHashMap.keysList().map((x) => (x === null ? " " : x)),
-    lang,
-  })
+  const firstMap = createHashDisplay(hashMap, lang)
+  const secondMap = createHashDisplay(secondHashMap, lang)
+  const secondList = secondHashMap.keysList().map((x) => (x === null ? " " : x))
 
-  const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
-    const a = parseInt(text["value-a"].trim())
-    const b = parseInt(text["value-b"].trim())
-    const p = parseInt(text["value-p"].trim())
-    const m = parseInt(text["value-m"].trim())
+  const feedback = isLinear
+    ? generateFeedbackLinear(
+        hashMap,
+        secondList,
+        userInsertions,
+        hashFunction.hashFunctionString,
+        translations,
+        lang,
+      )
+    : generateFeedbackDouble(
+        hashMap,
+        secondList,
+        userInsertions,
+        hashFunction.hashFunctionString,
+        translations,
+        lang,
+      )
 
-    if (isNaN(a) || isNaN(b) || isNaN(p) || isNaN(m)) {
-      return {
-        correct: false,
-        feedbackText: t(translations, lang, "invalidInputLinear"),
-      }
-    }
-
-    if (m !== hashMap.getSize()) {
-      return {
-        correct: false,
-        feedbackText: t(translations, lang, "invalidInputSize", [hashMap.getSize().toString()]),
-      }
-    }
-
-    const userMap = hashMap.copy()
-
-    function userHashFunction(key: number, size: number) {
-      return ((a * key + b) % p) % size
-    }
-    userMap.replaceHashFunction(userHashFunction)
-
-    for (const value of userInsertions) {
-      userMap.insert(value)
-    }
-
-    const userMapList = userMap.keysList().map((x) => (x === null ? " " : x))
-    const secondMapList = secondHashMap.keysList().map((x) => (x === null ? " " : x))
-    if (userMapList.toString() !== secondMapList.toString()) {
-      return {
-        correct: false,
-        correctAnswer: hashFunction.hashFunctionString,
-      }
-    }
-
-    return {
-      correct: true,
-    }
-  }
-
-  const inputFieldTable =
-    "\n|a|b|p|m|\n|:===:|:===:|:===:|:===:|\n|{{value-a#OS-2###overlay}}|{{value-b#OS-2###overlay}}|{{value-p#OS-2###overlay}}|{{value-m#OS-2###overlay}}|\n"
+  const inputFieldTable = isLinear
+    ? "\n|a|b|p|m|\n|:===:|:===:|:===:|:===:|\n|{{value-a#OS-2###overlay}}|{{value-b#OS-2###overlay}}|{{value-p#OS-2###overlay}}|{{value-m#OS-2###overlay}}|\n"
+    : "\n|a|m|\n|:===:|:===:|\n|{{value-a#OS-2###overlay}}|{{value-m#OS-2###overlay}}|\n"
 
   return {
     firstMap,
@@ -149,76 +216,8 @@ export function generateReverseLinear(random: Random, translations: Translations
   }
 }
 
-export function generateReverseDouble(random: Random, translations: Translations, lang: Language) {
-  const { hashMap, userInsertions, hashFunction } = generateQuestionBase(random, "double")
-  const secondHashMap = hashMap.copy()
-  for (const value of userInsertions) {
-    secondHashMap.insert(value)
-  }
+export const generateReverseLinear = (random: Random, translations: Translations, lang: Language) =>
+  generateReverseCommon(random, translations, lang, "linear")
 
-  const firstMap = createArrayDisplayCodeBlock({
-    array: hashMap.keysList().map((x) => (x === null ? " " : x)),
-    lang,
-  })
-  const secondMap = createArrayDisplayCodeBlock({
-    array: secondHashMap.keysList().map((x) => (x === null ? " " : x)),
-    lang,
-  })
-
-  const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
-    const a = parseInt(text["value-a"].trim())
-    const m = parseInt(text["value-m"].trim())
-
-    if (isNaN(a) || isNaN(m)) {
-      return {
-        correct: false,
-        feedbackText: t(translations, lang, "invalidInputLinear"),
-      }
-    }
-
-    if (m !== hashMap.getSize()) {
-      return {
-        correct: false,
-        feedbackText: t(translations, lang, "invalidInputSize", [hashMap.getSize().toString()]),
-      }
-    }
-
-    const userMap = hashMap.copy()
-
-    function userHashFunction(key: number, i: number, size: number) {
-      const f = (a * key) % size
-      const g = m - (key % (m - 1)) - 1
-      return (f + i * g) % size
-    }
-    userMap.replaceHashFunction(userHashFunction)
-
-    for (const value of userInsertions) {
-      userMap.insert(value)
-    }
-
-    const userMapList = userMap.keysList().map((x) => (x === null ? " " : x))
-    const secondMapList = secondHashMap.keysList().map((x) => (x === null ? " " : x))
-    if (userMapList.toString() !== secondMapList.toString()) {
-      return {
-        correct: false,
-        correctAnswer: hashFunction.hashFunctionString,
-      }
-    }
-
-    return {
-      correct: true,
-    }
-  }
-
-  const inputFieldTable =
-    "\n|a|m|\n|:===:|:===:|\n|{{value-a#OS-2###overlay}}|{{value-m#OS-2###overlay}}|\n"
-
-  return {
-    firstMap,
-    secondMap,
-    userInsertions,
-    inputFieldTable,
-    checkFormat,
-    feedback,
-  }
-}
+export const generateReverseDouble = (random: Random, translations: Translations, lang: Language) =>
+  generateReverseCommon(random, translations, lang, "double")

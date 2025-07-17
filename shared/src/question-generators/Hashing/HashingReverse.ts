@@ -7,7 +7,7 @@ import {
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
-const universalFunction = "h(x) = ((a \\cdot x + b) \\mod p) \\mod m \\]"
+const universalFunction = "\\[ h(x) = ((a \\cdot x + b) \\mod p) \\mod m \\]"
 const doubleFunction =
   "\\[ f(x) = a \\cdot x \\bmod m \\] \n\n" +
   "\\[ g(x) = (m - 1) - (x \\bmod (m-1)) \\] \n\n" +
@@ -21,7 +21,7 @@ const translations: Translations = {
     Our used hash function has the form:
     {{3}} 
     Find correct values for {{4}}, such that inserting the values in the first table results in the second table. {{5}}`,
-    invalidInputSize: "$m$ has to the size of the hash table.",
+    invalidInputSize: "$m$ has to be the size of the hash table.",
     linearMissing: "$a$, $b$, $p$ and $m$",
     doubleMissing: "$a$ and $m$",
   },
@@ -64,48 +64,28 @@ export const hashingReverseGenerator: QuestionGenerator = {
 
     const variant: "linear" | "double" = parameters.variant as "linear" | "double"
 
-    if (variant === "linear") {
-      const { firstMap, secondMap, userInsertions, inputFieldTable, checkFormat, feedback } =
-        generateReverseLinear(random, translations, lang)
-      return {
-        question: {
-          type: "MultiFreeTextQuestion",
-          name: t(translations, lang, "name"),
-          path: permalink,
-          fillOutAll: true,
-          text: t(translations, lang, "text", [
-            firstMap,
-            userInsertions.toString(),
-            secondMap,
-            universalFunction,
-            t(translations, lang, "linearMissing"),
-            inputFieldTable,
-          ]),
-          checkFormat,
-          feedback,
-        },
-      }
-    } else {
-      const { firstMap, secondMap, userInsertions, inputFieldTable, checkFormat, feedback } =
-        generateReverseDouble(random, translations, lang)
-      return {
-        question: {
-          type: "MultiFreeTextQuestion",
-          name: t(translations, lang, "name"),
-          path: permalink,
-          fillOutAll: true,
-          text: t(translations, lang, "text", [
-            firstMap,
-            userInsertions.toString(),
-            secondMap,
-            doubleFunction,
-            t(translations, lang, "doubleMissing"),
-            inputFieldTable,
-          ]),
-          checkFormat,
-          feedback,
-        },
-      }
+    const isLinear = variant === "linear"
+    const { firstMap, secondMap, userInsertions, inputFieldTable, checkFormat, feedback } = isLinear
+      ? generateReverseLinear(random, translations, lang)
+      : generateReverseDouble(random, translations, lang)
+
+    return {
+      question: {
+        type: "MultiFreeTextQuestion",
+        name: t(translations, lang, "name"),
+        path: permalink,
+        fillOutAll: true,
+        text: t(translations, lang, "text", [
+          firstMap,
+          userInsertions.map((x) => x.toString()).join(", "),
+          secondMap,
+          isLinear ? universalFunction : doubleFunction,
+          t(translations, lang, isLinear ? "linearMissing" : "doubleMissing"),
+          inputFieldTable,
+        ]),
+        checkFormat,
+        feedback,
+      },
     }
   },
 }
