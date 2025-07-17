@@ -26,14 +26,14 @@ export function generateOperationsHashMap(
   )
 
   const valuesToInsert = random.int(2, 3)
-  const insertions: number[] = possibleValues.slice(0, numberValues - valuesToInsert)
-  const toInsert: number[] = possibleValues.slice(numberValues - valuesToInsert)
+  const initialInsertions: number[] = possibleValues.slice(0, numberValues - valuesToInsert)
+  const userInsertions: number[] = possibleValues.slice(numberValues - valuesToInsert)
 
-  for (const value of insertions) {
+  for (const value of initialInsertions) {
     hashMap.insert(value)
   }
 
-  return { hashMap, toInsert }
+  return { hashMap, userInsertions }
 }
 
 export function generateQuestionBase(random: Random, variant: "linear" | "double") {
@@ -43,10 +43,10 @@ export function generateQuestionBase(random: Random, variant: "linear" | "double
     variant === "linear" ? "universal" : "double",
     random,
   )()
-  const { hashMap, toInsert } = generateOperationsHashMap(random, tableSize, hashFunction.hashFunction)
+  const { hashMap, userInsertions } = generateOperationsHashMap(random, tableSize, hashFunction.hashFunction)
   return {
     hashMap,
-    toInsert,
+    userInsertions,
     hashFunction,
   }
 }
@@ -72,9 +72,9 @@ const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
 }
 
 export function generateReverseLinear(random: Random, translations: Translations, lang: Language) {
-  const { hashMap, toInsert, hashFunction } = generateQuestionBase(random, "linear")
+  const { hashMap, userInsertions, hashFunction } = generateQuestionBase(random, "linear")
   const secondHashMap = hashMap.copy()
-  for (const value of toInsert) {
+  for (const value of userInsertions) {
     secondHashMap.insert(value)
   }
 
@@ -114,7 +114,7 @@ export function generateReverseLinear(random: Random, translations: Translations
     }
     userMap.replaceHashFunction(userHashFunction)
 
-    for (const value of toInsert) {
+    for (const value of userInsertions) {
       userMap.insert(value)
     }
 
@@ -138,7 +138,7 @@ export function generateReverseLinear(random: Random, translations: Translations
   return {
     firstMap,
     secondMap,
-    toInsert,
+    userInsertions,
     inputFieldTable,
     checkFormat,
     feedback,
@@ -146,9 +146,9 @@ export function generateReverseLinear(random: Random, translations: Translations
 }
 
 export function generateReverseDouble(random: Random, translations: Translations, lang: Language) {
-  const { hashMap, toInsert, hashFunction } = generateQuestionBase(random, "double")
+  const { hashMap, userInsertions, hashFunction } = generateQuestionBase(random, "double")
   const secondHashMap = hashMap.copy()
-  for (const value of toInsert) {
+  for (const value of userInsertions) {
     secondHashMap.insert(value)
   }
 
@@ -188,7 +188,7 @@ export function generateReverseDouble(random: Random, translations: Translations
     }
     userMap.replaceHashFunction(userHashFunction)
 
-    for (const value of toInsert) {
+    for (const value of userInsertions) {
       userMap.insert(value)
     }
 
@@ -212,7 +212,7 @@ export function generateReverseDouble(random: Random, translations: Translations
   return {
     firstMap,
     secondMap,
-    toInsert,
+    userInsertions,
     inputFieldTable,
     checkFormat,
     feedback,

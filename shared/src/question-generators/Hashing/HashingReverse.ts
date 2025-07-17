@@ -28,6 +28,13 @@ const translations: Translations = {
   de: {
     name: "Hashing Reverse",
     description: "Finde eine Hash-Funktion, die eine gegebene Hash-Tabelle erzeugt",
+    text: `Gegeben ist folgende Hashtabelle: {{0}} Wir fügen die Werte \`{{1}}\` in der angegebenen Reihenfolge ein, was zu folgender Hashtabelle führt: {{2}}
+    Unsere verwendete Hashfunktion hat die Form:
+    {{3}} 
+    Finde passende Werte für {{4}}, sodass das Einfügen der Werte aus der ersten Tabelle zur zweiten Tabelle führt. {{5}}`,
+    invalidInputSize: "$m$ muss der Größe der Hashtabelle entsprechen.",
+    linearMissing: "$a$, $b$, $p$ und $m$",
+    doubleMissing: "$a$ und $m$",
   },
 }
 
@@ -58,7 +65,7 @@ export const hashingReverseGenerator: QuestionGenerator = {
     const variant: "linear" | "double" = parameters.variant as "linear" | "double"
 
     if (variant === "linear") {
-      const { firstMap, secondMap, toInsert, inputFieldTable, checkFormat, feedback } =
+      const { firstMap, secondMap, userInsertions, inputFieldTable, checkFormat, feedback } =
         generateReverseLinear(random, translations, lang)
       return {
         question: {
@@ -68,7 +75,7 @@ export const hashingReverseGenerator: QuestionGenerator = {
           fillOutAll: true,
           text: t(translations, lang, "text", [
             firstMap,
-            toInsert.toString(),
+            userInsertions.toString(),
             secondMap,
             universalFunction,
             t(translations, lang, "linearMissing"),
@@ -79,7 +86,7 @@ export const hashingReverseGenerator: QuestionGenerator = {
         },
       }
     } else {
-      const { firstMap, secondMap, toInsert, inputFieldTable, checkFormat, feedback } =
+      const { firstMap, secondMap, userInsertions, inputFieldTable, checkFormat, feedback } =
         generateReverseDouble(random, translations, lang)
       return {
         question: {
@@ -89,7 +96,7 @@ export const hashingReverseGenerator: QuestionGenerator = {
           fillOutAll: true,
           text: t(translations, lang, "text", [
             firstMap,
-            toInsert.toString(),
+            userInsertions.toString(),
             secondMap,
             doubleFunction,
             t(translations, lang, "doubleMissing"),
