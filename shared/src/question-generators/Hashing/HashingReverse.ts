@@ -38,6 +38,10 @@ const translations: Translations = {
   },
 }
 
+/**
+ * Asks the user to find parameters for the hash function, such that inserting values
+ * into a first hash table results in a second hash table.
+ */
 export const hashingReverseGenerator: QuestionGenerator = {
   name: tFunctional(translations, "name"),
   id: "hashingrev",

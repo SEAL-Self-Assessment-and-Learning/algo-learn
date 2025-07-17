@@ -13,6 +13,11 @@ import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock
 import type Random from "@shared/utils/random.ts"
 import { t, type Translations } from "@shared/utils/translations.ts"
 
+/**
+ * Creates a display for the hash map, which is used in the question text
+ * @param map
+ * @param lang
+ */
 function createHashDisplay(map: MapLinProbing, lang: Language) {
   return createArrayDisplayCodeBlock({
     array: map.keysList().map((x) => (x === null ? " " : x)),
@@ -20,6 +25,15 @@ function createHashDisplay(map: MapLinProbing, lang: Language) {
   })
 }
 
+/**
+ * Generates feedback for the linear probing hash map question
+ * @param hashMap - the hash map used for the question
+ * @param secondMapList - the expected result of the hash map after insertions
+ * @param userInsertions - the values that are inserted using the user hash function
+ * @param hashFunctionString - the string representation of the hash function
+ * @param translations
+ * @param lang
+ */
 function generateFeedbackLinear(
   hashMap: MapLinProbing,
   secondMapList: (number | string)[],
@@ -62,6 +76,15 @@ function generateFeedbackLinear(
   }
 }
 
+/**
+ * Generates feedback for the double hashing hash map question
+ * @param hashMap - the hash map used for the question
+ * @param secondMapList - the expected result of the hash map after insertions
+ * @param userInsertions - the values that are inserted using the user hash function
+ * @param hashFunctionString - the string representation of the hash function
+ * @param translations
+ * @param lang
+ */
 function generateFeedbackDouble(
   hashMap: MapLinProbing,
   secondMapList: (number | string)[],
@@ -106,6 +129,12 @@ function generateFeedbackDouble(
   }
 }
 
+/**
+ * Generates a hash map with initial insertions and returns user insertions
+ * @param random
+ * @param tableSize
+ * @param hashFunction
+ */
 export function generateOperationsHashMap(
   random: Random,
   tableSize: number,
@@ -129,6 +158,11 @@ export function generateOperationsHashMap(
   return { hashMap, userInsertions }
 }
 
+/**
+ * Generates the base for the question, including the hash map, user insertions, and hash function
+ * @param random
+ * @param variant
+ */
 export function generateQuestionBase(random: Random, variant: "linear" | "double") {
   const tableSize = random.choice([7, 11])
   const hashFunction = generateHashFunction(
@@ -148,6 +182,11 @@ export function generateQuestionBase(random: Random, variant: "linear" | "double
   }
 }
 
+/**
+ * Checks the format of the input text for all variants
+ * @param text
+ * @param fieldID
+ */
 const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
   // check if text[field] is a valid number
   const value = text[fieldID]
@@ -168,6 +207,14 @@ const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
   }
 }
 
+/**
+ * Generates the question for reverse common hashing tasks
+ * - Variants: linear and double
+ * @param random
+ * @param translations
+ * @param lang
+ * @param variant
+ */
 function generateReverseCommon(
   random: Random,
   translations: Translations,
