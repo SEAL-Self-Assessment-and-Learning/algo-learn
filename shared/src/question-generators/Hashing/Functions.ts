@@ -21,7 +21,7 @@ type GenerateHashFuncType = {
  */
 export function generateHashFunction(
   tableSize: number,
-  type: "linked" | "linear" | "double",
+  type: "linked" | "linear" | "double" | "universal",
   random: Random,
 ): () => GenerateHashFuncType {
   /** Standard hashing - can be used for linked and linear */
@@ -83,6 +83,8 @@ export function generateHashFunction(
     return random.choice([divisionMethod, universalHashing])
   } else if (type === "linked") {
     return random.choice([divisionMethod, universalHashing])
+  } else if (type === "universal") {
+    return universalHashing
   } else {
     return doubleLinearHashing
   }

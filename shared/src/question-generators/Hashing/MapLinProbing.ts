@@ -12,9 +12,9 @@ export class MapLinProbing {
   private mapKeys: (number | null)[]
   private readonly size: number
   private amount: number = 0
-  private readonly hashFunction: HashFunction | null = null
-  private readonly doubleHashFunction: DoubleHashFunction | null = null
-  private readonly doubleHashing: boolean = false
+  private hashFunction: HashFunction | null = null
+  private doubleHashFunction: DoubleHashFunction | null = null
+  private doubleHashing: boolean = false
 
   constructor({
     size,
@@ -177,7 +177,25 @@ export class MapLinProbing {
     )
   }
 
+  replaceHashFunction(hashFunction: HashFunction | DoubleHashFunction) {
+    if (hashFunction.length === 2) {
+      this.hashFunction = hashFunction as HashFunction
+    } else if (hashFunction.length === 3) {
+      this.doubleHashFunction = hashFunction as DoubleHashFunction
+      this.doubleHashing = true
+    } else {
+      throw new Error("Invalid hash function")
+    }
+  }
+
   toString() {
     return this.keysList().toString()
+  }
+
+  copy(): MapLinProbing {
+    const newMap = new MapLinProbing({ size: this.size, hashFunction: this.hashFunction! })
+    newMap.mapKeys = [...this.mapKeys]
+    newMap.amount = this.amount
+    return newMap
   }
 }

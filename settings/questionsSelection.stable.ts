@@ -9,6 +9,7 @@ import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptot
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
 import { hashingGenerator } from "@shared/question-generators/Hashing/Hashing.ts"
+import { hashingReverseGenerator } from "@shared/question-generators/Hashing/HashingReverse.ts"
 import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
@@ -86,7 +87,7 @@ export const collection: QuestionCollection = [
   {
     slug: "hashing",
     name: { de: "Hashing", en: "Hashing" },
-    contents: [hashingGenerator],
+    contents: [hashingGenerator, hashingReverseGenerator],
   },
   {
     slug: "huffmancoding",
