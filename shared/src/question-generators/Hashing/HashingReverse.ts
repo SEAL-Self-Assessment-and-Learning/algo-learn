@@ -1,18 +1,29 @@
 import type { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { generateReverseLinear } from "@shared/question-generators/Hashing/utilsReverse.ts"
+import {
+  generateReverseDouble,
+  generateReverseLinear,
+} from "@shared/question-generators/Hashing/utilsReverse.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
+
+const universalFunction = "h(x) = ((a \\cdot x + b) \\mod p) \\mod m \\]"
+const doubleFunction =
+  "\\[ f(x) = a \\cdot x \\bmod m \\] \n\n" +
+  "\\[ g(x) = (m - 1) - (x \\bmod (m-1)) \\] \n\n" +
+  "\\[ h_i(x) = (f(x) + i \\cdot g(x)) \\bmod m \\]"
 
 const translations: Translations = {
   en: {
     name: "Hashing Reverse",
     description: "Find a hash function that produces a given hash table",
-    text: `Given the following hash table: {{0}} We insert the values {{1}} in the given order, resulting in the following hash table: {{2}}
+    text: `Given the following hash table: {{0}} We insert the values \`{{1}}\` in the given order, resulting in the following hash table: {{2}}
     Our used hash function has the form:
-    \\[ {{3}} \\]
-    Find correct values for **a**, **b** and **p**, such that inserting the values in the first table results in the second table. {{4}}`,
-    universalFunction: "h(x) = ((a \\cdot x + b) \\mod p) \\mod {{0}}",
+    {{3}} 
+    Find correct values for {{4}}, such that inserting the values in the first table results in the second table. {{5}}`,
+    invalidInputSize: "$m$ has to the size of the hash table.",
+    linearMissing: "$a$, $b$, $p$ and $m$",
+    doubleMissing: "$a$ and $m$",
   },
   de: {
     name: "Hashing Reverse",
@@ -44,12 +55,11 @@ export const hashingReverseGenerator: QuestionGenerator = {
       seed,
     })
 
-    let variant: "linear" | "double" = parameters.variant as "linear" | "double"
-    variant = "linear"
+    const variant: "linear" | "double" = parameters.variant as "linear" | "double"
 
     if (variant === "linear") {
-      const { firstMap, secondMap, toInsert, inputFieldTable, size, checkFormat, feedback } =
-        generateReverseLinear(random, lang)
+      const { firstMap, secondMap, toInsert, inputFieldTable, checkFormat, feedback } =
+        generateReverseLinear(random, translations, lang)
       return {
         question: {
           type: "MultiFreeTextQuestion",
@@ -58,9 +68,10 @@ export const hashingReverseGenerator: QuestionGenerator = {
           fillOutAll: true,
           text: t(translations, lang, "text", [
             firstMap,
-            "$" + toInsert.toString() + "$",
+            toInsert.toString(),
             secondMap,
-            t(translations, lang, "universalFunction", [size.toString()]),
+            universalFunction,
+            t(translations, lang, "linearMissing"),
             inputFieldTable,
           ]),
           checkFormat,
@@ -68,12 +79,24 @@ export const hashingReverseGenerator: QuestionGenerator = {
         },
       }
     } else {
+      const { firstMap, secondMap, toInsert, inputFieldTable, checkFormat, feedback } =
+        generateReverseDouble(random, translations, lang)
       return {
         question: {
-          type: "FreeTextQuestion",
+          type: "MultiFreeTextQuestion",
           name: t(translations, lang, "name"),
           path: permalink,
-          text: t(translations, lang, "text", []),
+          fillOutAll: true,
+          text: t(translations, lang, "text", [
+            firstMap,
+            toInsert.toString(),
+            secondMap,
+            doubleFunction,
+            t(translations, lang, "doubleMissing"),
+            inputFieldTable,
+          ]),
+          checkFormat,
+          feedback,
         },
       }
     }

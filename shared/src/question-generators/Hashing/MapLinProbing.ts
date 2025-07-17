@@ -193,7 +193,14 @@ export class MapLinProbing {
   }
 
   copy(): MapLinProbing {
-    const newMap = new MapLinProbing({ size: this.size, hashFunction: this.hashFunction! })
+    const newMap = new MapLinProbing({
+      size: this.size,
+      hashFunction: this.hashFunction
+        ? this.hashFunction
+        : this.doubleHashFunction
+          ? this.doubleHashFunction
+          : this.defaultHashFunction,
+    })
     newMap.mapKeys = [...this.mapKeys]
     newMap.amount = this.amount
     return newMap
