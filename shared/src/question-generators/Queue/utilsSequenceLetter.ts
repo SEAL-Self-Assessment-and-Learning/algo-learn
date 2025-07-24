@@ -1,3 +1,4 @@
+import type { Language } from "@shared/api/Language.ts"
 import type {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -21,7 +22,7 @@ import { t, type Translations } from "@shared/utils/translations.ts"
  * @param translations
  */
 export function generateVariantSequenceLetter(
-  lang: "de" | "en",
+  lang: Language,
   random: Random,
   permalink: string,
   translations: Translations,
@@ -34,7 +35,7 @@ export function generateVariantSequenceLetter(
     if (!/^[A-Z]*$/.test(text.toUpperCase())) {
       return {
         valid: false,
-        message: t(translations, lang, "checkFormatSeqLetter"),
+        message: t(translations, lang, "validationOnlyLetters"),
       }
     }
     return {
@@ -53,7 +54,7 @@ export function generateVariantSequenceLetter(
     return {
       correct: false,
       correctAnswer: popSequence,
-      feedbackText: buildDetailedFeedback(sequence),
+      feedbackText: buildDetailedFeedback(sequence, translations, lang),
     }
   }
 
@@ -112,8 +113,8 @@ function generateOperationsVariantSequenceLetter(random: Random) {
   }
 }
 
-function buildDetailedFeedback(popSequence: string): string {
-  const header = "|#|Operation|Queue|Output|\n"
+function buildDetailedFeedback(popSequence: string, translations: Translations, lang: Language): string {
+  const header = `|#|${t(translations, lang, "Operation")}|Queue|${t(translations, lang, "Output")}|\n`
   const separator = "|===|===|===|===|\n"
   let feedback = ""
 

@@ -11,9 +11,9 @@ const translations: Translations = {
     name: "Queues",
     description: "Perform queue operations",
     solutionFreetext: `\n|**Index**|**Question**|**Solution**|\n|===|===|===|\n{{0}}`,
-    checkFormat: "Please only enter a number.",
-    checkFormatSeqLetter: "Please only enter letters",
-    checkFormatSeqQueue: "Only numbers.",
+    validationOnlyNumbers: "Please only enter a number.",
+    validationOnlyLetters: "Please only enter letters",
+    validationOnlyNumbersShort: "Only numbers.",
     checkFormatBool: "Please only enter *false* or *true*",
     queueEmpty: "Currently the queue is empty.",
     queueContainsValues: `The queue currently contains the following elements (*with the front at the lowest index*):`,
@@ -22,23 +22,27 @@ const translations: Translations = {
     sequenceLetterText: `Let Q be a queue. Perform the following operations from left to right: A letter \`i\` stands for \`Q.enqueue(i)\` and \`*\` stands for \`Q.dequeue()\`.
                     \\[\\texttt{{{0}}}\\]
                     Enter the sequence of letters that are output by the \`dequeue\` calls.`,
+    Operation: "Operation",
+    Output: "Output",
   },
   de: {
     name: "Queues",
     description: "Queue-Operationen ausführen",
     solutionFreetext: `|**Index**|**Frage**|**Lösung**|\n|===|===|===|\n{{0}}`,
-    checkFormat: "Bitte gib nur Zahlen ein.",
-    checkFormatSeqLetter: "Bitte gib nur Buchstaben ein.",
-    checkFormatSeqQueue: "Nur Zahlen.",
+    validationOnlyNumbers: "Bitte gib nur Zahlen ein.",
+    validationOnlyLetters: "Bitte gib nur Buchstaben ein.",
+    validationOnlyNumbersShort: "Nur Zahlen.",
     checkFormatBool: "Bitte gib nur *false* oder *true* ein.",
     queueEmpty: "Die Queue ist aktuell leer.",
     queueContainsValues: `Die Queue enthält aktuell folgende Elemente (*mit dem Front-Element am niedrigsten Index*):`,
     freeTextInput:
       `Betrachte eine **Queue "Q"**. ` + `{{0}} **Wir führen die folgenden Operationen aus:** {{1}}`,
-    sequenceQueueText: `Betrachte eine anfangs leere Queue, in der die Operationen {{0}} ausgeführt werden. Gib den finalen Zustand der Queue an. {{1}} *(Das vorderste Element ist am niedrigsten Index, verschiebe die Elemente an den Index *$0$}*.)*`,
+    sequenceQueueText: `Betrachte eine anfangs leere Queue, in der die Operationen {{0}} ausgeführt werden. Gib den finalen Zustand der Queue an. {{1}} *(Das vorderste Element ist am niedrigsten Index, verschiebe die Elemente an den Index *$0$*.)*`,
     sequenceLetterText: `Sei Q eine Queue. Führe die folgenden Operationen von links nach rechts aus: Ein Buchstabe \`i\` steht hierbei für \`Q.enqueue(i)\` und \`*\` steht für \`Q.dequeue()\`.
                     \\[\\texttt{{{0}}}\\]
                     Gib die Sequenz der Buchstaben an, die durch die \`dequeue\`-Aufrufe ausgegeben werden.`,
+    Operation: "Operation",
+    Output: "Ausgabe",
   },
 }
 

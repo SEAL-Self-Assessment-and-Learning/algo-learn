@@ -1,3 +1,4 @@
+import type { Language } from "@shared/api/Language.ts"
 import type {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextFormatFunction,
@@ -78,7 +79,7 @@ export function generateQueueStartElements({
 }: {
   random: Random
   translations: Translations
-  lang: "en" | "de"
+  lang: Language
 }) {
   const startElementsAmount = random.int(0, 8)
 
@@ -118,7 +119,7 @@ export function createQueueInputFields({
 }: {
   operations: { [key: string]: string }[]
   translations: Translations
-  lang: "en" | "de"
+  lang: Language
 }) {
   // create the operations table
   let inputText = `\n| Operation | ${t(translations, lang, "result")} |\n|===|:===:|\n`
@@ -173,7 +174,7 @@ export function generateVariantStart(
 
     // check if is a number
     if (!/^\d+$/.test(text[fieldID])) {
-      return { valid: false, message: t(translations, lang, "checkFormat") }
+      return { valid: false, message: t(translations, lang, "validationOnlyNumbers") }
     }
     return { valid: true, message: "" }
   }

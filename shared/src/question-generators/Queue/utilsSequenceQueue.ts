@@ -1,3 +1,4 @@
+import type { Language } from "@shared/api/Language.ts"
 import type {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextFormatFunction,
@@ -26,7 +27,7 @@ import { t, type Translations } from "@shared/utils/translations.ts"
  * @param translations
  */
 export function generateVariantSequenceQueue(
-  lang: "de" | "en",
+  lang: Language,
   random: Random,
   permalink: string,
   translations: Translations,
@@ -42,7 +43,7 @@ export function generateVariantSequenceQueue(
       correct: false,
       correctAnswer: createArrayDisplayCodeBlock({
         array: [
-          ...queue.getQueueAsString(),
+          ...queue.toStringArray(),
           ...(Array(operations.length - queue.getCurrentNumberOfElements()).fill("") as string[]),
         ],
         lang,
@@ -52,7 +53,7 @@ export function generateVariantSequenceQueue(
     // input-x is the form for the input fields
     for (let i = 0; i < queue.getCurrentNumberOfElements(); i++) {
       allKeys.delete(`input-${i}`)
-      if (text[`input-${i}`] !== queue.getQueueAsString()[i]) {
+      if (text[`input-${i}`] !== queue.toStringArray()[i]) {
         return correctAnswer
       }
     }
@@ -73,7 +74,7 @@ export function generateVariantSequenceQueue(
     if (!/^[0-9]*$/.test(userInput)) {
       return {
         valid: false,
-        message: t(translations, lang, "checkFormatSeqQueue"),
+        message: t(translations, lang, "validationOnlyNumbersShort"),
       }
     }
     return {

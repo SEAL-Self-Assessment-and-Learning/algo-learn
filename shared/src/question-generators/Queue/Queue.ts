@@ -43,7 +43,7 @@ export class Queue<T> {
   /**
    * Returns all queue elements as strings
    */
-  getQueueAsString(): string[] {
+  toStringArray(): string[] {
     return this.queue.map((element) => String(element))
   }
 
