@@ -48,24 +48,20 @@ export function QuestionFooter({
   //       ? "red"
   //       : "disabled"
   return (
-    <div className="answer">
-      <div className={`${backgroundColor}`}>
-        <div className="m-auto flex max-w-xl flex-col justify-end gap-4 p-5 sm:min-h-[8rem] sm:flex-row sm:justify-between">
-          <div className={`flex place-items-center self-center text-left ${textColor}`}>
-            {icon}
-            <div>{message}</div>
-          </div>
-          <Button
-            variant={
-              mode === "incorrect" ? "wrongAnswer" : mode === "correct" ? "rightAnswer" : "default"
-            }
-            onClick={buttonClick}
-            className="self-end sm:self-center"
-            disabled={mode === "invalid" || mode === "submitted"}
-          >
-            {footerButtonText}
-          </Button>
+    <div className={`feedback ${backgroundColor}`}>
+      <div className="m-auto flex max-w-xl flex-col justify-end gap-4 p-5 sm:min-h-[8rem] sm:flex-row sm:justify-between">
+        <div className={`flex place-items-center self-center text-left ${textColor}`}>
+          {icon}
+          <div>{message}</div>
         </div>
+        <Button
+          variant={mode === "incorrect" ? "wrongAnswer" : mode === "correct" ? "rightAnswer" : "default"}
+          onClick={buttonClick}
+          className="self-end sm:self-center"
+          disabled={mode === "invalid" || mode === "submitted"}
+        >
+          {footerButtonText}
+        </Button>
       </div>
     </div>
   )

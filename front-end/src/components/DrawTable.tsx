@@ -37,7 +37,7 @@ export function DrawTable({ table }: { table: TableNode }) {
         <tbody
           className={cn(
             hasZebra &&
-              "[&>tr:nth-child(even)>td]:bg-muted first:[&>tr:nth-child(even)>td]:rounded-l-sm last:[&>tr:nth-child(even)>td]:rounded-r-sm [.answer_&>tr:nth-child(even)>td]:bg-muted-foreground",
+              "[&>tr:nth-child(even)>td]:bg-muted first:[&>tr:nth-child(even)>td]:rounded-l-sm last:[&>tr:nth-child(even)>td]:rounded-r-sm [.feedback_&>tr:nth-child(even)>td]:bg-muted-foreground",
           )}
         >
           {bodyRows.map((row, i) => (
