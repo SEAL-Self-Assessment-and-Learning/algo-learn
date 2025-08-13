@@ -3,22 +3,29 @@ import {
   type MultipleChoiceAnswer,
   type MultipleChoiceFeedback,
   type MultipleChoiceQuestion,
+  type FreeTextAnswer,
+  type FreeTextFeedback,
+  type FreeTextQuestion,
   type QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import Random from "@shared/utils/random"
 import { t, tFunctional, type Translations } from "@shared/utils/translations"
-
+import type { Language } from "@shared/api/Language"
 const translations: Translations = {
   en: {
     name: "Set Builder Notation",
-    description: "Match set-builder notation with explicit subsets",
+    description: "Match set builder notation with explicit subsets",
     text: "Match the following sets in set-builder notation with their explicit subsets:",
+    prompt: "List all elements of the following set explicitly: ",
+    checkFormat: "{a, b, c}",
   },
   de: {
     name: "Mengenschreibweise",
     description: "Ordne Mengen in Mengenschreibweise expliziten Mengen zu",
     text: "Ordne die folgenden Mengen in Mengenschreibweise den expliziten Mengen zu:",
+    prompt: "Gib alle Elemente der folgenden Menge explizit an: ",
+    checkFormat: "{a, b, c}",
   },
 }
 
@@ -150,11 +157,32 @@ export const SetBuilderQuestion: QuestionGenerator = {
   tags: ["dismod", "sets"],
   languages: ["en", "de"],
   license: "MIT",
-  expectedParameters: [],
+  expectedParameters: [
+    {
+      type: "string",
+      name: "variant",
+      allowedValues: ["match", "freetext"],
+    },
+  ],
 
-  generate: (lang = "en", parameters, seed) => {
+    generate: (lang, parameters, seed) => {
+    const path = serializeGeneratorCall({ generator: SetBuilderQuestion, lang, parameters, seed })
+    const variant = parameters.variant as "match" | "freetext"
     const random = new Random(seed)
 
+    switch (variant) {
+      case "match":
+        return generateMatchVariant(lang, path, random)
+      case "freetext":
+        return generateFreeTextVariant(lang, path, random)
+      default:
+        throw new Error("Unknown variant")
+    }
+  },
+}
+
+
+function generateMatchVariant(lang: Language, path: string, random: Random) {
     const nSets = random.int(5, 8)
     const left: string[] = []
     const rights: string[] = []
@@ -198,12 +226,7 @@ export const SetBuilderQuestion: QuestionGenerator = {
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
       name: SetBuilderQuestion.name(lang),
-      path: serializeGeneratorCall({
-        generator: SetBuilderQuestion,
-        lang,
-        parameters,
-        seed,
-      }),
+      path: path,
       sorting: true,
       matching: true,
       text: t(translations, lang, "text"),
@@ -213,5 +236,55 @@ export const SetBuilderQuestion: QuestionGenerator = {
     }
 
     return { question }
-  },
+  
 }
+
+function generateFreeTextVariant(lang: Language, path: string, random: Random) {
+  const tplt = random.choice(templates)
+  const dom: Domain = random.choice(["N", "Z"])
+  const param = tplt.paramRange(random)
+  const elems = tplt.build(dom, param)
+
+  const sorted = Array.from(new Set(elems)).sort((a, b) => a - b)
+  const subset = sorted.length > 8 ? random.subset(sorted, 8).sort((a, b) => a - b) : sorted
+  const correctSet = new Set(subset)
+  const expression = random.choice(tplt.labels(lang, dom, param))
+
+  const checkFormat = (a: FreeTextAnswer) => {
+    const input = a.text.trim()
+    const isValid = /^\{(\s*\d+\s*,)*\s*\d+\s*\}$/.test(input)
+    return isValid
+      ? { valid: true }
+      : { valid: false, message: t(translations, lang, "checkFormat") }
+  }
+
+  const feedback = (a: FreeTextAnswer): FreeTextFeedback => {
+    const match = a.text.trim().match(/^\{(.*?)\}$/)
+    if (!match) return { correct: false }
+
+    const user = match[1]
+      .split(",")
+      .map((s) => parseInt(s.trim()))
+      .filter((x) => !isNaN(x))
+
+    const correct = user.length === correctSet.size && [...correctSet].every((x) => user.includes(x))
+    return { correct }
+  }
+
+  const question: FreeTextQuestion = {
+    type: "FreeTextQuestion",
+    name: t(translations, lang, "name"),
+    path,
+    text: `${t(translations, lang, "prompt")}\n\n${expression}`,
+    checkFormat,
+    feedback,
+    typingAid: [
+      { text: "{", input: "{", label: "{" },
+      { text: "}", input: "}", label: "}" },
+      { text: ",", input: ",", label: "," },
+    ],
+  }
+
+  return { question }
+}
+
