@@ -190,22 +190,60 @@ export function ExerciseMultipleChoice({
       </InteractWithQuestion>
     )
   } else {
-    const message =
-      mode === "correct" ? (
-        <b className="text-2xl">{t("feedback.correct")}</b>
-      ) : mode === "incorrect" ? (
-        <>
-          <b className="text-lg">{t("feedback.thats-ok")}</b>
-          <br />
-          <Markdown
-            md={t("feedback.correct-order", [
-              `${state.feedbackObject?.correctChoice
-                ?.map((i) => "\n|" + question.answers[i] + "|")
-                .join("")}\n`,
-            ])}
-          />
-        </>
-      ) : null
+    let message = null
+
+    if (mode === "correct") {
+      message = <b className="text-2xl">{t("feedback.correct")}</b>
+    } else if (mode === "incorrect") {
+      if (question.matching) {
+        // mismatch table
+        const rows: string[] = []
+
+        question.left?.forEach((l, i) => {
+          const userIdx = choice[i]
+          const correctIdx = feedbackObject?.correctChoice?.[i]
+
+          const userAns = userIdx !== undefined ? question.answers[userIdx] : "?"
+          const correctAns = correctIdx !== undefined ? question.answers[correctIdx] : "?"
+
+          if (userAns !== correctAns) {
+            rows.push(`| ${l} | ${userAns} | ${correctAns} |`)
+          }
+        })
+
+        if (rows.length > 0) {
+          const table = `
+| | ❌ | ✅ |
+|-|----|----|
+${rows.join("\n")}
+`
+          message = (
+            <>
+              <b className="text-lg">{t("feedback.thats-ok")}</b>
+              <Markdown md={table} />
+            </>
+          )
+        } else {
+          // fallback
+          message = <b className="text-lg">{t("feedback.thats-ok")}</b>
+        }
+      } else {
+        // normal sorting
+        message = (
+          <>
+            <b className="text-lg">{t("feedback.thats-ok")}</b>
+            <br />
+            <Markdown
+              md={t("feedback.correct-order", [
+                `${state.feedbackObject?.correctChoice
+                  ?.map((i) => "\n|" + question.answers[i] + "|")
+                  .join("")}\n`,
+              ])}
+            />
+          </>
+        )
+      }
+    }
 
     const items: BaseItem[] = []
     for (const position of choice) {
@@ -230,18 +268,31 @@ export function ExerciseMultipleChoice({
         {question.matching ? (
           <div className="flex items-start gap-8">
             {/* left column */}
-            <SortableList
-              items={
-                question.left?.map((label, idx) => ({
-                  position: idx,
-                  element: <Markdown md={label} />,
-                  disabled: true, // 👈 non-draggable
-                })) ?? []
-              }
-              onChange={() => {}} // no-op
-              className="flex flex-col gap-2"
-              disabled={true}
-            />
+            <div className="flex flex-col gap-2">
+              {question.left?.map((label, idx) => {
+                const isCorrect =
+                  mode === "correct" || mode === "incorrect"
+                    ? feedbackObject?.rowCorrectness?.[idx]
+                    : undefined
+
+                let rowClass =
+                  "flex-grow text-center border rounded-md px-3 py-2 min-h-[40px] flex items-center justify-center"
+
+                if (isCorrect === false) {
+                  rowClass += " bg-red-900/40 text-red-400 border-red-700"
+                } else if (isCorrect === true) {
+                  rowClass += " bg-green-900/30 text-green-300 border-green-700"
+                } else {
+                  rowClass += " bg-neutral-800/40 text-neutral-300 border-neutral-600/40"
+                }
+
+                return (
+                  <div key={idx} className={rowClass}>
+                    <Markdown md={label} />
+                  </div>
+                )
+              })}
+            </div>
 
             {/* right column (sortable) */}
             <SortableList

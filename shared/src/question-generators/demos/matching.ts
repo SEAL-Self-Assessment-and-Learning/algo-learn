@@ -1,5 +1,7 @@
 import {
   minimalMultipleChoiceFeedback,
+  type MultipleChoiceAnswer,
+  type MultipleChoiceFeedback,
   type MultipleChoiceQuestion,
   type QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
@@ -75,6 +77,17 @@ export const DemoMatching: QuestionGenerator = {
     // correct order mapping
     const solution = left.map((l) => rightShuffled.indexOf(chosenPairs.find(([pl]) => pl === l)![1]))
 
+    const baseFeedback = minimalMultipleChoiceFeedback({
+      correctAnswerIndex: solution,
+      sorting: true,
+    })
+
+    const feedback = async (answer: MultipleChoiceAnswer): Promise<MultipleChoiceFeedback> => {
+      const result = await baseFeedback(answer)
+      const rowCorrectness = solution.map((c, i) => answer.choice[i] === c)
+      return { ...result, rowCorrectness }
+    }
+
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
       name: DemoMatching.name(lang),
@@ -89,10 +102,7 @@ export const DemoMatching: QuestionGenerator = {
       text: t(translations, lang, "text"),
       left, // fixed column
       answers: rightShuffled, // sortable column
-      feedback: minimalMultipleChoiceFeedback({
-        correctAnswerIndex: solution,
-        sorting: true,
-      }),
+      feedback,
     }
 
     return { question }

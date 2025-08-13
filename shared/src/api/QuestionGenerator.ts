@@ -99,6 +99,8 @@ export interface MultipleChoiceFeedback extends FeedbackBase {
    * (optional)
    */
   correctChoice?: number[]
+  /** Per-row correctness for matching questions (optional) */
+  rowCorrectness?: boolean[]
 }
 
 /** The signature of the feedback function for multiple-choice questions */
