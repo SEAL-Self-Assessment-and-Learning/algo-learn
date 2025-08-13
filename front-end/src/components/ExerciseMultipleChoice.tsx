@@ -199,11 +199,14 @@ export function ExerciseMultipleChoice({
           <br />
           <Markdown
             md={t("feedback.correct-order", [
-              `${state.feedbackObject?.correctChoice?.map((i) => "\n|" + question.answers[i] + "|").join("")}\n`,
+              `${state.feedbackObject?.correctChoice
+                ?.map((i) => "\n|" + question.answers[i] + "|")
+                .join("")}\n`,
             ])}
           />
         </>
       ) : null
+
     const items: BaseItem[] = []
     for (const position of choice) {
       items.push({
@@ -223,7 +226,32 @@ export function ExerciseMultipleChoice({
         handleFooterClick={handleClick}
       >
         <Markdown md={question.text ?? ""} />
-        <SortableList items={items} onChange={onChange} className="p-5" disabled={mode !== "draft"} />
+
+        {question.matching ? (
+          <div className="flex items-start gap-8">
+            {/* left column */}
+            <div className="flex flex-col gap-2">
+              {question.left?.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex min-h-[40px] items-center rounded-md border border-neutral-600/40 bg-neutral-800/40 px-3 py-2 text-neutral-300"
+                >
+                  <Markdown md={item} />
+                </div>
+              ))}
+            </div>
+
+            {/* right column (sortable) */}
+            <SortableList
+              items={items}
+              onChange={onChange}
+              className="flex flex-col gap-2"
+              disabled={mode !== "draft"}
+            />
+          </div>
+        ) : (
+          <SortableList items={items} onChange={onChange} className="p-5" disabled={mode !== "draft"} />
+        )}
       </InteractWithQuestion>
     )
   }
