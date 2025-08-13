@@ -230,16 +230,18 @@ export function ExerciseMultipleChoice({
         {question.matching ? (
           <div className="flex items-start gap-8">
             {/* left column */}
-            <div className="flex flex-col gap-2">
-              {question.left?.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="flex min-h-[40px] items-center rounded-md border border-neutral-600/40 bg-neutral-800/40 px-3 py-2 text-neutral-300"
-                >
-                  <Markdown md={item} />
-                </div>
-              ))}
-            </div>
+            <SortableList
+              items={
+                question.left?.map((label, idx) => ({
+                  position: idx,
+                  element: <Markdown md={label} />,
+                  disabled: true, // 👈 non-draggable
+                })) ?? []
+              }
+              onChange={() => {}} // no-op
+              className="flex flex-col gap-2"
+              disabled={true}
+            />
 
             {/* right column (sortable) */}
             <SortableList

@@ -10,6 +10,7 @@ import { Button } from "./ui/button"
 export interface BaseItem {
   position: number
   element: ReactNode
+  disabled?: boolean
 }
 
 export interface Props {
@@ -46,6 +47,7 @@ export function SortableList({ items, onChange, className = "", disabled = false
     id: string
     position: number
     element: ReactNode
+    disabled?: boolean
   }> = items.map((x) => ({ ...x, id: `id-${x.position}` }))
   return (
     <DndContext
@@ -84,12 +86,15 @@ export function SortableList({ items, onChange, className = "", disabled = false
                   <FaArrowDown />
                 </MemoizedButton>
               </div>
-              <SortableList.Item id={item.id} disabled={disabled}>
-                <GripHorizontal className="hidden sm:flex" />
-                <Button variant="outline" asChild className="flex-grow text-center">
+              <SortableList.Item id={item.id} disabled={disabled || item.disabled}>
+                {!item.disabled && <GripHorizontal className="hidden sm:flex" />}
+                <Button
+                  variant={item.disabled ? "secondary" : "outline"}
+                  asChild
+                  className="flex-grow text-center"
+                >
                   <div>{item.element}</div>
                 </Button>
-                <div></div>
               </SortableList.Item>
             </div>
           ))}
