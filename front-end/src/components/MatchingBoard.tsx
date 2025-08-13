@@ -58,9 +58,7 @@ export function MatchingBoard({
       const toIdx = parseInt(overId.replace("slot-", ""))
 
       const newSlots = [...slots]
-      const temp = newSlots[fromIdx]
-      newSlots[fromIdx] = newSlots[toIdx]
-      newSlots[toIdx] = temp
+      ;[newSlots[fromIdx], newSlots[toIdx]] = [newSlots[toIdx], newSlots[fromIdx]]
       setSlots(newSlots)
       onChange(newSlots)
     }
@@ -73,9 +71,8 @@ export function MatchingBoard({
     const newSlots = [...slots]
     newSlots[slotIndex] = null
 
-    const newPool = [...pool, item]
     setSlots(newSlots)
-    setPool(newPool)
+    setPool((p) => [...p, item])
     onChange(newSlots)
   }
 
@@ -87,9 +84,9 @@ export function MatchingBoard({
           {leftItems.map((label, i) => (
             <MatchingSlot
               key={i}
-              index={i}
+              row={i}
               label={label}
-              item={slots[i]}
+              item={[slots[i]]} // wrap in array
               onRemove={() => returnToPool(i)}
               disabled={disabled}
             />
@@ -97,7 +94,7 @@ export function MatchingBoard({
         </div>
 
         {/* draggable pool */}
-        <SortableContext items={pool.map((x, idx) => ({ id: `pool-${idx}` }))}>
+        <SortableContext items={pool.map((_, idx) => ({ id: `pool-${idx}` }))}>
           <ul className="flex flex-col gap-2">
             {pool.map((item, idx) => (
               <MatchingPoolItem

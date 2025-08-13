@@ -1,30 +1,26 @@
-import { X } from "lucide-react"
-import { useDroppable } from "@dnd-kit/core"
+import { useDraggable, useDroppable } from "@dnd-kit/core"
 import { cn } from "@/lib/utils"
 import { Markdown } from "./Markdown"
-import { Button } from "./ui/button"
 
 export function MatchingSlot({
-  index,
+  row,
   label,
-  item,
+  item: items,
   onRemove,
   disabled = false,
 }: {
-  index: number
+  row: number
   label: string
-  item: { position: number; element: React.ReactNode } | null
-  onRemove: () => void
+  item: ({ position: number; element: React.ReactNode } | null)[]
+  onRemove: (col: number) => void
   disabled?: boolean
 }) {
-  const { setNodeRef, isOver } = useDroppable({ id: `slot-${index}` })
-
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-start gap-2">
       {/* left label */}
       <div
         className={cn(
-          "flex min-h-[40px] flex-grow items-center justify-center rounded-md border px-3 py-2 text-center",
+          "flex min-h-[40px] min-w-[120px] items-center justify-center rounded-md border px-3 py-2 text-center",
           "border-neutral-600/40 bg-neutral-800/40 text-neutral-300",
         )}
       >
@@ -32,30 +28,68 @@ export function MatchingSlot({
       </div>
 
       {/* right droppable area */}
-      <div
-        ref={setNodeRef}
-        className={cn(
-          "relative w-[200px] rounded-md border px-2 py-1",
-          "flex items-center justify-between gap-2",
-          isOver ? "border-blue-500 bg-blue-800/30" : "border-dashed border-neutral-500",
-        )}
-      >
-        {item && (
-          <>
-            <div className="flex-grow break-words text-center">{item.element}</div>
-            {!disabled && (
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={onRemove}
-                className="h-6 w-6 shrink-0 text-red-400 hover:text-red-600"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+      {items.map((item, colIdx) => {
+        const dropId = `slot-${row}-${colIdx}`
+        const { setNodeRef: setDropRef, isOver } = useDroppable({ id: dropId })
+
+        const {
+          attributes,
+          listeners,
+          setNodeRef: setDragRef,
+          transform,
+          isDragging,
+        } = useDraggable({ id: dropId })
+
+        const dragStyle = transform
+          ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
+          : undefined
+
+        return (
+          <div
+            key={colIdx}
+            ref={setDropRef}
+            className={cn(
+              "relative flex min-h-[40px] min-w-[200px] max-w-[320px] items-stretch justify-stretch rounded-md border",
+              "transition-colors",
+              isOver ? "border-blue-500 bg-blue-800/30" : "border-dashed border-neutral-500",
             )}
-          </>
-        )}
-      </div>
+          >
+            {item && (
+              <div className="relative w-full px-2 py-2">
+                {/* drag only on inner wrapper */}
+                <div
+                  ref={setDragRef}
+                  style={dragStyle}
+                  {...attributes}
+                  {...listeners}
+                  className={cn(
+                    "cursor-move pr-6", // room for button
+                    isDragging ? "opacity-60" : "",
+                  )}
+                >
+                  {item.element}
+                </div>
+
+                {/* button outside drag target */}
+                {!disabled && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onRemove(colIdx)
+                    }}
+                    className="absolute right-1 top-1 z-10 inline-flex h-6 w-6 items-center justify-center rounded-md border border-red-400/60 text-red-400 hover:bg-red-500/10"
+                    aria-label="Remove"
+                    tabIndex={0}
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
