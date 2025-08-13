@@ -16,6 +16,7 @@ import { CRT } from "@shared/question-generators/math/modularArithmetic/crt.ts"
 import { ExtendedEuclideanAlgorithm } from "@shared/question-generators/math/modularArithmetic/eea.ts"
 import { modFactor } from "@shared/question-generators/math/modularArithmetic/modFactorization.ts"
 import { ModTricks } from "@shared/question-generators/math/modularArithmetic/modTricks.ts"
+import { SetBuilderQuestion } from "@shared/question-generators/math/setBuilder"
 import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
 import { Resolution } from "@shared/question-generators/propositional-logic/resolution.ts"
@@ -86,6 +87,11 @@ export const collection: QuestionCollection = [
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     contents: [huffmanCoding],
+  },
+  {
+    slug: "setbuilder",
+    name: { en: "Set Builder Notation", de: "Mengenschreibweise" },
+    contents: [SetBuilderQuestion],
   },
 ]
 

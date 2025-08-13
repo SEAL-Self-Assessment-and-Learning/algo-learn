@@ -7,6 +7,7 @@ import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
 import { InteractWithQuestion, type MODE } from "./InteractWithQuestion"
 import { Markdown } from "./Markdown"
+import { MatchingBoard } from "./MatchingBoard"
 import type { Result } from "./QuestionComponent"
 import { SortableList, type BaseItem } from "./SortableList"
 import { Checkbox } from "./ui/checkbox"
@@ -266,42 +267,15 @@ ${rows.join("\n")}
         <Markdown md={question.text ?? ""} />
 
         {question.matching ? (
-          <div className="flex items-start gap-8">
-            {/* left column */}
-            <div className="flex flex-col gap-2">
-              {question.left?.map((label, idx) => {
-                const isCorrect =
-                  mode === "correct" || mode === "incorrect"
-                    ? feedbackObject?.rowCorrectness?.[idx]
-                    : undefined
-
-                let rowClass =
-                  "flex-grow text-center border rounded-md px-3 py-2 min-h-[40px] flex items-center justify-center"
-
-                if (isCorrect === false) {
-                  rowClass += " bg-red-900/40 text-red-400 border-red-700"
-                } else if (isCorrect === true) {
-                  rowClass += " bg-green-900/30 text-green-300 border-green-700"
-                } else {
-                  rowClass += " bg-neutral-800/40 text-neutral-300 border-neutral-600/40"
-                }
-
-                return (
-                  <div key={idx} className={rowClass}>
-                    <Markdown md={label} />
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* right column (sortable) */}
-            <SortableList
-              items={items}
-              onChange={onChange}
-              className="flex flex-col gap-2"
-              disabled={mode !== "draft"}
-            />
-          </div>
+          <MatchingBoard
+            leftItems={question.left ?? []}
+            rightItems={question.answers.map((answer, i) => ({
+              position: i,
+              element: <Markdown md={answer} />,
+            }))}
+            onChange={(newSlots) => setChoice(newSlots.map((slot) => slot?.position ?? -1))}
+            disabled={mode !== "draft"}
+          />
         ) : (
           <SortableList items={items} onChange={onChange} className="p-5" disabled={mode !== "draft"} />
         )}
