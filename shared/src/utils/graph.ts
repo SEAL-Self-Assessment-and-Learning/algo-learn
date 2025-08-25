@@ -611,6 +611,7 @@ export class RootedTree {
       })
       order.push(this.root)
     } else if (type === "in") {
+      // Todo: this is not well defined for non-binary trees
       if (this.children.length > 0) order = order.concat(this.children[0].getTraversalOrder(type))
       order.push(this.root)
       for (let i = 1; i < this.children.length; i++) {
