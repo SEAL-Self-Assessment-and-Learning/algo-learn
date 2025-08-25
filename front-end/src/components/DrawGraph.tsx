@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactElement } from "react"
+import { useRef, useState, type Dispatch, type ReactElement, type SetStateAction } from "react"
 import type { Graph } from "@shared/utils/graph"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
@@ -14,6 +14,8 @@ const Node = ({
   clickable,
   state,
   onClickCallback,
+  setTouchStart,
+  setIsDragging,
 }: {
   pos: { x: number; y: number }
   setDragged: (() => void) | undefined
@@ -22,22 +24,45 @@ const Node = ({
   clickable: boolean
   state: GraphElementStateType
   onClickCallback: () => void
+  setTouchStart: Dispatch<SetStateAction<{ x: number; y: number } | null>>
+  setIsDragging: Dispatch<SetStateAction<boolean>>
 }) => {
   const nodeStyle = `${state.selected ? "cg-4" : state.group !== null ? `cg-${state.group}` : "primary"} ${clickable ? "cursor-pointer" : "group-hover:fill-accent"}`
+
+  // Make the drag area 2x bigger than the visible node
+  const dragAreaSize = size * 2
 
   return (
     <g
       className="group"
       transform={`translate(${pos.x},${pos.y})`}
       onMouseDown={setDragged}
+      onTouchStart={(e) => {
+        if (setDragged) {
+          e.preventDefault()
+          e.stopPropagation()
+          setDragged()
+          setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY })
+          setIsDragging(false)
+        }
+      }}
       onClick={onClickCallback}
     >
+      {/* Invisible larger circle for easier dragging */}
+      <circle
+        r={dragAreaSize}
+        fill="transparent"
+        stroke="none"
+        className={clickable ? "cursor-pointer" : ""}
+      />
+
+      {/* Visible node circle */}
       <circle className={`fill-${nodeStyle} stroke-secondary`} r={size} strokeWidth="6" />
       {label === undefined || label === "" ? null : (
         <text
           textAnchor="middle"
           dominantBaseline="central"
-          className={`cursor-${clickable ? "pointer" : "default group-hover:fill-accent-foreground"} ${!state.selected && state.group === null ? "fill-primary-foreground" : ""} select-none`}
+          className={`cursor-${clickable ? "pointer" : "default group-hover:fill-accent-foreground"} ${!state.selected && state.group === null ? "fill-primary-foreground" : ""} pointer-events-none select-none`}
           fontSize="1.5em"
         >
           {label}
@@ -192,6 +217,8 @@ export function DrawGraph({
     .filter(graph.directed ? () => true : (e) => e.source < e.target)
 
   const [currentlyDragged, setCurrentlyDragged] = useState<null | number>(null)
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
   const [nodePositions, setNodePositions] = useState(
     graph.nodes.map((u) => {
       return {
@@ -216,6 +243,31 @@ export function DrawGraph({
       }
     }),
   )
+
+  const updateDraggedNode = (clientX: number, clientY: number, preventDefault?: () => void) => {
+    if (currentlyDragged === null || svgRef.current === null) return
+    if (preventDefault) preventDefault()
+
+    const pt = svgRef.current.createSVGPoint()
+    pt.x = clientX
+    pt.y = clientY
+    const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
+
+    // Calculate boundaries with node radius as buffer
+    const nodeRadius = nodeScale
+    const minX = viewBox.x + nodeRadius
+    const maxX = viewBox.x + viewBox.width - nodeRadius
+    const minY = viewBox.y + nodeRadius
+    const maxY = viewBox.y + viewBox.height - nodeRadius
+
+    // Constrain the position within boundaries
+    const constrainedX = Math.max(minX, Math.min(maxX, svgPos.x))
+    const constrainedY = Math.max(minY, Math.min(maxY, svgPos.y))
+
+    nodePositions[currentlyDragged].x = constrainedX
+    nodePositions[currentlyDragged].y = constrainedY
+    setNodePositions([...nodePositions])
+  }
 
   const edges = edgeListFlat.map((e, i) => {
     return (
@@ -262,6 +314,8 @@ export function DrawGraph({
         label={u.label ?? ""}
         clickable={graph.nodeClickType !== "none"}
         state={nodeStates[i]}
+        setTouchStart={setTouchStart}
+        setIsDragging={setIsDragging}
         // todo the onClickCallback is duplicate code.
         onClickCallback={() => {
           if (graph.nodeClickType === "select") {
@@ -313,23 +367,49 @@ export function DrawGraph({
           : maxWidth * viewBoxAspectRatio
       }
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-      className="mx-auto h-auto max-w-full rounded-2xl bg-secondary"
-      onMouseMove={(e) => {
-        if (currentlyDragged === null || svgRef.current === null) return
+      className={`mx-auto h-auto max-w-full touch-none overscroll-x-none rounded-2xl bg-secondary`}
+      onMouseMove={(e) => updateDraggedNode(e.clientX, e.clientY)}
+      onTouchMove={(e) => {
+        // Always prevent default when a node is being dragged
+        if (currentlyDragged !== null) {
+          e.preventDefault()
+          e.stopPropagation()
+        }
 
-        const pt = svgRef.current.createSVGPoint()
-        pt.x = e.clientX
-        pt.y = e.clientY
-        // The cursor point, translated into svg coordinates
-        const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
-
-        nodePositions[currentlyDragged].x = svgPos.x
-        nodePositions[currentlyDragged].y = svgPos.y
-        // react requires a new array here
-        setNodePositions([...nodePositions])
+        if (currentlyDragged === null) return
+        const touch = e.touches[0]
+        if (!isDragging && touchStart) {
+          const dx = touch.clientX - touchStart.x
+          const dy = touch.clientY - touchStart.y
+          if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+            setIsDragging(true)
+          } else {
+            return
+          }
+        }
+        updateDraggedNode(touch.clientX, touch.clientY)
       }}
       onMouseUp={() => {
         if (currentlyDragged !== null) setCurrentlyDragged(null)
+        setIsDragging(false)
+        setTouchStart(null)
+      }}
+      onTouchEnd={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (currentlyDragged !== null) {
+          setCurrentlyDragged(null)
+        }
+        setIsDragging(false)
+        setTouchStart(null)
+      }}
+      onTouchCancel={(e) => {
+        e.preventDefault()
+        if (currentlyDragged !== null) {
+          setCurrentlyDragged(null)
+        }
+        setIsDragging(false)
+        setTouchStart(null)
       }}
     >
       <g>{edges}</g>
