@@ -1,4 +1,4 @@
-import type { MultiFreeTextQuestion, QuestionGenerator} from "@shared/api/QuestionGenerator"
+import type { MultiFreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { RandomGraph, RootedTree } from "@shared/utils/graph.ts"
 import Random from "@shared/utils/random"

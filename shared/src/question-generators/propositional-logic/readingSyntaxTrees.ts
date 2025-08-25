@@ -5,7 +5,7 @@ import {
   numToVariableValues,
   type ExpressionProperties,
   type SyntaxTreeNodeType,
-} from "@shared/utils/propositionalLogic.ts"
+} from "@shared/utils/propositionalLogic/propositionalLogic.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 

@@ -14,6 +14,13 @@ export const collection: QuestionCollection = [
   {
     slug: "demos",
     name: { de: "Demos", en: "Demos" },
-    contents: [DemoMultipleChoice, DemoSingleInput, DemoMultiInput, DemoGraphs, DemoSortingChoice, DemoTables],
+    contents: [
+      DemoMultipleChoice,
+      DemoSingleInput,
+      DemoMultiInput,
+      DemoGraphs,
+      DemoSortingChoice,
+      DemoTables,
+    ],
   },
 ]
