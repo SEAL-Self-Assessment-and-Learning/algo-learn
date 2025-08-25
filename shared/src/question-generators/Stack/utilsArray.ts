@@ -1,111 +1,102 @@
-import type {
-  FreeTextFeedbackFunction,
-  FreeTextFormatFunction,
-  FreeTextQuestion,
-} from "@shared/api/QuestionGenerator"
-import { insertSpaceAfterEveryXChars } from "@shared/question-generators/huffman-coding/utils/utils"
+import type { MultiFreeTextFeedbackFunction, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator"
 import { Stack } from "@shared/question-generators/Stack/Stack"
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator"
+import {
+  createArrayDisplayCodeBlock,
+  createArrayDisplayCodeBlockUserInput,
+} from "@shared/utils/arrayDisplayCodeBlock"
 import type Random from "@shared/utils/random"
 import { t, type Translations } from "@shared/utils/translations"
 
 /**
- * Generates a new Stack question for the seqLetter variant
+ * Generates a new Stack question for the seqStack variant
  *
- * Generates a sequence of letters and stars (vja* ad*a s...) (letter means push and * means pop)
- * Asks the user to enter the sequence of letters that are popped from the stack
+ * Generates a sequence of push and pop operations
+ * and asks the user for the final state of the stack
  *
  * @param lang
  * @param random
  * @param permalink
  * @param translations
  */
-export function generateVariantPopSeq(
+export function generateVariantArray(
   lang: "de" | "en",
   random: Random,
   permalink: string,
   translations: Translations,
 ) {
-  const { sequence, popSequence } = generateOperationsVariantPopSeq(random)
+  const { operations, stack } = generateOperationsVariantArray(random)
+  const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
+    numberOfInputFields: operations.length,
+    inputFieldCharacters: 2,
+    lang,
+  })
 
-  const checkFormat: FreeTextFormatFunction = ({ text }) => {
-    // check if the user input only consists of letters
-    text = text.replace(/\s/g, "")
-    if (!/^[A-Z]*$/.test(text.toUpperCase())) {
-      return {
-        valid: false,
-        message: t(translations, lang, "checkFormatSeqLetter"),
-      }
-    }
-    return {
-      valid: true,
-    }
-  }
-
-  const feedback: FreeTextFeedbackFunction = ({ text }) => {
-    // remove whitespaces and comparing user input (as uppercase) with the correct answer
-    text = text.replace(/\s/g, "")
-    if (text.toUpperCase() === popSequence) {
-      return {
-        correct: true,
-      }
-    }
-    return {
+  const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
+    const correctAnswer = {
       correct: false,
-      correctAnswer: popSequence,
+      correctAnswer: createArrayDisplayCodeBlock({
+        array: [
+          ...stack.getStackAsString(),
+          ...(Array(operations.length - stack.getSize()).fill("") as string[]),
+        ],
+        lang,
+      }),
+    }
+    const allKeys: Set<string> = new Set<string>(Object.keys(text))
+    // input-x is the form for the input fields
+    for (let i = 0; i < stack.getSize(); i++) {
+      allKeys.delete(`input-${i}`)
+      if (text[`input-${i}`] !== stack.getStackAsString()[i]) {
+        return correctAnswer
+      }
+    }
+    // expect the rest input fields inside allKeys to be empty
+    for (const restKey of allKeys) {
+      if (text[restKey].trim() !== "") {
+        return correctAnswer
+      }
+    }
+    return {
+      correct: true,
     }
   }
 
-  const question: FreeTextQuestion = {
-    type: "FreeTextQuestion",
+  const question: MultiFreeTextQuestion = {
+    type: "MultiFreeTextQuestion",
     name: stackQuestion.name(lang),
     path: permalink,
-    text: t(translations, lang, "popSeqText", [insertSpaceAfterEveryXChars(sequence, 3)]),
-    checkFormat,
+    text: t(translations, lang, "arrayStackText", [operations.join(", "), arrayDisplayBlock]),
     feedback,
   }
   return { question }
 }
 
 /**
- * Generates a sequence of letters and stars
- *
+ * Generates a sequence of push and pop operations
+ * and returns the final state of the stack
  * @param random
  */
-function generateOperationsVariantPopSeq(random: Random) {
-  const s = new Stack<string>()
-  const possibleChars: string = random.choice(["ABCDEF", "GHIJKL", "KLMNOP", "UVWXYZ"])
+function generateOperationsVariantArray(random: Random) {
+  const amountOfOperations = random.int(6, 9)
+  const stack = new Stack<number>()
+  const operations = []
 
-  const amountPopOperations = random.int(4, 6)
-  let seenAmountPopOperations = 0
-
-  let sequence = ""
-  let popSequence = ""
-  let lastOperation = "push"
-
-  while (seenAmountPopOperations < amountPopOperations) {
-    let currentOperation: string
-    if (lastOperation === "pop") {
-      // increases the chance of multiple pop operations in a row
-      currentOperation = random.weightedChoice(["push", "pop"], [0.4, 0.6])
+  for (let i = 0; i < amountOfOperations; i++) {
+    let operation = random.weightedChoice(["push", "pop"], [0.7, 0.3])
+    if (stack.isEmpty() || stack.getSize() === 1) operation = "push"
+    if (stack.getSize() >= 7) operation = "pop"
+    if (operation === "push") {
+      const value = random.int(1, 30)
+      stack.push(value)
+      operations.push("`push(" + value + ")`")
     } else {
-      currentOperation = random.weightedChoice(["push", "pop"], [0.65, 0.35])
+      stack.getTop()
+      operations.push("`pop()`")
     }
-    if (s.isEmpty()) currentOperation = "push"
-
-    if (currentOperation === "push") {
-      const value = random.choice(Array.from(possibleChars))
-      sequence += value
-      s.push(value)
-    } else {
-      popSequence += s.getTop()
-      sequence += "*"
-      seenAmountPopOperations++
-    }
-    lastOperation = currentOperation
   }
   return {
-    sequence,
-    popSequence,
+    operations,
+    stack,
   }
 }

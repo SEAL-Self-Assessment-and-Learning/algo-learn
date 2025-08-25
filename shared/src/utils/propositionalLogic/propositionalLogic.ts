@@ -1,6 +1,7 @@
 import { RootedTree } from "@shared/utils/graph.ts"
 import { mdInputField, mdTableFromData } from "@shared/utils/markdownTools.ts"
-import type Random from "./random.ts"
+import type { DisjunctionTerms } from "@shared/utils/propositionalLogic/resolution.ts"
+import type Random from "@shared/utils/random"
 
 export type VariableValues = Record<string, boolean>
 export type NormalForm = "CNF" | "DNF"
@@ -29,6 +30,11 @@ abstract class SyntaxTreeNode {
   public abstract eval(values: VariableValues): boolean
 
   public abstract toString(latex: boolean): string
+
+  /**
+   * Returns the disjunction terms of the expression (has to be in CNF).
+   */
+  public abstract toDisjunctionTerms(): DisjunctionTerms
 
   /**
    * Moves negation inwards to the literals
@@ -259,6 +265,10 @@ export class Literal extends SyntaxTreeNode {
 
   getNumLiterals(): number {
     return 1
+  }
+
+  toDisjunctionTerms(): DisjunctionTerms {
+    return [[this.copy()]]
   }
 
   public toRootedTree(): RootedTree {
@@ -642,6 +652,22 @@ export class Operator extends SyntaxTreeNode {
 
     return op
   }
+
+  toDisjunctionTerms(): DisjunctionTerms {
+    if (!this.isCNF()) {
+      throw new Error("Expression has to be CNF to compute the disjunction terms.")
+    }
+    if (this.type === "\\and") {
+      return [...this.leftOperand.toDisjunctionTerms(), ...this.rightOperand.toDisjunctionTerms()]
+    } else {
+      return [
+        [
+          ...this.leftOperand.toDisjunctionTerms().flat(),
+          ...this.rightOperand.toDisjunctionTerms().flat(),
+        ],
+      ]
+    }
+  }
 }
 
 export type SyntaxTreeNodeType = Operator | Literal
@@ -944,7 +970,19 @@ export function compareExpressions(expressions: SyntaxTreeNodeType[]): boolean {
       }
     }
   }
+  return true
+}
 
+/**
+ * Checks if no two expressions in a list are equivalent.
+ * @param expressions
+ */
+export function arePairwiseInequivalent(expressions: SyntaxTreeNodeType[]): boolean {
+  for (let i = 0; i < expressions.length; i++) {
+    for (let j = i + 1; j < expressions.length; j++) {
+      if (compareExpressions([expressions[i], expressions[j]])) return false
+    }
+  }
   return true
 }
 
@@ -1004,7 +1042,7 @@ export function getMdTruthTable(
         if ("input" in f && f.input) {
           const fieldId = `ti-${rowId}-${colId}`
           inputFieldIds.push(fieldId)
-          row.push(mdInputField(fieldId))
+          row.push(mdInputField(fieldId, "TTABLE"))
           return // works like continue in forEach()
         }
         val = f.formula.eval(varValues)
