@@ -1,4 +1,4 @@
-import { useRef, useState, type Dispatch, type ReactElement, type SetStateAction } from "react"
+import { useRef, useState, type ReactElement } from "react"
 import type { Graph } from "@shared/utils/graph"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
@@ -14,8 +14,6 @@ const Node = ({
   clickable,
   state,
   onClickCallback,
-  setTouchStart,
-  setIsDragging,
 }: {
   pos: { x: number; y: number }
   setDragged: (() => void) | undefined
@@ -24,8 +22,6 @@ const Node = ({
   clickable: boolean
   state: GraphElementStateType
   onClickCallback: () => void
-  setTouchStart: Dispatch<SetStateAction<{ x: number; y: number } | null>>
-  setIsDragging: Dispatch<SetStateAction<boolean>>
 }) => {
   const nodeStyle = `${state.selected ? "cg-4" : state.group !== null ? `cg-${state.group}` : "primary"} ${clickable ? "cursor-pointer" : "group-hover:fill-accent"}`
 
@@ -40,10 +36,8 @@ const Node = ({
       onTouchStart={(e) => {
         if (setDragged) {
           e.preventDefault()
-          e.stopPropagation()
+          // e.stopPropagation()
           setDragged()
-          setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY })
-          setIsDragging(false)
         }
       }}
       onClick={onClickCallback}
@@ -217,8 +211,6 @@ export function DrawGraph({
     .filter(graph.directed ? () => true : (e) => e.source < e.target)
 
   const [currentlyDragged, setCurrentlyDragged] = useState<null | number>(null)
-  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
   const [nodePositions, setNodePositions] = useState(
     graph.nodes.map((u) => {
       return {
@@ -244,9 +236,8 @@ export function DrawGraph({
     }),
   )
 
-  const updateDraggedNode = (clientX: number, clientY: number, preventDefault?: () => void) => {
+  const updateDraggedNode = (clientX: number, clientY: number) => {
     if (currentlyDragged === null || svgRef.current === null) return
-    if (preventDefault) preventDefault()
 
     const pt = svgRef.current.createSVGPoint()
     pt.x = clientX
@@ -314,13 +305,11 @@ export function DrawGraph({
         label={u.label ?? ""}
         clickable={graph.nodeClickType !== "none"}
         state={nodeStates[i]}
-        setTouchStart={setTouchStart}
-        setIsDragging={setIsDragging}
         // todo the onClickCallback is duplicate code.
         onClickCallback={() => {
           if (graph.nodeClickType === "select") {
             nodeStates[i].selected = !nodeStates[i].selected
-            setEdgeStates([...nodeStates])
+            setNodeStates([...nodeStates])
           } else if (graph.nodeClickType === "group") {
             nodeStates[i].group =
               nodeStates[i].group === Math.min(graph.nodeGroupMax ?? maxGroups, maxGroups) - 1
@@ -369,30 +358,18 @@ export function DrawGraph({
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
       className={`mx-auto h-auto max-w-full touch-none overscroll-x-none rounded-2xl bg-secondary`}
       onMouseMove={(e) => updateDraggedNode(e.clientX, e.clientY)}
+      // Even simpler alternative - remove the threshold entirely:
+
       onTouchMove={(e) => {
         // Always prevent default when a node is being dragged
         if (currentlyDragged !== null) {
           e.preventDefault()
           e.stopPropagation()
+          updateDraggedNode(e.touches[0].clientX, e.touches[0].clientY)
         }
-
-        if (currentlyDragged === null) return
-        const touch = e.touches[0]
-        if (!isDragging && touchStart) {
-          const dx = touch.clientX - touchStart.x
-          const dy = touch.clientY - touchStart.y
-          if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-            setIsDragging(true)
-          } else {
-            return
-          }
-        }
-        updateDraggedNode(touch.clientX, touch.clientY)
       }}
       onMouseUp={() => {
         if (currentlyDragged !== null) setCurrentlyDragged(null)
-        setIsDragging(false)
-        setTouchStart(null)
       }}
       onTouchEnd={(e) => {
         e.preventDefault()
@@ -400,16 +377,12 @@ export function DrawGraph({
         if (currentlyDragged !== null) {
           setCurrentlyDragged(null)
         }
-        setIsDragging(false)
-        setTouchStart(null)
       }}
       onTouchCancel={(e) => {
         e.preventDefault()
         if (currentlyDragged !== null) {
           setCurrentlyDragged(null)
         }
-        setIsDragging(false)
-        setTouchStart(null)
       }}
     >
       <g>{edges}</g>
