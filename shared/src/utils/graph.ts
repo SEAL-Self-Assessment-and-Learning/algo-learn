@@ -143,12 +143,19 @@ export class Graph {
     if (lines.length < numNodes + numEdges + 1) throw Error("Input error: graph data is incomplete")
     if (nodeClick === undefined || edgeClick === undefined)
       throw Error("Input error: click events invalid")
+    if (nodeGroupMax > 8 || edgeGroupMax > 8) throw Error("Input error: too many groups (max 8)")
 
     const nodes: Node[] = []
     const nodesEnd = numNodes + 1
     for (let i = 1; i < nodesEnd; i++) {
       const nodeData = lines[i].match(/^(-?\d+(?:\.\d{1,2})?) (-?\d+(?:\.\d{1,2})?) (-|\d+) "(.*)"$/)
       if (nodeData === null) throw Error("Input error: invalid node data: " + lines[i])
+      if (
+        !(nodeData[3] === "-") &&
+        (parseInt(nodeData[3]) > nodeGroupMax - 1 || parseInt(nodeData[3]) < 0)
+      ) {
+        throw Error("Input error: node group too large: " + lines[i])
+      }
 
       nodes.push({
         coords: { x: parseFloat(nodeData[1]), y: parseFloat(nodeData[2]) },
@@ -165,6 +172,12 @@ export class Graph {
     for (let i = nodesEnd; i < edgeEnd; i++) {
       const edgeData = lines[i].match(edgeRegex)
       if (edgeData === null) throw Error("Input error: invalid edge data: " + lines[i])
+      if (
+        !(edgeData[3] === "-") &&
+        (parseInt(edgeData[3]) > edgeGroupMax - 1 || parseInt(edgeData[3]) < 0)
+      ) {
+        throw Error("Input error: edge group too large: " + lines[i])
+      }
 
       const source = parseInt(edgeData[1])
       edges[source].push({
@@ -235,10 +248,14 @@ export class Graph {
   }
 
   public setNodeGroup(u: NodeId, group: number): void {
+    if (group > this.nodeGroupMax - 1 || group < 0)
+      throw Error("Input error: node group too large or negative")
     this.nodes[u].group = group
   }
 
   public setEdgeGroup(u: NodeId, v: NodeId, group: number): void {
+    if (group > this.edgeGroupMax - 1 || group < 0)
+      throw Error("Input error: edge group too large or negative")
     this.getEdge(u, v).group = group
     if (!this.directed) this.getEdge(v, u).group = group
   }
@@ -258,6 +275,10 @@ export class Graph {
 }
 
 export class RandomGraph {
+  /**
+   * Generates labels based on the index (0 -> A, 1 -> B, ..., 25 -> Z, 26 -> AA, 27 -> AB, ...)
+   * @param i
+   */
   public static getLabel(i: number): string {
     let label: string = ""
     do {
@@ -574,8 +595,6 @@ export class RootedTree {
   }
 
   public getNumNodes(): number {
-    // if (this.children.length === 0) return 1
-
     return this.children.reduce((acc: number, node: RootedTree) => acc + node.getNumNodes(), 1)
   }
 
