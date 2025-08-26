@@ -769,10 +769,11 @@ export class RootedTree {
 
     const nodeContour = this.getLeftContour()
 
-    // iterate all siblings to the left
+    // check against all siblings to the left
     for (let i = 0; i < this.coordinates.index; i++) {
-      const sibling = this.coordinates.parent!.children[i] // since the node has siblings it also has a parent.
+      const sibling = this.coordinates.parent!.children[i]
       const siblingContour = sibling.getRightContour()
+
       for (
         let y = this.coordinates.y + 1;
         y <=
@@ -783,17 +784,18 @@ export class RootedTree {
         y++
       ) {
         const dist = nodeContour[y] - siblingContour[y]
-        if (dist + shiftValue < minDistance) shiftValue = minDistance - dist
+        shiftValue = Math.max(shiftValue, minDistance - dist)
       }
+    }
 
-      if (shiftValue > 0) {
-        this.coordinates.x += shiftValue
-        this.coordinates.mod += shiftValue
+    // ✅ apply shift once, after all siblings considered
+    if (shiftValue > 0) {
+      this.coordinates.x += shiftValue
+      this.coordinates.mod += shiftValue
 
-        this.centerNodes(sibling)
-
-        shiftValue = 0
-      }
+      // pass the *last left sibling* (closest one) to centerNodes
+      const leftSibling = this.coordinates.parent!.children[this.coordinates.index - 1]
+      this.centerNodes(leftSibling)
     }
   }
 
@@ -805,8 +807,8 @@ export class RootedTree {
     if (nodeSpan > 0) {
       const nodeDist = (this.coordinates.x - leftSibling.coordinates.x) / (nodeSpan + 1)
 
-      for (let i = 1; i < rightIndex; i++) {
-        const middleNode = this.coordinates.parent!.children[leftIndex + i] // since the nod has siblings it has a parent
+      for (let i = 1; i <= nodeSpan; i++) {
+        const middleNode = this.coordinates.parent!.children[leftIndex + i] // since the node has siblings it has a parent
         const offset = leftSibling.coordinates.x + nodeDist * i - middleNode.coordinates.x
         middleNode.coordinates.x += offset
         middleNode.coordinates.mod += offset

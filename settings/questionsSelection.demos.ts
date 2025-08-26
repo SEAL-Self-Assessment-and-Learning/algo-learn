@@ -10,6 +10,7 @@ import { DemoMultipleChoice } from "@shared/question-generators/demos/multipleCh
 import { DemoSingleInput } from "@shared/question-generators/demos/singleInput"
 import { DemoSortingChoice } from "@shared/question-generators/demos/sorting.ts"
 import { DemoTables } from "@shared/question-generators/demos/tables.ts"
+import { DemoTrees } from "@shared/question-generators/demos/trees.ts"
 
 export const collection: QuestionCollection = [
   {
@@ -20,6 +21,7 @@ export const collection: QuestionCollection = [
       DemoSingleInput,
       DemoMultiInput,
       DemoGraphs,
+      DemoTrees,
       DemoDraggingGraphs,
       DemoSortingChoice,
       DemoTables,
