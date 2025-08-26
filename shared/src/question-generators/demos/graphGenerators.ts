@@ -12,8 +12,7 @@ const translations: Translations = {
   en: {
     name: "Graph Generators",
     description: "Shows graph examples",
-    text: "Draggable Nodes:{{interactive}}",
-    // text: "Directed: {{directed}}\n\nUndirected:{{undirected}}\n\nDraggable Nodes:{{interactive}}\n\nGrouping Nodes and Edges:{{groups}}\n\nTrees:{{tree}}",
+    text: "Directed: {{directed}}\n\nUndirected:{{undirected}}\n\nGrouping Nodes and Edges:{{groups}}\n\nTrees:{{tree}}",
   },
 }
 

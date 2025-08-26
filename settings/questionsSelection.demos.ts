@@ -4,6 +4,7 @@
  */
 import type { QuestionCollection } from "@shared/api/QuestionRouter"
 import { DemoGraphs } from "@shared/question-generators/demos/graphGenerators"
+import { DemoDraggingGraphs } from "@shared/question-generators/demos/interactiveGraphGenerator.ts"
 import { DemoMultiInput } from "@shared/question-generators/demos/multiInput"
 import { DemoMultipleChoice } from "@shared/question-generators/demos/multipleChoice"
 import { DemoSingleInput } from "@shared/question-generators/demos/singleInput"
@@ -19,6 +20,7 @@ export const collection: QuestionCollection = [
       DemoSingleInput,
       DemoMultiInput,
       DemoGraphs,
+      DemoDraggingGraphs,
       DemoSortingChoice,
       DemoTables,
     ],
