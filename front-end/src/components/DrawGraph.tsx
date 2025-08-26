@@ -236,30 +236,6 @@ export function DrawGraph({
     }),
   )
 
-  const updateDraggedNode = (clientX: number, clientY: number) => {
-    if (currentlyDragged === null || svgRef.current === null) return
-
-    const pt = svgRef.current.createSVGPoint()
-    pt.x = clientX
-    pt.y = clientY
-    const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
-
-    // Calculate boundaries with node radius as buffer
-    const nodeRadius = nodeScale
-    const minX = viewBox.x + nodeRadius
-    const maxX = viewBox.x + viewBox.width - nodeRadius
-    const minY = viewBox.y + nodeRadius
-    const maxY = viewBox.y + viewBox.height - nodeRadius
-
-    // Constrain the position within boundaries
-    const constrainedX = Math.max(minX, Math.min(maxX, svgPos.x))
-    const constrainedY = Math.max(minY, Math.min(maxY, svgPos.y))
-
-    nodePositions[currentlyDragged].x = constrainedX
-    nodePositions[currentlyDragged].y = constrainedY
-    setNodePositions([...nodePositions])
-  }
-
   const edges = edgeListFlat.map((e, i) => {
     return (
       <Edge
@@ -346,6 +322,29 @@ export function DrawGraph({
 
   const viewBoxAspectRatio = Math.min(maxHeight / maxWidth, viewBox.height / viewBox.width)
 
+  const updateDraggedNode = (clientX: number, clientY: number) => {
+    if (currentlyDragged === null || svgRef.current === null) return
+
+    const pt = svgRef.current.createSVGPoint()
+    pt.x = clientX
+    pt.y = clientY
+    const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
+
+    // Calculate boundaries with node radius as buffer
+    const nodeRadius = nodeScale
+    const minX = viewBox.x - (viewBox.width - maxWidth) / 2
+    const maxX = viewBox.x + viewBox.width + (viewBox.width - maxWidth) / 2
+    const minY = viewBox.y + nodeRadius
+    const maxY = viewBox.y + viewBox.height - nodeRadius
+
+    // Constrain the position within boundaries
+    const constrainedX = Math.max(minX, Math.min(maxX, svgPos.x))
+    const constrainedY = Math.max(minY, Math.min(maxY, svgPos.y))
+
+    nodePositions[currentlyDragged].x = constrainedX
+    nodePositions[currentlyDragged].y = constrainedY
+    setNodePositions([...nodePositions])
+  }
   return (
     <svg
       ref={svgRef}
@@ -355,7 +354,8 @@ export function DrawGraph({
           ? viewBox.height * 0.75
           : maxWidth * viewBoxAspectRatio
       }
-      viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+      // - 10 and + 20 to give some extra space for arrow heads and edge weights
+      viewBox={`${viewBox.x} ${viewBox.y - 10} ${viewBox.width} ${viewBox.height + 20}`}
       className={`mx-auto h-auto max-w-full touch-none overscroll-x-none rounded-2xl bg-secondary`}
       onMouseMove={(e) => updateDraggedNode(e.clientX, e.clientY)}
       // Even simpler alternative - remove the threshold entirely:
