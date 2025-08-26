@@ -745,6 +745,7 @@ export class RootedTree {
       if (this.coordinates.index > 0) {
         // place the node just right of its left sibling
         this.coordinates.x = this.getPreviousSiblingX() + this.nodeDistX + this.siblingDist
+        this.checkForOverlappingSubtrees()
       }
       // else x = 0 (initialization value)
     } else {
@@ -771,6 +772,7 @@ export class RootedTree {
 
     // check against all siblings to the left
     for (let i = 0; i < this.coordinates.index; i++) {
+      // since the node has siblings it also has a parent.
       const sibling = this.coordinates.parent!.children[i]
       const siblingContour = sibling.getRightContour()
 
@@ -788,7 +790,7 @@ export class RootedTree {
       }
     }
 
-    // ✅ apply shift once, after all siblings considered
+    // apply shift once, after all siblings considered
     if (shiftValue > 0) {
       this.coordinates.x += shiftValue
       this.coordinates.mod += shiftValue
