@@ -337,11 +337,15 @@ const templates: SetTemplate[] = [
       )
       const clause = bounds ? `, ${bounds}` : ""
       return [
-        `\\{ n \\in ${cfg.domainLatex} : n \\text{ ${word}}${clause} \\}`,
-        `\\{ n \\in \\mathbb{N}_{\\geq 2} : \\forall d \\in \\mathbb{N}, (d \\mid n \\Rightarrow (d=1 \\lor d=n))${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : n \\geq 2 \\wedge n \\text{ ${word}}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : n \\geq 2 \\wedge \\forall d \\in \\mathbb{N}, (d \\mid n \\Rightarrow (d=1 \\lor d=n))${clause} \\}`,
       ]
     },
-    build: (_dom, _n, cfg) => rangeArray(cfg.includeStart, cfg.includeEnd).filter(isPrime),
+    build: (_dom, _n, cfg) => {
+      const start = Math.max(2, cfg.includeStart)
+      const end = cfg.includeEnd
+      return start <= end ? rangeArray(start, end).filter(isPrime) : []
+    },
     paramRange: (r) => r.int(20, 50),
   },
 
@@ -432,7 +436,7 @@ const templates: SetTemplate[] = [
       const clause = bounds ? `, ${bounds}` : ""
       return [
         `\\{ n \\in ${cfg.domainLatex} : n \\text{ ${word}}${clause} \\}`,
-        `\\{ n \\in \\mathbb{N} : \\exists k \\in \\mathbb{N}, n = k^2${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : \\exists k \\in \\mathbb{N}, n = k^2${clause} \\}`,
       ]
     },
     build: (_dom, _n, cfg) => rangeArray(cfg.includeStart, cfg.includeEnd).filter(isSquare),
