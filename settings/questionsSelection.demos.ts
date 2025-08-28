@@ -6,9 +6,11 @@ import type { QuestionCollection } from "@shared/api/QuestionRouter"
 import { DemoGraphEdgeInput } from "@shared/question-generators/demos/graphEdgeInput.ts"
 import { DemoGraphs } from "@shared/question-generators/demos/graphGenerators"
 import { DemoGraphNodeInput } from "@shared/question-generators/demos/graphNodeInput.ts"
+import { DemoDraggingGraphs } from "@shared/question-generators/demos/interactiveGraphGenerator.ts"
 import { DemoMultiInput } from "@shared/question-generators/demos/multiInput"
 import { DemoMultipleChoice } from "@shared/question-generators/demos/multipleChoice"
 import { DemoSingleInput } from "@shared/question-generators/demos/singleInput"
+import { DemoSortingChoice } from "@shared/question-generators/demos/sorting.ts"
 import { DemoTables } from "@shared/question-generators/demos/tables.ts"
 
 export const collection: QuestionCollection = [
@@ -16,13 +18,15 @@ export const collection: QuestionCollection = [
     slug: "demos",
     name: { de: "Demos", en: "Demos" },
     contents: [
-      DemoGraphNodeInput,
-      DemoGraphEdgeInput,
       DemoMultipleChoice,
       DemoSingleInput,
       DemoMultiInput,
-      DemoGraphs,
       DemoTables,
+      DemoSortingChoice,
+      DemoGraphs,
+      DemoDraggingGraphs,
+      DemoGraphNodeInput,
+      DemoGraphEdgeInput,
     ],
   },
 ]

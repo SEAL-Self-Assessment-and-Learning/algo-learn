@@ -173,7 +173,7 @@ export function generateVariantDetailed(
       const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
       if (resultMap[key].trim().toLowerCase() !== correctAnswers[key].trim()) {
         foundError = true
-        const secondSolutionPart: string = "**" + correctAnswers[key] + "**\n"
+        const secondSolutionPart: string = "**" + correctAnswers[key] + "**|\n"
         solutionDisplay[count] = firstSolutionPart + secondSolutionPart
       }
       count++

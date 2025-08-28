@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import type { TableNode } from "@shared/utils/parseMarkdown"
 import { MarkdownTree } from "@/components/Markdown"
 import { cn } from "@/lib/utils"
+import { isMobileOrTablet } from "@/utils/deviceInformation.ts"
 
 /**
  * A component that returns a table
@@ -14,46 +15,48 @@ export function DrawTable({ table }: { table: TableNode }) {
   const hasZebra = bodyRows.length >= 5
 
   return (
-    <table className="m-5 w-auto border-collapse justify-self-center">
-      {headerRow && (
-        <thead className="first:[&_th]:rounded-tl-sm last:[&_th]:rounded-tr-sm">
-          <tr>
-            {headerRow.map((cell, j) => (
-              <TableCell
-                key={j}
-                rightBorder={vLines.includes(j)}
-                alignment={alignment[j]}
-                bottomBorder={true}
-                header={true}
-              >
-                <MarkdownTree parseTree={cell} />
-              </TableCell>
-            ))}
-          </tr>
-        </thead>
-      )}
-      <tbody
-        className={cn(
-          hasZebra &&
-            "[&>tr:nth-child(even)>td]:bg-muted first:[&>tr:nth-child(even)>td]:rounded-l-sm last:[&>tr:nth-child(even)>td]:rounded-r-sm",
+    <div className={`${isMobileOrTablet ? "overflow-x-scroll" : ""}`}>
+      <table className="my-5 w-auto border-collapse">
+        {headerRow && (
+          <thead className="first:[&_th]:rounded-tl-sm last:[&_th]:rounded-tr-sm">
+            <tr>
+              {headerRow.map((cell, j) => (
+                <TableCell
+                  key={j}
+                  rightBorder={vLines.includes(j)}
+                  alignment={alignment[j]}
+                  bottomBorder={true}
+                  header={true}
+                >
+                  <MarkdownTree parseTree={cell} />
+                </TableCell>
+              ))}
+            </tr>
+          </thead>
         )}
-      >
-        {bodyRows.map((row, i) => (
-          <tr key={i}>
-            {row.map((cell, j) => (
-              <TableCell
-                key={j}
-                rightBorder={vLines.includes(j)}
-                bottomBorder={hLines.includes(i + (headerRow ? 1 : 0))}
-                alignment={alignment[j]}
-              >
-                <MarkdownTree parseTree={cell} />
-              </TableCell>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+        <tbody
+          className={cn(
+            hasZebra &&
+              "[&>tr:nth-child(even)>td]:bg-muted first:[&>tr:nth-child(even)>td]:rounded-l-sm last:[&>tr:nth-child(even)>td]:rounded-r-sm",
+          )}
+        >
+          {bodyRows.map((row, i) => (
+            <tr key={i}>
+              {row.map((cell, j) => (
+                <TableCell
+                  key={j}
+                  rightBorder={vLines.includes(j)}
+                  bottomBorder={hLines.includes(i + (headerRow ? 1 : 0))}
+                  alignment={alignment[j]}
+                >
+                  <MarkdownTree parseTree={cell} />
+                </TableCell>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 

@@ -42,6 +42,7 @@ export interface Edge {
  * A graph.
  * @property nodes - The nodes of the graph.
  * @property links - The links of the graph.
+ * @property inputFields - A unique ID for the input field associated with the graph.
  */
 export class Graph {
   nodes: NodeList
@@ -135,7 +136,7 @@ export class Graph {
   public static parse(graphStr: string): Graph {
     const lines = graphStr.split("\n")
     const graphMetaData = lines[0].match(
-      /^(\d+) (\d+) ([01]) ([01]) ([01]) ([01]) ([012]) ([012]) (\d+) (\d+)$/,
+      /^(\d+) (\d+) ([01]) ([01]) ([\d+]) ([01]) ([012]) ([012]) (\d+) (\d+)$/,
     )
 
     if (graphMetaData === null) throw Error(`Input error: graph data has invalid meta data: ${lines[0]}`)
@@ -154,12 +155,19 @@ export class Graph {
     if (lines.length < numNodes + numEdges + 1) throw Error("Input error: graph data is incomplete")
     if (nodeClick === undefined || edgeClick === undefined)
       throw Error("Input error: click events invalid")
+    if (nodeGroupMax > 8 || edgeGroupMax > 8) throw Error("Input error: too many groups (max 8)")
 
     const nodes: Node[] = []
     const nodesEnd = numNodes + 1
     for (let i = 1; i < nodesEnd; i++) {
       const nodeData = lines[i].match(/^(-?\d+(?:\.\d{1,2})?) (-?\d+(?:\.\d{1,2})?) (-|\d+) "(.*)"$/)
       if (nodeData === null) throw Error("Input error: invalid node data: " + lines[i])
+      if (
+        !(nodeData[3] === "-") &&
+        (parseInt(nodeData[3]) > nodeGroupMax - 1 || parseInt(nodeData[3]) < 0)
+      ) {
+        throw Error("Input error: node group too large: " + lines[i])
+      }
 
       nodes.push({
         coords: { x: parseFloat(nodeData[1]), y: parseFloat(nodeData[2]) },
@@ -176,6 +184,12 @@ export class Graph {
     for (let i = nodesEnd; i < edgeEnd; i++) {
       const edgeData = lines[i].match(edgeRegex)
       if (edgeData === null) throw Error("Input error: invalid edge data: " + lines[i])
+      if (
+        !(edgeData[3] === "-") &&
+        (parseInt(edgeData[3]) > edgeGroupMax - 1 || parseInt(edgeData[3]) < 0)
+      ) {
+        throw Error("Input error: edge group too large: " + lines[i])
+      }
 
       const source = parseInt(edgeData[1])
       edges[source].push({
@@ -247,10 +261,14 @@ export class Graph {
   }
 
   public setNodeGroup(u: NodeId, group: number): void {
+    if (group > this.nodeGroupMax - 1 || group < 0)
+      throw Error("Input error: node group too large or negative")
     this.nodes[u].group = group
   }
 
   public setEdgeGroup(u: NodeId, v: NodeId, group: number): void {
+    if (group > this.edgeGroupMax - 1 || group < 0)
+      throw Error("Input error: edge group too large or negative")
     this.getEdge(u, v).group = group
     if (!this.directed) this.getEdge(v, u).group = group
   }
@@ -269,6 +287,10 @@ export class Graph {
   }
 }
 
+/**
+ * Generates labels based on the index (0 -> A, 1 -> B, ..., 25 -> Z, 26 -> AA, 27 -> AB, ...)
+ * @param i
+ */
 export function getNodeLabel(i: number): string {
   let label: string = ""
   do {
@@ -586,8 +608,6 @@ export class RootedTree {
   }
 
   public getNumNodes(): number {
-    // if (this.children.length === 0) return 1
-
     return this.children.reduce((acc: number, node: RootedTree) => acc + node.getNumNodes(), 1)
   }
 
@@ -604,6 +624,7 @@ export class RootedTree {
       })
       order.push(this.root)
     } else if (type === "in") {
+      // Todo: this is not well defined for non-binary trees
       if (this.children.length > 0) order = order.concat(this.children[0].getTraversalOrder(type))
       order.push(this.root)
       for (let i = 1; i < this.children.length; i++) {
@@ -737,6 +758,7 @@ export class RootedTree {
       if (this.coordinates.index > 0) {
         // place the node just right of its left sibling
         this.coordinates.x = this.getPreviousSiblingX() + this.nodeDistX + this.siblingDist
+        this.checkForOverlappingSubtrees()
       }
       // else x = 0 (initialization value)
     } else {
@@ -761,10 +783,12 @@ export class RootedTree {
 
     const nodeContour = this.getLeftContour()
 
-    // iterate all siblings to the left
+    // check against all siblings to the left
     for (let i = 0; i < this.coordinates.index; i++) {
-      const sibling = this.coordinates.parent!.children[i] // since the node has siblings it also has a parent.
+      // since the node has siblings it also has a parent.
+      const sibling = this.coordinates.parent!.children[i]
       const siblingContour = sibling.getRightContour()
+
       for (
         let y = this.coordinates.y + 1;
         y <=
@@ -775,17 +799,18 @@ export class RootedTree {
         y++
       ) {
         const dist = nodeContour[y] - siblingContour[y]
-        if (dist + shiftValue < minDistance) shiftValue = minDistance - dist
+        shiftValue = Math.max(shiftValue, minDistance - dist)
       }
+    }
 
-      if (shiftValue > 0) {
-        this.coordinates.x += shiftValue
-        this.coordinates.mod += shiftValue
+    // apply shift once, after all siblings considered
+    if (shiftValue > 0) {
+      this.coordinates.x += shiftValue
+      this.coordinates.mod += shiftValue
 
-        this.centerNodes(sibling)
-
-        shiftValue = 0
-      }
+      // pass the *last left sibling* (closest one) to centerNodes
+      const leftSibling = this.coordinates.parent!.children[this.coordinates.index - 1]
+      this.centerNodes(leftSibling)
     }
   }
 
@@ -797,8 +822,8 @@ export class RootedTree {
     if (nodeSpan > 0) {
       const nodeDist = (this.coordinates.x - leftSibling.coordinates.x) / (nodeSpan + 1)
 
-      for (let i = 1; i < rightIndex; i++) {
-        const middleNode = this.coordinates.parent!.children[leftIndex + i] // since the nod has siblings it has a parent
+      for (let i = 1; i <= nodeSpan; i++) {
+        const middleNode = this.coordinates.parent!.children[leftIndex + i] // since the node has siblings it has a parent
         const offset = leftSibling.coordinates.x + nodeDist * i - middleNode.coordinates.x
         middleNode.coordinates.x += offset
         middleNode.coordinates.mod += offset

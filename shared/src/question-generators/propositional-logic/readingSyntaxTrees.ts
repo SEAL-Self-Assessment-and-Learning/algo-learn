@@ -1,24 +1,24 @@
-import type { QuestionGenerator } from "../../api/QuestionGenerator.ts"
-import { serializeGeneratorCall } from "../../api/QuestionRouter.ts"
+import type { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
+import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import {
   generateRandomExpression,
   numToVariableValues,
   type ExpressionProperties,
   type SyntaxTreeNodeType,
-} from "../../utils/propositionalLogic.ts"
-import Random from "../../utils/random.ts"
-import { t, tFunctional, type Translations } from "../../utils/translations.ts"
+} from "@shared/utils/propositionalLogic/propositionalLogic.ts"
+import Random from "@shared/utils/random.ts"
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
     name: "Reading Syntax Trees",
     description: "Read and evaluate a given syntax tree.",
     param_size: "The size of the syntax tree.",
-    freetext_question: `Given the following propositional logic formular as syntax tree, compute a variable assignment such that the formular is **{{t}}**. {{g}}`,
+    freetext_question: `Given the following propositional logic formula as syntax tree, compute a variable assignment such that the formula is **{{t}}**. {{g}}`,
     target_satisfied: "satisfied",
     target_falsified: "falsified",
     check_invalid: "Input invalid",
-    feedback_wrong: "The provided values evaluate the formular to **{{0}}** instead of **{{1}}**.",
+    feedback_wrong: "The provided values evaluate the formula to **{{0}}** instead of **{{1}}**.",
   },
   de: {
     name: "Syntaxbäume lesen",

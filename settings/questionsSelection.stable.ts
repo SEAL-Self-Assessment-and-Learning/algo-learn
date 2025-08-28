@@ -25,7 +25,11 @@ import { ModTricks } from "@shared/question-generators/math/modularArithmetic/mo
 import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
 import { ReadingSyntaxTrees } from "@shared/question-generators/propositional-logic/readingSyntaxTrees.ts"
+import { Resolution } from "@shared/question-generators/propositional-logic/resolution.ts"
 import { Satisfiability } from "@shared/question-generators/propositional-logic/satisfiability"
+import { SemanticEquivalence } from "@shared/question-generators/propositional-logic/semanticEquivalence.ts"
+import { TruthTableFillingGenerator } from "@shared/question-generators/propositional-logic/truthTableFillingGenerator.ts"
+import { TruthTableReadingGenerator } from "@shared/question-generators/propositional-logic/truthTableReadingGenerator.ts"
 import { queueQuestion } from "@shared/question-generators/Queue/QueueGenerator.ts"
 import { RecursionFormula } from "@shared/question-generators/recursion/formula"
 import { RecurrenceMaster } from "@shared/question-generators/recursion/recurrenceMaster"
@@ -37,7 +41,16 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    contents: [ReadingSyntaxTrees, Satisfiability, NormalForms, MinimizePropositionalLogic],
+    contents: [
+      Satisfiability,
+      NormalForms,
+      SemanticEquivalence,
+      TruthTableReadingGenerator,
+      TruthTableFillingGenerator,
+      ReadingSyntaxTrees,
+      Resolution,
+      MinimizePropositionalLogic,
+    ],
   },
   {
     slug: "modular-arithmetic",

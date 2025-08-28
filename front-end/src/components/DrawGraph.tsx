@@ -42,19 +42,38 @@ const Node = ({
 }) => {
   const nodeStyle = `${state.selected ? "cg-4" : state.group !== null ? `cg-${state.group}` : "primary"} ${clickable ? "cursor-pointer" : "group-hover:fill-accent"}`
 
+  // Make the drag area 2x bigger than the visible node
+  const dragAreaSize = size * 2
+
   return (
     <g
       className="group"
       transform={`translate(${pos.x},${pos.y})`}
       onMouseDown={setDragged}
+      onTouchStart={(e) => {
+        if (setDragged) {
+          e.preventDefault()
+          // e.stopPropagation()
+          setDragged()
+        }
+      }}
       onClick={onClickCallback}
     >
+      {/* Invisible larger circle for easier dragging */}
+      <circle
+        r={dragAreaSize}
+        fill="transparent"
+        stroke="none"
+        className={clickable ? "cursor-pointer" : ""}
+      />
+
+      {/* Visible node circle */}
       <circle className={`fill-${nodeStyle} stroke-secondary`} r={size} strokeWidth="6" />
       {label === undefined || label === "" ? null : (
         <text
           textAnchor="middle"
           dominantBaseline="central"
-          className={`cursor-${clickable ? "pointer" : "default group-hover:fill-accent-foreground"} ${!state.selected && state.group === null ? "fill-primary-foreground" : ""} select-none`}
+          className={`cursor-${clickable ? "pointer" : "default group-hover:fill-accent-foreground"} ${!state.selected && state.group === null ? "fill-primary-foreground" : ""} pointer-events-none select-none`}
           fontSize="1.5em"
         >
           {label}
@@ -359,6 +378,30 @@ export function DrawGraph({
   }
 
   const viewBoxAspectRatio = Math.min(maxHeight / maxWidth, viewBox.height / viewBox.width)
+
+  const updateDraggedNode = (clientX: number, clientY: number) => {
+    if (currentlyDragged === null || svgRef.current === null) return
+
+    const pt = svgRef.current.createSVGPoint()
+    pt.x = clientX
+    pt.y = clientY
+    const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
+
+    // Calculate boundaries with node radius as buffer
+    const nodeRadius = nodeScale
+    const minX = viewBox.x - (viewBox.width - maxWidth) / 2
+    const maxX = viewBox.x + viewBox.width + (viewBox.width - maxWidth) / 2
+    const minY = viewBox.y + nodeRadius
+    const maxY = viewBox.y + viewBox.height - nodeRadius
+
+    // Constrain the position within boundaries
+    const constrainedX = Math.max(minX, Math.min(maxX, svgPos.x))
+    const constrainedY = Math.max(minY, Math.min(maxY, svgPos.y))
+
+    nodePositions[currentlyDragged].x = constrainedX
+    nodePositions[currentlyDragged].y = constrainedY
+    setNodePositions([...nodePositions])
+  }
   return (
     <div className={`mb-8`}>
       <div className={`relative`}>
@@ -366,28 +409,39 @@ export function DrawGraph({
           ref={svgRef}
           width={maxWidth}
           height={
-            viewBox.height / viewBox.width > 1 && viewBox.height < 300
+            viewBox.height / viewBox.width > 1 && viewBox.height < maxHeight
               ? viewBox.height * 0.75
               : maxWidth * viewBoxAspectRatio
           }
-          viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-          className="mx-auto h-auto max-w-full rounded-lg bg-secondary pb-2"
-          onMouseMove={(e) => {
-            if (currentlyDragged === null || svgRef.current === null) return
+          // - 10 and + 20 to give some extra space for arrow heads and edge weights
+          viewBox={`${viewBox.x} ${viewBox.y - 10} ${viewBox.width} ${viewBox.height + 20}`}
+          className={`mx-auto h-auto max-w-full touch-none overscroll-x-none rounded-2xl bg-secondary`}
+          onMouseMove={(e) => updateDraggedNode(e.clientX, e.clientY)}
+          // Even simpler alternative - remove the threshold entirely:
 
-            const pt = svgRef.current.createSVGPoint()
-            pt.x = e.clientX
-            pt.y = e.clientY
-            // The cursor point, translated into svg coordinates
-            const svgPos = pt.matrixTransform(svgRef.current.getScreenCTM()?.inverse())
-
-            nodePositions[currentlyDragged].x = svgPos.x
-            nodePositions[currentlyDragged].y = svgPos.y
-            // react requires a new array here
-            setNodePositions([...nodePositions])
+          onTouchMove={(e) => {
+            // Always prevent default when a node is being dragged
+            if (currentlyDragged !== null) {
+              e.preventDefault()
+              e.stopPropagation()
+              updateDraggedNode(e.touches[0].clientX, e.touches[0].clientY)
+            }
           }}
           onMouseUp={() => {
             if (currentlyDragged !== null) setCurrentlyDragged(null)
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            if (currentlyDragged !== null) {
+              setCurrentlyDragged(null)
+            }
+          }}
+          onTouchCancel={(e) => {
+            e.preventDefault()
+            if (currentlyDragged !== null) {
+              setCurrentlyDragged(null)
+            }
           }}
         >
           <g>{edges}</g>

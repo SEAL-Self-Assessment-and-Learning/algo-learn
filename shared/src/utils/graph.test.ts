@@ -4,7 +4,7 @@ import { Graph, RandomGraph, RootedTree, type Edge } from "./graph.ts"
 
 // Todo: More parsing tests
 test("parse", () => {
-  const graphStr = '3 3 1 1 0 1 0 0 0 0\n1 0 3 "A"\n0 1 4 "B"\n1 1 5 "C"\n0 1 1 1\n1 2 2 2\n2 0 3 3\n'
+  const graphStr = '3 3 1 1 1 0 0 0 6 4\n1 0 3 "A"\n0 1 4 "B"\n1 1 5 "C"\n0 1 1 1\n1 2 2 2\n2 0 3 3\n'
   const graph = Graph.parse(graphStr)
 
   expect(graph.getNumNodes()).toEqual(3)

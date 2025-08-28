@@ -68,7 +68,7 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
       graph = RandomGraph.grid(random, [6, 3], 0.6, "square-width-diagonals", null, false, false)
       graph.nodeDraggable = false
       graph.edgeClickType = "select"
-      graph.inputFields = 1
+      graph.inputFields = 1 // The ID of the input field for the edge input
 
       startNode = random.choice(graph.nodes)
       bfsNodePaths = bfs(startNode, graph)
