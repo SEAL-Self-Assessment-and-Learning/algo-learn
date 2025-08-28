@@ -136,7 +136,7 @@ export class Graph {
   public static parse(graphStr: string): Graph {
     const lines = graphStr.split("\n")
     const graphMetaData = lines[0].match(
-      /^(\d+) (\d+) ([01]) ([01]) ([01]) ([01]) ([012]) ([012]) (\d+) (\d+)$/,
+      /^(\d+) (\d+) ([01]) ([01]) ([\d+]) ([01]) ([012]) ([012]) (\d+) (\d+)$/,
     )
 
     if (graphMetaData === null) throw Error(`Input error: graph data has invalid meta data: ${lines[0]}`)
