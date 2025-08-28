@@ -127,8 +127,6 @@ function getFeedbackFunction(
       })
       .join("\n")
 
-    const additionalStyling = "|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |\n"
-
     // check final coefficients for linear combination
     const initialStep = steps[0]
     const a = initialStep.dividend
@@ -150,7 +148,7 @@ function getFeedbackFunction(
 
     return {
       correct: isCorrect,
-      correctAnswer: `${feedbackDetails}${additionalStyling}\n\n$\\text{${t(translations, lang, "gcd")}}(${a}, ${b}) = ${gcd} = ${finalStep.s} \\cdot ${a} + ${finalStep.t} \\cdot ${b}$`,
+      correctAnswer: `${feedbackDetails}\n\n$\\text{${t(translations, lang, "gcd")}}(${a}, ${b}) = ${gcd} = ${finalStep.s} \\cdot ${a} + ${finalStep.t} \\cdot ${b}$`,
     }
   }
 }
@@ -233,7 +231,6 @@ function generateEEATableSteps(
   const linearCombinationPrompt = `\n${t(translations, lang, "linearCombinationPrompt")}\n`
   const gcdRow = `| $\\text{${t(translations, lang, "gcd")}}(${a},${b})$ | $=$ | {{gcd#OS-2#}} | | | |\n`
   const combinationRow = `| | $=$ | {{coefA#OS-2##s}} | $\\cdot$ | ${a} | $+$ | {{coefB#OS-2##t}} | $\\cdot$ | ${b} |\n`
-  const additionalStyling = "|#div_my-5?border_none?av_middle?ah_center?table_w-full#| |\n"
 
-  return `${calcTable}${additionalStyling}${linearCombinationPrompt}\n${gcdRow}${combinationRow}${additionalStyling}`
+  return `${calcTable}${linearCombinationPrompt}\n${gcdRow}${combinationRow}`
 }

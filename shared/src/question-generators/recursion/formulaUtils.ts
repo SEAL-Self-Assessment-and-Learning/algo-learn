@@ -579,7 +579,7 @@ function generateOperationsArithmetic(stars: number, random: Random) {
     }
     const currentNumber = random.int(1, 9)
     if (operation === "*") {
-      operation = "\\cdot"
+      operation = "\\cdot "
     } else if (operation === "/") {
       lastOperationWasFraction = true
       equationString = equationString.trim()
@@ -619,7 +619,7 @@ function generateRecursiveReturnArithmetic({
     }
     if (i < numRecCalls - 1) {
       const chooseOperation = random.choice(arithmeticOperations.filter((op) => op !== "/"))
-      returnString.push(`${chooseOperation === "*" ? "\\cdot" : chooseOperation} `)
+      returnString.push(`${chooseOperation === "*" ? "\\cdot " : chooseOperation} `)
     }
   }
   return { returnString }

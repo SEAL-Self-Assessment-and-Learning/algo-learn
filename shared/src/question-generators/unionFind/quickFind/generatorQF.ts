@@ -41,13 +41,7 @@ export const QuickFindGenerator: QuestionGenerator = {
   description: tFunctional(translations, "description"),
   tags: ["union-find", "quick-find"],
   languages: ["en", "de"],
-  expectedParameters: [
-    {
-      type: "string",
-      name: "variant",
-      allowedValues: ["start"],
-    },
-  ],
+  expectedParameters: [],
 
   generate(lang, parameters, seed) {
     const random = new Random(seed)

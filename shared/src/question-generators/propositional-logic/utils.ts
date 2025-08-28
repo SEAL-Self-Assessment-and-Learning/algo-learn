@@ -17,6 +17,9 @@ const typingAidTranslations: Translations = {
     "aria.or": "logical or",
     "aria.and": "logical and",
     "aria.not": "negation",
+    "aria.xor": "logical xor",
+    "aria.implies": "logical implication",
+    "aria.equivalent": "logical equivalent",
     "aria.variable": "variable {{0}}",
   },
   de: {
@@ -25,6 +28,9 @@ const typingAidTranslations: Translations = {
     "aria.or": "logisches Oder",
     "aria.and": "logisches Und",
     "aria.not": "Negation",
+    "aria.xor": "logisches xor",
+    "aria.implies": "Logische Implikation",
+    "aria.equivalent": "Logische Äquivalenz",
     "aria.variable": "Variable {{0}}",
   },
 }
@@ -56,8 +62,32 @@ export function getTypingAids(lang: "en" | "de") {
     input: "\\not",
     label: t(typingAidTranslations, lang, "aria.not"),
   }
+  const logicalXor = {
+    text: "$\\oplus$",
+    input: "\\xor",
+    label: t(typingAidTranslations, lang, "aria.xor"),
+  }
+  const logicalImpl = {
+    text: "$\\Rightarrow$",
+    input: "=>",
+    label: t(typingAidTranslations, lang, "aria.implies"),
+  }
+  const logicalEquivalence = {
+    text: "$\\Leftrightarrow$",
+    input: "<=>",
+    label: t(typingAidTranslations, lang, "aria.biimplies"),
+  }
 
-  return { leftParenthesis, rightParenthesis, logicalOr, logicalAnd, logicalNot }
+  return {
+    leftParenthesis,
+    rightParenthesis,
+    logicalOr,
+    logicalAnd,
+    logicalNot,
+    logicalXor,
+    logicalImpl,
+    logicalEquivalence,
+  }
 }
 
 /**

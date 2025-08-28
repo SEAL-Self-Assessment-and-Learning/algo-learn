@@ -14,7 +14,7 @@ const translations: Translations = {
     name: "Tree Taversal",
     description: "Compute a traversal order of the nodes in a tree.",
     param_size: "Tree size",
-    text: `Given the following tree compute **{{t}} traversal** of the nodes. {{g}}`,
+    text: `Given the following tree, compute **{{t}} traversal** of the nodes. {{g}}`,
     freetext_prompt: "Node order:",
     check_unknown_node: '"{{n}}" is not a node in the tree.',
     feedback_num_nodes:
@@ -79,14 +79,15 @@ export const TreeTraversal: QuestionGenerator = {
     const random = new Random(seed)
     const size = parameters.size as number
 
+    const strategy = random.choice(traversalStrategies)
+
     const depth = { min: size < 3 ? 1 : 2, max: size < 2 ? 2 : 3 }
-    const degree = { min: 2, max: size < 2 ? 2 : 3 }
+    const degree = { min: 2, max: strategy === "in" ? 2 : size < 2 ? 2 : 3 }
 
     const T = RootedTree.random(depth, degree, random)
     const G = T.toGraph()
-    G.nodeDraggable = false
 
-    const strategy = random.choice(traversalStrategies)
+    G.nodeDraggable = false
 
     const correctOrder = T.getTraversalOrder(strategy)
 

@@ -1,4 +1,4 @@
-import type { FreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator"
+import type { MultiFreeTextQuestion, QuestionGenerator } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import { RandomGraph, RootedTree } from "@shared/utils/graph.ts"
 import Random from "@shared/utils/random"
@@ -12,7 +12,7 @@ const translations: Translations = {
   en: {
     name: "Graph Generators",
     description: "Shows graph examples",
-    text: "Directed: {{directed}}\n\nUndriected:{{undirected}}\n\nDraggable Nodes:{{interactive}}\n\nTrees:{{tree}}",
+    text: "Directed: {{directed}}\n\nUndirected:{{undirected}}\n\nGrouping Nodes and Edges:{{groups}}\n\nTrees:{{tree}}",
   },
 }
 
@@ -36,6 +36,20 @@ export const DemoGraphs: QuestionGenerator = {
    */
   generate(lang = "en", parameters, seed) {
     const random = new Random(seed)
+
+    const groupGraph = RandomGraph.grid(
+      random,
+      [5, 4],
+      0.3,
+      random.choice(["square", "triangle", "square-width-diagonals"]),
+      random.choice(["random", "unique", null]),
+      random.bool(),
+      false,
+      false,
+    )
+    groupGraph.nodeClickType = "group"
+    groupGraph.edgeClickType = "select"
+    groupGraph.nodeGroupMax = 5
 
     const graphs = {
       directed: RandomGraph.grid(
@@ -70,11 +84,12 @@ export const DemoGraphs: QuestionGenerator = {
       )
         .setDraggable(true)
         .toMarkdown(),
-      tree: RootedTree.random({ min: 2, max: 4 }, { min: 2, max: 3 }, random).toGraph().toMarkdown(),
+      groups: groupGraph.toMarkdown(),
+      tree: RootedTree.random({ min: 2, max: 3 }, { min: 2, max: 3 }, random).toGraph().toMarkdown(),
     }
 
-    const question: FreeTextQuestion = {
-      type: "FreeTextQuestion",
+    const question: MultiFreeTextQuestion = {
+      type: "MultiFreeTextQuestion",
       name: DemoGraphs.name(lang),
       path: serializeGeneratorCall({
         generator: DemoGraphs,

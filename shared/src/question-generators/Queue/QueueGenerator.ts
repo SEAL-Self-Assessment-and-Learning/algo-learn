@@ -17,7 +17,7 @@ const translations: Translations = {
   en: {
     name: "Queues",
     description: "Perform queue operations",
-    solutionFreetext: `|Index|Question|Solution|\n{{0}}`,
+    solutionFreetext: `\n|**Index**|**Question**|**Solution**|\n|===|===|===|\n{{0}}`,
     checkFormat: "Please only enter a number.",
     checkFormatBool: "Please only enter *false* or *true*",
     queueEmpty: "Currently the queue is empty.",
@@ -27,7 +27,7 @@ const translations: Translations = {
   de: {
     name: "Queues",
     description: "Queue-Operationen ausführen",
-    solutionFreetext: `|Index|Frage|Lösung|\n{{0}}`,
+    solutionFreetext: `|**Index**|**Frage**|**Lösung**|\n|===|===|===|\n{{0}}`,
     checkFormat: "Bitte gib nur Zahlen ein.",
     checkFormatBool: "Bitte gib nur *false* oder *true* ein.",
     queueEmpty: "Die Queue ist aktuell leer.",
@@ -102,7 +102,7 @@ export const queueQuestion: QuestionGenerator = {
         const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
         if (resultMap[key].trim().toLowerCase() !== correctAnswers[key].trim()) {
           foundError = true
-          const secondSolutionPart: string = "**" + correctAnswers[key] + "**\n"
+          const secondSolutionPart: string = "**" + correctAnswers[key] + "**|\n"
           solutionDisplay[count] = firstSolutionPart + secondSolutionPart
         }
         count++

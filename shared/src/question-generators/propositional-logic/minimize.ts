@@ -11,6 +11,7 @@ import {
   variableNames,
 } from "@shared/question-generators/propositional-logic/utils"
 import { _ } from "@shared/utils/generics"
+import { MinimalNormalForm } from "@shared/utils/propositionalLogic/minimize.ts"
 import {
   compareExpressions,
   generateRandomExpression,
@@ -18,17 +19,16 @@ import {
   PropositionalLogicParser,
   tokenToLatex,
   type SyntaxTreeNodeType,
-} from "@shared/utils/propositionalLogic"
-import { MinimalNormalForm } from "@shared/utils/propositionalLogicMinimize.ts"
+} from "@shared/utils/propositionalLogic/propositionalLogic.ts"
 import Random from "@shared/utils/random"
 import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
 const translations: Translations = {
   en: {
-    name: "Minimize boolean expression",
-    description: "Minimize the normal form of a boolean expression",
+    name: "Minimize propositional logic formula",
+    description: "Minimize the normal form of a propositional logic formula",
     param_size: "The maximal number of variables used",
-    text: "Given the boolean expression \\[\\varPhi={{0}}\\] Compute  the minimized **{{1}}** of $\\varPhi$ labeled as $\\varPhi^*$.",
+    text: "Given the propositional logic formula \\[\\varPhi={{0}}\\] Compute the minimized **{{1}}** of $\\varPhi$ labeled as $\\varPhi^*$.",
     ff_parse_error: "Your answer couldn't be parsed.",
     ff_no_normal_form: "Your answer is not a {{0}}.",
     ff_not_equivalent: "Your answer is **not** equivalent to $\\varPhi$.",
@@ -37,10 +37,10 @@ const translations: Translations = {
     CNF: "CNF",
   },
   de: {
-    name: "Boolesche Ausdrücke minimieren",
-    description: "Minimiere die Normalform eines booleschen Ausdruck",
+    name: "Aussagenlogische Formel minimieren",
+    description: "Minimiere die Normalform einer aussagenlogischen Formel",
     param_size: "Die maximale Anzahl der verwendeten Variablen",
-    text: "Gegeben sei der boolesche Ausdruck \\[\\varPhi={{0}}\\] Bestimme die minimierte **{{1}}** von $\\varPhi$, bezeichnet als $\\varPhi^*$",
+    text: "Gegeben sei die aussagenlogische Formel \\[\\varPhi={{0}}\\] Bestimme die minimierte **{{1}}** von $\\varPhi$, bezeichnet als $\\varPhi^*$",
     ff_parse_error: "Deine Antwort ist kein gültiger aussagenlogischer Ausdruck.",
     ff_no_normal_form: "Deine Antwort ist keine {{0}}.",
     ff_not_equivalent: "Deine Antwort ist **nicht** äquivalent zu $\\varPhi$.",
