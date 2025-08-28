@@ -42,6 +42,7 @@ export interface Edge {
  * A graph.
  * @property nodes - The nodes of the graph.
  * @property links - The links of the graph.
+ * @property inputFields - A unique ID for the input field associated with the graph.
  */
 export class Graph {
   nodes: NodeList

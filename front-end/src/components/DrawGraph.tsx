@@ -405,43 +405,43 @@ export function DrawGraph({
   return (
     <div className={`mb-8`}>
       <div className={`relative`}>
-    <svg
-      ref={svgRef}
-      width={maxWidth}
-      height={
-        viewBox.height / viewBox.width > 1 && viewBox.height < maxHeight
-          ? viewBox.height * 0.75
-          : maxWidth * viewBoxAspectRatio
-      }
-      // - 10 and + 20 to give some extra space for arrow heads and edge weights
-      viewBox={`${viewBox.x} ${viewBox.y - 10} ${viewBox.width} ${viewBox.height + 20}`}
-      className={`mx-auto h-auto max-w-full touch-none overscroll-x-none rounded-2xl bg-secondary`}
-      onMouseMove={(e) => updateDraggedNode(e.clientX, e.clientY)}
-      // Even simpler alternative - remove the threshold entirely:
+        <svg
+          ref={svgRef}
+          width={maxWidth}
+          height={
+            viewBox.height / viewBox.width > 1 && viewBox.height < maxHeight
+              ? viewBox.height * 0.75
+              : maxWidth * viewBoxAspectRatio
+          }
+          // - 10 and + 20 to give some extra space for arrow heads and edge weights
+          viewBox={`${viewBox.x} ${viewBox.y - 10} ${viewBox.width} ${viewBox.height + 20}`}
+          className={`mx-auto h-auto max-w-full touch-none overscroll-x-none rounded-2xl bg-secondary`}
+          onMouseMove={(e) => updateDraggedNode(e.clientX, e.clientY)}
+          // Even simpler alternative - remove the threshold entirely:
 
-            onTouchMove={(e) => {
+          onTouchMove={(e) => {
             // Always prevent default when a node is being dragged
-        if (currentlyDragged !== null) {
-          e.preventDefault()
-          e.stopPropagation()
-            updateDraggedNode(e.touches[0].clientX, e.touches[0].clientY)
+            if (currentlyDragged !== null) {
+              e.preventDefault()
+              e.stopPropagation()
+              updateDraggedNode(e.touches[0].clientX, e.touches[0].clientY)
             }
-            }}
-      onMouseUp={() => {
+          }}
+          onMouseUp={() => {
             if (currentlyDragged !== null) setCurrentlyDragged(null)
-            }}
-      onTouchEnd={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        if (currentlyDragged !== null) {
-            setCurrentlyDragged(null)
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            if (currentlyDragged !== null) {
+              setCurrentlyDragged(null)
             }
           }}
           onTouchCancel={(e) => {
-        e.preventDefault()
+            e.preventDefault()
             if (currentlyDragged !== null) {
-          setCurrentlyDragged(null)
-        }
+              setCurrentlyDragged(null)
+            }
           }}
         >
           <g>{edges}</g>
