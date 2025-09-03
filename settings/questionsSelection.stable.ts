@@ -98,7 +98,12 @@ export const collection: QuestionCollection = [
   {
     slug: "graphs",
     name: { de: "Graphen", en: "Graphs" },
-    contents: [TreeTraversal, MSTWeightGen, MSTGraphGen, KruskalCycle, PrimOrder, UniqueMSTGen],
+    contents: [TreeTraversal],
+  },
+  {
+    slug: "spanning-trees",
+    name: { de: "MST", en: "MST" },
+    contents: [MSTWeightGen, MSTGraphGen, KruskalCycle, PrimOrder, UniqueMSTGen],
   },
 ]
 

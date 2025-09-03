@@ -83,6 +83,7 @@ export const MSTGraphGen: QuestionGenerator = {
       random.bool(),
     )
     G.edgeClickType = "select"
+    G.edgeGroupMax = 2
     G.nodeDraggable = false
     G.inputFields = 1
 

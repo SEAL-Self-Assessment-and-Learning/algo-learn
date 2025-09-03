@@ -118,6 +118,7 @@ function getFeedback(
     const edgeInput = checkEdgeInput(text[edgeInputFieldID(1)], graph, lang)
     graph.inputFields = 0
     graph.edgeClickType = "none"
+    graph.edgeGroupMax = 2
     for (let i = 1; i < endNodePath[1].length; i++) {
       const node1 = graph.nodes.findIndex((node) => node.label! === endNodePath[1][i - 1].label)
       const node2 = graph.nodes.findIndex((node) => node.label! === endNodePath[1][i].label)
