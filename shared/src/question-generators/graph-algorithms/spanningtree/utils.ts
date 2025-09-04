@@ -16,6 +16,17 @@ export function setEdgesGroup(graph: Graph, edges: Edge[], group: number) {
 }
 
 /**
+ * Checks if two edges are the same (ignoring direction)
+ * @param a
+ * @param b
+ */
+export function isSameEdge(a: Edge, b: Edge): boolean {
+  return (
+    (a.source === b.source && a.target === b.target) || (a.source === b.target && a.target === b.source)
+  )
+}
+
+/**
  * Checks if a given list of edges forms a spanning tree
  * @param numNodes
  * @param edges

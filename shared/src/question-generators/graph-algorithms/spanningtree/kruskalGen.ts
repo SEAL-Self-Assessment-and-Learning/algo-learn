@@ -81,6 +81,7 @@ export const KruskalCycle: QuestionGenerator = {
     } while (kruskalResult.cycle.length < 2)
 
     G.inputFields = 1
+    G.edgeGroupMax = 2
     G.edgeClickType = "select"
     G.nodeDraggable = false
     let numEdges: number

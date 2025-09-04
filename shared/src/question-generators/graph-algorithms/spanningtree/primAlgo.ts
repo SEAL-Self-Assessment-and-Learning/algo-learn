@@ -1,4 +1,5 @@
 import { spanningTreeBaseChecks } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalAlgo.ts"
+import { isSameEdge } from "@shared/question-generators/graph-algorithms/spanningtree/utils.ts"
 import type { Edge, Graph, Node } from "@shared/utils/graph.ts"
 
 export function getNumOfAllMST(graph: Graph) {
@@ -81,12 +82,6 @@ function isSameMST(a: { mst: Edge[]; nodes: Node[] }, b: { mst: Edge[]; nodes: N
     if (!b.mst.some((x) => isSameEdge(x, edge))) return false
   }
   return true
-}
-
-function isSameEdge(a: Edge, b: Edge): boolean {
-  return (
-    (a.source === b.source && a.target === b.target) || (a.source === b.target && a.target === b.source)
-  )
 }
 
 function checkNodeIncluded(graph: Graph, node: Node): boolean {

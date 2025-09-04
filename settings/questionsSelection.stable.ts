@@ -8,6 +8,7 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { FindMinimalMST } from "@shared/question-generators/graph-algorithms/spanningtree/findMinimalMST.ts"
 import { KruskalCycle } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalGen.ts"
 import { MSTGraphGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTGraph.ts"
 import { MSTWeightGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTWeight.ts"
@@ -103,7 +104,7 @@ export const collection: QuestionCollection = [
   {
     slug: "spanning-trees",
     name: { de: "MST", en: "MST" },
-    contents: [MSTWeightGen, MSTGraphGen, KruskalCycle, PrimOrder, UniqueMSTGen],
+    contents: [MSTWeightGen, MSTGraphGen, KruskalCycle, PrimOrder, UniqueMSTGen, FindMinimalMST],
   },
 ]
 
