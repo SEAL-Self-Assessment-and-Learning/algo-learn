@@ -27,6 +27,10 @@ const translations: Translations = {
   },
 }
 
+/**
+ * A multiple choice question where the user has to select all graphs
+ * in which the highlighted spanning tree is a minimal spanning tree.
+ */
 export const FindMinimalMST: QuestionGenerator = {
   id: "matchmst",
   name: tFunctional(translations, "name"),
@@ -55,7 +59,7 @@ export const FindMinimalMST: QuestionGenerator = {
     const size = parameters.size as number
 
     const graphs = []
-    while (graphs.length < 4) {
+    for (let _ = 0; _ < 4; _++) {
       const G = RandomGraph.grid(
         random,
         [size, size],
@@ -88,18 +92,24 @@ export const FindMinimalMST: QuestionGenerator = {
   },
 }
 
+/**
+ * Computes spanning trees for the given graphs, modifying them in place.
+ *
+ * @param graphs
+ * @param random
+ *
+ * @returns The indices of the graphs that have a correct MST
+ */
 function computeSpanningTrees(
   graphs: Graph[],
   random: Random,
 ): {
-  msts: Graph[]
   correctIndices: number[]
 } {
   const correctIndices: number[] = random.subset(
     Array.from({ length: graphs.length }, (_, i) => i),
     random.int(1, graphs.length - 1),
   )
-  const msts: Graph[] = []
   for (let i = 0; i < graphs.length; i++) {
     const G = graphs[i]
     if (correctIndices.includes(i)) {
@@ -110,7 +120,6 @@ function computeSpanningTrees(
   }
 
   return {
-    msts,
     correctIndices,
   }
 }
@@ -154,6 +163,12 @@ function drawIncorrectMST(graph: Graph, random: Random) {
   }
 }
 
+/**
+ * Creates a cycle in the MST by adding an edge from the cycle found by Kruskal's algorithm,
+ * or by adding a random edge if no cycle was found.
+ * @param graph
+ * @param random
+ */
 function createCycleMST(graph: Graph, random: Random) {
   const kruskalResult = kruskalAlgorithm(graph)
   const edges: Edge[] = kruskalResult.mst
@@ -169,6 +184,11 @@ function createCycleMST(graph: Graph, random: Random) {
   setEdgesGroup(graph, edges, 1)
 }
 
+/**
+ * Creates a missing edge in the MST by removing an edge that is a bridge or connected to a leaf.
+ * @param graph
+ * @param random
+ */
 function createMissingMST(graph: Graph, random: Random) {
   const MST = (
     random.bool()
@@ -191,6 +211,11 @@ function createMissingMST(graph: Graph, random: Random) {
   setEdgesGroup(graph, MST, 1)
 }
 
+/**
+ * Creates a heavier edge in the MST by removing an edge and replacing it with a heavier edge
+ * @param graph
+ * @param random
+ */
 function createHeavierMST(graph: Graph, random: Random) {
   // Get a correct MST
   const MST = (
@@ -205,7 +230,7 @@ function createHeavierMST(graph: Graph, random: Random) {
   const edgeToReplace = random.choice(newMST)
   newMST.splice(newMST.indexOf(edgeToReplace), 1)
 
-  // --- Step 1: Find the two components after removal ---
+  // Find the two components after removal
   const visited = new Set<number>()
   const stack = [edgeToReplace.source]
   visited.add(edgeToReplace.source)
@@ -225,7 +250,7 @@ function createHeavierMST(graph: Graph, random: Random) {
   const compA = visited
   const compB = new Set(graph.nodes.map((_, i) => i).filter((i) => !compA.has(i)))
 
-  // --- Step 2: Find candidate edges crossing between compA and compB ---
+  // Find candidate edges crossing between compA and compB
   const candidates = graph.edges.flat().filter(
     (e) =>
       !newMST.some((x) => isSameEdge(x, e)) && // not already in MST
@@ -233,12 +258,13 @@ function createHeavierMST(graph: Graph, random: Random) {
       (e.value ?? 1) > (edgeToReplace.value ?? 1), // heavier
   )
 
-  // --- Step 3: Pick a replacement ---
+  // Step 3: Pick a replacement
   if (candidates.length > 0) {
     newMST.push(random.choice(candidates))
     setEdgesGroup(graph, newMST, 1)
   } else {
-    // fallback
+    // fallback, create either a cycle or a missing edge
+    // all functions are modifying the graph in place
     if (random.bool()) {
       createCycleMST(graph, random)
     } else {
@@ -247,6 +273,12 @@ function createHeavierMST(graph: Graph, random: Random) {
   }
 }
 
+/**
+ * Checks if the given edge is a bridge in the list of edges.
+ * An edge is a bridge if its removal increases the number of connected components.
+ * @param edges
+ * @param edge
+ */
 function isBridge(edges: Edge[], edge: Edge): boolean {
   if (edges.length <= 1) return false
 
