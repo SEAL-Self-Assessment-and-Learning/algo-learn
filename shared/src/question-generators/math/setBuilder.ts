@@ -6,6 +6,7 @@ import {
   type FreeTextQuestion,
   type MultipleChoiceAnswer,
   type MultipleChoiceFeedback,
+  type MultipleChoiceFeedbackFunction,
   type MultipleChoiceQuestion,
   type QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
@@ -20,6 +21,10 @@ const translations: Translations = {
     match: "Match each set given in set-builder notation with its explicit list of elements:",
     free: "Write out all elements of the following set explicitly:",
     checkFormat: "{a, b, c}",
+    even: "even",
+    odd: "odd",
+    prime: "prime",
+    square: "is a square",
   },
   de: {
     name: "Mengenschreibweise",
@@ -28,6 +33,10 @@ const translations: Translations = {
       "Ordne jeder in Mengenschreibweise gegebenen Menge ihre explizite Aufzählung der Elemente zu:",
     free: "Schreibe alle Elemente der folgenden Menge explizit auf:",
     checkFormat: "{a, b, c}",
+    even: "gerade",
+    odd: "ungerade",
+    prime: "prim",
+    square: "ist eine Quadratzahl",
   },
 }
 
@@ -103,7 +112,7 @@ function pickBounds(
 }
 
 // choose inequalities, compute displayed bounds and iterator bounds
-// iterator bounds are derived prom displayed bounds to keep them equal
+// iterator bounds are derived from displayed bounds to keep them equal
 function chooseInequalities(r: Random, low: number, high: number) {
   // pick display operators
   let leftOp = r.choice(["<", "\\leq"])
@@ -144,7 +153,7 @@ function maybeDecorateNaturalDomain(
   omitLower: boolean,
   r: Random,
 ) {
-  if (dom !== "N" || !omitLower) return { latex: "\\mathbb{N}", embedsUpper: false }
+  if (dom !== "N" || !omitLower) return { latex: domainLatexSymbol(dom), embedsUpper: false }
   const useDecoration = r.choice([true, false])
   if (!useDecoration) return { latex: "\\mathbb{N}", embedsUpper: false }
   const tag = rightOp === "<" ? "<" : "\\leq"
@@ -164,9 +173,9 @@ function formatBoundsClause(
   const implied = implicitLowerBound(dom, prop)
   const omitLower =
     implied !== null && (leftOp === "<" ? displayLowBound + 1 : displayLowBound) <= implied
-  if (omitLower && embedsUpper) return "" // domain already encodes upper; drop entire clause
-  if (omitLower) return `n ${rightOp} ${displayHighBound}` // only show upper
-  if (embedsUpper) return `${displayLowBound} ${leftOp} n` // only show lower
+  if (omitLower && embedsUpper) return ""
+  if (omitLower) return `n ${rightOp} ${displayHighBound}`
+  if (embedsUpper) return `${displayLowBound} ${leftOp} n`
   return `${displayLowBound} ${leftOp} n ${rightOp} ${displayHighBound}`
 }
 
@@ -191,9 +200,9 @@ type TemplateConfig = {
 type SetTemplate = {
   // compute all randomness only once then pass via config
   generateConfig: (dom: Domain, param: number, r: Random) => TemplateConfig
-  labels: (lang: string, dom: Domain, param: number, cfg: TemplateConfig) => string[]
+  labels: (lang: Language, dom: Domain, param: number, cfg: TemplateConfig) => string[]
   build: (dom: Domain, param: number, cfg: TemplateConfig) => number[]
-  paramRange: (random: Random) => number
+  paramRange: (r: Random) => number
 }
 
 const templates: SetTemplate[] = [
@@ -223,8 +232,8 @@ const templates: SetTemplate[] = [
         embedsUpper: natDecor.embedsUpper,
       }
     },
-    labels: (lang, dom, _n, cfg) => {
-      const word = lang === "en" ? "even" : "gerade"
+    labels: (lang: Language, dom, _n, cfg) => {
+      const even = t(translations, lang, "even")
       const bounds = formatBoundsClause(
         dom,
         "even",
@@ -236,7 +245,7 @@ const templates: SetTemplate[] = [
       )
       const clause = bounds ? `, ${bounds}` : ""
       return [
-        `\\{ n \\in ${cfg.domainLatex} : n \\text{ ${word}}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : n \\text{ ${even}}${clause} \\}`,
         `\\{ n \\in ${cfg.domainLatex} : n \\equiv 0 \\pmod{2}${clause} \\}`,
         `\\{ n \\in ${cfg.domainLatex} : \\exists k \\in ${cfg.domainLatex}, n = 2k${clause} \\}`,
       ]
@@ -276,8 +285,8 @@ const templates: SetTemplate[] = [
         embedsUpper: natDecor.embedsUpper,
       }
     },
-    labels: (lang, dom, _n, cfg) => {
-      const word = lang === "en" ? "odd" : "ungerade"
+    labels: (lang: Language, dom, _n, cfg) => {
+      const odd = t(translations, lang, "odd")
       const bounds = formatBoundsClause(
         dom,
         "odd",
@@ -289,7 +298,7 @@ const templates: SetTemplate[] = [
       )
       const clause = bounds ? `, ${bounds}` : ""
       return [
-        `\\{ n \\in ${cfg.domainLatex} : n \\text{ ${word}}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : n \\text{ ${odd}}${clause} \\}`,
         `\\{ n \\in ${cfg.domainLatex} : n \\equiv 1 \\pmod{2}${clause} \\}`,
         `\\{ n \\in ${cfg.domainLatex} : \\exists k \\in ${cfg.domainLatex}, n = 2k+1${clause} \\}`,
       ]
@@ -324,8 +333,8 @@ const templates: SetTemplate[] = [
         embedsUpper: natDecor.embedsUpper,
       }
     },
-    labels: (lang, _dom, _n, cfg) => {
-      const word = lang === "en" ? "prime" : "prim"
+    labels: (lang: Language, _dom, _n, cfg) => {
+      const prime = t(translations, lang, "prime")
       const bounds = formatBoundsClause(
         "N",
         "prime",
@@ -337,7 +346,7 @@ const templates: SetTemplate[] = [
       )
       const clause = bounds ? `, ${bounds}` : ""
       return [
-        `\\{ n \\in ${cfg.domainLatex} : n \\geq 2 \\wedge n \\text{ ${word}}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : n \\geq 2 \\wedge n \\text{ ${prime}}${clause} \\}`,
         `\\{ n \\in ${cfg.domainLatex} : n \\geq 2 \\wedge \\forall d \\in \\mathbb{N}, (d \\mid n \\Rightarrow (d=1 \\lor d=n))${clause} \\}`,
       ]
     },
@@ -376,7 +385,7 @@ const templates: SetTemplate[] = [
         embedsUpper: natDecor.embedsUpper,
       }
     },
-    labels: (_lang, dom, m, cfg) => {
+    labels: (_lang: Language, dom, m, cfg) => {
       const bounds = formatBoundsClause(
         dom,
         "multiple",
@@ -422,8 +431,8 @@ const templates: SetTemplate[] = [
         embedsUpper: natDecor.embedsUpper,
       }
     },
-    labels: (lang, _dom, _n, cfg) => {
-      const word = lang === "en" ? "is a square" : "ist eine Quadratzahl"
+    labels: (lang: Language, _dom, _n, cfg) => {
+      const square = t(translations, lang, "square")
       const bounds = formatBoundsClause(
         "N",
         "square",
@@ -435,7 +444,7 @@ const templates: SetTemplate[] = [
       )
       const clause = bounds ? `, ${bounds}` : ""
       return [
-        `\\{ n \\in ${cfg.domainLatex} : n \\text{ ${word}}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : n \\text{ ${square}}${clause} \\}`,
         `\\{ n \\in ${cfg.domainLatex} : \\exists k \\in \\mathbb{N}, n = k^2${clause} \\}`,
       ]
     },
@@ -471,7 +480,7 @@ const templates: SetTemplate[] = [
         residue,
       }
     },
-    labels: (_lang, dom, m, cfg) => {
+    labels: (_lang: Language, dom, m, cfg) => {
       const bounds = formatBoundsClause(
         dom,
         "congruence",
@@ -531,7 +540,7 @@ export const SetBuilderQuestion: QuestionGenerator = {
 }
 
 function generateMatchVariant(lang: Language, path: string, random: Random) {
-  const nSets = random.int(5, 8)
+  const nSets = random.int(4, 5)
   const left: string[] = []
   const rights: string[] = []
 
@@ -566,11 +575,15 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     sorting: true,
   })
 
-  const feedback = async (answer: MultipleChoiceAnswer): Promise<MultipleChoiceFeedback> => {
-    const result = await baseFeedback(answer)
-    const rowCorrectness = solution.map((c, i) => answer.choice[i] === c)
-    return { ...result, rowCorrectness }
+  function matchingRowFeedback(correctMapping: number[], base: MultipleChoiceFeedbackFunction) {
+    return async (answer: MultipleChoiceAnswer): Promise<MultipleChoiceFeedback> => {
+      const result = await Promise.resolve(base(answer))
+      const rowCorrectness = correctMapping.map((c, i) => answer.choice[i] === c)
+      return { ...result, rowCorrectness }
+    }
   }
+
+  const feedback = matchingRowFeedback(solution, baseFeedback)
 
   const question: MultipleChoiceQuestion = {
     type: "MultipleChoiceQuestion",
@@ -588,16 +601,16 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
 }
 
 function generateFreeTextVariant(lang: Language, path: string, random: Random) {
-  const tplt = random.choice(templates)
+  const template = random.choice(templates)
   const dom: Domain = random.choice(["N", "Z"])
-  const param = tplt.paramRange(random)
+  const param = template.paramRange(random)
 
-  const cfg = tplt.generateConfig(dom, param, random)
-  const elems = tplt.build(dom, param, cfg)
+  const cfg = template.generateConfig(dom, param, random)
+  const elements = template.build(dom, param, cfg)
 
-  const sorted = Array.from(new Set(elems)).sort((a, b) => a - b)
+  const sorted = Array.from(new Set(elements)).sort((a, b) => a - b)
   const correctSet = new Set(sorted)
-  const expression = random.choice(tplt.labels(lang, dom, param, cfg))
+  const expression = random.choice(template.labels(lang, dom, param, cfg))
 
   const checkFormat = (a: FreeTextAnswer) => {
     const input = a.text.trim()
