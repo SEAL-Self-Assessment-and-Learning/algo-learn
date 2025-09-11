@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { base } from "$app/paths"
+  import { resolve } from "$app/paths"
   import { page } from "$app/state"
   import type { Result } from "$lib/components/types.ts"
   import { Button } from "$lib/components/ui/button"
@@ -196,7 +196,7 @@
     <div class="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
       <div class="font-serif text-red-500 italic">{t("quiz-session-aborted")}</div>
       <Button
-        href={`${base}/${getLanguage()}`}
+        href={resolve(`/${getLanguage()}`)}
         variant="rightAnswer"
         class="mt-12 ml-auto block max-w-max"
       >
@@ -217,7 +217,7 @@
     <div class="w-full rounded-xl bg-black/10 p-16 dark:bg-black/20">
       <div class="font-serif italic">{msg}</div>
       <Button
-        href={`${base}/${getLanguage()}`}
+        href={resolve(`/${getLanguage()}`)}
         variant="rightAnswer"
         class="mt-12 ml-auto block max-w-max"
       >
@@ -231,7 +231,7 @@
   onkeydown={(e) => {
     if (e.key === "Enter") {
       if (status !== "running") {
-        window.location.href = `${base}/${getLanguage()}`
+        window.location.href = resolve(`/${getLanguage()}`)
       }
     }
   }}

@@ -9,7 +9,8 @@
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { Tooltip } from "bits-ui"
-  import { CheckCheck, XCircle } from "lucide-svelte"
+  import CheckCheck from "@lucide/svelte/icons/check-check"
+  import CircleX from "@lucide/svelte/icons/circle-x"
   import type { Language } from "@shared/api/Language.ts"
   import type { MultipleChoiceFeedback, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator.ts"
   import { tFunction } from "@shared/utils/translations.ts"
@@ -246,7 +247,7 @@
   {#if correct}
     <CheckCheck class={"h-4 w-4 text-green-700" + (hidden ? " invisible" : "")} />
   {:else}
-    <XCircle class={"h-4 w-4 text-red-700" + (hidden ? " invisible" : "")} />
+    <CircleX class={"h-4 w-4 text-red-700" + (hidden ? " invisible" : "")} />
   {/if}
 {/snippet}
 

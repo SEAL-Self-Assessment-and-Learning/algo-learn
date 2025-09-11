@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { cn } from "$lib/utils.js"
-  import type { WithElementRef } from "bits-ui"
+  import { cn, type WithElementRef } from "$lib/utils.js"
   import type { HTMLAttributes } from "svelte/elements"
 
   let {
@@ -13,7 +12,8 @@
 
 <div
   bind:this={ref}
-  class={cn("flex flex-col space-y-2 text-center sm:text-left", className)}
+  data-slot="alert-dialog-header"
+  class={cn("flex flex-col gap-2 text-center sm:text-left", className)}
   {...restProps}
 >
   {@render children?.()}

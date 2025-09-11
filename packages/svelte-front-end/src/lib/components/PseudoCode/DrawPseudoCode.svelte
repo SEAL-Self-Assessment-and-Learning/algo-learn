@@ -8,7 +8,9 @@
   import { cn } from "$lib/utils.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { Toggle, Tooltip } from "bits-ui"
-  import { Copy, ListOrdered, PaintBucket } from "lucide-svelte"
+  import Copy from "@lucide/svelte/icons/copy"
+  import ListOrdered from "@lucide/svelte/icons/list-ordered"
+  import PaintBucket from "@lucide/svelte/icons/paint-bucket"
   import type { PseudoCode } from "@shared/utils/pseudoCodeUtils.ts"
   import { tFunction } from "@shared/utils/translations.ts"
 

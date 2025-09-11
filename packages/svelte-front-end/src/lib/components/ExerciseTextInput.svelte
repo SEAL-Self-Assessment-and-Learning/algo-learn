@@ -4,7 +4,7 @@
   import Markdown from "$lib/components/markdown/markdown.svelte"
   import type { MODE, Result } from "$lib/components/types.ts"
   import { Button } from "$lib/components/ui/button"
-  import { inputClass } from "$lib/components/ui/input/cnInput.ts"
+  import { inputClass } from "$lib/components/ui/MultiInput/cnInput.ts"
   import { playSound } from "$lib/sound.svelte.ts"
   import { globalTranslations } from "$lib/translation.ts"
   import { isMobileOrTablet } from "$lib/utils/deviceInformation.ts"

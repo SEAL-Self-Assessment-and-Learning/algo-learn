@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation"
-  import { base } from "$app/paths"
+  import { resolve } from "$app/paths"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { Language } from "@shared/api/Language.ts"
 
@@ -19,7 +19,7 @@
       class="text-md rounded-md bg-red-900 px-5 py-2 text-white transition hover:cursor-pointer hover:bg-red-950"
       onclick={() => {
         reset()
-        goto(`${base}/${lang}`)
+        goto(resolve(`/${lang}`))
       }}
     >
       Go to Start Page

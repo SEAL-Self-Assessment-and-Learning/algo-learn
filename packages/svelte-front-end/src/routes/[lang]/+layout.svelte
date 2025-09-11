@@ -8,7 +8,7 @@
 </script>
 
 <svelte:boundary>
-  <div class="flex h-screen flex-col">
+  <div class="flex h-screen flex-col overflow-scroll">
     <Header />
     {@render children()}
   </div>

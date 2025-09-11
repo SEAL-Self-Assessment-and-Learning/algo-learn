@@ -1,9 +1,9 @@
 <script lang="ts">
   import Markdown from "$lib/components/markdown/markdown.svelte"
-  import { GripHorizontal } from "lucide-svelte"
   import type { UniqueIdentifier } from "@dnd-kit-svelte/core"
   import { useSortable } from "@dnd-kit-svelte/sortable"
   import { CSS, styleObjectToString } from "@dnd-kit-svelte/utilities"
+  import GripHorizontal from "@lucide/svelte/icons/grip-horizontal"
 
   interface Item {
     id: UniqueIdentifier

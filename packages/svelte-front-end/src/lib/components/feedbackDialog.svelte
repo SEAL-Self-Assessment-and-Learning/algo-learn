@@ -3,9 +3,9 @@
   import * as Card from "$lib/components/ui/card/index.js"
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
-  import Mail from "lucide-svelte/icons/mail"
-  import MessageSquareText from "lucide-svelte/icons/message-square-text"
   import Github from "@icons-pack/svelte-simple-icons/icons/SiGithub"
+  import Mail from "@lucide/svelte/icons/mail"
+  import MessageSquareText from "@lucide/svelte/icons/message-square-text"
   import type { Language } from "@shared/api/Language.ts"
   import { tFunction } from "@shared/utils/translations"
   import { Button } from "./ui/button"
@@ -28,12 +28,7 @@
 <AlertDialog.Root bind:open={alertOpen}>
   <AlertDialog.Trigger>
     {#snippet child({ props })}
-      <Button
-        variant="ghost"
-        size="icon"
-        class="hover:bg-primary hover:text-primary-foreground bg-inherit"
-        {...props}
-      >
+      <Button variant="ghost" size="icon" {...props}>
         <MessageSquareText class="h-4 w-4" />
       </Button>
     {/snippet}

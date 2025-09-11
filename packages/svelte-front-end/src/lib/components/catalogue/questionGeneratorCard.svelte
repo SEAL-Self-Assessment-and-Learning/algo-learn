@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { base } from "$app/paths"
+  import { resolve } from "$app/paths"
   import * as Card from "$lib/components/ui/card/index.js"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { HTMLAttributes } from "svelte/elements"
@@ -23,21 +23,16 @@
 </script>
 
 <Card.Root {...rest}>
-  <Card.Header class="m-0 p-3">
-    <Card.Title class="text-base">{generator.name(lang)}</Card.Title>
+  <Card.Header>
+    <Card.Title>{generator.name(lang)}</Card.Title>
     {#if showDescription && generator.description}
       <Card.Description>
         {generator.description(lang)}
       </Card.Description>
     {/if}
   </Card.Header>
-  <Card.Footer class="m-0 flex flex-wrap items-center gap-2 p-3">
-    <Button
-      size="sm"
-      href={`${base}/${lang}/${generator.id}`}
-      class="no-underline"
-      variant="rightAnswer"
-    >
+  <Card.Footer class="flex flex-wrap items-center gap-1">
+    <Button size="sm" href={resolve(`/${lang}/${generator.id}`)} variant="rightAnswer">
       {t("Catalogue.practice")}
       ›
     </Button>
@@ -46,7 +41,7 @@
         {@const path = serializeGeneratorCall({ lang, generator, parameters })}
         {@const params = serializeParameters(parameters, generator.expectedParameters)}
         {#if params}
-          <Button size="xsm" variant="secondary" href={`${base}/${path}`}>{params}</Button>
+          <Button size="xsm" variant="secondary" href={resolve(`/${path}`)}>{params}</Button>
         {/if}
       {/each}
     {/if}

@@ -69,6 +69,12 @@ export default ts.config(
       "@typescript-eslint/no-unsafe-member-access": "off",
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-import-type-side-effects": "error",
+      "svelte/no-navigation-without-resolve": [
+        "error",
+        {
+          ignoreLinks: true,
+        },
+      ],
     },
   },
   {

@@ -32,7 +32,10 @@
   const { t } = $derived(tFunction(globalTranslations, lang))
 </script>
 
-<Card.Root {...rest} class={cn("bg-secondary text-secondary-foreground border-0", rest.class)}>
+<Card.Root
+  {...rest}
+  class={cn("bg-secondary text-secondary-foreground border-0 shadow-transparent", rest.class)}
+>
   <Card.Header>
     <Card.Title>{t("Catalogue.topic")}</Card.Title>
     <Card.Description>{t("Catalogue.choose.desc")}</Card.Description>
@@ -41,8 +44,8 @@
     {#each collection as g (g.slug)}
       <Button
         onclick={() => setSelectedGroup(g.slug)}
-        variant={selectedGroup === g.slug ? "default" : "ghost"}
-        class="justify-start"
+        variant={selectedGroup === g.slug ? "default" : "outline"}
+        class="hover:bg-goethe hover:text-goethe-foreground dark:hover:bg-goethe dark:hover:text-goethe-foreground justify-start"
       >
         {g.name[lang]}
       </Button>

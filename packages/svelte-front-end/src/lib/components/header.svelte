@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { base } from "$app/paths"
+  import { resolve } from "$app/paths"
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js"
   import { getLanguage, setLanguage } from "$lib/utils/langState.svelte.ts"
-  import FileKey2 from "lucide-svelte/icons/file-key-2"
-  import GitCommitHorizontal from "lucide-svelte/icons/git-commit-horizontal"
-  import Home from "lucide-svelte/icons/home"
-  import Info from "lucide-svelte/icons/info"
-  import MoreVertical from "lucide-svelte/icons/more-vertical"
-  import Settings from "lucide-svelte/icons/settings"
-  import WifiOff from "lucide-svelte/icons/wifi-off"
+  import FileKey2 from "@lucide/svelte/icons/file-key-2"
+  import GitCommitHorizontal from "@lucide/svelte/icons/git-commit-horizontal"
+  import Home from "@lucide/svelte/icons/home"
+  import Info from "@lucide/svelte/icons/info"
+  import MoreVertical from "@lucide/svelte/icons/more-vertical"
+  import Settings from "@lucide/svelte/icons/settings"
+  import WifiOff from "@lucide/svelte/icons/wifi-off"
   import type { Language } from "@shared/api/Language"
   import { tFunction } from "@shared/utils/translations"
   import { VERSION } from "../config.js"
@@ -16,7 +16,7 @@
   import { availableThemes, getTheme, setTheme } from "../theme.svelte.js"
   import { globalTranslations, NATIVE_NAME, SUPPORTED_LANGUAGES } from "../translation"
   import FeedbackDialog from "./feedbackDialog.svelte"
-  import LogoHorizontalWhite from "./logo/seal-logo-text-horizontal-white.svg"
+  import SealLogo from "./logo/seal-logo-white.svg"
   import Button from "./ui/button/button.svelte"
 
   const lang: Language = $derived(getLanguage())
@@ -27,19 +27,19 @@
 </script>
 
 <header
-  class="bg-goethe text-goethe-foreground flex flex-none flex-wrap place-items-center justify-between gap-1 border-b-2 p-2"
+  class="dark bg-goethe text-goethe-foreground flex flex-none flex-wrap place-items-center justify-between gap-1 p-2"
 >
-  <div class="grow">
-    {@render logo()}
-  </div>
+  {@render logo()}
+  <div class="grow"></div>
   <FeedbackDialog />
   {@render settingsMenu()}
   {@render navigationMenu()}
 </header>
 
 {#snippet logo()}
-  <Button href={`${base}/`} variant="link" class="inline p-0">
-    <img src={LogoHorizontalWhite} alt="Logo" class="w-32 font-mono" />
+  <Button variant="ghost" href={resolve("/")} class="flex items-center gap-2 px-2 text-3xl font-thin">
+    <img src={SealLogo} alt="Logo" class="h-8 invert-0 dark:invert" />
+    SEAL
   </Button>
 {/snippet}
 
@@ -47,13 +47,7 @@
   <DropdownMenu.Root>
     <DropdownMenu.Trigger>
       {#snippet child({ props })}
-        <Button
-          variant="ghost"
-          size="icon"
-          class="hover:bg-primary hover:text-primary-foreground bg-inherit"
-          aria-label={t("menu.settings")}
-          {...props}
-        >
+        <Button variant="ghost" size="icon" aria-label={t("menu.settings")} {...props}>
           <Settings class="h-4 w-4" />
         </Button>
       {/snippet}
@@ -97,13 +91,7 @@
   <DropdownMenu.Root>
     <DropdownMenu.Trigger>
       {#snippet child({ props })}
-        <Button
-          variant="ghost"
-          size="icon"
-          class="hover:bg-primary hover:text-primary-foreground bg-inherit"
-          aria-label={t("menu")}
-          {...props}
-        >
+        <Button variant="ghost" size="icon" aria-label={t("menu")} {...props}>
           <MoreVertical class="h-4 w-4" />
         </Button>
       {/snippet}
@@ -113,7 +101,7 @@
       <DropdownMenu.Separator /><DropdownMenu.Group>
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a href={`${base}/${lang}`} class="flex items-center" {...props}>
+            <a href={resolve(`/${lang}`)} class="flex items-center" {...props}>
               <Home class="mr-2 h-4 w-4" />
               {t("Home")}
             </a>
@@ -121,7 +109,7 @@
         </DropdownMenu.Item>
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a href={`${base}/${lang}/about`} class="flex items-center" {...props}>
+            <a href={resolve(`/${lang}/about`)} class="flex items-center" {...props}>
               <Info class="mr-2 h-4 w-4" />
               {t("About.label")}
             </a>
@@ -129,7 +117,7 @@
         </DropdownMenu.Item>
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a href={`${base}/${lang}/legal`} class="flex items-center" {...props}>
+            <a href={resolve(`/${lang}/legal`)} class="flex items-center" {...props}>
               <FileKey2 class="mr-2 h-4 w-4" />
               {t("Legal.label")}
             </a>

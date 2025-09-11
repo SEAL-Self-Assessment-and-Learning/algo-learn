@@ -5,7 +5,8 @@
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { Tooltip } from "bits-ui"
-  import { Link, RefreshCwIcon } from "lucide-svelte"
+  import Link from "@lucide/svelte/icons/link"
+  import RefreshCw from "@lucide/svelte/icons/refresh-cw"
   import type { Language } from "@shared/api/Language.ts"
   import { tFunction } from "@shared/utils/translations.ts"
 
@@ -52,7 +53,7 @@
     <Tooltip.Provider>
       <MyTooltip contentProps={{ sideOffset: 5 }} triggerProps={{ onclick: regenerate }}>
         {#snippet trigger()}
-          <RefreshCwIcon class="-mb-0.5 pl-1" size={22} strokeWidth={1.5} absoluteStrokeWidth />
+          <RefreshCw class="-mb-0.5 pl-1" size={22} strokeWidth={1.5} absoluteStrokeWidth />
         {/snippet}
         {t("generate-new-exercise-of-same-type")}
       </MyTooltip>

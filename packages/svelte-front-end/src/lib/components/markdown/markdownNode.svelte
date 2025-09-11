@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DrawPeuseoCode from "$lib/components/PseudoCode/DrawPseudoCode.svelte"
+  import DrawPseudoCode from "$lib/components/PseudoCode/DrawPseudoCode.svelte"
   import DrawTable from "$lib/components/table/DrawTable.svelte"
   import TeX from "$lib/components/TeX.svelte"
   import FormInputField from "$lib/components/ui/MultiInput/FormInputField.svelte"
@@ -47,7 +47,7 @@
   </span>
 {:else if x.kind === "```"}
   {#if x.language === "pseudoCode"}
-    <DrawPeuseoCode displayCode={x.child} />
+    <DrawPseudoCode displayCode={x.child} />
   {:else}
     <pre class="block">{x}</pre>
   {/if}
