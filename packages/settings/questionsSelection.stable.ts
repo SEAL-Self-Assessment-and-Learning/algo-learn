@@ -53,19 +53,19 @@ export const collection: QuestionCollection = [
     slug: "asymptotics",
     name: { de: "Asymptotik", en: "Asymptotics" },
     contents: [AsymptoticsPreciseLanguage, SortTerms, LandauNotation, SimplifySum, Between],
-    image: new URL("../front-end/assets/images/skill-asymptotics.jpg", import.meta.url),
+    // image: new URL("../front-end/assets/images/skill-asymptotics.jpg", import.meta.url),
   },
   {
     slug: "recursion",
     name: { de: "Rekursion", en: "Recursion" },
     contents: [RecursionFormula, RecurrenceMaster],
-    image: new URL("../front-end/assets/images/skill-recursion.jpg", import.meta.url),
+    // image: new URL("../front-end/assets/images/skill-recursion.jpg", import.meta.url),
   },
   {
     slug: "time",
     name: { de: "Laufzeit", en: "Time" },
     contents: [Loops],
-    image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
+    // image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
   },
   {
     slug: "stack",

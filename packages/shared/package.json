@@ -3,6 +3,6 @@
   "private": true,
   "dependencies": {
     "fraction.js": "^4.3.7",
-    "mathjs": "^13.2.1"
+    "mathjs": "^13.2.3"
   }
 }
