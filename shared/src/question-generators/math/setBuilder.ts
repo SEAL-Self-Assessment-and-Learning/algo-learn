@@ -40,6 +40,7 @@ const translations: Translations = {
   },
 }
 
+/** primality test for small n by trial division */
 function isPrime(n: number): boolean {
   if (n < 2) return false
   for (let i = 2; i * i <= n; i++) {
@@ -48,6 +49,7 @@ function isPrime(n: number): boolean {
   return true
 }
 
+/** returns true iff x is perfect square */
 const isSquare = (x: number) => {
   const r = Math.floor(Math.sqrt(x))
   return r * r === x
@@ -58,9 +60,13 @@ type SetProperty = "even" | "odd" | "prime" | "square" | "multiple" | "congruenc
 
 type BoundsMode = "auto" | "negOnly" | "posOnly"
 
+/** Symbol for domain */
 const domainLatexSymbol = (dom: Domain) => (dom === "N" ? "\\mathbb{N}" : "\\mathbb{Z}")
 
-// implicit lower bounds for naturals by property
+/**
+ * Implicit minimum element for naturals by property.
+ * We omit showing the explicit lower bound if the printed bound is this value.
+ */
 function implicitLowerBound(dom: Domain, prop: SetProperty): number | null {
   if (dom !== "N") return null
   switch (prop) {
@@ -75,7 +81,10 @@ function implicitLowerBound(dom: Domain, prop: SetProperty): number | null {
   }
 }
 
-// random bounds with optional negative-only ranges for integers
+/**
+ * Pick numeric bounds (low, high) for display and iteration.
+ * Supports all-negative, all-positive, or mixed ranges for integers.
+ */
 function pickBounds(
   r: Random,
   dom: Domain,
@@ -111,8 +120,10 @@ function pickBounds(
   return { low, high }
 }
 
-// choose inequalities, compute displayed bounds and iterator bounds
-// iterator bounds are derived from displayed bounds to keep them equal
+/**
+ * Choose printed inequality operators and derive inclusive iteration bounds
+ * so explicit set equals printed interval respecting strictness
+ */
 function chooseInequalities(r: Random, low: number, high: number) {
   // pick display operators
   let leftOp = r.choice(["<", "\\leq"])
@@ -126,7 +137,7 @@ function chooseInequalities(r: Random, low: number, high: number) {
   let includeStart = leftOp === "<" ? displayLowBound + 1 : displayLowBound
   let includeEnd = rightOp === "<" ? displayHighBound - 1 : displayHighBound
 
-  // normalize if empty by relaxing strictness in printed operators
+  // Normalize empty intervals by relaxing strictness
   if (includeStart > includeEnd) {
     if (rightOp === "<") {
       rightOp = "\\leq"
@@ -144,8 +155,10 @@ function chooseInequalities(r: Random, low: number, high: number) {
   return { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd }
 }
 
-// optionally decorate N with an upper constraint when lower bound is implicit
-// returns whether upper bound is already embedded to avoid duplication
+/**
+ * For naturals, optionally decorate the domain with its upper bound
+ * when the lower bound is omitted due to being implicit.
+ */
 function maybeDecorateNaturalDomain(
   dom: Domain,
   rightOp: string,
@@ -160,7 +173,11 @@ function maybeDecorateNaturalDomain(
   return { latex: `\\mathbb{N}_{${tag}${displayHighBound}}`, embedsUpper: true }
 }
 
-// omit lower when implicit; avoid duplicating upper when domain is decorated
+/**
+ * Build textual bounds clause:
+ * - omits lower bound if implicit
+ * - avoid duplicating the upper bound if domain is already decorated
+ */
 function formatBoundsClause(
   dom: Domain,
   prop: SetProperty,
@@ -179,10 +196,10 @@ function formatBoundsClause(
   return `${displayLowBound} ${leftOp} n ${rightOp} ${displayHighBound}`
 }
 
-// build range array
+/** Inclusive integer range [a..b] */
 const rangeArray = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, i) => a + i)
 
-// unified template config
+/** Per-row, precomputed config for template instance */
 type TemplateConfig = {
   low: number
   high: number
@@ -194,7 +211,7 @@ type TemplateConfig = {
   includeEnd: number
   domainLatex: string
   embedsUpper: boolean
-  residue?: number // used by congruence
+  residue?: number // for congruence templates
 }
 
 type SetTemplate = {
@@ -204,6 +221,8 @@ type SetTemplate = {
   build: (dom: Domain, param: number, cfg: TemplateConfig) => number[]
   paramRange: (r: Random) => number
 }
+
+/* ----------------------- Templates ----------------------- */
 
 const templates: SetTemplate[] = [
   // even numbers
@@ -508,6 +527,8 @@ const templates: SetTemplate[] = [
   },
 ]
 
+/* ----------------------- Generator ----------------------- */
+
 export const SetBuilderQuestion: QuestionGenerator = {
   id: "setbuild",
   name: tFunctional(translations, "name"),
@@ -537,6 +558,15 @@ export const SetBuilderQuestion: QuestionGenerator = {
         throw new Error("Unknown variant")
     }
   },
+}
+
+/** helper to add row-by-row correctness into MultipleChoice feedback */
+function matchingRowFeedback(correctMapping: number[], base: MultipleChoiceFeedbackFunction) {
+  return async (answer: MultipleChoiceAnswer): Promise<MultipleChoiceFeedback> => {
+    const result = await Promise.resolve(base(answer))
+    const rowCorrectness = correctMapping.map((c, i) => answer.choice[i] === c)
+    return { ...result, rowCorrectness }
+  }
 }
 
 function generateMatchVariant(lang: Language, path: string, random: Random) {
@@ -575,14 +605,6 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     sorting: true,
   })
 
-  function matchingRowFeedback(correctMapping: number[], base: MultipleChoiceFeedbackFunction) {
-    return async (answer: MultipleChoiceAnswer): Promise<MultipleChoiceFeedback> => {
-      const result = await Promise.resolve(base(answer))
-      const rowCorrectness = correctMapping.map((c, i) => answer.choice[i] === c)
-      return { ...result, rowCorrectness }
-    }
-  }
-
   const feedback = matchingRowFeedback(solution, baseFeedback)
 
   const question: MultipleChoiceQuestion = {
@@ -612,19 +634,20 @@ function generateFreeTextVariant(lang: Language, path: string, random: Random) {
   const correctSet = new Set(sorted)
   const expression = random.choice(template.labels(lang, dom, param, cfg))
 
+  // also accept negative integers
   const checkFormat = (a: FreeTextAnswer) => {
     const input = a.text.trim()
-    const isValid = /^\{(\s*\d+\s*,)*\s*\d+\s*\}$/.test(input)
+    const isValid = /^\{\s*(-?\d+)(\s*,\s*-?\d+)*\s*\}$/.test(input)
     return isValid ? { valid: true } : { valid: false, message: t(translations, lang, "checkFormat") }
   }
 
   const feedback = (a: FreeTextAnswer): FreeTextFeedback => {
-    const match = a.text.trim().match(/^\{(.*?)\}$/)
+    const match = a.text.trim().match(/^\{\s*(.*?)\s*\}$/)
     if (!match) return { correct: false }
 
     const user = match[1]
       .split(",")
-      .map((s) => parseInt(s.trim()))
+      .map((s) => parseInt(s.trim(), 10))
       .filter((x) => !isNaN(x))
 
     const correct = user.length === correctSet.size && [...correctSet].every((x) => user.includes(x))
