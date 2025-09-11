@@ -40,7 +40,7 @@ jobs:
             });
             return pullRequest
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{fromJSON(steps.pr.outputs.result).merge_commit_sha}}
           fetch-depth: 0
