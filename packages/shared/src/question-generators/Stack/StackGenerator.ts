@@ -22,6 +22,8 @@ const translations: Translations = {
     popSeqText: `Let S be a stack. Perform the following operations from left to right: A letter \`x\` stands for \`S.push(x)\` and \`*\` stands for \`S.pop()\`.
                     \\[\\texttt{{{0}}}\\]
                     Enter the sequence of letters that are output by the \`pop\` calls.`,
+    Operation: "Operation",
+    Output: "Output",
   },
   de: {
     name: "Stacks",
@@ -38,6 +40,8 @@ const translations: Translations = {
     popSeqText: `Sei S ein Stapel. Führe die folgenden Operationen von links nach rechts aus: Ein Buchstabe \`x\` steht hierbei für \`S.push(x)\` und \`*\` steht für \`S.pop()\`.
                     \\[\\texttt{{{0}}}\\]
                     Gib die Sequenz der Buchstaben an, die durch die \`pop\`-Aufrufe ausgegeben werden.`,
+    Operation: "Operation",
+    Output: "Ausgabe",
   },
 }
 

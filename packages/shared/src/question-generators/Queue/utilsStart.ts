@@ -1,7 +1,14 @@
-import { createArrayDisplayCodeBlock } from "../../utils/arrayDisplayCodeBlock.ts"
-import type Random from "../../utils/random.ts"
-import { t, type Translations } from "../../utils/translations.ts"
+import type { Language } from "@shared/api/Language.ts"
+import type {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextFormatFunction,
+  MultiFreeTextQuestion,
+} from "@shared/api/QuestionGenerator.ts"
+import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
+import type Random from "@shared/utils/random.ts"
+import { t, tFunction, type Translations } from "@shared/utils/translations.ts"
 import { Queue } from "./Queue.ts"
+import { queueQuestion } from "./QueueGenerator.ts"
 
 /**
  * Function to generate the operations for the queue (FREETEXT option)
@@ -72,7 +79,7 @@ export function generateQueueStartElements({
 }: {
   random: Random
   translations: Translations
-  lang: "en" | "de"
+  lang: Language
 }) {
   const startElementsAmount = random.int(0, 8)
 
@@ -112,7 +119,7 @@ export function createQueueInputFields({
 }: {
   operations: { [key: string]: string }[]
   translations: Translations
-  lang: "en" | "de"
+  lang: Language
 }) {
   // create the operations table
   let inputText = `\n| Operation | ${t(translations, lang, "result")} |\n|===|:===:|\n`
@@ -144,4 +151,83 @@ export function createQueueInputFields({
     solutionDisplay,
     correctAnswers,
   }
+}
+
+/**
+ * Creates the question for the variant start for the queue generator
+ */
+export function generateVariantStart(
+  lang: "de" | "en",
+  random: Random,
+  permalink: string,
+  translations: Translations,
+  wordTranslations: Translations,
+) {
+  const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
+    if (fieldID.includes("empty")) {
+      // check if either "true" or "false"
+      if (text[fieldID].trim() !== "true" && text[fieldID].trim() !== "false") {
+        return { valid: false, message: t(translations, lang, "checkFormatBool") }
+      }
+      return { valid: true, message: "" }
+    }
+
+    // check if is a number
+    if (!/^\d+$/.test(text[fieldID])) {
+      return { valid: false, message: t(translations, lang, "validationOnlyNumbers") }
+    }
+    return { valid: true, message: "" }
+  }
+
+  const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
+    // renaming for better understanding
+    const resultMap: { [key: string]: string } = text
+
+    let foundError = false
+    let count = 0
+    for (const key in resultMap) {
+      const firstSolutionPart: string = solutionDisplay[count].split("|").slice(0, 3).join("|") + "|"
+      if (resultMap[key].trim() !== correctAnswers[key].trim()) {
+        foundError = true
+        const secondSolutionPart: string = "**" + correctAnswers[key] + "**|\n"
+        solutionDisplay[count] = firstSolutionPart + secondSolutionPart
+      }
+      count++
+    }
+    if (foundError) {
+      return {
+        correct: false,
+        message: tFunction(translations, lang).t("feedback.incomplete"),
+        correctAnswer: t(translations, lang, "solutionFreetext", [solutionDisplay.join("")]),
+      }
+    }
+    return {
+      correct: true,
+      message: tFunction(translations, lang).t("feedback.correct"),
+    }
+  }
+
+  const { startElements, queueInformationElements } = generateQueueStartElements({
+    random,
+    translations,
+    lang,
+  })
+  const operations = generateOperationsQueueFreetext(startElements, random).operations
+  const { inputText, solutionDisplay, correctAnswers } = createQueueInputFields({
+    operations,
+    lang,
+    translations: wordTranslations,
+  })
+
+  const question: MultiFreeTextQuestion = {
+    type: "MultiFreeTextQuestion",
+    name: queueQuestion.name(lang),
+    path: permalink,
+    text: t(translations, lang, "freeTextInput", [queueInformationElements, inputText]),
+    fillOutAll: true,
+    checkFormat,
+    feedback,
+  }
+
+  return { question }
 }
