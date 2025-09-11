@@ -25,7 +25,6 @@
   const textColor: string = $derived(
     mode === "correct" ? "text-green-900" : mode === "incorrect" ? "text-red-900" : "",
   )
-  console.log(mode)
 </script>
 
 <div class={backgroundColor}>
