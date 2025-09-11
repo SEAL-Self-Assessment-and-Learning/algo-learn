@@ -48,7 +48,7 @@ In principle, you're now in position to start development. However, we strongly 
 
 ### Run format
 
-To format the code according to the project’s settings, run:
+To format the code according to the project's settings, run:
 
 ```bash
 bun run format
