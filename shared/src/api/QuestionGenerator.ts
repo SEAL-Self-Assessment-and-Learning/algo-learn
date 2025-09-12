@@ -51,6 +51,12 @@ export interface MultipleChoiceQuestion extends QuestionBase {
 
   /** The feedback function for this question; defaults to undefined */
   feedback?: MultipleChoiceFeedbackFunction
+
+  /** Whether the question is a matching question; defaults to false */
+  matching?: boolean
+
+  /** List of fixed items in a matching question */
+  left?: string[]
 }
 
 /**
@@ -93,6 +99,8 @@ export interface MultipleChoiceFeedback extends FeedbackBase {
    * (optional)
    */
   correctChoice?: number[]
+  /** Per-row correctness for matching questions (optional) */
+  rowCorrectness?: boolean[]
 }
 
 /** The signature of the feedback function for multiple-choice questions */

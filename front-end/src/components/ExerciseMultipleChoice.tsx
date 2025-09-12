@@ -7,6 +7,7 @@ import { useSound } from "../hooks/useSound"
 import { useTranslation } from "../hooks/useTranslation"
 import { InteractWithQuestion, type MODE } from "./InteractWithQuestion"
 import { Markdown } from "./Markdown"
+import { MatchingBoard } from "./MatchingBoard"
 import type { Result } from "./QuestionComponent"
 import { SortableList, type BaseItem } from "./SortableList"
 import { Checkbox } from "./ui/checkbox"
@@ -190,20 +191,61 @@ export function ExerciseMultipleChoice({
       </InteractWithQuestion>
     )
   } else {
-    const message =
-      mode === "correct" ? (
-        <b className="text-2xl">{t("feedback.correct")}</b>
-      ) : mode === "incorrect" ? (
-        <>
-          <b className="text-lg">{t("feedback.thats-ok")}</b>
-          <br />
-          <Markdown
-            md={t("feedback.correct-order", [
-              `${state.feedbackObject?.correctChoice?.map((i) => "\n|" + question.answers[i] + "|").join("")}\n`,
-            ])}
-          />
-        </>
-      ) : null
+    let message = null
+
+    if (mode === "correct") {
+      message = <b className="text-2xl">{t("feedback.correct")}</b>
+    } else if (mode === "incorrect") {
+      if (question.matching) {
+        // mismatch table
+        const rows: string[] = []
+
+        question.left?.forEach((l, i) => {
+          const userIdx = choice[i]
+          const correctIdx = feedbackObject?.correctChoice?.[i]
+
+          const userAns = userIdx !== undefined ? question.answers[userIdx] : "?"
+          const correctAns = correctIdx !== undefined ? question.answers[correctIdx] : "?"
+
+          if (userAns !== correctAns) {
+            rows.push(`| ${l} | ${userAns} | ${correctAns} |`)
+          }
+        })
+
+        if (rows.length > 0) {
+          const table = `
+| | ❌ | ✅ |
+|-|----|----|
+${rows.join("\n")}
+`
+          message = (
+            <>
+              <b className="text-lg">{t("feedback.thats-ok")}</b>
+              <Markdown md={table} />
+            </>
+          )
+        } else {
+          // fallback
+          message = <b className="text-lg">{t("feedback.thats-ok")}</b>
+        }
+      } else {
+        // normal sorting
+        message = (
+          <>
+            <b className="text-lg">{t("feedback.thats-ok")}</b>
+            <br />
+            <Markdown
+              md={t("feedback.correct-order", [
+                `${state.feedbackObject?.correctChoice
+                  ?.map((i) => "\n|" + question.answers[i] + "|")
+                  .join("")}\n`,
+              ])}
+            />
+          </>
+        )
+      }
+    }
+
     const items: BaseItem[] = []
     for (const position of choice) {
       items.push({
@@ -223,7 +265,20 @@ export function ExerciseMultipleChoice({
         handleFooterClick={handleClick}
       >
         <Markdown md={question.text ?? ""} />
-        <SortableList items={items} onChange={onChange} className="p-5" disabled={mode !== "draft"} />
+
+        {question.matching ? (
+          <MatchingBoard
+            leftItems={question.left ?? []}
+            rightItems={question.answers.map((answer, i) => ({
+              position: i,
+              element: <Markdown md={answer} />,
+            }))}
+            onChange={(newSlots) => setChoice(newSlots.map((slot) => slot?.position ?? -1))}
+            disabled={mode !== "draft"}
+          />
+        ) : (
+          <SortableList items={items} onChange={onChange} className="p-5" disabled={mode !== "draft"} />
+        )}
       </InteractWithQuestion>
     )
   }
