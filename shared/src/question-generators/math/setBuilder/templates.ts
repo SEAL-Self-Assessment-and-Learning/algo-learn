@@ -1,0 +1,320 @@
+import type { Language } from "@shared/api/Language"
+import { t } from "@shared/utils/translations"
+import {
+  chooseInequalities,
+  domainLatexSymbol,
+  formatBoundsClause,
+  implicitLowerBound,
+  isPrime,
+  isSquare,
+  maybeDecorateNaturalDomain,
+  pickBounds,
+  rangeArray,
+  type BoundsMode,
+  type SetProperty,
+  type SetTemplate,
+} from "./helpers"
+import { translations } from "./translations"
+
+export const templates: SetTemplate[] = [
+  // even numbers
+  {
+    generateConfig: (dom, n, r) => {
+      const prop: SetProperty = "even"
+      const mode: BoundsMode = dom === "Z" && r.choice([true, false]) ? "negOnly" : "auto"
+      const { low, high } = pickBounds(r, dom, n, 4, mode)
+      const { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd } =
+        chooseInequalities(r, low, high)
+      const implied = implicitLowerBound(dom, prop)
+      const omitLower =
+        implied !== null && (leftOp === "<" ? displayLowBound + 1 : displayLowBound) <= implied
+      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, r)
+      const domainLatex = dom === "N" ? natDecor.latex : domainLatexSymbol(dom)
+      return {
+        low,
+        high,
+        leftOp,
+        rightOp,
+        displayLowBound,
+        displayHighBound,
+        includeStart,
+        includeEnd,
+        domainLatex,
+        embedsUpper: natDecor.embedsUpper,
+      }
+    },
+    labels: (lang: Language, dom, _n, cfg) => {
+      const even = t(translations, lang, "even")
+      const bounds = formatBoundsClause(
+        dom,
+        "even",
+        cfg.displayLowBound,
+        cfg.displayHighBound,
+        cfg.leftOp,
+        cfg.rightOp,
+        cfg.embedsUpper,
+      )
+      const clause = bounds ? `, ${bounds}` : ""
+      return [
+        `\\{ n \\in ${cfg.domainLatex} : n \\text{ ${even}}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : n \\equiv 0 \\pmod{2}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : \\exists k \\in ${cfg.domainLatex}, n = 2k${clause} \\}`,
+      ]
+    },
+    build: (dom, _n, cfg) => {
+      const start = dom === "N" ? Math.max(1, cfg.includeStart) : cfg.includeStart
+      const arr: number[] = []
+      for (let x = start; x <= cfg.includeEnd; x++) if (x % 2 === 0) arr.push(x)
+      return arr
+    },
+    paramRange: (r) => r.int(10, 40),
+  },
+
+  // odd numbers
+  {
+    generateConfig: (dom, n, r) => {
+      const prop: SetProperty = "odd"
+      const mode: BoundsMode = dom === "Z" && r.choice([true, false]) ? "negOnly" : "auto"
+      const { low, high } = pickBounds(r, dom, n, 4, mode)
+      const { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd } =
+        chooseInequalities(r, low, high)
+      const implied = implicitLowerBound(dom, prop)
+      const omitLower =
+        implied !== null && (leftOp === "<" ? displayLowBound + 1 : displayLowBound) <= implied
+      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, r)
+      const domainLatex = dom === "N" ? natDecor.latex : domainLatexSymbol(dom)
+      return {
+        low,
+        high,
+        leftOp,
+        rightOp,
+        displayLowBound,
+        displayHighBound,
+        includeStart,
+        includeEnd,
+        domainLatex,
+        embedsUpper: natDecor.embedsUpper,
+      }
+    },
+    labels: (lang: Language, dom, _n, cfg) => {
+      const odd = t(translations, lang, "odd")
+      const bounds = formatBoundsClause(
+        dom,
+        "odd",
+        cfg.displayLowBound,
+        cfg.displayHighBound,
+        cfg.leftOp,
+        cfg.rightOp,
+        cfg.embedsUpper,
+      )
+      const clause = bounds ? `, ${bounds}` : ""
+      return [
+        `\\{ n \\in ${cfg.domainLatex} : n \\text{ ${odd}}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : n \\equiv 1 \\pmod{2}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : \\exists k \\in ${cfg.domainLatex}, n = 2k+1${clause} \\}`,
+      ]
+    },
+    build: (dom, _n, cfg) => {
+      const start = dom === "N" ? Math.max(1, cfg.includeStart) : cfg.includeStart
+      const arr: number[] = []
+      for (let x = start; x <= cfg.includeEnd; x++) if (x % 2 !== 0) arr.push(x)
+      return arr
+    },
+    paramRange: (r) => r.int(10, 40),
+  },
+
+  // primes in N
+  {
+    generateConfig: (_dom, n, r) => {
+      const low = 2
+      const high = n
+      const { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd } =
+        chooseInequalities(r, low, high)
+      const natDecor = maybeDecorateNaturalDomain("N", rightOp, displayHighBound, true, r)
+      return {
+        low,
+        high,
+        leftOp,
+        rightOp,
+        displayLowBound,
+        displayHighBound,
+        includeStart,
+        includeEnd,
+        domainLatex: natDecor.latex,
+        embedsUpper: natDecor.embedsUpper,
+      }
+    },
+    labels: (lang: Language, _dom, _n, cfg) => {
+      const prime = t(translations, lang, "prime")
+      const bounds = formatBoundsClause(
+        "N",
+        "prime",
+        cfg.displayLowBound,
+        cfg.displayHighBound,
+        cfg.leftOp,
+        cfg.rightOp,
+        cfg.embedsUpper,
+      )
+      const clause = bounds ? `, ${bounds}` : ""
+      return [
+        `\\{ n \\in ${cfg.domainLatex} : n \\geq 2 \\wedge n \\text{ ${prime}}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : n \\geq 2 \\wedge \\forall d \\in \\mathbb{N}, (d \\mid n \\Rightarrow (d=1 \\lor d=n))${clause} \\}`,
+      ]
+    },
+    build: (_dom, _n, cfg) => {
+      const start = Math.max(2, cfg.includeStart)
+      const end = cfg.includeEnd
+      return start <= end ? rangeArray(start, end).filter(isPrime) : []
+    },
+    paramRange: (r) => r.int(20, 50),
+  },
+
+  // multiples of m in N or Z
+  {
+    generateConfig: (dom, m, r) => {
+      const prop: SetProperty = "multiple"
+      const cap = 3 * m
+      const mode: BoundsMode = dom === "Z" && r.choice([true, false]) ? "negOnly" : "auto"
+      const { low, high } = pickBounds(r, dom, cap, 4, mode)
+      const { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd } =
+        chooseInequalities(r, low, high)
+      const implied = implicitLowerBound(dom, prop)
+      const omitLower =
+        implied !== null && (leftOp === "<" ? displayLowBound + 1 : displayLowBound) <= implied
+      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, r)
+      const domainLatex = dom === "N" ? natDecor.latex : domainLatexSymbol(dom)
+      return {
+        low,
+        high,
+        leftOp,
+        rightOp,
+        displayLowBound,
+        displayHighBound,
+        includeStart,
+        includeEnd,
+        domainLatex,
+        embedsUpper: natDecor.embedsUpper,
+      }
+    },
+    labels: (_lang: Language, dom, m, cfg) => {
+      const bounds = formatBoundsClause(
+        dom,
+        "multiple",
+        cfg.displayLowBound,
+        cfg.displayHighBound,
+        cfg.leftOp,
+        cfg.rightOp,
+        cfg.embedsUpper,
+      )
+      const clause = bounds ? `, ${bounds}` : ""
+      return [
+        `\\{ n \\in ${cfg.domainLatex} : ${m} \\mid n${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : \\exists k \\in ${cfg.domainLatex}, n = k \\cdot ${m}${clause} \\}`,
+      ]
+    },
+    build: (dom, m, cfg) => {
+      const start = dom === "N" ? Math.max(1, cfg.includeStart) : cfg.includeStart
+      const arr: number[] = []
+      for (let x = start; x <= cfg.includeEnd; x++) if (x % m === 0) arr.push(x)
+      return arr
+    },
+    paramRange: (r) => r.int(3, 15),
+  },
+
+  // squares in N
+  {
+    generateConfig: (_dom, n, r) => {
+      const low = 1
+      const high = n
+      const { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd } =
+        chooseInequalities(r, low, high)
+      const natDecor = maybeDecorateNaturalDomain("N", rightOp, displayHighBound, true, r)
+      return {
+        low,
+        high,
+        leftOp,
+        rightOp,
+        displayLowBound,
+        displayHighBound,
+        includeStart,
+        includeEnd,
+        domainLatex: natDecor.latex,
+        embedsUpper: natDecor.embedsUpper,
+      }
+    },
+    labels: (lang: Language, _dom, _n, cfg) => {
+      const square = t(translations, lang, "square")
+      const bounds = formatBoundsClause(
+        "N",
+        "square",
+        cfg.displayLowBound,
+        cfg.displayHighBound,
+        cfg.leftOp,
+        cfg.rightOp,
+        cfg.embedsUpper,
+      )
+      const clause = bounds ? `, ${bounds}` : ""
+      return [
+        `\\{ n \\in ${cfg.domainLatex} : n \\text{ ${square}}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : \\exists k \\in \\mathbb{N}, n = k^2${clause} \\}`,
+      ]
+    },
+    build: (_dom, _n, cfg) => rangeArray(cfg.includeStart, cfg.includeEnd).filter(isSquare),
+    paramRange: (r) => r.int(30, 80),
+  },
+
+  // congruence in N or Z
+  {
+    generateConfig: (dom, m, r) => {
+      const cap = 3 * m
+      const mode: BoundsMode = dom === "Z" && r.choice([true, false]) ? "negOnly" : "auto"
+      const { low, high } = pickBounds(r, dom, cap, 4, mode)
+      const { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd } =
+        chooseInequalities(r, low, high)
+      const implied = implicitLowerBound(dom, "congruence")
+      const omitLower =
+        implied !== null && (leftOp === "<" ? displayLowBound + 1 : displayLowBound) <= implied
+      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, r)
+      const domainLatex = dom === "N" ? natDecor.latex : domainLatexSymbol(dom)
+      const residue = m > 1 ? r.int(1, m - 1) : 0
+      return {
+        low,
+        high,
+        leftOp,
+        rightOp,
+        displayLowBound,
+        displayHighBound,
+        includeStart,
+        includeEnd,
+        domainLatex,
+        embedsUpper: natDecor.embedsUpper,
+        residue,
+      }
+    },
+    labels: (_lang: Language, dom, m, cfg) => {
+      const bounds = formatBoundsClause(
+        dom,
+        "congruence",
+        cfg.displayLowBound,
+        cfg.displayHighBound,
+        cfg.leftOp,
+        cfg.rightOp,
+        cfg.embedsUpper,
+      )
+      const clause = bounds ? `, ${bounds}` : ""
+      const rVal = cfg.residue ?? 0
+      return [
+        `\\{ n \\in ${cfg.domainLatex} : n \\equiv ${rVal} \\pmod{${m}}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : \\exists k \\in ${cfg.domainLatex}, n = k \\cdot ${m} + ${rVal}${clause} \\}`,
+      ]
+    },
+    build: (dom, m, cfg) => {
+      const start = dom === "N" ? Math.max(1, cfg.includeStart) : cfg.includeStart
+      const rVal = cfg.residue ?? 0
+      const arr: number[] = []
+      for (let x = start; x <= cfg.includeEnd; x++) if (x % m === rVal) arr.push(x)
+      return arr
+    },
+    paramRange: (r) => r.int(4, 12),
+  },
+]
