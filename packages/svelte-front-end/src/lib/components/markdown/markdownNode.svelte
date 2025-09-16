@@ -1,9 +1,11 @@
 <script lang="ts">
+  import DrawGraph from "$lib/components/Graph/DrawGraph.svelte"
   import DrawPseudoCode from "$lib/components/PseudoCode/DrawPseudoCode.svelte"
   import DrawTable from "$lib/components/table/DrawTable.svelte"
   import TeX from "$lib/components/TeX.svelte"
   import FormInputField from "$lib/components/ui/MultiInput/FormInputField.svelte"
   import type { Snippet } from "svelte"
+  import { Graph } from "@shared/utils/graph.ts"
   import type { ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
   import Markdown from "./markdown.svelte"
   import MarkdownNode from "./markdownNode.svelte"
@@ -48,6 +50,10 @@
 {:else if x.kind === "```"}
   {#if x.language === "pseudoCode"}
     <DrawPseudoCode displayCode={x.child} />
+  {:else if x.language === "graph"}
+    <div class="my-5">
+      <DrawGraph maxWidth={550} maxHeight={300} graph={Graph.parse(x.child)} />
+    </div>
   {:else}
     <pre class="block">{x}</pre>
   {/if}

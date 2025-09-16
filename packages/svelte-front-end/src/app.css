@@ -42,6 +42,17 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+
+  /* Color-blind safe color scheme by Paul Tol (https://personal.sron.nl/~pault/) in non-default order */
+  --color-group-0: #77aadd;
+  --color-group-1: #ee8866;
+  --color-group-2: #bbcc33;
+  --color-group-3: #ffaabb;
+  --color-group-4: #44bb99;
+  --color-group-5: #99ddff;
+  --color-group-6: #eedd88;
+  --color-group-7: #aaaa00;
+  --color-group-foreground: var(--foreground);
 }
 
 .dark {

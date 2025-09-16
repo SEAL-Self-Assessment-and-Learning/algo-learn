@@ -1,5 +1,5 @@
 import { useRef, useState, type ReactElement } from "react"
-import type { Graph } from "@shared/utils/graph"
+import type { Graph } from "shared/src/utils/graph"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
 
@@ -69,7 +69,7 @@ const Node = ({
 const EdgeWeight = ({ weight, x, y }: { weight: number; x: number; y: number }) => {
   return (
     <text
-      className="select-none fill-primary"
+      className="fill-primary select-none"
       textAnchor="middle"
       dominantBaseline="central"
       x={x}
@@ -356,7 +356,7 @@ export function DrawGraph({
       }
       // - 10 and + 20 to give some extra space for arrow heads and edge weights
       viewBox={`${viewBox.x} ${viewBox.y - 10} ${viewBox.width} ${viewBox.height + 20}`}
-      className={`mx-auto h-auto max-w-full touch-none overscroll-x-none rounded-2xl bg-secondary`}
+      className={`bg-secondary mx-auto h-auto max-w-full touch-none overscroll-x-none rounded-2xl`}
       onMouseMove={(e) => updateDraggedNode(e.clientX, e.clientY)}
       // Even simpler alternative - remove the threshold entirely:
 
