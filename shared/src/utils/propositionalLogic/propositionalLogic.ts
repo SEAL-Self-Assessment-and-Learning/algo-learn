@@ -1,3 +1,4 @@
+import { RootedTree } from "@shared/utils/graph.ts"
 import { mdInputField, mdTableFromData } from "@shared/utils/markdownTools.ts"
 import type { DisjunctionTerms } from "@shared/utils/propositionalLogic/resolution.ts"
 import type Random from "@shared/utils/random"
@@ -182,6 +183,8 @@ abstract class SyntaxTreeNode {
       invert: false,
     })
   }
+
+  public abstract toRootedTree(): RootedTree
 }
 
 export class Literal extends SyntaxTreeNode {
@@ -267,6 +270,11 @@ export class Literal extends SyntaxTreeNode {
   toDisjunctionTerms(): DisjunctionTerms {
     return [[this.copy()]]
   }
+
+  public toRootedTree(): RootedTree {
+    if (this.negated) return new RootedTree(`${operatorToUnicode[negationType]}${this.name}`)
+    else return new RootedTree(this.name)
+  }
 }
 
 const negationType = "\\not"
@@ -284,6 +292,15 @@ const operatorToLatex: Record<BinaryOperatorType | NegationOperatorType, string>
   "\\xor": "\\oplus",
   "=>": "\\Rightarrow",
   "<=>": "\\Leftrightarrow",
+}
+
+const operatorToUnicode: Record<BinaryOperatorType | NegationOperatorType, string> = {
+  "\\not": "¬",
+  "\\and": "∧",
+  "\\or": "∨",
+  "\\xor": "⊕",
+  "=>": "⇒",
+  "<=>": "⇔",
 }
 
 export function tokenToLatex(str: string) {
@@ -624,6 +641,16 @@ export class Operator extends SyntaxTreeNode {
 
   public getNumLiterals(): number {
     return this.leftOperand.getNumLiterals() + this.rightOperand.getNumLiterals()
+  }
+
+  toRootedTree(): RootedTree {
+    let op = new RootedTree(operatorToUnicode[this.type], [
+      this.leftOperand.toRootedTree(),
+      this.rightOperand.toRootedTree(),
+    ])
+    if (this.negated) op = new RootedTree(operatorToUnicode[negationType], [op])
+
+    return op
   }
 
   toDisjunctionTerms(): DisjunctionTerms {

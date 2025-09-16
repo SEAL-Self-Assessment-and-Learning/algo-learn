@@ -1,11 +1,13 @@
 import { Fragment, type FunctionComponent, type ReactNode } from "react"
 import { Link } from "react-router-dom"
+import { Graph } from "@shared/utils/graph.ts"
 import { parseMarkdown, type ParseTree, type ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
 import { DrawList } from "@/components/DrawList.tsx"
 import { DrawPseudoCode } from "@/components/DrawPseudoCode.tsx"
 import { DrawTable } from "@/components/DrawTable.tsx"
 import { MatrixInput } from "@/components/MatrixInput.tsx"
 import { FormInputField } from "@/components/ui/FormInputField.tsx"
+import { DrawGraph } from "./DrawGraph"
 import { Format } from "./Format"
 import TeX from "./TeX"
 
@@ -96,6 +98,13 @@ export const MarkdownTreeNode: FunctionComponent<{
   if (parseTreeNode.kind === "```") {
     if (parseTreeNode.language === "pseudoCode") {
       return <DrawPseudoCode displayCode={parseTreeNode.child} />
+    }
+    if (parseTreeNode.language === "graph") {
+      return (
+        <div className="my-5">
+          <DrawGraph maxWidth={550} maxHeight={300} graph={Graph.parse(parseTreeNode.child)} />
+        </div>
+      )
     }
     if (parseTreeNode.language === "matrixInput") {
       return <MatrixInput matrixObject={parseTreeNode.child} />
