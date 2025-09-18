@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Edge from "$lib/components/Graph/Edge.svelte"
   import Node from "$lib/components/Graph/Node.svelte"
   import type { Graph } from "@shared/utils/graph.ts"
 
@@ -16,9 +17,13 @@
   // limited by the number of colors we have. See tailwind --color-group-0,...,--color-group-7.
   const maxGroups = 8
 
+  const edgeListFlat = graph.edges
+    .flat()
+    .filter(graph.directed ? () => true : (e) => e.source < e.target)
+
   let currentlyDragged = $state<null | number>(null)
 
-  let nodePositions = $state(
+  let nodePositions = $derived(
     graph.nodes.map((u) => {
       return {
         x: u.coords.x * coordinateScale,
@@ -26,11 +31,20 @@
       }
     }),
   )
-  let nodeStates = $state<GraphElementStateType[]>(
+  let nodeStates = $derived<GraphElementStateType[]>(
     graph.nodes.map((u) => {
       return {
         selected: false,
         group: u.group ?? null,
+      }
+    }),
+  )
+
+  let edgeStates = $derived<GraphElementStateType[]>(
+    edgeListFlat.map((e) => {
+      return {
+        selected: false,
+        group: e.group ?? null,
       }
     }),
   )
@@ -116,6 +130,32 @@
     }
   }}
 >
+  <g>
+    {#each edgeListFlat as e, i (i)}
+      <Edge
+        u={nodePositions[e.source]}
+        v={nodePositions[e.target]}
+        weight={e.value}
+        directed={graph.directed}
+        clickable={graph.edgeClickType !== "none"}
+        state={edgeStates[i]}
+        onClickCallback={() => {
+          if (graph.edgeClickType === "select") {
+            edgeStates[i].selected = !edgeStates[i].selected
+            edgeStates = [...edgeStates]
+          } else if (graph.edgeClickType === "group") {
+            edgeStates[i].group =
+              edgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
+                ? null
+                : edgeStates[i].group === null
+                  ? 0
+                  : edgeStates[i].group + 1
+            edgeStates = [...edgeStates]
+          }
+        }}
+      />
+    {/each}
+  </g>
   <g>
     {#each graph.nodes as u, i (i)}
       <Node
