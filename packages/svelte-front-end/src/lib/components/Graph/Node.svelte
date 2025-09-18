@@ -15,10 +15,14 @@
 
   // Todo: fix the cg-colors
   let baseFillClass = $derived(
-    nodeState.selected ? "fill-cg-4" : nodeState.group !== null ? `fill-blue-500` : "fill-primary",
+    nodeState.selected
+      ? "fill-cg-4"
+      : nodeState.group !== null
+        ? `fill-cg-${nodeState.group}`
+        : "fill-primary",
   )
   // Todo: Fix the accent color (org: group-hover:fill-accent)
-  let hoverFillClass = $derived(clickable ? "" : "group-hover:fill-red-500")
+  let hoverFillClass = $derived(clickable ? "" : "group-hover:fill-goethe")
 
   // Make the drag area 2x bigger than the visible node
   const dragAreaSize = size * 2
@@ -40,6 +44,7 @@
 <!--Todo: Touchstart and keydown still show some issues in the IDE?? -->
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
+
 <g
   class="group"
   transform={`translate(${pos.x},${pos.y})`}

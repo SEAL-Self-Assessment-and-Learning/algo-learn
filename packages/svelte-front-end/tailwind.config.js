@@ -1,33 +1,30 @@
-// javascript
-const cgCount = 8
-const cgFillClasses = Array.from({ length: cgCount }, (_, i) => `fill-cg-${i}`)
-
+// tailwind.config.cjs
 module.exports = {
+  darkMode: "class",
   content: ["./src/**/*.{svelte,js,ts}", "./packages/svelte-front-end/src/**/*.{svelte,js,ts}"],
   safelist: [
-    ...cgFillClasses,
-    "fill-primary",
-    "fill-primary-foreground",
+    "fill-cg-0",
+    "fill-cg-1",
+    "fill-cg-2",
+    "fill-cg-3",
+    "fill-cg-4",
+    "fill-cg-5",
+    "fill-cg-6",
+    "fill-cg-7",
     "fill-cg-foreground",
-    "group-hover:fill-accent",
+    "fill-primary",
+    "fill-accent",
+    "fill-primary-foreground",
+    "fill-accent-foreground",
     "stroke-secondary",
     "cursor-pointer",
   ],
   theme: {
+    extend: {},
+  },
+  variants: {
     extend: {
-      colors: {
-        cg: {
-          foreground: "hsl(var(--color-group-foreground))",
-          0: "var(--color-group-0)",
-          1: "var(--color-group-1)",
-          2: "var(--color-group-2)",
-          3: "var(--color-group-3)",
-          4: "var(--color-group-4)",
-          5: "var(--color-group-5)",
-          6: "var(--color-group-6)",
-          7: "var(--color-group-7)",
-        },
-      },
+      fill: ["group-hover", "dark"], // generates dark + group-hover combinations
     },
   },
   plugins: [],
