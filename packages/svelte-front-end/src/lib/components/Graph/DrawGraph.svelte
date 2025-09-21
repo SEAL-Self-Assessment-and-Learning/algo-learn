@@ -110,7 +110,7 @@
 
     nodePositions[currentlyDragged].x = constrainedX
     nodePositions[currentlyDragged].y = constrainedY
-    nodePositions = [...nodePositions] // reassign to trigger Svelte reactivity
+    nodePositions = [...nodePositions]
   }
 </script>
 
@@ -125,6 +125,27 @@
   class="bg-secondary mx-auto h-auto max-w-full touch-none overscroll-x-none rounded-2xl"
   onmousemove={(e) => updateDraggedNode(e.clientX, e.clientY)}
   onmouseup={() => {
+    if (currentlyDragged !== null) {
+      currentlyDragged = null
+    }
+  }}
+  ontouchmove={(e) => {
+    // Always prevent default when a node is being dragged
+    if (currentlyDragged !== null) {
+      e.preventDefault()
+      e.stopPropagation()
+      updateDraggedNode(e.touches[0].clientX, e.touches[0].clientY)
+    }
+  }}
+  ontouchend={(e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (currentlyDragged !== null) {
+      currentlyDragged = null
+    }
+  }}
+  ontouchcancel={(e) => {
+    e.preventDefault()
     if (currentlyDragged !== null) {
       currentlyDragged = null
     }

@@ -22,34 +22,49 @@
   )
   let hoverFillClass = $derived(clickable ? "" : "group-hover:fill-goethe")
 
-  // Make the drag area 2x bigger than the visible node
   const dragAreaSize = size * 2
 
-  function handleMouseDown(e: MouseEvent) {
-    // Prevent focusing on mouse down so the browser focus ring doesn't appear while dragging.
-    e.preventDefault()
-    if (setDragged) setDragged()
+  let startX = 0
+  let startY = 0
+  let dragging = false
+
+  function handlePointerDown(e: PointerEvent) {
+    startX = e.clientX
+    startY = e.clientY
+    dragging = false
+
+    // Capture moves globally so we detect drags outside the circle
+    window.addEventListener("pointermove", handlePointerMove)
+    window.addEventListener("pointerup", handlePointerUp)
   }
 
-  function handleTouchStart(e: TouchEvent) {
-    if (setDragged) {
-      e.preventDefault()
-      setDragged()
+  function handlePointerMove(e: PointerEvent) {
+    const dx = e.clientX - startX
+    const dy = e.clientY - startY
+    if (!dragging && Math.sqrt(dx * dx + dy * dy) > 5) {
+      dragging = true
+      if (setDragged) setDragged()
+    }
+  }
+
+  function handlePointerUp() {
+    window.removeEventListener("pointermove", handlePointerMove)
+    window.removeEventListener("pointerup", handlePointerUp)
+
+    if (!dragging) {
+      // It was a tap/click
+      onClickCallback()
     }
   }
 </script>
 
-<!--Todo: Touchstart and keydown still show some issues in the IDE?? -->
-
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <g
-  class="group"
+  class="group outline-none"
   transform={`translate(${pos.x},${pos.y})`}
   role="button"
   tabindex="0"
-  onmousedown={handleMouseDown}
-  ontouchstart={handleTouchStart}
-  onclick={onClickCallback}
+  onpointerdown={handlePointerDown}
+  onpointerup={handlePointerUp}
 >
   <!-- Invisible larger circle for easier dragging -->
   <circle r={dragAreaSize} fill="transparent" stroke="none" class={clickable ? "cursor-pointer" : ""} />
