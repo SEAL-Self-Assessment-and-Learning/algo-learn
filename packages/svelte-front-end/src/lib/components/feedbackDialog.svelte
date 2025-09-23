@@ -43,7 +43,7 @@
               <Card.Root class="w-full cursor-pointer" onclick={openMail}>
                 <Card.Header>
                   <Card.Title>
-                    <Mail class="mr-2 inline w-6 align-top" />
+                    <Mail class="mr-2 inline w-6 align-middle" />
                     {t("About.suggestImprovement")}
                   </Card.Title>
                 </Card.Header>
@@ -52,7 +52,7 @@
               <Card.Root class="w-full cursor-pointer" onclick={openGithubIssue}>
                 <Card.Header>
                   <Card.Title>
-                    <div class="mr-2 inline-block w-6 align-top"><Github /></div>
+                    <div class="mr-2 inline-block w-6 align-middle"><Github /></div>
                     {t("About.reportBug")}
                   </Card.Title>
                 </Card.Header>
