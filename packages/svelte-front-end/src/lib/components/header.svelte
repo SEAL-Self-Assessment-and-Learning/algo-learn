@@ -16,7 +16,7 @@
   import { availableThemes, getTheme, setTheme } from "../theme.svelte.js"
   import { globalTranslations, NATIVE_NAME, SUPPORTED_LANGUAGES } from "../translation"
   import FeedbackDialog from "./feedbackDialog.svelte"
-  import SealLogo from "./logo/seal-logo-white.svg"
+  import SealLogo from "./logo/seal-logo-text-horizontal-white.svg"
   import Button from "./ui/button/button.svelte"
 
   const lang: Language = $derived(getLanguage())
@@ -38,8 +38,7 @@
 
 {#snippet logo()}
   <Button variant="ghost" href={resolve("/")} class="flex items-center gap-2 px-2 text-3xl font-thin">
-    <img src={SealLogo} alt="Logo" class="h-8 invert-0 dark:invert" />
-    SEAL
+    <img src={SealLogo} alt="Logo" class="h-10" />
   </Button>
 {/snippet}
 
