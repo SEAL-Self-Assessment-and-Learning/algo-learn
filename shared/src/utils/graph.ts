@@ -863,3 +863,143 @@ export class RootedTree {
     this.children.forEach((child) => child.computeFinalNodeCoordinates(modSum))
   }
 }
+
+function addEdge(
+  edges: EdgeList,
+  source: NodeId,
+  target: NodeId,
+  weight: number | undefined,
+  directed: boolean,
+  ensureBidirectional: boolean,
+  random: Random,
+): void {
+  edges[source].push({ source, target, value: weight })
+
+  if (directed) {
+    if (ensureBidirectional || random.bool(0.5)) {
+      edges[target].push({ source: target, target: source, value: weight })
+    }
+  } else {
+    edges[target].push({ source: target, target: source, value: weight })
+  }
+}
+
+function centerPartition(nodes: NodeList, partitionSize: number, totalSize: number): void {
+  const offset = ((totalSize - partitionSize) * 2) / 2
+  for (let i = 0; i < partitionSize; i++) {
+    nodes[i].coords.x += offset
+  }
+}
+
+export class KNMGraphGenerator {
+  public static completeGraph(
+    random: Random,
+    size: number,
+    weights: "random" | "unique" | null,
+    directed: boolean = false,
+    ensureBidirectional: boolean = false,
+  ): Graph {
+    const nodes: NodeList = []
+    const edges: EdgeList = Array.from(Array(size), () => [])
+
+    // calculate radius
+    const minDistance = 2
+    const radius = Math.max(minDistance / (2 * Math.sin(Math.PI / size)), 5) // fallback minimum
+
+    for (let i = 0; i < size; i++) {
+      const angle = (2 * Math.PI * i) / size
+      nodes.push({
+        label: RandomGraph.getLabel(i),
+        coords: { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius },
+      })
+    }
+
+    // connect nodes
+    for (let i = 0; i < size; i++) {
+      for (let j = i + 1; j < size; j++) {
+        const weight = weights === "random" ? random.int(1, 20) : i + j
+        addEdge(edges, i, j, weight, directed, ensureBidirectional, random)
+      }
+    }
+
+    return new Graph(nodes, edges, directed, !!weights)
+  }
+
+  public static bipartiteGraph(
+    random: Random,
+    nodesInPartA: number,
+    nodesInPartB: number,
+    weights: "random" | "unique" | null,
+    directed: boolean = false,
+    ensureBidirectional: boolean = false,
+    edgeProbability: number = 1.0, // Default: complete bipartite graph
+  ): Graph {
+    const nodes: NodeList = []
+    const edges: EdgeList = Array.from(Array(nodesInPartA + nodesInPartB), () => [])
+    const yOffset = 3
+
+    // create partitions
+    for (let i = 0; i < nodesInPartA; i++) {
+      nodes.push({ label: RandomGraph.getLabel(i), coords: { x: i * 2, y: -yOffset } })
+    }
+    for (let j = 0; j < nodesInPartB; j++) {
+      nodes.push({ label: RandomGraph.getLabel(nodesInPartA + j), coords: { x: j * 2, y: yOffset } })
+    }
+
+    centerPartition(nodes.slice(0, nodesInPartA), nodesInPartA, nodesInPartA + nodesInPartB)
+    centerPartition(nodes.slice(nodesInPartA), nodesInPartB, nodesInPartA + nodesInPartB)
+
+    for (let a = 0; a < nodesInPartA; a++) {
+      for (let b = nodesInPartA; b < nodesInPartA + nodesInPartB; b++) {
+        if (random.bool(edgeProbability)) {
+          // add edge with probability
+          const weight = weights === "random" ? random.int(1, 20) : a + b
+          addEdge(edges, a, b, weight, directed, ensureBidirectional, random)
+        }
+      }
+    }
+
+    return new Graph(nodes, edges, directed, !!weights)
+  }
+}
+
+export class CycleGraph {
+  public static generate(
+    random: Random,
+    size: number,
+    weights: "random" | "unique" | null,
+    directed: boolean = false,
+    shakeUpNodePosition: boolean = false,
+    ensureBidirectional: boolean = false,
+  ): Graph {
+    const nodes: NodeList = []
+    const edges: EdgeList = Array.from(Array(size), () => [])
+
+    // calculate radius
+    const minDistance = 2
+    const radius = Math.max(minDistance / (2 * Math.sin(Math.PI / size)), 5) // fallback minimum
+
+    const shakeup = shakeUpNodePosition ? () => random.float(-0.5, 0.5) : () => 0
+
+    for (let i = 0; i < size; i++) {
+      const angle = (2 * Math.PI * i) / size
+      nodes.push({
+        label: RandomGraph.getLabel(i),
+        coords: {
+          x: Math.cos(angle) * radius + shakeup(),
+          y: Math.sin(angle) * radius + shakeup(),
+        },
+      })
+    }
+
+    // connect nodes
+    for (let i = 0; i < size; i++) {
+      const next = (i + 1) % size
+      const weight = weights === "random" ? random.int(1, 20) : i + 1
+
+      addEdge(edges, i, next, weight, directed, ensureBidirectional, random)
+    }
+
+    return new Graph(nodes, edges, directed, !!weights)
+  }
+}
