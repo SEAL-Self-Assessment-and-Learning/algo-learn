@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
  * @param props The props to pass to the div.
  */
 export function HorizontallyCenteredDiv(props: HTMLAttributes<HTMLDivElement>): ReactElement {
-  return <div {...props} className={cn("mx-auto block w-full max-w-xl p-3 pt-12", props.className)} />
+  return <div {...props} className={cn("mx-auto block w-full max-w-3xl p-3 pt-12", props.className)} />
 }
 
 /**
@@ -21,7 +21,7 @@ export function ScreenCenteredDiv(props: HTMLAttributes<HTMLDivElement>): ReactE
   return (
     <div
       {...props}
-      className={cn("m-auto flex h-full max-w-xl place-items-center p-8 text-xl", props.className)}
+      className={cn("m-auto flex h-full max-w-3xl place-items-center p-8 text-xl", props.className)}
     />
   )
 }

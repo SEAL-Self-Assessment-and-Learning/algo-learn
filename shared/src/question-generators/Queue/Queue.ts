@@ -41,6 +41,13 @@ export class Queue<T> {
   }
 
   /**
+   * Returns all queue elements as strings
+   */
+  toStringArray(): string[] {
+    return this.queue.map((element) => String(element))
+  }
+
+  /**
    * This method returns the current queue as a string
    * @returns The current queue as a string
    */

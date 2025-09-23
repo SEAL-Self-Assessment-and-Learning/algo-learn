@@ -310,7 +310,6 @@ export class RandomGraph {
     shape: "square" | "square-width-diagonals" | "triangle",
     weights: "random" | "unique" | null,
     directed: boolean = false,
-    //connected: boolean = false,
     shakeUpNodePosition: boolean = false,
     ensureStronglyConnected: boolean = false,
   ): Graph {
