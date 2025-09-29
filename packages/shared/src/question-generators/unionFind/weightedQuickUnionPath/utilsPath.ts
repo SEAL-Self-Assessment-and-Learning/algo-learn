@@ -1,6 +1,7 @@
-import { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
+import type { Language } from "@shared/api/Language.ts"
+import type { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
 import { createArrayDisplayCodeBlock } from "@shared/utils/arrayDisplayCodeBlock.ts"
-import Random from "@shared/utils/random.ts"
+import type Random from "@shared/utils/random.ts"
 
 /**
  * Creates artificial states for union find.
@@ -15,16 +16,21 @@ import Random from "@shared/utils/random.ts"
  *
  * @param random
  * @param union
+ * @param lang
  */
-export function createChainedUnionState({ random, union }: { random: Random; union: UnionFind }): {
+export function createChainedUnionState({
+  random,
+  union,
+  lang,
+}: {
+  random: Random
+  union: UnionFind
+  lang: Language
+}): {
   gapField: string
   gapOperationValues: number[]
 } {
-  return random.choice([
-    createTwoPathTree({ random, union }),
-    createTwoPath({ random, union }),
-    createOnePath({ random, union }),
-  ])
+  return random.choice([createTwoPathTree, createTwoPath, createOnePath])({ random, union, lang })
 }
 
 /**
@@ -33,8 +39,17 @@ export function createChainedUnionState({ random, union }: { random: Random; uni
  *
  * @param random
  * @param union
+ * @param lang
  */
-function createTwoPathTree({ random, union }: { random: Random; union: UnionFind }) {
+function createTwoPathTree({
+  random,
+  union,
+  lang,
+}: {
+  random: Random
+  union: UnionFind
+  lang: Language
+}) {
   const unionSize = union.getSize()
   const workingUnion = union.getArray()[0].map((x) => x)
 
@@ -68,6 +83,7 @@ function createTwoPathTree({ random, union }: { random: Random; union: UnionFind
 
   const gapField = createArrayDisplayCodeBlock({
     array: workingUnion,
+    lang,
   })
 
   union.union(gapOperationValues[0], gapOperationValues[1])
@@ -80,8 +96,9 @@ function createTwoPathTree({ random, union }: { random: Random; union: UnionFind
  * Asks to combine two nodes from the bottom of each path
  * @param random
  * @param union
+ * @param lang
  */
-function createTwoPath({ random, union }: { random: Random; union: UnionFind }) {
+function createTwoPath({ random, union, lang }: { random: Random; union: UnionFind; lang: Language }) {
   const unionSize = union.getSize()
   const workingUnion = union.getArray()[0].map((x) => x)
 
@@ -111,6 +128,7 @@ function createTwoPath({ random, union }: { random: Random; union: UnionFind }) 
 
   const gapField = createArrayDisplayCodeBlock({
     array: workingUnion,
+    lang,
   })
 
   union.union(gapOperationValues[0], gapOperationValues[1])
@@ -123,8 +141,9 @@ function createTwoPath({ random, union }: { random: Random; union: UnionFind }) 
  * with a value not inside the path
  * @param random
  * @param union
+ * @param lang
  */
-function createOnePath({ random, union }: { random: Random; union: UnionFind }) {
+function createOnePath({ random, union, lang }: { random: Random; union: UnionFind; lang: Language }) {
   const unionSize = union.getSize()
   const workingUnion = union.getArray()[0].map((x) => x)
 
@@ -143,6 +162,7 @@ function createOnePath({ random, union }: { random: Random; union: UnionFind }) 
 
   const gapField = createArrayDisplayCodeBlock({
     array: workingUnion,
+    lang,
   })
 
   union.union(gapOperationValues[0], gapOperationValues[1])

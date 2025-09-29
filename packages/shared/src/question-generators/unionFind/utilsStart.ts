@@ -1,5 +1,9 @@
-import { MultiFreeTextFeedbackFunction, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
-import { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
+import type { Language } from "@shared/api/Language.ts"
+import type {
+  MultiFreeTextFeedbackFunction,
+  MultiFreeTextQuestion,
+} from "@shared/api/QuestionGenerator.ts"
+import type { UnionFind } from "@shared/question-generators/unionFind/unionFind.ts"
 import {
   unionOneBlockCombineNone,
   unionOneBlockCombineOne,
@@ -13,15 +17,19 @@ import {
   createArrayDisplayCodeBlock,
   createArrayDisplayCodeBlockUserInput,
 } from "@shared/utils/arrayDisplayCodeBlock.ts"
-import Random from "@shared/utils/random.ts"
-import { t, Translations } from "@shared/utils/translations.ts"
+import type Random from "@shared/utils/random.ts"
+import { t, type Translations } from "@shared/utils/translations.ts"
 
 /**
  * Returns a simple feedback function to check if the user input is the same as
  * the solution union
  * @param solutionUnions - correct calculated union
+ * @param lang
  */
-export function getFeedbackFunction(solutionUnions: UnionFind): MultiFreeTextFeedbackFunction {
+export function getFeedbackFunction(
+  solutionUnions: UnionFind,
+  lang: Language,
+): MultiFreeTextFeedbackFunction {
   // fieldIds form input-x x \in [0,1,2,3...]
   return ({ text }) => {
     for (let j = 0; j < solutionUnions.getUnionAmount(); j++) {
@@ -42,6 +50,7 @@ export function getFeedbackFunction(solutionUnions: UnionFind): MultiFreeTextFee
       correct: false,
       correctAnswer: createArrayDisplayCodeBlock({
         array: solutionUnions.getArray()[0],
+        lang,
       }),
     }
   }
@@ -79,6 +88,7 @@ export function unionFindStartQuestion({
     const { gapField: _gapField, gapOperationValues: _gapOperationValues } = createChainedUnionState({
       random,
       union,
+      lang,
     })
     gapField = _gapField
     gapOperationValues = _gapOperationValues
@@ -87,6 +97,7 @@ export function unionFindStartQuestion({
       random,
       union,
       unionSize,
+      lang,
     })
     gapField = _gapField
     gapOperationValues = _gapOperationValues
@@ -94,6 +105,7 @@ export function unionFindStartQuestion({
 
   const { arrayDisplayBlock } = createArrayDisplayCodeBlockUserInput({
     numberOfInputFields: union.getArray()[0].length,
+    lang,
   })
 
   const question: MultiFreeTextQuestion = {
@@ -107,7 +119,7 @@ export function unionFindStartQuestion({
       gapOperationValues[1].toString(),
       arrayDisplayBlock,
     ]),
-    feedback: getFeedbackFunction(union),
+    feedback: getFeedbackFunction(union, lang),
   }
   return question
 }

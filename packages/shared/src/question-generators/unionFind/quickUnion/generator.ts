@@ -1,9 +1,9 @@
-import { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
+import type { QuestionGenerator } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { QuickUnion } from "@shared/question-generators/unionFind/quickUnion/algorithm.ts"
 import { unionFindStartQuestion } from "@shared/question-generators/unionFind/utilsStart.ts"
 import Random from "@shared/utils/random.ts"
-import { tFunctional, Translations } from "@shared/utils/translations.ts"
+import { tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
