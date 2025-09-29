@@ -27,6 +27,9 @@ const config = {
       "@settings/*": "./../settings/*",
     },
   },
+  build: {
+    bundleStrategy: "single",
+  },
 }
 
 export default config
