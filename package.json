@@ -2,50 +2,32 @@
   "name": "algo-learn-monorepo",
   "private": true,
   "workspaces": [
-    "front-end",
-    "settings",
-    "shared"
+    "packages/settings",
+    "packages/shared",
+    "packages/*"
   ],
   "license": "MIT",
   "author": "Holger Dell (https://holgerdell.com)",
   "scripts": {
-    "dev": "cd front-end; $npm_execpath run dev",
-    "build": "cd front-end; $npm_execpath run build",
-    "preview": "cd front-end; $npm_execpath run preview",
+    "dev": "cd packages/svelte-front-end; $npm_execpath run dev",
+    "build": "cd packages/svelte-front-end; $npm_execpath run build",
+    "preview": "cd packages/svelte-front-end; $npm_execpath run preview",
     "build:json-schema": "$npm_execpath run ts-json-schema-generator --path 'src/**/QuestionGenerator.ts' --tsconfig ./tsconfig.ts-json-schema-generator.json --type 'Question'",
     "test": "$npm_execpath run lint && $npm_execpath run test:unit",
     "test:unit": "which bun && bun test --bail || vitest run --bail 1",
-    "lint": "eslint && tsc && prettier . --check",
-    "format": "prettier . --write",
-    "clean": "rm -rf dist/ .yarn/cache/ node_modules/ front-end/node_modules settings/node_modules/ shared/node_modules/ docs/ vite-bundle-visualizer.html",
+    "lint": "eslint && tsc && prettier . --check && cd packages/svelte-front-end && $npm_execpath run lint",
+    "lint-fix": "eslint --fix && cd packages/svelte-front-end && $npm_execpath run eslint --fix",
+    "format": "prettier . --write && cd packages/svelte-front-end && $npm_execpath run format",
+    "clean": "rm -rf dist/ .yarn/cache/ node_modules/ packages/settings/node_modules/ packages/shared/node_modules/ packages/svelte-front-end/node_modules/ docs/ vite-bundle-visualizer.html",
     "visualize": "$npm_execpath run vite-bundle-visualizer -o vite-bundle-visualizer.html",
-    "docs": "$npm_execpath run typedoc --out docs shared/src/**/*.ts shared/src/**/*.tsx"
+    "docs": "$npm_execpath run typedoc --out docs packages/shared/src/**/*.ts shared/src/**/*.tsx"
   },
   "devDependencies": {
-    "@eslint-react/eslint-plugin": "^1.17.3",
-    "@eslint/js": "^9.16.0",
-    "@ianvs/prettier-plugin-sort-imports": "^4.4.0",
-    "@tailwindcss/typography": "^0.5.15",
-    "@tanstack/eslint-plugin-query": "^5.62.1",
-    "@types/eslint__js": "^8.42.3",
-    "bun-types": "^1.1.38",
-    "eslint": "^9.16.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-react": "^7.37.2",
-    "globals": "^15.13.0",
-    "postcss": "^8.4.49",
-    "prettier": "^3.4.2",
-    "prettier-plugin-css-order": "^2.1.2",
-    "prettier-plugin-tailwindcss": "^0.6.9",
-    "stylelint": "^16.11.0",
-    "stylelint-config-recommended": "^14.0.1",
-    "stylelint-config-tailwindcss": "^0.0.7",
-    "tailwindcss": "^3.4.16",
-    "typescript": "^5.7.2",
-    "typescript-eslint": "^8.17.0",
-    "vite": "^6.0.2",
-    "vite-bundle-visualizer": "^1.2.1",
-    "vite-tsconfig-paths": "^5.1.3",
-    "vitest": "^2.1.8"
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@types/node": "^24.3.1"
   }
 }

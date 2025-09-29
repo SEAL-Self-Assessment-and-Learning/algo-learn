@@ -40,35 +40,34 @@ jobs:
             });
             return pullRequest
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{fromJSON(steps.pr.outputs.result).merge_commit_sha}}
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20"
-          # cache: "yarn"
+          bun-version: latest
 
-      - uses: oven-sh/setup-bun@v1
+      - name: Navigate to subfolder and install dependencies 🔧
+        run: |
+          cd packages/svelte-front-end
+          bun install --frozen-lockfile
 
       - name: Get a clean name of the current branch or pull request
         run: echo "CLEAN_REF=pull_request_${{github.event.pull_request.number}}" >> $GITHUB_ENV
         shell: bash
 
-      - name: Bun install 🔧
-        run: bun install --frozen-lockfile
-
-      - name: Write basename and version number to front-end/src/config.ts
+      - name: Write basename and version number to packages/svelte-front-end/src/lib/config.js
         run: |
-          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$CLEAN_REF\"/g" front-end/src/config.ts
-          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" front-end/src/config.ts
+          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$CLEAN_REF\"/g" packages/svelte-front-end/src/lib/config.js
+          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" packages/svelte-front-end/src/lib/config.js
 
       - name: Run test suite
         run: bun run test
 
       - name: Build 🔧
-        run: bun run build --base /algo-learn-testing/$CLEAN_REF/
+        run: bun run build --mode staging --base /algo-learn-testing/$CLEAN_REF/
 
       - name: Deploy to server 🚀
         id: deploy
@@ -78,7 +77,7 @@ jobs:
         with:
           options: ""
           ssh_options: ""
-          src: "front-end/dist/"
+          src: "packages/svelte-front-end/build/"
           dest: "dell-from-github@tcs.uni-frankfurt.de:/var/www/html/algo-learn-testing/$CLEAN_REF/"
 
       - name: Display status from deploy
