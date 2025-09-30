@@ -56,7 +56,7 @@ export interface MultipleChoiceQuestion extends QuestionBase {
   matching?: boolean
 
   /** List of fixed items in a matching question */
-  left?: string[]
+  fixedItems?: string[]
 }
 
 /**

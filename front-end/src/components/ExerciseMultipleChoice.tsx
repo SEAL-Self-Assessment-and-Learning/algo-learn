@@ -200,7 +200,7 @@ export function ExerciseMultipleChoice({
         // mismatch table
         const rows: string[] = []
 
-        question.left?.forEach((l, i) => {
+        question.fixedItems?.forEach((l, i) => {
           const userIdx = choice[i]
           const correctIdx = feedbackObject?.correctChoice?.[i]
 
@@ -268,7 +268,7 @@ ${rows.join("\n")}
 
         {question.matching ? (
           <MatchingBoard
-            leftItems={question.left ?? []}
+            leftItems={question.fixedItems ?? []}
             rightItems={question.answers.map((answer, i) => ({
               position: i,
               element: <Markdown md={answer} />,

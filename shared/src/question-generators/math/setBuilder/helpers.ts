@@ -46,7 +46,7 @@ export function implicitLowerBound(dom: Domain, prop: SetProperty): number | nul
  * Supports all-negative, all-positive, or mixed ranges for integers.
  */
 export function pickBounds(
-  r: Random,
+  random: Random,
   dom: Domain,
   targetHigh: number,
   minWidth = 4,
@@ -57,26 +57,26 @@ export function pickBounds(
   if (dom === "N") {
     const high = Math.max(targetHigh, width + 1)
     const maxLow = Math.max(1, high - width)
-    const low = r.int(1, maxLow)
+    const low = random.int(1, maxLow)
     return { low, high }
   }
 
   if (mode === "negOnly") {
-    const highNeg = -r.int(1, Math.max(2, Math.floor(targetHigh / 2) + 1))
+    const highNeg = -random.int(1, Math.max(2, Math.floor(targetHigh / 2) + 1))
     const lowMin = highNeg - Math.max(width, 4)
-    const low = r.int(lowMin - width, highNeg - width)
+    const low = random.int(lowMin - width, highNeg - width)
     return { low, high: highNeg }
   }
 
   if (mode === "posOnly") {
     const high = Math.max(targetHigh, width + 1)
-    const low = r.int(0, Math.max(0, high - width))
+    const low = random.int(0, Math.max(0, high - width))
     return { low, high }
   }
 
   const high = Math.max(targetHigh, width + 1)
   const maxLow = high - width
-  const low = r.int(-high, Math.min(maxLow, high - width))
+  const low = random.int(-high, Math.min(maxLow, high - width))
   return { low, high }
 }
 
@@ -84,9 +84,9 @@ export function pickBounds(
  * Choose printed inequality operators and derive inclusive iteration bounds
  * so explicit set equals printed interval respecting strictness
  */
-export function chooseInequalities(r: Random, low: number, high: number) {
-  let leftOp = r.choice(["<", "\\leq"])
-  let rightOp = r.choice(["<", "\\leq"])
+export function chooseInequalities(random: Random, low: number, high: number) {
+  let leftOp = random.choice(["<", "\\leq"])
+  let rightOp = random.choice(["<", "\\leq"])
 
   const displayLowBound = low
   const displayHighBound = high
@@ -119,10 +119,10 @@ export function maybeDecorateNaturalDomain(
   rightOp: string,
   displayHighBound: number,
   omitLower: boolean,
-  r: Random,
+  random: Random,
 ) {
   if (dom !== "N" || !omitLower) return { latex: domainLatexSymbol(dom), embedsUpper: false }
-  const useDecoration = r.choice([true, false])
+  const useDecoration = random.choice([true, false])
   if (!useDecoration) return { latex: "\\mathbb{N}", embedsUpper: false }
   const tag = rightOp === "<" ? "<" : "\\leq"
   return { latex: `\\mathbb{N}_{${tag}${displayHighBound}}`, embedsUpper: true }

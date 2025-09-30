@@ -59,10 +59,10 @@ function matchingRowFeedback(correctMapping: number[], base: MultipleChoiceFeedb
 
 function generateMatchVariant(lang: Language, path: string, random: Random) {
   const nSets = random.int(4, 5)
-  const left: string[] = []
-  const rights: string[] = []
+  const fixed: string[] = []
+  const movable: string[] = []
 
-  while (left.length < nSets) {
+  while (fixed.length < nSets) {
     const template = random.choice(templates)
     const domain: Domain = random.choice(["N", "Z"])
     const param = template.paramRange(random)
@@ -76,17 +76,17 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     // full explicit set, sorted and deduped
     const elementsSorted = Array.from(new Set(elements)).sort((a, b) => a - b)
     const explicit = `$\\{ ${elementsSorted.join(", ")} \\}$`
-    if (rights.includes(explicit)) continue
+    if (movable.includes(explicit)) continue
 
     const variants = template.labels(lang, domain, param, cfg)
     const label = `\\[` + random.choice(variants) + `\\]`
 
-    left.push(label)
-    rights.push(explicit)
+    fixed.push(label)
+    movable.push(explicit)
   }
 
-  const rightShuffled = random.shuffle([...rights])
-  const solution = rights.map((exp) => rightShuffled.indexOf(exp))
+  const movableShuffled = random.shuffle([...movable])
+  const solution = movable.map((exp) => movableShuffled.indexOf(exp))
 
   const baseFeedback = minimalMultipleChoiceFeedback({
     correctAnswerIndex: solution,
@@ -102,8 +102,8 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     sorting: true,
     matching: true,
     text: t(translations, lang, "match"),
-    left,
-    answers: rightShuffled,
+    fixedItems: fixed,
+    answers: movableShuffled,
     feedback,
   }
 

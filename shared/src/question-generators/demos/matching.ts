@@ -68,14 +68,14 @@ export const DemoMatching: QuestionGenerator = {
     // shuffle chosen pairs
     const shuffledPairs = random.shuffle(chosenPairs)
 
-    const left = shuffledPairs.map(([l]) => l)
-    const right = shuffledPairs.map(([, r]) => r)
+    const fixed = shuffledPairs.map(([l]) => l)
+    const movable = shuffledPairs.map(([, r]) => r)
 
     // shuffle sortable column
-    const rightShuffled = random.shuffle(right)
+    const movableShuffled = random.shuffle(movable)
 
     // correct order mapping
-    const solution = left.map((l) => rightShuffled.indexOf(chosenPairs.find(([pl]) => pl === l)![1]))
+    const solution = fixed.map((l) => movableShuffled.indexOf(chosenPairs.find(([pl]) => pl === l)![1]))
 
     const baseFeedback = minimalMultipleChoiceFeedback({
       correctAnswerIndex: solution,
@@ -100,8 +100,8 @@ export const DemoMatching: QuestionGenerator = {
       sorting: true,
       matching: true,
       text: t(translations, lang, "text"),
-      left, // fixed column
-      answers: rightShuffled, // sortable column
+      fixedItems: fixed,
+      answers: movableShuffled,
       feedback,
     }
 

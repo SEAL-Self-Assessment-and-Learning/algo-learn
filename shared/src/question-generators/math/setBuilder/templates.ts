@@ -19,16 +19,16 @@ import { translations } from "./translations"
 export const templates: SetTemplate[] = [
   // even numbers
   {
-    generateConfig: (dom, n, r) => {
+    generateConfig: (dom, n, random) => {
       const prop: SetProperty = "even"
-      const mode: BoundsMode = dom === "Z" && r.choice([true, false]) ? "negOnly" : "auto"
-      const { low, high } = pickBounds(r, dom, n, 4, mode)
+      const mode: BoundsMode = dom === "Z" && random.choice([true, false]) ? "negOnly" : "auto"
+      const { low, high } = pickBounds(random, dom, n, 4, mode)
       const { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd } =
-        chooseInequalities(r, low, high)
+        chooseInequalities(random, low, high)
       const implied = implicitLowerBound(dom, prop)
       const omitLower =
         implied !== null && (leftOp === "<" ? displayLowBound + 1 : displayLowBound) <= implied
-      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, r)
+      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, random)
       const domainLatex = dom === "N" ? natDecor.latex : domainLatexSymbol(dom)
       return {
         low,
@@ -67,21 +67,21 @@ export const templates: SetTemplate[] = [
       for (let x = start; x <= cfg.includeEnd; x++) if (x % 2 === 0) arr.push(x)
       return arr
     },
-    paramRange: (r) => r.int(10, 40),
+    paramRange: (random) => random.int(10, 40),
   },
 
   // odd numbers
   {
-    generateConfig: (dom, n, r) => {
+    generateConfig: (dom, n, random) => {
       const prop: SetProperty = "odd"
-      const mode: BoundsMode = dom === "Z" && r.choice([true, false]) ? "negOnly" : "auto"
-      const { low, high } = pickBounds(r, dom, n, 4, mode)
+      const mode: BoundsMode = dom === "Z" && random.choice([true, false]) ? "negOnly" : "auto"
+      const { low, high } = pickBounds(random, dom, n, 4, mode)
       const { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd } =
-        chooseInequalities(r, low, high)
+        chooseInequalities(random, low, high)
       const implied = implicitLowerBound(dom, prop)
       const omitLower =
         implied !== null && (leftOp === "<" ? displayLowBound + 1 : displayLowBound) <= implied
-      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, r)
+      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, random)
       const domainLatex = dom === "N" ? natDecor.latex : domainLatexSymbol(dom)
       return {
         low,
@@ -120,7 +120,7 @@ export const templates: SetTemplate[] = [
       for (let x = start; x <= cfg.includeEnd; x++) if (x % 2 !== 0) arr.push(x)
       return arr
     },
-    paramRange: (r) => r.int(10, 40),
+    paramRange: (random) => random.int(10, 40),
   },
 
   // primes in N
@@ -166,22 +166,22 @@ export const templates: SetTemplate[] = [
       const end = cfg.includeEnd
       return start <= end ? rangeArray(start, end).filter(isPrime) : []
     },
-    paramRange: (r) => r.int(20, 50),
+    paramRange: (random) => random.int(20, 50),
   },
 
   // multiples of m in N or Z
   {
-    generateConfig: (dom, m, r) => {
+    generateConfig: (dom, m, random) => {
       const prop: SetProperty = "multiple"
       const cap = 3 * m
-      const mode: BoundsMode = dom === "Z" && r.choice([true, false]) ? "negOnly" : "auto"
-      const { low, high } = pickBounds(r, dom, cap, 4, mode)
+      const mode: BoundsMode = dom === "Z" && random.choice([true, false]) ? "negOnly" : "auto"
+      const { low, high } = pickBounds(random, dom, cap, 4, mode)
       const { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd } =
-        chooseInequalities(r, low, high)
+        chooseInequalities(random, low, high)
       const implied = implicitLowerBound(dom, prop)
       const omitLower =
         implied !== null && (leftOp === "<" ? displayLowBound + 1 : displayLowBound) <= implied
-      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, r)
+      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, random)
       const domainLatex = dom === "N" ? natDecor.latex : domainLatexSymbol(dom)
       return {
         low,
@@ -218,17 +218,17 @@ export const templates: SetTemplate[] = [
       for (let x = start; x <= cfg.includeEnd; x++) if (x % m === 0) arr.push(x)
       return arr
     },
-    paramRange: (r) => r.int(3, 15),
+    paramRange: (random) => random.int(3, 15),
   },
 
   // squares in N
   {
-    generateConfig: (_dom, n, r) => {
+    generateConfig: (_dom, n, random) => {
       const low = 1
       const high = n
       const { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd } =
-        chooseInequalities(r, low, high)
-      const natDecor = maybeDecorateNaturalDomain("N", rightOp, displayHighBound, true, r)
+        chooseInequalities(random, low, high)
+      const natDecor = maybeDecorateNaturalDomain("N", rightOp, displayHighBound, true, random)
       return {
         low,
         high,
@@ -260,23 +260,23 @@ export const templates: SetTemplate[] = [
       ]
     },
     build: (_dom, _n, cfg) => rangeArray(cfg.includeStart, cfg.includeEnd).filter(isSquare),
-    paramRange: (r) => r.int(30, 80),
+    paramRange: (random) => random.int(30, 80),
   },
 
   // congruence in N or Z
   {
-    generateConfig: (dom, m, r) => {
+    generateConfig: (dom, m, random) => {
       const cap = 3 * m
-      const mode: BoundsMode = dom === "Z" && r.choice([true, false]) ? "negOnly" : "auto"
-      const { low, high } = pickBounds(r, dom, cap, 4, mode)
+      const mode: BoundsMode = dom === "Z" && random.choice([true, false]) ? "negOnly" : "auto"
+      const { low, high } = pickBounds(random, dom, cap, 4, mode)
       const { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd } =
-        chooseInequalities(r, low, high)
+        chooseInequalities(random, low, high)
       const implied = implicitLowerBound(dom, "congruence")
       const omitLower =
         implied !== null && (leftOp === "<" ? displayLowBound + 1 : displayLowBound) <= implied
-      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, r)
+      const natDecor = maybeDecorateNaturalDomain(dom, rightOp, displayHighBound, omitLower, random)
       const domainLatex = dom === "N" ? natDecor.latex : domainLatexSymbol(dom)
-      const residue = m > 1 ? r.int(1, m - 1) : 0
+      const residue = m > 1 ? random.int(1, m - 1) : 0
       return {
         low,
         high,
@@ -315,6 +315,6 @@ export const templates: SetTemplate[] = [
       for (let x = start; x <= cfg.includeEnd; x++) if (x % m === rVal) arr.push(x)
       return arr
     },
-    paramRange: (r) => r.int(4, 12),
+    paramRange: (random) => random.int(4, 12),
   },
 ]
