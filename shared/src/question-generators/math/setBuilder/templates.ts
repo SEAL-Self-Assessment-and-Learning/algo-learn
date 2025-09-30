@@ -146,8 +146,8 @@ export const templates: SetTemplate[] = [
       )
       const clause = bounds ? `, ${bounds}` : ""
       return [
-        `\\{ n \\in ${cfg.domainLatex} : n \\geq 2 \\wedge n \\text{ ${prime}}${clause} \\}`,
-        `\\{ n \\in ${cfg.domainLatex} : n \\geq 2 \\wedge \\forall d \\in \\mathbb{N}, (d \\mid n \\Rightarrow (d=1 \\lor d=n))${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : n \\geq 2, n \\text{ ${prime}}${clause} \\}`,
+        `\\{ n \\in ${cfg.domainLatex} : n \\geq 2, \\forall d \\in \\mathbb{N}, (d \\mid n \\Rightarrow (d=1 \\lor d=n))${clause} \\}`,
       ]
     },
     build: (_dom, _n, cfg) => {
