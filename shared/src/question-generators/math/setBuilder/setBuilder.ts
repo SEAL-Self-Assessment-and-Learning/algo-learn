@@ -17,6 +17,9 @@ import type { Domain } from "./helpers"
 import { templates } from "./templates"
 import { translations } from "./translations"
 
+const maxMatchSize = 8
+const maxAttempts = 100
+
 export const SetBuilderQuestion: QuestionGenerator = {
   id: "setbuild",
   name: tFunctional(translations, "name"),
@@ -62,7 +65,10 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
   const fixed: string[] = []
   const movable: string[] = []
 
-  while (fixed.length < nSets) {
+  let attempts = 0
+  while (fixed.length < nSets && attempts < maxAttempts) {
+    attempts++
+
     const template = random.choice(templates)
     const domain: Domain = random.choice(["N", "Z"])
     const param = template.paramRange(random)
@@ -75,6 +81,10 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
 
     // full explicit set, sorted and deduped
     const elementsSorted = Array.from(new Set(elements)).sort((a, b) => a - b)
+
+    // skip sets that would be too large for matching
+    if (elementsSorted.length > maxMatchSize) continue
+
     const explicit = `$\\{ ${elementsSorted.join(", ")} \\}$`
     if (movable.includes(explicit)) continue
 
@@ -83,6 +93,10 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
 
     fixed.push(label)
     movable.push(explicit)
+  }
+
+  if (fixed.length < nSets) {
+    throw new Error("Could not generate enough small sets for matching")
   }
 
   const movableShuffled = random.shuffle([...movable])
