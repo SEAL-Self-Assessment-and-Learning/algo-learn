@@ -78,7 +78,7 @@ export function MatchingBoard({
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className={cn("my-6 flex flex-wrap gap-8", className)}>
+      <div className={cn("my-x flex flex-wrap gap-8", className)}>
         {/* matching rows */}
         <div className="flex flex-col gap-2">
           {leftItems.map((label, i) => (
