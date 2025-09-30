@@ -88,26 +88,23 @@ export function chooseInequalities(random: Random, low: number, high: number) {
   let leftOp = random.choice(["<", "\\leq"])
   let rightOp = random.choice(["<", "\\leq"])
 
-  const displayLowBound = low
-  const displayHighBound = high
-
-  let includeStart = leftOp === "<" ? displayLowBound + 1 : displayLowBound
-  let includeEnd = rightOp === "<" ? displayHighBound - 1 : displayHighBound
+  let includeStart = leftOp === "<" ? low + 1 : low
+  let includeEnd = rightOp === "<" ? high - 1 : high
 
   if (includeStart > includeEnd) {
     if (rightOp === "<") {
       rightOp = "\\leq"
-      includeEnd = displayHighBound
+      includeEnd = high
     } else if (leftOp === "<") {
       leftOp = "\\leq"
-      includeStart = displayLowBound
+      includeStart = low
     } else {
-      includeStart = displayLowBound
-      includeEnd = displayLowBound
+      includeStart = low
+      includeEnd = low
     }
   }
 
-  return { leftOp, rightOp, displayLowBound, displayHighBound, includeStart, includeEnd }
+  return { leftOp, rightOp, includeStart, includeEnd }
 }
 
 /**
@@ -117,7 +114,7 @@ export function chooseInequalities(random: Random, low: number, high: number) {
 export function maybeDecorateNaturalDomain(
   dom: Domain,
   rightOp: string,
-  displayHighBound: number,
+  high: number,
   omitLower: boolean,
   random: Random,
 ) {
@@ -125,7 +122,7 @@ export function maybeDecorateNaturalDomain(
   const useDecoration = random.choice([true, false])
   if (!useDecoration) return { latex: "\\mathbb{N}", embedsUpper: false }
   const tag = rightOp === "<" ? "<" : "\\leq"
-  return { latex: `\\mathbb{N}_{${tag}${displayHighBound}}`, embedsUpper: true }
+  return { latex: `\\mathbb{N}_{${tag}${high}}`, embedsUpper: true }
 }
 
 /**
@@ -136,19 +133,18 @@ export function maybeDecorateNaturalDomain(
 export function formatBoundsClause(
   dom: Domain,
   prop: SetProperty,
-  displayLowBound: number,
-  displayHighBound: number,
+  low: number,
+  high: number,
   leftOp: string,
   rightOp: string,
   embedsUpper: boolean,
 ) {
   const implied = implicitLowerBound(dom, prop)
-  const omitLower =
-    implied !== null && (leftOp === "<" ? displayLowBound + 1 : displayLowBound) <= implied
+  const omitLower = implied !== null && (leftOp === "<" ? low + 1 : low) <= implied
   if (omitLower && embedsUpper) return ""
-  if (omitLower) return `n ${rightOp} ${displayHighBound}`
-  if (embedsUpper) return `${displayLowBound} ${leftOp} n`
-  return `${displayLowBound} ${leftOp} n ${rightOp} ${displayHighBound}`
+  if (omitLower) return `n ${rightOp} ${high}`
+  if (embedsUpper) return `${low} ${leftOp} n`
+  return `${low} ${leftOp} n ${rightOp} ${high}`
 }
 
 /** Inclusive integer range [a..b] */
@@ -160,8 +156,6 @@ export type TemplateConfig = {
   high: number
   leftOp: string
   rightOp: string
-  displayLowBound: number
-  displayHighBound: number
   includeStart: number
   includeEnd: number
   domainLatex: string
@@ -170,8 +164,8 @@ export type TemplateConfig = {
 }
 
 export type SetTemplate = {
-  generateConfig: (dom: Domain, param: number, r: Random) => TemplateConfig
+  generateConfig: (dom: Domain, param: number, random: Random) => TemplateConfig
   labels: (lang: Language, dom: Domain, param: number, cfg: TemplateConfig) => string[]
   build: (dom: Domain, param: number, cfg: TemplateConfig) => number[]
-  paramRange: (r: Random) => number
+  paramRange: (random: Random) => number
 }
