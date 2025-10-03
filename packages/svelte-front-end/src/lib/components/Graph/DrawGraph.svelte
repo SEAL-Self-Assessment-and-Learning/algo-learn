@@ -44,13 +44,13 @@
     .filter(graph.directed ? () => true : (e) => e.source < e.target)
 
   let fieldOpen = $derived(false)
-  const nodeId = nodeInputFieldID(graph.inputFields)
-  const edgeId = edgeInputFieldID(graph.inputFields)
+  const nodeId = nodeInputFieldID(graph.inputFieldID)
+  const edgeId = edgeInputFieldID(graph.inputFieldID)
   const nodeInputFieldMd = `${nodeId}#TL###`
   const edgeInputFieldMd = `${edgeId}#TL###`
 
   // register fields first so parent/provider can add them
-  if (graph.inputFields) {
+  if (graph.inputFieldID) {
     if (graph.nodeClickType !== "none") {
       addTextFieldAfterwards(nodeInputFieldMd)
     }
@@ -251,7 +251,7 @@
     <div
       class="absolute right-28 -bottom-6 flex flex-row items-center space-x-1 rounded-lg dark:border-gray-700 dark:bg-gray-800"
     >
-      {#if graph.inputFields !== 0}
+      {#if graph.inputFieldID !== 0}
         <Toggle
           class={`${theme === "dark" ? "text-white" : "text-black"}  hover:cursor-pointer`}
           size="sm"

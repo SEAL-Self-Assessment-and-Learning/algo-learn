@@ -42,14 +42,14 @@ export interface Edge {
  * A graph.
  * @property nodes - The nodes of the graph.
  * @property links - The links of the graph.
- * @property inputFields - A unique ID for the input field associated with the graph.
+ * @property inputFieldID - A unique ID for the input field associated with the graph.
  */
 export class Graph {
   nodes: NodeList
   edges: EdgeList
   weighted: boolean
   directed: boolean
-  public inputFields: number
+  public inputFieldID: number
   public nodeDraggable: boolean
   public nodeClickType: ClickEventType
   public edgeClickType: ClickEventType
@@ -62,18 +62,18 @@ export class Graph {
     edges: EdgeList,
     directed: boolean,
     weighted: boolean,
-    inputFields: number = 0,
+    inputFieldID: number = 0,
     nodeDraggable: boolean = false,
     nodeClick: ClickEventType = "none",
     edgeClick: ClickEventType = "none",
-    nodeGroupMax: number = 0,
-    edgeGroupMax: number = 0,
+    nodeGroupMax: number = 2,
+    edgeGroupMax: number = 2,
   ) {
     this.nodes = nodes
     this.edges = edges
     this.directed = directed
     this.weighted = weighted
-    this.inputFields = inputFields
+    this.inputFieldID = inputFieldID
     this.nodeDraggable = nodeDraggable
     this.nodeClickType = nodeClick
     this.edgeClickType = edgeClick
@@ -112,7 +112,7 @@ export class Graph {
 
   public toString(): string {
     const clickTypeMapping: Record<ClickEventType, string> = { none: "0", select: "1", group: "2" }
-    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${this.inputFields} ${this.nodeDraggable ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
+    let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${this.inputFieldID} ${this.nodeDraggable ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
 
     for (const node of this.nodes) {
       graphStr += `${Math.round(node.coords.x * 100) / 100} ${Math.round(node.coords.y * 100) / 100} ${node.group ?? "-"} "${node.label ?? ""}"\n`

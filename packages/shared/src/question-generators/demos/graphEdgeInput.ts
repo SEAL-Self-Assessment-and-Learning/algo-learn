@@ -69,7 +69,7 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
       graph.nodeDraggable = false
       graph.edgeClickType = "select"
       graph.edgeGroupMax = 2
-      graph.inputFields = 1 // The ID of the input field for the edge input
+      graph.inputFieldID = 1 // The ID of the input field for the edge input
 
       startNode = random.choice(graph.nodes)
       bfsNodePaths = bfs(startNode, graph)
@@ -116,7 +116,7 @@ function getFeedback(
 ): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
     const edgeInput = checkEdgeInput(text[edgeInputFieldID(1)], graph, lang)
-    graph.inputFields = 0
+    graph.inputFieldID = 0
     graph.edgeClickType = "none"
     for (let i = 1; i < endNodePath[1].length; i++) {
       const node1 = graph.nodes.findIndex((node) => node.label! === endNodePath[1][i - 1].label)
