@@ -1,7 +1,8 @@
 import type { Language } from "@shared/api/Language.ts"
 import { getNodeLabel, type Edge, type Graph } from "@shared/utils/graph.ts"
 import { t, type Translations } from "@shared/utils/translations.ts"
-import type { GraphElementStateType } from "@/components/DrawGraph.tsx"
+
+type GraphElementStateType = { selected: boolean; group: null | number }
 
 export type NodeInputSelectedCheckResult = { parsed: boolean; messages: string[]; selected: string[] }
 export type NodeInputGroupCheckResult = {
@@ -42,7 +43,6 @@ const parseFdTranslations: Translations = {
   },
 }
 
-// Quick comment test
 export function updateGraphNodeSelected(
   graph: Graph,
   nodeStates: GraphElementStateType[],
@@ -219,7 +219,7 @@ function checkNodeInputGroup(nodes: string[], graph: Graph, lang: Language): Nod
  * @param lang
  */
 export function checkEdgeInput(edgeString: string, graph: Graph, lang: Language): EdgeInputCheckResult {
-  const edges = edgeString.toUpperCase().split(";")
+  const edges = (edgeString ?? "").toUpperCase().split(";")
   return graph.edgeClickType === "select" || graph.edgeClickType === "none"
     ? checkEdgeInputSelect(edges, graph, lang)
     : checkEdgeInputGroup(edges, graph, lang)

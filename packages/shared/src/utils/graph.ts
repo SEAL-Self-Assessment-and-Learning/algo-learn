@@ -299,8 +299,8 @@ export function getNodeLabel(i: number): string {
     label = String.fromCharCode(65 + a) + label
   } while (i > 0)
 
-    return label
-  }
+  return label
+}
 
 export class RandomGraph {
   /**
@@ -922,7 +922,7 @@ export class KNMGraphGenerator {
     for (let i = 0; i < size; i++) {
       const angle = (2 * Math.PI * i) / size
       nodes.push({
-        label: RandomGraph.getLabel(i),
+        label: getNodeLabel(i),
         coords: { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius },
       })
     }
@@ -953,10 +953,10 @@ export class KNMGraphGenerator {
 
     // create partitions
     for (let i = 0; i < nodesInPartA; i++) {
-      nodes.push({ label: RandomGraph.getLabel(i), coords: { x: i * 2, y: -yOffset } })
+      nodes.push({ label: getNodeLabel(i), coords: { x: i * 2, y: -yOffset } })
     }
     for (let j = 0; j < nodesInPartB; j++) {
-      nodes.push({ label: RandomGraph.getLabel(nodesInPartA + j), coords: { x: j * 2, y: yOffset } })
+      nodes.push({ label: getNodeLabel(nodesInPartA + j), coords: { x: j * 2, y: yOffset } })
     }
 
     centerPartition(nodes.slice(0, nodesInPartA), nodesInPartA, nodesInPartA + nodesInPartB)
@@ -997,7 +997,7 @@ export class CycleGraph {
     for (let i = 0; i < size; i++) {
       const angle = (2 * Math.PI * i) / size
       nodes.push({
-        label: RandomGraph.getLabel(i),
+        label: getNodeLabel(i),
         coords: {
           x: Math.cos(angle) * radius + shakeup(),
           y: Math.sin(angle) * radius + shakeup(),

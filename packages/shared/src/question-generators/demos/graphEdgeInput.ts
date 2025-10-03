@@ -68,6 +68,7 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
       graph = RandomGraph.grid(random, [6, 3], 0.6, "square-width-diagonals", null, false, false)
       graph.nodeDraggable = false
       graph.edgeClickType = "select"
+      graph.edgeGroupMax = 2
       graph.inputFields = 1 // The ID of the input field for the edge input
 
       startNode = random.choice(graph.nodes)
@@ -95,7 +96,6 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
 function getCheckFormat(graph: Graph, lang: Language): MultiFreeTextFormatFunction {
   return ({ text }, fieldID) => {
     const edgeCheck = checkEdgeInput(text[fieldID], graph, lang)
-    console.log(edgeCheck.messages)
     if (!edgeCheck.parsed) {
       return {
         valid: false,

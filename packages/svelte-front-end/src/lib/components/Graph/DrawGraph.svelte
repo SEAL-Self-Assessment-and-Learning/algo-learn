@@ -1,7 +1,22 @@
 <script lang="ts">
   import Edge from "$lib/components/Graph/Edge.svelte"
+  import {
+    edgeInputSetText,
+    nodeInputSetText,
+    saveEdgeInput,
+    saveNodeInput,
+  } from "$lib/components/Graph/inputHelper.ts"
   import Node from "$lib/components/Graph/Node.svelte"
-  import type { Graph } from "@shared/utils/graph.ts"
+  import { Toggle } from "$lib/components/ui/toggle"
+  import { getTheme } from "$lib/theme.svelte.ts"
+  import { globalTranslations } from "$lib/translation.ts"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
+  import { getContext } from "svelte"
+  import { TextCursorInput } from "@lucide/svelte"
+  import { edgeInputFieldID, nodeInputFieldID, type Graph } from "@shared/utils/graph.ts"
+  import { tFunction } from "@shared/utils/translations.ts"
+  import Markdown from "../markdown/markdown.svelte"
+  import { ADD_TEXTFIELDS_AFTERWARDS, type FormContextValue } from "../types.ts"
 
   type GraphElementStateType = { selected: boolean; group: null | number }
 
@@ -11,15 +26,58 @@
     graph: Graph
   }
   const { maxWidth, maxHeight, graph }: Props = $props()
+
+  const theme = $derived(getTheme())
+  const lang = $derived(getLanguage())
+  const { t } = $derived(tFunction([globalTranslations], lang))
+
   let svgRef: SVGSVGElement | null = null
   const coordinateScale = 60
   const nodeScale = 20
   // limited by the number of colors we have. See tailwind --color-group-0,...,--color-group-7.
   const maxGroups = 8
 
+  const { addTextFieldAfterwards } = getContext<FormContextValue>(ADD_TEXTFIELDS_AFTERWARDS)
+
   const edgeListFlat = graph.edges
     .flat()
     .filter(graph.directed ? () => true : (e) => e.source < e.target)
+
+  let fieldOpen = $derived(false)
+  const nodeId = nodeInputFieldID(graph.inputFields)
+  const edgeId = edgeInputFieldID(graph.inputFields)
+  const nodeInputFieldMd = `${nodeId}#TL###`
+  const edgeInputFieldMd = `${edgeId}#TL###`
+
+  // register fields first so parent/provider can add them
+  if (graph.inputFields) {
+    if (graph.nodeClickType !== "none") {
+      addTextFieldAfterwards(nodeInputFieldMd)
+    }
+    if (graph.edgeClickType !== "none") {
+      addTextFieldAfterwards(edgeInputFieldMd)
+    }
+  }
+
+  // get context (the provider should keep this object reactive)
+  const context = getContext<FormContextValue>(ADD_TEXTFIELDS_AFTERWARDS)
+
+  // derive the live field objects from the context (no one-time copies)
+  // this reads the context object each time it changes
+  const nodeField = $derived(() => context.textFieldStateValues?.[nodeId])
+  const edgeField = $derived(() => context.textFieldStateValues?.[edgeId])
+
+  // derive the text string reactively from nodeField
+  const nodeText = $derived(() => nodeField()?.text ?? "")
+  const edgeText = $derived(() => edgeField()?.text ?? "")
+
+  $effect(() => {
+    saveNodeInput(nodeText(), nodeStates, graph, lang)
+  })
+
+  $effect(() => {
+    saveEdgeInput(edgeText(), edgeStates, edgeListFlat, graph, lang)
+  })
 
   let currentlyDragged = $state<null | number>(null)
 
@@ -31,22 +89,18 @@
       }
     }),
   )
-  let nodeStates = $derived<GraphElementStateType[]>(
-    graph.nodes.map((u) => {
-      return {
-        selected: false,
-        group: u.group ?? null,
-      }
-    }),
+  let nodeStates = $state<GraphElementStateType[]>(
+    graph.nodes.map((u) => ({
+      selected: false,
+      group: u.group ?? null,
+    })),
   )
 
-  let edgeStates = $derived<GraphElementStateType[]>(
-    edgeListFlat.map((e) => {
-      return {
-        selected: false,
-        group: e.group ?? null,
-      }
-    }),
+  let edgeStates = $state<GraphElementStateType[]>(
+    edgeListFlat.map((e) => ({
+      selected: false,
+      group: e.group ?? null,
+    })),
   )
 
   function handleSetDragged(i: number) {
@@ -55,18 +109,30 @@
     }
   }
 
-  function handleClick(i: number) {
+  function handleClickNode(i: number) {
     if (graph.nodeClickType === "select") {
-      nodeStates = nodeStates.map((s, idx) => (idx === i ? { ...s, selected: !s.selected } : s))
+      nodeStates[i].selected = !nodeStates[i].selected
     } else if (graph.nodeClickType === "group") {
       const max = Math.min(graph.nodeGroupMax ?? maxGroups, maxGroups) - 1
-      nodeStates = nodeStates.map((s, idx) => {
-        if (idx !== i) return s
-        const next = s.group === max ? null : s.group === null ? 0 : s.group + 1
-        return { ...s, group: next }
-      })
-      console.log(nodeStates[i])
+      nodeStates[i].group =
+        nodeStates[i].group === max ? null : nodeStates[i].group === null ? 0 : nodeStates[i].group + 1
     }
+    nodeInputSetText(nodeField(), nodeStates)
+  }
+
+  function handleClickEdge(i: number) {
+    if (graph.edgeClickType === "select") {
+      edgeStates[i].selected = !edgeStates[i].selected
+    } else if (graph.edgeClickType === "group") {
+      edgeStates[i].group =
+        edgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
+          ? null
+          : edgeStates[i].group === null
+            ? 0
+            : edgeStates[i].group + 1
+      edgeStates = [...edgeStates]
+    }
+    edgeInputSetText(edgeField(), edgeStates, edgeListFlat)
   }
 
   const dimensions = graph.getDimensions()
@@ -115,79 +181,113 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<svg
-  bind:this={svgRef}
-  width={maxWidth}
-  height={viewBox.height / viewBox.width > 1 && viewBox.height < maxHeight
-    ? viewBox.height * 0.75
-    : maxWidth * viewBoxAspectRatio}
-  viewBox={`${viewBox.x} ${viewBox.y - 10} ${viewBox.width} ${viewBox.height + 20}`}
-  class="bg-secondary mx-auto h-auto max-w-full touch-none overscroll-x-none rounded-2xl"
-  onmousemove={(e) => updateDraggedNode(e.clientX, e.clientY)}
-  onmouseup={() => {
-    if (currentlyDragged !== null) {
-      currentlyDragged = null
-    }
-  }}
-  ontouchmove={(e) => {
-    // Always prevent default when a node is being dragged
-    if (currentlyDragged !== null) {
-      e.preventDefault()
-      e.stopPropagation()
-      updateDraggedNode(e.touches[0].clientX, e.touches[0].clientY)
-    }
-  }}
-  ontouchend={(e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (currentlyDragged !== null) {
-      currentlyDragged = null
-    }
-  }}
-  ontouchcancel={(e) => {
-    e.preventDefault()
-    if (currentlyDragged !== null) {
-      currentlyDragged = null
-    }
-  }}
->
-  <g>
-    {#each edgeListFlat as e, i (i)}
-      <Edge
-        u={nodePositions[e.source]}
-        v={nodePositions[e.target]}
-        weight={e.value}
-        directed={graph.directed}
-        clickable={graph.edgeClickType !== "none"}
-        state={edgeStates[i]}
-        onClickCallback={() => {
-          if (graph.edgeClickType === "select") {
-            edgeStates[i].selected = !edgeStates[i].selected
-            edgeStates = [...edgeStates]
-          } else if (graph.edgeClickType === "group") {
-            edgeStates[i].group =
-              edgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
-                ? null
-                : edgeStates[i].group === null
-                  ? 0
-                  : edgeStates[i].group + 1
-            edgeStates = [...edgeStates]
-          }
-        }}
-      />
-    {/each}
-  </g>
-  <g>
-    {#each graph.nodes as u, i (i)}
-      <Node
-        pos={nodePositions[i]}
-        setDragged={graph.nodeDraggable ? () => handleSetDragged(i) : undefined}
-        size={nodeScale}
-        label={u.label ?? ""}
-        clickable={graph.nodeClickType !== "none"}
-        nodeState={nodeStates[i]}
-        onClickCallback={() => handleClick(i)}
-      />
-    {/each}
-  </g>
-</svg>
+<div class="mb-8">
+  <div class="relative">
+    <svg
+      bind:this={svgRef}
+      width={maxWidth}
+      height={viewBox.height / viewBox.width > 1 && viewBox.height < maxHeight
+        ? viewBox.height * 0.75
+        : maxWidth * viewBoxAspectRatio}
+      viewBox={`${viewBox.x} ${viewBox.y - 10} ${viewBox.width} ${viewBox.height + 20}`}
+      class="bg-secondary mx-auto h-auto max-w-full touch-none overscroll-x-none rounded-2xl"
+      onmousemove={(e) => updateDraggedNode(e.clientX, e.clientY)}
+      onmouseup={() => {
+        if (currentlyDragged !== null) {
+          currentlyDragged = null
+        }
+      }}
+      ontouchmove={(e) => {
+        // Always prevent default when a node is being dragged
+        if (currentlyDragged !== null) {
+          e.preventDefault()
+          e.stopPropagation()
+          updateDraggedNode(e.touches[0].clientX, e.touches[0].clientY)
+        }
+      }}
+      ontouchend={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (currentlyDragged !== null) {
+          currentlyDragged = null
+        }
+      }}
+      ontouchcancel={(e) => {
+        e.preventDefault()
+        if (currentlyDragged !== null) {
+          currentlyDragged = null
+        }
+      }}
+    >
+      <g>
+        {#each edgeListFlat as e, i (i)}
+          <Edge
+            u={nodePositions[e.source]}
+            v={nodePositions[e.target]}
+            weight={e.value}
+            directed={graph.directed}
+            clickable={graph.edgeClickType !== "none"}
+            state={edgeStates[i]}
+            onClickCallback={() => {
+              handleClickEdge(i)
+            }}
+          />
+        {/each}
+      </g>
+      <g>
+        {#each graph.nodes as u, i (i)}
+          <Node
+            pos={nodePositions[i]}
+            setDragged={graph.nodeDraggable ? () => handleSetDragged(i) : undefined}
+            size={nodeScale}
+            label={u.label ?? ""}
+            clickable={graph.nodeClickType !== "none"}
+            nodeState={nodeStates[i]}
+            onClickCallback={() => handleClickNode(i)}
+          />
+        {/each}
+      </g>
+    </svg>
+    <div
+      class="absolute right-28 -bottom-6 flex flex-row items-center space-x-1 rounded-lg dark:border-gray-700 dark:bg-gray-800"
+    >
+      {#if graph.inputFields !== 0}
+        <Toggle
+          class={`${theme === "dark" ? "text-white" : "text-black"}  hover:cursor-pointer`}
+          size="sm"
+          variant="bg"
+          disabled={nodeField()?.disabled || edgeField()?.disabled}
+          onclick={() => {
+            fieldOpen = !fieldOpen
+          }}
+        >
+          <TextCursorInput />
+        </Toggle>
+      {/if}
+    </div>
+  </div>
+  {#if graph.nodeClickType !== "none" && fieldOpen}
+    <div class="mt-1">
+      <div class="mb-1">
+        <b>{t("nodeSelection")}</b>
+      </div>
+      <div class="flex w-full flex-row items-center justify-center space-x-1">
+        <div class="mr-0.5 flex-grow">
+          <Markdown md={`{{${nodeInputFieldMd}}}`} />
+        </div>
+      </div>
+    </div>
+  {/if}
+  {#if graph.edgeClickType !== "none" && fieldOpen}
+    <div class="mt-1">
+      <div class="mb-1">
+        <b>{t("edgeSelection")}</b>
+      </div>
+      <div class="flex w-full flex-row items-center justify-center space-x-1">
+        <div class="mr-0.5 flex-grow">
+          <Markdown md={`{{${edgeInputFieldMd}}}`} />
+        </div>
+      </div>
+    </div>
+  {/if}
+</div>
