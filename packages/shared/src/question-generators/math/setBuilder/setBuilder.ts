@@ -14,8 +14,8 @@ import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import Random from "@shared/utils/random"
 import { t, tFunctional } from "@shared/utils/translations"
 import type { Domain } from "./helpers"
-import { templates } from "./templates"
-import { translations } from "./translations"
+import { templates } from "./templates.ts"
+import { translations } from "./translations.ts"
 
 const maxMatchSize = 8
 const maxAttempts = 100
@@ -173,4 +173,4 @@ function generateFreeTextVariant(lang: Language, path: string, random: Random) {
   return { question }
 }
 
-export { translations } from "./translations"
+export { translations } from "./translations.ts"

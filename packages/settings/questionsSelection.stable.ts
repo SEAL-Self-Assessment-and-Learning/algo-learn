@@ -19,7 +19,7 @@ import { CRT } from "@shared/question-generators/math/modularArithmetic/crt.ts"
 import { ExtendedEuclideanAlgorithm } from "@shared/question-generators/math/modularArithmetic/eea.ts"
 import { modFactor } from "@shared/question-generators/math/modularArithmetic/modFactorization.ts"
 import { ModTricks } from "@shared/question-generators/math/modularArithmetic/modTricks.ts"
-import { SetBuilderQuestion } from "@shared/question-generators/math/setBuilder/setBuilder"
+import { SetBuilderQuestion } from "@shared/question-generators/math/setBuilder/setBuilder.ts"
 import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
 import { ReadingSyntaxTrees } from "@shared/question-generators/propositional-logic/readingSyntaxTrees.ts"
@@ -94,11 +94,10 @@ export const collection: QuestionCollection = [
     contents: [huffmanCoding],
   },
   {
-<<<<<<< HEAD:settings/questionsSelection.stable.ts
     slug: "setbuilder",
     name: { en: "Set Builder Notation", de: "Mengenschreibweise" },
-    contents: [SetBuilderQuestion],
-=======
+    contents: [SetBuilderQuestion]},
+  {
     slug: "graphs",
     name: { de: "Graphen", en: "Graphs" },
     contents: [TreeTraversal],
@@ -107,7 +106,6 @@ export const collection: QuestionCollection = [
     slug: "dijkstra",
     name: { de: "Dijkstra", en: "Dijkstra" },
     contents: [DijkstraAlgorithm, DijkstraTableGenerator],
->>>>>>> upstream/main:packages/settings/questionsSelection.stable.ts
   },
 ]
 
