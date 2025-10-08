@@ -7,5 +7,5 @@
     "allowSyntheticDefaultImports": true,
     "strict": true
   },
-  "include": ["front-end/vite.config.ts"]
+  "include": ["front-end/svelte.config.js"]
 }
