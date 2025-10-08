@@ -1,4 +1,4 @@
-import {
+import type {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextFormatFunction,
   MultiFreeTextQuestion,
@@ -7,15 +7,16 @@ import {
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import {
   getHuffmanCodeOfTable,
-  HuffmanNode,
+  type HuffmanNode,
 } from "@shared/question-generators/huffman-coding/Huffman.ts"
 import {
   checkProvidedCode,
   convertDictToMdTable,
 } from "@shared/question-generators/huffman-coding/utils/utils.ts"
 import { generateDictFoundations } from "@shared/question-generators/huffman-coding/utils/utilsDict.ts"
+import { mdTableFromData } from "@shared/utils/markdownTools.ts"
 import Random from "@shared/utils/random.ts"
-import { t, tFunctional, Translations } from "@shared/utils/translations.ts"
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
@@ -84,7 +85,7 @@ export const ReverseHuffmanCoding: QuestionGenerator = {
       numDifferentCharacters,
     })
     // fits on iPhone SE 3rd generation
-    const frequencyTable = convertDictToMdTable(originalEncoding, "#div_my-5#")
+    const frequencyTable = convertDictToMdTable(originalEncoding)
 
     const charList: string[] = Object.keys(characterFrequencies)
     const numberOfInputFields =
@@ -98,7 +99,6 @@ export const ReverseHuffmanCoding: QuestionGenerator = {
       indicesOfInputFields,
       charList,
     })
-
     const question: MultiFreeTextQuestion = {
       type: "MultiFreeTextQuestion",
       name: ReverseHuffmanCoding.name(lang),
@@ -238,14 +238,14 @@ function createMixInputCharFreqTable({
   indicesOfInputFields: number[]
   charList: string[]
 }) {
-  let table = `|${charList.join("|")}|`
-  table += "\n|"
-  charList.forEach((key, i) => {
-    table += indicesOfInputFields.includes(i)
-      ? `{{char-${i}#OS-2###overlay}}`
-      : `**${characterFrequencies[key]}**`
-    table += "|"
-  })
-  table += "\n|#?ah_center?av_middle?div_my-5#| |"
-  return table
+  const data: string[][] = []
+  data.push(charList.map((value) => value))
+  data.push(
+    charList.map((key, i) =>
+      indicesOfInputFields.includes(i)
+        ? `{{char-${i}#OS-2###overlay}}`
+        : `**${characterFrequencies[key]}**`,
+    ),
+  )
+  return mdTableFromData(data, "center", undefined, [0], [])
 }

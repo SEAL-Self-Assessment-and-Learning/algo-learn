@@ -1,9 +1,9 @@
 import {
   minimalMultipleChoiceFeedback,
-  MultiFreeTextFeedbackFunction,
-  MultiFreeTextFormatFunction,
-  MultiFreeTextQuestion,
-  MultipleChoiceQuestion,
+  type MultiFreeTextFeedbackFunction,
+  type MultiFreeTextFormatFunction,
+  type MultiFreeTextQuestion,
+  type MultipleChoiceQuestion,
 } from "@shared/api/QuestionGenerator"
 import { generatePossibleAnswersChoice2 } from "@shared/question-generators/huffman-coding/generate/dictStructure"
 import { generateCharacterFrequencyTable } from "@shared/question-generators/huffman-coding/generate/words"
@@ -13,8 +13,8 @@ import {
   checkProvidedCode,
   convertDictToMdTable,
 } from "@shared/question-generators/huffman-coding/utils/utils"
-import Random from "@shared/utils/random"
-import { t, Translations } from "@shared/utils/translations"
+import type Random from "@shared/utils/random"
+import { t, type Translations } from "@shared/utils/translations"
 
 /**
  * This function generates the basic structure for input2 and choice2 questions
@@ -31,7 +31,7 @@ export function generateDictFoundations({
   const characterFrequencies = generateCharacterFrequencyTable(numDifferentCharacters, random)
   // only temporary displaying the word array
   // add some spacing to table in the question text using extra feature div_my-5
-  const displayTable = convertDictToMdTable(characterFrequencies, "#div_my-5#")
+  const displayTable = convertDictToMdTable(characterFrequencies)
   const correctAnswerTreeNode = getHuffmanCodeOfTable(characterFrequencies)
   const correctAnswerDict = correctAnswerTreeNode.getEncodingTable()
 

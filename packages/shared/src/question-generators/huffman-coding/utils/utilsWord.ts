@@ -4,9 +4,9 @@ import {
   type FreeTextFormatFunction,
   type FreeTextQuestion,
   type MultipleChoiceQuestion,
-} from "../../../api/QuestionGenerator.ts"
-import type Random from "../../../utils/random.ts"
-import { t, type Translations } from "../../../utils/translations.ts"
+} from "@shared/api/QuestionGenerator.ts"
+import type Random from "@shared/utils/random.ts"
+import { t, type Translations } from "@shared/utils/translations.ts"
 import { generateChoice1Question, generateInputChoice1Foundations } from "../generate/stringStructure.ts"
 import { huffmanCoding } from "../huffmanCoding.ts"
 import { insertSpaceAfterEveryXChars } from "./utils.ts"
