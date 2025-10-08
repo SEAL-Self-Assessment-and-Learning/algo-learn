@@ -29,7 +29,7 @@
   ]
 
   let selectedCategory = $state("all")
-  let sortBy: "name" | "random" = $state("name")
+  let sortBy: "name" | "default" = $state("name")
   let selectedGroup: string | null = $state(null)
   let expandedContentEl: HTMLDivElement | null = $state(null) // For scrolling
 
@@ -71,9 +71,7 @@
   const sorted = $derived(
     [...filtered].sort((a, b) => {
       if (sortBy === "name") return a.name[lang]!.localeCompare(b.name[lang]!)
-      // For random, we can just return 0 to keep the original (filtered) order,
-      // or implement a shuffle if true randomness is needed on each sort change.
-      // For now, returning 0 is fine.
+      // For default, we can just return 0 to keep the original (filtered) order,
       return 0
     }),
   )
@@ -130,7 +128,7 @@
           </DropdownMenu.Trigger>
           <DropdownMenu.Content>
             <DropdownMenu.Item onclick={() => (sortBy = "name")}>Name</DropdownMenu.Item>
-            <DropdownMenu.Item onclick={() => (sortBy = "random")}>Random</DropdownMenu.Item>
+            <DropdownMenu.Item onclick={() => (sortBy = "default")}>Default</DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </div>
