@@ -80,12 +80,14 @@
   const rows = $derived(chunk(sorted, columns))
 
   function toggleGroup(slug: string) {
-    const isOpening = selectedGroup !== slug
-    selectedGroup = isOpening ? slug : null
-    if (isOpening) {
+    // Toggle open/close instantly
+    selectedGroup = selectedGroup === slug ? null : slug
+
+    // Scroll new section into view (optional)
+    if (selectedGroup) {
       setTimeout(() => {
         expandedContentEl?.scrollIntoView({ behavior: "smooth", block: "nearest" })
-      }, 50)
+      }, 20)
     }
   }
 </script>
@@ -186,11 +188,7 @@
 
       {#if row.find((g) => g.slug === selectedGroup)}
         {#each row.filter((g) => g.slug === selectedGroup) as gSelected (gSelected.slug)}
-          <div
-            bind:this={expandedContentEl}
-            class="mt-2 mb-8"
-            transition:slide={{ duration: 350, easing: quintOut }}
-          >
+          <div bind:this={expandedContentEl} class="mt-2 mb-8">
             <div class="relative rounded-xl border border-slate-200 bg-slate-50 p-6 shadow-inner sm:p-8">
               <button
                 onclick={() => (selectedGroup = null)}
