@@ -26,7 +26,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -34,8 +34,10 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Bun install 🔧
-        run: bun install --frozen-lockfile
+      - name: Navigate to subfolder and install dependencies 🔧
+        run: |
+          cd packages/svelte-front-end
+          bun install --frozen-lockfile
 
       # See https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables for a definition of GITHUB_REF.
       # The GITHUB_REF is in the form of refs/heads/<branch_name> or refs/pull/<pull_request_number>/merge. We replace the slashes with underscores.
@@ -43,10 +45,10 @@ jobs:
         run: echo "CLEAN_REF=$(echo "$GITHUB_REF" | sed -e 's/\//_/g')" >> $GITHUB_ENV
         shell: bash
 
-      - name: Write basename and version number to front-end/src/config.ts
+      - name: Write basename and version number to packages/svelte-front-end/src/lib/config.js
         run: |
-          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$CLEAN_REF\"/g" front-end/src/config.ts
-          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" front-end/src/config.ts
+          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn-testing\/$CLEAN_REF\"/g" packages/svelte-front-end/src/lib/config.js
+          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short HEAD)\"/g" packages/svelte-front-end/src/lib/config.js
 
       - name: Build 🔧
         run: bun run build --mode staging --base /algo-learn-testing/$CLEAN_REF/
@@ -59,7 +61,7 @@ jobs:
         with:
           options: ""
           ssh_options: ""
-          src: "front-end/dist/"
+          src: "packages/svelte-front-end/build/"
           dest: "dell-from-github@tcs.uni-frankfurt.de:/var/www/html/algo-learn-testing/$CLEAN_REF/"
 
       - name: Display status from deploy
