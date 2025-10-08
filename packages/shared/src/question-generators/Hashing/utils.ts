@@ -1,7 +1,7 @@
 import type {
   MultiFreeTextFeedbackFunction,
   MultiFreeTextFormatFunction,
-} from "@shared/api/QuestionGenerator"
+} from "@shared/api/QuestionGenerator.ts"
 import { generateHashFunction } from "@shared/question-generators/Hashing/Functions"
 import { MapLinked } from "@shared/question-generators/Hashing/MapLinked"
 import {
@@ -12,9 +12,9 @@ import {
 import {
   createArrayDisplayCodeBlock,
   createArrayDisplayCodeBlockUserInput,
-} from "@shared/utils/arrayDisplayCodeBlock"
-import type Random from "@shared/utils/random"
-import { t, type Translations } from "@shared/utils/translations"
+} from "@shared/utils/arrayDisplayCodeBlock.ts"
+import type Random from "@shared/utils/random.ts"
+import { t, type Translations } from "@shared/utils/translations.ts"
 
 /**
  * This function creates the view to create a better readable solution for the user
