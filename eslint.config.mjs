@@ -1,14 +1,14 @@
 // @ts-check
 
-import tseslint from "typescript-eslint"
-import react from "@eslint-react/eslint-plugin"
+import prettier from "eslint-config-prettier"
+import globals from "globals"
+import ts from "typescript-eslint"
 import js from "@eslint/js"
-import pluginQuery from "@tanstack/eslint-plugin-query"
 
-const namingConvention = [
+export const namingConvention = [
   {
     selector: "default",
-    format: ["camelCase"],
+    format: ["camelCase", "UPPER_CASE"],
     leadingUnderscore: "allow",
     trailingUnderscore: "allow",
   },
@@ -36,17 +36,17 @@ const namingConvention = [
   },
 ]
 
-export default [
-  ...pluginQuery.configs["flat/recommended"],
-  {
-    ignores: ["**/*.config.{js,cjs,mjs}", "node_modules", "front-end/dist"],
-  },
+export default ts.config(
   js.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
+  ...ts.configs.recommendedTypeChecked,
   {
     languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
       parserOptions: {
-        parser: tseslint.parser,
+        parser: ts.parser,
         project: "./tsconfig.json",
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
@@ -54,15 +54,13 @@ export default [
     },
   },
   {
-    ...react.configs["recommended-type-checked"],
-  },
-  {
     rules: {
-      "@eslint-react/no-leaked-conditional-rendering": "error",
-      "@eslint-react/no-array-index-key": "off",
       "@typescript-eslint/naming-convention": ["error", ...namingConvention],
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/consistent-type-imports": "error",
+      "@typescript-eslint/no-import-type-side-effects": "error",
       "@typescript-eslint/unbound-method": [
         "error",
         {
@@ -71,4 +69,8 @@ export default [
       ],
     },
   },
-]
+  prettier,
+  {
+    ignores: ["**/*.config.{js,cjs,mjs}", "node_modules", "packages/svelte-front-end/"],
+  },
+)

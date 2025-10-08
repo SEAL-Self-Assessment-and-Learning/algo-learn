@@ -8,13 +8,13 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
-    "types": ["vite/client"],
 
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
 
     /* Linting */
     "strict": true,
@@ -25,12 +25,11 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["front-end/src/*"],
-      "@shared/*": ["shared/src/*"],
-      "@settings/*": ["settings/*"]
+      "@shared/*": ["packages/shared/src/*"],
+      "@settings/*": ["packages/settings/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
-  "exclude": ["node_modules", "front-end/dist", "front-end/vite.config.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "./vite-env.d.ts"],
+  "exclude": ["packages/svelte-front-end"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

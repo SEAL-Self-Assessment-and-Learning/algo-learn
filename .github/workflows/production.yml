@@ -28,31 +28,29 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20"
-          # cache: "yarn"
+          bun-version: latest
 
-      - uses: oven-sh/setup-bun@v1
-
-      - name: Bun install 🔧
-        run: bun install --frozen-lockfile
-
-      - name: Write basename and version number to front-end/src/config.ts
+      - name: Navigate to subfolder and install dependencies 🔧
         run: |
-          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn\"/g" front-end/src/config.ts
-          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short $GITHUB_SHA)\"/g" front-end/src/config.ts
+          cd packages/svelte-front-end
+          bun install --frozen-lockfile
+
+      - name: Write basename and version number to packages/svelte-front-end/src/lib/config.js
+        run: |
+          sed -i "s/^export const BASENAME =.*$/export const BASENAME = \"\/algo-learn\"/g" packages/svelte-front-end/src/lib/config.js
+          sed -i "s/^export const VERSION =.*$/export const VERSION = \"$(git rev-parse --short $GITHUB_SHA)\"/g" packages/svelte-front-end/src/lib/config.js
 
       - name: Run test suite
         run: bun run test
 
       - name: Build 🔧
-        run: bun run build --base /algo-learn/
+        run: bun run build --mode production --base /algo-learn/
 
       - name: Deploy to server 🚀
         id: deploy
@@ -62,7 +60,7 @@ jobs:
         with:
           options: ""
           ssh_options: ""
-          src: "front-end/dist/"
+          src: "packages/svelte-front-end/build/"
           dest: "dell-from-github@tcs.uni-frankfurt.de:/var/www/html/algo-learn/"
 
       - name: Display status from deploy
