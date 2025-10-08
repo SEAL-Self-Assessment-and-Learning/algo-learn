@@ -15,6 +15,7 @@ export const collection: QuestionCollection = [
   {
     slug: "demos",
     name: { de: "Demos", en: "Demos" },
+    topics: ["demo"],
     contents: [
       DemoMultipleChoice,
       DemoSingleInput,

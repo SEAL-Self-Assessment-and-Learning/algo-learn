@@ -38,6 +38,7 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
+    topics: ["logic"],
     contents: [
       Satisfiability,
       NormalForms,
@@ -52,54 +53,64 @@ export const collection: QuestionCollection = [
   {
     slug: "modular-arithmetic",
     name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
+    topics: ["math"],
     contents: [ModTricks, CRT, modFactor, ExtendedEuclideanAlgorithm],
   },
   {
     slug: "asymptotics",
     name: { de: "Asymptotik", en: "Asymptotics" },
+    topics: ["math", "cs"],
     contents: [AsymptoticsPreciseLanguage, SortTerms, LandauNotation, SimplifySum, Between],
     // image: new URL("../front-end/assets/images/skill-asymptotics.jpg", import.meta.url),
   },
   {
     slug: "recursion",
     name: { de: "Rekursion", en: "Recursion" },
+    topics: ["cs"],
     contents: [RecursionFormula, RecurrenceMaster],
     // image: new URL("../front-end/assets/images/skill-recursion.jpg", import.meta.url),
   },
   {
-    slug: "time",
-    name: { de: "Laufzeit", en: "Time" },
+    slug: "pseudocode",
+    name: { de: "Pseudocode", en: "Pseudocode" },
+    topics: ["cs"],
     contents: [Loops],
     // image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
   },
   {
     slug: "stack",
     name: { de: "Stacks und Queues", en: "Stacks and Queues" },
+    topics: ["cs", "algorithms", "data structures"],
     contents: [stackQuestion, queueQuestion],
   },
   {
     slug: "heap",
     name: { de: "Heaps", en: "Heaps" },
+    topics: ["cs", "algorithms", "data structures"],
     contents: [HeapOperations, HeapVerifying, HeapNeighbours],
   },
   {
     slug: "union-find",
     name: { de: "Union-Find", en: "Union-Find" },
+    topics: ["cs", "algorithms", "data structures"],
     contents: [QuickFindGenerator],
   },
   {
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
+    topics: ["cs", "algorithms"],
     contents: [huffmanCoding],
   },
   {
     slug: "graphs",
     name: { de: "Graphen", en: "Graphs" },
+    topics: ["cs", "algorithms", "data structures", "graphs"],
     contents: [TreeTraversal],
   },
   {
     slug: "dijkstra",
     name: { de: "Dijkstra", en: "Dijkstra" },
+    topics: ["cs", "algorithms", "graphs"],
     contents: [DijkstraAlgorithm, DijkstraTableGenerator],
   },
 ]

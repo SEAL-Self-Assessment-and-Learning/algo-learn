@@ -75,11 +75,13 @@ const exampleCollection: QuestionCollection = [
   {
     slug: "test",
     name: { en: "Test", de: "Test" },
+    topics: ["test"],
     contents: [testQuestion],
   },
   {
     slug: "test2",
     name: { en: "Test2", de: "Test2" },
+    topics: ["test2"],
     contents: [exampleQuestion],
   },
 ]

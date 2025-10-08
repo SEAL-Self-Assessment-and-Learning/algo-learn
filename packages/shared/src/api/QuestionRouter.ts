@@ -10,6 +10,7 @@ export type QuestionCollection = Array<{
   slug: string
   name: SingleTranslation
   contents: Array<QuestionGenerator>
+  topics: Array<string>
   image?: URL
 }>
 
