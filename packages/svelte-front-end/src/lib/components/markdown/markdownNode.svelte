@@ -54,6 +54,8 @@
     <div class="my-5">
       <DrawGraph maxWidth={550} maxHeight={300} graph={Graph.parse(x.child)} />
     </div>
+  {:else if x.language === "matrixInput"}
+    <div class="my-5">Todo</div>
   {:else}
     <pre class="block">{x}</pre>
   {/if}
