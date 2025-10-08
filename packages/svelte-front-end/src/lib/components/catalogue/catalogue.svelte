@@ -93,8 +93,8 @@
 </script>
 
 <!-- Main container -->
-<div class="flex items-center justify-center">
-  <div {...rest} class="p-2" use:resizeObserverAction>
+<div class="flex items-center justify-center px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12">
+  <div {...rest} class="w-full p-2" use:resizeObserverAction>
     <!-- Filter + Sort Header -->
     <div class="mb-6 flex items-center justify-between">
       <div class="flex items-center gap-2 sm:gap-4">
