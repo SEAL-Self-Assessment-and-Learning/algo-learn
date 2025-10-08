@@ -4,9 +4,9 @@ import {
   type FreeTextFormatFunction,
   type FreeTextQuestion,
   type MultipleChoiceQuestion,
-} from "../../../api/QuestionGenerator.ts"
-import type Random from "../../../utils/random.ts"
-import { t, type Translations } from "../../../utils/translations.ts"
+} from "@shared/api/QuestionGenerator.ts"
+import type Random from "@shared/utils/random.ts"
+import { t, type Translations } from "@shared/utils/translations.ts"
 import { generateChoice1Question, generateInputChoice1Foundations } from "../generate/stringStructure.ts"
 import { huffmanCoding } from "../huffmanCoding.ts"
 import { insertSpaceAfterEveryXChars } from "./utils.ts"
@@ -84,16 +84,8 @@ export function generateInputQuestion({
   }
 
   const feedback: FreeTextFeedbackFunction = ({ text: codeword }) => {
-    const valid = correctTree.setLabelsByCodeword(word, codeword)
-
-    if (valid) {
-      return {
-        correct: true,
-      }
-    }
-
     return {
-      correct: false,
+      correct: correctTree.setLabelsByCodeword(word, codeword.replace(/\s+/g, "")),
       correctAnswer: insertSpaceAfterEveryXChars(correctAnswer, 3),
     }
   }
