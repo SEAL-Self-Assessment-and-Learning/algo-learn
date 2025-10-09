@@ -4,21 +4,30 @@ import {
   type MultiFreeTextFormatFunction,
   type MultiFreeTextQuestion,
   type MultipleChoiceQuestion,
-} from "../../../api/QuestionGenerator.ts"
-import type Random from "../../../utils/random.ts"
-import { t, type Translations } from "../../../utils/translations.ts"
-import { generatePossibleAnswersChoice2 } from "../generate/dictStructure.ts"
-import { generateCharacterFrequencyTable } from "../generate/words.ts"
-import { getHuffmanCodeOfTable } from "../Huffman.ts"
-import { huffmanCoding } from "../huffmanCoding.ts"
-import { checkProvidedCode, convertDictToMdTable } from "./utils.ts"
+} from "@shared/api/QuestionGenerator"
+import { generatePossibleAnswersChoice2 } from "@shared/question-generators/huffman-coding/generate/dictStructure"
+import { generateCharacterFrequencyTable } from "@shared/question-generators/huffman-coding/generate/words"
+import { getHuffmanCodeOfTable } from "@shared/question-generators/huffman-coding/Huffman"
+import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import {
+  checkProvidedCode,
+  convertDictToMdTable,
+} from "@shared/question-generators/huffman-coding/utils/utils"
+import type Random from "@shared/utils/random"
+import { t, type Translations } from "@shared/utils/translations"
 
 /**
  * This function generates the basic structure for input2 and choice2 questions
  * @param random
+ * @param numDifferentCharacters - number of different chars
  */
-function generateDictFoundations({ random }: { random: Random }) {
-  const numDifferentCharacters = random.int(6, 9)
+export function generateDictFoundations({
+  random,
+  numDifferentCharacters,
+}: {
+  random: Random
+  numDifferentCharacters: number
+}) {
   const characterFrequencies = generateCharacterFrequencyTable(numDifferentCharacters, random)
   // only temporary displaying the word array
   // add some spacing to table in the question text using extra feature div_my-5
@@ -40,33 +49,21 @@ function generateDictFoundations({ random }: { random: Random }) {
  * @param characterFrequencies
  */
 function createInputFields(characterFrequencies: { [p: string]: number }) {
-  let inputFields = "|"
+  let inputFields = ""
   const fieldIDCharMap: { [key: string]: string } = {}
   // iterate through the wordArray to create the input fields
   let i = 0
   for (const key in characterFrequencies) {
     const fieldID = `index-${i}-${key}` // this is the unique ID for the input field
     fieldIDCharMap[fieldID] = key
-    inputFields += `${key}:|{{${fieldID}#TL###overlay}}|`
+    inputFields += "|{{" + fieldID + "#TL#" + key + ": ##overlay}}"
     if (i % 2 == 1) {
-      inputFields += "\n|"
+      inputFields += "|\n"
     }
     i++
   }
-
+  inputFields += "|\n|#border_none?table_w-full#||"
   return inputFields
-}
-
-/**
- * This function creates the solution table for the user to see a correct encoding
- * @param correctAnswerDict
- */
-function createSolutionTable(correctAnswerDict: Record<string, string>) {
-  let solutionDisplay = ""
-  for (const key in correctAnswerDict) {
-    solutionDisplay += `|**${key}**|$${correctAnswerDict[key]}$|\n`
-  }
-  return solutionDisplay
 }
 
 /**
@@ -90,11 +87,13 @@ export function generateInput2Question({
   lang: "en" | "de"
   permalink: string
 }) {
+  const numDifferentCharacters = random.int(6, 9)
   const { characterFrequencies, displayTable, correctAnswerDict } = generateDictFoundations({
     random,
+    numDifferentCharacters,
   })
   const inputFields = createInputFields(characterFrequencies)
-  const solutionTable = createSolutionTable(correctAnswerDict)
+  const solutionTable = convertDictToMdTable(correctAnswerDict)
 
   const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
     if (text[fieldID].trim() === "") return { valid: false, message: "" }
@@ -172,8 +171,10 @@ export function generateChoice2Question({
   lang: "en" | "de"
   permalink: string
 }) {
+  const numDifferentCharacters = random.int(6, 9)
   const { characterFrequencies, displayTable, correctAnswerTreeNode } = generateDictFoundations({
     random,
+    numDifferentCharacters,
   })
   const { answers, correctAnswerIndices } = generatePossibleAnswersChoice2(
     random,

@@ -15,6 +15,7 @@ import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighb
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import { ReverseHuffmanCoding } from "@shared/question-generators/huffman-coding/reverseHuffmanCoding.ts"
 import { AxbGenerator } from "@shared/question-generators/math/linearAlgebra/axb/axbGen.ts"
 import { Determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
 import { CRT } from "@shared/question-generators/math/modularArithmetic/crt.ts"
@@ -92,7 +93,7 @@ export const collection: QuestionCollection = [
   {
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
-    contents: [huffmanCoding],
+    contents: [huffmanCoding, ReverseHuffmanCoding],
   },
   {
     slug: "graphs",
