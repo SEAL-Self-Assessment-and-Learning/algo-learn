@@ -3,7 +3,7 @@ import type {
   MultiFreeTextQuestion,
 } from "@shared/api/QuestionGenerator.ts"
 import { AxbGenerator } from "@shared/question-generators/math/linearAlgebra/axb/axbGen"
-import { generateAforAxEqualsB } from "@shared/question-generators/math/linearAlgebra/generations/matrix"
+import { allRandomMatrix } from "@shared/question-generators/math/linearAlgebra/generations/matrix"
 import { matrixToTex, vectorToTex } from "@shared/question-generators/math/linearAlgebra/tex"
 import { _ } from "@shared/utils/generics.ts"
 import math from "@shared/utils/math.ts"
@@ -33,7 +33,7 @@ export function generateVariantStartAxb(
       userX.push(parseFloat(text[`x_${i}_0`].replace(/\s/g, "")))
     }
     const userB = math.multiply(A, userX)
-    const correct = _.isEqual(userB, updatedB)
+    const correct = _.isEqual(userB, b)
     if (correct) {
       return {
         correct: true,
@@ -49,12 +49,17 @@ export function generateVariantStartAxb(
   do {
     x = Array.from({ length: matrixSize }, () => random.int(-8, 8))
   } while (math.norm(x) === 0)
-  const b: number[] = Array.from({ length: matrixSize }, () => random.int(-8, 8))
-  const { A, updatedB } = generateAforAxEqualsB({
+  // generate a random A matrix
+  const A = allRandomMatrix({
     random,
-    x,
-    b,
+    rows: matrixSize,
+    cols: matrixSize,
+    min: -8,
+    max: 8,
+    precision: 1,
   })
+  // calculate b
+  const b = math.multiply(A, x)
 
   const matrixInput = createMatrixInput({
     rows: matrixSize,
@@ -68,11 +73,7 @@ export function generateVariantStartAxb(
     name: AxbGenerator.name(lang),
     path: permalink,
     fillOutAll: true,
-    text: t(translations, lang, "text", [
-      matrixToTex(A, "r"),
-      vectorToTex(updatedB),
-      matrixInput.matrixInput,
-    ]),
+    text: t(translations, lang, "text", [matrixToTex(A, "r"), vectorToTex(b), matrixInput.matrixInput]),
     feedback,
   }
 

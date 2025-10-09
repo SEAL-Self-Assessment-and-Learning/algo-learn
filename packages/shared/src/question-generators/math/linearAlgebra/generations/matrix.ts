@@ -326,6 +326,8 @@ function zeroOutExceptIndex(
  * Given [min, max], the matrix values may be greater/smaller to satisfy the condition.
  * B may be outside the range of [min, max] too.
  *
+ * @NotUsed: This is currently not used, but might be useful in future questions
+ *
  * @param random
  * @param x - vector x
  * @param b - vector b
