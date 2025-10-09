@@ -80,7 +80,7 @@ export function getExtraStyles(style: string, feedbackVariation: string) {
     additionalClassnames =
       "focus:outline-none w-10 py-0.5 px-1 h-8 mx-0.5 my-0.5 focus-visible:ring-1 focus-visible:ring-offset-0 text-center"
   } else if (style === "MAT") {
-    additionalClassnames = `w-12 p-2 mx-0.5 focus-visible:ring-1 focus-visible:ring-offset-0`
+    additionalClassnames = `w-12 p-2 mx-0.5 my-0 focus-visible:ring-1 focus-visible:ring-offset-0`
   }
   if (additionalClassnames === "") {
     if (feedbackVariation === "below") {

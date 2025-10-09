@@ -1,5 +1,6 @@
 <script lang="ts">
   import DrawGraph from "$lib/components/Graph/DrawGraph.svelte"
+  import MatrixInput from "$lib/components/MatrixInput.svelte"
   import DrawPseudoCode from "$lib/components/PseudoCode/DrawPseudoCode.svelte"
   import DrawTable from "$lib/components/table/DrawTable.svelte"
   import TeX from "$lib/components/TeX.svelte"
@@ -52,6 +53,10 @@
   {:else if x.language === "graph"}
     <div class="my-5">
       <DrawGraph maxWidth={550} maxHeight={300} graph={Graph.parse(x.child)} />
+    </div>
+  {:else if x.language === "matrixInput"}
+    <div class="my-5">
+      <MatrixInput x={x.child} />
     </div>
   {:else}
     <pre class="block">{x}</pre>
