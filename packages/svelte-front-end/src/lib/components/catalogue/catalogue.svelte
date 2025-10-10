@@ -3,11 +3,14 @@
   import FilterSortHeader from "$lib/components/catalogue/FilterSortHeader.svelte"
   import SlugIcon from "$lib/components/catalogue/SlugIcon.svelte"
   import TopicsFooter from "$lib/components/catalogue/TopicsFooter.svelte"
+  import { Button } from "$lib/components/ui/button"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { HTMLAttributes } from "svelte/elements"
   import { X } from "@lucide/svelte"
   import { collection, type QuestionTopic } from "@settings/questionsSelection"
   import type { Language } from "@shared/api/Language"
+  import { allParameterCombinations, serializeParameters } from "@shared/api/Parameters.ts"
+  import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 
   const { ...rest }: HTMLAttributes<HTMLDivElement> = $props()
   const lang: Language = $derived(getLanguage())
@@ -16,6 +19,12 @@
   let sortBy: "Name" | "Default" = $state("Default")
   let selectedGroup: string | null = $state(null)
   let expandedContentEl: HTMLDivElement | null = $state(null)
+  // Track showAllVariants per topic (keyed by topic ID or slug)
+  let showAllVariants: Record<string, boolean> = $state({})
+
+  function toggleVariants(topicId: string) {
+    showAllVariants = { ...showAllVariants, [topicId]: !showAllVariants[topicId] }
+  }
 
   // 1. A reactive variable to hold the current number of columns
   let columns = $state(4) // Default to max columns
@@ -134,32 +143,71 @@
               </button>
 
               <div class="mx-auto max-w-7xl">
-                <h2 class="mb-6 text-3xl font-bold text-gray-900 dark:text-gray-50">
-                  {gSelected.name[lang]}
-                </h2>
+                <div class="mb-6 flex flex-wrap items-center">
+                  <!-- Topic Name -->
+                  <h2 class="mr-4 text-3xl font-bold text-gray-900 dark:text-gray-50">
+                    {gSelected.name[lang]}
+                  </h2>
+
+                  <!-- Toggle Button -->
+                  <button
+                    class={`mr-4 transform rounded-full border px-3 py-0.5 text-sm
+          font-medium transition-colors duration-200 ease-in-out
+          ${
+            showAllVariants[gSelected.slug]
+              ? "border-accent text-accent hover:border-accent-400 hover:text-accent-400"
+              : "border-gray-300 text-gray-800 dark:border-slate-600 dark:text-gray-100 dark:hover:border-gray-400 dark:hover:text-gray-200"
+          }`}
+                    onclick={() => toggleVariants(gSelected.slug)}
+                  >
+                    {showAllVariants[gSelected.slug] ? "Hide Variants" : "Show Variants"}
+                  </button>
+                </div>
 
                 {#if gSelected.contents?.length}
                   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {#each gSelected.contents as generator (generator.name)}
-                      <a
-                        href={resolve(`/${lang}/${generator.id}`)}
-                        class="group hover:border-accent-400 dark:hover:border-accent-500 block rounded-lg border border-gray-300 bg-white p-4 transition-all hover:scale-[1.02] hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+                      <div
+                        class="group block rounded-lg border border-gray-300 bg-white p-4 transition-all hover:scale-[1.02] hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
                       >
-                        <h3
-                          class="group-hover:text-accent-600 dark:group-hover:text-accent-400 font-semibold text-gray-800 transition-colors dark:text-gray-100"
-                        >
-                          {generator.name(lang)}
-                        </h3>
+                        <!-- Topic name -->
+                        <div class="flex flex-col">
+                          <a href={resolve(`/${lang}/${generator.id}`)}>
+                            <h3
+                              class="group-hover:text-accent-600 dark:group-hover:text-accent-400 font-semibold text-gray-800 transition-colors dark:text-gray-100"
+                            >
+                              {generator.name(lang)}
+                            </h3>
+                          </a>
+                        </div>
+
                         {#if generator.description}
                           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                             {generator.description(lang)}
                           </p>
                         {/if}
-                      </a>
+
+                        {#if showAllVariants[gSelected.slug]}
+                          <div class="mt-2 flex flex-wrap gap-2">
+                            {#each allParameterCombinations(generator.expectedParameters) as parameters (parameters)}
+                              {@const path = serializeGeneratorCall({ lang, generator, parameters })}
+                              {@const params = serializeParameters(
+                                parameters,
+                                generator.expectedParameters,
+                              )}
+                              {#if params}
+                                <Button size="xsm" variant="secondary" href={resolve(`/${path}`)}>
+                                  {params}
+                                </Button>
+                              {/if}
+                            {/each}
+                          </div>
+                        {/if}
+                      </div>
                     {/each}
                   </div>
                 {:else}
-                  <p class="text-gray-500 italic dark:text-gray-400">No subtopics yet.</p>
+                  <p class="text-gray-500 dark:text-gray-400">No generators available.</p>
                 {/if}
               </div>
             </div>
