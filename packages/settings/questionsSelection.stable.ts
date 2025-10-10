@@ -163,7 +163,7 @@ export const collection: QuestionCollection = [
     topics: ["math"],
     description: {
       de: "Fragen zu Linearer Algebra",
-      en: "Questions about Linear Algebra"
+      en: "Questions about Linear Algebra",
     },
     contents: [Determinant, AxbGenerator],
   },
