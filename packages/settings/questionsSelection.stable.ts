@@ -73,7 +73,6 @@ export const collection: QuestionCollection = [
       de: "Wachstumsraten und Grenzen",
     },
     contents: [AsymptoticsPreciseLanguage, SortTerms, LandauNotation, SimplifySum, Between],
-    // image: new URL("../front-end/assets/images/skill-asymptotics.jpg", import.meta.url),
   },
   {
     slug: "recursion",
@@ -84,7 +83,6 @@ export const collection: QuestionCollection = [
       de: "Funktionen, die sich selbst aufrufen",
     },
     contents: [RecursionFormula, RecurrenceMaster],
-    // image: new URL("../front-end/assets/images/skill-recursion.jpg", import.meta.url),
   },
   {
     slug: "pseudocode",
@@ -95,7 +93,6 @@ export const collection: QuestionCollection = [
       de: "Übung zur Algorithmusnotation",
     },
     contents: [Loops],
-    // image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
   },
   {
     slug: "stack",
