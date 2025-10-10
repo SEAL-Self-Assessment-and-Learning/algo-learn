@@ -8,23 +8,33 @@ export { oldPathToGenerator }
 
 export const collection = mode === "production" ? stable : demos.concat(stable)
 
-export type QuestionTopic = "demo" | "math" | "cs" | "logic" | "graph" | "data-structures" | "algorithms"
+export type QuestionTopic =
+  | "demo"
+  | "math"
+  | "logic"
+  | "graph"
+  | "data-structures"
+  | "algorithms"
+  | "pseudocode"
+  | "recursion"
 export const allQuestionTopics: QuestionTopic[] = [
   ...(mode !== "production" ? ["demo" as QuestionTopic] : []),
   "math",
-  "cs",
   "logic",
   "graph",
   "data-structures",
   "algorithms",
+  "pseudocode",
+  "recursion",
 ]
 
 export const topicNames: Record<QuestionTopic, SingleTranslation> = {
   demo: { de: "Demo", en: "Demo" },
   math: { de: "Mathematik", en: "Math" },
-  cs: { de: "Informatik", en: "Computer Science" },
   logic: { de: "Logik", en: "Logic" },
   graph: { de: "Graphen", en: "Graphs" },
   "data-structures": { de: "Datenstrukturen", en: "Data Structures" },
   algorithms: { de: "Algorithmen", en: "Algorithms" },
+  pseudocode: { de: "Pseudocode", en: "Pseudocode" },
+  recursion: { de: "Rekursion", en: "Recursion" },
 }

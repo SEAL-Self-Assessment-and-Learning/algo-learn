@@ -38,7 +38,7 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
-    topics: ["logic"],
+    topics: ["logic", "math"],
     description: {
       en: "Logic formulas and truth tables",
       de: "Logische Formeln und Wahrheitstabellen",
@@ -67,7 +67,7 @@ export const collection: QuestionCollection = [
   {
     slug: "asymptotics",
     name: { de: "Asymptotik", en: "Asymptotics" },
-    topics: ["math", "cs"],
+    topics: ["math"],
     description: {
       en: "Growth rates and limits",
       de: "Wachstumsraten und Grenzen",
@@ -78,7 +78,7 @@ export const collection: QuestionCollection = [
   {
     slug: "recursion",
     name: { de: "Rekursion", en: "Recursion" },
-    topics: ["cs"],
+    topics: ["recursion"],
     description: {
       en: "Functions calling themselves",
       de: "Funktionen, die sich selbst aufrufen",
@@ -89,7 +89,7 @@ export const collection: QuestionCollection = [
   {
     slug: "pseudocode",
     name: { de: "Pseudocode", en: "Pseudocode" },
-    topics: ["cs"],
+    topics: ["pseudocode"],
     description: {
       en: "Algorithm notation practice",
       de: "Übung zur Algorithmusnotation",
@@ -100,7 +100,7 @@ export const collection: QuestionCollection = [
   {
     slug: "stack",
     name: { de: "Stacks und Queues", en: "Stacks and Queues" },
-    topics: ["cs", "algorithms", "data-structures"],
+    topics: ["algorithms", "data-structures"],
     description: {
       en: "LIFO and FIFO structures",
       de: "LIFO- und FIFO-Strukturen",
@@ -110,7 +110,7 @@ export const collection: QuestionCollection = [
   {
     slug: "heap",
     name: { de: "Heaps", en: "Heaps" },
-    topics: ["cs", "algorithms", "data-structures"],
+    topics: ["algorithms", "data-structures"],
     description: {
       en: "Tree-based priority structures",
       de: "Baumbasierte Prioritätsstrukturen",
@@ -120,7 +120,7 @@ export const collection: QuestionCollection = [
   {
     slug: "union-find",
     name: { de: "Union-Find", en: "Union-Find" },
-    topics: ["cs", "algorithms", "data-structures"],
+    topics: ["algorithms", "data-structures"],
     description: {
       en: "Disjoint set operations",
       de: "Operationen auf disjunkten Mengen",
@@ -130,7 +130,7 @@ export const collection: QuestionCollection = [
   {
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
-    topics: ["cs", "algorithms"],
+    topics: ["algorithms"],
     description: {
       en: "Data compression algorithm",
       de: "Algorithmus zur Datenkompression",
@@ -140,7 +140,7 @@ export const collection: QuestionCollection = [
   {
     slug: "graphs",
     name: { de: "Graphen", en: "Graphs" },
-    topics: ["cs", "algorithms", "data-structures", "graph"],
+    topics: ["algorithms", "data-structures", "graph"],
     description: {
       en: "Nodes and edges",
       de: "Knoten und Kanten",
@@ -150,7 +150,7 @@ export const collection: QuestionCollection = [
   {
     slug: "dijkstra",
     name: { de: "Dijkstra", en: "Dijkstra" },
-    topics: ["cs", "algorithms", "graph"],
+    topics: ["algorithms", "graph"],
     description: {
       en: "Shortest path algorithm",
       de: "Kürzester-Pfad-Algorithmus",
