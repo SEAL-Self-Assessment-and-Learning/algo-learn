@@ -150,18 +150,20 @@
                   </h2>
 
                   <!-- Toggle Button -->
-                  <button
-                    class={`mr-4 transform rounded-full border px-3 py-0.5 text-sm
+                  {#if gSelected.contents.some((x) => x.expectedParameters.length > 0)}
+                    <button
+                      class={`mr-4 transform rounded-full border px-3 py-0.5 text-sm
           font-medium transition-colors duration-200 ease-in-out
           ${
             showAllVariants[gSelected.slug]
               ? "border-accent text-accent hover:border-accent-400 hover:text-accent-400"
               : "border-gray-300 text-gray-800 dark:border-slate-600 dark:text-gray-100 dark:hover:border-gray-400 dark:hover:text-gray-200"
           }`}
-                    onclick={() => toggleVariants(gSelected.slug)}
-                  >
-                    {showAllVariants[gSelected.slug] ? "Hide Variants" : "Show Variants"}
-                  </button>
+                      onclick={() => toggleVariants(gSelected.slug)}
+                    >
+                      {showAllVariants[gSelected.slug] ? "Hide Variants" : "Show Variants"}
+                    </button>
+                  {/if}
                 </div>
 
                 {#if gSelected.contents?.length}
@@ -188,20 +190,22 @@
                         {/if}
 
                         {#if showAllVariants[gSelected.slug]}
-                          <div class="mt-2 flex flex-wrap gap-2">
-                            {#each allParameterCombinations(generator.expectedParameters) as parameters (parameters)}
-                              {@const path = serializeGeneratorCall({ lang, generator, parameters })}
-                              {@const params = serializeParameters(
-                                parameters,
-                                generator.expectedParameters,
-                              )}
-                              {#if params}
-                                <Button size="xsm" variant="secondary" href={resolve(`/${path}`)}>
-                                  {params}
-                                </Button>
-                              {/if}
-                            {/each}
-                          </div>
+                          {#if generator.expectedParameters.length > 0}
+                            <div class="mt-2 flex flex-wrap gap-2">
+                              {#each allParameterCombinations(generator.expectedParameters) as parameters (parameters)}
+                                {@const path = serializeGeneratorCall({ lang, generator, parameters })}
+                                {@const params = serializeParameters(
+                                  parameters,
+                                  generator.expectedParameters,
+                                )}
+                                {#if params}
+                                  <Button size="xsm" variant="secondary" href={resolve(`/${path}`)}>
+                                    {params}
+                                  </Button>
+                                {/if}
+                              {/each}
+                            </div>
+                          {/if}
                         {/if}
                       </div>
                     {/each}
