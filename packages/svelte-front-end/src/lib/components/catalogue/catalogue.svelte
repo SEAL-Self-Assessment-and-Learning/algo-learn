@@ -1,42 +1,27 @@
 <script lang="ts">
-  import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js"
+  import { resolve } from "$app/paths"
+  import FilterSortHeader from "$lib/components/catalogue/FilterSortHeader.svelte"
+  import SlugIcon from "$lib/components/catalogue/SlugIcon.svelte"
+  import TopicsFooter from "$lib/components/catalogue/TopicsFooter.svelte"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
-  import { quintOut } from "svelte/easing" // import { quintOut } from "svelte/easing"
   import type { HTMLAttributes } from "svelte/elements"
-  import { slide } from "svelte/transition"
-  import { ListFilterPlus, X } from "@lucide/svelte"
-  import { collection } from "@settings/questionsSelection"
+  import { X } from "@lucide/svelte"
+  import { collection, type QuestionTopic } from "@settings/questionsSelection"
   import type { Language } from "@shared/api/Language"
 
   const { ...rest }: HTMLAttributes<HTMLDivElement> = $props()
   const lang: Language = $derived(getLanguage())
 
-  const topicStyles = {
-    math: { icon: "∑", color: "text-red-500" },
-    logic: { icon: "↔", color: "text-green-500" },
-    graphs: { icon: "⟶", color: "text-blue-500" },
-    algorithms: { icon: "⚙", color: "text-purple-500" },
-    cs: { icon: "💻", color: "text-indigo-500" },
-    "data structures": { icon: "🧱", color: "text-orange-500" },
-    default: { icon: "?", color: "text-gray-400" },
-  }
-
-  const categories = [
-    { id: "math", label: "Math", ...topicStyles.math },
-    { id: "logic", label: "Logic", ...topicStyles.logic },
-    { id: "graphs", label: "Graphs", ...topicStyles.graphs },
-    { id: "algorithms", label: "Algorithms", ...topicStyles.algorithms },
-  ]
-
-  let selectedCategory = $state("all")
-  let sortBy: "name" | "default" = $state("name")
+  let selectedTopic: QuestionTopic | "all" = $state("all")
+  let sortBy: "Name" | "Default" = $state("Default")
   let selectedGroup: string | null = $state(null)
-  let expandedContentEl: HTMLDivElement | null = $state(null) // For scrolling
+  let expandedContentEl: HTMLDivElement | null = $state(null)
 
   // 1. A reactive variable to hold the current number of columns
   let columns = $state(4) // Default to max columns
   // 2. A ResizeObserver action to detect the active number of columns
-  function resizeObserverAction() {
+  function resizeObserverAction(_node: HTMLElement) {
+    void _node // to avoid unused var warning
     const updateColumns = () => {
       const width = window.innerWidth
       if (width >= 1024) columns = 4
@@ -63,14 +48,16 @@
   }
 
   const filtered = $derived(
-    selectedCategory === "all"
+    selectedTopic === "all"
       ? collection
-      : collection.filter((g) => g.topics.includes(selectedCategory)),
+      : collection.filter((g) => g.topics.includes(selectedTopic as QuestionTopic)),
   )
 
   const sorted = $derived(
     [...filtered].sort((a, b) => {
-      if (sortBy === "name") return a.name[lang]!.localeCompare(b.name[lang]!)
+      // typescript needs this assertion
+      if (sortBy === "Default") return 0 // Keep original order
+      if (sortBy === "Name") return a.name[lang]!.localeCompare(b.name[lang]!)
       // For default, we can just return 0 to keep the original (filtered) order,
       return 0
     }),
@@ -92,96 +79,42 @@
   }
 </script>
 
-<!-- Main container -->
-<div class="flex items-center justify-center px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12">
+<div class="mt-4 flex items-center justify-center px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12">
   <div {...rest} class="w-full p-2" use:resizeObserverAction>
-    <!-- Filter + Sort Header -->
-    <div class="mb-6 flex items-center justify-between">
-      <div class="flex items-center gap-2 sm:gap-4">
-        <button
-          onclick={() => (selectedCategory = "all")}
-          class="flex h-10 items-center justify-center rounded-full border-2 px-4 text-sm font-semibold transition-all
-          {selectedCategory === 'all'
-            ? 'border-slate-800 bg-slate-800 text-white'
-            : 'border-gray-300 text-gray-500 hover:border-black hover:text-black'}"
-        >
-          All
-        </button>
-        {#each categories as cat (cat.id)}
-          <button
-            onclick={() => (selectedCategory = cat.id)}
-            title={cat.label}
-            class="flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all
-            {selectedCategory === cat.id
-              ? `${cat.color} border-current ring-2 ring-current ring-offset-2`
-              : 'border-gray-300 text-gray-400 hover:border-black hover:text-black'}"
-          >
-            <span class="text-xl font-semibold">{cat.icon}</span>
-          </button>
-        {/each}
-      </div>
+    <FilterSortHeader bind:selectedTopic bind:sortBy />
 
-      <div class="flex items-center gap-2">
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger
-            class="flex items-center gap-2 rounded-md border border-gray-300 px-3 py-1.5 text-sm transition hover:bg-gray-50"
-          >
-            <ListFilterPlus class="h-4 w-4" /> Sort by: <span class="font-medium">{sortBy}</span>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content>
-            <DropdownMenu.Item onclick={() => (sortBy = "name")}>Name</DropdownMenu.Item>
-            <DropdownMenu.Item onclick={() => (sortBy = "default")}>Default</DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
-      </div>
-    </div>
-
-    <!-- Topic grid -->
     {#each rows as row (row[0]?.slug)}
       <div class="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {#each row as g (g.slug)}
           <button
             type="button"
             aria-expanded={selectedGroup === g.slug}
-            class="group flex cursor-pointer flex-col items-center justify-between rounded-xl border p-4 text-center shadow-sm transition-all duration-200 hover:border-blue-500 hover:shadow-lg
-    {selectedGroup === g.slug
-              ? 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-500 ring-offset-2'
-              : 'border-gray-200 bg-white hover:bg-gray-50'}"
             onclick={() => toggleGroup(g.slug)}
+            class={`group relative flex w-full cursor-pointer flex-col items-start justify-between rounded-xl border p-5 text-left shadow-sm transition-all duration-200
+              ${
+                selectedGroup === g.slug
+                  ? "border-accent-500 bg-accent-50/50 ring-accent-500 dark:border-accent-400 dark:ring-accent-400 shadow-lg ring-2 ring-offset-2 ring-offset-white dark:bg-slate-800 dark:ring-offset-slate-900"
+                  : "hover:border-accent-300 dark:hover:border-accent-500 border-gray-200 bg-white hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+              }`}
           >
-            <div>
-              <div class="mb-4 flex justify-center">
-                <div
-                  class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 transition-transform group-hover:scale-110"
+            <div class="mb-3 flex w-full items-center justify-between">
+              <div class="flex items-center gap-3">
+                <SlugIcon slug={g.slug} />
+
+                <h2
+                  class="text-lg leading-tight font-semibold tracking-tight text-gray-900 dark:text-gray-100"
+                  style="word-break: break-word;"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="h-8 w-8 text-blue-600"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 6v6h4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
+                  {g.name[lang]}
+                </h2>
               </div>
-
-              <h2 class="mb-2 justify-center text-lg font-bold text-gray-800">{g.name[lang]}</h2>
-              <p class="mb-4 text-sm leading-relaxed text-gray-500">"Just a placeholder description."</p>
             </div>
 
-            <div class="mt-auto flex justify-center gap-3 border-t border-gray-100 pt-3">
-              {#each g.topics as topic (topic)}
-                <div class="text-xl font-semibold" title={topic}>
-                  {topicStyles[topic]?.icon || topicStyles.default.icon}
-                </div>
-              {/each}
-            </div>
+            <p class="mb-4 text-sm leading-snug text-gray-600 dark:text-gray-300">
+              {g.description[lang]}
+            </p>
+
+            <TopicsFooter {g} />
           </button>
         {/each}
       </div>
@@ -189,36 +122,44 @@
       {#if row.find((g) => g.slug === selectedGroup)}
         {#each row.filter((g) => g.slug === selectedGroup) as gSelected (gSelected.slug)}
           <div bind:this={expandedContentEl} class="mt-2 mb-8">
-            <div class="relative rounded-xl border border-slate-200 bg-slate-50 p-6 shadow-inner sm:p-8">
+            <div
+              class="relative rounded-xl border border-slate-300 bg-slate-100 p-6 shadow-inner sm:p-8 dark:border-slate-700 dark:bg-slate-900"
+            >
               <button
                 onclick={() => (selectedGroup = null)}
-                class="absolute top-4 right-4 text-gray-400 transition hover:text-gray-800"
+                class="absolute top-4 right-4 rounded-full p-1 text-gray-500 transition hover:bg-white/10 hover:text-gray-300"
                 title="Close"
               >
                 <X class="h-6 w-6" />
               </button>
 
               <div class="mx-auto max-w-7xl">
-                <h2 class="mb-4 text-3xl font-bold text-gray-900">{gSelected.name[lang]}</h2>
+                <h2 class="mb-6 text-3xl font-bold text-gray-900 dark:text-gray-50">
+                  {gSelected.name[lang]}
+                </h2>
 
                 {#if gSelected.contents?.length}
                   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {#each gSelected.contents as x (x.name)}
+                    {#each gSelected.contents as generator (generator.name)}
                       <a
-                        href="#"
-                        class="group block rounded-lg border border-gray-200 bg-white p-4 transition-all hover:border-blue-300 hover:bg-blue-50"
+                        href={resolve(`/${lang}/${generator.id}`)}
+                        class="group hover:border-accent-400 dark:hover:border-accent-500 block rounded-lg border border-gray-300 bg-white p-4 transition-all hover:scale-[1.02] hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
                       >
-                        <h3 class="font-semibold text-gray-800 group-hover:text-blue-800">
-                          {x.name(lang)}
+                        <h3
+                          class="group-hover:text-accent-600 dark:group-hover:text-accent-400 font-semibold text-gray-800 transition-colors dark:text-gray-100"
+                        >
+                          {generator.name(lang)}
                         </h3>
-                        {#if x.description}
-                          <p class="mt-1 text-sm text-gray-600">{x.description(lang)}</p>
+                        {#if generator.description}
+                          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {generator.description(lang)}
+                          </p>
                         {/if}
                       </a>
                     {/each}
                   </div>
                 {:else}
-                  <p class="text-gray-500 italic">No subtopics yet.</p>
+                  <p class="text-gray-500 italic dark:text-gray-400">No subtopics yet.</p>
                 {/if}
               </div>
             </div>

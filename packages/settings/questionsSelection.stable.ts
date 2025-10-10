@@ -39,6 +39,10 @@ export const collection: QuestionCollection = [
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
     topics: ["logic"],
+    description: {
+      en: "Logic formulas and truth tables",
+      de: "Logische Formeln und Wahrheitstabellen",
+    },
     contents: [
       Satisfiability,
       NormalForms,
@@ -54,12 +58,20 @@ export const collection: QuestionCollection = [
     slug: "modular-arithmetic",
     name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
     topics: ["math"],
+    description: {
+      en: "Numbers modulo n",
+      de: "Rechnen modulo n",
+    },
     contents: [ModTricks, CRT, modFactor, ExtendedEuclideanAlgorithm],
   },
   {
     slug: "asymptotics",
     name: { de: "Asymptotik", en: "Asymptotics" },
     topics: ["math", "cs"],
+    description: {
+      en: "Growth rates and limits",
+      de: "Wachstumsraten und Grenzen",
+    },
     contents: [AsymptoticsPreciseLanguage, SortTerms, LandauNotation, SimplifySum, Between],
     // image: new URL("../front-end/assets/images/skill-asymptotics.jpg", import.meta.url),
   },
@@ -67,6 +79,10 @@ export const collection: QuestionCollection = [
     slug: "recursion",
     name: { de: "Rekursion", en: "Recursion" },
     topics: ["cs"],
+    description: {
+      en: "Functions calling themselves",
+      de: "Funktionen, die sich selbst aufrufen",
+    },
     contents: [RecursionFormula, RecurrenceMaster],
     // image: new URL("../front-end/assets/images/skill-recursion.jpg", import.meta.url),
   },
@@ -74,43 +90,71 @@ export const collection: QuestionCollection = [
     slug: "pseudocode",
     name: { de: "Pseudocode", en: "Pseudocode" },
     topics: ["cs"],
+    description: {
+      en: "Algorithm notation practice",
+      de: "Übung zur Algorithmusnotation",
+    },
     contents: [Loops],
     // image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
   },
   {
     slug: "stack",
     name: { de: "Stacks und Queues", en: "Stacks and Queues" },
-    topics: ["cs", "algorithms", "data structures"],
+    topics: ["cs", "algorithms", "data-structures"],
+    description: {
+      en: "LIFO and FIFO structures",
+      de: "LIFO- und FIFO-Strukturen",
+    },
     contents: [stackQuestion, queueQuestion],
   },
   {
     slug: "heap",
     name: { de: "Heaps", en: "Heaps" },
-    topics: ["cs", "algorithms", "data structures"],
+    topics: ["cs", "algorithms", "data-structures"],
+    description: {
+      en: "Tree-based priority structures",
+      de: "Baumbasierte Prioritätsstrukturen",
+    },
     contents: [HeapOperations, HeapVerifying, HeapNeighbours],
   },
   {
     slug: "union-find",
     name: { de: "Union-Find", en: "Union-Find" },
-    topics: ["cs", "algorithms", "data structures"],
+    topics: ["cs", "algorithms", "data-structures"],
+    description: {
+      en: "Disjoint set operations",
+      de: "Operationen auf disjunkten Mengen",
+    },
     contents: [QuickFindGenerator],
   },
   {
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     topics: ["cs", "algorithms"],
+    description: {
+      en: "Data compression algorithm",
+      de: "Algorithmus zur Datenkompression",
+    },
     contents: [huffmanCoding],
   },
   {
     slug: "graphs",
     name: { de: "Graphen", en: "Graphs" },
-    topics: ["cs", "algorithms", "data structures", "graphs"],
+    topics: ["cs", "algorithms", "data-structures", "graph"],
+    description: {
+      en: "Nodes and edges",
+      de: "Knoten und Kanten",
+    },
     contents: [TreeTraversal],
   },
   {
     slug: "dijkstra",
     name: { de: "Dijkstra", en: "Dijkstra" },
-    topics: ["cs", "algorithms", "graphs"],
+    topics: ["cs", "algorithms", "graph"],
+    description: {
+      en: "Shortest path algorithm",
+      de: "Kürzester-Pfad-Algorithmus",
+    },
     contents: [DijkstraAlgorithm, DijkstraTableGenerator],
   },
 ]

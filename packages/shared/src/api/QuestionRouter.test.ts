@@ -75,13 +75,21 @@ const exampleCollection: QuestionCollection = [
   {
     slug: "test",
     name: { en: "Test", de: "Test" },
-    topics: ["test"],
+    topics: ["demo"],
+    description: {
+      en: "This is a test collection",
+      de: "Das ist eine Testkollektion",
+    },
     contents: [testQuestion],
   },
   {
     slug: "test2",
     name: { en: "Test2", de: "Test2" },
-    topics: ["test2"],
+    topics: ["demo"],
+    description: {
+      en: "This is a test collection",
+      de: "Das ist eine Testkollektion",
+    },
     contents: [exampleQuestion],
   },
 ]
