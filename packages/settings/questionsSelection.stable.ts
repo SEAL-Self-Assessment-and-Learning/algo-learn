@@ -15,6 +15,9 @@ import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighb
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import { ReverseHuffmanCoding } from "@shared/question-generators/huffman-coding/reverseHuffmanCoding.ts"
+import { AxbGenerator } from "@shared/question-generators/math/linearAlgebra/axb/axbGen.ts"
+import { Determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
 import { CRT } from "@shared/question-generators/math/modularArithmetic/crt.ts"
 import { ExtendedEuclideanAlgorithm } from "@shared/question-generators/math/modularArithmetic/eea.ts"
 import { modFactor } from "@shared/question-generators/math/modularArithmetic/modFactorization.ts"
@@ -127,12 +130,12 @@ export const collection: QuestionCollection = [
   {
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
+    contents: [huffmanCoding, ReverseHuffmanCoding],
     topics: ["algorithms"],
     description: {
       en: "Data compression algorithm",
       de: "Algorithmus zur Datenkompression",
     },
-    contents: [huffmanCoding],
   },
   {
     slug: "graphs",
@@ -153,6 +156,16 @@ export const collection: QuestionCollection = [
       de: "Kürzester-Pfad-Algorithmus",
     },
     contents: [DijkstraAlgorithm, DijkstraTableGenerator],
+  },
+  {
+    slug: "linear-algebra",
+    name: { de: "Lineare Algebra", en: "Linear Algebra" },
+    topics: ["math"],
+    description: {
+      de: "Fragen zu Linearer Algebra",
+      en: "Questions about Linear Algebra"
+    },
+    contents: [Determinant, AxbGenerator],
   },
 ]
 
