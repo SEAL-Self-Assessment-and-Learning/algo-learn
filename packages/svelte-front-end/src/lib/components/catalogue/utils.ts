@@ -1,5 +1,9 @@
 import type { QuestionTopic } from "@settings/questionsSelection.ts"
 
+/**
+ * Maps question topics to their corresponding colors.
+ * Code for background
+ */
 export const topicColorsBG: Record<QuestionTopic, string> = {
   demo: "bg-red-700 dark:bg-red-900",
   math: "bg-blue-700 dark:bg-blue-900",
@@ -11,6 +15,10 @@ export const topicColorsBG: Record<QuestionTopic, string> = {
   recursion: "bg-green-500 dark:bg-green-900",
 }
 
+/**
+ * Maps question topics to their corresponding border colors.
+ * Code for border
+ */
 export const topicColorBorder: Record<QuestionTopic, string> = {
   demo: "border-red-700 dark:border-red-900",
   math: "border-blue-700 dark:border-blue-900",
