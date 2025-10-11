@@ -1,7 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths"
   import FilterSortHeader from "$lib/components/catalogue/FilterSortHeader.svelte"
-  import SlugIcon from "$lib/components/catalogue/SlugIcon.svelte"
+  // import SlugIcon from "$lib/components/catalogue/SlugIcon.svelte"
   import TopicsFooter from "$lib/components/catalogue/TopicsFooter.svelte"
   import { Button } from "$lib/components/ui/button"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
@@ -117,7 +117,7 @@
             <div class="mb-3 flex w-full items-center justify-between">
               <div class="flex items-center gap-3">
                 <!--                Maybe later add a icon for each topic -->
-                <SlugIcon slug={g.slug} />
+                <!--                <SlugIcon slug={g.slug} />-->
 
                 <h2
                   class="text-lg leading-tight font-semibold tracking-tight text-gray-900 dark:text-gray-100"
