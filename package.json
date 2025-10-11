@@ -28,6 +28,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
+    "@dnd-kit-svelte/utilities": "^0.0.11",
     "@types/node": "^24.3.1"
   }
 }
