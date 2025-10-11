@@ -11,6 +11,7 @@
   import type { Language } from "@shared/api/Language"
   import { allParameterCombinations, serializeParameters } from "@shared/api/Parameters.ts"
   import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
+  import type { SingleTranslation } from "@shared/utils/translations.ts"
 
   const { ...rest }: HTMLAttributes<HTMLDivElement> = $props()
   const lang: Language = $derived(getLanguage())
@@ -21,6 +22,15 @@
   let expandedContentEl: HTMLDivElement | null = $state(null)
   // Track showAllVariants per topic (keyed by topic ID or slug)
   let showAllVariants: Record<string, boolean> = $state({})
+
+  const showVariantsLang: SingleTranslation = {
+    en: "Show Variants",
+    de: "Varianten anzeigen",
+  }
+  const hideVariantsLang: SingleTranslation = {
+    en: "Hide Variants",
+    de: "Varianten ausblenden",
+  }
 
   function toggleVariants(topicId: string) {
     showAllVariants = { ...showAllVariants, [topicId]: !showAllVariants[topicId] }
@@ -42,9 +52,7 @@
     updateColumns() // initial
     window.addEventListener("resize", updateColumns)
 
-    return {
-      destroy: () => window.removeEventListener("resize", updateColumns),
-    }
+    return {}
   }
 
   // 3. A utility function to chunk an array
@@ -108,6 +116,7 @@
           >
             <div class="mb-3 flex w-full items-center justify-between">
               <div class="flex items-center gap-3">
+                <!--                Maybe later add a icon for each topic -->
                 <SlugIcon slug={g.slug} />
 
                 <h2
@@ -122,7 +131,6 @@
             <p class="mb-4 text-sm leading-snug text-gray-600 dark:text-gray-300">
               {g.description[lang]}
             </p>
-
             <TopicsFooter {g} />
           </button>
         {/each}
@@ -152,16 +160,17 @@
                   <!-- Toggle Button -->
                   {#if gSelected.contents.some((x) => x.expectedParameters.length > 0)}
                     <button
-                      class={`mr-4 transform rounded-full border px-3 py-0.5 text-sm
-          font-medium transition-colors duration-200 ease-in-out
-          ${
-            showAllVariants[gSelected.slug]
-              ? "border-accent text-accent hover:border-accent-400 hover:text-accent-400"
-              : "border-gray-300 text-gray-800 dark:border-slate-600 dark:text-gray-100 dark:hover:border-gray-400 dark:hover:text-gray-200"
-          }`}
+                      class={`mr-4 transform rounded-full border px-3 py-0.5 text-sm font-medium transition-colors duration-200 ease-in-out
+                        ${
+                          showAllVariants[gSelected.slug]
+                            ? // Active state
+                              "border-accent bg-accent text-accent-foreground dark:border-accent dark:bg-accent dark:text-accent-foreground hover:brightness-110 dark:hover:brightness-110"
+                            : // Inactive state
+                              "hover:border-accent hover:text-accent dark:hover:border-accent dark:hover:text-accent-foreground border-gray-300 text-gray-800 hover:bg-blue-50 dark:border-slate-600 dark:text-gray-100 dark:hover:bg-slate-700/60"
+                        }`}
                       onclick={() => toggleVariants(gSelected.slug)}
                     >
-                      {showAllVariants[gSelected.slug] ? "Hide Variants" : "Show Variants"}
+                      {showAllVariants[gSelected.slug] ? hideVariantsLang[lang] : showVariantsLang[lang]}
                     </button>
                   {/if}
                 </div>
@@ -172,22 +181,22 @@
                       <div
                         class="group block rounded-lg border border-gray-300 bg-white p-4 transition-all hover:scale-[1.02] hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
                       >
-                        <!-- Topic name -->
-                        <div class="flex flex-col">
-                          <a href={resolve(`/${lang}/${generator.id}`)}>
+                        <a href={resolve(`/${lang}/${generator.id}`)}>
+                          <!-- Topic name -->
+                          <div class="flex flex-col">
                             <h3
                               class="group-hover:text-accent-600 dark:group-hover:text-accent-400 font-semibold text-gray-800 transition-colors dark:text-gray-100"
                             >
                               {generator.name(lang)}
                             </h3>
-                          </a>
-                        </div>
+                          </div>
 
-                        {#if generator.description}
-                          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            {generator.description(lang)}
-                          </p>
-                        {/if}
+                          {#if generator.description}
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                              {generator.description(lang)}
+                            </p>
+                          {/if}
+                        </a>
 
                         {#if showAllVariants[gSelected.slug]}
                           {#if generator.expectedParameters.length > 0}
@@ -199,7 +208,7 @@
                                   generator.expectedParameters,
                                 )}
                                 {#if params}
-                                  <Button size="xsm" variant="secondary" href={resolve(`/${path}`)}>
+                                  <Button size="xsm" variant="outline" href={resolve(`/${path}`)}>
                                     {params}
                                   </Button>
                                 {/if}

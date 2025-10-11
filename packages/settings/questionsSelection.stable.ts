@@ -145,18 +145,19 @@ export const collection: QuestionCollection = [
       en: "Nodes and edges",
       de: "Knoten und Kanten",
     },
-    contents: [TreeTraversal],
+    contents: [TreeTraversal, DijkstraAlgorithm, DijkstraTableGenerator],
   },
-  {
-    slug: "dijkstra",
-    name: { de: "Dijkstra", en: "Dijkstra" },
-    topics: ["algorithms", "graph"],
-    description: {
-      en: "Shortest path algorithm",
-      de: "Kürzester-Pfad-Algorithmus",
-    },
-    contents: [DijkstraAlgorithm, DijkstraTableGenerator],
-  },
+  // Keep it for later separation
+  // {
+  //   slug: "dijkstra",
+  //   name: { de: "Dijkstra", en: "Dijkstra" },
+  //   topics: ["algorithms", "graph"],
+  //   description: {
+  //     en: "Shortest path algorithm",
+  //     de: "Kürzester-Pfad-Algorithmus",
+  //   },
+  //   contents: [DijkstraAlgorithm, DijkstraTableGenerator],
+  // },
   {
     slug: "linear-algebra",
     name: { de: "Lineare Algebra", en: "Linear Algebra" },
