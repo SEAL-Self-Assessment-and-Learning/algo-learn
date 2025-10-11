@@ -178,10 +178,10 @@
                 {#if gSelected.contents?.length}
                   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {#each gSelected.contents as generator (generator.name)}
-                      <div
-                        class="group block rounded-lg border border-gray-300 bg-white p-4 transition-all hover:scale-[1.02] hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
-                      >
-                        <a href={resolve(`/${lang}/${generator.id}`)}>
+                      <a href={resolve(`/${lang}/${generator.id}`)}>
+                        <div
+                          class="group block rounded-lg border border-gray-300 bg-white p-4 transition-all hover:scale-[1.02] hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+                        >
                           <!-- Topic name -->
                           <div class="flex flex-col">
                             <h3
@@ -196,27 +196,27 @@
                               {generator.description(lang)}
                             </p>
                           {/if}
-                        </a>
 
-                        {#if showAllVariants[gSelected.slug]}
-                          {#if generator.expectedParameters.length > 0}
-                            <div class="mt-2 flex flex-wrap gap-2">
-                              {#each allParameterCombinations(generator.expectedParameters) as parameters (parameters)}
-                                {@const path = serializeGeneratorCall({ lang, generator, parameters })}
-                                {@const params = serializeParameters(
-                                  parameters,
-                                  generator.expectedParameters,
-                                )}
-                                {#if params}
-                                  <Button size="xsm" variant="outline" href={resolve(`/${path}`)}>
-                                    {params}
-                                  </Button>
-                                {/if}
-                              {/each}
-                            </div>
+                          {#if showAllVariants[gSelected.slug]}
+                            {#if generator.expectedParameters.length > 0}
+                              <div class="mt-2 flex flex-wrap gap-2">
+                                {#each allParameterCombinations(generator.expectedParameters) as parameters (parameters)}
+                                  {@const path = serializeGeneratorCall({ lang, generator, parameters })}
+                                  {@const params = serializeParameters(
+                                    parameters,
+                                    generator.expectedParameters,
+                                  )}
+                                  {#if params}
+                                    <Button size="xsm" variant="outline" href={resolve(`/${path}`)}>
+                                      {params}
+                                    </Button>
+                                  {/if}
+                                {/each}
+                              </div>
+                            {/if}
                           {/if}
-                        {/if}
-                      </div>
+                        </div>
+                      </a>
                     {/each}
                   </div>
                 {:else}
