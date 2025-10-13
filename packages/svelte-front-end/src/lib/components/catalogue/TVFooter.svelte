@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CardTopics from "$lib/components/catalogue/CardTopics.svelte"
+  import TvFooterTopics from "$lib/components/catalogue/TVFooterTopics.svelte"
   import { isMobileOrTablet } from "$lib/utils/deviceInformation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { Language } from "@shared/api/Language.ts"
@@ -28,7 +28,7 @@
     class="text-accent dark:text-accent-foreground dark:border-dark-border mt-auto flex w-full items-center justify-between border-t pt-3
            text-sm font-medium"
   >
-    <CardTopics {g} />
+    <TvFooterTopics {g} />
     <span
       class="text-accent dark:text-accent-foreground inline-flex items-center gap-1 transition-transform duration-200 group-hover:translate-x-1"
     >
@@ -47,17 +47,17 @@
   </div>
 {:else}
   <div
-    class="text-accent dark:text-accent-foreground dark:border-dark-border relative mt-auto flex w-full items-center justify-between border-t pt-3
+    class="text-accent dark:text-accent-foreground relative mt-auto flex w-full items-center justify-between border-t pt-3
          text-sm font-medium"
   >
     <!-- Topics -->
-    <div class="flex items-center gap-2 sm:gap-3">
-      <CardTopics {g} />
+    <div class="flex items-center gap-2">
+      <TvFooterTopics {g} />
     </div>
 
     <!-- Centered generator info -->
     <div
-      class="flex flex-col items-center justify-center rounded-full border p-2 leading-tight text-gray-400 dark:text-gray-300"
+      class="flex flex-col items-center justify-center rounded-md border p-2 leading-tight text-gray-400 dark:text-gray-300"
     >
       {g.contents.length}
     </div>

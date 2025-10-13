@@ -60,7 +60,7 @@
           <div class="flex gap-1">
             {#each g.topics as topic (topic)}
               <span
-                class="ml-0.5 h-1.5 w-1.5 rounded-full {topicColorsBG[topic as QuestionTopic] ??
+                class="ml-0.5 h-1.5 w-1.5 rounded-md {topicColorsBG[topic as QuestionTopic] ??
                   'bg-gray-400 dark:bg-gray-600'}"
               ></span>
             {/each}
