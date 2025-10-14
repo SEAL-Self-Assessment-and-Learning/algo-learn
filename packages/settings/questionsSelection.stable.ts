@@ -61,7 +61,7 @@ export const collection: QuestionCollection = [
   },
   {
     slug: "asymptotics",
-    name: {de: "Asymptotische Notation", en: "Asymptotic Notation"},
+    name: { de: "Asymptotische Notation", en: "Asymptotic Notation" },
     topics: ["math"],
     contents: [AsymptoticsPreciseLanguage, LandauNotation, SortTerms, SimplifySum, Between],
   },
@@ -108,7 +108,7 @@ export const collection: QuestionCollection = [
   },
   {
     slug: "graphs",
-    name: {de: "Graphalgorithmen", en: "Graph Algorithms"},
+    name: { de: "Graphalgorithmen", en: "Graph Algorithms" },
     topics: ["algorithms", "data-structures", "graph"],
     contents: [TreeTraversal, DijkstraAlgorithm, DijkstraTableGenerator],
   },

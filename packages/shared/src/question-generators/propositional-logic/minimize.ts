@@ -1,4 +1,4 @@
-import type {Language} from "@shared/api/Language.ts"
+import type { Language } from "@shared/api/Language.ts"
 import type {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,

@@ -45,10 +45,10 @@
     </h2>
   </div>
 
-    {#if g?.description}
-        <p class="mb-4 text-sm leading-snug text-gray-600 dark:text-gray-300">
+  {#if g?.description}
+    <p class="mb-4 text-sm leading-snug text-gray-600 dark:text-gray-300">
       {g?.description[lang]}
-        </p>
-    {/if}
+    </p>
+  {/if}
   <TvFooter {g} />
 </div>
