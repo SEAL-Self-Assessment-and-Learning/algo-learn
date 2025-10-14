@@ -1,3 +1,5 @@
+import { mdTableFromData } from "@shared/utils/markdownTools.ts"
+
 /**
  * Function to insert a space after every x characters
  * @param input - the input string
@@ -15,10 +17,10 @@ export function insertSpaceAfterEveryXChars(input: string, x: number): string {
  * Creates the table for markdown
  * @param wordArray - the word arrays with frequency of each letter
  */
-export function convertDictToMdTable(wordArray: { [key: string]: string | number }) {
+export function convertDictToMdTable(wordArray: { [key: string]: any }) {
   const header = Object.keys(wordArray)
-  const content = Object.values(wordArray)
-  return `\n|${header.join("|")}|\n${"|:---:".repeat(header.length)}|\n|$${content.join("$|$")}$|\n`
+  const content = Object.values(wordArray).map((x) => String(x))
+  return mdTableFromData([header, content], "center", undefined, [0])
 }
 
 /**

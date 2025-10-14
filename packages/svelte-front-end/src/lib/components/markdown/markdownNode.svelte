@@ -1,5 +1,6 @@
 <script lang="ts">
   import DrawGraph from "$lib/components/Graph/DrawGraph.svelte"
+  import MatrixInput from "$lib/components/MatrixInput.svelte"
   import DrawPseudoCode from "$lib/components/PseudoCode/DrawPseudoCode.svelte"
   import DrawTable from "$lib/components/table/DrawTable.svelte"
   import TeX from "$lib/components/TeX.svelte"
@@ -8,7 +9,6 @@
   import { Graph } from "@shared/utils/graph.ts"
   import type { ParseTreeNode } from "@shared/utils/parseMarkdown.ts"
   import Markdown from "./markdown.svelte"
-  import MarkdownNode from "./markdownNode.svelte"
   import MarkdownTree from "./markdownTree.svelte"
 
   interface Props {
@@ -54,6 +54,10 @@
     <div class="my-5">
       <DrawGraph maxWidth={550} maxHeight={300} graph={Graph.parse(x.child)} />
     </div>
+  {:else if x.language === "matrixInput"}
+    <div class="my-5">
+      <MatrixInput x={x.child} />
+    </div>
   {:else}
     <pre class="block">{x}</pre>
   {/if}
@@ -76,13 +80,15 @@
     <MarkdownTree t={x.child} {children} />
   </a>
 {:else if x.kind === "list"}
-  <ul>
-    {#each x.child as c (c)}
-      <li>
-        <MarkdownNode x={c.text} {children} />
-      </li>
-    {/each}
-  </ul>
+  <div class="my-2">
+    <ul class="list-inside list-disc space-y-1 leading-relaxed text-gray-800 dark:text-gray-100">
+      {#each x.child as c (c)}
+        <li class="marker:text-gray-500 dark:marker:text-gray-400">
+          <Markdown md={c.text} />
+        </li>
+      {/each}
+    </ul>
+  </div>
 {:else if x.kind === "input"}
   <FormInputField id={x.child.split("#")[0]} />
 {:else if x.kind === "table"}
