@@ -1,3 +1,4 @@
+import type {Language} from "@shared/api/Language.ts"
 import type {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -18,7 +19,6 @@ import {
 import Random from "../../utils/random.ts"
 import { t, tFunctional, type Translations } from "../../utils/translations.ts"
 import { getTypingAids, getTypingAidsVars, variableNames } from "./utils.ts"
-import type {Language} from "@shared/api/Language.ts";
 
 const translations: Translations = {
   en: {
