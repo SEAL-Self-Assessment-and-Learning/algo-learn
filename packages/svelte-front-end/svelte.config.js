@@ -23,7 +23,6 @@ const config = {
     }),
     paths: {
       base: BASENAME,
-      assets: BASENAME,
     },
     alias: {
       "@/*": "./src/*",
