@@ -33,7 +33,8 @@ const translations: Translations = {
 }
 
 /**
- * This question generator generates a simple multiple choice question.
+ * This question generator generates a simple multifreetext question
+ * to show the graph edge input field feature.
  */
 export const DemoGraphEdgeInput: QuestionGenerator = {
   id: "demogei",
@@ -50,7 +51,7 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
    * @param lang The language of the question
    * @param parameters The parameters for the question. In this case none are used.
    * @param seed The seed for the random number generator
-   * @returns A new MultipleChoiceQuestion question
+   * @returns A new MultiFreeText question
    */
   generate: (lang = "en", parameters, seed) => {
     const permaLink = serializeGeneratorCall({
@@ -68,8 +69,7 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
       graph = RandomGraph.grid(random, [6, 3], 0.6, "square-width-diagonals", null, false, false)
       graph.nodeDraggable = false
       graph.edgeClickType = "select"
-      graph.edgeGroupMax = 2
-      graph.inputFieldID = 1 // The ID of the input field for the edge input
+      graph.inputFieldID = 1
 
       startNode = random.choice(graph.nodes)
       bfsNodePaths = bfs(startNode, graph)
@@ -93,6 +93,12 @@ export const DemoGraphEdgeInput: QuestionGenerator = {
   },
 }
 
+/**
+ * Simple check format.
+ * Most work done by the external function `checkEdgeInput`.
+ * @param graph
+ * @param lang
+ */
 function getCheckFormat(graph: Graph, lang: Language): MultiFreeTextFormatFunction {
   return ({ text }, fieldID) => {
     const edgeCheck = checkEdgeInput(text[fieldID], graph, lang)
@@ -108,6 +114,15 @@ function getCheckFormat(graph: Graph, lang: Language): MultiFreeTextFormatFuncti
   }
 }
 
+/**
+ * Feedback function.
+ * Parsing done by the external function `checkEdgeInput`.
+
+ * @param startNode
+ * @param endNodePath - Tuple of end node label and path (nodes) to it
+ * @param graph
+ * @param lang
+ */
 function getFeedback(
   startNode: string,
   endNodePath: [string, Node[]],
@@ -116,8 +131,13 @@ function getFeedback(
 ): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
     const edgeInput = checkEdgeInput(text[edgeInputFieldID(1)], graph, lang)
-    graph.inputFieldID = 0
-    graph.edgeClickType = "none"
+    graph.edgeClickType = "selectupgrade"
+    graph.nodeClickType = "none"
+    // first remove all highlighting
+    for (const edge of graph.edges.flat()) {
+      graph.setEdgeGroup(edge.source, edge.target, null)
+    }
+    // add the correct path highlighting
     for (let i = 1; i < endNodePath[1].length; i++) {
       const node1 = graph.nodes.findIndex((node) => node.label! === endNodePath[1][i - 1].label)
       const node2 = graph.nodes.findIndex((node) => node.label! === endNodePath[1][i].label)
@@ -139,21 +159,20 @@ function getFeedback(
           correctAnswer: graph.toMarkdown(),
         }
       }
-    } else {
-      return {
-        correct: false,
-        feedbackText: t(translations, lang, "fdParse"),
-        correctAnswer: graph.toMarkdown(),
-      }
     }
 
     return {
       correct: true,
-      correctAnswer: graph.toMarkdown(),
     }
   }
 }
 
+/**
+ * Check if the given edges form a simple path from startNode to endNode.
+ * @param edges
+ * @param startNode
+ * @param endNode
+ */
 function isSimplePath(edges: [string, string][], startNode: string, endNode: string): boolean {
   const adjacencyList = new Map<string, Set<string>>()
 
@@ -193,6 +212,11 @@ function isSimplePath(edges: [string, string][], startNode: string, endNode: str
   return false
 }
 
+/**
+ * Quick and dirty BFS to find all paths from the start node.
+ * @param startNode
+ * @param graph
+ */
 function bfs(startNode: Node, graph: Graph): Record<string, Node[]> {
   const queue: Node[] = [startNode]
   const visited: Set<Node> = new Set()

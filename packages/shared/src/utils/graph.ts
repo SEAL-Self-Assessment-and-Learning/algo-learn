@@ -3,7 +3,7 @@ import type Random from "./random"
 type NodeId = number
 export type NodeList = Node[]
 export type EdgeList = Edge[][]
-export type ClickEventType = "none" | "select" | "group"
+export type ClickEventType = "none" | "select" | "group" | "selectupgrade" | "groupupgrade"
 
 export function nodeInputFieldID(idNum: number) {
   return `node-field-${idNum}`
@@ -66,8 +66,8 @@ export class Graph {
     nodeDraggable: boolean = false,
     nodeClick: ClickEventType = "none",
     edgeClick: ClickEventType = "none",
-    nodeGroupMax: number = 2,
-    edgeGroupMax: number = 2,
+    nodeGroupMax: number = 1,
+    edgeGroupMax: number = 1,
   ) {
     this.nodes = nodes
     this.edges = edges
@@ -111,7 +111,13 @@ export class Graph {
   }
 
   public toString(): string {
-    const clickTypeMapping: Record<ClickEventType, string> = { none: "0", select: "1", group: "2" }
+    const clickTypeMapping: Record<ClickEventType, string> = {
+      none: "0",
+      select: "1",
+      group: "2",
+      selectupgrade: "3",
+      groupupgrade: "4",
+    }
     let graphStr = `${this.nodes.length} ${this.getNumEdges()} ${this.directed ? "1" : "0"} ${this.weighted ? "1" : "0"} ${this.inputFieldID} ${this.nodeDraggable ? "1" : "0"} ${clickTypeMapping[this.nodeClickType]} ${clickTypeMapping[this.edgeClickType]} ${this.nodeGroupMax ?? "0"} ${this.edgeGroupMax ?? "0"}\n`
 
     for (const node of this.nodes) {
@@ -136,7 +142,7 @@ export class Graph {
   public static parse(graphStr: string): Graph {
     const lines = graphStr.split("\n")
     const graphMetaData = lines[0].match(
-      /^(\d+) (\d+) ([01]) ([01]) ([\d+]) ([01]) ([012]) ([012]) (\d+) (\d+)$/,
+      /^(\d+) (\d+) ([01]) ([01]) ([\d+]) ([01]) ([01234]) ([01234]) (\d+) (\d+)$/,
     )
 
     if (graphMetaData === null) throw Error(`Input error: graph data has invalid meta data: ${lines[0]}`)
@@ -146,7 +152,13 @@ export class Graph {
     const weighted = graphMetaData[4] === "1"
     const inputFields = parseInt(graphMetaData[5])
     const nodeDraggable = graphMetaData[6] === "1"
-    const clickTypeMapping: Record<string, ClickEventType> = { "0": "none", "1": "select", "2": "group" }
+    const clickTypeMapping: Record<string, ClickEventType> = {
+      "0": "none",
+      "1": "select",
+      "2": "group",
+      "3": "selectupgrade",
+      "4": "groupupgrade",
+    }
     const nodeClick = clickTypeMapping[graphMetaData[7]]
     const edgeClick = clickTypeMapping[graphMetaData[8]]
     const nodeGroupMax = parseInt(graphMetaData[9])
@@ -164,7 +176,7 @@ export class Graph {
       if (nodeData === null) throw Error("Input error: invalid node data: " + lines[i])
       if (
         !(nodeData[3] === "-") &&
-        (parseInt(nodeData[3]) > nodeGroupMax - 1 || parseInt(nodeData[3]) < 0)
+        (parseInt(nodeData[3]) > nodeGroupMax || parseInt(nodeData[3]) < 0)
       ) {
         throw Error("Input error: node group too large: " + lines[i])
       }
@@ -186,7 +198,7 @@ export class Graph {
       if (edgeData === null) throw Error("Input error: invalid edge data: " + lines[i])
       if (
         !(edgeData[3] === "-") &&
-        (parseInt(edgeData[3]) > edgeGroupMax - 1 || parseInt(edgeData[3]) < 0)
+        (parseInt(edgeData[3]) > edgeGroupMax || parseInt(edgeData[3]) < 0)
       ) {
         throw Error("Input error: edge group too large: " + lines[i])
       }
@@ -260,14 +272,23 @@ export class Graph {
     if (!this.directed) this.getEdge(v, u).value = weight
   }
 
-  public setNodeGroup(u: NodeId, group: number): void {
-    if (group > this.nodeGroupMax - 1 || group < 0)
+  public setNodeGroup(u: NodeId, group: number | null): void {
+    if (group === null) {
+      this.nodes[u].group = null
+      return
+    }
+    if (group > this.nodeGroupMax || group < 0)
       throw Error("Input error: node group too large or negative")
     this.nodes[u].group = group
   }
 
-  public setEdgeGroup(u: NodeId, v: NodeId, group: number): void {
-    if (group > this.edgeGroupMax - 1 || group < 0)
+  public setEdgeGroup(u: NodeId, v: NodeId, group: number | null): void {
+    if (group === null) {
+      this.getEdge(u, v).group = null
+      if (!this.directed) this.getEdge(v, u).group = null
+      return
+    }
+    if (group > this.edgeGroupMax || group < 0)
       throw Error("Input error: edge group too large or negative")
     this.getEdge(u, v).group = group
     if (!this.directed) this.getEdge(v, u).group = group

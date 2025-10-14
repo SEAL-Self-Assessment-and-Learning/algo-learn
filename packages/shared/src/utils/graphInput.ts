@@ -1,5 +1,5 @@
 import type { Language } from "@shared/api/Language.ts"
-import { getNodeLabel, type Edge, type Graph } from "@shared/utils/graph.ts"
+import { getNodeLabel, type Edge, type Graph, type NodeList } from "@shared/utils/graph.ts"
 import { t, type Translations } from "@shared/utils/translations.ts"
 
 type GraphElementStateType = { selected: boolean; group: null | number }
@@ -26,16 +26,16 @@ export type EdgeInputCheckResult = EdgeInputSelectedCheckResult | EdgeInputGroup
 
 const parseFdTranslations: Translations = {
   en: {
-    validNodeName: `"**{{0}}**" is not a valid node label.`,
-    validGroup: `"**{{0}}**" is not a valid group.`,
-    edgeFormat: `"**{{0}}**" Invalid edge format.`,
+    validNodeName: `**{{0}}** is not a valid node label.`,
+    validGroup: `**{{0}}** is not a valid group.`,
+    edgeFormat: `**{{0}}** Invalid edge format.`,
     selfLoop: "No self loops allowed.",
     edgeNodeMissing: "Edge connects a node that is not in the graph",
     edgeMissing: "Edge does not exist in the graph.",
   },
   de: {
-    validNodeName: `"**{{0}}**" ist kein gültiger Knotenname.`,
-    validGroup: `"**{{0}}**" ist keine gültige Gruppe.`,
+    validNodeName: `**{{0}}** ist kein gültiger Knotenname.`,
+    validGroup: `**{{0}}** ist keine gültige Gruppe.`,
     edgeFormat: "{{0}}: Ungültiges Kantenformat.",
     selfLoop: "Keine Schleifen erlaubt.",
     edgeNodeMissing: "Die Kante verbindet einen Knoten, der nicht im Graphen existiert.",
@@ -43,30 +43,26 @@ const parseFdTranslations: Translations = {
   },
 }
 
-export function updateGraphNodeSelected(
-  graph: Graph,
-  nodeStates: GraphElementStateType[],
-  selected: string[],
-) {
+export function updateGraphNodeSelected(graph: Graph, nodeList: NodeList, selected: string[]) {
   for (let i = 0; i < graph.nodes.length; i++) {
-    nodeStates[i].selected = selected.includes(graph.nodes[i].label!)
+    nodeList[i].group = selected.includes(graph.nodes[i].label!) ? 1 : null
   }
 }
 
 export function updateGraphNodeGroup(
   graph: Graph,
-  nodeStates: GraphElementStateType[],
+  nodeList: NodeList,
   groups: { [key: number]: string[] },
 ) {
   for (let i = 0; i < graph.nodes.length; i++) {
-    nodeStates[i].group = null
+    nodeList[i].group = null
   }
 
   for (const [group, nodes] of Object.entries(groups)) {
     for (const node of nodes) {
       const nodeIndex = graph.nodes.findIndex((n) => n.label === node)
       if (nodeIndex !== -1) {
-        nodeStates[nodeIndex].group = parseInt(group) - 1
+        nodeList[nodeIndex].group = parseInt(group) - 1
       }
     }
   }
@@ -75,19 +71,20 @@ export function updateGraphNodeGroup(
 export function updateGraphEdgeSelected(
   directed: boolean,
   edgeListFlat: Edge[],
-  edgeStates: GraphElementStateType[],
   selected: [string, string][],
 ) {
   for (let i = 0; i < edgeListFlat.length; i++) {
     if (directed) {
-      edgeStates[i].selected =
+      edgeListFlat[i].group =
         selected.findIndex(
           (edge) =>
             getNodeLabel(edgeListFlat[i].source) === edge[0] &&
             getNodeLabel(edgeListFlat[i].target) === edge[1],
         ) !== -1
+          ? 1
+          : null
     } else {
-      edgeStates[i].selected =
+      edgeListFlat[i].group =
         selected.findIndex(
           (edge) =>
             getNodeLabel(edgeListFlat[i].source) === edge[0] &&
@@ -98,6 +95,8 @@ export function updateGraphEdgeSelected(
             getNodeLabel(edgeListFlat[i].target) === edge[0] &&
             getNodeLabel(edgeListFlat[i].source) === edge[1],
         ) !== -1
+          ? 1
+          : null
     }
   }
 }
@@ -105,11 +104,10 @@ export function updateGraphEdgeSelected(
 export function updateGraphEdgeGroup(
   directed: boolean,
   edgeListFlat: Edge[],
-  edgeStates: GraphElementStateType[],
   group: { [key: number]: [string, string][] },
 ) {
   for (let i = 0; i < edgeListFlat.length; i++) {
-    edgeStates[i].group = null
+    edgeListFlat[i].group = null
   }
 
   for (const [groupIndex, edges] of Object.entries(group)) {
@@ -127,7 +125,7 @@ export function updateGraphEdgeGroup(
         )
       }
       if (edgeIndex !== -1) {
-        edgeStates[edgeIndex].group = parseInt(groupIndex) - 1
+        edgeListFlat[edgeIndex].group = parseInt(groupIndex) - 1
       }
     }
   }
@@ -143,7 +141,7 @@ export function updateGraphEdgeGroup(
  */
 export function checkNodeInput(nodeString: string, graph: Graph, lang: Language): NodeInputCheckResult {
   const nodes = nodeString.toUpperCase().split(";")
-  return graph.nodeClickType === "select" || graph.nodeClickType === "none"
+  return graph.nodeClickType === "select" || graph.nodeClickType === "selectupgrade"
     ? checkNodeInputSelect(nodes, graph, lang)
     : checkNodeInputGroup(nodes, graph, lang)
 }
@@ -220,7 +218,7 @@ function checkNodeInputGroup(nodes: string[], graph: Graph, lang: Language): Nod
  */
 export function checkEdgeInput(edgeString: string, graph: Graph, lang: Language): EdgeInputCheckResult {
   const edges = (edgeString ?? "").toUpperCase().split(";")
-  return graph.edgeClickType === "select" || graph.edgeClickType === "none"
+  return graph.edgeClickType === "select" || graph.edgeClickType === "selectupgrade"
     ? checkEdgeInputSelect(edges, graph, lang)
     : checkEdgeInputGroup(edges, graph, lang)
 }
@@ -316,12 +314,12 @@ function checkEdgeInputGroup(edges: string[], graph: Graph, lang: Language): Edg
   return { parsed, messages, groups }
 }
 
-export function parseEdgeText(edgeStates: GraphElementStateType[], edgeListFlat: Edge[]) {
-  return edgeStates
+export function parseEdgeText(edgeListFlat: Edge[], graph: Graph) {
+  return edgeListFlat
     .map((edge, i) =>
-      edge.group !== null
-        ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)},${(edge.group + 1).toString()})`
-        : edge.selected
+      edge.group !== null && graph.edgeClickType === "group"
+        ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)},${(edge.group! + 1).toString()})`
+        : edge.group !== null && graph.edgeClickType === "select"
           ? `(${getNodeLabel(edgeListFlat[i].source)},${getNodeLabel(edgeListFlat[i].target)})`
           : "",
     )

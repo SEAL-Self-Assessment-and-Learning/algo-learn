@@ -1,6 +1,6 @@
 import type { TextFieldState } from "$lib/components/types.ts"
 import type { Language } from "@shared/api/Language.ts"
-import type { Edge, Graph } from "@shared/utils/graph.ts"
+import type { Edge, Graph, NodeList } from "@shared/utils/graph.ts"
 import {
   checkEdgeInput,
   checkNodeInput,
@@ -16,11 +16,11 @@ type GraphElementStateType = { selected: boolean; group: null | number }
 
 export function edgeInputSetText(
   edgeField: TextFieldState | undefined,
-  edgeStates: GraphElementStateType[],
   edgeListFlat: Edge[],
+  graph: Graph,
 ) {
   if (edgeField !== undefined && edgeField.setText) {
-    edgeField.setText(parseEdgeText(edgeStates, edgeListFlat))
+    edgeField.setText(parseEdgeText(edgeListFlat, graph))
   }
 }
 
@@ -33,35 +33,24 @@ export function nodeInputSetText(
   }
 }
 
-export function saveNodeInput(
-  nodeText: string,
-  nodeStates: GraphElementStateType[],
-  graph: Graph,
-  lang: Language,
-) {
+export function saveNodeInput(nodeText: string, nodeList: NodeList, graph: Graph, lang: Language) {
   const nodeCheck = checkNodeInput(nodeText, graph, lang)
   if (nodeCheck.parsed) {
     if ("selected" in nodeCheck) {
-      updateGraphNodeSelected(graph, nodeStates, nodeCheck.selected)
+      updateGraphNodeSelected(graph, nodeList, nodeCheck.selected)
     } else {
-      updateGraphNodeGroup(graph, nodeStates, nodeCheck.groups)
+      updateGraphNodeGroup(graph, nodeList, nodeCheck.groups)
     }
   }
 }
 
-export function saveEdgeInput(
-  edgeString: string,
-  edgeStates: GraphElementStateType[],
-  edgeListFlat: Edge[],
-  graph: Graph,
-  lang: Language,
-) {
+export function saveEdgeInput(edgeString: string, edgeListFlat: Edge[], graph: Graph, lang: Language) {
   const edgeCheck = checkEdgeInput(edgeString, graph, lang)
   if (edgeCheck.parsed) {
     if ("selected" in edgeCheck) {
-      updateGraphEdgeSelected(graph.directed, edgeListFlat, edgeStates, edgeCheck.selected)
+      updateGraphEdgeSelected(graph.directed, edgeListFlat, edgeCheck.selected)
     } else {
-      updateGraphEdgeGroup(graph.directed, edgeListFlat, edgeStates, edgeCheck.groups)
+      updateGraphEdgeGroup(graph.directed, edgeListFlat, edgeCheck.groups)
     }
   }
 }

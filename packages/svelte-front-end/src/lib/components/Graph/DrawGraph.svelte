@@ -39,9 +39,12 @@
 
   const { addTextFieldAfterwards } = getContext<FormContextValue>(ADD_TEXTFIELDS_AFTERWARDS)
 
-  const edgeListFlat = graph.edges
-    .flat()
-    .filter(graph.directed ? () => true : (e) => e.source < e.target)
+  let nodeList = $state(graph.nodes)
+  let edgeListFlat = $state(
+    graph.edges.flat().filter(graph.directed ? () => true : (e) => e.source < e.target),
+  )
+  const nodeClickType = $derived(graph.nodeClickType)
+  const edgeClickType = $derived(graph.edgeClickType)
 
   let fieldOpen = $derived(false)
   const nodeId = nodeInputFieldID(graph.inputFieldID)
@@ -72,34 +75,34 @@
   const edgeText = $derived(() => edgeField()?.text ?? "")
 
   $effect(() => {
-    saveNodeInput(nodeText(), nodeStates, graph, lang)
+    saveNodeInput(nodeText(), nodeList, graph, lang)
   })
 
   $effect(() => {
-    saveEdgeInput(edgeText(), edgeStates, edgeListFlat, graph, lang)
+    saveEdgeInput(edgeText(), edgeListFlat, graph, lang)
   })
 
   let currentlyDragged = $state<null | number>(null)
 
   let nodePositions = $derived(
-    graph.nodes.map((u) => {
+    nodeList.map((u) => {
       return {
         x: u.coords.x * coordinateScale,
         y: u.coords.y * coordinateScale,
       }
     }),
   )
-  let nodeStates = $state<GraphElementStateType[]>(
-    graph.nodes.map((u) => ({
-      selected: false,
-      group: u.group ?? null,
+  let nodeStates = $derived<GraphElementStateType[]>(
+    nodeList.map((u) => ({
+      selected: nodeClickType === "select" || nodeClickType === "selectupgrade" ? !!u.group : false,
+      group: nodeClickType === "group" || nodeClickType === "groupupgrade" ? (u.group ?? null) : null,
     })),
   )
 
-  let edgeStates = $state<GraphElementStateType[]>(
+  const edgeStates = $derived<GraphElementStateType[]>(
     edgeListFlat.map((e) => ({
-      selected: false,
-      group: e.group ?? null,
+      selected: edgeClickType === "select" || edgeClickType === "selectupgrade" ? !!e.group : false,
+      group: edgeClickType === "group" || edgeClickType === "selectupgrade" ? (e.group ?? null) : null,
     })),
   )
 
@@ -110,29 +113,36 @@
   }
 
   function handleClickNode(i: number) {
-    if (graph.nodeClickType === "select") {
-      nodeStates[i].selected = !nodeStates[i].selected
-    } else if (graph.nodeClickType === "group") {
+    if (nodeClickType === "select") {
+      if (nodeList[i].group) nodeList[i].group = null
+      else nodeList[i].group = 1
+    } else if (nodeClickType === "group") {
       const max = Math.min(graph.nodeGroupMax ?? maxGroups, maxGroups) - 1
-      nodeStates[i].group =
-        nodeStates[i].group === max ? null : nodeStates[i].group === null ? 0 : nodeStates[i].group + 1
+      nodeList[i].group =
+        nodeList[i].group === max ? null : nodeList[i].group === null ? 0 : nodeList[i].group! + 1
     }
+    // reassign to trigger reactivity
+    nodeList = [...nodeList]
+
     nodeInputSetText(nodeField(), nodeStates)
   }
 
   function handleClickEdge(i: number) {
-    if (graph.edgeClickType === "select") {
-      edgeStates[i].selected = !edgeStates[i].selected
-    } else if (graph.edgeClickType === "group") {
-      edgeStates[i].group =
-        edgeStates[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
+    if (edgeClickType === "select") {
+      if (edgeListFlat[i].group) edgeListFlat[i].group = null
+      else edgeListFlat[i].group = 1
+    } else if (edgeClickType === "group") {
+      edgeListFlat[i].group =
+        edgeListFlat[i].group === Math.min(graph.edgeGroupMax ?? maxGroups, maxGroups) - 1
           ? null
-          : edgeStates[i].group === null
+          : edgeListFlat[i].group === null
             ? 0
-            : edgeStates[i].group + 1
-      edgeStates = [...edgeStates]
+            : edgeListFlat[i].group! + 1
     }
-    edgeInputSetText(edgeField(), edgeStates, edgeListFlat)
+    // reassign to trigger reactivity
+    edgeListFlat = [...edgeListFlat]
+
+    edgeInputSetText(edgeField(), edgeListFlat, graph)
   }
 
   const dimensions = graph.getDimensions()
@@ -226,24 +236,30 @@
             v={nodePositions[e.target]}
             weight={e.value}
             directed={graph.directed}
-            clickable={graph.edgeClickType !== "none"}
+            clickable={edgeClickType === "select" || edgeClickType === "group"}
             state={edgeStates[i]}
             onClickCallback={() => {
-              handleClickEdge(i)
+              if (edgeClickType === "select" || edgeClickType === "group") {
+                handleClickEdge(i)
+              }
             }}
           />
         {/each}
       </g>
       <g>
-        {#each graph.nodes as u, i (i)}
+        {#each nodeList as u, i (i)}
           <Node
             pos={nodePositions[i]}
             setDragged={graph.nodeDraggable ? () => handleSetDragged(i) : undefined}
             size={nodeScale}
             label={u.label ?? ""}
-            clickable={graph.nodeClickType !== "none"}
+            clickable={nodeClickType === "select" || nodeClickType === "group"}
             nodeState={nodeStates[i]}
-            onClickCallback={() => handleClickNode(i)}
+            onClickCallback={() => {
+              if (nodeClickType === "select" || nodeClickType === "group") {
+                handleClickNode(i)
+              }
+            }}
           />
         {/each}
       </g>
@@ -251,7 +267,7 @@
     <div
       class="absolute right-28 -bottom-6 flex flex-row items-center space-x-1 rounded-lg dark:border-gray-700 dark:bg-gray-800"
     >
-      {#if graph.inputFieldID !== 0}
+      {#if nodeClickType === "select" || nodeClickType === "group" || edgeClickType === "select" || edgeClickType === "group"}
         <Toggle
           class={`${theme === "dark" ? "text-white" : "text-black"}  hover:cursor-pointer`}
           size="sm"
@@ -266,7 +282,7 @@
       {/if}
     </div>
   </div>
-  {#if graph.nodeClickType !== "none" && fieldOpen}
+  {#if (nodeClickType === "select" || nodeClickType === "group") && fieldOpen}
     <div class="mt-1">
       <div class="mb-1">
         <b>{t("nodeSelection")}</b>
@@ -278,7 +294,7 @@
       </div>
     </div>
   {/if}
-  {#if graph.edgeClickType !== "none" && fieldOpen}
+  {#if (edgeClickType === "select" || edgeClickType === "group") && fieldOpen}
     <div class="mt-1">
       <div class="mb-1">
         <b>{t("edgeSelection")}</b>
