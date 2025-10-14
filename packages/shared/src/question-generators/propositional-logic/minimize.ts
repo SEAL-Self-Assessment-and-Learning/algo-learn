@@ -18,10 +18,11 @@ import {
 import Random from "../../utils/random.ts"
 import { t, tFunctional, type Translations } from "../../utils/translations.ts"
 import { getTypingAids, getTypingAidsVars, variableNames } from "./utils.ts"
+import type {Language} from "@shared/api/Language.ts";
 
 const translations: Translations = {
   en: {
-    name: "Minimize propositional logic formula",
+    name: "Minimize Propositional Logic Formula",
     description: "Minimize the normal form of a propositional logic formula",
     param_size: "The maximal number of variables used",
     text: "Given the propositional logic formula \\[\\varPhi={{0}}\\] Compute the minimized **{{1}}** of $\\varPhi$ labeled as $\\varPhi^*$.",
@@ -70,7 +71,7 @@ export const MinimizePropositionalLogic: QuestionGenerator = {
     },
   ],
 
-  generate: (lang = "en", parameters, seed) => {
+  generate: (lang: Language = "en", parameters, seed) => {
     const path = serializeGeneratorCall({
       generator: MinimizePropositionalLogic,
       lang,

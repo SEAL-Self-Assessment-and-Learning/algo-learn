@@ -9,7 +9,7 @@
     g: {
       name: { [key: string]: string }
       slug: string
-      description: { [key: string]: string }
+      description?: { [key: string]: string }
       topics: string[]
       contents: Array<any>
     }
@@ -39,14 +39,15 @@
   <div class="mb-3 flex w-full items-center justify-between">
     <h2
       class="text-lg leading-tight font-semibold tracking-tight text-gray-900 transition-transform duration-200 group-hover:scale-[1.02] dark:text-gray-100"
-      style="word-break: break-word;"
-    >
+      style="word-break: break-word;">
       {g.name[lang]}
     </h2>
   </div>
 
+    {#if g?.description}
   <p class="mb-4 text-sm leading-snug text-gray-600 dark:text-gray-300">
-    {g.description[lang]}
+      {g?.description[lang]}
   </p>
+    {/if}
   <TvFooter {g} />
 </div>

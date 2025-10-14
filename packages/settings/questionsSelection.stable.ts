@@ -42,10 +42,6 @@ export const collection: QuestionCollection = [
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
     topics: ["logic", "math"],
-    description: {
-      en: "Logic formulas and truth tables",
-      de: "Logische Formeln und Wahrheitstabellen",
-    },
     contents: [
       Satisfiability,
       NormalForms,
@@ -61,70 +57,47 @@ export const collection: QuestionCollection = [
     slug: "modular-arithmetic",
     name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
     topics: ["math"],
-    description: {
-      en: "Numbers modulo n",
-      de: "Rechnen modulo n",
-    },
     contents: [ModTricks, CRT, modFactor, ExtendedEuclideanAlgorithm],
   },
   {
     slug: "asymptotics",
-    name: { de: "Asymptotik", en: "Asymptotics" },
+    name: {de: "Asymptotische Notation", en: "Asymptotic Notation"},
     topics: ["math"],
-    description: {
-      en: "Growth rates and limits",
-      de: "Wachstumsraten und Grenzen",
-    },
-    contents: [AsymptoticsPreciseLanguage, SortTerms, LandauNotation, SimplifySum, Between],
+    contents: [AsymptoticsPreciseLanguage, LandauNotation, SortTerms, SimplifySum, Between],
   },
   {
     slug: "recursion",
     name: { de: "Rekursion", en: "Recursion" },
-    topics: ["recursion"],
-    description: {
-      en: "Functions calling themselves",
-      de: "Funktionen, die sich selbst aufrufen",
-    },
+    topics: ["recursion", "pseudocode"],
+    // description:
+    // {
+    //   de: "Master Theorem und Analyse von rekursivem Code",
+    //   en: "Master Theorem and run time analysis of recursive code."
+    // },
     contents: [RecursionFormula, RecurrenceMaster],
   },
   {
     slug: "pseudocode",
     name: { de: "Pseudocode", en: "Pseudocode" },
     topics: ["pseudocode"],
-    description: {
-      en: "Algorithm notation practice",
-      de: "Übung zur Algorithmusnotation",
-    },
-    contents: [Loops],
+    contents: [Loops, RecursionFormula],
   },
   {
     slug: "stack",
     name: { de: "Stacks und Queues", en: "Stacks and Queues" },
     topics: ["algorithms", "data-structures"],
-    description: {
-      en: "LIFO and FIFO structures",
-      de: "LIFO- und FIFO-Strukturen",
-    },
     contents: [stackQuestion, queueQuestion],
   },
   {
     slug: "heap",
     name: { de: "Heaps", en: "Heaps" },
     topics: ["algorithms", "data-structures"],
-    description: {
-      en: "Tree-based priority structures",
-      de: "Baumbasierte Prioritätsstrukturen",
-    },
     contents: [HeapOperations, HeapVerifying, HeapNeighbours],
   },
   {
     slug: "union-find",
     name: { de: "Union-Find", en: "Union-Find" },
     topics: ["algorithms", "data-structures"],
-    description: {
-      en: "Disjoint set operations",
-      de: "Operationen auf disjunkten Mengen",
-    },
     contents: [QuickFindGenerator],
   },
   {
@@ -132,40 +105,17 @@ export const collection: QuestionCollection = [
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
     contents: [huffmanCoding, ReverseHuffmanCoding],
     topics: ["algorithms"],
-    description: {
-      en: "Data compression algorithm",
-      de: "Algorithmus zur Datenkompression",
-    },
   },
   {
     slug: "graphs",
-    name: { de: "Graphen", en: "Graphs" },
+    name: {de: "Graphalgorithmen", en: "Graph Algorithms"},
     topics: ["algorithms", "data-structures", "graph"],
-    description: {
-      en: "Nodes and edges",
-      de: "Knoten und Kanten",
-    },
     contents: [TreeTraversal, DijkstraAlgorithm, DijkstraTableGenerator],
   },
-  // Keep it for later separation
-  // {
-  //   slug: "dijkstra",
-  //   name: { de: "Dijkstra", en: "Dijkstra" },
-  //   topics: ["algorithms", "graph"],
-  //   description: {
-  //     en: "Shortest path algorithm",
-  //     de: "Kürzester-Pfad-Algorithmus",
-  //   },
-  //   contents: [DijkstraAlgorithm, DijkstraTableGenerator],
-  // },
   {
     slug: "linear-algebra",
     name: { de: "Lineare Algebra", en: "Linear Algebra" },
     topics: ["math"],
-    description: {
-      de: "Fragen zu Linearer Algebra",
-      en: "Questions about Linear Algebra",
-    },
     contents: [Determinant, AxbGenerator],
   },
 ]

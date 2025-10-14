@@ -12,7 +12,7 @@ export type QuestionCollection = Array<{
   name: SingleTranslation
   contents: Array<QuestionGenerator>
   topics: Array<QuestionTopic>
-  description: SingleTranslation
+  description?: SingleTranslation
   image?: URL
 }>
 
