@@ -80,7 +80,7 @@ export const collection: QuestionCollection = [
     slug: "pseudocode",
     name: { de: "Pseudocode", en: "Pseudocode" },
     topics: ["pseudocode"],
-    contents: [Loops, RecursionFormula],
+    contents: [Loops], // RecursionFormula
   },
   {
     slug: "stack",
