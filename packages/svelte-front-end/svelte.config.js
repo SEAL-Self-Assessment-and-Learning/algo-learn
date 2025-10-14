@@ -8,6 +8,14 @@ const config = {
   kit: {
     prerender: {
       entries: ["*", "/en/about", "/en/legal", "/de/about", "/de/legal"],
+      handleHttpError: ({ path, referrer, message }) => {
+        void referrer
+        // Ignore favicon errors during prerender - they're handled by hooks
+        if (path.includes("/favicon/")) {
+          return
+        }
+        throw new Error(message)
+      },
     },
     adapter: adapter({
       pages: "build",
