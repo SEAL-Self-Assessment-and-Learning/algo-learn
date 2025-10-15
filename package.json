@@ -15,7 +15,7 @@
     "build:json-schema": "$npm_execpath run ts-json-schema-generator --path 'src/**/QuestionGenerator.ts' --tsconfig ./tsconfig.ts-json-schema-generator.json --type 'Question'",
     "test": "$npm_execpath run lint && $npm_execpath run test:unit",
     "test:unit": "which bun && bun test --bail || vitest run --bail 1",
-    "lint": "cd packages/svelte-front-end && eslint && prettier . --check && $npm_execpath run lint",
+    "lint": "eslint && prettier . --check && cd packages/svelte-front-end && $npm_execpath run lint",
     "lint-fix": "eslint --fix && cd packages/svelte-front-end && $npm_execpath run eslint --fix",
     "format": "prettier . --write && cd packages/svelte-front-end && $npm_execpath run format",
     "clean": "rm -rf dist/ .yarn/cache/ node_modules/ packages/settings/node_modules/ packages/shared/node_modules/ packages/svelte-front-end/node_modules/ docs/ vite-bundle-visualizer.html",
