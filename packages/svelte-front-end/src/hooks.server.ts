@@ -37,7 +37,7 @@ export const handle: Handle = async ({ event, resolve }) => {
           },
         })
       } catch (e) {
-        console.error(`Failed to load favicon: ${filename}`, e)
+        console.error("Failed to load favicon", e)
         // Return 404
         return new Response("Not found", { status: 404 })
       }
