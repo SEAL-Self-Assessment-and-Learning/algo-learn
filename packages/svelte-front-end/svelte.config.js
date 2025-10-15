@@ -29,9 +29,9 @@ const config = {
       "@shared/*": "./../shared/src/*",
       "@settings/*": "./../settings/*",
     },
-  },
-  build: {
-    bundleStrategy: "single",
+    output: {
+      bundleStrategy: "single",
+    },
   },
 }
 
