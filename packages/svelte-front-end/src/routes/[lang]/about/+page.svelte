@@ -1,12 +1,11 @@
 <script lang="ts">
   import CenteredDivs from "$lib/components/centeredDivs.svelte"
+  import Footer from "$lib/components/Footer.svelte"
   import Markdown from "$lib/components/markdown/markdown.svelte"
-  import { Button } from "$lib/components/ui/button"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { SiSvelte } from "@icons-pack/svelte-simple-icons"
   import Duolingo from "@icons-pack/svelte-simple-icons/icons/SiDuolingo"
   import Github from "@icons-pack/svelte-simple-icons/icons/SiGithub"
-  import ArrowUp from "@lucide/svelte/icons/arrow-up"
   import type { Language } from "@shared/api/Language.ts"
   import { tFunction } from "@shared/utils/translations"
   import { globalTranslations } from "@/lib/translation"
@@ -65,19 +64,14 @@
     {@render activeLearning()}
     {@render inspiration()}
   </section>
-  <section id="Development">
+  <section id="Development" class="mb-4">
     {@render development()}
     {@render openSource()}
     {@render teamMembers()}
     {@render contributors()}
   </section>
-  <div class="my-4">
-    {@render dsep()}
-  </div>
-  <div class="my-4">
-    {@render backToTop()}
-  </div>
 </CenteredDivs>
+<Footer />
 
 {#snippet about()}
   <div class="pl-2 text-4xl font-extrabold">
@@ -192,21 +186,6 @@
         <span class="mt-2 text-sm text-gray-500 dark:text-gray-400">{contributor.name}</span>
       </div>
     {/each}
-  </div>
-{/snippet}
-
-{#snippet backToTop()}
-  <div class="flex justify-center">
-    <Button variant="outline" onclick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-      <ArrowUp />
-    </Button>
-  </div>
-{/snippet}
-
-{#snippet dsep()}
-  <div class="flex flex-col items-center">
-    <hr class="mt-2 w-full border-t-2 border-gray-300 dark:border-gray-700" />
-    <hr class="mt-0.5 mb-2 w-full border-t-2 border-gray-300 dark:border-gray-700" />
   </div>
 {/snippet}
 

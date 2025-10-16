@@ -3,6 +3,7 @@
   import Topic from "$lib/components/catalogue/Topic.svelte"
   import TvGenerators from "$lib/components/catalogue/TVGenerators.svelte"
   import TvHeader from "$lib/components/catalogue/TVHeader.svelte"
+  import Footer from "$lib/components/Footer.svelte"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { HTMLAttributes } from "svelte/elements"
   import { X } from "@lucide/svelte"
@@ -121,3 +122,5 @@
     {/each}
   </div>
 </div>
+
+<Footer />
