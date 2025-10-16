@@ -1,22 +1,15 @@
 <script lang="ts">
   import { resolve } from "$app/paths"
-  import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js"
-  import { getLanguage, setLanguage } from "$lib/utils/langState.svelte.ts"
-  import Settings from "@lucide/svelte/icons/settings"
+  import { getLanguage, toggleLanguage } from "$lib/utils/langState.svelte.ts"
+  import { Moon, Sun, Volume2, VolumeX } from "@lucide/svelte"
   import type { Language } from "@shared/api/Language"
-  import { tFunction } from "@shared/utils/translations"
-  import { getMuted, setMuted } from "../sound.svelte.js"
-  import { availableThemes, getTheme, setTheme } from "../theme.svelte.js"
-  import { globalTranslations, NATIVE_NAME, SUPPORTED_LANGUAGES } from "../translation"
+  import { getMuted, toggleMuted } from "../sound.svelte.js"
+  import { derivedTheme, toggleTheme } from "../theme.svelte.js"
   import FeedbackDialog from "./feedbackDialog.svelte"
   import SealLogo from "./logo/seal-logo-text-horizontal-white.svg"
   import Button from "./ui/button/button.svelte"
 
   const lang: Language = $derived(getLanguage())
-  const { t } = $derived(tFunction([globalTranslations], lang))
-  function setLang(s: string) {
-    setLanguage(s as Language)
-  }
 </script>
 
 <header
@@ -24,8 +17,10 @@
 >
   {@render logo()}
   <div class="grow"></div>
+  {@render switchTheme()}
+  {@render soundSwitch()}
+  {@render switchLang()}
   <FeedbackDialog />
-  {@render settingsMenu()}
 </header>
 
 {#snippet logo()}
@@ -34,46 +29,98 @@
   </Button>
 {/snippet}
 
-{#snippet settingsMenu()}
-  <DropdownMenu.Root>
-    <DropdownMenu.Trigger>
-      {#snippet child({ props })}
-        <Button variant="ghost" size="icon" aria-label={t("menu.settings")} {...props}>
-          <Settings class="h-4 w-4" />
-        </Button>
-      {/snippet}
-    </DropdownMenu.Trigger>
-    <DropdownMenu.Content class="w-56">
-      <DropdownMenu.Label>{t("menu.language")}</DropdownMenu.Label>
-      <DropdownMenu.RadioGroup value={lang} onValueChange={(s) => setLang(s)}>
-        {#each SUPPORTED_LANGUAGES as lng (lng)}
-          <DropdownMenu.RadioItem value={lng} closeOnSelect={false}>
-            {NATIVE_NAME[lng]}
-          </DropdownMenu.RadioItem>
-        {/each}
-      </DropdownMenu.RadioGroup>
-      <DropdownMenu.Separator />
-      <DropdownMenu.Label>{t("menu.sound")}</DropdownMenu.Label>
-      <DropdownMenu.RadioGroup
-        value={getMuted() ? "off" : "on"}
-        onValueChange={(s) => setMuted(s === "off")}
-      >
-        <DropdownMenu.RadioItem value="on" closeOnSelect={false}>
-          {t("on")}
-        </DropdownMenu.RadioItem>
-        <DropdownMenu.RadioItem value="off" closeOnSelect={false}>
-          {t("off")}
-        </DropdownMenu.RadioItem>
-      </DropdownMenu.RadioGroup>
-      <DropdownMenu.Separator />
-      <DropdownMenu.Label>{t("menu.theme")}</DropdownMenu.Label>
-      <DropdownMenu.RadioGroup value={getTheme()} onValueChange={setTheme}>
-        {#each availableThemes as thm (thm)}
-          <DropdownMenu.RadioItem value={thm} closeOnSelect={false}>
-            {t("theme." + thm)}
-          </DropdownMenu.RadioItem>
-        {/each}
-      </DropdownMenu.RadioGroup>
-    </DropdownMenu.Content>
-  </DropdownMenu.Root>
+{#snippet soundSwitch()}
+  <Button
+    variant="ghost"
+    size="icon"
+    onclick={toggleMuted}
+    aria-label={getMuted() ? "Unmute" : "Mute"}
+    class="relative overflow-hidden"
+  >
+    <!-- Sound On Icon -->
+    <div
+      class="absolute inset-0 flex items-center justify-center transition-all duration-200"
+      class:opacity-0={getMuted()}
+      class:scale-75={getMuted()}
+      class:opacity-100={!getMuted()}
+      class:scale-100={!getMuted()}
+    >
+      <Volume2 class="h-5 w-5 transition-transform duration-200" />
+    </div>
+
+    <!-- Sound Off Icon -->
+    <div
+      class="absolute inset-0 flex items-center justify-center transition-all duration-200"
+      class:opacity-100={getMuted()}
+      class:scale-100={getMuted()}
+      class:opacity-0={!getMuted()}
+      class:scale-75={!getMuted()}
+    >
+      <VolumeX class="h-5 w-5 transition-transform duration-200" />
+    </div>
+  </Button>
+{/snippet}
+
+{#snippet switchLang()}
+  <Button
+    variant="ghost"
+    size="icon"
+    onclick={toggleLanguage}
+    aria-label={lang === "en" ? "Switch to German" : "Switch to English"}
+    class="relative overflow-hidden"
+  >
+    <!-- English Flag -->
+    <div
+      class="absolute inset-0 flex items-center justify-center transition-all duration-200"
+      class:opacity-0={lang === "de"}
+      class:scale-75={lang === "de"}
+      class:opacity-100={lang === "en"}
+      class:scale-100={lang === "en"}
+    >
+      En
+    </div>
+
+    <!-- German Flag -->
+    <div
+      class="absolute inset-0 flex items-center justify-center transition-all duration-200"
+      class:opacity-100={lang === "de"}
+      class:scale-100={lang === "de"}
+      class:opacity-0={lang === "en"}
+      class:scale-75={lang === "en"}
+    >
+      De
+    </div>
+  </Button>
+{/snippet}
+
+{#snippet switchTheme()}
+  <Button
+    variant="ghost"
+    size="icon"
+    onclick={toggleTheme}
+    aria-label={derivedTheme() === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+    class="relative overflow-hidden"
+  >
+    <!-- Light Mode -->
+    <div
+      class="absolute inset-0 flex items-center justify-center transition-all duration-200"
+      class:opacity-0={derivedTheme() === "dark"}
+      class:scale-75={derivedTheme() === "dark"}
+      class:opacity-100={derivedTheme() === "light"}
+      class:scale-100={derivedTheme() === "light"}
+    >
+      <Sun class="h-5 w-5 transition-transform duration-200" />
+    </div>
+
+    <!-- Dark Mode -->
+    <div
+      class="absolute inset-0 flex items-center justify-center transition-all duration-200"
+      class:opacity-100={derivedTheme() === "dark"}
+      class:scale-100={derivedTheme() === "dark"}
+      class:opacity-0={derivedTheme() === "light"}
+      class:scale-75={derivedTheme() === "light"}
+    >
+      <Moon class="h-5 w-5 transition-transform duration-200" />
+    </div>
+  </Button>
 {/snippet}

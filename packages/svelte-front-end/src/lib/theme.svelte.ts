@@ -11,7 +11,7 @@ let systemTheme: typeof LIGHT | typeof DARK = $state(LIGHT)
 
 const localStorageTheme = persisted<Themes>("theme", SYSTEM, { onChange: syncTheme })
 
-function derivedTheme() {
+export function derivedTheme() {
   const x = localStorageTheme.get()
   if (x === LIGHT) return LIGHT
   if (x === DARK) return DARK

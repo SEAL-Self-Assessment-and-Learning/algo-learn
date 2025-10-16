@@ -16,7 +16,9 @@
       <!-- Logo + Name -->
       <div class="mb-1 flex items-center space-x-3 rtl:space-x-reverse">
         <img src={SealLogo} class="h-8 brightness-0 invert filter" alt="SEAL Logo" />
-        <span class="mr-4 self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+        <span
+          class="mr-4 self-center text-2xl font-semibold whitespace-nowrap text-white dark:text-white"
+        >
           Self Assessment and Learning
         </span>
       </div>
