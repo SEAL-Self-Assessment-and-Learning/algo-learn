@@ -1,6 +1,6 @@
 <script lang="ts">
   import CenteredDivs from "$lib/components/centeredDivs.svelte"
-  import Footer from "$lib/components/Footer.svelte"
+  import Footer from "$lib/components/footer.svelte"
   import Markdown from "$lib/components/markdown/markdown.svelte"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { SiSvelte } from "@icons-pack/svelte-simple-icons"

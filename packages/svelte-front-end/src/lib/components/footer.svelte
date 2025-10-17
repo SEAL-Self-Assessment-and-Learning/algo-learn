@@ -14,7 +14,7 @@
   <div class="mx-auto w-full max-w-screen-xl px-7 py-4">
     <div class="flex flex-wrap items-center justify-between">
       <!-- Logo + Name -->
-      <div class="mb-1 flex items-center space-x-3 rtl:space-x-reverse">
+      <div class="mb-1 flex flex-wrap items-center justify-center space-x-3 rtl:space-x-reverse">
         <img src={SealLogo} class="h-8 brightness-0 invert filter" alt="SEAL Logo" />
         <span
           class="mr-4 self-center text-2xl font-semibold whitespace-nowrap text-white dark:text-white"
@@ -24,7 +24,7 @@
       </div>
 
       <!-- Navigation Links -->
-      <ul class="mb-1 flex flex-wrap items-center text-sm font-medium text-gray-500 dark:text-gray-400">
+      <ul class="mb-1 flex flex-wrap items-center text-sm font-medium text-gray-400">
         <li>
           <a href={resolve(`/${lang}/about`)} class="me-4 hover:underline">{t("About.label")}</a>
         </li>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Footer from "$lib/components/Footer.svelte"
+  import Footer from "$lib/components/footer.svelte"
   import Markdown from "$lib/components/markdown/markdown.svelte"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { Language } from "@shared/api/Language.ts"
