@@ -6,6 +6,9 @@ import tailwindcss from "@tailwindcss/vite"
 
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
+  ssr: {
+    noExternal: ["@lucide/svelte"],
+  },
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),

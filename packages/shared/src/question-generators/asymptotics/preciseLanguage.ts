@@ -246,11 +246,11 @@ const questions: BasicMultipleChoiceQuestion[] = [
 
 const metaTranslations = {
   en: {
-    title: "Oh-Notation",
+    title: "Reading Oh-Notation",
     description: "Correctly interpret Oh-Notation",
   },
   de: {
-    title: "Oh-Notation",
+    title: "Oh-Notation lesen",
     description: "Oh-Notation korrekt interpretieren",
   },
 }
