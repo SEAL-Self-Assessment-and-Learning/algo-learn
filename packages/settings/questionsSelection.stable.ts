@@ -61,21 +61,18 @@ export const collection: QuestionCollection = [
   },
   {
     slug: "asymptotics",
-    name: { de: "Asymptotische Notation", en: "Asymptotic Notation" },
-    topics: ["math"],
-    contents: [AsymptoticsPreciseLanguage, LandauNotation, SortTerms, SimplifySum, Between],
-  },
-  {
-    slug: "recursion",
-    name: { de: "Rekursion", en: "Recursion" },
-    topics: ["recursion", "pseudocode"],
-    contents: [RecursionFormula, RecurrenceMaster],
-  },
-  {
-    slug: "pseudocode",
-    name: { de: "Pseudocode", en: "Pseudocode" },
-    topics: ["pseudocode"],
-    contents: [Loops], // Todo: add RecursionFormula (needs other refactoring first)
+    name: { de: "Asymptotische Notation und Laufzeiten", en: "Asymptotic Notation and Runtimes" },
+    topics: ["math", "recursion", "pseudocode"],
+    contents: [
+      AsymptoticsPreciseLanguage,
+      LandauNotation,
+      SortTerms,
+      SimplifySum,
+      Between,
+      RecursionFormula,
+      RecurrenceMaster,
+      Loops,
+    ],
   },
   {
     slug: "stack",

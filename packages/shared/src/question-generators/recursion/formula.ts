@@ -37,7 +37,7 @@ const translations: Translations = {
     text2Arithmetic: "Sei ${{0}}$ die Anzahl der arithmetischen Operationen ($+$, $-$, $\\cdot$, /).",
     longName: "Rekurrenzrelation",
     question: "Was ist die Rekurrenzrelation von",
-    name: "Rekurrenz",
+    name: "Rekursion",
     description: "Bestimme die Rekurrenzrelation einer rekursiven Funktion",
     bottomnote: "Hinweis: Dieses Feld erwartet einen String der Form `{{0}}` als Eingabe.",
     feedbackIncomplete: "Nicht vollständig oder zu komplex",
