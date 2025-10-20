@@ -69,18 +69,13 @@ export const collection: QuestionCollection = [
     slug: "recursion",
     name: { de: "Rekursion", en: "Recursion" },
     topics: ["recursion", "pseudocode"],
-    // description:
-    // {
-    //   de: "Master Theorem und Analyse von rekursivem Code",
-    //   en: "Master Theorem and run time analysis of recursive code."
-    // },
     contents: [RecursionFormula, RecurrenceMaster],
   },
   {
     slug: "pseudocode",
     name: { de: "Pseudocode", en: "Pseudocode" },
     topics: ["pseudocode"],
-    contents: [Loops], // RecursionFormula
+    contents: [Loops], // Todo: add RecursionFormula (needs other refactoring first)
   },
   {
     slug: "stack",

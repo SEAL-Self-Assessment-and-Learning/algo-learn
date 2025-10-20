@@ -8,17 +8,7 @@ export { oldPathToGenerator }
 
 export const collection = mode === "production" ? stable : demos.concat(stable)
 
-export type QuestionTopic =
-  | "demo"
-  | "math"
-  | "logic"
-  | "graph"
-  | "data-structures"
-  | "algorithms"
-  | "pseudocode"
-  | "recursion"
-export const allQuestionTopics: QuestionTopic[] = [
-  ...(mode !== "production" ? ["demo" as QuestionTopic] : []),
+const baseTopics = [
   "math",
   "logic",
   "graph",
@@ -26,7 +16,14 @@ export const allQuestionTopics: QuestionTopic[] = [
   "algorithms",
   "pseudocode",
   "recursion",
-]
+] as const
+
+export type QuestionTopic = (typeof baseTopics)[number] | "demo"
+
+export const allQuestionTopics: QuestionTopic[] =
+  mode !== "production"
+    ? (["demo", ...baseTopics] as QuestionTopic[])
+    : ([...baseTopics] as QuestionTopic[])
 
 export const topicNames: Record<QuestionTopic, SingleTranslation> = {
   demo: { de: "Demo", en: "Demo" },
