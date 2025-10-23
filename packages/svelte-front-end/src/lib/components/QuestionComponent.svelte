@@ -1,8 +1,8 @@
 <script lang="ts">
+  import ExerciseMatching from "$lib/components/ExerciseMatching.svelte"
   import ExerciseMultipleChoice from "$lib/components/ExerciseMultipleChoice.svelte"
   import ExerciseMultiTextInput from "$lib/components/ExerciseMultiTextInput.svelte"
   import ExerciseTextInput from "$lib/components/ExerciseTextInput.svelte"
-  import ExerciseMatching from "$lib/components/ExerciseMatching.svelte"
   import type { Result } from "$lib/components/types.ts"
   import type { Question } from "@shared/api/QuestionGenerator.ts"
 

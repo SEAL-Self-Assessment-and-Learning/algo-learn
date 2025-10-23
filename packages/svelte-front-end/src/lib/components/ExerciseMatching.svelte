@@ -1,14 +1,11 @@
 <script lang="ts">
+  import MatchingExercise from "$lib/components/DnD/MatchingExercise.svelte"
+  import type { SlotItem } from "$lib/components/DnD/MatchingSlot.svelte"
   import InteractWithQuestion from "$lib/components/InteractWithQuestion.svelte"
   import Markdown from "$lib/components/markdown/markdown.svelte"
-  import MatchingExercise from "$lib/components/DnD/MatchingExercise.svelte"
   import type { MODE, Result } from "$lib/components/types.ts"
   import { playSound } from "$lib/sound.svelte.ts"
-  import type {
-    MultipleChoiceQuestion,
-    MultipleChoiceFeedback,
-  } from "@shared/api/QuestionGenerator.ts"
-  import type { SlotItem } from "$lib/components/DnD/MatchingSlot.svelte"
+  import type { MultipleChoiceFeedback, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator.ts"
 
   interface Props {
     question: MultipleChoiceQuestion
@@ -66,18 +63,13 @@
     pairs={(question.fixedItems ?? []).map((f, i) => ({
       id: `${i}`,
       fixed: f,
-      answerId:
-        questionState.choice[i] >= 0
-          ? `${questionState.choice[i]}`
-          : null,
+      answerId: questionState.choice[i] >= 0 ? `${questionState.choice[i]}` : null,
     }))}
-
     answers={question.answers.map((a, i) => ({
       id: `${i}`,
       content: a,
     }))}
-
-    disabled={disabled}
+    {disabled}
     {onChange}
   />
 </InteractWithQuestion>

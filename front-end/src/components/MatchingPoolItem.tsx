@@ -17,7 +17,7 @@ export function MatchingPoolItem({
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <Button
         variant="secondary"
-        className={`w-full min-w-[200px] max-w-[320px] cursor-move text-center ${isDragging ? "opacity-50" : ""}`}
+        className={`w-full max-w-[320px] min-w-[200px] cursor-move text-center ${isDragging ? "opacity-50" : ""}`}
         disabled={disabled}
         type="button"
       >

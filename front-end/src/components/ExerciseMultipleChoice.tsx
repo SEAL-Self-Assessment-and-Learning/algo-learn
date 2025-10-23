@@ -315,6 +315,6 @@ function FeedbackIcon({ correct, hidden }: { correct: boolean; hidden?: boolean 
   if (correct) {
     return <CheckCheck className={"h-4 w-4 text-green-700" + cn} />
   } else {
-    return <XCircle className={"h-4 w-4 text-destructive" + cn} />
+    return <XCircle className={"text-destructive h-4 w-4" + cn} />
   }
 }

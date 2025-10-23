@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { useDraggable } from "@dnd-kit-svelte/core"
   import Markdown from "$lib/components/markdown/markdown.svelte"
+  import { useDraggable } from "@dnd-kit-svelte/core"
 
   export interface SlotItem {
     id: string
@@ -27,8 +27,8 @@
 <li
   bind:this={drag.node.current}
   style={dragStyle}
-  {...(!disabled ? { ...drag.attributes.current, ...drag.listeners.current } : {})}
-  class={`border rounded-md p-2 select-none text-center cursor-move transition-all
+  {...!disabled ? { ...drag.attributes.current, ...drag.listeners.current } : {}}
+  class={`cursor-move rounded-md border p-2 text-center transition-all select-none
           ${disabled ? "opacity-60" : "hover:bg-goethe"}
           dark:border-gray-700`}
 >

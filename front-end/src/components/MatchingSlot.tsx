@@ -49,7 +49,7 @@ export function MatchingSlot({
             key={colIdx}
             ref={setDropRef}
             className={cn(
-              "relative flex min-h-[40px] min-w-[200px] max-w-[320px] items-stretch justify-stretch rounded-md border",
+              "relative flex min-h-[40px] max-w-[320px] min-w-[200px] items-stretch justify-stretch rounded-md border",
               "transition-colors",
               isOver ? "border-blue-500 bg-blue-800/30" : "border-dashed border-neutral-500",
             )}
@@ -78,7 +78,7 @@ export function MatchingSlot({
                       e.stopPropagation()
                       onRemove(colIdx)
                     }}
-                    className="absolute right-1 top-1 z-10 inline-flex h-6 w-6 items-center justify-center rounded-md border border-red-400/60 text-red-400 hover:bg-red-500/10"
+                    className="absolute top-1 right-1 z-10 inline-flex h-6 w-6 items-center justify-center rounded-md border border-red-400/60 text-red-400 hover:bg-red-500/10"
                     aria-label="Remove"
                     tabIndex={0}
                   >

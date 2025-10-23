@@ -5,12 +5,12 @@
 import type { QuestionCollection } from "@shared/api/QuestionRouter"
 import { DemoGraphs } from "@shared/question-generators/demos/graphGenerators"
 import { DemoDraggingGraphs } from "@shared/question-generators/demos/interactiveGraphGenerator.ts"
+import { DemoMatching } from "@shared/question-generators/demos/matching.ts"
 import { DemoMultiInput } from "@shared/question-generators/demos/multiInput"
 import { DemoMultipleChoice } from "@shared/question-generators/demos/multipleChoice"
 import { DemoSingleInput } from "@shared/question-generators/demos/singleInput"
 import { DemoSortingChoice } from "@shared/question-generators/demos/sorting.ts"
 import { DemoTables } from "@shared/question-generators/demos/tables.ts"
-import { DemoMatching } from "@shared/question-generators/demos/matching.ts"
 
 export const collection: QuestionCollection = [
   {

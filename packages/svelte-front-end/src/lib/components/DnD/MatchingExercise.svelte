@@ -1,15 +1,10 @@
 <script lang="ts">
-  import {
-    DndContext,
-    DragOverlay,
-    type DragStartEvent,
-    type DragEndEvent,
-  } from "@dnd-kit-svelte/core"
-  import { SortableContext } from "@dnd-kit-svelte/sortable"
-  import { dropAnimation, sensors } from "$lib/components/DnD/utils.ts"
-  import MatchingSlot, { type SlotItem } from "$lib/components/DnD/MatchingSlot.svelte"
   import MatchingPoolItem from "$lib/components/DnD/MatchingPoolItem.svelte"
+  import MatchingSlot, { type SlotItem } from "$lib/components/DnD/MatchingSlot.svelte"
+  import { dropAnimation, sensors } from "$lib/components/DnD/utils.ts"
   import Markdown from "$lib/components/markdown/markdown.svelte"
+  import { DndContext, DragOverlay, type DragEndEvent, type DragStartEvent } from "@dnd-kit-svelte/core"
+  import { SortableContext } from "@dnd-kit-svelte/sortable"
 
   export interface Pair {
     id: string
@@ -118,7 +113,7 @@
 
   <DragOverlay {dropAnimation}>
     {#if activeItem}
-      <div class="border rounded-md p-2 bg-gray-100 dark:bg-gray-800">
+      <div class="rounded-md border bg-gray-100 p-2 dark:bg-gray-800">
         <Markdown md={activeItem.content ?? ""} />
       </div>
     {/if}
