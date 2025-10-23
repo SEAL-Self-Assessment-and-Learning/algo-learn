@@ -2,6 +2,7 @@
   import ExerciseMultipleChoice from "$lib/components/ExerciseMultipleChoice.svelte"
   import ExerciseMultiTextInput from "$lib/components/ExerciseMultiTextInput.svelte"
   import ExerciseTextInput from "$lib/components/ExerciseTextInput.svelte"
+  import ExerciseMatching from "$lib/components/ExerciseMatching.svelte"
   import type { Result } from "$lib/components/types.ts"
   import type { Question } from "@shared/api/QuestionGenerator.ts"
 
@@ -13,7 +14,9 @@
   const { question, onResult, regenerate }: Props = $props()
 </script>
 
-{#if question.type === "MultipleChoiceQuestion"}
+{#if question.type === "MultipleChoiceQuestion" && question.matching}
+  <ExerciseMatching {question} permalink={question.path} {onResult} {regenerate} />
+{:else if question.type === "MultipleChoiceQuestion"}
   <ExerciseMultipleChoice {question} permalink={question.path} {onResult} {regenerate} />
 {:else if question.type === "FreeTextQuestion"}
   <ExerciseTextInput {question} permalink={question.path} {onResult} {regenerate} />

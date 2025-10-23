@@ -1,0 +1,95 @@
+<script lang="ts">
+  import InteractWithQuestion from "$lib/components/InteractWithQuestion.svelte"
+  import Markdown from "$lib/components/markdown/markdown.svelte"
+  import MatchingExercise from "$lib/components/DnD/MatchingExercise.svelte"
+  import type { MODE, Result } from "$lib/components/types.ts"
+  import { playSound } from "$lib/sound.svelte.ts"
+  import type {
+    MultipleChoiceQuestion,
+    MultipleChoiceFeedback,
+  } from "@shared/api/QuestionGenerator.ts"
+  import type { SlotItem } from "$lib/components/DnD/MatchingSlot.svelte"
+
+  interface Props {
+    question: MultipleChoiceQuestion
+    permalink?: string
+    onResult?: (result: Result, finished: boolean) => void
+    regenerate?: () => void
+  }
+
+  const { question, permalink, onResult, regenerate }: Props = $props()
+
+  const questionState: {
+    mode: MODE
+    choice: number[]
+    feedbackObject?: MultipleChoiceFeedback
+  } = $state({
+    mode: "draft",
+    choice: Array(question.answers.length).fill(-1),
+  })
+
+  const disabled = $derived(questionState.mode !== "draft")
+
+  // handle submit
+  function handleClick(finished: boolean) {
+    if (question.feedback && questionState.mode === "draft") {
+      void Promise.resolve(question.feedback({ choice: questionState.choice })).then(
+        (feedbackObject) => {
+          const mode: MODE = feedbackObject.correct ? "correct" : "incorrect"
+          playSound(mode === "correct" ? "pass" : "fail")
+          questionState.feedbackObject = feedbackObject
+          questionState.mode = mode
+        },
+      )
+    } else if (["correct", "incorrect"].includes(questionState.mode)) {
+      onResult?.(questionState.mode as Result, finished)
+    }
+  }
+
+  // handle drag/drop changes
+  function onChange(slots: (SlotItem | null)[]) {
+    questionState.choice = slots.map((s) => (s ? Number(s.id) : -1))
+  }
+</script>
+
+<InteractWithQuestion
+  {permalink}
+  name={question.name}
+  {regenerate}
+  footerMode={questionState.mode}
+  footerMessage={footerMsg}
+  handleFooterClick={handleClick}
+>
+  <Markdown md={question.text ?? ""} />
+
+  <MatchingExercise
+    pairs={(question.fixedItems ?? []).map((f, i) => ({
+      id: `${i}`,
+      fixed: f,
+      answerId:
+        questionState.choice[i] >= 0
+          ? `${questionState.choice[i]}`
+          : null,
+    }))}
+
+    answers={question.answers.map((a, i) => ({
+      id: `${i}`,
+      content: a,
+    }))}
+
+    disabled={disabled}
+    {onChange}
+  />
+</InteractWithQuestion>
+
+{#snippet footerMsg()}
+  <b class="text-lg">
+    {#if questionState.mode === "correct"}
+      Correct!
+    {:else if questionState.mode === "incorrect"}
+      Incorrect.
+    {:else}
+      That's okay!
+    {/if}
+  </b>
+{/snippet}
