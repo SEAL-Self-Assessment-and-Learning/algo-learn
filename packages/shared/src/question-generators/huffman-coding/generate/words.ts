@@ -1,4 +1,4 @@
-import type Random from "../../../utils/random.ts"
+import type Random from "@shared/utils/random.ts"
 
 // Todo: generate those frequencies
 const tmpFrequencies: { [key: number]: number[][] } = {
