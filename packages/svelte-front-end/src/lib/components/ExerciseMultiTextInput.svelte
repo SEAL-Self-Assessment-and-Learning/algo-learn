@@ -128,6 +128,18 @@
         disabled: questionState.mode === "correct" || questionState.mode === "incorrect",
         feedback: questionState.formatFeedback[id],
         focus: i === 0 && !isMobileOrTablet,
+        mode:
+          questionState.modeID[id] === "invalid"
+            ? "invalid"
+            : questionState.mode === "correct"
+              ? "correct"
+              : questionState.mode === "incorrect"
+                ? "incorrect"
+                : questionState.mode === "submitted"
+                  ? "submitted"
+                  : question.fillOutAll && questionState.text[id].trim().length === 0
+                    ? "initial"
+                    : "draft",
       }
       return acc
     }, {}),

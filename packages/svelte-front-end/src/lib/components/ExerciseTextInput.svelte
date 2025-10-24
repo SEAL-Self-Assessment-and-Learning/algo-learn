@@ -4,11 +4,14 @@
   import Markdown from "$lib/components/markdown/markdown.svelte"
   import type { MODE, Result } from "$lib/components/types.ts"
   import { Button } from "$lib/components/ui/button"
-  import { inputClass } from "$lib/components/ui/MultiInput/cnInput.ts"
+  import InputFieldIcon from "$lib/components/ui/MultiInput/InputFieldIcon.svelte"
+  import { indicatorColor, inputClass } from "$lib/components/ui/MultiInput/inputUtils.ts"
+  import MyTooltip from "$lib/components/ui/MyTooltip.svelte"
   import { playSound } from "$lib/sound.svelte.ts"
   import { globalTranslations } from "$lib/translation.ts"
   import { isMobileOrTablet } from "$lib/utils/deviceInformation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
+  import { Tooltip } from "bits-ui"
   import { onMount } from "svelte"
   import type { Language } from "@shared/api/Language.ts"
   import type { FreeTextFeedback, FreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
@@ -30,9 +33,11 @@
     feedbackObject?: FreeTextFeedback
     formatFeedback?: string
   } = $state({
-    mode: "invalid",
+    mode: "initial",
     text: "",
   })
+
+  let showTooltip: boolean = $state(false)
 
   let userInputRef: HTMLInputElement | null = $state(null)
   if (browser) {
@@ -52,7 +57,13 @@
       ...questionState,
       text,
     }
-    if (question.checkFormat) {
+    if (text.trim().length === 0) {
+      questionState = {
+        ...questionState,
+        mode: "initial",
+        formatFeedback: "",
+      }
+    } else if (question.checkFormat) {
       void Promise.resolve(question.checkFormat({ text })).then(({ valid, message }) => {
         questionState = {
           ...questionState,
@@ -116,11 +127,12 @@
     }
   }
 
-  const msgColor = $derived(
-    questionState.mode === "draft"
-      ? "text-green-600 dark:text-green-400"
-      : "text-red-600 dark:text-red-400",
-  )
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === "?" || e.key === "F1") {
+      e.preventDefault()
+      showTooltip = !showTooltip
+    }
+  }
 </script>
 
 <InteractWithQuestion
@@ -134,21 +146,48 @@
   <Markdown md={question.text ?? ""} />
   <br />
   <br />
-  <div class="flex place-items-center gap-2 pl-3">
+  <div class="flex flex-row items-center">
     <Markdown md={question.prompt ?? ""} />
-    <input
-      class="${inputClass}"
-      bind:this={userInputRef}
-      disabled={questionState.mode === "correct" || questionState.mode === "incorrect"}
-      value={questionState.text}
-      oninput={handleChange}
-      type="text"
-      placeholder={question.placeholder}
-    />
-    <div class={`flex h-12 items-center ${msgColor}`}>
-      <div>
-        <Markdown md={questionState.formatFeedback ?? ""} />
-      </div>
+    <div class="relative flex h-12 w-full items-center">
+      <input
+        class="${inputClass}"
+        bind:this={userInputRef}
+        disabled={questionState.mode === "correct" || questionState.mode === "incorrect"}
+        value={questionState.text}
+        oninput={handleChange}
+        onkeydown={handleKeydown}
+        type="text"
+        placeholder={question.placeholder}
+      />
+
+      {#if questionState.mode === "invalid" || questionState.mode === "draft"}
+        <span
+          class={`absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full ${indicatorColor[questionState.mode as "draft" | "correct" | "incorrect" | "invalid"]} text-[10px] font-bold text-white`}
+        >
+          {#if questionState.formatFeedback !== ""}
+            <Tooltip.Provider>
+              <MyTooltip
+                open={showTooltip}
+                onOpenChange={(open) => (showTooltip = open)}
+                contentProps={{
+                  side: "top",
+                  sideOffset: 5,
+                  class: "max-w-xs whitespace-pre-wrap break-words",
+                }}
+              >
+                {#snippet trigger()}
+                  <div class="cursor-pointer p-2">
+                    <InputFieldIcon mode={questionState.mode} />
+                  </div>
+                {/snippet}
+                <Markdown md={questionState.formatFeedback ?? ""} />
+              </MyTooltip>
+            </Tooltip.Provider>
+          {:else}
+            <InputFieldIcon mode={questionState.mode} />
+          {/if}
+        </span>
+      {/if}
     </div>
   </div>
   <div class="py-5 text-slate-600 dark:text-slate-400">

@@ -65,7 +65,10 @@ export const DemoSingleInput: QuestionGenerator = {
       },
       checkFormat: ({ text }) => {
         const val = parseInt(text)
-        return { valid: !Number.isNaN(val), message: `${val}` }
+        return {
+          valid: !Number.isNaN(val),
+          message: `${val} this is just a quick test. this is just a quick test.this is just a quick test.this is just a quick test.this is just a quick test.this is just a quick test.this is just a quick test.this is just a quick test.this is just a quick test.this is just a quick test.this is just a quick test.this is just a quick test.this is just a quick test.this is just a quick test.`,
+        }
       },
     }
 
