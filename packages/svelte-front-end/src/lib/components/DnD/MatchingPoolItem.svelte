@@ -28,9 +28,10 @@
   bind:this={drag.node.current}
   style={dragStyle}
   {...!disabled ? { ...drag.attributes.current, ...drag.listeners.current } : {}}
+  data-no-dnd-kit-drag-preview
   class={`cursor-move rounded-md border p-2 text-center transition-all select-none
           ${disabled ? "opacity-60" : "hover:bg-goethe"}
-          dark:border-gray-700`}
+          ${drag.isDragging.current ? "opacity-0" : ""} dark:border-gray-700`}
 >
   <Markdown md={item.content ?? ""} />
 </li>
