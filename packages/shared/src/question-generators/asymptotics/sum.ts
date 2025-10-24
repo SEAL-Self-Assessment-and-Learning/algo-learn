@@ -13,12 +13,12 @@ const translations: Translations = {
   en: {
     text: "Let ${{0}}$ be defined via \\[{{1}}\\,.\\] Which asymptotic growth is correct for this function? Choose exactly one answer:",
     description: "Determine the asymptotically dominant term in a sum",
-    name: "Sum",
+    name: "Simplify Sums",
   },
   de: {
     text: "Sei ${{0}}$ definiert durch \\[{{1}}\\,.\\] Welches asymptotische Wachstum ist für diese Funktion richtig? Wähle genau eine Antwort aus:",
     description: "Bestimme den asymptotisch dominanten Term in einer Summe",
-    name: "Summe",
+    name: "Summen vereinfachen",
   },
 }
 /**

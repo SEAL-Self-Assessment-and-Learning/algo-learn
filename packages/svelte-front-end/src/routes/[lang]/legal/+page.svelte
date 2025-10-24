@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Footer from "$lib/components/footer.svelte"
   import Markdown from "$lib/components/markdown/markdown.svelte"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import type { Language } from "@shared/api/Language.ts"
@@ -15,6 +16,7 @@
   {@render detailedImprint()}
   {@render authors()}
 </CenteredDivs>
+<Footer />
 
 {#snippet legal()}
   <div class="pl-2 text-4xl font-extrabold">
