@@ -9,14 +9,14 @@ import { tFunction, tFunctional, type Translations } from "../../utils/translati
 
 const translations: Translations = {
   en: {
-    name: "Landau Notation",
-    description: "Compare functions by their asymptotic growth",
+    name: "Oh-Notation",
+    description: "Find true Oh-Notation statements.",
     text: "Which of these statements are true? Select all that apply.",
   },
   de: {
-    name: "Landau Notation",
-    description: "Vergleiche Funktionen nach ihrem asymptotischen Wachstum",
-    text: "Welche dieser Aussagen sind wahr? Wähle alle aus.",
+    name: "Oh-Notation",
+    description: "Finde zutreffende Aussagen in Oh-Notation.",
+    text: "Welche dieser Aussagen sind wahr? Wähle alle korrekten Aussagen aus.",
   },
 }
 /** Multiple-choice questions for asymptotic notation */

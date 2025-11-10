@@ -15,6 +15,11 @@ export const collection: QuestionCollection = [
   {
     slug: "demos",
     name: { de: "Demos", en: "Demos" },
+    topics: ["demo"],
+    description: {
+      en: "Collection of question to showcase website features",
+      de: "Sammlung von Fragen zur Demonstration der Website-Funktionen",
+    },
     contents: [
       DemoMultipleChoice,
       DemoSingleInput,
