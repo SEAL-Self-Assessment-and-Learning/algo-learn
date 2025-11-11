@@ -53,23 +53,31 @@ export class ConstantNode extends ExprNode {
 
 // VARIABLE NODE:  e.g., "x"
 export class VariableNode extends ExprNode {
-  constructor(public name: string) {
+  constructor(
+    public name: string,
+    public multiplier: number = 1,
+  ) {
     super()
   }
 
   toString() {
-    return this.name
+    // multiplier should be positive integer
+    if (this.multiplier > 1) {
+      return `${this.multiplier}${this.name}`
+    } else {
+      return this.name
+    }
   }
 
   toTex() {
-    return this.name
+    return this.toString()
   }
 
   evaluate(assign: Record<string, number>) {
     if (!(this.name in assign)) {
       throw new Error(`Missing assignment for variable '${this.name}'`)
     }
-    return assign[this.name]
+    return this.multiplier * assign[this.name]
   }
 
   containsVariable() {
@@ -104,9 +112,9 @@ export class UnaryNode extends ExprNode {
 
   toTex() {
     if (this.child instanceof VariableNode || this.child instanceof ConstantNode) {
-      return `\\left(-${this.child.toTex()}\\right)`
+      return `-${this.child.toTex()}`
     }
-    return `- \\left(${this.child.toTex()}\\right)`
+    return `-\\left(${this.child.toTex()}\\right)`
   }
 
   evaluate(assign: Record<string, number>) {
@@ -158,16 +166,44 @@ export class BinaryNode extends ExprNode {
   }
 
   toTex() {
-    const L = this.left.toTex()
-    const R = this.right.toTex()
+    const needsParensLeft = this.needsParens(this.left, true)
+    const needsParensRight = this.needsParens(this.right, false)
+
+    const L = needsParensLeft ? `\\left(${this.left.toTex()}\\right)` : this.left.toTex()
+    const R = needsParensRight ? `\\left(${this.right.toTex()}\\right)` : this.right.toTex()
 
     if (this.op === "/") {
-      return `\\frac{${L}}{${R}}`
+      // Fraction handles its own grouping
+      return `\\frac{${this.left.toTex()}}{${this.right.toTex()}}`
     } else if (this.op === "^") {
-      return `{${L}}^{${R}}`
+      const base = needsParensLeft ? `\\left(${this.left.toTex()}\\right)` : this.left.toTex()
+      return `{${base}}^{${this.right.toTex()}}`
     } else {
       return `${L} ${this.op} ${R}`
     }
+  }
+
+  private needsParens(child: ExprNode, isLeft: boolean): boolean {
+    if (!(child instanceof BinaryNode)) return false
+
+    const childPrecedence = this.getPrecedence(child.op)
+    const parentPrecedence = this.getPrecedence(this.op)
+
+    if (childPrecedence < parentPrecedence) return true
+    if (childPrecedence === parentPrecedence && !isLeft && !this.isAssociative()) return true
+
+    return false
+  }
+
+  private getPrecedence(op: ArithmeticOperator): number {
+    if (op === "^") return 3
+    if (op === "*" || op === "/") return 2
+    if (op === "+" || op === "-") return 1
+    return 0
+  }
+
+  private isAssociative(): boolean {
+    return this.op === "+" || this.op === "*"
   }
 
   evaluate(assign: Record<string, number>) {
@@ -236,11 +272,20 @@ function getExpressionSettings(difficulty: number) {
     throw new Error("Difficulty must be between 1 and 5")
   }
   return {
-    maxDepth: [2, 2, 2, 3, 3][difficulty - 1] ?? 2,
+    maxDepth: [2, 2, 3, 3, 4][difficulty - 1] ?? 2,
     useMul: difficulty >= 2,
     useDiv: difficulty >= 3,
     usePow: difficulty >= 4,
   }
+}
+
+function getConstantRange(difficulty: number, forAssignment = false): [number, number] {
+  if (forAssignment) {
+    // Assignments should use simpler numbers
+    return [1, 5]
+  }
+  // In-expression constants
+  return difficulty <= 2 ? [1, 5] : [1, 9]
 }
 
 export function randomExpressionTree(
@@ -254,15 +299,15 @@ export function randomExpressionTree(
 
   // ----- BASE CASE -----
   if (depth >= settings.maxDepth) {
-    if (mustContainVariable) {
-      return new VariableNode(random.choice(variables))
+    if (mustContainVariable || random.bool(0.3)) {
+      return new VariableNode(
+        random.choice(variables),
+        random.weightedChoice([1, 2, 3], [0.7, 0.2, 0.1]),
+      )
     }
-
-    if (random.choice([true, false])) {
-      return new VariableNode(random.choice(variables))
-    }
-
-    return new ConstantNode(random.int(1, 9))
+    return new ConstantNode(
+      random.int(getConstantRange(difficulty, false)[0], getConstantRange(difficulty, false)[1]),
+    )
   }
 
   // ----- POSSIBLE OPERATIONS -----
@@ -306,8 +351,21 @@ export function randomExpressionTree(
 
   // ----- POWER -----
   if (op === "^") {
-    const exponent = random.int(0, 3)
+    // 0 or 1 as base cases
+    const exponent = random.int(0, 2)
     return new BinaryNode("^", left, new ConstantNode(exponent))
+  }
+
+  // In randomExpressionTree, when creating division:
+  if (op === "/") {
+    const right = randomExpressionTree(random, difficulty, depth + 1, rightMust, variables)
+
+    // Prevent division by expressions that could be zero or very small
+    if (right instanceof ConstantNode && Math.abs(right.value) < 2) {
+      return randomExpressionTree(random, difficulty, depth, mustContainVariable, variables)
+    }
+
+    return new BinaryNode("/", left, right)
   }
 
   // ----- BINARY + - * / -----
@@ -330,9 +388,11 @@ export function randomAssignment(
   for (const v of vars) {
     if (varToMakeExpression === v) {
       const varSet = vars.filter((varName) => varName !== v)
-      assign[v] = randomExpressionTree(random, 1, 0, false, varSet)
+      assign[v] = randomExpressionTree(random, 1, 0, true, varSet)
     } else {
-      assign[v] = new ConstantNode(random.int(-5, 9))
+      assign[v] = new ConstantNode(
+        random.int(getConstantRange(1, false)[0], getConstantRange(1, false)[1]),
+      )
     }
   }
   return assign
@@ -345,22 +405,26 @@ export function evalWithExprAssignments(expr: ExprNode, assigns: Record<string, 
 
   // First pass: resolve constants
   for (const v of unresolved) {
-    if (assigns[v] instanceof ConstantNode) {
-      resolved[v] = assigns[v].value
+    const node = assigns[v]
+    if (node instanceof ConstantNode) {
+      resolved[v] = node.value
       unresolved.delete(v)
     }
   }
 
   let progress = true
+  const maxIterations = 100 // Prevent infinite loops
+  let iterations = 0
 
   // Keep evaluating until every variable is resolved or no progress is made
-  while (unresolved.size > 0 && progress) {
+  while (unresolved.size > 0 && progress && iterations < maxIterations) {
     progress = false
+    iterations++
 
     for (const v of Array.from(unresolved)) {
       try {
-        // Try evaluating using currently resolved values only
-        resolved[v] = assigns[v].evaluate(resolved)
+        const node = assigns[v]
+        resolved[v] = node.evaluate(resolved)
         unresolved.delete(v)
         progress = true
       } catch {
@@ -378,5 +442,9 @@ export function evalWithExprAssignments(expr: ExprNode, assigns: Record<string, 
   }
 
   // Finally evaluate the main expression
-  return expr.evaluate(resolved)
+  console.log(expr.toString())
+  console.log(Object.entries(resolved))
+  const res = expr.evaluate(resolved)
+  console.log(`Result: ${res}`)
+  return res
 }
