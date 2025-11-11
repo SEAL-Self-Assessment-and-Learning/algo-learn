@@ -71,7 +71,6 @@ export const EvaluatingTerms: QuestionGenerator = {
       assignments = randomAssignment(random, varExpression, vars)
       result = evalWithExprAssignments(exprTree, assignments)
     } while (!isGoodResult(result))
-    console.log(`Result: ${result}`)
 
     // exprTree.simplify()
     const assignmentsTex = Object.entries(assignments)

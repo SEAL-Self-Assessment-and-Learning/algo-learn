@@ -442,9 +442,5 @@ export function evalWithExprAssignments(expr: ExprNode, assigns: Record<string, 
   }
 
   // Finally evaluate the main expression
-  console.log(expr.toString())
-  console.log(Object.entries(resolved))
-  const res = expr.evaluate(resolved)
-  console.log(`Result: ${res}`)
-  return res
+  return expr.evaluate(resolved)
 }
