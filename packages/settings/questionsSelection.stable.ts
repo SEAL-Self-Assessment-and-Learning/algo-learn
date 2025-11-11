@@ -16,6 +16,7 @@ import { HeapOperations } from "@shared/question-generators/heap/generatorOperat
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
 import { ReverseHuffmanCoding } from "@shared/question-generators/huffman-coding/reverseHuffmanCoding.ts"
+import { EvaluatingTerms } from "@shared/question-generators/math/basicMath/evaluatingTerms.ts"
 import { AxbGenerator } from "@shared/question-generators/math/linearAlgebra/axb/axbGen.ts"
 import { Determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
 import { CRT } from "@shared/question-generators/math/modularArithmetic/crt.ts"
@@ -109,6 +110,12 @@ export const collection: QuestionCollection = [
     name: { de: "Lineare Algebra", en: "Linear Algebra" },
     topics: ["math"],
     contents: [Determinant, AxbGenerator],
+  },
+  {
+    slug: "basic-math",
+    name: { de: "Grundlagen der Mathematik", en: "Basic Math" },
+    topics: ["math"],
+    contents: [EvaluatingTerms],
   },
 ]
 
