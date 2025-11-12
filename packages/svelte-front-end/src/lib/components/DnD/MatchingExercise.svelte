@@ -3,6 +3,7 @@
   import MatchingSlot, { type SlotItem } from "$lib/components/DnD/MatchingSlot.svelte"
   import { dropAnimation, sensors } from "$lib/components/DnD/utils.ts"
   import Markdown from "$lib/components/markdown/markdown.svelte"
+  import { onMount } from "svelte"
   import { DndContext, DragOverlay, type DragEndEvent, type DragStartEvent } from "@dnd-kit-svelte/core"
   import { SortableContext } from "@dnd-kit-svelte/sortable"
 
@@ -25,6 +26,15 @@
   let pool = $state<SlotItem[]>(structuredClone(answers))
   let slots = $state<(SlotItem | null)[]>(Array(pairs.length).fill(null))
   let activeItem = $state<SlotItem | null>(null)
+
+  // responsive mode flag
+  let isMobile = $state(false)
+  onMount(() => {
+    const check = () => (isMobile = window.innerWidth < 768)
+    check()
+    window.addEventListener("resize", check)
+    return () => window.removeEventListener("resize", check)
+  })
 
   // helper: find by stable id
   function findPoolIndexById(id: string) {
@@ -82,24 +92,6 @@
       return
     }
 
-    // pool to slot
-    if (activeId.startsWith("pool-") && overId.startsWith("slot-")) {
-      const poolIdx = parseInt(activeId.replace("pool-", ""))
-      const slotIdx = parseInt(overId.replace("slot-", ""))
-
-      const item = pool[poolIdx]
-      const newSlots = [...slots]
-      const newPool = [...pool]
-
-      newPool.splice(poolIdx, 1)
-      if (newSlots[slotIdx]) newPool.push(newSlots[slotIdx]!)
-
-      newSlots[slotIdx] = item
-      slots = newSlots
-      pool = newPool
-      onChange(newSlots)
-    }
-
     // slot ↔ slot swap
     if (activeId.startsWith("slot-") && overId.startsWith("slot-")) {
       const fromIdx = parseInt(activeId.replace("slot-", ""))
@@ -124,47 +116,80 @@
     pool = [...pool, item]
     onChange(newSlots)
   }
+
+  // mobile dropdown handler
+  function handleSelectChange(slotIdx: number, value: string) {
+    const newSlots = [...slots]
+    const selected = answers.find((a) => a.id === value) ?? null
+    newSlots[slotIdx] = selected
+    slots = newSlots
+    onChange(newSlots)
+  }
 </script>
 
-<DndContext
-  {sensors}
-  onDragStart={handleDragStart}
-  onDragEnd={handleDragEnd}
-  onDragCancel={() => (activeItem = null)}
->
-  <div class="matching-board flex flex-wrap gap-8">
-    <!-- left column: droppable slots -->
-    <div class="flex flex-col gap-2">
-      {#each pairs as pair, i (pair.id)}
-        <MatchingSlot
-          id={`slot-${i}`}
-          label={pair.fixed}
-          item={slots[i]}
-          onRemove={() => returnToPool(i)}
-          {disabled}
-        />
-      {/each}
+{#if !isMobile}
+  <!-- Desktop DnD -->
+  <DndContext
+    {sensors}
+    onDragStart={handleDragStart}
+    onDragEnd={handleDragEnd}
+    onDragCancel={() => (activeItem = null)}
+  >
+    <div class="matching-board flex flex-wrap gap-8">
+      <!-- left column: droppable slots -->
+      <div class="flex flex-col gap-2">
+        {#each pairs as pair, i (pair.id)}
+          <MatchingSlot
+            id={`slot-${i}`}
+            label={pair.fixed}
+            item={slots[i]}
+            onRemove={() => returnToPool(i)}
+            {disabled}
+          />
+        {/each}
+      </div>
+
+      <!-- right column: draggable pool -->
+      <!-- SortableContext expects a list of ids (strings) that are stable -->
+      <SortableContext items={pool.map((it) => it.id)}>
+        <ul class="flex flex-col gap-2">
+          {#each pool as item (item.id)}
+            <MatchingPoolItem id={item.id} {item} {disabled} />
+          {/each}
+        </ul>
+      </SortableContext>
     </div>
 
-    <!-- right column: draggable pool -->
-    <!-- SortableContext expects a list of ids (strings) that are stable -->
-    <SortableContext items={pool.map((it) => it.id)}>
-      <ul class="flex flex-col gap-2">
-        {#each pool as item (item.id)}
-          <MatchingPoolItem id={item.id} {item} {disabled} />
-        {/each}
-      </ul>
-    </SortableContext>
-  </div>
-
-  <DragOverlay {dropAnimation}>
-    {#if activeItem}
-      <div class="rounded-md border bg-gray-100 p-2 text-center dark:bg-gray-800">
-        <Markdown md={activeItem.content ?? ""} />
+    <DragOverlay {dropAnimation}>
+      {#if activeItem}
+        <div class="rounded-md border bg-gray-100 p-2 text-center dark:bg-gray-800">
+          <Markdown md={activeItem.content ?? ""} />
+        </div>
+      {/if}
+    </DragOverlay>
+  </DndContext>
+{:else}
+  <!-- Mobile: dropdown -->
+  <div class="grid gap-3 p-2">
+    {#each pairs as pair, i (pair.id)}
+      <div class="flex flex-col gap-1">
+        <Markdown md={pair.fixed} />
+        <select
+          class="rounded-md border p-2 dark:border-gray-700 dark:bg-gray-900"
+          {disabled}
+          on:change={(e) => handleSelectChange(i, (e.target as HTMLSelectElement).value)}
+        >
+          <option value="">—</option>
+          {#each answers as ans (ans.id)}
+            <option value={ans.id} selected={slots[i]?.id === ans.id}>
+              {@html ans.content}
+            </option>
+          {/each}
+        </select>
       </div>
-    {/if}
-  </DragOverlay>
-</DndContext>
+    {/each}
+  </div>
+{/if}
 
 <style>
   .matching-board {
