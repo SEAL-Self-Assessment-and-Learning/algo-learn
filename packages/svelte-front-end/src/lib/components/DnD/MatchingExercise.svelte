@@ -3,9 +3,12 @@
   import MatchingSlot, { type SlotItem } from "$lib/components/DnD/MatchingSlot.svelte"
   import { dropAnimation, sensors } from "$lib/components/DnD/utils.ts"
   import Markdown from "$lib/components/markdown/markdown.svelte"
+  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { onMount } from "svelte"
   import { DndContext, DragOverlay, type DragEndEvent, type DragStartEvent } from "@dnd-kit-svelte/core"
   import { SortableContext } from "@dnd-kit-svelte/sortable"
+  import type { Language } from "@shared/api/Language.ts"
+  import type { SingleTranslation } from "@shared/utils/translations.ts"
 
   export interface Pair {
     id: string
@@ -29,6 +32,19 @@
 
   // responsive mode flag
   let isMobile = $state(false)
+  let openIndex = $state(-1)
+
+  // translations
+  const lang: Language = $derived(getLanguage())
+  const matchingTapLang: SingleTranslation = {
+    en: "Tap to choose",
+    de: "Tippe zum Auswählen",
+  }
+  const matchingChosenLang: SingleTranslation = {
+    en: "Chosen",
+    de: "Ausgewählt",
+  }
+
   onMount(() => {
     const check = () => (isMobile = window.innerWidth < 768)
     check()
@@ -121,9 +137,20 @@
   function handleSelectChange(slotIdx: number, value: string) {
     const newSlots = [...slots]
     const selected = answers.find((a) => a.id === value) ?? null
+
+    // if selected item is already assigned elsewhere, unassign it first
+    if (selected) {
+      const prevIdx = newSlots.findIndex((s, i) => s?.id === value && i !== slotIdx)
+      if (prevIdx >= 0) newSlots[prevIdx] = null
+    }
+
     newSlots[slotIdx] = selected
     slots = newSlots
     onChange(newSlots)
+  }
+
+  function isAlreadyUsed(id: string, currentIdx: number) {
+    return slots.some((s, idx) => s?.id === id && idx !== currentIdx)
   }
 </script>
 
@@ -172,20 +199,41 @@
   <!-- Mobile: dropdown -->
   <div class="grid gap-3 p-2">
     {#each pairs as pair, i (pair.id)}
-      <div class="flex flex-col gap-1">
-        <Markdown md={pair.fixed} />
-        <select
-          class="rounded-md border p-2 dark:border-gray-700 dark:bg-gray-900"
-          {disabled}
-          on:change={(e) => handleSelectChange(i, (e.target as HTMLSelectElement).value)}
+      <div class="flex flex-col gap-1 rounded-md border p-2 dark:border-gray-700 dark:bg-gray-900">
+        <div
+          class="flex cursor-pointer items-center justify-between select-none"
+          on:click={() => (openIndex = openIndex === i ? -1 : i)}
         >
-          <option value="">—</option>
-          {#each answers as ans (ans.id)}
-            <option value={ans.id} selected={slots[i]?.id === ans.id}>
-              {@html ans.content}
-            </option>
-          {/each}
-        </select>
+          <Markdown md={pair.fixed} />
+          <span class="text-sm text-gray-400">
+            {slots[i] ? matchingChosenLang[lang] : matchingTapLang[lang]}
+          </span>
+        </div>
+
+        {#if openIndex === i}
+          <div class="mt-2 grid gap-1">
+            {#each answers as ans (ans.id)}
+              {@const alreadyUsed = isAlreadyUsed(ans.id, i)}
+              <button
+                type="button"
+                class={`w-full rounded-md border p-2 text-left text-sm transition-colors
+                  ${
+                    slots[i]?.id === ans.id
+                      ? "bg-goethe text-white"
+                      : alreadyUsed
+                        ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400"
+                        : "hover:bg-goethe/10 dark:hover:bg-goethe/20"
+                  }`}
+                on:click={() => {
+                  handleSelectChange(i, ans.id)
+                  openIndex = -1
+                }}
+              >
+                <Markdown md={ans.content} />
+              </button>
+            {/each}
+          </div>
+        {/if}
       </div>
     {/each}
   </div>
