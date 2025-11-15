@@ -27,7 +27,7 @@ const operatorTex = (operator: ArithmeticOperator) => {
       return "\\cdot"
     case "/":
       // Only partial implementation; should be handled specially
-      return "\\frac{}{}"
+      return "\\dfrac{}{}"
     case "^":
       return "^"
     default:
@@ -235,7 +235,7 @@ function fractionToString(fraction: Fraction, asTex: boolean): string {
   const sign = numerator < 0 ? "-" : ""
   const absoluteNumerator = Math.abs(numerator)
   if (asTex) {
-    return `${sign}\\frac{${absoluteNumerator}}{${denominator}}`
+    return `${sign}\\dfrac{${absoluteNumerator}}{${denominator}}`
   }
   return `${sign}${absoluteNumerator}/${denominator}`
 }
@@ -620,7 +620,7 @@ export class BinaryNode extends ExprNode {
 
   toTex() {
     if (this.op === "/") {
-      return `\\frac{${this.left.toTex()}}{${this.right.toTex()}}`
+      return `\\dfrac{${this.left.toTex()}}{${this.right.toTex()}}`
     }
     if (this.op === "^") {
       const baseNeedsParens =
