@@ -1,4 +1,4 @@
-import math from "@shared/utils/math.ts"
+import math from "@shared/utils/math/math.ts"
 import type Random from "@shared/utils/random.ts"
 import type { PrecisionValues } from "@shared/utils/random.ts"
 

@@ -1,6 +1,6 @@
 import Fraction from "fraction.js"
 import { expect, test } from "vitest"
-import math from "../../utils/math.ts"
+import math from "../../utils/math/math.ts"
 import {
   createProductTerm,
   mathNodeToSumProductTerm,

@@ -6,7 +6,7 @@ import type {
   QuestionGenerator,
 } from "../../api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "../../api/QuestionRouter.ts"
-import math, { getVars } from "../../utils/math.ts"
+import math, { getVars } from "../../utils/math/math.ts"
 import Random from "../../utils/random.ts"
 import { tFunction, tFunctional, type Translations } from "../../utils/translations.ts"
 import {

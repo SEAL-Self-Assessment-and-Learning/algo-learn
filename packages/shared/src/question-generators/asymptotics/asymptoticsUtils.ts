@@ -1,5 +1,5 @@
 import Fraction from "fraction.js"
-import math, { baseOfLog, exponentToLatex, exponentToText, log2Fraction } from "../../utils/math.ts"
+import math, { baseOfLog, exponentToLatex, exponentToText, log2Fraction } from "../../utils/math/math.ts"
 import type Random from "../../utils/random.ts"
 
 /**

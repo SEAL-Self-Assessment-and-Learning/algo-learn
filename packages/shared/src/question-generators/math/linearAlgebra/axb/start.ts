@@ -6,7 +6,7 @@ import { AxbGenerator } from "@shared/question-generators/math/linearAlgebra/axb
 import { allRandomMatrix } from "@shared/question-generators/math/linearAlgebra/generations/matrix"
 import { matrixToTex, vectorToTex } from "@shared/question-generators/math/linearAlgebra/tex"
 import { _ } from "@shared/utils/generics.ts"
-import math from "@shared/utils/math.ts"
+import math from "@shared/utils/math/math.ts"
 import { createMatrixInput } from "@shared/utils/matrixInput.ts"
 import type Random from "@shared/utils/random.ts"
 import { t, type Translations } from "@shared/utils/translations.ts"

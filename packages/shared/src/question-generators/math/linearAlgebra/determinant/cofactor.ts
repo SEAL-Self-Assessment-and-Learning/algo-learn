@@ -7,7 +7,7 @@ import {
   generateUpperRightTriangleMatrix,
 } from "@shared/question-generators/math/linearAlgebra/generations/matrix.ts"
 import { matrixToTex } from "@shared/question-generators/math/linearAlgebra/tex.ts"
-import math from "@shared/utils/math.ts"
+import math from "@shared/utils/math/math.ts"
 import type Random from "@shared/utils/random.ts"
 import { t, type Translations } from "@shared/utils/translations.ts"
 

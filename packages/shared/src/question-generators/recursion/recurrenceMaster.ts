@@ -10,7 +10,7 @@ import {
 } from "../../api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "../../api/QuestionRouter.ts"
 import { format } from "../../utils/format.ts"
-import math, { getVars } from "../../utils/math.ts"
+import math, { getVars } from "../../utils/math/math.ts"
 import Random from "../../utils/random.ts"
 import { tFunction, tFunctional, type Translations } from "../../utils/translations.ts"
 import { mathNodeToSumProductTerm, type SumProductTerm } from "../asymptotics/asymptoticsUtils.ts"

@@ -3,7 +3,7 @@ import { Determinant } from "@shared/question-generators/math/linearAlgebra/dete
 import { getFeedback } from "@shared/question-generators/math/linearAlgebra/determinant/utils.ts"
 import { allRandomMatrix } from "@shared/question-generators/math/linearAlgebra/generations/matrix.ts"
 import { matrixToTex } from "@shared/question-generators/math/linearAlgebra/tex.ts"
-import math from "@shared/utils/math.ts"
+import math from "@shared/utils/math/math.ts"
 import type Random from "@shared/utils/random.ts"
 import { t, type Translations } from "@shared/utils/translations.ts"
 

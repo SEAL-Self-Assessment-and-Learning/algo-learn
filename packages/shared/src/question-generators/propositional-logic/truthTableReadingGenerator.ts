@@ -6,7 +6,7 @@ import type {
 } from "../../api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "../../api/QuestionRouter.ts"
 import { _ } from "../../utils/generics.ts"
-import math from "../../utils/math.ts"
+import math from "../../utils/math/math.ts"
 import {
   generateRandomExpression,
   getMdTruthTable,
