@@ -279,6 +279,20 @@ function formatNumberInternal(value: number, precision = 4, asTex = false): stri
   return fractionToString(fraction, asTex)
 }
 
+function ensureWrapped(str: string): string {
+  if (str.length >= 2 && str.startsWith("(") && str.endsWith(")")) {
+    return str
+  }
+  return `(${str})`
+}
+
+function ensureTexWrapped(str: string): string {
+  if (str.startsWith("\\left(") && str.endsWith("\\right)")) {
+    return str
+  }
+  return `\\left(${str}\\right)`
+}
+
 /**
  * Expression Node Base Class
  */
@@ -344,10 +358,16 @@ export class ConstantNode extends ExprNode {
   }
 
   toString(precision = 4) {
+    if (this.value < 0) {
+      return `(${formatNumber(this.value, precision)})`
+    }
     return formatNumber(this.value, precision)
   }
 
   toTex(precision = 4) {
+    if (this.value < 0) {
+      return `\\left(${formatNumberToTex(this.value, precision)}\\right)`
+    }
     return formatNumberToTex(this.value, precision)
   }
 
@@ -400,7 +420,10 @@ export class VariableNode extends ExprNode {
       return this.name
     }
     if (approximatelyEqual(this.multiplier, -1)) {
-      return `-${this.name}`
+      return `(-${this.name})`
+    }
+    if (this.multiplier < 0) {
+      return `(${formatNumber(this.multiplier)}${this.name})`
     }
     return `${formatNumber(this.multiplier)}${this.name}`
   }
@@ -410,7 +433,10 @@ export class VariableNode extends ExprNode {
       return this.name
     }
     if (approximatelyEqual(this.multiplier, -1)) {
-      return `-${this.name}`
+      return `\\left(-${this.name}\\right)`
+    }
+    if (this.multiplier < 0) {
+      return `\\left(${formatNumberToTex(this.multiplier)}${this.name}\\right)`
     }
     return `${formatNumberToTex(this.multiplier)}${this.name}`
   }
@@ -506,18 +532,41 @@ export class UnaryNode extends ExprNode {
   }
 
   toString() {
-    const c =
-      this.child instanceof ConstantNode || this.child instanceof VariableNode
-        ? this.child.toString()
-        : `(${this.child.toString()})`
-    return `-${c}`
+    if (this.child instanceof ConstantNode || this.child instanceof VariableNode) {
+      const childStr = this.child.toString()
+      if (childStr.length >= 2 && childStr.startsWith("(") && childStr.endsWith(")")) {
+        return `-${childStr}`
+      }
+      if (childStr.startsWith("-")) {
+        return `-(${childStr})`
+      }
+      return `(-${childStr})`
+    }
+
+    const childStr = this.child.toString()
+    if (childStr.length >= 2 && childStr.startsWith("(") && childStr.endsWith(")")) {
+      return `-${childStr}`
+    }
+    return `-(${childStr})`
   }
 
   toTex() {
-    if (this.child instanceof VariableNode || this.child instanceof ConstantNode) {
-      return `-${this.child.toTex()}`
+    if (this.child instanceof ConstantNode || this.child instanceof VariableNode) {
+      const childTex = this.child.toTex()
+      if (childTex.startsWith("\\left(") && childTex.endsWith("\\right)")) {
+        return `-${childTex}`
+      }
+      if (childTex.startsWith("-")) {
+        return `-\\left(${childTex}\\right)`
+      }
+      return `\\left(-${childTex}\\right)`
     }
-    return `-\\left(${this.child.toTex()}\\right)`
+
+    const childTex = this.child.toTex()
+    if (childTex.startsWith("\\left(") && childTex.endsWith("\\right)")) {
+      return `-${childTex}`
+    }
+    return `-\\left(${childTex}\\right)`
   }
 
   evaluate(assign?: Record<string, number>): EvaluationResult {
@@ -577,11 +626,15 @@ export class BinaryNode extends ExprNode {
   }
 
   toString() {
+    if (this.op === "/") {
+      return `(${this.left.toString()} / ${this.right.toString()})`
+    }
     if (this.op === "^") {
       const baseNeedsParens =
         !(this.left instanceof ConstantNode && this.left.value >= 0) &&
         !(this.left instanceof VariableNode && this.left.multiplier >= 0)
-      const baseStr = baseNeedsParens ? `(${this.left.toString()})` : this.left.toString()
+      const baseRaw = this.left.toString()
+      const baseStr = baseNeedsParens ? ensureWrapped(baseRaw) : baseRaw
       const expStr = this.formatChildForString(this.right, false)
       return `${baseStr} ^ ${expStr}`
     }
@@ -611,7 +664,7 @@ export class BinaryNode extends ExprNode {
 
     if (child instanceof BinaryNode) {
       if (this.needsParens(child, isLeft)) {
-        return `(${child.toString()})`
+        return ensureWrapped(child.toString())
       }
       return child.toString()
     }
@@ -626,7 +679,8 @@ export class BinaryNode extends ExprNode {
       const baseNeedsParens =
         !(this.left instanceof ConstantNode && this.left.value >= 0) &&
         !(this.left instanceof VariableNode && this.left.multiplier >= 0)
-      const base = baseNeedsParens ? `\\left(${this.left.toTex()}\\right)` : this.left.toTex()
+      const baseRaw = this.left.toTex()
+      const base = baseNeedsParens ? ensureTexWrapped(baseRaw) : baseRaw
       return `{${base}}^{${this.right.toTex()}}`
     }
     if (this.op === "+") {
@@ -634,10 +688,10 @@ export class BinaryNode extends ExprNode {
       if (signInfo.sign === -1) {
         const magnitude = signInfo.magnitude
         const formattedLeft = this.needsParens(this.left, true)
-          ? `\\left(${this.left.toTex()}\\right)`
+          ? ensureTexWrapped(this.left.toTex())
           : this.left.toTex()
         const formattedRight = this.needsParens(magnitude, false)
-          ? `\\left(${magnitude.toTex()}\\right)`
+          ? ensureTexWrapped(magnitude.toTex())
           : magnitude.toTex()
         return `${formattedLeft} - ${formattedRight}`
       }
@@ -646,8 +700,8 @@ export class BinaryNode extends ExprNode {
     const needsParensLeft = this.needsParens(this.left, true)
     const needsParensRight = this.needsParens(this.right, false)
 
-    const L = needsParensLeft ? `\\left(${this.left.toTex()}\\right)` : this.left.toTex()
-    const R = needsParensRight ? `\\left(${this.right.toTex()}\\right)` : this.right.toTex()
+    const L = needsParensLeft ? ensureTexWrapped(this.left.toTex()) : this.left.toTex()
+    const R = needsParensRight ? ensureTexWrapped(this.right.toTex()) : this.right.toTex()
 
     return `${L} ${operatorTex(this.op)} ${R}`
   }

@@ -40,8 +40,8 @@ test("ConstantNode (Base)", () => {
 
   const constNodeNegFloat = new ConstantNode(-3.14159)
   expect(constNodeNegFloat.evaluate()).toBeCloseTo(-3.14159)
-  expect(constNodeNegFloat.toString()).toBe("-3927/1250")
-  expect(constNodeNegFloat.toTex()).toBe("-\\dfrac{3927}{1250}")
+  expect(constNodeNegFloat.toString()).toBe("(-3927/1250)")
+  expect(constNodeNegFloat.toTex()).toBe("\\left(-\\dfrac{3927}{1250}\\right)")
   expect(constNodeNegFloat.toCanonicalKey()).toBe("C:-3927/1250")
 })
 
@@ -53,8 +53,8 @@ test("VariableNode (Base)", () => {
   expect(v.toTex()).toBe("x")
 
   const v2 = new VariableNode("y", -1)
-  expect(v2.toString()).toBe("-y")
-  expect(v2.toTex()).toBe("-y")
+  expect(v2.toString()).toBe("(-y)")
+  expect(v2.toTex()).toBe("\\left(-y\\right)")
 
   const v3 = new VariableNode("z", 3.5)
   expect(v3.toString()).toBe("7/2z")
@@ -115,12 +115,12 @@ test("UnaryNode (Base)", () => {
   const vx = new VariableNode("x")
 
   const u1 = new UnaryNode("-", cx)
-  expect(u1.toString()).toBe("-3")
-  expect(u1.toTex()).toBe("-3")
+  expect(u1.toString()).toBe("(-3)")
+  expect(u1.toTex()).toBe("\\left(-3\\right)")
 
   const u2 = new UnaryNode("-", vx)
-  expect(u2.toString()).toBe("-x")
-  expect(u2.toTex()).toBe("-x")
+  expect(u2.toString()).toBe("(-x)")
+  expect(u2.toTex()).toBe("\\left(-x\\right)")
 
   // Nested expression formatting
   const nested = new UnaryNode("-", new BinaryNode("+", cx, vx))
@@ -184,7 +184,7 @@ test("UnaryNode (Base)", () => {
   expect(complex.toString()).toBe("-(x * 2)")
   const simplifiedComplex = complex.simplify()
   expect(simplifiedComplex).toBeInstanceOf(VariableNode)
-  expect((simplifiedComplex as VariableNode).toString()).toBe("-2x")
+  expect((simplifiedComplex as VariableNode).toString()).toBe("(-2x)")
 
   // getVariables
   expect(u2.getVariables()).toEqual(new Set(["x"]))
@@ -233,7 +233,7 @@ describe("BinaryNode (Base)", () => {
     expect(multiplication.toString()).toMatch(/2 \* 4z|4z \* 2/)
     expect(multiplication.toTex()).toMatch(/2 \\cdot 4z|4z \\cdot 2/)
 
-    expect(division.toString()).toBe("4z / 5")
+    expect(division.toString()).toBe("(4z / 5)")
     expect(division.toTex()).toBe("\\dfrac{4z}{5}")
 
     expect(power.toString()).toBe("y ^ 2")
@@ -242,14 +242,18 @@ describe("BinaryNode (Base)", () => {
     expect(complex.toString()).toMatch(/2 \* 4z \+ 5 - 2|5 - 2 \+ 2 \* 4z/)
     expect(complex.toTex()).toBe("2 \\cdot 4z + 5 - 2")
 
-    expect(complex2.toString()).toBe("(2 * 4z + 5 - 2) / -10")
-    expect(complex2.toTex()).toBe("\\dfrac{2 \\cdot 4z + 5 - 2}{-10}")
+    expect(complex2.toString()).toBe("(2 * 4z + 5 - 2 / (-10))")
+    expect(complex2.toTex()).toBe("\\dfrac{2 \\cdot 4z + 5 - 2}{\\left(-10\\right)}")
 
-    expect(complex3.toString()).toBe("((2 * 4z + 5 - 2) / -10) * y ^ 2")
-    expect(complex3.toTex()).toBe("\\left(\\dfrac{2 \\cdot 4z + 5 - 2}{-10}\\right) \\cdot {y}^{2}")
+    expect(complex3.toString()).toBe("(2 * 4z + 5 - 2 / (-10)) * y ^ 2")
+    expect(complex3.toTex()).toBe(
+      "\\left(\\dfrac{2 \\cdot 4z + 5 - 2}{\\left(-10\\right)}\\right) \\cdot {y}^{2}",
+    )
 
-    expect(complex4.toString()).toBe("((2 * 4z + 5 - 2) / -10) ^ y")
-    expect(complex4.toTex()).toBe("{\\left(\\dfrac{2 \\cdot 4z + 5 - 2}{-10}\\right)}^{y}")
+    expect(complex4.toString()).toBe("(2 * 4z + 5 - 2 / (-10)) ^ y")
+    expect(complex4.toTex()).toBe(
+      "{\\left(\\dfrac{2 \\cdot 4z + 5 - 2}{\\left(-10\\right)}\\right)}^{y}",
+    )
   })
   test("evaluate", () => {
     // Base evaluations
@@ -280,7 +284,7 @@ describe("BinaryNode (Base)", () => {
     expect((unresolved as VariableNode).multiplier).toBe(8)
 
     const evaluateNode2: BinaryNode = complex3.evaluate({ z: 2 }) as BinaryNode
-    expect(evaluateNode2.toString()).toBe("-19/10 * y ^ 2")
+    expect(evaluateNode2.toString()).toBe("(-19/10) * y ^ 2")
 
     const evaluateNode3: BinaryNode = complex4.evaluate({ z: 2 }) as BinaryNode
     expect(evaluateNode3.toString()).toBe("(-19/10) ^ y")
