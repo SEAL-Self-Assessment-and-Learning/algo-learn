@@ -235,6 +235,7 @@ export function randomExpressionTree(
   depth = 0,
   mustContainVariable = true,
   variables: readonly string[],
+  unaryDepth = 0,
 ): ExprNode {
   const settings = getExpressionSettings(difficulty)
 
@@ -250,11 +251,11 @@ export function randomExpressionTree(
     return new ConstantNode(random.bool(0.3) ? -value : value)
   }
 
-  const ops = ["+", "-"]
+  const ops: Array<ArithmeticOperator | "unary"> = ["+", "-"]
   if (settings.useMul) ops.push("*")
   if (settings.useDiv) ops.push("/")
   if (settings.usePow) ops.push("^")
-  if (difficulty >= 2) ops.push("unary")
+  if (difficulty >= 2 && unaryDepth < 2) ops.push("unary")
 
   const op = random.choice(ops)
 
@@ -278,11 +279,18 @@ export function randomExpressionTree(
   }
 
   if (op === "unary") {
-    const child = randomExpressionTree(random, difficulty, depth + 1, leftMust, variables)
+    const child = randomExpressionTree(
+      random,
+      difficulty,
+      depth + 1,
+      leftMust,
+      variables,
+      unaryDepth + 1,
+    )
     return new UnaryNode("-", child)
   }
 
-  const left = randomExpressionTree(random, difficulty, depth + 1, leftMust, variables)
+  const left = randomExpressionTree(random, difficulty, depth + 1, leftMust, variables, 0)
 
   if (op === "^") {
     const exponent = random.int(1, 3)
@@ -290,14 +298,14 @@ export function randomExpressionTree(
   }
 
   if (op === "/") {
-    const right = randomExpressionTree(random, difficulty, depth + 1, rightMust, variables)
+    const right = randomExpressionTree(random, difficulty, depth + 1, rightMust, variables, 0)
     if (right instanceof ConstantNode && Math.abs(right.value) < 2) {
-      return randomExpressionTree(random, difficulty, depth, mustContainVariable, variables)
+      return randomExpressionTree(random, difficulty, depth, mustContainVariable, variables, unaryDepth)
     }
     return new BinaryNode("/", left, right)
   }
 
-  const right = randomExpressionTree(random, difficulty, depth + 1, rightMust, variables)
+  const right = randomExpressionTree(random, difficulty, depth + 1, rightMust, variables, 0)
   return new BinaryNode(op as ArithmeticOperator, left, right)
 }
 

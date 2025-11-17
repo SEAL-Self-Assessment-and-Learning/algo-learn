@@ -6,7 +6,11 @@ import type {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { parseArithmeticExpression, type ExprNode } from "@shared/utils/math/ArithmeticExpression.ts"
+import {
+  evaluateExpression,
+  parseArithmeticExpression,
+  type ExprNode,
+} from "@shared/utils/math/ArithmeticExpression.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 import { generateExpressionScenario, type ExpressionScenario } from "./randomExpression"
@@ -66,16 +70,15 @@ export const EvaluatingTerms: QuestionGenerator = {
     const maxAttempts = 50
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      const candidate = generateExpressionScenario(random, difficulty, variables)
-      if (candidate.expectsNumeric) {
-        if (typeof candidate.expected === "number" && isGoodResult(candidate.expected)) {
+      try {
+        const candidate = generateExpressionScenario(random, difficulty, variables)
+        if (isValidScenario(candidate)) {
           scenario = candidate
           break
         }
-        continue
+      } catch {
+        // ignore & retry
       }
-      scenario = candidate
-      break
     }
 
     if (!scenario) {
@@ -99,13 +102,29 @@ export const EvaluatingTerms: QuestionGenerator = {
       checkFormat: scenario.expectsNumeric ? checkNumericFormat(lang) : checkExpressionFormat(lang),
       feedback: scenario.expectsNumeric
         ? getNumericFeedback(scenario.expected as number)
-        : getSymbolicFeedback((scenario.expected as ExprNode).clone().simplify()),
+        : getSymbolicFeedback((scenario.expected as ExprNode).clone()),
     }
 
     return {
       question,
     }
   },
+}
+
+function isValidScenario(candidate: ExpressionScenario): boolean {
+  // Check that the expression itself evaluates and simplifies
+  evaluateExpression(candidate.expression)
+  candidate.expression.clone().simplify()
+
+  // If it’s symbolic, ensure expected expression also simplifies
+  if (!candidate.expectsNumeric) {
+    const expectedExpr = candidate.expected as ExprNode
+    expectedExpr.clone().simplify()
+    return true
+  }
+
+  // Otherwise: numeric result -> check its quality
+  return typeof candidate.expected === "number" && isGoodResult(candidate.expected)
 }
 
 function formatAssignments(assignments: Record<string, ExprNode>): string {

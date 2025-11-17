@@ -1,3 +1,12 @@
+/*
+Future-Extensions:
+- Extend UnaryNode to support more operations like sqrt, exp, etc.
+- Support constants like e and pi in parsing and evaluation
+- Derive more simplification rules
+- Compute integrals and derivatives
+- 
+*/
+
 export type ArithmeticOperator = "+" | "-" | "*" | "/" | "^"
 
 export type SymbolicAssignmentValue = number | ExprNode
@@ -19,6 +28,11 @@ export interface FunctionDefinition {
   toTex?: (args: string[]) => string
   toString?: (args: string[]) => string
   arity?: number
+}
+
+export interface Fraction {
+  numerator: number
+  denominator: number
 }
 
 const operatorTex = (operator: ArithmeticOperator) => {
@@ -135,11 +149,12 @@ function normalizeNumeric(value: number, precision = 4): number {
   return rounded
 }
 
-interface Fraction {
-  numerator: number
-  denominator: number
-}
-
+/**
+ * Helper-Function to compute gcd
+ * @param a
+ * @param b
+ * @returns greatest common divisor
+ */
 function gcdInteger(a: number, b: number): number {
   let x = Math.abs(Math.round(a))
   let y = Math.abs(Math.round(b))
@@ -521,7 +536,12 @@ export function expectNumeric(result: EvaluationResult, context: string): number
 }
 
 /**
- * Class for unary operations (currently only negation)
+ * Class for unary operations
+ * (currently only negation)
+ *
+ * To extend with:
+ * - sqrt
+ * - e-function
  */
 export class UnaryNode extends ExprNode {
   constructor(
@@ -646,6 +666,13 @@ export class BinaryNode extends ExprNode {
         return `${formattedLeft} - ${formattedRight}`
       }
     }
+    if (this.op === "-") {
+      const signInfo = extractSignAndMagnitude(this.right)
+      if (signInfo.sign === -1) {
+        const formattedRight = this.formatChildForString(signInfo.magnitude, false)
+        return `${formattedLeft} + ${formattedRight}`
+      }
+    }
     const formattedRight = this.formatChildForString(this.right, false)
     return `${formattedLeft} ${this.op} ${formattedRight}`
   }
@@ -694,6 +721,19 @@ export class BinaryNode extends ExprNode {
           ? ensureTexWrapped(magnitude.toTex())
           : magnitude.toTex()
         return `${formattedLeft} - ${formattedRight}`
+      }
+    }
+    if (this.op === "-") {
+      const signInfo = extractSignAndMagnitude(this.right)
+      if (signInfo.sign === -1) {
+        const magnitude = signInfo.magnitude
+        const formattedLeft = this.needsParens(this.left, true)
+          ? ensureTexWrapped(this.left.toTex())
+          : this.left.toTex()
+        const formattedRight = this.needsParens(magnitude, false)
+          ? ensureTexWrapped(magnitude.toTex())
+          : magnitude.toTex()
+        return `${formattedLeft} + ${formattedRight}`
       }
     }
 
