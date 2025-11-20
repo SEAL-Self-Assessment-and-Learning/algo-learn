@@ -438,18 +438,18 @@ describe("expressionsEqual", () => {
     const expr2 = new BinaryNode("+", new ConstantNode(2), new VariableNode("x"))
     const expr3 = new BinaryNode("*", new VariableNode("x"), new ConstantNode(2))
 
-    expect(expressionsEqual(expr1, expr2, r)).toBeTruthy()
-    expect(expressionsEqual(expr1, expr3, r)).toBeFalsy()
-    expect(expressionsEqual(expr2, expr3, r)).toBeFalsy()
+    expect(expressionsEqual(expr1, expr2, r).equal).toBeTruthy()
+    expect(expressionsEqual(expr1, expr3, r).equal).toBeFalsy()
+    expect(expressionsEqual(expr2, expr3, r).equal).toBeFalsy()
 
     const expr4 = new BinaryNode(
       "+",
       new VariableNode("x"),
       new BinaryNode("+", new ConstantNode(2), new VariableNode("y", 0)),
     )
-    expect(expressionsEqual(expr1, expr4, r)).toBeTruthy()
-    expect(expressionsEqual(expr2, expr4, r)).toBeTruthy()
-    expect(expressionsEqual(expr3, expr4, r)).toBeFalsy()
+    expect(expressionsEqual(expr1, expr4, r).equal).toBeTruthy()
+    expect(expressionsEqual(expr2, expr4, r).equal).toBeTruthy()
+    expect(expressionsEqual(expr3, expr4, r).equal).toBeFalsy()
   })
 
   test("High-degree polynomial", () => {
@@ -473,7 +473,7 @@ describe("expressionsEqual", () => {
       ),
     )
 
-    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+    expect(expressionsEqual(e1, e2, r).equal).toBeTruthy()
   })
 
   test("Expressions Equal – nested polynomial equivalence", () => {
@@ -515,7 +515,7 @@ describe("expressionsEqual", () => {
       ),
     )
 
-    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+    expect(expressionsEqual(e1, e2, r).equal).toBeTruthy()
   })
 
   test("Expressions Equal – huge zero polynomial", () => {
@@ -552,7 +552,7 @@ describe("expressionsEqual", () => {
 
     const zero = new ConstantNode(0)
 
-    expect(expressionsEqual(e, zero, r)).toBeTruthy()
+    expect(expressionsEqual(e, zero, r).equal).toBeTruthy()
   })
 
   test("Expressions Equal – nested powers", () => {
@@ -566,7 +566,7 @@ describe("expressionsEqual", () => {
     // x^5
     const e2 = new BinaryNode("^", new VariableNode("x"), new ConstantNode(5))
 
-    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+    expect(expressionsEqual(e1, e2, r).equal).toBeTruthy()
   })
 
   test("Expressions Equal – factored vs expanded polynomial", () => {
@@ -588,7 +588,7 @@ describe("expressionsEqual", () => {
       ),
     )
 
-    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+    expect(expressionsEqual(e1, e2, r).equal).toBeTruthy()
   })
 
   test("Expressions Equal – deep random polynomial tree", () => {
@@ -662,7 +662,7 @@ describe("expressionsEqual", () => {
       ),
     )
 
-    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+    expect(expressionsEqual(e1, e2, r).equal).toBeTruthy()
   })
 
   test("Expressions Equal – multivariate symmetric expansion", () => {
@@ -693,7 +693,9 @@ describe("expressionsEqual", () => {
       ),
     ])
 
-    expect(expressionsEqual(new BinaryNode("^", sumXYZ, new ConstantNode(2)), permuted, r)).toBeTruthy()
+    expect(
+      expressionsEqual(new BinaryNode("^", sumXYZ, new ConstantNode(2)), permuted, r).equal,
+    ).toBeTruthy()
   })
 
   test("Expressions Equal – adversarial simplifier cancellation", () => {
@@ -709,7 +711,7 @@ describe("expressionsEqual", () => {
     ])
 
     const difference = new BinaryNode("-", factored, expanded)
-    expect(expressionsEqual(difference.simplify(), new ConstantNode(0), r)).toBeTruthy()
+    expect(expressionsEqual(difference.simplify(), new ConstantNode(0), r).equal).toBeTruthy()
   })
 
   test("Expressions Equal – floating point stability", () => {
@@ -727,8 +729,8 @@ describe("expressionsEqual", () => {
       new ConstantNode(Math.E),
     ])
 
-    expect(expressionsEqual(fractional, aggregate, r)).toBeTruthy()
-    expect(expressionsEqual(irrationalExpansion, new ConstantNode(Math.PI), r)).toBeTruthy()
+    expect(expressionsEqual(fractional, aggregate, r).equal).toBeTruthy()
+    expect(expressionsEqual(irrationalExpansion, new ConstantNode(Math.PI), r).equal).toBeTruthy()
   })
 
   test("Floating point stability (2)", () => {
@@ -737,7 +739,7 @@ describe("expressionsEqual", () => {
 
     const e2 = new ConstantNode(1)
 
-    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+    expect(expressionsEqual(e1, e2, r).equal).toBeTruthy()
   })
 
   test("Expressions Equal – detects inequality", () => {
@@ -759,6 +761,6 @@ describe("expressionsEqual", () => {
       ]),
     )
 
-    expect(expressionsEqual(expr1, expr2, r)).toBeFalsy()
+    expect(expressionsEqual(expr1, expr2, r).equal).toBeFalsy()
   })
 })

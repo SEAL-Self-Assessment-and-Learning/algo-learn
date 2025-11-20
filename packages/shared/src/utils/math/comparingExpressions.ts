@@ -18,11 +18,29 @@ const maxIterations = 1000
  * @param expr2 - Second expression
  * @param random - To pick random values for variables
  * @returns True if the expressions are considered equal, false otherwise
+ *          All paris of the expressions that were not equal
  */
-export function expressionsEqual(expr1: ExprNode, expr2: ExprNode, random: Random): boolean {
+export function expressionsEqual(
+  expr1: ExprNode,
+  expr2: ExprNode,
+  random: Random,
+): {
+  equal: boolean
+  wrongEvaluations?: Array<{
+    values: { [key: string]: number }
+    value1: number
+    value2: number
+  }>
+} {
   let errorCount = 0
   const highPrimeValue = 299600008717
   const epsilon = 1e-8
+
+  const wrongEvaluations: Array<{
+    values: { [key: string]: number }
+    value1: number
+    value2: number
+  }> = []
 
   const variables1 = expr1.getVariables()
   const variables2 = expr2.getVariables()
@@ -35,9 +53,17 @@ export function expressionsEqual(expr1: ExprNode, expr2: ExprNode, random: Rando
 
     if (!approximatelyEqual(value1, value2, epsilon)) {
       errorCount++
+      wrongEvaluations.push({
+        values: randomValues,
+        value1,
+        value2,
+      })
     }
   }
-  return errorCount <= 2
+  return {
+    equal: errorCount <= 2,
+    wrongEvaluations,
+  }
 }
 
 /**

@@ -11,6 +11,7 @@ import {
   parseArithmeticExpression,
   type ExprNode,
 } from "@shared/utils/math/ArithmeticExpression.ts"
+import { expressionsEqual } from "@shared/utils/math/comparingExpressions.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 import { generateExpressionScenario, type ExpressionScenario } from "./randomExpression"
@@ -25,6 +26,8 @@ const translations: Translations = {
       "Difficulty: {{2}} \\[\\]Apply the assignments to simplify the expression: \\[ {{0}} \\] and provide the resulting expression. Assignments: {{1}}",
     ValidNumber: "Please enter a valid number. You entered: '{{0}}'.",
     ValidExpression: "Please enter a valid expression. {{0}}",
+    feedback:
+      "On the value{{0}} \\[{{1}}\\] your expression evaluated to {{2}}, but the correct value is {{3}}.",
   },
   de: {
     name: "Terme auswerten",
@@ -35,6 +38,8 @@ const translations: Translations = {
       "Schwierigkeitsgrad: {{2}} \\[\\]Wende die Zuordnungen auf den Ausdruck an und vereinfache: \\[ {{0}} \\] . Gib den resultierenden Term an. Zuordnungen: {{1}}",
     ValidNumber: "Bitte gib eine gültige Zahl ein. Deine Eingabe: '{{0}}'.",
     ValidExpression: "Bitte gib einen gültigen Term ein. {{0}}",
+    feedback:
+      "Auf den Werten {{0}} wurde dein Term zu {{1}} ausgewertet, aber der korrekte Wert ist {{2}}.",
   },
 }
 
@@ -102,7 +107,7 @@ export const EvaluatingTerms: QuestionGenerator = {
       checkFormat: scenario.expectsNumeric ? checkNumericFormat(lang) : checkExpressionFormat(lang),
       feedback: scenario.expectsNumeric
         ? getNumericFeedback(scenario.expected as number)
-        : getSymbolicFeedback((scenario.expected as ExprNode).clone()),
+        : getSymbolicFeedback((scenario.expected as ExprNode).clone(), random, lang),
     }
 
     return {
@@ -149,26 +154,42 @@ function getNumericFeedback(expected: number): FreeTextFeedbackFunction {
   }
 }
 
-// TODO
-function getSymbolicFeedback(expected: ExprNode): FreeTextFeedbackFunction {
-  const canonical = expected.simplify()
-  const canonicalKey = canonical.toCanonicalKey()
-
+function getSymbolicFeedback(
+  expected: ExprNode,
+  random: Random,
+  lang: Language,
+): FreeTextFeedbackFunction {
   return ({ text }) => {
     try {
-      const parsed = parseArithmeticExpression(text, { simplify: true })
-      if (parsed.toCanonicalKey() === canonicalKey) {
+      const parsed = parseArithmeticExpression(text, { simplify: true }).simplify()
+      const { equal, wrongEvaluations } = expressionsEqual(expected, parsed, random)
+      if (equal) {
         return { correct: true }
       }
+      const randomWrong = random.choice(wrongEvaluations!)
+      const assignments =
+        "{ " +
+        Object.entries(randomWrong.values)
+          .map(([variable, value]) => `${variable} = ${value}`)
+          .join(", ") +
+        " }"
+      const userValue = randomWrong.value2.toString()
+      const correctValue = randomWrong.value1.toString()
       return {
         correct: false,
         correctAnswer: "$" + expected.toTex() + "$",
+        feedbackText: t(translations, lang, "feedback", [
+          `${Object.entries(assignments).length > 1 ? "s" : ""}`,
+          assignments,
+          userValue,
+          correctValue,
+        ]),
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       return {
         correct: false,
-        message,
+        feedbackText: message,
         correctAnswer: "$" + expected.toTex() + "$",
       }
     }
