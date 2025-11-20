@@ -169,6 +169,44 @@ function gcdInteger(a: number, b: number): number {
   return x === 0 ? 1 : x
 }
 
+function modPow(base: number, exp: number, mod: number): number {
+  if (mod === 0) {
+    throw new Error("Modulus cannot be zero.")
+  }
+
+  // 1. Convert inputs to BigInt
+  const bigBase = BigInt(base)
+  let bigExp = BigInt(exp)
+  const bigMod = BigInt(mod)
+
+  if (bigExp < 0n) {
+    throw new Error("Exponent must be non-negative.")
+  }
+  if (bigExp === 0n) {
+    return Number(1n % bigMod)
+  }
+
+  let result = 1n
+  let b = bigBase % bigMod
+
+  // 2. Perform all calculations using BigInt arithmetic
+  while (bigExp > 0n) {
+    // Check if exponent is odd (if the LSB is 1)
+    if (bigExp & 1n) {
+      result = (result * b) % bigMod
+    }
+
+    // Square the base, applying the modulus
+    b = (b * b) % bigMod
+
+    // Right-shift (divide by 2) the exponent
+    bigExp >>= 1n
+  }
+
+  // 3. Convert the final result back to number (if it fits)
+  return Number(result)
+}
+
 function normalizeFraction(numerator: number, denominator: number): Fraction {
   if (denominator === 0) {
     throw new Error("Cannot normalize fraction with zero denominator")
@@ -325,11 +363,12 @@ export abstract class ExprNode {
   /**
    * Evaluate expression with optional variable assignments
    * @param assign - variable assignments
+   * @param mod - optional modulus for evaluation
    * @return EvaluationResult
    *         - number if fully evaluated
    *         - ExprNode if symbolic expression remains
    */
-  abstract evaluate(assign?: Record<string, number>): EvaluationResult
+  abstract evaluate(assign?: Record<string, number>, mod?: number): EvaluationResult
 
   /**
    * Check if expression contains any free variables
@@ -355,10 +394,6 @@ export abstract class ExprNode {
    * Generate a canonical key for the expression
    */
   abstract toCanonicalKey(): string
-
-  evaluateWith(assignments: SymbolicAssignments = {}, options?: EvaluateOptions): ExprNode {
-    return evaluateExpression(this, assignments, options)
-  }
 }
 
 /**
@@ -386,7 +421,10 @@ export class ConstantNode extends ExprNode {
     return formatNumberToTex(this.value, precision)
   }
 
-  evaluate(): EvaluationResult {
+  evaluate(_assign?: Record<string, number>, mod?: number): EvaluationResult {
+    if (mod !== undefined) {
+      return this.value % mod
+    }
     return this.value
   }
 
@@ -456,9 +494,13 @@ export class VariableNode extends ExprNode {
     return `${formatNumberToTex(this.multiplier)}${this.name}`
   }
 
-  evaluate(assign?: Record<string, number>): EvaluationResult {
+  evaluate(assign?: Record<string, number>, mod?: number): EvaluationResult {
     if (!assign || !Object.prototype.hasOwnProperty.call(assign, this.name)) {
       return this.clone()
+    }
+    if (mod !== undefined) {
+      const value = assign[this.name] % mod
+      return normalizeNumeric((this.multiplier * value) % mod)
     }
     const value = assign[this.name]
     return normalizeNumeric(this.multiplier * value)
@@ -589,9 +631,12 @@ export class UnaryNode extends ExprNode {
     return `-\\left(${childTex}\\right)`
   }
 
-  evaluate(assign?: Record<string, number>): EvaluationResult {
-    const childValue = this.child.evaluate(assign)
+  evaluate(assign?: Record<string, number>, mod?: number): EvaluationResult {
+    const childValue = this.child.evaluate(assign, mod)
     if (typeof childValue === "number") {
+      if (mod !== undefined) {
+        return normalizeNumeric(-childValue % mod)
+      }
       return normalizeNumeric(-childValue)
     }
     return new UnaryNode(this.op, evaluationResultToExpr(childValue)).simplify()
@@ -775,21 +820,36 @@ export class BinaryNode extends ExprNode {
     return this.op === "+" || this.op === "*"
   }
 
-  evaluate(assign?: Record<string, number>): EvaluationResult {
-    const leftValue = this.left.evaluate(assign)
-    const rightValue = this.right.evaluate(assign)
+  evaluate(assign?: Record<string, number>, mod?: number): EvaluationResult {
+    const leftValue = this.left.evaluate(assign, mod)
+    const rightValue = this.right.evaluate(assign, mod)
 
     if (typeof leftValue === "number" && typeof rightValue === "number") {
       switch (this.op) {
         case "+":
+          if (mod !== undefined) {
+            return normalizeNumeric((leftValue + rightValue) % mod)
+          }
           return normalizeNumeric(leftValue + rightValue)
         case "-":
+          if (mod !== undefined) {
+            return normalizeNumeric((leftValue - rightValue) % mod)
+          }
           return normalizeNumeric(leftValue - rightValue)
         case "*":
+          if (mod !== undefined) {
+            return normalizeNumeric((leftValue * rightValue) % mod)
+          }
           return normalizeNumeric(leftValue * rightValue)
         case "/":
+          if (mod !== undefined) {
+            return normalizeNumeric(leftValue / rightValue) % mod
+          }
           return normalizeNumeric(leftValue / rightValue)
         case "^":
+          if (mod !== undefined) {
+            return normalizeNumeric(modPow(leftValue, rightValue, mod))
+          }
           return normalizeNumeric(leftValue ** rightValue)
       }
     }
@@ -893,11 +953,15 @@ export class FunctionNode extends ExprNode {
     return `\\operatorname{${this.name}}\\left(${renderedArgs.join(", ")}\\right)`
   }
 
-  evaluate(assign?: Record<string, number>): EvaluationResult {
+  evaluate(assign?: Record<string, number>, mod?: number): EvaluationResult {
     const definition = getFunctionDefinition(this.name)
-    const evaluatedArgs = this.args.map((arg) => arg.evaluate(assign))
+    const evaluatedArgs = this.args.map((arg) => arg.evaluate(assign, mod))
     if (evaluatedArgs.every((arg): arg is number => typeof arg === "number")) {
       const numericArgs = evaluatedArgs.map((value) => normalizeNumeric(value))
+      if (mod !== undefined) {
+        const modArgs = numericArgs.map((value) => value % mod)
+        return normalizeNumeric(definition.evaluate(...modArgs, mod) % mod)
+      }
       return normalizeNumeric(definition.evaluate(...numericArgs))
     }
 
@@ -1299,50 +1363,6 @@ export const Expr = {
   func(name: string, ...args: ExprNode[]): ExprNode {
     return new FunctionNode(name, args).simplify()
   },
-}
-
-export class Equation {
-  constructor(
-    public left: ExprNode,
-    public right: ExprNode,
-  ) {}
-
-  clone(): Equation {
-    return new Equation(this.left.clone(), this.right.clone())
-  }
-
-  simplify(): Equation {
-    return new Equation(this.left.simplify(), this.right.simplify())
-  }
-
-  evaluate(assignments: SymbolicAssignments = {}, options?: EvaluateOptions): Equation {
-    return new Equation(
-      evaluateExpression(this.left, assignments, options),
-      evaluateExpression(this.right, assignments, options),
-    )
-  }
-
-  evaluateNumeric(assignments: Record<string, number>): { left: number; right: number } {
-    const leftValue = expectNumeric(this.left.evaluate(assignments), "Equation.evaluateNumeric:left")
-    const rightValue = expectNumeric(this.right.evaluate(assignments), "Equation.evaluateNumeric:right")
-    return {
-      left: leftValue,
-      right: rightValue,
-    }
-  }
-
-  isBalanced(assignments: Record<string, number>, tolerance = NUMERIC_EPSILON): boolean {
-    const numeric = this.evaluateNumeric(assignments)
-    return Math.abs(numeric.left - numeric.right) <= tolerance
-  }
-
-  toString(): string {
-    return `${this.left.toString()} = ${this.right.toString()}`
-  }
-
-  toTex(): string {
-    return `${this.left.toTex()} = ${this.right.toTex()}`
-  }
 }
 
 export function evaluateExpression(

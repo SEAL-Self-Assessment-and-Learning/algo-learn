@@ -9,6 +9,19 @@ import {
   VariableNode,
   type ExprNode,
 } from "@shared/utils/math/ArithmeticExpression.ts"
+import { expressionsEqual } from "@shared/utils/math/comparingExpressions.ts"
+import Random, { sampleRandomSeed } from "@shared/utils/random.ts"
+
+function foldAddition(terms: ExprNode[]): ExprNode {
+  if (terms.length === 0) {
+    return new ConstantNode(0)
+  }
+  let result = terms[0]
+  for (let i = 1; i < terms.length; i++) {
+    result = new BinaryNode("+", result, terms[i])
+  }
+  return result
+}
 
 test("functionRegistry", () => {
   const cos = getFunctionDefinition("cos")
@@ -205,6 +218,8 @@ test("UnaryNode (Base)", () => {
 })
 
 describe("BinaryNode (Base)", () => {
+  const c0 = new ConstantNode(0)
+  const c1 = new ConstantNode(1)
   const c2 = new ConstantNode(2)
   const c5 = new ConstantNode(5)
   const cNeg10 = new ConstantNode(-10)
@@ -294,11 +309,112 @@ describe("BinaryNode (Base)", () => {
       (new BinaryNode("+", vY, new BinaryNode("+", vY, vY)).evaluate() as ExprNode).toString(),
     ).toBe("3y")
   })
-  test("simplify", () => {})
-  test("variable including", () => {})
-  test("clone", () => {})
-  test("substitute", () => {})
-  test("canonical", () => {})
+  test("simplify", () => {
+    // Constant folding
+    expect(new BinaryNode("+", c2, c5).simplify().toString()).toBe("7")
+    expect(new BinaryNode("*", c2, c5).simplify().toString()).toBe("10")
+    expect(new BinaryNode("-", c5, c2).simplify().toString()).toBe("3")
+    expect(new BinaryNode("/", c5, c2).simplify().toString()).toBe("5/2")
+
+    // Neutral elements
+    expect(new BinaryNode("+", vY, c0).simplify().toString()).toBe("y")
+    expect(new BinaryNode("+", c0, vY).simplify().toString()).toBe("y")
+
+    expect(new BinaryNode("*", vY, c1).simplify().toString()).toBe("y")
+    expect(new BinaryNode("*", c1, vY).simplify().toString()).toBe("y")
+
+    // Zero multiplication
+    expect(new BinaryNode("*", vY, c0).simplify().toString()).toBe("0")
+    expect(new BinaryNode("*", c0, vY).simplify().toString()).toBe("0")
+
+    // Subtraction by zero
+    expect(new BinaryNode("-", vY, c0).simplify().toString()).toBe("y")
+
+    // Exponent rules
+    expect(new BinaryNode("^", vY, c1).simplify().toString()).toBe("y")
+    expect(new BinaryNode("^", vY, c0).simplify().toString()).toBe("1")
+    expect(new BinaryNode("^", c5, c2).simplify().toString()).toBe("25")
+
+    // Complex: distributive constant folding
+    const expr = new BinaryNode("+", new BinaryNode("*", c2, vY), new BinaryNode("-", c5, c2))
+    expect(expr.simplify().toString()).toMatch(/2y \+ 3|3 \+ 2y/)
+  })
+  test("variable including", () => {
+    const c2 = new ConstantNode(2)
+    const vY = new VariableNode("y")
+    const expr = new BinaryNode("*", new BinaryNode("+", c2, vY), c2)
+
+    expect(expr.containsVariable()).toBe(true)
+    expect(new BinaryNode("+", c2, c2).containsVariable()).toBe(false)
+  })
+  test("clone", () => {
+    const vY = new VariableNode("y")
+    const expr = new BinaryNode("*", new BinaryNode("+", vY, new ConstantNode(3)), new ConstantNode(2))
+
+    const cloned = expr.clone() as BinaryNode
+
+    // Structural equality
+    expect(cloned.toString()).toBe(expr.toString())
+
+    // Different references
+    expect(cloned).not.toBe(expr)
+    expect(cloned.left).not.toBe(expr.left)
+    expect(cloned.right).not.toBe(expr.right)
+
+    // Mutate clone
+    ;(cloned.left as BinaryNode).left = new ConstantNode(99)
+
+    // Original remains unchanged
+    expect(expr.toString()).toBe("(y + 3) * 2")
+    expect(cloned.toString()).toBe("(99 + 3) * 2")
+  })
+  test("substitute", () => {
+    const vX = new VariableNode("x")
+    const vY = new VariableNode("y")
+    const expr = new BinaryNode("+", vX, new BinaryNode("*", vY, new ConstantNode(3)))
+
+    // Substitute x → 10
+    const sub1 = expr.substitute({ x: new ConstantNode(10) })
+    expect(sub1.toString()).toBe("10 + y * 3")
+
+    // Substitute y → (x + 1)
+    const sub2 = expr.substitute({
+      y: new BinaryNode("+", vX.clone(), new ConstantNode(1)),
+    })
+    expect(sub2.toString()).toBe("x + (x + 1) * 3")
+  })
+  test("canonical", () => {
+    const a = new VariableNode("a")
+    const b = new VariableNode("b")
+
+    // Commutative
+    const add1 = new BinaryNode("+", a, b)
+    const add2 = new BinaryNode("+", b, a)
+    expect(add1.toCanonicalKey()).toBe(add2.toCanonicalKey())
+
+    const mul1 = new BinaryNode("*", a, b)
+    const mul2 = new BinaryNode("*", b, a)
+    expect(mul1.toCanonicalKey()).toBe(mul2.toCanonicalKey())
+
+    // Non-commutative
+    const sub1 = new BinaryNode("-", a, b)
+    const sub2 = new BinaryNode("-", b, a)
+    expect(sub1.toCanonicalKey()).not.toBe(sub2.toCanonicalKey())
+
+    const div1 = new BinaryNode("/", a, b)
+    const div2 = new BinaryNode("/", b, a)
+    expect(div1.toCanonicalKey()).not.toBe(div2.toCanonicalKey())
+
+    const pow1 = new BinaryNode("^", a, b)
+    const pow2 = new BinaryNode("^", b, a)
+    expect(pow1.toCanonicalKey()).not.toBe(pow2.toCanonicalKey())
+
+    // Nested commutativity
+    const nested1 = new BinaryNode("+", new BinaryNode("*", a, b), new ConstantNode(3))
+    const nested2 = new BinaryNode("+", new ConstantNode(3), new BinaryNode("*", b, a))
+
+    expect(nested1.toCanonicalKey()).toBe(nested2.toCanonicalKey())
+  })
 })
 
 test("Basic arithmetic addition", () => {
@@ -313,4 +429,336 @@ test("Basic arithmetic addition", () => {
   const additionWithVariable = new BinaryNode("+", variableX, const4)
   expect((additionWithVariable.evaluate() as ExprNode).toString()).toMatch(/x \+ 4|4 \+ x/)
   expect(additionWithVariable.evaluate({ x: 6 })).toEqual(10)
+})
+
+describe("expressionsEqual", () => {
+  const r = new Random(sampleRandomSeed())
+  test("Base", () => {
+    const expr1 = new BinaryNode("+", new VariableNode("x"), new ConstantNode(2))
+    const expr2 = new BinaryNode("+", new ConstantNode(2), new VariableNode("x"))
+    const expr3 = new BinaryNode("*", new VariableNode("x"), new ConstantNode(2))
+
+    expect(expressionsEqual(expr1, expr2, r)).toBeTruthy()
+    expect(expressionsEqual(expr1, expr3, r)).toBeFalsy()
+    expect(expressionsEqual(expr2, expr3, r)).toBeFalsy()
+
+    const expr4 = new BinaryNode(
+      "+",
+      new VariableNode("x"),
+      new BinaryNode("+", new ConstantNode(2), new VariableNode("y", 0)),
+    )
+    expect(expressionsEqual(expr1, expr4, r)).toBeTruthy()
+    expect(expressionsEqual(expr2, expr4, r)).toBeTruthy()
+    expect(expressionsEqual(expr3, expr4, r)).toBeFalsy()
+  })
+
+  test("High-degree polynomial", () => {
+    const e1 = new BinaryNode(
+      "+",
+      new BinaryNode(
+        "*",
+        new VariableNode("x", 7),
+        new BinaryNode("^", new VariableNode("x"), new ConstantNode(40)),
+      ),
+      new ConstantNode(3),
+    )
+
+    const e2 = new BinaryNode(
+      "+",
+      new ConstantNode(3),
+      new BinaryNode(
+        "*",
+        new ConstantNode(7),
+        new BinaryNode("^", new VariableNode("x"), new ConstantNode(41)),
+      ),
+    )
+
+    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+  })
+
+  test("Expressions Equal – nested polynomial equivalence", () => {
+    // (x^3 + 2x^2) + (3x + 5)
+    const e1 = new BinaryNode(
+      "+",
+      new BinaryNode(
+        "+",
+        new BinaryNode("^", new VariableNode("x"), new ConstantNode(3)),
+        new BinaryNode(
+          "*",
+          new ConstantNode(2),
+          new BinaryNode("^", new VariableNode("x"), new ConstantNode(2)),
+        ),
+      ),
+      new BinaryNode(
+        "+",
+        new BinaryNode("*", new ConstantNode(3), new VariableNode("x")),
+        new ConstantNode(5),
+      ),
+    )
+
+    // 5 + x(3 + 2x + x^2)
+    const e2 = new BinaryNode(
+      "+",
+      new ConstantNode(5),
+      new BinaryNode(
+        "*",
+        new VariableNode("x"),
+        new BinaryNode(
+          "+",
+          new ConstantNode(3),
+          new BinaryNode(
+            "+",
+            new BinaryNode("*", new ConstantNode(2), new VariableNode("x")),
+            new BinaryNode("^", new VariableNode("x"), new ConstantNode(2)),
+          ),
+        ),
+      ),
+    )
+
+    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+  })
+
+  test("Expressions Equal – huge zero polynomial", () => {
+    // (x^5 - x^5) + (3x^3 - 3x^3) + (7x - 7x)
+    const e = new BinaryNode(
+      "+",
+      new BinaryNode(
+        "-",
+        new BinaryNode("^", new VariableNode("x"), new ConstantNode(5)),
+        new BinaryNode("^", new VariableNode("x"), new ConstantNode(5)),
+      ),
+      new BinaryNode(
+        "+",
+        new BinaryNode(
+          "-",
+          new BinaryNode(
+            "*",
+            new ConstantNode(3),
+            new BinaryNode("^", new VariableNode("x"), new ConstantNode(3)),
+          ),
+          new BinaryNode(
+            "*",
+            new ConstantNode(3),
+            new BinaryNode("^", new VariableNode("x"), new ConstantNode(3)),
+          ),
+        ),
+        new BinaryNode(
+          "-",
+          new BinaryNode("*", new ConstantNode(7), new VariableNode("x")),
+          new BinaryNode("*", new ConstantNode(7), new VariableNode("x")),
+        ),
+      ),
+    )
+
+    const zero = new ConstantNode(0)
+
+    expect(expressionsEqual(e, zero, r)).toBeTruthy()
+  })
+
+  test("Expressions Equal – nested powers", () => {
+    // x^(2+3)
+    const e1 = new BinaryNode(
+      "^",
+      new VariableNode("x"),
+      new BinaryNode("+", new ConstantNode(2), new ConstantNode(3)),
+    )
+
+    // x^5
+    const e2 = new BinaryNode("^", new VariableNode("x"), new ConstantNode(5))
+
+    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+  })
+
+  test("Expressions Equal – factored vs expanded polynomial", () => {
+    // (x + 2)*(x + 3)
+    const e1 = new BinaryNode(
+      "*",
+      new BinaryNode("+", new VariableNode("x"), new ConstantNode(2)),
+      new BinaryNode("+", new VariableNode("x"), new ConstantNode(3)),
+    )
+
+    // x^2 + 5x + 6
+    const e2 = new BinaryNode(
+      "+",
+      new BinaryNode("^", new VariableNode("x"), new ConstantNode(2)),
+      new BinaryNode(
+        "+",
+        new BinaryNode("*", new ConstantNode(5), new VariableNode("x")),
+        new ConstantNode(6),
+      ),
+    )
+
+    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+  })
+
+  test("Expressions Equal – deep random polynomial tree", () => {
+    // (7x^8 + 4x^6) + ((3x^4 + 2x^2) + 9)
+    const e1 = new BinaryNode(
+      "+",
+      new BinaryNode(
+        "+",
+        new BinaryNode(
+          "*",
+          new ConstantNode(7),
+          new BinaryNode("^", new VariableNode("x"), new ConstantNode(8)),
+        ),
+        new BinaryNode(
+          "*",
+          new ConstantNode(4),
+          new BinaryNode("^", new VariableNode("x"), new ConstantNode(6)),
+        ),
+      ),
+      new BinaryNode(
+        "+",
+        new BinaryNode(
+          "+",
+          new BinaryNode(
+            "*",
+            new ConstantNode(3),
+            new BinaryNode("^", new VariableNode("x"), new ConstantNode(4)),
+          ),
+          new BinaryNode(
+            "*",
+            new ConstantNode(2),
+            new BinaryNode("^", new VariableNode("x"), new ConstantNode(2)),
+          ),
+        ),
+        new ConstantNode(9),
+      ),
+    )
+
+    // Same polynomial reordered
+    const e2 = new BinaryNode(
+      "+",
+      new ConstantNode(9),
+      new BinaryNode(
+        "+",
+        new BinaryNode(
+          "*",
+          new ConstantNode(2),
+          new BinaryNode("^", new VariableNode("x"), new ConstantNode(2)),
+        ),
+        new BinaryNode(
+          "+",
+          new BinaryNode(
+            "*",
+            new ConstantNode(4),
+            new BinaryNode("^", new VariableNode("x"), new ConstantNode(6)),
+          ),
+          new BinaryNode(
+            "+",
+            new BinaryNode(
+              "*",
+              new ConstantNode(3),
+              new BinaryNode("^", new VariableNode("x"), new ConstantNode(4)),
+            ),
+            new BinaryNode(
+              "*",
+              new ConstantNode(7),
+              new BinaryNode("^", new VariableNode("x"), new ConstantNode(8)),
+            ),
+          ),
+        ),
+      ),
+    )
+
+    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+  })
+
+  test("Expressions Equal – multivariate symmetric expansion", () => {
+    const sumXYZ = new BinaryNode(
+      "+",
+      new BinaryNode("+", new VariableNode("x"), new VariableNode("y")),
+      new VariableNode("z"),
+    )
+
+    const permuted = foldAddition([
+      new BinaryNode("^", new VariableNode("x"), new ConstantNode(2)),
+      new BinaryNode("^", new VariableNode("y"), new ConstantNode(2)),
+      new BinaryNode("^", new VariableNode("z"), new ConstantNode(2)),
+      new BinaryNode(
+        "*",
+        new ConstantNode(2),
+        new BinaryNode("*", new VariableNode("x"), new VariableNode("y")),
+      ),
+      new BinaryNode(
+        "*",
+        new ConstantNode(2),
+        new BinaryNode("*", new VariableNode("x"), new VariableNode("z")),
+      ),
+      new BinaryNode(
+        "*",
+        new ConstantNode(2),
+        new BinaryNode("*", new VariableNode("y"), new VariableNode("z")),
+      ),
+    ])
+
+    expect(expressionsEqual(new BinaryNode("^", sumXYZ, new ConstantNode(2)), permuted, r)).toBeTruthy()
+  })
+
+  test("Expressions Equal – adversarial simplifier cancellation", () => {
+    const sumXY = new BinaryNode("+", new VariableNode("x"), new VariableNode("y"))
+    const sumZc = new BinaryNode("+", new VariableNode("z"), new ConstantNode(-1))
+    const factored = new BinaryNode("*", sumXY, sumZc)
+
+    const expanded = foldAddition([
+      new BinaryNode("*", new VariableNode("x"), new VariableNode("z")),
+      new BinaryNode("*", new VariableNode("y"), new VariableNode("z")),
+      new UnaryNode("-", new VariableNode("x")),
+      new UnaryNode("-", new VariableNode("y")),
+    ])
+
+    const difference = new BinaryNode("-", factored, expanded)
+    expect(expressionsEqual(difference.simplify(), new ConstantNode(0), r)).toBeTruthy()
+  })
+
+  test("Expressions Equal – floating point stability", () => {
+    const fractional = foldAddition([
+      new BinaryNode("*", new ConstantNode(0.1), new VariableNode("x")),
+      new BinaryNode("*", new ConstantNode(0.2), new VariableNode("x")),
+      new BinaryNode("*", new ConstantNode(0.3), new VariableNode("x")),
+    ])
+
+    const aggregate = new BinaryNode("*", new ConstantNode(0.6), new VariableNode("x"))
+
+    const irrationalExpansion = foldAddition([
+      new ConstantNode(Math.PI),
+      new UnaryNode("-", new ConstantNode(Math.E)),
+      new ConstantNode(Math.E),
+    ])
+
+    expect(expressionsEqual(fractional, aggregate, r)).toBeTruthy()
+    expect(expressionsEqual(irrationalExpansion, new ConstantNode(Math.PI), r)).toBeTruthy()
+  })
+
+  test("Floating point stability (2)", () => {
+    // Note typescript only stable up tp e15
+    const e1 = new BinaryNode("-", new ConstantNode(1e14 + 1), new ConstantNode(1e14))
+
+    const e2 = new ConstantNode(1)
+
+    expect(expressionsEqual(e1, e2, r)).toBeTruthy()
+  })
+
+  test("Expressions Equal – detects inequality", () => {
+    const expr1 = new BinaryNode(
+      "+",
+      new BinaryNode("^", new VariableNode("x"), new ConstantNode(2)),
+      foldAddition([
+        new BinaryNode("*", new ConstantNode(3), new VariableNode("x")),
+        new ConstantNode(1),
+      ]),
+    )
+
+    const expr2 = new BinaryNode(
+      "+",
+      new BinaryNode("^", new VariableNode("x"), new ConstantNode(2)),
+      foldAddition([
+        new BinaryNode("*", new ConstantNode(3), new VariableNode("x")),
+        new ConstantNode(2),
+      ]),
+    )
+
+    expect(expressionsEqual(expr1, expr2, r)).toBeFalsy()
+  })
 })
