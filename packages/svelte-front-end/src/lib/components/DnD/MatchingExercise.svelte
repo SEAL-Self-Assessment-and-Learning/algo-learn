@@ -199,7 +199,19 @@
   <!-- Mobile: dropdown -->
   <div class="grid gap-3 p-2">
     {#each pairs as pair, i (pair.id)}
-      <div class="flex flex-col gap-1 rounded-md border p-2 dark:border-gray-700 dark:bg-gray-900">
+      {@const correctness = pair.correctness}
+
+      <div
+        class={`flex flex-col gap-1 rounded-md border p-2 transition-colors
+          ${
+            correctness === true
+              ? "border-green-600 bg-green-900/20"
+              : correctness === false
+                ? "border-red-600 bg-red-900/20"
+                : "border-gray-700 dark:bg-gray-900"
+          }
+        `}
+      >
         <div
           class="flex cursor-pointer items-center justify-between select-none"
           on:click={() => (openIndex = openIndex === i ? -1 : i)}
@@ -220,15 +232,21 @@
           <div class="mt-2 grid gap-1">
             {#each answers as ans (ans.id)}
               {@const alreadyUsed = isAlreadyUsed(ans.id, i)}
+              {@const isSelected = slots[i]?.id === ans.id}
+
+              {@const btnColor = isSelected
+                ? correctness === true
+                  ? "bg-green-500/20 text-green-700 border-green-500"
+                  : correctness === false
+                    ? "bg-red-500/20 text-red-700 border-red-500"
+                    : "bg-goethe text-white"
+                : alreadyUsed
+                  ? "bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400 opacity-60"
+                  : "hover:bg-goethe/10 dark:hover:bg-goethe/20"}
+
               <button
                 type="button"
-                class={`w-full rounded-md border p-2 text-left text-sm transition-colors ${
-                  slots[i]?.id === ans.id
-                    ? "bg-goethe text-white"
-                    : alreadyUsed
-                      ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400"
-                      : "hover:bg-goethe/10 dark:hover:bg-goethe/20"
-                }`}
+                class={`w-full rounded-md border p-2 text-left text-sm transition-colors ${btnColor}`}
                 on:click={() => {
                   handleSelectChange(i, ans.id)
                   openIndex = -1
