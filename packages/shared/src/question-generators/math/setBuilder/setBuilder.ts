@@ -145,10 +145,16 @@ function generateFreeTextVariant(lang: Language, path: string, random: Random) {
   }
 
   const feedback = (a: FreeTextAnswer): FreeTextFeedback => {
-    const match = a.text.trim().match(/^\{\s*(.*?)\s*\}$/)
-    if (!match) return { correct: false }
+    const trimmed = a.text.trim()
+    if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
+      return { correct: false }
+    }
+    const inside = trimmed.slice(1, -1).trim()
+    if (inside === "") {
+      return { correct: correctSet.size === 0 }
+    }
 
-    const user = match[1]
+    const user = inside
       .split(",")
       .map((s) => parseInt(s.trim(), 10))
       .filter((x) => !isNaN(x))
