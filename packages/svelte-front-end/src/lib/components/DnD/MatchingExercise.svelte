@@ -152,7 +152,10 @@
     onDragEnd={handleDragEnd}
     onDragCancel={() => (activeItem = null)}
   >
-    <div class="grid gap-4">
+    <div
+      class="grid gap-4"
+      style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: start;"
+    >
       {#each pairs as pair, i (pair.id)}
         <div class="rounded-lg border p-3 dark:border-gray-600 dark:bg-gray-800">
           <Markdown md={pair.fixed} />
@@ -161,19 +164,19 @@
           </div>
         </div>
       {/each}
+    </div>
 
-      <div
-        id="pool-area"
-        class="mt-6 flex list-none flex-wrap justify-center gap-2 rounded-lg border border-dashed p-3 dark:border-gray-600"
-      >
-        <SortableContext items={pool.map((it) => it.id)}>
-          <div class="flex list-none flex-wrap gap-2">
-            {#each pool as item (item.id)}
-              <MatchingPoolItem id={item.id} {item} {disabled} />
-            {/each}
-          </div>
-        </SortableContext>
-      </div>
+    <div
+      id="pool-area"
+      class="mt-6 flex list-none flex-wrap justify-center gap-2 rounded-lg border border-dashed p-3 dark:border-gray-600"
+    >
+      <SortableContext items={pool.map((it) => it.id)}>
+        <div class="flex list-none flex-wrap gap-2">
+          {#each pool as item (item.id)}
+            <MatchingPoolItem id={item.id} {item} {disabled} />
+          {/each}
+        </div>
+      </SortableContext>
     </div>
 
     <DragOverlay {dropAnimation}>
