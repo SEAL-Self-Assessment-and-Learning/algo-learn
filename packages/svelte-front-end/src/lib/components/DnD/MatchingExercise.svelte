@@ -3,12 +3,9 @@
   import MatchingSlot, { type SlotItem } from "$lib/components/DnD/MatchingSlot.svelte"
   import { dropAnimation, sensors } from "$lib/components/DnD/utils.ts"
   import Markdown from "$lib/components/markdown/markdown.svelte"
-  import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { onMount } from "svelte"
   import { DndContext, DragOverlay, type DragEndEvent, type DragStartEvent } from "@dnd-kit-svelte/core"
   import { SortableContext } from "@dnd-kit-svelte/sortable"
-  import type { Language } from "@shared/api/Language.ts"
-  import type { SingleTranslation } from "@shared/utils/translations.ts"
 
   export interface Pair {
     id: string
