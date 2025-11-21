@@ -103,6 +103,7 @@ export const DemoMatching: QuestionGenerator = {
       fixedItems: fixed,
       answers: movableShuffled,
       feedback,
+      columns: 5,
     }
 
     return { question }

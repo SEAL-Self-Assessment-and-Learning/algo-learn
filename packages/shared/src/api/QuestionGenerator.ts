@@ -57,6 +57,9 @@ export interface MultipleChoiceQuestion extends QuestionBase {
 
   /** List of fixed items in a matching question */
   fixedItems?: string[]
+
+  /** Optional number of columns for matching layout (desktop only) */
+  columns?: number
 }
 
 /**

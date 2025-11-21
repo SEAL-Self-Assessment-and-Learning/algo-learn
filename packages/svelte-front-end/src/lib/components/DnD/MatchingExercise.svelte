@@ -18,9 +18,10 @@
     answers: SlotItem[] // MUST have a stable `id: string` property
     disabled?: boolean
     onChange: (slots: (SlotItem | null)[]) => void
+    columns?: number
   }
 
-  const { pairs, answers, disabled = false, onChange }: Props = $props()
+  const { pairs, answers, disabled = false, onChange, columns = 2 }: Props = $props()
 
   // pool uses the supplied items (cloned so we don't mutate caller's array)
   let pool = $state<SlotItem[]>(structuredClone(answers))
@@ -154,7 +155,7 @@
   >
     <div
       class="grid gap-4"
-      style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: start;"
+      style={`grid-template-columns: repeat(${columns}, minmax(0, 1fr)); align-items: start;`}
     >
       {#each pairs as pair, i (pair.id)}
         <div class="rounded-lg border p-3 dark:border-gray-600 dark:bg-gray-800">
@@ -214,7 +215,13 @@
               {@const alreadyUsed = isAlreadyUsed(ans.id, i)}
               <button
                 type="button"
-                class={`w-full rounded-md border p-2 text-left text-sm transition-colors ${slots[i]?.id === ans.id ? "bg-goethe text-white" : alreadyUsed ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400" : "hover:bg-goethe/10 dark:hover:bg-goethe/20"}`}
+                class={`w-full rounded-md border p-2 text-left text-sm transition-colors ${
+                  slots[i]?.id === ans.id
+                    ? "bg-goethe text-white"
+                    : alreadyUsed
+                      ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400"
+                      : "hover:bg-goethe/10 dark:hover:bg-goethe/20"
+                }`}
                 on:click={() => {
                   handleSelectChange(i, ans.id)
                   openIndex = -1

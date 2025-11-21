@@ -119,6 +119,7 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     fixedItems: fixed,
     answers: movableShuffled,
     feedback,
+    columns: 2,
   }
 
   return { question }

@@ -71,6 +71,7 @@
     }))}
     {disabled}
     {onChange}
+    columns={question.columns}
   />
 </InteractWithQuestion>
 
