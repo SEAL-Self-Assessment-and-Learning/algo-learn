@@ -24,7 +24,7 @@
   )
 </script>
 
-<li
+<div
   bind:this={drag.node.current}
   style={dragStyle}
   {...!disabled ? { ...drag.attributes.current, ...drag.listeners.current } : {}}
@@ -34,4 +34,4 @@
           ${drag.isDragging.current ? "opacity-0" : ""} dark:border-gray-700`}
 >
   <Markdown md={item.content ?? ""} />
-</li>
+</div>

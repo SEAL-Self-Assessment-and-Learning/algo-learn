@@ -34,17 +34,6 @@
   let isMobile = $state(false)
   let openIndex = $state(-1)
 
-  // translations
-  const lang: Language = $derived(getLanguage())
-  const matchingTapLang: SingleTranslation = {
-    en: "Tap to choose",
-    de: "Tippe zum Auswählen",
-  }
-  const matchingChosenLang: SingleTranslation = {
-    en: "Chosen",
-    de: "Ausgewählt",
-  }
-
   onMount(() => {
     const check = () => (isMobile = window.innerWidth < 768)
     check()
@@ -117,7 +106,6 @@
       ;[newSlots[fromIdx], newSlots[toIdx]] = [newSlots[toIdx], newSlots[fromIdx]]
       slots = newSlots
       onChange(newSlots)
-      return
     }
   }
 
@@ -129,7 +117,12 @@
     const newSlots = [...slots]
     newSlots[slotIndex] = null
     slots = newSlots
-    pool = [...pool, item]
+
+    // Only add if it's not already in the pool
+    if (!pool.some((p) => p.id === item.id)) {
+      pool = [...pool, item]
+    }
+
     onChange(newSlots)
   }
 
@@ -162,29 +155,28 @@
     onDragEnd={handleDragEnd}
     onDragCancel={() => (activeItem = null)}
   >
-    <div class="matching-board flex flex-wrap gap-8">
-      <!-- left column: droppable slots -->
-      <div class="flex flex-col gap-2">
-        {#each pairs as pair, i (pair.id)}
-          <MatchingSlot
-            id={`slot-${i}`}
-            label={pair.fixed}
-            item={slots[i]}
-            onRemove={() => returnToPool(i)}
-            {disabled}
-          />
-        {/each}
-      </div>
+    <div class="grid gap-4">
+      {#each pairs as pair, i (pair.id)}
+        <div class="rounded-lg border p-3 dark:border-gray-600 dark:bg-gray-800">
+          <Markdown md={pair.fixed} />
+          <div class="mt-3">
+            <MatchingSlot id={`slot-${i}`} item={slots[i]} onRemove={() => returnToPool(i)} {disabled} />
+          </div>
+        </div>
+      {/each}
 
-      <!-- right column: draggable pool -->
-      <!-- SortableContext expects a list of ids (strings) that are stable -->
-      <SortableContext items={pool.map((it) => it.id)}>
-        <ul class="flex flex-col gap-2">
-          {#each pool as item (item.id)}
-            <MatchingPoolItem id={item.id} {item} {disabled} />
-          {/each}
-        </ul>
-      </SortableContext>
+      <div
+        id="pool-area"
+        class="mt-6 flex list-none flex-wrap justify-center gap-2 rounded-lg border border-dashed p-3 dark:border-gray-600"
+      >
+        <SortableContext items={pool.map((it) => it.id)}>
+          <div class="flex list-none flex-wrap gap-2">
+            {#each pool as item (item.id)}
+              <MatchingPoolItem id={item.id} {item} {disabled} />
+            {/each}
+          </div>
+        </SortableContext>
+      </div>
     </div>
 
     <DragOverlay {dropAnimation}>
@@ -205,10 +197,16 @@
           on:click={() => (openIndex = openIndex === i ? -1 : i)}
         >
           <Markdown md={pair.fixed} />
-          <span class="text-sm text-gray-400">
-            {slots[i] ? matchingChosenLang[lang] : matchingTapLang[lang]}
-          </span>
+          <span class="text-sm text-gray-400">{openIndex === i ? "▴" : "▾"}</span>
         </div>
+
+        {#if slots[i] && openIndex !== i}
+          <div
+            class="mt-1 rounded-md border border-gray-500/30 bg-gray-100/20 p-2 dark:border-gray-600 dark:bg-gray-800/40"
+          >
+            <Markdown md={slots[i]?.content ?? ""} />
+          </div>
+        {/if}
 
         {#if openIndex === i}
           <div class="mt-2 grid gap-1">
@@ -216,14 +214,7 @@
               {@const alreadyUsed = isAlreadyUsed(ans.id, i)}
               <button
                 type="button"
-                class={`w-full rounded-md border p-2 text-left text-sm transition-colors
-                  ${
-                    slots[i]?.id === ans.id
-                      ? "bg-goethe text-white"
-                      : alreadyUsed
-                        ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400"
-                        : "hover:bg-goethe/10 dark:hover:bg-goethe/20"
-                  }`}
+                class={`w-full rounded-md border p-2 text-left text-sm transition-colors ${slots[i]?.id === ans.id ? "bg-goethe text-white" : alreadyUsed ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400" : "hover:bg-goethe/10 dark:hover:bg-goethe/20"}`}
                 on:click={() => {
                   handleSelectChange(i, ans.id)
                   openIndex = -1
