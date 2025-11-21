@@ -64,6 +64,7 @@
       id: `${i}`,
       fixed: f,
       answerId: questionState.choice[i] >= 0 ? `${questionState.choice[i]}` : null,
+      correctness: questionState.feedbackObject?.rowCorrectness?.[i] ?? null,
     }))}
     answers={question.answers.map((a, i) => ({
       id: `${i}`,

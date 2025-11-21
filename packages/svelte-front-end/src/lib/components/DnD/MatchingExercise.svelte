@@ -11,6 +11,7 @@
     id: string
     fixed: string
     answerId: string | null
+    correctness?: boolean | null
   }
 
   interface Props {
@@ -161,7 +162,13 @@
         <div class="rounded-lg border p-3 dark:border-gray-600 dark:bg-gray-800">
           <Markdown md={pair.fixed} />
           <div class="mt-3">
-            <MatchingSlot id={`slot-${i}`} item={slots[i]} onRemove={() => returnToPool(i)} {disabled} />
+            <MatchingSlot
+              id={`slot-${i}`}
+              item={slots[i]}
+              onRemove={() => returnToPool(i)}
+              {disabled}
+              correctness={pair.correctness}
+            />
           </div>
         </div>
       {/each}

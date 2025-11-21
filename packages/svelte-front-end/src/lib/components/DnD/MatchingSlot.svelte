@@ -12,9 +12,11 @@
     item: SlotItem | null
     onRemove: () => void
     disabled?: boolean
+    correctness?: boolean | null // ⭐ ALREADY PRESENT
   }
 
-  const { id, item, onRemove, disabled = false }: Props = $props()
+  // ⭐ correctness added here
+  const { id, item, onRemove, disabled = false, correctness = null }: Props = $props()
 
   const drop = useDroppable({ id })
   const drag = useDraggable({ id: `${id}-drag` })
@@ -30,13 +32,18 @@
   )
 </script>
 
+<!-- ⭐ correctness styling added to outer div -->
 <div
   bind:this={drop.node.current}
   class={`relative flex min-h-[40px] items-center rounded-md border px-2 py-2 transition-colors
     ${
-      drop.isOver.current
-        ? "border-blue-500 bg-blue-800/30"
-        : "border-gray-500/60 dark:border-gray-600/60"
+      correctness === true
+        ? "border-green-500 bg-green-900/20"
+        : correctness === false
+          ? "border-red-500 bg-red-900/20"
+          : drop.isOver.current
+            ? "border-blue-500 bg-blue-800/30"
+            : "border-gray-500/60 dark:border-gray-600/60"
     }`}
 >
   <div
