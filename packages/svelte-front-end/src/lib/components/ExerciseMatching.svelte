@@ -5,7 +5,14 @@
   import Markdown from "$lib/components/markdown/markdown.svelte"
   import type { MODE, Result } from "$lib/components/types.ts"
   import { playSound } from "$lib/sound.svelte.ts"
+  import { globalTranslations } from "$lib/translation.ts"
+  import { getLanguage } from "$lib/utils/langState.svelte"
+  import type { Language } from "@shared/api/Language"
   import type { MultipleChoiceFeedback, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator.ts"
+  import { tFunction } from "@shared/utils/translations"
+
+  const lang: Language = $derived(getLanguage())
+  const { t } = $derived(tFunction([globalTranslations], lang))
 
   interface Props {
     question: MultipleChoiceQuestion
@@ -94,15 +101,18 @@
 </InteractWithQuestion>
 
 {#snippet footerMsg()}
-  <b class="text-lg">
+  <div class="flex-col">
     {#if questionState.mode === "correct"}
-      Correct!
+      <b class="text-2xl">{t("feedback.correct")}</b>
     {:else if questionState.mode === "incorrect"}
-      Incorrect.
-    {:else if questionState.mode === "invalid"}
-      Fill All.
+      <b class="text-2xl">{t("incorrect")}</b>
+
+      {#if questionState.feedbackObject?.feedbackText}
+        <Markdown md={questionState.feedbackObject.feedbackText} />
+        <br />
+      {/if}
     {:else}
-      That's okay!
+      <b class="text-2xl">{t("incorrect")}</b>
     {/if}
-  </b>
+  </div>
 {/snippet}
