@@ -143,6 +143,7 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     answers: movableShuffled,
     feedback,
     columns: 2,
+    fillOutAll: true,
   }
 
   return { question }

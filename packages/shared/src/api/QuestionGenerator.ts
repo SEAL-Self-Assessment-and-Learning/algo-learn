@@ -60,6 +60,9 @@ export interface MultipleChoiceQuestion extends QuestionBase {
 
   /** Optional number of columns for matching layout (desktop only) */
   columns?: number
+
+  /** If all input fields need to be filled out. Defaults to false */
+  fillOutAll?: boolean
 }
 
 /**

@@ -19,10 +19,11 @@
     answers: SlotItem[] // MUST have a stable `id: string` property
     disabled?: boolean
     onChange: (slots: (SlotItem | null)[]) => void
+    onModeChange?: (mode: "draft" | "invalid") => void
     columns?: number
   }
 
-  const { pairs, answers, disabled = false, onChange, columns = 2 }: Props = $props()
+  const { pairs, answers, disabled = false, onChange, onModeChange, columns = 2 }: Props = $props()
 
   // pool uses the supplied items (cloned so we don't mutate caller's array)
   let pool = $state<SlotItem[]>(structuredClone(answers))
@@ -40,6 +41,11 @@
     return () => window.removeEventListener("resize", check)
   })
 
+  function notifyMode(slotsArr: (SlotItem | null)[]) {
+    if (!onModeChange) return
+    const allFilled = slotsArr.every((s) => s !== null)
+    onModeChange(allFilled ? "draft" : "invalid")
+  }
   // helper: find by stable id
   function findPoolIndexById(id: string) {
     return pool.findIndex((it) => it.id === id)
@@ -93,6 +99,7 @@
       slots = newSlots
       pool = newPool
       onChange(newSlots)
+      notifyMode(newSlots)
       return
     }
 
@@ -105,6 +112,7 @@
       ;[newSlots[fromIdx], newSlots[toIdx]] = [newSlots[toIdx], newSlots[fromIdx]]
       slots = newSlots
       onChange(newSlots)
+      notifyMode(newSlots)
     }
   }
 
@@ -123,6 +131,7 @@
     }
 
     onChange(newSlots)
+    notifyMode(newSlots)
   }
 
   // mobile dropdown handler
@@ -139,6 +148,7 @@
     newSlots[slotIdx] = selected
     slots = newSlots
     onChange(newSlots)
+    notifyMode(newSlots)
   }
 
   function isAlreadyUsed(id: string, currentIdx: number) {

@@ -21,11 +21,21 @@
     choice: number[]
     feedbackObject?: MultipleChoiceFeedback
   } = $state({
-    mode: "draft",
+    mode: question.fillOutAll ? "invalid" : "draft",
     choice: Array(question.answers.length).fill(-1),
   })
 
-  const disabled = $derived(questionState.mode !== "draft")
+  const disabled = $derived(questionState.mode === "correct" || questionState.mode === "incorrect")
+
+  // handle fillOutAll mode
+  function onModeChange(newMode: MODE) {
+    // if already correct/incorrect, don't revert mode
+    if (questionState.mode === "correct" || questionState.mode === "incorrect") return
+    // otherwise update
+    if (question.fillOutAll) {
+      questionState.mode = newMode
+    }
+  }
 
   // handle submit
   function handleClick(finished: boolean) {
@@ -46,6 +56,12 @@
   // handle drag/drop changes
   function onChange(slots: (SlotItem | null)[]) {
     questionState.choice = slots.map((s) => (s ? Number(s.id) : -1))
+  }
+
+  function onModeChangeFromChild(newMode: MODE) {
+    if (question.fillOutAll) {
+      questionState.mode = newMode
+    }
   }
 </script>
 
@@ -72,6 +88,7 @@
     }))}
     {disabled}
     {onChange}
+    {onModeChange}
     columns={question.columns}
   />
 </InteractWithQuestion>
@@ -82,6 +99,8 @@
       Correct!
     {:else if questionState.mode === "incorrect"}
       Incorrect.
+    {:else if questionState.mode === "invalid"}
+      Fill All.
     {:else}
       That's okay!
     {/if}
