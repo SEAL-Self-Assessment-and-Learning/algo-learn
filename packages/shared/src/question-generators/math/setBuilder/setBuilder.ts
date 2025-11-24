@@ -14,8 +14,8 @@ import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import Random from "@shared/utils/random"
 import { t, tFunctional } from "@shared/utils/translations"
 import type { Domain } from "./helpers"
-import { templates } from "./templates.ts"
-import { translations } from "./translations.ts"
+import { templates } from "./templates"
+import { translations } from "./translations"
 
 const maxMatchSize = 8
 const maxAttempts = 100
@@ -89,7 +89,7 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     if (movable.includes(explicit)) continue
 
     const variants = template.labels(lang, domain, param, cfg)
-    const label = `\\[` + random.choice(variants) + `\\]`
+    const label = `\\[${random.choice(variants)}\\]`
 
     fixed.push(label)
     movable.push(explicit)
@@ -99,8 +99,31 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     throw new Error("Could not generate enough small sets for matching")
   }
 
-  const movableShuffled = random.shuffle([...movable])
+  // shuffle correct answers
+  let movableShuffled = random.shuffle([...movable])
   const solution = movable.map((exp) => movableShuffled.indexOf(exp))
+
+  // add confounders (0–2 wrong answers)
+  const nConfounders = random.int(0, 2)
+  const confounders: string[] = []
+
+  for (let k = 0; k < nConfounders; k++) {
+    let fake: string
+    let tries = 0
+
+    do {
+      tries++
+      const nums = Array.from({ length: random.int(1, 5) }, () => random.int(-10, 20)).sort(
+        (a, b) => a - b,
+      )
+
+      fake = `$\\{ ${nums.join(", ")} \\}$`
+    } while ((movable.includes(fake) || confounders.includes(fake)) && tries < 30)
+
+    confounders.push(fake)
+  }
+
+  movableShuffled = [...movableShuffled, ...confounders]
 
   const baseFeedback = minimalMultipleChoiceFeedback({
     correctAnswerIndex: solution,
@@ -112,7 +135,7 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
   const question: MultipleChoiceQuestion = {
     type: "MultipleChoiceQuestion",
     name: SetBuilderQuestion.name(lang),
-    path: path,
+    path,
     sorting: true,
     matching: true,
     text: t(translations, lang, "match"),
@@ -180,4 +203,4 @@ function generateFreeTextVariant(lang: Language, path: string, random: Random) {
   return { question }
 }
 
-export { translations } from "./translations.ts"
+export { translations } from "./translations"
