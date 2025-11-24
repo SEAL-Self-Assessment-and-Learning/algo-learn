@@ -11,6 +11,7 @@ import {
 } from "@shared/utils/math/ArithmeticExpression.ts"
 import { expressionsEqual } from "@shared/utils/math/comparingExpressions.ts"
 import Random, { sampleRandomSeed } from "@shared/utils/random.ts"
+import { parseArithmeticExpression } from "@shared/utils/math/ParseArithmeticExpression.ts"
 
 function foldAddition(terms: ExprNode[]): ExprNode {
   if (terms.length === 0) {
@@ -431,6 +432,10 @@ test("Basic arithmetic addition", () => {
   expect(additionWithVariable.evaluate({ x: 6 })).toEqual(10)
 })
 
+describe("Correct parenthesization in toString and toTex", () => {  
+  
+})
+
 describe("expressionsEqual", () => {
   const r = new Random(sampleRandomSeed())
   test("Base", () => {
@@ -742,7 +747,11 @@ describe("expressionsEqual", () => {
     expect(expressionsEqual(e1, e2, r).equal).toBeTruthy()
   })
 
-  test("Expressions Equal – detects inequality", () => {
+  test("Expressions Equal - float as base", () => {
+
+  })
+
+  test("Expressions Equal - detects inequality", () => {
     const expr1 = new BinaryNode(
       "+",
       new BinaryNode("^", new VariableNode("x"), new ConstantNode(2)),
@@ -762,5 +771,15 @@ describe("expressionsEqual", () => {
     )
 
     expect(expressionsEqual(expr1, expr2, r).equal).toBeFalsy()
+  })
+})
+
+describe("Parser for ArithmeticExpression", () => {
+  test("Basic addition with simplification", () => {
+    const exprStr = "2 + 3 + x + 5"
+    const pasrsedExpr = parseArithmeticExpression(exprStr)
+    const variables = pasrsedExpr.getVariables()
+    expect(variables).toEqual(new Set(["x"]))
+    expect(pasrsedExpr.simplify().toString()).toBe("10 + x")
   })
 })

@@ -8,13 +8,13 @@ import type {
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import {
   evaluateExpression,
-  parseArithmeticExpression,
   type ExprNode,
 } from "@shared/utils/math/ArithmeticExpression.ts"
 import { expressionsEqual } from "@shared/utils/math/comparingExpressions.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 import { generateExpressionScenario, type ExpressionScenario } from "./randomExpression"
+import { parseArithmeticExpression } from "@shared/utils/math/ParseArithmeticExpression.ts"
 
 const translations: Translations = {
   en: {

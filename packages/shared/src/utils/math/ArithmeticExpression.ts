@@ -35,6 +35,11 @@ export interface Fraction {
   denominator: number
 }
 
+interface SignedTerm {
+  node: ExprNode
+  sign: 1 | -1
+}
+
 const operatorTex = (operator: ArithmeticOperator) => {
   switch (operator) {
     case "*":
@@ -169,6 +174,13 @@ function gcdInteger(a: number, b: number): number {
   return x === 0 ? 1 : x
 }
 
+/**
+ * @Alex ist das korrekt?
+ *
+ * @param base
+ * @param exp
+ * @param mod
+ */
 function modPow(base: number, exp: number, mod: number): number {
   if (mod === 0) {
     throw new Error("Modulus cannot be zero.")
@@ -302,10 +314,26 @@ function formatNumber(value: number, precision = 4): string {
   return formatNumberInternal(value, precision, false)
 }
 
+/**
+ * Format to Tex
+ * @param value
+ * @param precision
+ */
 function formatNumberToTex(value: number, precision = 4): string {
   return formatNumberInternal(value, precision, true)
 }
 
+/**
+ * Formats number to
+ * - NaN if not a number
+ * - Infinity/-Infinity if infinite
+ * - 0 if zero
+ * - integer if integer
+ * - fraction otherwise
+ * @param value
+ * @param precision
+ * @param asTex
+ */
 function formatNumberInternal(value: number, precision = 4, asTex = false): string {
   const normalized = normalizeNumeric(value, precision)
   if (Number.isNaN(normalized)) {
@@ -321,6 +349,7 @@ function formatNumberInternal(value: number, precision = 4, asTex = false): stri
     return normalized.toString()
   }
 
+  // Approximate as fraction
   const tolerance = 1 / Math.pow(10, precision)
   const approxMaxDenominator = Math.min(MAX_APPROXIMATE_DENOMINATOR, Math.pow(10, precision))
   const approximated = approximateFraction(normalized, approxMaxDenominator, tolerance)
@@ -344,6 +373,30 @@ function ensureTexWrapped(str: string): string {
     return str
   }
   return `\\left(${str}\\right)`
+}
+
+
+/**
+ * Converts the result of an evaluation into an ExprNode
+ * @param result
+ */
+function evaluationResultToExpr(result: EvaluationResult): ExprNode {
+  if (typeof result === "number") {
+    return new ConstantNode(normalizeNumeric(result))
+  }
+  return result.clone()
+}
+
+/**
+ * Checks if the evaluation result is numeric, otherwise throws an error
+ * @param result
+ * @param context
+ */
+export function expectNumeric(result: EvaluationResult, context: string): number {
+  if (typeof result !== "number") {
+    throw new Error(`${context}: expected numeric result but received symbolic expression`)
+  }
+  return result
 }
 
 /**
@@ -457,6 +510,12 @@ export class ConstantNode extends ExprNode {
   }
 }
 
+/**
+ * Represents a variable in an expression, possibly with a multiplier
+ * Variables should have a individual name (e.g., "x", "y", "z")
+ *
+ * The multiplier can also be represented as a ConstantNode multiplied with the variable,
+ */
 export class VariableNode extends ExprNode {
   public multiplier: number
 
@@ -552,29 +611,6 @@ export class VariableNode extends ExprNode {
   toCanonicalKey(): string {
     return `V:${this.name}:${formatNumber(normalizeNumeric(this.multiplier))}`
   }
-}
-
-/**
- * Converts the result of an evaluation into an ExprNode
- * @param result
- */
-function evaluationResultToExpr(result: EvaluationResult): ExprNode {
-  if (typeof result === "number") {
-    return new ConstantNode(normalizeNumeric(result))
-  }
-  return result.clone()
-}
-
-/**
- * Checks if the evaluation result is numeric, otherwise throws an error
- * @param result
- * @param context
- */
-export function expectNumeric(result: EvaluationResult, context: string): number {
-  if (typeof result !== "number") {
-    throw new Error(`${context}: expected numeric result but received symbolic expression`)
-  }
-  return result
 }
 
 /**
@@ -681,6 +717,15 @@ export class UnaryNode extends ExprNode {
   }
 }
 
+/**
+ * Represents a binary operation between two expressions
+ * Currently supported:
+ * - Addition (+)
+ * - Subtraction (-)
+ * - Multiplication (*)
+ * - Division (/)
+ * - Power (^)
+ */
 export class BinaryNode extends ExprNode {
   constructor(
     public op: ArithmeticOperator,
@@ -921,6 +966,10 @@ export class BinaryNode extends ExprNode {
   }
 }
 
+/**
+ * Represents a function call with a name and arguments
+ * Currently supported functions are defined in the function registry
+ */
 export class FunctionNode extends ExprNode {
   constructor(
     public name: string,
@@ -1013,11 +1062,13 @@ export class FunctionNode extends ExprNode {
   }
 }
 
-interface SignedTerm {
-  node: ExprNode
-  sign: 1 | -1
-}
-
+/**
+ * Collect addition terms from an expression tree
+ * Helper function for addition simplification
+ * @param node
+ * @param sign
+ * @param terms
+ */
 function gatherAdditionTerms(node: ExprNode, sign: 1 | -1, terms: SignedTerm[]): void {
   if (node instanceof BinaryNode) {
     if (node.op === "+") {
@@ -1034,6 +1085,11 @@ function gatherAdditionTerms(node: ExprNode, sign: 1 | -1, terms: SignedTerm[]):
   terms.push({ node, sign })
 }
 
+
+/**
+ * Extract linear term from expression node
+ * @param node
+ */
 function extractLinearTerm(node: ExprNode): { coefficient: number; base: ExprNode | null } {
   if (node instanceof ConstantNode) {
     return { coefficient: node.value, base: null }
@@ -1054,6 +1110,10 @@ function extractLinearTerm(node: ExprNode): { coefficient: number; base: ExprNod
   return { coefficient: constant, base }
 }
 
+/**
+ * Split a product expression into its constant and factor components
+ * @param node
+ */
 function splitProduct(node: ExprNode): { constant: number; factors: ExprNode[] } {
   let constant = 1
   const factors: ExprNode[] = []
@@ -1085,6 +1145,10 @@ function splitProduct(node: ExprNode): { constant: number; factors: ExprNode[] }
   return { constant: normalizeNumeric(constant), factors }
 }
 
+/**
+ * Build a product expression from a list of factors
+ * @param factors
+ */
 function buildProductFromFactors(factors: ExprNode[]): ExprNode {
   if (factors.length === 0) {
     return new ConstantNode(1)
@@ -1144,6 +1208,11 @@ function buildProductFromComponents(constant: number, factors: ExprNode[]): Expr
   return new BinaryNode("*", new ConstantNode(accumulatedConstant), product)
 }
 
+/**
+ * Applies a coefficient to the base of a expression
+ * @param base
+ * @param coefficient
+ */
 function applyCoefficientToBase(base: ExprNode, coefficient: number): ExprNode {
   const normalized = normalizeNumeric(coefficient)
   if (isApproximatelyZero(normalized)) {
@@ -1163,7 +1232,7 @@ function combineAdditionTerms(terms: SignedTerm[]): ExprNode {
   const buckets = new Map<string, { base: ExprNode; coefficient: number }>()
 
   for (const { node, sign } of terms) {
-    const simplified = node
+    const simplified = node.simplify()
     const { coefficient, base } = extractLinearTerm(simplified)
     const signedCoefficient = normalizeNumeric(coefficient * sign)
     if (base === null) {
@@ -1321,50 +1390,6 @@ function simplifyPower(left: ExprNode, right: ExprNode): ExprNode {
   return new BinaryNode("^", left, right)
 }
 
-export const Expr = {
-  constant(value: number): ExprNode {
-    return new ConstantNode(value)
-  },
-  variable(name: string, multiplier = 1): ExprNode {
-    return new VariableNode(name, multiplier)
-  },
-  negate(child: ExprNode): ExprNode {
-    return new UnaryNode("-", child).simplify()
-  },
-  add(...terms: ExprNode[]): ExprNode {
-    if (terms.length === 0) {
-      return new ConstantNode(0)
-    }
-    let current = terms[0]
-    for (let i = 1; i < terms.length; i++) {
-      current = new BinaryNode("+", current, terms[i])
-    }
-    return current.simplify()
-  },
-  subtract(left: ExprNode, right: ExprNode): ExprNode {
-    return new BinaryNode("-", left, right).simplify()
-  },
-  multiply(...factors: ExprNode[]): ExprNode {
-    if (factors.length === 0) {
-      return new ConstantNode(1)
-    }
-    let current = factors[0]
-    for (let i = 1; i < factors.length; i++) {
-      current = new BinaryNode("*", current, factors[i])
-    }
-    return current.simplify()
-  },
-  divide(left: ExprNode, right: ExprNode): ExprNode {
-    return new BinaryNode("/", left, right).simplify()
-  },
-  power(base: ExprNode, exponent: ExprNode): ExprNode {
-    return new BinaryNode("^", base, exponent).simplify()
-  },
-  func(name: string, ...args: ExprNode[]): ExprNode {
-    return new FunctionNode(name, args).simplify()
-  },
-}
-
 export function evaluateExpression(
   expr: ExprNode,
   assignments: SymbolicAssignments = {},
@@ -1386,349 +1411,3 @@ export function evaluateExpression(
   return substituted.simplify()
 }
 
-type TokenType =
-  | "number"
-  | "identifier"
-  | "plus"
-  | "minus"
-  | "star"
-  | "slash"
-  | "caret"
-  | "lparen"
-  | "rparen"
-  | "comma"
-  | "eof"
-
-interface Token {
-  type: TokenType
-  value: string
-  start: number
-  end: number
-}
-
-export class ArithmeticExpressionParseError extends Error {
-  constructor(
-    message: string,
-    public readonly expression: string,
-    public readonly position: number,
-  ) {
-    super(buildParseErrorMessage(message, expression, position))
-    this.name = "ArithmeticExpressionParseError"
-  }
-}
-
-interface InternalParseOptions {
-  allowImplicitMultiplication: boolean
-}
-
-class ArithmeticExpressionParser {
-  private current = 0
-
-  constructor(
-    private readonly tokens: Token[],
-    private readonly expression: string,
-    private readonly options: InternalParseOptions,
-  ) {}
-
-  parse(): ExprNode {
-    const expr = this.parseExpression()
-    return expr
-  }
-
-  private parseExpression(): ExprNode {
-    return this.parseAddition()
-  }
-
-  private parseAddition(): ExprNode {
-    let node = this.parseMultiplication()
-    while (true) {
-      if (this.match("plus")) {
-        node = new BinaryNode("+", node, this.parseMultiplication())
-        continue
-      }
-      if (this.match("minus")) {
-        node = new BinaryNode("-", node, this.parseMultiplication())
-        continue
-      }
-      break
-    }
-    return node
-  }
-
-  private parseMultiplication(): ExprNode {
-    let node = this.parsePower()
-    while (true) {
-      if (this.match("star")) {
-        node = new BinaryNode("*", node, this.parsePower())
-        continue
-      }
-      if (this.match("slash")) {
-        node = new BinaryNode("/", node, this.parsePower())
-        continue
-      }
-      if (this.shouldApplyImplicitMultiplication()) {
-        node = new BinaryNode("*", node, this.parsePower())
-        continue
-      }
-      break
-    }
-    return node
-  }
-
-  private parsePower(): ExprNode {
-    const base = this.parseUnary()
-    if (this.match("caret")) {
-      const exponent = this.parsePower()
-      return new BinaryNode("^", base, exponent)
-    }
-    return base
-  }
-
-  private parseUnary(): ExprNode {
-    if (this.match("minus")) {
-      return new UnaryNode("-", this.parseUnary())
-    }
-    if (this.match("plus")) {
-      return this.parseUnary()
-    }
-    return this.parsePrimary()
-  }
-
-  private parsePrimary(): ExprNode {
-    const token = this.peek()
-    switch (token.type) {
-      case "number": {
-        this.advance()
-        const value = Number.parseFloat(token.value)
-        if (!Number.isFinite(value)) {
-          throw this.error(token, `Invalid number '${token.value}'`)
-        }
-        return new ConstantNode(value)
-      }
-      case "identifier":
-        return this.parseIdentifier()
-      case "lparen": {
-        this.advance()
-        const expr = this.parseExpression()
-        this.consume("rparen", "Expected ')' to close '('")
-        return expr
-      }
-      default:
-        throw this.error(token, `Unexpected token '${token.value || token.type}'`)
-    }
-  }
-
-  private parseIdentifier(): ExprNode {
-    const token = this.advance()
-    const name = token.value
-    if (this.match("lparen")) {
-      const args: ExprNode[] = []
-      if (!this.check("rparen")) {
-        do {
-          args.push(this.parseExpression())
-        } while (this.match("comma"))
-      }
-      this.consume("rparen", `Expected ')' after arguments of '${name}'`)
-      try {
-        return new FunctionNode(name, args)
-      } catch (error) {
-        if (error instanceof Error) {
-          throw this.error(token, error.message)
-        }
-        throw this.error(token, `Invalid function '${name}'`)
-      }
-    }
-    return new VariableNode(name)
-  }
-
-  private shouldApplyImplicitMultiplication(): boolean {
-    if (!this.options.allowImplicitMultiplication) return false
-    const token = this.peek()
-    if (token.type === "eof" || token.type === "comma" || token.type === "rparen") {
-      return false
-    }
-    return token.type === "number" || token.type === "identifier" || token.type === "lparen"
-  }
-
-  private match(...types: TokenType[]): boolean {
-    for (const type of types) {
-      if (this.check(type)) {
-        this.advance()
-        return true
-      }
-    }
-    return false
-  }
-
-  private consume(type: TokenType, message: string): void {
-    if (this.check(type)) {
-      this.advance()
-      return
-    }
-    throw this.error(this.peek(), message)
-  }
-
-  private check(type: TokenType): boolean {
-    if (this.isAtEnd()) return false
-    return this.peek().type === type
-  }
-
-  private advance(): Token {
-    if (!this.isAtEnd()) {
-      this.current++
-    }
-    return this.previous()
-  }
-
-  private isAtEnd(): boolean {
-    return this.peek().type === "eof"
-  }
-
-  private peek(): Token {
-    return this.tokens[this.current]
-  }
-
-  private previous(): Token {
-    return this.tokens[this.current - 1]
-  }
-
-  private error(token: Token, message: string): ArithmeticExpressionParseError {
-    return new ArithmeticExpressionParseError(message, this.expression, token.start)
-  }
-}
-
-function tokenizeArithmeticExpression(expression: string): Token[] {
-  const tokens: Token[] = []
-  let index = 0
-
-  while (index < expression.length) {
-    const char = expression[index]
-
-    if (isWhitespace(char)) {
-      index++
-      continue
-    }
-
-    if (isDigit(char) || (char === "." && isDigit(expression[index + 1] ?? ""))) {
-      const start = index
-      let hasDot = char === "."
-      index++
-      while (index < expression.length) {
-        const next = expression[index]
-        if (isDigit(next)) {
-          index++
-          continue
-        }
-        if (next === ".") {
-          if (hasDot) {
-            throw new ArithmeticExpressionParseError("Invalid number format", expression, index)
-          }
-          hasDot = true
-          index++
-          continue
-        }
-        break
-      }
-      const value = expression.slice(start, index)
-      tokens.push({ type: "number", value, start, end: index })
-      continue
-    }
-
-    if (isAlpha(char)) {
-      const start = index
-      index++
-      while (index < expression.length && isAlphaNumeric(expression[index])) {
-        index++
-      }
-      const value = expression.slice(start, index)
-      tokens.push({ type: "identifier", value, start, end: index })
-      continue
-    }
-
-    const start = index
-    index++
-
-    switch (char) {
-      case "+":
-        tokens.push({ type: "plus", value: char, start, end: index })
-        break
-      case "-":
-        tokens.push({ type: "minus", value: char, start, end: index })
-        break
-      case "*":
-        tokens.push({ type: "star", value: char, start, end: index })
-        break
-      case "/":
-        tokens.push({ type: "slash", value: char, start, end: index })
-        break
-      case "^":
-        tokens.push({ type: "caret", value: char, start, end: index })
-        break
-      case "(":
-        tokens.push({ type: "lparen", value: char, start, end: index })
-        break
-      case ")":
-        tokens.push({ type: "rparen", value: char, start, end: index })
-        break
-      case ",":
-        tokens.push({ type: "comma", value: char, start, end: index })
-        break
-      default:
-        throw new ArithmeticExpressionParseError(`Unexpected character '${char}'`, expression, start)
-    }
-  }
-
-  tokens.push({ type: "eof", value: "", start: expression.length, end: expression.length })
-  return tokens
-}
-
-function isWhitespace(char: string): boolean {
-  return char === " " || char === "\t" || char === "\n" || char === "\r"
-}
-
-function isDigit(char: string): boolean {
-  return char >= "0" && char <= "9"
-}
-
-function isAlpha(char: string): boolean {
-  return (char >= "a" && char <= "z") || (char >= "A" && char <= "Z") || char === "_"
-}
-
-function isAlphaNumeric(char: string): boolean {
-  return isAlpha(char) || isDigit(char)
-}
-
-function buildParseErrorMessage(message: string, expression: string, position: number): string {
-  const clamped = Math.max(0, Math.min(position, expression.length))
-  const indicator = `${" ".repeat(clamped)}`
-  return `${message} at position ${clamped}.\n${expression}\n${indicator}`
-}
-
-export function parseArithmeticExpression(text: string, options: ParseOptions = {}): ExprNode {
-  const expression = text ?? ""
-  if (expression.trim().length === 0) {
-    throw new ArithmeticExpressionParseError("Expression is empty", expression, 0)
-  }
-
-  const allowImplicitMultiplication = options.allowImplicitMultiplication !== false
-  console.log("allowImplicitMultiplication:", allowImplicitMultiplication)
-  const simplify = options.simplify !== false
-  console.log("simplify:", simplify)
-
-  try {
-    const tokens = tokenizeArithmeticExpression(expression)
-    console.log("Tokens:", tokens)
-    const parser = new ArithmeticExpressionParser(tokens, expression, {
-      allowImplicitMultiplication,
-    })
-    const node = parser.parse()
-    console.log(node)
-    return simplify ? node.simplify() : node
-  } catch (error) {
-    if (error instanceof ArithmeticExpressionParseError) {
-      throw error
-    }
-    const message = error instanceof Error ? error.message : "Unknown parsing error"
-    throw new ArithmeticExpressionParseError(message, expression, 0)
-  }
-}
