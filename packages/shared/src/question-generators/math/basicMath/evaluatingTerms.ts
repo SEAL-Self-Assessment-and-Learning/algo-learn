@@ -6,15 +6,12 @@ import type {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import {
-  evaluateExpression,
-  type ExprNode,
-} from "@shared/utils/math/ArithmeticExpression.ts"
+import { evaluateExpression, type ExprNode } from "@shared/utils/math/ArithmeticExpression.ts"
 import { expressionsEqual } from "@shared/utils/math/comparingExpressions.ts"
+import { parseArithmeticExpression } from "@shared/utils/math/ParseArithmeticExpression.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 import { generateExpressionScenario, type ExpressionScenario } from "./randomExpression"
-import { parseArithmeticExpression } from "@shared/utils/math/ParseArithmeticExpression.ts"
 
 const translations: Translations = {
   en: {
@@ -89,6 +86,7 @@ export const EvaluatingTerms: QuestionGenerator = {
     if (!scenario) {
       throw new Error("Unable to generate a valid exercise for the requested difficulty level.")
     }
+    console.log(scenario.expression)
 
     const assignmentsTex = formatAssignments(scenario.assignments)
     const expressionTex = scenario.expression.toTex()

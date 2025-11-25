@@ -10,8 +10,8 @@ import {
   type ExprNode,
 } from "@shared/utils/math/ArithmeticExpression.ts"
 import { expressionsEqual } from "@shared/utils/math/comparingExpressions.ts"
-import Random, { sampleRandomSeed } from "@shared/utils/random.ts"
 import { parseArithmeticExpression } from "@shared/utils/math/ParseArithmeticExpression.ts"
+import Random, { sampleRandomSeed } from "@shared/utils/random.ts"
 
 function foldAddition(terms: ExprNode[]): ExprNode {
   if (terms.length === 0) {
@@ -48,30 +48,23 @@ test("Two numbers approximately equal", () => {
 test("ConstantNode (Base)", () => {
   const constNode = new ConstantNode(5)
   expect(constNode.evaluate()).toBe(5)
-  expect(constNode.toString()).toBe("5")
   expect(constNode.toTex()).toBe("5")
-  expect(constNode.toCanonicalKey()).toBe("C:5")
 
   const constNodeNegFloat = new ConstantNode(-3.14159)
   expect(constNodeNegFloat.evaluate()).toBeCloseTo(-3.14159)
-  expect(constNodeNegFloat.toString()).toBe("(-3927/1250)")
-  expect(constNodeNegFloat.toTex()).toBe("\\left(-\\dfrac{3927}{1250}\\right)")
-  expect(constNodeNegFloat.toCanonicalKey()).toBe("C:-3927/1250")
+  expect(constNodeNegFloat.toTex(4)).toBe("-\\dfrac{3927}{1250}")
 })
 
 test("VariableNode (Base)", () => {
   const v = new VariableNode("x")
   expect(v.name).toBe("x")
   expect(v.multiplier).toBe(1)
-  expect(v.toString()).toBe("x")
   expect(v.toTex()).toBe("x")
 
   const v2 = new VariableNode("y", -1)
-  expect(v2.toString()).toBe("(-y)")
-  expect(v2.toTex()).toBe("\\left(-y\\right)")
+  expect(v2.toTex()).toBe("-y")
 
   const v3 = new VariableNode("z", 3.5)
-  expect(v3.toString()).toBe("7/2z")
   expect(v3.toTex()).toBe("\\dfrac{7}{2}z")
 
   // evaluate
@@ -92,7 +85,7 @@ test("VariableNode (Base)", () => {
   expect(simplifiedZero).toBeInstanceOf(ConstantNode)
   expect((simplifiedZero as ConstantNode).value).toBe(0)
 
-  const vNorm = new VariableNode("x", 1.0000001)
+  const vNorm = new VariableNode("x", 1.000000001)
   const simplifiedNorm = vNorm.simplify()
   expect(simplifiedNorm).not.toBe(vNorm) // new instance
   expect((simplifiedNorm as VariableNode).multiplier).toBe(1)
@@ -112,16 +105,12 @@ test("VariableNode (Base)", () => {
   const substMap = { x: substTarget }
 
   // 3 x -->  3 * (2 a)  = 6 a
-  expect(substExpr.substitute(substMap).toString()).toBe("6a")
+  expect(substExpr.substitute(substMap).toTex()).toBe("6a")
 
   // substitution merging with constant multiplication
   const c = new ConstantNode(5)
   const subst2 = new VariableNode("x", 4).substitute({ x: c })
   expect((subst2 as ConstantNode).value).toBe(20)
-
-  // canonical key
-  expect(v.toCanonicalKey()).toBe("V:x:1")
-  expect(v3.toCanonicalKey()).toBe("V:z:7/2")
 })
 
 test("UnaryNode (Base)", () => {
@@ -129,20 +118,16 @@ test("UnaryNode (Base)", () => {
   const vx = new VariableNode("x")
 
   const u1 = new UnaryNode("-", cx)
-  expect(u1.toString()).toBe("(-3)")
-  expect(u1.toTex()).toBe("\\left(-3\\right)")
+  expect(u1.toTex()).toBe("-3")
 
   const u2 = new UnaryNode("-", vx)
-  expect(u2.toString()).toBe("(-x)")
-  expect(u2.toTex()).toBe("\\left(-x\\right)")
+  expect(u2.toTex()).toBe("-x")
 
   // Nested expression formatting
   const nested = new UnaryNode("-", new BinaryNode("+", cx, vx))
-  expect(nested.toString()).toBe("-(3 + x)")
   expect(nested.toTex()).toBe("-\\left(3 + x\\right)")
   // double negation
   const doubleNeg = new UnaryNode("-", new UnaryNode("-", vx))
-  expect(doubleNeg.toString()).toBe("-(-x)")
   expect(doubleNeg.toTex()).toBe("-\\left(-x\\right)")
 
   // evaluate: direct numeric
@@ -179,7 +164,6 @@ test("UnaryNode (Base)", () => {
   // 3. Double negation: -(-x) → x
   const double = new UnaryNode("-", new UnaryNode("-", vx)).simplify()
   expect(double).toBeInstanceOf(VariableNode)
-  expect((double as VariableNode).toString()).toBe("x")
 
   // 4. Double negation on constants: -(-3) → 3
   const doubleConst = new UnaryNode("-", new UnaryNode("-", new ConstantNode(3))).simplify()
@@ -195,10 +179,10 @@ test("UnaryNode (Base)", () => {
 
   // 6. Non-trivial child is preserved when not simplifiable
   const complex = new UnaryNode("-", new BinaryNode("*", vx, new ConstantNode(2)))
-  expect(complex.toString()).toBe("-(x * 2)")
+  expect(complex.toTex()).toBe("-x \\cdot 2")
   const simplifiedComplex = complex.simplify()
   expect(simplifiedComplex).toBeInstanceOf(VariableNode)
-  expect((simplifiedComplex as VariableNode).toString()).toBe("(-2x)")
+  expect((simplifiedComplex as VariableNode).toTex()).toBe("-2x")
 
   // getVariables
   expect(u2.getVariables()).toEqual(new Set(["x"]))
@@ -207,15 +191,12 @@ test("UnaryNode (Base)", () => {
   // clone
   const clone = nested.clone()
   expect(clone).not.toBe(nested)
-  expect((clone as UnaryNode).child.toString()).toBe("3 + x")
+  expect((clone as UnaryNode).child.toTex()).toBe("3 + x")
 
   // substitute
   const sub = new UnaryNode("-", vx).substitute({ x: new ConstantNode(4) })
   expect(sub).toBeInstanceOf(UnaryNode)
-  expect((sub as UnaryNode).child.toString()).toBe("4")
-
-  // canonical key
-  expect(u2.toCanonicalKey()).toBe("U:-:V:x:1")
+  expect((sub as UnaryNode).child.toTex()).toBe("4")
 })
 
 describe("BinaryNode (Base)", () => {
@@ -236,41 +217,6 @@ describe("BinaryNode (Base)", () => {
   const complex2 = new BinaryNode("/", complex, cNeg10) // ((2 * 4z) + (5 - 2)) / -10
   const complex3 = new BinaryNode("*", complex2, power) // [((2 * 4z) + (5 - 2)) / -10] * (y ^ 2)
   const complex4 = new BinaryNode("^", complex2, vY)
-  test("toString and toTex", () => {
-    expect(addition.toString()).toMatch(/2 \+ 5|5 \+ 2/)
-    expect(addition.toTex()).toMatch(/2 \+ 5|5 \+ 2/)
-
-    expect(subtraction.toString()).toBe("5 - 2")
-    expect(subtraction.toTex()).toBe("5 - 2")
-
-    expect(doubleSubtraction.toString()).toBe("5 - (5 - 2)")
-    expect(doubleSubtraction.toTex()).toBe("5 - \\left(5 - 2\\right)")
-
-    expect(multiplication.toString()).toMatch(/2 \* 4z|4z \* 2/)
-    expect(multiplication.toTex()).toMatch(/2 \\cdot 4z|4z \\cdot 2/)
-
-    expect(division.toString()).toBe("(4z / 5)")
-    expect(division.toTex()).toBe("\\dfrac{4z}{5}")
-
-    expect(power.toString()).toBe("y ^ 2")
-    expect(power.toTex()).toBe("{y}^{2}")
-
-    expect(complex.toString()).toMatch(/2 \* 4z \+ 5 - 2|5 - 2 \+ 2 \* 4z/)
-    expect(complex.toTex()).toBe("2 \\cdot 4z + 5 - 2")
-
-    expect(complex2.toString()).toBe("(2 * 4z + 5 - 2 / (-10))")
-    expect(complex2.toTex()).toBe("\\dfrac{2 \\cdot 4z + 5 - 2}{\\left(-10\\right)}")
-
-    expect(complex3.toString()).toBe("(2 * 4z + 5 - 2 / (-10)) * y ^ 2")
-    expect(complex3.toTex()).toBe(
-      "\\left(\\dfrac{2 \\cdot 4z + 5 - 2}{\\left(-10\\right)}\\right) \\cdot {y}^{2}",
-    )
-
-    expect(complex4.toString()).toBe("(2 * 4z + 5 - 2 / (-10)) ^ y")
-    expect(complex4.toTex()).toBe(
-      "{\\left(\\dfrac{2 \\cdot 4z + 5 - 2}{\\left(-10\\right)}\\right)}^{y}",
-    )
-  })
   test("evaluate", () => {
     // Base evaluations
     expect(addition.evaluate()).toBe(7)
@@ -300,45 +246,44 @@ describe("BinaryNode (Base)", () => {
     expect((unresolved as VariableNode).multiplier).toBe(8)
 
     const evaluateNode2: BinaryNode = complex3.evaluate({ z: 2 }) as BinaryNode
-    expect(evaluateNode2.toString()).toBe("(-19/10) * y ^ 2")
+    expect(evaluateNode2.toTex()).toBe("-\\dfrac{19}{10} \\cdot y^{2}")
 
     const evaluateNode3: BinaryNode = complex4.evaluate({ z: 2 }) as BinaryNode
-    expect(evaluateNode3.toString()).toBe("(-19/10) ^ y")
-    expect(evaluateNode3.toTex()).toBe("{\\left(-\\dfrac{19}{10}\\right)}^{y}")
+    expect(evaluateNode3.toTex()).toBe("\\left(-\\dfrac{19}{10}\\right)^{y}")
 
-    expect(
-      (new BinaryNode("+", vY, new BinaryNode("+", vY, vY)).evaluate() as ExprNode).toString(),
-    ).toBe("3y")
+    expect((new BinaryNode("+", vY, new BinaryNode("+", vY, vY)).evaluate() as ExprNode).toTex()).toBe(
+      "3y",
+    )
   })
   test("simplify", () => {
     // Constant folding
-    expect(new BinaryNode("+", c2, c5).simplify().toString()).toBe("7")
-    expect(new BinaryNode("*", c2, c5).simplify().toString()).toBe("10")
-    expect(new BinaryNode("-", c5, c2).simplify().toString()).toBe("3")
-    expect(new BinaryNode("/", c5, c2).simplify().toString()).toBe("5/2")
+    expect(new BinaryNode("+", c2, c5).simplify().toTex()).toBe("7")
+    expect(new BinaryNode("*", c2, c5).simplify().toTex()).toBe("10")
+    expect(new BinaryNode("-", c5, c2).simplify().toTex()).toBe("3")
+    expect(new BinaryNode("/", c5, c2).simplify().toTex()).toBe("\\dfrac{5}{2}")
 
     // Neutral elements
-    expect(new BinaryNode("+", vY, c0).simplify().toString()).toBe("y")
-    expect(new BinaryNode("+", c0, vY).simplify().toString()).toBe("y")
+    expect(new BinaryNode("+", vY, c0).simplify().toTex()).toBe("y")
+    expect(new BinaryNode("+", c0, vY).simplify().toTex()).toBe("y")
 
-    expect(new BinaryNode("*", vY, c1).simplify().toString()).toBe("y")
-    expect(new BinaryNode("*", c1, vY).simplify().toString()).toBe("y")
+    expect(new BinaryNode("*", vY, c1).simplify().toTex()).toBe("y")
+    expect(new BinaryNode("*", c1, vY).simplify().toTex()).toBe("y")
 
     // Zero multiplication
-    expect(new BinaryNode("*", vY, c0).simplify().toString()).toBe("0")
-    expect(new BinaryNode("*", c0, vY).simplify().toString()).toBe("0")
+    expect(new BinaryNode("*", vY, c0).simplify().toTex()).toBe("0")
+    expect(new BinaryNode("*", c0, vY).simplify().toTex()).toBe("0")
 
     // Subtraction by zero
-    expect(new BinaryNode("-", vY, c0).simplify().toString()).toBe("y")
+    expect(new BinaryNode("-", vY, c0).simplify().toTex()).toBe("y")
 
     // Exponent rules
-    expect(new BinaryNode("^", vY, c1).simplify().toString()).toBe("y")
-    expect(new BinaryNode("^", vY, c0).simplify().toString()).toBe("1")
-    expect(new BinaryNode("^", c5, c2).simplify().toString()).toBe("25")
+    expect(new BinaryNode("^", vY, c1).simplify().toTex()).toBe("y")
+    expect(new BinaryNode("^", vY, c0).simplify().toTex()).toBe("1")
+    expect(new BinaryNode("^", c5, c2).simplify().toTex()).toBe("25")
 
     // Complex: distributive constant folding
     const expr = new BinaryNode("+", new BinaryNode("*", c2, vY), new BinaryNode("-", c5, c2))
-    expect(expr.simplify().toString()).toMatch(/2y \+ 3|3 \+ 2y/)
+    expect(expr.simplify().toTex()).toMatch(/2y \+ 3|3 \+ 2y/)
   })
   test("variable including", () => {
     const c2 = new ConstantNode(2)
@@ -355,7 +300,7 @@ describe("BinaryNode (Base)", () => {
     const cloned = expr.clone() as BinaryNode
 
     // Structural equality
-    expect(cloned.toString()).toBe(expr.toString())
+    expect(cloned.toTex()).toBe(expr.toTex())
 
     // Different references
     expect(cloned).not.toBe(expr)
@@ -366,8 +311,8 @@ describe("BinaryNode (Base)", () => {
     ;(cloned.left as BinaryNode).left = new ConstantNode(99)
 
     // Original remains unchanged
-    expect(expr.toString()).toBe("(y + 3) * 2")
-    expect(cloned.toString()).toBe("(99 + 3) * 2")
+    expect(expr.toTex()).toBe("\\left(y + 3\\right) \\cdot 2")
+    expect(cloned.toTex()).toBe("\\left(99 + 3\\right) \\cdot 2")
   })
   test("substitute", () => {
     const vX = new VariableNode("x")
@@ -376,45 +321,13 @@ describe("BinaryNode (Base)", () => {
 
     // Substitute x → 10
     const sub1 = expr.substitute({ x: new ConstantNode(10) })
-    expect(sub1.toString()).toBe("10 + y * 3")
+    expect(sub1.toTex()).toBe("10 + y \\cdot 3")
 
     // Substitute y → (x + 1)
     const sub2 = expr.substitute({
       y: new BinaryNode("+", vX.clone(), new ConstantNode(1)),
     })
-    expect(sub2.toString()).toBe("x + (x + 1) * 3")
-  })
-  test("canonical", () => {
-    const a = new VariableNode("a")
-    const b = new VariableNode("b")
-
-    // Commutative
-    const add1 = new BinaryNode("+", a, b)
-    const add2 = new BinaryNode("+", b, a)
-    expect(add1.toCanonicalKey()).toBe(add2.toCanonicalKey())
-
-    const mul1 = new BinaryNode("*", a, b)
-    const mul2 = new BinaryNode("*", b, a)
-    expect(mul1.toCanonicalKey()).toBe(mul2.toCanonicalKey())
-
-    // Non-commutative
-    const sub1 = new BinaryNode("-", a, b)
-    const sub2 = new BinaryNode("-", b, a)
-    expect(sub1.toCanonicalKey()).not.toBe(sub2.toCanonicalKey())
-
-    const div1 = new BinaryNode("/", a, b)
-    const div2 = new BinaryNode("/", b, a)
-    expect(div1.toCanonicalKey()).not.toBe(div2.toCanonicalKey())
-
-    const pow1 = new BinaryNode("^", a, b)
-    const pow2 = new BinaryNode("^", b, a)
-    expect(pow1.toCanonicalKey()).not.toBe(pow2.toCanonicalKey())
-
-    // Nested commutativity
-    const nested1 = new BinaryNode("+", new BinaryNode("*", a, b), new ConstantNode(3))
-    const nested2 = new BinaryNode("+", new ConstantNode(3), new BinaryNode("*", b, a))
-
-    expect(nested1.toCanonicalKey()).toBe(nested2.toCanonicalKey())
+    expect(sub2.toTex()).toBe("x + \\left(x + 1\\right) \\cdot 3")
   })
 })
 
@@ -425,15 +338,11 @@ test("Basic arithmetic addition", () => {
 
   const addition = new BinaryNode("+", const4, constNeg2)
   expect(addition.evaluate()).toBe(2)
-  expect(addition.toString()).toEqual("4 - 2")
+  expect(addition.toTex()).toEqual("4 + \\left(-2\\right)")
 
   const additionWithVariable = new BinaryNode("+", variableX, const4)
-  expect((additionWithVariable.evaluate() as ExprNode).toString()).toMatch(/x \+ 4|4 \+ x/)
+  expect((additionWithVariable.evaluate() as ExprNode).toTex()).toMatch(/x \+ 4|4 \+ x/)
   expect(additionWithVariable.evaluate({ x: 6 })).toEqual(10)
-})
-
-describe("Correct parenthesization in toString and toTex", () => {  
-  
 })
 
 describe("expressionsEqual", () => {
@@ -747,9 +656,7 @@ describe("expressionsEqual", () => {
     expect(expressionsEqual(e1, e2, r).equal).toBeTruthy()
   })
 
-  test("Expressions Equal - float as base", () => {
-
-  })
+  test("Expressions Equal - float as base", () => {})
 
   test("Expressions Equal - detects inequality", () => {
     const expr1 = new BinaryNode(
@@ -780,6 +687,6 @@ describe("Parser for ArithmeticExpression", () => {
     const pasrsedExpr = parseArithmeticExpression(exprStr)
     const variables = pasrsedExpr.getVariables()
     expect(variables).toEqual(new Set(["x"]))
-    expect(pasrsedExpr.simplify().toString()).toBe("10 + x")
+    expect(pasrsedExpr.simplify().toTex()).toBe("10 + x")
   })
 })

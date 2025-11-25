@@ -1,10 +1,10 @@
 import {
   BinaryNode,
   ConstantNode,
-  type ExprNode,
   FunctionNode,
   UnaryNode,
   VariableNode,
+  type ExprNode,
   type ParseOptions,
 } from "@shared/utils/math/ArithmeticExpression.ts"
 

@@ -153,8 +153,8 @@ function buildAssignments(
   return assignments
 }
 
-function isReadableExpression(expr: ExprNode, maxLength = 80): boolean {
-  return expr.toString().length <= maxLength
+function isReadableExpression(expr: ExprNode, maxLength = 90): boolean {
+  return expr.toTex().length <= maxLength
 }
 
 function areAssignmentsReadable(assignments: Record<string, ExprNode>, maxLength = 60): boolean {

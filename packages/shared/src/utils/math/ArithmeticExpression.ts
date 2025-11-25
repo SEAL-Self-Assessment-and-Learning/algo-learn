@@ -26,7 +26,6 @@ export interface ParseOptions {
 export interface FunctionDefinition {
   evaluate: (...args: number[]) => number
   toTex?: (args: string[]) => string
-  toString?: (args: string[]) => string
   arity?: number
 }
 
@@ -54,7 +53,7 @@ const operatorTex = (operator: ArithmeticOperator) => {
   }
 }
 
-const NUMERIC_EPSILON = 1e-8
+const NUMERIC_EPSILON = 1e-7
 const MAX_APPROXIMATE_DENOMINATOR = 1000
 
 const radToDeg = (x: number) => (x * Math.PI) / 180
@@ -142,7 +141,7 @@ export function isApproximatelyZero(value: number): boolean {
  * @param value
  * @param precision
  */
-function normalizeNumeric(value: number, precision = 4): number {
+export function normalizeNumeric(value: number, precision = 8): number {
   if (Number.isNaN(value)) return value
   if (!Number.isFinite(value)) return value
   if (isApproximatelyZero(value)) return 0
@@ -239,7 +238,7 @@ function normalizeFraction(numerator: number, denominator: number): Fraction {
   }
 }
 
-function fractionFromDecimal(value: number, precision = 4): Fraction {
+function fractionFromDecimal(value: number, precision = 8): Fraction {
   const sign = value < 0 ? -1 : 1
   const absolute = Math.abs(value)
   const str = absolute.toString()
@@ -289,7 +288,7 @@ function approximateFraction(value: number, maxDenominator: number, tolerance: n
   return bestFraction
 }
 
-function fractionToString(fraction: Fraction, asTex: boolean): string {
+function fractionToString(fraction: Fraction): string {
   const { numerator, denominator } = fraction
   if (denominator === 1) {
     return numerator.toString()
@@ -299,19 +298,7 @@ function fractionToString(fraction: Fraction, asTex: boolean): string {
   }
   const sign = numerator < 0 ? "-" : ""
   const absoluteNumerator = Math.abs(numerator)
-  if (asTex) {
-    return `${sign}\\dfrac{${absoluteNumerator}}{${denominator}}`
-  }
-  return `${sign}${absoluteNumerator}/${denominator}`
-}
-
-/**
- * Format number as string after normalization
- * @param value
- * @param precision
- */
-function formatNumber(value: number, precision = 4): string {
-  return formatNumberInternal(value, precision, false)
+  return `${sign}\\dfrac{${absoluteNumerator}}{${denominator}}`
 }
 
 /**
@@ -319,8 +306,8 @@ function formatNumber(value: number, precision = 4): string {
  * @param value
  * @param precision
  */
-function formatNumberToTex(value: number, precision = 4): string {
-  return formatNumberInternal(value, precision, true)
+function formatNumberToTex(value: number, precision = 8): string {
+  return formatNumberInternal(value, precision)
 }
 
 /**
@@ -334,7 +321,7 @@ function formatNumberToTex(value: number, precision = 4): string {
  * @param precision
  * @param asTex
  */
-function formatNumberInternal(value: number, precision = 4, asTex = false): string {
+function formatNumberInternal(value: number, precision = 8): string {
   const normalized = normalizeNumeric(value, precision)
   if (Number.isNaN(normalized)) {
     return "NaN"
@@ -358,14 +345,7 @@ function formatNumberInternal(value: number, precision = 4, asTex = false): stri
       ? approximated
       : fractionFromDecimal(normalized, precision)
 
-  return fractionToString(fraction, asTex)
-}
-
-function ensureWrapped(str: string): string {
-  if (str.length >= 2 && str.startsWith("(") && str.endsWith(")")) {
-    return str
-  }
-  return `(${str})`
+  return fractionToString(fraction)
 }
 
 function ensureTexWrapped(str: string): string {
@@ -374,7 +354,6 @@ function ensureTexWrapped(str: string): string {
   }
   return `\\left(${str}\\right)`
 }
-
 
 /**
  * Converts the result of an evaluation into an ExprNode
@@ -401,13 +380,10 @@ export function expectNumeric(result: EvaluationResult, context: string): number
 
 /**
  * Expression Node Base Class
+ *
+ * Does not provide toString method, use toTex instead
  */
 export abstract class ExprNode {
-  /**
-   * Convert expression to string
-   */
-  abstract toString(precision?: number): string
-
   /**
    * Convert expression to LaTeX string
    */
@@ -442,11 +418,6 @@ export abstract class ExprNode {
    * @param assignments
    */
   abstract substitute(assignments: Record<string, ExprNode>): ExprNode
-
-  /**
-   * Generate a canonical key for the expression
-   */
-  abstract toCanonicalKey(): string
 }
 
 /**
@@ -460,17 +431,7 @@ export class ConstantNode extends ExprNode {
     this.value = normalizeNumeric(value)
   }
 
-  toString(precision = 4) {
-    if (this.value < 0) {
-      return `(${formatNumber(this.value, precision)})`
-    }
-    return formatNumber(this.value, precision)
-  }
-
-  toTex(precision = 4) {
-    if (this.value < 0) {
-      return `\\left(${formatNumberToTex(this.value, precision)}\\right)`
-    }
+  toTex(precision = 8) {
     return formatNumberToTex(this.value, precision)
   }
 
@@ -504,10 +465,6 @@ export class ConstantNode extends ExprNode {
   substitute(): ExprNode {
     return this.clone()
   }
-
-  toCanonicalKey(): string {
-    return `C:${formatNumber(this.value)}`
-  }
 }
 
 /**
@@ -527,28 +484,15 @@ export class VariableNode extends ExprNode {
     this.multiplier = multiplier
   }
 
-  toString() {
-    if (approximatelyEqual(this.multiplier, 1)) {
-      return this.name
-    }
-    if (approximatelyEqual(this.multiplier, -1)) {
-      return `(-${this.name})`
-    }
-    if (this.multiplier < 0) {
-      return `(${formatNumber(this.multiplier)}${this.name})`
-    }
-    return `${formatNumber(this.multiplier)}${this.name}`
-  }
-
   toTex() {
     if (approximatelyEqual(this.multiplier, 1)) {
       return this.name
     }
     if (approximatelyEqual(this.multiplier, -1)) {
-      return `\\left(-${this.name}\\right)`
+      return `-${this.name}`
     }
     if (this.multiplier < 0) {
-      return `\\left(${formatNumberToTex(this.multiplier)}${this.name}\\right)`
+      return `${formatNumberToTex(this.multiplier)}${this.name}`
     }
     return `${formatNumberToTex(this.multiplier)}${this.name}`
   }
@@ -573,11 +517,7 @@ export class VariableNode extends ExprNode {
     if (isApproximatelyZero(this.multiplier)) {
       return new ConstantNode(0)
     }
-    const normalized = normalizeNumeric(this.multiplier)
-    if (approximatelyEqual(normalized, this.multiplier)) {
-      return this
-    }
-    return new VariableNode(this.name, normalized)
+    return new VariableNode(this.name, normalizeNumeric(this.multiplier))
   }
 
   getVariables(): Set<string> {
@@ -607,10 +547,6 @@ export class VariableNode extends ExprNode {
 
     return new BinaryNode("*", new ConstantNode(multiplier), clonedReplacement).simplify()
   }
-
-  toCanonicalKey(): string {
-    return `V:${this.name}:${formatNumber(normalizeNumeric(this.multiplier))}`
-  }
 }
 
 /**
@@ -629,42 +565,41 @@ export class UnaryNode extends ExprNode {
     super()
   }
 
-  toString() {
-    if (this.child instanceof ConstantNode || this.child instanceof VariableNode) {
-      const childStr = this.child.toString()
-      if (childStr.length >= 2 && childStr.startsWith("(") && childStr.endsWith(")")) {
-        return `-${childStr}`
-      }
-      if (childStr.startsWith("-")) {
-        return `-(${childStr})`
-      }
-      return `(-${childStr})`
-    }
-
-    const childStr = this.child.toString()
-    if (childStr.length >= 2 && childStr.startsWith("(") && childStr.endsWith(")")) {
-      return `-${childStr}`
-    }
-    return `-(${childStr})`
-  }
-
   toTex() {
-    if (this.child instanceof ConstantNode || this.child instanceof VariableNode) {
-      const childTex = this.child.toTex()
-      if (childTex.startsWith("\\left(") && childTex.endsWith("\\right)")) {
-        return `-${childTex}`
-      }
-      if (childTex.startsWith("-")) {
-        return `-\\left(${childTex}\\right)`
-      }
-      return `\\left(-${childTex}\\right)`
-    }
-
     const childTex = this.child.toTex()
+    const requiresGrouping = this.childRequiresGrouping(childTex)
+    if (!requiresGrouping) {
+      return `-${childTex}`
+    }
     if (childTex.startsWith("\\left(") && childTex.endsWith("\\right)")) {
       return `-${childTex}`
     }
     return `-\\left(${childTex}\\right)`
+  }
+
+  private childRequiresGrouping(childTex: string): boolean {
+    if (this.child instanceof BinaryNode) {
+      if (this.child.op === "+" || this.child.op === "-") {
+        return true
+      }
+      if (this.child.op === "*") {
+        return childTex.startsWith("-")
+      }
+      return false
+    }
+    if (this.child instanceof UnaryNode) {
+      return true
+    }
+    if (this.child instanceof ConstantNode) {
+      return this.child.value < 0
+    }
+    if (this.child instanceof VariableNode) {
+      return this.child.multiplier < 0
+    }
+    if (childTex.startsWith("-")) {
+      return true
+    }
+    return false
   }
 
   evaluate(assign?: Record<string, number>, mod?: number): EvaluationResult {
@@ -711,10 +646,6 @@ export class UnaryNode extends ExprNode {
   substitute(assignments: Record<string, ExprNode>): ExprNode {
     return new UnaryNode(this.op, this.child.substitute(assignments))
   }
-
-  toCanonicalKey(): string {
-    return `U:${this.op}:${this.child.toCanonicalKey()}`
-  }
 }
 
 /**
@@ -735,103 +666,31 @@ export class BinaryNode extends ExprNode {
     super()
   }
 
-  toString() {
-    if (this.op === "/") {
-      return `(${this.left.toString()} / ${this.right.toString()})`
-    }
-    if (this.op === "^") {
-      const baseNeedsParens =
-        !(this.left instanceof ConstantNode && this.left.value >= 0) &&
-        !(this.left instanceof VariableNode && this.left.multiplier >= 0)
-      const baseRaw = this.left.toString()
-      const baseStr = baseNeedsParens ? ensureWrapped(baseRaw) : baseRaw
-      const expStr = this.formatChildForString(this.right, false)
-      return `${baseStr} ^ ${expStr}`
-    }
-    const formattedLeft = this.formatChildForString(this.left, true)
-    if (this.op === "+") {
-      const signInfo = extractSignAndMagnitude(this.right)
-      if (signInfo.sign === -1) {
-        const formattedRight = this.formatChildForString(signInfo.magnitude, false)
-        return `${formattedLeft} - ${formattedRight}`
-      }
-    }
-    if (this.op === "-") {
-      const signInfo = extractSignAndMagnitude(this.right)
-      if (signInfo.sign === -1) {
-        const formattedRight = this.formatChildForString(signInfo.magnitude, false)
-        return `${formattedLeft} + ${formattedRight}`
-      }
-    }
-    const formattedRight = this.formatChildForString(this.right, false)
-    return `${formattedLeft} ${this.op} ${formattedRight}`
-  }
-
-  private formatChildForString(child: ExprNode, isLeft: boolean): string {
-    if (
-      child instanceof ConstantNode ||
-      child instanceof VariableNode ||
-      child instanceof FunctionNode
-    ) {
-      return child.toString()
-    }
-    if (child instanceof UnaryNode) {
-      return child.toString()
-    }
-
-    if (child instanceof BinaryNode) {
-      if (this.needsParens(child, isLeft)) {
-        return ensureWrapped(child.toString())
-      }
-      return child.toString()
-    }
-    return child.toString()
-  }
-
   toTex() {
     if (this.op === "/") {
       return `\\dfrac{${this.left.toTex()}}{${this.right.toTex()}}`
     }
     if (this.op === "^") {
-      const baseNeedsParens =
-        !(this.left instanceof ConstantNode && this.left.value >= 0) &&
-        !(this.left instanceof VariableNode && this.left.multiplier >= 0)
-      const baseRaw = this.left.toTex()
-      const base = baseNeedsParens ? ensureTexWrapped(baseRaw) : baseRaw
-      return `{${base}}^{${this.right.toTex()}}`
+      const base = this.formatPowerBase(this.left)
+      const exponent = this.formatPowerExponent(this.right)
+      return `${base}^{${exponent}}`
     }
     if (this.op === "+") {
-      const signInfo = extractSignAndMagnitude(this.right)
-      if (signInfo.sign === -1) {
-        const magnitude = signInfo.magnitude
-        const formattedLeft = this.needsParens(this.left, true)
-          ? ensureTexWrapped(this.left.toTex())
-          : this.left.toTex()
-        const formattedRight = this.needsParens(magnitude, false)
-          ? ensureTexWrapped(magnitude.toTex())
-          : magnitude.toTex()
-        return `${formattedLeft} - ${formattedRight}`
-      }
+      const L = this.formatAdditiveChild(this.left, true)
+      const R = this.formatAdditiveChild(this.right, false)
+      return `${L} + ${R}`
     }
     if (this.op === "-") {
-      const signInfo = extractSignAndMagnitude(this.right)
-      if (signInfo.sign === -1) {
-        const magnitude = signInfo.magnitude
-        const formattedLeft = this.needsParens(this.left, true)
-          ? ensureTexWrapped(this.left.toTex())
-          : this.left.toTex()
-        const formattedRight = this.needsParens(magnitude, false)
-          ? ensureTexWrapped(magnitude.toTex())
-          : magnitude.toTex()
-        return `${formattedLeft} + ${formattedRight}`
-      }
+      const L = this.formatAdditiveChild(this.left, true)
+      const R = this.formatAdditiveChild(this.right, false)
+      return `${L} - ${R}`
+    }
+    if (this.op === "*") {
+      return this.formatProductTex()
     }
 
-    const needsParensLeft = this.needsParens(this.left, true)
-    const needsParensRight = this.needsParens(this.right, false)
-
-    const L = needsParensLeft ? ensureTexWrapped(this.left.toTex()) : this.left.toTex()
-    const R = needsParensRight ? ensureTexWrapped(this.right.toTex()) : this.right.toTex()
+    const L = this.formatMultiplicativeChild(this.left, true)
+    const R = this.formatMultiplicativeChild(this.right, false)
 
     return `${L} ${operatorTex(this.op)} ${R}`
   }
@@ -852,6 +711,220 @@ export class BinaryNode extends ExprNode {
     if (!isLeft && !this.isAssociative()) return true
 
     return false
+  }
+
+  private formatAdditiveChild(child: ExprNode, isLeft: boolean): string {
+    if (child instanceof BinaryNode && child.op === "*") {
+      const wrapLeadingNegative = this.shouldWrapMultiplicationLeadingFactor(child, isLeft)
+      if (wrapLeadingNegative) {
+        return child.formatProductTex(true)
+      }
+    }
+    const tex = child.toTex()
+    if (this.op === "+" && child instanceof BinaryNode && child.op === "-") {
+      const firstSeparator = tex.indexOf(" - ")
+      if (firstSeparator > 0) {
+        const first = tex.slice(0, firstSeparator)
+        if (!first.startsWith("\\left(") && first.trim().startsWith("-")) {
+          const wrappedFirst = ensureTexWrapped(first)
+          return `${wrappedFirst}${tex.slice(firstSeparator)}`
+        }
+      }
+    }
+    if (child instanceof BinaryNode && this.needsParens(child, isLeft)) {
+      return ensureTexWrapped(tex)
+    }
+    if (this.op === "+" && this.isNegativeLiteral(child)) {
+      const wrapLeftConstant = isLeft && child instanceof ConstantNode
+      if (!isLeft || wrapLeftConstant) {
+        return ensureTexWrapped(tex)
+      }
+    }
+    if (this.op === "-" && !isLeft && this.isNegativeLiteral(child)) {
+      return ensureTexWrapped(tex)
+    }
+    return tex
+  }
+
+  private formatMultiplicativeChild(child: ExprNode, isLeft: boolean): string {
+    const tex = child.toTex()
+    if (child instanceof BinaryNode && child.op === "/") {
+      return tex
+    }
+    if (child instanceof BinaryNode && this.needsParens(child, isLeft)) {
+      return ensureTexWrapped(tex)
+    }
+    if (!isLeft && this.isNegativeLiteral(child)) {
+      return ensureTexWrapped(tex)
+    }
+    return tex
+  }
+
+  private formatPowerBase(child: ExprNode): string {
+    const tex = child.toTex()
+    if (child instanceof ConstantNode && child.value >= 0) {
+      return tex
+    }
+    if (child instanceof VariableNode && child.multiplier >= 0) {
+      return tex
+    }
+    if (child instanceof FunctionNode) {
+      return tex
+    }
+    if (child instanceof BinaryNode && child.op === "/") {
+      return tex
+    }
+    return ensureTexWrapped(tex)
+  }
+
+  private formatPowerExponent(child: ExprNode): string {
+    return child.toTex()
+  }
+
+  private isNegativeLiteral(node: ExprNode): boolean {
+    if (node instanceof ConstantNode) {
+      return node.value < 0
+    }
+    if (node instanceof VariableNode) {
+      return node.multiplier < 0
+    }
+    return node instanceof UnaryNode && node.op === "-"
+  }
+
+  private isNumericLiteral(node: ExprNode): boolean {
+    if (node instanceof ConstantNode) {
+      return true
+    }
+    if (node instanceof VariableNode) {
+      return /^\d+$/.test(node.name)
+    }
+    if (node instanceof UnaryNode && node.op === "-") {
+      return this.isNumericLiteral(node.child)
+    }
+    return false
+  }
+
+  private isSimpleSymbol(node: ExprNode): boolean {
+    if (node instanceof VariableNode) {
+      return /^[a-zA-Z]+$/.test(node.name) && approximatelyEqual(node.multiplier, 1)
+    }
+    return false
+  }
+
+  private formatProductTex(forceWrapFirstNegative = false): string {
+    const factors: ExprNode[] = []
+    this.collectMultiplicativeFactors(this, factors)
+    if (factors.length === 0) {
+      return "1"
+    }
+
+    const pieces: string[] = []
+    for (let i = 0; i < factors.length; i++) {
+      const current = factors[i]
+      const next = factors[i + 1]
+
+      if (next && !(forceWrapFirstNegative && i === 0)) {
+        const concatenated = this.tryConcatenateNumericWithSymbol(current, next)
+        if (concatenated) {
+          pieces.push(concatenated)
+          i += 1
+          continue
+        }
+      }
+
+      let formatted = this.formatMultiplicativeFactor(current, pieces.length === 0)
+      if (forceWrapFirstNegative && i === 0 && this.factorLooksNegative(current, formatted)) {
+        formatted = ensureTexWrapped(formatted)
+      }
+      pieces.push(formatted)
+    }
+
+    return pieces.join(" \\cdot ")
+  }
+
+  private collectMultiplicativeFactors(node: ExprNode, result: ExprNode[]): void {
+    if (node instanceof BinaryNode && node.op === "*") {
+      this.collectMultiplicativeFactors(node.left, result)
+      this.collectMultiplicativeFactors(node.right, result)
+      return
+    }
+    result.push(node)
+  }
+
+  private formatMultiplicativeFactor(child: ExprNode, isFirst: boolean): string {
+    return this.formatMultiplicativeChild(child, isFirst)
+  }
+
+  private tryConcatenateNumericWithSymbol(
+    numericCandidate: ExprNode,
+    symbolCandidate: ExprNode,
+  ): string | null {
+    if (!this.isNumericLiteral(numericCandidate)) {
+      return null
+    }
+    if (!this.isSimpleSymbol(symbolCandidate)) {
+      return null
+    }
+
+    const numericTex = this.renderNumericLiteralTex(numericCandidate)
+    const symbolTex = (symbolCandidate as VariableNode).toTex()
+
+    if (numericTex === "1") {
+      return symbolTex
+    }
+    if (numericTex === "-1") {
+      return null
+    }
+    return `${numericTex}${symbolTex}`
+  }
+
+  private factorLooksNegative(node: ExprNode, rendered: string): boolean {
+    if (this.isNegativeLiteral(node)) {
+      return true
+    }
+    return rendered.startsWith("-")
+  }
+
+  private shouldWrapMultiplicationLeadingFactor(child: BinaryNode, isLeft: boolean): boolean {
+    if (child.op !== "*") {
+      return false
+    }
+    if (!child.multiplicationStartsWithNegativeFactor()) {
+      return false
+    }
+    if (this.op === "+" && !isLeft) {
+      return true
+    }
+    if (this.op === "-" && !isLeft) {
+      return true
+    }
+    return false
+  }
+
+  private multiplicationStartsWithNegativeFactor(): boolean {
+    if (this.op !== "*") {
+      return false
+    }
+    const factors: ExprNode[] = []
+    this.collectMultiplicativeFactors(this, factors)
+    if (factors.length === 0) {
+      return false
+    }
+    return this.isNegativeLiteral(factors[0])
+  }
+
+  private renderNumericLiteralTex(node: ExprNode): string {
+    if (node instanceof ConstantNode) {
+      return node.toTex()
+    }
+    if (node instanceof VariableNode) {
+      return node.toTex()
+    }
+    if (node instanceof UnaryNode && node.op === "-") {
+      const inner = this.renderNumericLiteralTex(node.child)
+      return `-${inner}`
+    }
+    return node.toTex()
   }
 
   private getPrecedence(op: ArithmeticOperator): number {
@@ -954,16 +1027,6 @@ export class BinaryNode extends ExprNode {
   substitute(assignments: Record<string, ExprNode>): ExprNode {
     return new BinaryNode(this.op, this.left.substitute(assignments), this.right.substitute(assignments))
   }
-
-  toCanonicalKey(): string {
-    const leftKey = this.left.toCanonicalKey()
-    const rightKey = this.right.toCanonicalKey()
-    if (this.op === "+" || this.op === "*") {
-      const ordered = [leftKey, rightKey].sort()
-      return `B:${this.op}:${ordered[0]}:${ordered[1]}`
-    }
-    return `B:${this.op}:${leftKey}:${rightKey}`
-  }
 }
 
 /**
@@ -982,15 +1045,6 @@ export class FunctionNode extends ExprNode {
         `Function '${name}' expects ${definition.arity} arguments but received ${args.length}`,
       )
     }
-  }
-
-  toString(): string {
-    const definition = getFunctionDefinition(this.name)
-    const renderedArgs = this.args.map((arg) => arg.toString())
-    if (definition.toString) {
-      return definition.toString(renderedArgs)
-    }
-    return `${this.name}(${renderedArgs.join(", ")})`
   }
 
   toTex(): string {
@@ -1055,11 +1109,6 @@ export class FunctionNode extends ExprNode {
       this.args.map((arg) => arg.substitute(assignments)),
     )
   }
-
-  toCanonicalKey(): string {
-    const argsKey = this.args.map((arg) => arg.toCanonicalKey()).join(",")
-    return `F:${this.name}:${argsKey}`
-  }
 }
 
 /**
@@ -1084,7 +1133,6 @@ function gatherAdditionTerms(node: ExprNode, sign: 1 | -1, terms: SignedTerm[]):
   }
   terms.push({ node, sign })
 }
-
 
 /**
  * Extract linear term from expression node
@@ -1154,7 +1202,14 @@ function buildProductFromFactors(factors: ExprNode[]): ExprNode {
     return new ConstantNode(1)
   }
   const orderedFactors = factors.map((factor) => factor.clone())
-  orderedFactors.sort((a, b) => a.toCanonicalKey().localeCompare(b.toCanonicalKey()))
+  orderedFactors.sort((a, b) => {
+    const ka = a.toTex()
+    const kb = b.toTex()
+    const cmp = ka.localeCompare(kb)
+    if (cmp !== 0) return cmp
+    // tie-breaker: constructor name ensures deterministic ordering for same TeX
+    return a.constructor.name.localeCompare(b.constructor.name)
+  })
 
   let result = orderedFactors[0]
   for (let i = 1; i < orderedFactors.length; i++) {
@@ -1238,7 +1293,7 @@ function combineAdditionTerms(terms: SignedTerm[]): ExprNode {
     if (base === null) {
       constantSum += signedCoefficient
     } else {
-      const key = base.toCanonicalKey()
+      const key = base.toTex()
       const bucket = buckets.get(key)
       if (bucket) {
         bucket.coefficient = normalizeNumeric(bucket.coefficient + signedCoefficient)
@@ -1257,7 +1312,14 @@ function combineAdditionTerms(terms: SignedTerm[]): ExprNode {
   const entries = Array.from(buckets.values())
     .map(({ base, coefficient }) => ({ base, coefficient: normalizeNumeric(coefficient) }))
     .filter(({ coefficient }) => !isApproximatelyZero(coefficient))
-    .sort((a, b) => a.base.toCanonicalKey().localeCompare(b.base.toCanonicalKey()))
+    .sort((a, b) => {
+      const ka = a.base.toTex()
+      const kb = b.base.toTex()
+      const cmp = ka.localeCompare(kb)
+      if (cmp !== 0) return cmp
+      // tie-breaker: constructor name ensures deterministic ordering for same TeX
+      return a.constructor.name.localeCompare(b.constructor.name)
+    })
 
   for (const { base, coefficient } of entries) {
     resultTerms.push(applyCoefficientToBase(base, coefficient))
@@ -1354,10 +1416,6 @@ function simplifyDivision(left: ExprNode, right: ExprNode): ExprNode {
     return new ConstantNode(0)
   }
 
-  if (left.toCanonicalKey() === right.toCanonicalKey()) {
-    return new ConstantNode(1)
-  }
-
   if (right instanceof ConstantNode && approximatelyEqual(right.value, 1)) {
     return left
   }
@@ -1410,4 +1468,3 @@ export function evaluateExpression(
   }
   return substituted.simplify()
 }
-
