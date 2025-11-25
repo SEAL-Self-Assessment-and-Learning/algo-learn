@@ -113,7 +113,7 @@ export function deserializePath({
     }
   | undefined {
   let parts = path.split("/")
-
+  parts = parts.filter((part) => part !== "")
   if (expectLang === undefined) {
     expectLang = parts[0] === "de" || parts[0] === "en"
   }
