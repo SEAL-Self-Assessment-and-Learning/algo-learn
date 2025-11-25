@@ -6,7 +6,7 @@ import {
   VariableNode,
   type ExprNode,
   type ParseOptions,
-} from "@shared/utils/math/ArithmeticExpression.ts"
+} from "@shared/utils/math/arithmeticExpression.ts"
 
 /**
  * Types of tokens in the arithmetic expression

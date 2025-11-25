@@ -6,9 +6,9 @@ import type {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { evaluateExpression, type ExprNode } from "@shared/utils/math/ArithmeticExpression.ts"
+import { evaluateExpression, type ExprNode } from "@shared/utils/math/arithmeticExpression.ts"
 import { expressionsEqual } from "@shared/utils/math/comparingExpressions.ts"
-import { parseArithmeticExpression } from "@shared/utils/math/ParseArithmeticExpression.ts"
+import { parseArithmeticExpression } from "@shared/utils/math/parseArithmeticExpression.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 import { generateExpressionScenario, type ExpressionScenario } from "./randomExpression"

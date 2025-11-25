@@ -6,7 +6,7 @@ import {
   isApproximatelyZero,
   UnaryNode,
   VariableNode,
-} from "@shared/utils/math/ArithmeticExpression.ts"
+} from "@shared/utils/math/arithmeticExpression.ts"
 
 /**
  * Tests to ensure that parentheses are correctly added in toTex method

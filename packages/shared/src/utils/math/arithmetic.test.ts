@@ -8,9 +8,9 @@ import {
   UnaryNode,
   VariableNode,
   type ExprNode,
-} from "@shared/utils/math/ArithmeticExpression.ts"
+} from "@shared/utils/math/arithmeticExpression.ts"
 import { expressionsEqual } from "@shared/utils/math/comparingExpressions.ts"
-import { parseArithmeticExpression } from "@shared/utils/math/ParseArithmeticExpression.ts"
+import { parseArithmeticExpression } from "@shared/utils/math/parseArithmeticExpression.ts"
 import Random, { sampleRandomSeed } from "@shared/utils/random.ts"
 
 function foldAddition(terms: ExprNode[]): ExprNode {

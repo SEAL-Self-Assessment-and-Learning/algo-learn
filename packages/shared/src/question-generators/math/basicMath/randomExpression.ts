@@ -7,7 +7,7 @@ import {
   VariableNode,
   type ArithmeticOperator,
   type ExprNode,
-} from "../../../utils/math/ArithmeticExpression.ts"
+} from "../../../utils/math/arithmeticExpression.ts"
 
 type AssignmentMode = "numeric" | "numericExpression" | "symbolic"
 

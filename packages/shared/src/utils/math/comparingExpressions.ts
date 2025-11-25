@@ -1,5 +1,5 @@
 import type Random from "@shared/utils/random.ts"
-import { approximatelyEqual, type ExprNode } from "./ArithmeticExpression"
+import { approximatelyEqual, type ExprNode } from "./arithmeticExpression.ts"
 
 const maxIterations = 1000
 
