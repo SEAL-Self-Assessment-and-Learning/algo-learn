@@ -76,7 +76,6 @@
     const activeId = String(active.id)
     const overId = String(over.id)
 
-    // pool item → slot
     // pool ids are the stable item ids; over is slot-<idx>
     if (!activeId.startsWith("slot-") && overId.startsWith("slot-")) {
       const slotIdx = parseInt(overId.replace("slot-", ""))
@@ -103,7 +102,7 @@
       return
     }
 
-    // slot ↔ slot swap
+    // slot to slot swap
     if (activeId.startsWith("slot-") && overId.startsWith("slot-")) {
       const fromIdx = parseInt(activeId.replace("slot-", ""))
       const toIdx = parseInt(overId.replace("slot-", ""))
@@ -222,13 +221,14 @@
           }
         `}
       >
-        <div
-          class="flex cursor-pointer items-center justify-between select-none"
-          on:click={() => (openIndex = openIndex === i ? -1 : i)}
+        <button
+          type="button"
+          class="flex w-full items-center justify-between text-left select-none"
+          onclick={() => (openIndex = openIndex === i ? -1 : i)}
         >
           <Markdown md={pair.fixed} />
           <span class="text-sm text-gray-400">{openIndex === i ? "▴" : "▾"}</span>
-        </div>
+        </button>
 
         {#if slots[i] && openIndex !== i}
           <div
@@ -257,7 +257,7 @@
               <button
                 type="button"
                 class={`w-full rounded-md border p-2 text-left text-sm transition-colors ${btnColor}`}
-                on:click={() => {
+                onclick={() => {
                   handleSelectChange(i, ans.id)
                   openIndex = -1
                 }}
