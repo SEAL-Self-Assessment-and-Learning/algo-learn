@@ -64,12 +64,6 @@
   function onChange(slots: (SlotItem | null)[]) {
     questionState.choice = slots.map((s) => (s ? Number(s.id) : -1))
   }
-
-  function onModeChangeFromChild(newMode: MODE) {
-    if (question.fillOutAll) {
-      questionState.mode = newMode
-    }
-  }
 </script>
 
 <InteractWithQuestion
