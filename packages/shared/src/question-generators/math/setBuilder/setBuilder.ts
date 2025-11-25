@@ -51,7 +51,36 @@ export const SetBuilderQuestion: QuestionGenerator = {
   },
 }
 
-/** helper to add row-by-row correctness into MultipleChoice feedback */
+function buildMismatchTable(
+  lang: Language,
+  fixedItems: string[],
+  shuffledAnswers: string[],
+  userChoice: number[],
+  correctMapping: number[],
+): string {
+  const rows: string[] = []
+
+  for (let i = 0; i < fixedItems.length; i++) {
+    const userIdx = userChoice[i]
+    const correctIdx = correctMapping[i]
+
+    if (userIdx === correctIdx) continue
+
+    const correct = shuffledAnswers[correctIdx]
+
+    rows.push(`| ${fixedItems[i]} | ${correct} |`)
+  }
+
+  if (rows.length === 0) return ""
+
+  return [
+    `| ${t(translations, lang, "expression")} | ${t(translations, lang, "answer")} |`,
+    "|:-----------|:----------------|",
+    ...rows,
+    "",
+  ].join("\n")
+}
+
 function matchingRowFeedback(correctMapping: number[], base: MultipleChoiceFeedbackFunction) {
   return async (answer: MultipleChoiceAnswer): Promise<MultipleChoiceFeedback> => {
     const result = await Promise.resolve(base(answer))
@@ -101,7 +130,6 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
 
   // shuffle correct answers
   let movableShuffled = random.shuffle([...movable])
-  const solution = movable.map((exp) => movableShuffled.indexOf(exp))
 
   // add confounders (0–2 wrong answers)
   const nConfounders = random.int(0, 2)
@@ -124,13 +152,23 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
   }
 
   movableShuffled = [...movableShuffled, ...confounders]
+  const solution = movable.map((exp) => movableShuffled.indexOf(exp))
 
   const baseFeedback = minimalMultipleChoiceFeedback({
     correctAnswerIndex: solution,
     sorting: true,
   })
 
-  const feedback = matchingRowFeedback(solution, baseFeedback)
+  const feedback: MultipleChoiceFeedbackFunction = async (answer) => {
+    const base = await matchingRowFeedback(solution, baseFeedback)(answer)
+
+    const table = buildMismatchTable(lang, fixed, movableShuffled, answer.choice, solution)
+
+    return {
+      ...base,
+      correctAnswer: base.correct ? undefined : table,
+    }
+  }
 
   const question: MultipleChoiceQuestion = {
     type: "MultipleChoiceQuestion",
@@ -148,6 +186,10 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
 
   return { question }
 }
+
+/* -------------------------------------------------------------------------- */
+/*  FREETEXT VARIANT                                                          */
+/* -------------------------------------------------------------------------- */
 
 function generateFreeTextVariant(lang: Language, path: string, random: Random) {
   const template = random.choice(templates)

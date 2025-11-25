@@ -103,16 +103,29 @@
 {#snippet footerMsg()}
   <div class="flex-col">
     {#if questionState.mode === "correct"}
-      <b class="text-2xl">{t("feedback.correct")}</b>
+      {@render correct()}
     {:else if questionState.mode === "incorrect"}
-      <b class="text-2xl">{t("incorrect")}</b>
-
-      {#if questionState.feedbackObject?.feedbackText}
-        <Markdown md={questionState.feedbackObject.feedbackText} />
-        <br />
+      {@render incorrect()}
+      {#if questionState.feedbackObject?.correctAnswer !== undefined}
+        {@render correctAnswer()}
       {/if}
+    {:else if questionState.mode === "invalid"}
+      <b class="text-lg">{t("feedback.fillOutAll")}</b>
     {:else}
-      <b class="text-2xl">{t("incorrect")}</b>
+      <b class="text-lg">{t("feedback.tryAgain")}</b>
     {/if}
   </div>
+{/snippet}
+
+{#snippet correct()}
+  <b class="text-xl">{t("feedback.correct")}</b>
+{/snippet}
+
+{#snippet incorrect()}
+  <b class="text-xl">{t("feedback.incorrect")}</b>
+{/snippet}
+
+{#snippet correctAnswer()}
+  <br />
+  <Markdown md={questionState.feedbackObject?.correctAnswer ?? ""} />
 {/snippet}

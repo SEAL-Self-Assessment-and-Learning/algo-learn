@@ -11,6 +11,8 @@ export const translations: Translations = {
     odd: "odd",
     prime: "prime",
     square: "is a square",
+    expression: "Expression",
+    answer: "Correct Answer",
   },
   de: {
     name: "Mengenschreibweise",
@@ -23,5 +25,7 @@ export const translations: Translations = {
     odd: "ungerade",
     prime: "prim",
     square: "ist eine Quadratzahl",
+    expression: "Ausdruck",
+    answer: "Richtige Antwort",
   },
 }
