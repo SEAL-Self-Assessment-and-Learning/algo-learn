@@ -687,6 +687,6 @@ describe("Parser for ArithmeticExpression", () => {
     const pasrsedExpr = parseArithmeticExpression(exprStr)
     const variables = pasrsedExpr.getVariables()
     expect(variables).toEqual(new Set(["x"]))
-    expect(pasrsedExpr.simplify().toTex()).toBe("10 + x")
+    expect(pasrsedExpr.simplify().toTex()).toBe("x + 10")
   })
 })

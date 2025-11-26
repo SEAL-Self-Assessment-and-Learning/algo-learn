@@ -223,6 +223,13 @@ describe("Correct parenthesization in toString and toTex", () => {
     expect(expr.evaluate(assignments)).toBe(4)
   })
 
+  test("((1)/(2))^2", () => {
+    const fraction = new BinaryNode("/", c1, c2) // 1/2
+    const expr = new BinaryNode("^", fraction, c2)
+    expect(expr.toTex()).toBe("\\left(\\dfrac{1}{2}\\right)^{2}")
+    expect(approximatelyEqual(0.25, expr.evaluate(assignments) as number)).toBeTruthy()
+  })
+
   /**************************************************
    * Mixed
    **************************************************/
@@ -257,7 +264,7 @@ describe("Correct parenthesization in toString and toTex", () => {
     const lower = new BinaryNode("-", lowerLeft, lowerRight) // -18
     const fraction = new BinaryNode("/", upper, lower) // 2/-18 = -1/9
     const expr = new BinaryNode("^", fraction, c2) // (-1/9)^2
-    expect(expr.toTex()).toBe("\\dfrac{-x - \\left(-z\\right)}{x \\cdot y - 2 \\cdot 2x}^{2}")
+    expect(expr.toTex()).toBe("\\left(\\dfrac{-x - \\left(-z\\right)}{xy - 2 \\cdot 2x}\\right)^{2}")
     expect(approximatelyEqual((-1 / 9) ** 2, expr.evaluate(assignments) as number)).toBeTruthy()
   })
 
@@ -278,7 +285,7 @@ describe("Correct parenthesization in toString and toTex", () => {
     const innerFraction = new BinaryNode("/", z, y) // -2.5
     const innerPower = new BinaryNode("^", innerFraction, c2) // 6.25
     const expr = new BinaryNode("/", new UnaryNode("-", c2), innerPower) // -2/6.25
-    expect(expr.toTex()).toBe("\\dfrac{-2}{\\dfrac{z}{y}^{2}}")
+    expect(expr.toTex()).toBe("\\dfrac{-2}{\\left(\\dfrac{z}{y}\\right)^{2}}")
     expect(approximatelyEqual(-2 / 6.25, expr.evaluate(assignments) as number)).toBeTruthy()
   })
 

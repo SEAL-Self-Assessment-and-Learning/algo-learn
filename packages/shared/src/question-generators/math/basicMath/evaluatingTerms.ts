@@ -86,7 +86,6 @@ export const EvaluatingTerms: QuestionGenerator = {
     if (!scenario) {
       throw new Error("Unable to generate a valid exercise for the requested difficulty level.")
     }
-    console.log(scenario.expression)
 
     const assignmentsTex = formatAssignments(scenario.assignments)
     const expressionTex = scenario.expression.toTex()
