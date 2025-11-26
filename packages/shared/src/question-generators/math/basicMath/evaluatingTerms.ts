@@ -158,7 +158,7 @@ function getSymbolicFeedback(
 ): FreeTextFeedbackFunction {
   return ({ text }) => {
     try {
-      const parsed = parseArithmeticExpression(text, { simplify: true }).simplify()
+      const parsed = parseArithmeticExpression(text, { simplify: true })
       const { equal, wrongEvaluations } = expressionsEqual(expected, parsed, random)
       if (equal) {
         return { correct: true }
@@ -174,7 +174,7 @@ function getSymbolicFeedback(
       const correctValue = randomWrong.value1.toString()
       return {
         correct: false,
-        correctAnswer: "$" + expected.toTex() + "$",
+        correctAnswer: "$" + expected.simplify().toTex() + "$",
         feedbackText: t(translations, lang, "feedback", [
           `${Object.entries(assignments).length > 1 ? "s" : ""}`,
           assignments,
