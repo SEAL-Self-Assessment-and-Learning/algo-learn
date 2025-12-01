@@ -51,6 +51,10 @@ export const SetBuilderQuestion: QuestionGenerator = {
   },
 }
 
+/* -------------------------------------------------------------------------- */
+/*  MATCHING VARIANT                                                          */
+/* -------------------------------------------------------------------------- */
+
 function buildMismatchTable(
   lang: Language,
   fixedItems: string[],
@@ -75,7 +79,7 @@ function buildMismatchTable(
 
   return [
     `| ${t(translations, lang, "expression")} | ${t(translations, lang, "answer")} |`,
-    "|:-----------|:----------------|",
+    "|:---|:---|",
     ...rows,
     "",
   ].join("\n")
@@ -206,18 +210,18 @@ function generateFreeTextVariant(lang: Language, path: string, random: Random) {
   // also accept negative integers
   const checkFormat = (a: FreeTextAnswer) => {
     const input = a.text.trim()
-    const isValid = /^\{\s*(-?\d+)(\s*,\s*-?\d+)*\s*\}$/.test(input)
+    const isValid = /^\{\s*(-?\d+(\s*,\s*-?\d+)*)?\s*\}$/.test(input)
     return isValid ? { valid: true } : { valid: false, message: t(translations, lang, "checkFormat") }
   }
 
   const feedback = (a: FreeTextAnswer): FreeTextFeedback => {
     const trimmed = a.text.trim()
     if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
-      return { correct: false }
+      return { correct: false, correctAnswer: `\\{ ${sorted.join(", ")} \\}` }
     }
     const inside = trimmed.slice(1, -1).trim()
     if (inside === "") {
-      return { correct: correctSet.size === 0 }
+      return { correct: correctSet.size === 0, correctAnswer: `$\\{ ${sorted.join(", ")} \\}$` }
     }
 
     const user = inside
@@ -226,7 +230,7 @@ function generateFreeTextVariant(lang: Language, path: string, random: Random) {
       .filter((x) => !isNaN(x))
 
     const correct = user.length === correctSet.size && [...correctSet].every((x) => user.includes(x))
-    return { correct }
+    return { correct, correctAnswer: `\\{ ${sorted.join(", ")} \\}` }
   }
 
   const question: FreeTextQuestion = {
