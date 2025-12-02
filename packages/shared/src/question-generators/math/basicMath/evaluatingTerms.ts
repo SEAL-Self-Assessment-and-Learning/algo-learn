@@ -172,9 +172,11 @@ function getSymbolicFeedback(
         " }"
       const userValue = randomWrong.value2.toString()
       const correctValue = randomWrong.value1.toString()
+      expected = expected.simplify()
+      console.log(expected)
       return {
         correct: false,
-        correctAnswer: "$" + expected.simplify().toTex() + "$",
+        correctAnswer: "$" + expected.toTex() + "$",
         feedbackText: t(translations, lang, "feedback", [
           `${Object.entries(assignments).length > 1 ? "s" : ""}`,
           assignments,

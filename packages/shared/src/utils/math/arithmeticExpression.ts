@@ -34,10 +34,6 @@ export interface Fraction {
   denominator: number
 }
 
-interface SignedTerm {
-  node: ExprNode
-  sign: 1 | -1
-}
 
 const operatorTex = (operator: ArithmeticOperator) => {
   switch (operator) {
@@ -55,7 +51,6 @@ const operatorTex = (operator: ArithmeticOperator) => {
 
 const NUMERIC_EPSILON = 1e-7
 const MAX_APPROXIMATE_DENOMINATOR = 1000
-const MAX_COMMON_DENOMINATOR = 24
 
 const radToDeg = (x: number) => (x * Math.PI) / 180
 
@@ -172,13 +167,6 @@ function gcdInteger(a: number, b: number): number {
     y = temp
   }
   return x === 0 ? 1 : x
-}
-
-function lcmInteger(a: number, b: number): number {
-  if (a === 0 || b === 0) {
-    return 0
-  }
-  return Math.abs((a * b) / gcdInteger(a, b))
 }
 
 /**
@@ -454,11 +442,8 @@ export class ConstantNode extends ExprNode {
   }
 
   simplify() {
-    const normalized = normalizeNumeric(this.value)
-    if (normalized === this.value) {
-      return this
-    }
-    return new ConstantNode(normalized)
+    // Todo just a placeholder for now
+    return this
   }
 
   getVariables(): Set<string> {
@@ -521,9 +506,11 @@ export class VariableNode extends ExprNode {
   }
 
   simplify() {
+    // If multiplier is zero, return constant zero
     if (isApproximatelyZero(this.multiplier)) {
       return new ConstantNode(0)
     }
+    // Otherwise, normalize multiplier using the standard precision
     return new VariableNode(this.name, normalizeNumeric(this.multiplier))
   }
 
@@ -625,21 +612,8 @@ export class UnaryNode extends ExprNode {
   }
 
   simplify(): ExprNode {
-    const simplifiedChild = this.child.simplify()
-
-    if (simplifiedChild instanceof UnaryNode && simplifiedChild.op === "-") {
-      return simplifiedChild.child
-    }
-
-    if (simplifiedChild instanceof ConstantNode) {
-      return new ConstantNode(-simplifiedChild.value)
-    }
-
-    if (simplifiedChild instanceof VariableNode) {
-      return new VariableNode(simplifiedChild.name, -simplifiedChild.multiplier)
-    }
-
-    return new UnaryNode(this.op, simplifiedChild)
+    // Todo just a placeholder for now
+    return this
   }
 
   getVariables(): Set<string> {
@@ -1012,33 +986,8 @@ export class BinaryNode extends ExprNode {
   }
 
   simplify(): ExprNode {
-    const left = this.left.simplify()
-    const right = this.right.simplify()
-
-    switch (this.op) {
-      case "+": {
-        const combined = tryCombineFractionsWithSameDenominator(left, right, "+")
-        if (combined) {
-          return combined
-        }
-        return simplifyAddition(left, right, "+")
-      }
-      case "-": {
-        const combined = tryCombineFractionsWithSameDenominator(left, right, "-")
-        if (combined) {
-          return combined
-        }
-        return simplifyAddition(left, right, "-")
-      }
-      case "*":
-        return simplifyMultiplication(left, right)
-      case "/":
-        return simplifyDivision(left, right)
-      case "^":
-        return simplifyPower(left, right)
-      default:
-        return new BinaryNode(this.op, left, right)
-    }
+    // Todo just a placeholder for now
+    return this
   }
 
   getVariables(): Set<string> {
@@ -1105,13 +1054,8 @@ export class FunctionNode extends ExprNode {
   }
 
   simplify(): ExprNode {
-    const simplifiedArgs = this.args.map((arg) => arg.simplify())
-    if (simplifiedArgs.every((arg): arg is ConstantNode => arg instanceof ConstantNode)) {
-      const numericArgs = simplifiedArgs.map((arg) => arg.value)
-      const definition = getFunctionDefinition(this.name)
-      return new ConstantNode(normalizeNumeric(definition.evaluate(...numericArgs)))
-    }
-    return new FunctionNode(this.name, simplifiedArgs)
+    // Todo just a placeholder for now
+    return this
   }
 
   getVariables(): Set<string> {
@@ -1137,99 +1081,6 @@ export class FunctionNode extends ExprNode {
       this.args.map((arg) => arg.substitute(assignments)),
     )
   }
-}
-
-/**
- * Collect addition terms from an expression tree
- * Helper function for addition simplification
- * @param node
- * @param sign
- * @param terms
- */
-function gatherAdditionTerms(node: ExprNode, sign: 1 | -1, terms: SignedTerm[]): void {
-  if (node instanceof BinaryNode) {
-    if (node.op === "+") {
-      gatherAdditionTerms(node.left, sign, terms)
-      gatherAdditionTerms(node.right, sign, terms)
-      return
-    }
-    if (node.op === "-") {
-      gatherAdditionTerms(node.left, sign, terms)
-      gatherAdditionTerms(node.right, sign === 1 ? -1 : 1, terms)
-      return
-    }
-  }
-  terms.push({ node, sign })
-}
-
-/**
- * Extract linear term from expression node
- * @param node
- */
-function extractLinearTerm(node: ExprNode): { coefficient: number; base: ExprNode | null } {
-  if (node instanceof ConstantNode) {
-    return { coefficient: node.value, base: null }
-  }
-  if (node instanceof VariableNode) {
-    return { coefficient: node.multiplier, base: new VariableNode(node.name, 1) }
-  }
-  if (node instanceof UnaryNode && node.op === "-") {
-    const childResult = extractLinearTerm(node.child)
-    return { coefficient: -childResult.coefficient, base: childResult.base }
-  }
-  if (node instanceof BinaryNode && node.op === "/" && node.right instanceof ConstantNode) {
-    const denominator = node.right.value
-    if (approximatelyEqual(denominator, 0)) {
-      throw new Error("Division by zero in linear term extraction")
-    }
-    const childResult = extractLinearTerm(node.left)
-    return {
-      coefficient: childResult.coefficient / denominator,
-      base: childResult.base,
-    }
-  }
-
-  const { constant, factors } = splitProduct(node)
-  if (factors.length === 0) {
-    return { coefficient: constant, base: null }
-  }
-  const base = buildProductFromFactors(factors)
-  return { coefficient: constant, base }
-}
-
-/**
- * Split a product expression into its constant and factor components
- * @param node
- */
-function splitProduct(node: ExprNode): { constant: number; factors: ExprNode[] } {
-  let constant = 1
-  const factors: ExprNode[] = []
-  const stack: ExprNode[] = [node]
-
-  while (stack.length > 0) {
-    const current = stack.pop() as ExprNode
-    if (current instanceof BinaryNode && current.op === "*") {
-      stack.push(current.left, current.right)
-      continue
-    }
-    if (current instanceof UnaryNode && current.op === "-") {
-      constant *= -1
-      stack.push(current.child)
-      continue
-    }
-    if (current instanceof ConstantNode) {
-      constant *= current.value
-      continue
-    }
-    if (current instanceof VariableNode) {
-      constant *= current.multiplier
-      factors.push(new VariableNode(current.name, 1))
-      continue
-    }
-    factors.push(current.clone())
-  }
-
-  return { constant: normalizeNumeric(constant), factors }
 }
 
 /**
@@ -1353,90 +1204,6 @@ function buildNormalizedProductFromFactors(factors: ExprNode[]): ExprNode {
   return buildProductFromFactors(normalizedFactors)
 }
 
-interface FractionComponents {
-  numeratorConstant: number
-  denominatorConstant: number
-  numeratorFactors: ExprNode[]
-  denominatorFactors: ExprNode[]
-}
-
-type FractionPlacement = "numerator" | "denominator"
-
-function collectFractionComponents(node: ExprNode): FractionComponents {
-  const result: FractionComponents = {
-    numeratorConstant: 1,
-    denominatorConstant: 1,
-    numeratorFactors: [],
-    denominatorFactors: [],
-  }
-  distributeFractionComponents(node, "numerator", result)
-  return result
-}
-
-function distributeFractionComponents(
-  node: ExprNode,
-  target: FractionPlacement,
-  acc: FractionComponents,
-): void {
-  if (node instanceof BinaryNode && node.op === "/") {
-    distributeFractionComponents(node.left, target, acc)
-    distributeFractionComponents(node.right, target === "numerator" ? "denominator" : "numerator", acc)
-    return
-  }
-
-  const parts = splitProduct(node)
-  if (target === "numerator") {
-    acc.numeratorConstant = normalizeNumeric(acc.numeratorConstant * parts.constant)
-    acc.numeratorFactors.push(...parts.factors)
-  } else {
-    acc.denominatorConstant = normalizeNumeric(acc.denominatorConstant * parts.constant)
-    acc.denominatorFactors.push(...parts.factors)
-  }
-}
-
-function fractionFromConstants(numerator: number, denominator: number): Fraction {
-  if (isApproximatelyZero(denominator)) {
-    throw new Error("Division by zero")
-  }
-  if (isApproximatelyZero(numerator)) {
-    return { numerator: 0, denominator: 1 }
-  }
-  const ratio = normalizeNumeric(numerator / denominator)
-  const approximation = approximateFraction(ratio, MAX_APPROXIMATE_DENOMINATOR, NUMERIC_EPSILON)
-  const fraction = approximation ?? fractionFromDecimal(ratio)
-  if (fraction.denominator < 0) {
-    return {
-      numerator: -fraction.numerator,
-      denominator: -fraction.denominator,
-    }
-  }
-  return fraction
-}
-
-function buildFractionConstantNode(fraction: Fraction): ExprNode {
-  const value = normalizeNumeric(fraction.numerator / fraction.denominator)
-  return new ConstantNode(value)
-}
-
-function normalizeFractionSign(numerator: ExprNode, denominator: ExprNode): ExprNode | null {
-  const numeratorSign = extractSignAndMagnitude(numerator)
-  const denominatorSign = extractSignAndMagnitude(denominator)
-
-  if (numeratorSign.sign === 1 && denominatorSign.sign === 1) {
-    return null
-  }
-
-  const numeratorMag = numeratorSign.magnitude.clone()
-  const denominatorMag = denominatorSign.magnitude.clone()
-  const unsignedFraction = new BinaryNode("/", numeratorMag, denominatorMag)
-
-  if (numeratorSign.sign === denominatorSign.sign) {
-    return unsignedFraction
-  }
-
-  return new UnaryNode("-", unsignedFraction)
-}
-
 /**
  * Applies a coefficient to the base of a expression
  * @param base
@@ -1454,493 +1221,6 @@ function applyCoefficientToBase(base: ExprNode, coefficient: number): ExprNode {
     return new VariableNode(base.name, normalizeNumeric(base.multiplier * normalized))
   }
   return buildProductFromComponents(normalized, [base])
-}
-
-function combineAdditionTerms(terms: SignedTerm[]): ExprNode {
-  let constantSum = 0
-  const buckets = new Map<string, { base: ExprNode; coefficient: number }>()
-
-  for (const { node, sign } of terms) {
-    const simplified = node.simplify()
-    const { coefficient, base } = extractLinearTerm(simplified)
-    const signedCoefficient = normalizeNumeric(coefficient * sign)
-    if (base === null) {
-      constantSum += signedCoefficient
-    } else {
-      const key = base.toTex()
-      const bucket = buckets.get(key)
-      if (bucket) {
-        bucket.coefficient = normalizeNumeric(bucket.coefficient + signedCoefficient)
-      } else {
-        buckets.set(key, { base: base.clone(), coefficient: signedCoefficient })
-      }
-    }
-  }
-
-  const normalizedConstant = normalizeNumeric(constantSum)
-  const entries = Array.from(buckets.values())
-    .map(({ base, coefficient }) => ({ base, coefficient: normalizeNumeric(coefficient) }))
-    .filter(({ coefficient }) => !isApproximatelyZero(coefficient))
-    .sort((a, b) => {
-      const ka = a.base.toTex()
-      const kb = b.base.toTex()
-      const cmp = ka.localeCompare(kb)
-      if (cmp !== 0) return cmp
-      // tie-breaker: constructor name ensures deterministic ordering for same TeX
-      return a.constructor.name.localeCompare(b.constructor.name)
-    })
-
-  const linearTerms: { base: ExprNode | null; coefficient: number }[] = []
-  for (const { base, coefficient } of entries) {
-    linearTerms.push({ base, coefficient })
-  }
-  if (!isApproximatelyZero(normalizedConstant)) {
-    linearTerms.push({ base: null, coefficient: normalizedConstant })
-  }
-
-  const factored = factorCommonDenominator(linearTerms)
-  if (factored) {
-    return factored
-  }
-
-  if (linearTerms.length === 0) {
-    return new ConstantNode(0)
-  }
-
-  const resultTerms: ExprNode[] = []
-  for (const term of linearTerms) {
-    if (term.base === null) {
-      resultTerms.push(new ConstantNode(term.coefficient))
-    } else {
-      resultTerms.push(applyCoefficientToBase(term.base.clone(), term.coefficient))
-    }
-  }
-
-  return buildAdditionChain(resultTerms)
-}
-
-function buildAdditionChain(terms: ExprNode[]): ExprNode {
-  if (terms.length === 1) {
-    return terms[0]
-  }
-
-  let result = terms[0]
-  for (let i = 1; i < terms.length; i++) {
-    const term = terms[i]
-    const { sign, magnitude } = extractSignAndMagnitude(term)
-    if (sign === -1) {
-      result = new BinaryNode("-", result, magnitude)
-    } else {
-      result = new BinaryNode("+", result, magnitude)
-    }
-  }
-  return result
-}
-
-function fractionFromNumber(value: number): Fraction | null {
-  const approx = approximateFraction(value, MAX_COMMON_DENOMINATOR, NUMERIC_EPSILON)
-  if (approx) {
-    return approx
-  }
-  const decimal = fractionFromDecimal(value)
-  if (decimal.denominator <= MAX_COMMON_DENOMINATOR) {
-    return decimal
-  }
-  return null
-}
-
-function factorCommonDenominator(
-  terms: { base: ExprNode | null; coefficient: number }[],
-): ExprNode | null {
-  if (terms.length <= 1) {
-    return null
-  }
-
-  const fractionTerms: Array<{ base: ExprNode | null; fraction: Fraction }> = []
-  let lcm = 1
-  let hasUnitDenominator = false
-
-  for (const term of terms) {
-    const fraction = fractionFromNumber(term.coefficient)
-    if (!fraction) {
-      return null
-    }
-    const denominator = Math.abs(fraction.denominator)
-    if (denominator === 1) {
-      hasUnitDenominator = true
-    }
-    lcm = lcmInteger(lcm, denominator)
-    fractionTerms.push({ base: term.base, fraction: { numerator: fraction.numerator, denominator } })
-  }
-
-  if (lcm <= 1 || hasUnitDenominator) {
-    return null
-  }
-
-  const scaledSymbolicTerms: ExprNode[] = []
-  const scaledConstantTerms: ConstantNode[] = []
-  for (const { base, fraction } of fractionTerms) {
-    const scale = lcm / fraction.denominator
-    const scaledCoefficient = fraction.numerator * scale
-    if (base === null) {
-      if (!isApproximatelyZero(scaledCoefficient)) {
-        scaledConstantTerms.push(new ConstantNode(scaledCoefficient))
-      }
-    } else {
-      scaledSymbolicTerms.push(applyCoefficientToBase(base.clone(), scaledCoefficient))
-    }
-  }
-
-  const scaledTerms = [...scaledSymbolicTerms, ...scaledConstantTerms]
-
-  if (scaledTerms.length === 0) {
-    return new ConstantNode(0)
-  }
-
-  const numeratorExpr = buildAdditionChain(scaledTerms)
-  return new BinaryNode("/", numeratorExpr, new ConstantNode(lcm)).simplify()
-}
-
-function tryCombineFractionsWithSameDenominator(
-  left: ExprNode,
-  right: ExprNode,
-  op: "+" | "-",
-): ExprNode | null {
-  if (!(left instanceof BinaryNode && left.op === "/")) {
-    return null
-  }
-  if (!(right instanceof BinaryNode && right.op === "/")) {
-    return null
-  }
-  if (left.right.toTex() !== right.right.toTex()) {
-    return null
-  }
-
-  const numeratorOp = op === "+" ? "+" : "-"
-  const numerator = new BinaryNode(numeratorOp, left.left.clone(), right.left.clone()).simplify()
-  return new BinaryNode("/", numerator, left.right.clone()).simplify()
-}
-
-function extractSignAndMagnitude(node: ExprNode): { sign: 1 | -1; magnitude: ExprNode } {
-  if (node instanceof ConstantNode) {
-    if (node.value < 0) {
-      return { sign: -1, magnitude: new ConstantNode(-node.value) }
-    }
-    return { sign: 1, magnitude: node }
-  }
-  if (node instanceof VariableNode) {
-    if (node.multiplier < 0) {
-      return { sign: -1, magnitude: new VariableNode(node.name, -node.multiplier) }
-    }
-    return { sign: 1, magnitude: node }
-  }
-  if (node instanceof UnaryNode && node.op === "-") {
-    return { sign: -1, magnitude: node.child }
-  }
-  if (node instanceof BinaryNode && node.op === "*") {
-    if (node.left instanceof ConstantNode && node.left.value < 0) {
-      const magnitude = new BinaryNode(
-        "*",
-        new ConstantNode(-node.left.value),
-        node.right.clone(),
-      ).simplify()
-      return { sign: -1, magnitude }
-    }
-    if (node.right instanceof ConstantNode && node.right.value < 0) {
-      const magnitude = new BinaryNode(
-        "*",
-        node.left.clone(),
-        new ConstantNode(-node.right.value),
-      ).simplify()
-      return { sign: -1, magnitude }
-    }
-  }
-  return { sign: 1, magnitude: node }
-}
-
-function simplifyAddition(left: ExprNode, right: ExprNode, op: "+" | "-"): ExprNode {
-  const terms: SignedTerm[] = []
-  gatherAdditionTerms(left, 1, terms)
-  gatherAdditionTerms(right, op === "+" ? 1 : -1, terms)
-  return combineAdditionTerms(terms)
-}
-
-function simplifyMultiplication(left: ExprNode, right: ExprNode): ExprNode {
-  const leftParts = collectFractionComponents(left)
-  const rightParts = collectFractionComponents(right)
-
-  const numeratorConstant = normalizeNumeric(leftParts.numeratorConstant * rightParts.numeratorConstant)
-  const denominatorConstant = normalizeNumeric(
-    leftParts.denominatorConstant * rightParts.denominatorConstant,
-  )
-
-  const numeratorFactors: ExprNode[] = [...leftParts.numeratorFactors, ...rightParts.numeratorFactors]
-  const denominatorFactors: ExprNode[] = [
-    ...leftParts.denominatorFactors,
-    ...rightParts.denominatorFactors,
-  ]
-
-  // Aggregate variable powers: map baseTex -> exponent (number) or collect generic power groups
-  const varExponentMap = new Map<string, number>()
-  const otherFactors: ExprNode[] = []
-
-  for (const f of numeratorFactors) {
-    if (f instanceof BinaryNode && f.op === "^") {
-      const base = f.left
-      const exp = f.right
-      if (
-        base instanceof VariableNode &&
-        exp instanceof ConstantNode &&
-        approximatelyEqual(base.multiplier, 1)
-      ) {
-        const key = base.name
-        varExponentMap.set(key, (varExponentMap.get(key) || 0) + exp.value)
-        continue
-      }
-    }
-    if (f instanceof VariableNode) {
-      const key = f.name
-      // treat as plain variable with exponent 1
-      varExponentMap.set(key, (varExponentMap.get(key) || 0) + 1)
-      continue
-    }
-    otherFactors.push(f)
-  }
-
-  // Build variable factors back
-  const rebuiltVarFactors: ExprNode[] = []
-  // If multiple variables share the same exponent, factor it: x^2 * y^2 => (x*y)^2
-  const exponentGroups = new Map<number, string[]>()
-  for (const [name, exp] of varExponentMap) {
-    const e = normalizeNumeric(exp)
-    if (!exponentGroups.has(e)) exponentGroups.set(e, [])
-    exponentGroups.get(e)!.push(name)
-  }
-
-  for (const [exp, names] of exponentGroups) {
-    if (names.length > 1 && !approximatelyEqual(exp, 1)) {
-      // build product of bases
-      const bases = names.map((n) => new VariableNode(n))
-      const product = buildProductFromFactors(bases)
-      rebuiltVarFactors.push(new BinaryNode("^", product, new ConstantNode(exp)))
-      // remove these names from map by setting to 0
-      for (const n of names) varExponentMap.set(n, 0)
-    }
-  }
-
-  for (const [name, exp] of varExponentMap) {
-    if (approximatelyEqual(exp, 0)) continue
-    if (approximatelyEqual(exp, 1)) {
-      rebuiltVarFactors.push(new VariableNode(name))
-    } else {
-      rebuiltVarFactors.push(new BinaryNode("^", new VariableNode(name), new ConstantNode(exp)))
-    }
-  }
-
-  const finalFactors = [...otherFactors, ...rebuiltVarFactors]
-  const numeratorExpr = buildProductFromComponents(numeratorConstant, finalFactors)
-
-  if (!approximatelyEqual(denominatorConstant, 1) || denominatorFactors.length > 0) {
-    const denominatorExpr = buildProductFromComponents(denominatorConstant, denominatorFactors)
-    return simplifyDivision(numeratorExpr, denominatorExpr)
-  }
-
-  return numeratorExpr
-}
-
-function simplifyDivision(left: ExprNode, right: ExprNode): ExprNode {
-  const leftParts = collectFractionComponents(left)
-  const rightParts = collectFractionComponents(right)
-
-  if (isApproximatelyZero(rightParts.numeratorConstant)) {
-    throw new Error("Division by zero")
-  }
-
-  if (isApproximatelyZero(leftParts.numeratorConstant)) {
-    return new ConstantNode(0)
-  }
-
-  const numeratorConstant = normalizeNumeric(
-    leftParts.numeratorConstant * rightParts.denominatorConstant,
-  )
-  const denominatorConstant = normalizeNumeric(
-    leftParts.denominatorConstant * rightParts.numeratorConstant,
-  )
-
-  const numeratorFactors: ExprNode[] = [...leftParts.numeratorFactors, ...rightParts.denominatorFactors]
-  const denominatorFactors: ExprNode[] = [
-    ...rightParts.numeratorFactors,
-    ...leftParts.denominatorFactors,
-  ]
-
-  const cancelledNum: ExprNode[] = []
-  const remainingDen: ExprNode[] = [...denominatorFactors]
-
-  const equalByTex = (a: ExprNode, b: ExprNode) => a.toTex() === b.toTex()
-
-  for (const nf of numeratorFactors) {
-    let currentFactor: ExprNode | null = nf
-    for (let j = 0; j < remainingDen.length; j++) {
-      const df = remainingDen[j]
-      if (equalByTex(nf, df)) {
-        remainingDen.splice(j, 1)
-        currentFactor = null
-        break
-      }
-      if (nf instanceof BinaryNode && nf.op === "^" && df instanceof BinaryNode && df.op === "^") {
-        const sameBase = nf.left.toTex() === df.left.toTex()
-        if (sameBase && nf.right instanceof ConstantNode && df.right instanceof ConstantNode) {
-          const newExp = normalizeNumeric(nf.right.value - df.right.value)
-          if (approximatelyEqual(newExp, 0)) {
-            remainingDen.splice(j, 1)
-            currentFactor = null
-            break
-          }
-          if (newExp > 0) {
-            currentFactor = new BinaryNode("^", nf.left.clone(), new ConstantNode(newExp))
-            remainingDen.splice(j, 1)
-            break
-          }
-          if (newExp < 0) {
-            remainingDen[j] = new BinaryNode("^", nf.left.clone(), new ConstantNode(-newExp))
-            currentFactor = null
-            break
-          }
-        }
-      }
-      if (nf instanceof VariableNode && df instanceof VariableNode && nf.name === df.name) {
-        remainingDen.splice(j, 1)
-        currentFactor = null
-        break
-      }
-    }
-    if (currentFactor !== null) {
-      cancelledNum.push(currentFactor)
-    }
-  }
-
-  const constantFraction = fractionFromConstants(numeratorConstant, denominatorConstant)
-  if (constantFraction.numerator === 0) {
-    return new ConstantNode(0)
-  }
-
-  const hasNumeratorFactors = cancelledNum.length > 0
-  const hasDenominatorFactors = remainingDen.length > 0
-
-  const pureNumerator = buildProductFromComponents(1, cancelledNum)
-  const pureDenominator = hasDenominatorFactors ? buildProductFromComponents(1, remainingDen) : null
-
-  const numeratorWithConstant =
-    constantFraction.numerator === 1
-      ? pureNumerator
-      : buildProductFromComponents(constantFraction.numerator, cancelledNum)
-
-  if (
-    hasNumeratorFactors &&
-    hasDenominatorFactors &&
-    Math.abs(constantFraction.numerator) === 1 &&
-    constantFraction.denominator !== 1
-  ) {
-    const constantExpr = buildFractionConstantNode(constantFraction)
-    return new BinaryNode(
-      "*",
-      constantExpr,
-      new BinaryNode("/", pureNumerator, pureDenominator ?? new ConstantNode(1)),
-    )
-  }
-
-  if (!hasDenominatorFactors && constantFraction.denominator !== 1) {
-    if (!hasNumeratorFactors) {
-      return buildFractionConstantNode(constantFraction)
-    }
-    if (pureNumerator instanceof VariableNode) {
-      const coefficientExpr = buildFractionConstantNode(constantFraction)
-      return new BinaryNode("*", coefficientExpr, pureNumerator)
-    }
-    return new BinaryNode("/", numeratorWithConstant, new ConstantNode(constantFraction.denominator))
-  }
-
-  if (!hasDenominatorFactors && constantFraction.denominator === 1) {
-    return numeratorWithConstant
-  }
-
-  const denominatorFactorsWithConst = [...remainingDen]
-  if (constantFraction.denominator !== 1) {
-    denominatorFactorsWithConst.push(new ConstantNode(constantFraction.denominator))
-  }
-  const denominatorExpr = buildProductFromComponents(1, denominatorFactorsWithConst)
-  const numeratorExpr = numeratorWithConstant
-
-  const powerOfFraction = extractPowerOfFraction(numeratorExpr, denominatorExpr)
-  if (powerOfFraction) {
-    return powerOfFraction
-  }
-
-  const signNormalized = normalizeFractionSign(numeratorExpr, denominatorExpr)
-  if (signNormalized) {
-    return signNormalized
-  }
-
-  return new BinaryNode("/", numeratorExpr, denominatorExpr)
-}
-
-function extractPowerOfFraction(numerator: ExprNode, denominator: ExprNode): ExprNode | null {
-  if (!(numerator instanceof BinaryNode && numerator.op === "^")) {
-    return null
-  }
-  if (!(denominator instanceof BinaryNode && denominator.op === "^")) {
-    return null
-  }
-  if (!(numerator.right instanceof ConstantNode && denominator.right instanceof ConstantNode)) {
-    return null
-  }
-  if (!approximatelyEqual(numerator.right.value, denominator.right.value)) {
-    return null
-  }
-
-  const exponent = numerator.right.value
-  if (approximatelyEqual(exponent, 1)) {
-    return null
-  }
-
-  const baseQuotient = new BinaryNode("/", numerator.left.clone(), denominator.left.clone()).simplify()
-  return new BinaryNode("^", baseQuotient, new ConstantNode(exponent)).simplify()
-}
-
-function simplifyPower(left: ExprNode, right: ExprNode): ExprNode {
-  if (right instanceof ConstantNode) {
-    if (approximatelyEqual(right.value, 0)) {
-      if (left instanceof ConstantNode && approximatelyEqual(left.value, 0)) {
-        return new ConstantNode(1)
-      }
-      return new ConstantNode(1)
-    }
-    if (approximatelyEqual(right.value, 1)) {
-      return left
-    }
-  }
-
-  if (left instanceof ConstantNode && right instanceof ConstantNode) {
-    return new ConstantNode(normalizeNumeric(left.value ** right.value))
-  }
-
-  if (left instanceof ConstantNode && approximatelyEqual(left.value, 0)) {
-    return new ConstantNode(0)
-  }
-
-  // (a^m)^n => a^(m*n) when exponents are numeric constants
-  if (
-    left instanceof BinaryNode &&
-    left.op === "^" &&
-    left.right instanceof ConstantNode &&
-    right instanceof ConstantNode
-  ) {
-    const m = left.right.value
-    const n = right.value
-    return new BinaryNode("^", left.left, new ConstantNode(normalizeNumeric(m * n)))
-  }
-
-  return new BinaryNode("^", left, right)
 }
 
 export function evaluateExpression(

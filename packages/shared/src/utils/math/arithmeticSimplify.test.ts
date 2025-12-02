@@ -1,10 +1,6 @@
-import { describe, expect, test } from "vitest"
-import {
-  BinaryNode,
-  ConstantNode,
-  UnaryNode,
-  VariableNode,
-} from "@shared/utils/math/arithmeticExpression.ts"
+import { describe, expect, test } from "vitest";
+import { approximatelyEqual, BinaryNode, ConstantNode, UnaryNode, VariableNode } from "@shared/utils/math/arithmeticExpression.ts";
+
 
 const c0 = new ConstantNode(0)
 const c1 = new ConstantNode(1)
@@ -18,6 +14,7 @@ const z = new VariableNode("z")
 
 const uc1 = new UnaryNode("-", c1)
 const uc2 = new UnaryNode("-", c2)
+const uc4 = new UnaryNode("-", c4)
 
 const ux = new UnaryNode("-", x)
 const uy = new UnaryNode("-", y)
@@ -233,6 +230,50 @@ describe("Arithmetic > Simplify > Powers", () => {
     const expr = new BinaryNode("/", c2, new BinaryNode("^", x, c2))
     const simplified = expr.simplify()
     expect(simplified.toTex()).toBe("\\dfrac{2}{x^{2}}")
+    expect(simplified.evaluate(assignments)).toEqual(expr.evaluate(assignments))
+  })
+
+  // negative base with even power => remove negative
+  test("(-x)^2 => x^2", () => {
+    const expr = new BinaryNode("^", ux, c2)
+    const simplified = expr.simplify()
+    expect(simplified.toTex()).toBe("x^{2}")
+    expect(simplified.evaluate(assignments)).toEqual(expr.evaluate(assignments))
+  })
+
+  test("(-2y)^16 => (2y)^16", () => {
+    const expr = new BinaryNode("^", new UnaryNode("-", new BinaryNode("*", c2, y)), new ConstantNode(16))
+    const simplified = expr.simplify()
+    expect(simplified.toTex()).toBe("\\left(2y\\right)^{16}")
+    expect(simplified.evaluate(assignments)).toEqual(expr.evaluate(assignments))
+  })
+
+  // negative base with odd power => STAYS THE SAME
+  test("(-3z)^5 => (-3z)^5", () => {
+    const expr = new BinaryNode("^", new UnaryNode("-", new BinaryNode("*", c3, z)), new ConstantNode(5))
+    const simplified = expr.simplify()
+    expect(simplified.toTex()).toBe("\\left(-3z\\right)^{5}")
+    expect(simplified.evaluate(assignments)).toEqual(expr.evaluate(assignments))
+  })
+
+  test("(-(-1))^2 => 1", () => {
+    const expr = new BinaryNode("^", new UnaryNode("-", uc1), c2)
+    const simplified = expr.simplify()
+    expect(simplified.toTex()).toBe("1")
+    expect(simplified.evaluate(assignments)).toEqual(expr.evaluate(assignments))
+  })
+
+  test("-(-(-1))^2 => -1", () => {
+    const expr = new UnaryNode("-", new BinaryNode("^", new UnaryNode("-", uc1), c2))
+    const simplified = expr.simplify()
+    expect(simplified.toTex()).toBe("-1")
+    expect(simplified.evaluate(assignments)).toEqual(expr.evaluate(assignments))
+  })
+
+  test("(-x^3)^4 => -x^{12}", () => {
+    const expr = new BinaryNode("^", new UnaryNode("-", new BinaryNode("^", x, c3)), c4)
+    const simplified = expr.simplify()
+    expect(simplified.toTex()).toBe("-x^{12}")
     expect(simplified.evaluate(assignments)).toEqual(expr.evaluate(assignments))
   })
 
@@ -534,5 +575,41 @@ describe("Arithmetic > Simplify > Fractions", () => {
     const simplified = expr.simplify()
     expect(simplified.toTex()).toBe("\\dfrac{xz}{y}")
     expect(simplified.evaluate(assignments)).toEqual(expr.evaluate(assignments))
+  })
+
+  /*
+  Longer fractions:
+   */
+  test("x-((-1)/(3-1))", () => {
+    const expr = new BinaryNode("-", x, new BinaryNode("/", uc1, new BinaryNode("-", c3, c1)))
+    // validate construction
+    expect(expr.toTex()).toBe("x - \\dfrac{-1}{3 - 1}")
+
+    const simplified = expr.simplify()
+    expect(simplified.toTex()).toBe("x + \\dfrac{1}{2}")
+    expect(simplified.evaluate(assignments)).toEqual(expr.evaluate(assignments))
+  })
+
+  test("(2x- 2)/(-4) => - (x-1)/(2)", () => {
+    const expr = new BinaryNode("/", new BinaryNode("-", new BinaryNode("*", c2, x), c2), uc4)
+    // validate construction
+    expect(expr.toTex()).toBe("\\dfrac{2x - 2}{-4}")
+
+    const simplified = expr.simplify()
+    expect(simplified.toTex()).toBe("-\\dfrac{x - 1}{2}")
+    expect(simplified.evaluate(assignments)).toEqual(expr.evaluate(assignments))
+  })
+})
+
+describe("Arithmetic > Simplify > Combined cases", () => {
+  // double negative
+  test("−(−(1)/(7) * y)", () => {
+    const expr = new UnaryNode("-", new UnaryNode("-", new VariableNode("y", 1/7)))
+    // validate construction
+    expect(expr.toTex()).toBe("-\\left(-\\dfrac{1}{7}y\\right)")
+
+    const simplified = expr.simplify()
+    expect(simplified.toTex()).toBe("\\dfrac{1}{7}y")
+    expect(approximatelyEqual(expr.evaluate(assignments) as number, simplified.evaluate(assignments)  as number)).toBeTruthy()
   })
 })
