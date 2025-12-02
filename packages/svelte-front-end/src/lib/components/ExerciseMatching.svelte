@@ -76,7 +76,8 @@
 >
   <Markdown md={question.text ?? ""} />
 
-  <MatchingExercise
+  <div class="my-5">
+    <MatchingExercise
     pairs={(question.fixedItems ?? []).map((f, i) => ({
       id: `${i}`,
       fixed: f,
@@ -91,7 +92,8 @@
     {onChange}
     {onModeChange}
     columns={question.columns}
-  />
+    />
+  </div>
 </InteractWithQuestion>
 
 {#snippet footerMsg()}
