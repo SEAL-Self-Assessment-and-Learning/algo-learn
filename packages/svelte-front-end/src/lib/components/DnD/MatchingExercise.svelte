@@ -196,7 +196,7 @@
       </SortableContext>
     </div>
 
-    <DragOverlay {dropAnimation}>
+    <DragOverlay dropAnimation={null}>
       {#if activeItem}
         <div class="rounded-md border bg-gray-100 p-2 text-center dark:bg-gray-800">
           <Markdown md={activeItem.content ?? ""} />
