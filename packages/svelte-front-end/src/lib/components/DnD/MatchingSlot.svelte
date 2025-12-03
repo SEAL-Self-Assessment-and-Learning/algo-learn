@@ -52,7 +52,7 @@
     {...dragProps}
     class="flex-1 cursor-move text-center"
   >
-    {#if item}
+    {#if item && !drag.isDragging.current}
       <Markdown md={item.content} />
     {/if}
   </div>

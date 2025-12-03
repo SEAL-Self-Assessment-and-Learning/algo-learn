@@ -30,6 +30,9 @@
   let slots = $state<(SlotItem | null)[]>(Array(pairs.length).fill(null))
   let activeItem = $state<SlotItem | null>(null)
 
+  let isDragging = $state(false)
+  let isDraggingFromSlot = $state(false)
+
   // responsive mode flag
   let isMobile = $state(false)
   let openIndex = $state(-1)
@@ -52,15 +55,19 @@
   }
 
   function handleDragStart(e: DragStartEvent) {
+    isDragging = true
+
     const id = String(e.active.id)
+
     // slot ids are "slot-<idx>", pool items are their own stable ids
     if (id.startsWith("slot-")) {
       const slotIdx = parseInt(id.replace("slot-", ""))
       activeItem = slots[slotIdx] ?? null
+      isDraggingFromSlot = true
     } else {
-      // pool item id
       const poolIdx = findPoolIndexById(id)
       activeItem = poolIdx >= 0 ? pool[poolIdx] : null
+      isDraggingFromSlot = false
     }
   }
 
@@ -69,18 +76,34 @@
 
     // clear the overlay immediately (prevent stale overlay)
     const prevActive = activeItem
-    activeItem = null
 
-    if (!over) return
+    activeItem = null
+    isDragging = false
+
+    if (!over) {
+      isDraggingFromSlot = false
+      return
+    }
 
     const activeId = String(active.id)
     const overId = String(over.id)
 
-    // pool ids are the stable item ids; over is slot-<idx>
+    // slot to return slot
+    if (activeId.startsWith("slot-") && overId === "slot-return") {
+      const slotIdx = parseInt(activeId.replace("slot-", ""))
+      returnToPool(slotIdx)
+      isDraggingFromSlot = false
+      return
+    }
+
+    // pool to slot
     if (!activeId.startsWith("slot-") && overId.startsWith("slot-")) {
       const slotIdx = parseInt(overId.replace("slot-", ""))
       const poolIdx = findPoolIndexById(activeId)
-      if (poolIdx < 0) return
+      if (poolIdx < 0) {
+        isDraggingFromSlot = false
+        return
+      }
 
       const item = prevActive ?? pool[poolIdx]
       const newSlots = [...slots]
@@ -99,6 +122,8 @@
       pool = newPool
       onChange(newSlots)
       notifyMode(newSlots)
+
+      isDraggingFromSlot = false
       return
     }
 
@@ -109,10 +134,17 @@
 
       const newSlots = [...slots]
       ;[newSlots[fromIdx], newSlots[toIdx]] = [newSlots[toIdx], newSlots[fromIdx]]
+
       slots = newSlots
       onChange(newSlots)
       notifyMode(newSlots)
+
+      isDraggingFromSlot = false
+      return
     }
+
+    // fallback
+    isDraggingFromSlot = false
   }
 
   // called by MatchingSlot remove button
@@ -163,7 +195,11 @@
     {sensors}
     onDragStart={handleDragStart}
     onDragEnd={handleDragEnd}
-    onDragCancel={() => (activeItem = null)}
+    onDragCancel={() => {
+      activeItem = null
+      isDragging = false
+      isDraggingFromSlot = false
+    }}
   >
     <div
       class="grid gap-4"
@@ -187,6 +223,31 @@
       {/each}
     </div>
 
+    <!-- return slot -->
+    {#if isDraggingFromSlot}
+      <div class="my-4 flex w-full justify-center">
+        <div class="relative w-full max-w-4xl">
+          <!-- RETURN SLOT -->
+          <MatchingSlot
+            id="slot-return"
+            item={null}
+            onRemove={() => {}}
+            disabled={false}
+            correctness={null}
+          />
+
+          <!-- return symbol overlay -->
+          <div
+            class="pointer-events-none absolute inset-0 flex items-center justify-center
+               text-xl opacity-50 select-none"
+          >
+            ↺
+          </div>
+        </div>
+      </div>
+    {/if}
+
+    <!-- POOL -->
     <div
       id="pool-area"
       class="mt-6 flex list-none flex-wrap justify-center gap-2 rounded-lg border border-dashed p-3 dark:border-gray-600"
