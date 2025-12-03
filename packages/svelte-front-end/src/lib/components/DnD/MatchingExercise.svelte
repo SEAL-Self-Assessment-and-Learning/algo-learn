@@ -16,7 +16,7 @@
 
   interface Props {
     pairs: Pair[]
-    answers: SlotItem[] // MUST have a stable `id: string` property
+    answers: SlotItem[]
     disabled?: boolean
     onChange: (slots: (SlotItem | null)[]) => void
     onModeChange?: (mode: "draft" | "invalid") => void
@@ -165,11 +165,13 @@
   >
     <div
       class="grid gap-4"
-      style={`grid-template-columns: repeat(${columns}, minmax(0, 1fr)); align-items: start;`}
+      style={`grid-template-columns: repeat(${columns}, minmax(0, 1fr)); align-items: stretch;`}
     >
       {#each pairs as pair, i (pair.id)}
-        <div class="rounded-lg border p-3 dark:border-gray-600 dark:bg-gray-800">
-          <Markdown md={pair.fixed} />
+        <div class="rounded-lg border p-3 dark:border-gray-600 dark:bg-gray-800 flex flex-col h-full">
+          <div class="mb-auto">
+            <Markdown md={pair.fixed} />
+          </div>
           <div class="mt-3">
             <MatchingSlot
               id={`slot-${i}`}
