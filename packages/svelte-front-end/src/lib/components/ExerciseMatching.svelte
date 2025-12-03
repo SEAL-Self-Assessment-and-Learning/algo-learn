@@ -78,20 +78,20 @@
 
   <div class="my-5">
     <MatchingExercise
-    pairs={(question.fixedItems ?? []).map((f, i) => ({
-      id: `${i}`,
-      fixed: f,
-      answerId: questionState.choice[i] >= 0 ? `${questionState.choice[i]}` : null,
-      correctness: questionState.feedbackObject?.rowCorrectness?.[i] ?? null,
-    }))}
-    answers={question.answers.map((a, i) => ({
-      id: `${i}`,
-      content: a,
-    }))}
-    {disabled}
-    {onChange}
-    {onModeChange}
-    columns={question.columns}
+      pairs={(question.fixedItems ?? []).map((f, i) => ({
+        id: `${i}`,
+        fixed: f,
+        answerId: questionState.choice[i] >= 0 ? `${questionState.choice[i]}` : null,
+        correctness: questionState.feedbackObject?.rowCorrectness?.[i] ?? null,
+      }))}
+      answers={question.answers.map((a, i) => ({
+        id: `${i}`,
+        content: a,
+      }))}
+      {disabled}
+      {onChange}
+      {onModeChange}
+      columns={question.columns}
     />
   </div>
 </InteractWithQuestion>
