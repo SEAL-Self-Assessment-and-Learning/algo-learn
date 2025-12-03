@@ -1,7 +1,7 @@
 <script lang="ts">
   import MatchingPoolItem from "$lib/components/DnD/MatchingPoolItem.svelte"
   import MatchingSlot, { type SlotItem } from "$lib/components/DnD/MatchingSlot.svelte"
-  import { dropAnimation, sensors } from "$lib/components/DnD/utils.ts"
+  import { sensors } from "$lib/components/DnD/utils.ts"
   import Markdown from "$lib/components/markdown/markdown.svelte"
   import { onMount } from "svelte"
   import { DndContext, DragOverlay, type DragEndEvent, type DragStartEvent } from "@dnd-kit-svelte/core"
@@ -30,7 +30,6 @@
   let slots = $state<(SlotItem | null)[]>(Array(pairs.length).fill(null))
   let activeItem = $state<SlotItem | null>(null)
 
-  let isDragging = $state(false)
   let isDraggingFromSlot = $state(false)
 
   // responsive mode flag
@@ -55,8 +54,6 @@
   }
 
   function handleDragStart(e: DragStartEvent) {
-    isDragging = true
-
     const id = String(e.active.id)
 
     // slot ids are "slot-<idx>", pool items are their own stable ids
@@ -78,7 +75,6 @@
     const prevActive = activeItem
 
     activeItem = null
-    isDragging = false
 
     if (!over) {
       isDraggingFromSlot = false
@@ -197,7 +193,6 @@
     onDragEnd={handleDragEnd}
     onDragCancel={() => {
       activeItem = null
-      isDragging = false
       isDraggingFromSlot = false
     }}
   >
