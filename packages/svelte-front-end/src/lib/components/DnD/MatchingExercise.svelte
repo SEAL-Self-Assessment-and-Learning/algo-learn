@@ -135,6 +135,8 @@
 
   // mobile dropdown handler
   function handleSelectChange(slotIdx: number, value: string) {
+    if (disabled) return
+
     const newSlots = [...slots]
     const selected = answers.find((a) => a.id === value) ?? null
 
@@ -168,7 +170,7 @@
       style={`grid-template-columns: repeat(${columns}, minmax(0, 1fr)); align-items: stretch;`}
     >
       {#each pairs as pair, i (pair.id)}
-        <div class="rounded-lg border p-3 dark:border-gray-600 dark:bg-gray-800 flex flex-col h-full">
+        <div class="flex h-full flex-col rounded-lg border p-3 dark:border-gray-600 dark:bg-gray-800">
           <div class="mb-auto">
             <Markdown md={pair.fixed} />
           </div>
@@ -216,20 +218,24 @@
         class={`flex flex-col gap-1 rounded-md border p-2 transition-colors
           ${
             correctness === true
-              ? "border-green-600 bg-green-900/20"
+              ? "border-green-600 bg-green-900/10"
               : correctness === false
-                ? "border-red-600 bg-red-900/20"
+                ? "border-red-600 bg-red-900/10"
                 : "border-gray-700 dark:bg-gray-900"
           }
         `}
       >
         <button
           type="button"
-          class="flex w-full items-center justify-between text-left select-none"
-          onclick={() => (openIndex = openIndex === i ? -1 : i)}
+          class={`flex w-full items-center justify-between text-left select-none ${
+            disabled ? "cursor-not-allowed opacity-60" : ""
+          }`}
+          onclick={() => {
+            if (!disabled) openIndex = openIndex === i ? -1 : i
+          }}
         >
           <Markdown md={pair.fixed} />
-          <span class="text-sm text-gray-400">{openIndex === i ? "▴" : "▾"}</span>
+          <span class="text-lg text-gray-400">{openIndex === i ? "▴" : "▾"}</span>
         </button>
 
         {#if slots[i] && openIndex !== i}
@@ -253,15 +259,19 @@
                     ? "bg-red-500/20 text-red-700 border-red-500"
                     : "bg-goethe text-white"
                 : alreadyUsed
-                  ? "bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400 opacity-60"
+                  ? "text-gray-500 opacity-70"
                   : "hover:bg-goethe/10 dark:hover:bg-goethe/20"}
 
               <button
                 type="button"
-                class={`w-full rounded-md border p-2 text-left text-sm transition-colors ${btnColor}`}
+                class={`w-full rounded-md border p-2 text-left text-sm transition-colors ${btnColor} ${
+                  disabled ? "cursor-not-allowed opacity-60" : ""
+                }`}
                 onclick={() => {
-                  handleSelectChange(i, ans.id)
-                  openIndex = -1
+                  if (!disabled) {
+                    handleSelectChange(i, ans.id)
+                    openIndex = -1
+                  }
                 }}
               >
                 <Markdown md={ans.content} />
