@@ -1,3 +1,4 @@
+import type { QuestionTopic } from "@settings/questionsSelection.ts"
 import type { SingleTranslation } from "../utils/translations.ts"
 import type { Language } from "./Language.ts"
 import { deserializeParameters, missingParameters, type Parameters } from "./Parameters.ts"
@@ -10,6 +11,8 @@ export type QuestionCollection = Array<{
   slug: string
   name: SingleTranslation
   contents: Array<QuestionGenerator>
+  topics: Array<QuestionTopic>
+  description?: SingleTranslation
   image?: URL
 }>
 
@@ -110,7 +113,7 @@ export function deserializePath({
     }
   | undefined {
   let parts = path.split("/")
-
+  parts = parts.filter((part) => part !== "")
   if (expectLang === undefined) {
     expectLang = parts[0] === "de" || parts[0] === "en"
   }
