@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import Random from "@shared/utils/random.ts"
+import Random, { sampleRandomSeed } from "@shared/utils/random.ts"
 import { Graph, RandomGraph, RootedTree, type Edge } from "./graph.ts"
 
 // Todo: More parsing tests
@@ -108,4 +108,16 @@ describe("tree traversal", () => {
   test("postorder", () => {
     expect(tree.getTraversalOrder("post")).toEqual(["b", "c", "a"])
   })
+})
+
+describe("Graph parse => toString consistency", () => {
+  const random = new Random(sampleRandomSeed())
+  for (let i = 0; i < 10; i++) {
+    test(`- Iteration ${i}`, () => {
+      const graph = RandomGraph.grid(random, [4, 5], 0.3, "square", "unique", true, false, true)
+      const graphStr = graph.toString()
+      const parsedGraph = Graph.parse(graphStr)
+      expect(parsedGraph.toString()).toEqual(graphStr)
+    })
+  }
 })
