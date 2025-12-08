@@ -8,7 +8,6 @@
   } from "$lib/components/Graph/inputHelper.ts"
   import Node from "$lib/components/Graph/Node.svelte"
   import { Toggle } from "$lib/components/ui/toggle"
-  import { getTheme } from "$lib/theme.svelte.ts"
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { getContext } from "svelte"
@@ -27,7 +26,6 @@
   }
   const { maxWidth, maxHeight, graph }: Props = $props()
 
-  const theme = $derived(getTheme())
   const lang = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
 
@@ -69,6 +67,9 @@
   // this reads the context object each time it changes
   const nodeField = $derived(() => context.textFieldStateValues?.[nodeId])
   const edgeField = $derived(() => context.textFieldStateValues?.[edgeId])
+
+  const nodeDisabled = $derived(() => nodeField()?.disabled ?? false)
+  const edgeDisabled = $derived(() => edgeField()?.disabled ?? false)
 
   // derive the text string reactively from nodeField
   const nodeText = $derived(() => nodeField()?.text ?? "")
@@ -240,7 +241,9 @@
             state={edgeStates[i]}
             onClickCallback={() => {
               if (edgeClickType === "select" || edgeClickType === "group") {
-                handleClickEdge(i)
+                if (!edgeDisabled()) {
+                  handleClickEdge(i)
+                }
               }
             }}
           />
@@ -257,7 +260,9 @@
             nodeState={nodeStates[i]}
             onClickCallback={() => {
               if (nodeClickType === "select" || nodeClickType === "group") {
-                handleClickNode(i)
+                if (!nodeDisabled()) {
+                  handleClickNode(i)
+                }
               }
             }}
           />
@@ -269,7 +274,7 @@
     >
       {#if nodeClickType === "select" || nodeClickType === "group" || edgeClickType === "select" || edgeClickType === "group"}
         <Toggle
-          class={`${theme === "dark" ? "text-white" : "text-black"}  hover:cursor-pointer`}
+          class="hover:cursor-pointer"
           size="sm"
           variant="bg"
           disabled={nodeField()?.disabled || edgeField()?.disabled}
@@ -283,7 +288,7 @@
     </div>
   </div>
   {#if (nodeClickType === "select" || nodeClickType === "group") && fieldOpen}
-    <div class="mt-1">
+    <div class="mt-4">
       <div class="mb-1">
         <b>{t("nodeSelection")}</b>
       </div>
