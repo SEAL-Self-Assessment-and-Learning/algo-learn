@@ -38,7 +38,7 @@ export function saveNodeInput(nodeText: string, nodeList: NodeList, graph: Graph
   if (nodeCheck.parsed) {
     if ("selected" in nodeCheck) {
       updateGraphNodeSelected(graph, nodeList, nodeCheck.selected)
-    } else {
+    } else if ("group" in nodeCheck) {
       updateGraphNodeGroup(graph, nodeList, nodeCheck.groups)
     }
   }
@@ -49,7 +49,7 @@ export function saveEdgeInput(edgeString: string, edgeListFlat: Edge[], graph: G
   if (edgeCheck.parsed) {
     if ("selected" in edgeCheck) {
       updateGraphEdgeSelected(graph.directed, edgeListFlat, edgeCheck.selected)
-    } else {
+    } else if ("group" in edgeCheck) {
       updateGraphEdgeGroup(graph.directed, edgeListFlat, edgeCheck.groups)
     }
   }

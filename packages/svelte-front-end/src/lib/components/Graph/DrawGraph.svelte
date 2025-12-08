@@ -1,18 +1,18 @@
 <script lang="ts">
-  import Edge from "$lib/components/Graph/Edge.svelte"
+  import EdgeComp from "$lib/components/Graph/Edge.svelte"
   import {
     edgeInputSetText,
     nodeInputSetText,
     saveEdgeInput,
     saveNodeInput,
   } from "$lib/components/Graph/inputHelper.ts"
-  import Node from "$lib/components/Graph/Node.svelte"
+  import NodeComp from "$lib/components/Graph/Node.svelte"
   import { Toggle } from "$lib/components/ui/toggle"
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
-  import { getContext } from "svelte"
+  import { getContext, untrack } from "svelte"
   import { TextCursorInput } from "@lucide/svelte"
-  import { edgeInputFieldID, nodeInputFieldID, type Graph } from "@shared/utils/graph.ts"
+  import { edgeInputFieldID, nodeInputFieldID, type Edge, type Graph } from "@shared/utils/graph.ts"
   import { tFunction } from "@shared/utils/translations.ts"
   import Markdown from "../markdown/markdown.svelte"
   import { ADD_TEXTFIELDS_AFTERWARDS, type FormContextValue } from "../types.ts"
@@ -25,7 +25,7 @@
     graph: Graph
   }
   const { maxWidth, maxHeight, graph }: Props = $props()
-
+  console.log(graph.nodes)
   const lang = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
 
@@ -35,12 +35,24 @@
   // limited by the number of colors we have. See tailwind --color-group-0,...,--color-group-7.
   const maxGroups = 8
 
+  function cloneNodesForState(nodes: Graph["nodes"]): Graph["nodes"] {
+    return nodes.map((node) => ({
+      ...node,
+      coords: { ...node.coords },
+    }))
+  }
+
+  function buildEdgeListForState(graph: Graph): Edge[] {
+    return graph.edges
+      .flat()
+      .filter(graph.directed ? () => true : (edge) => edge.source < edge.target)
+      .map((edge) => ({ ...edge }))
+  }
+
   const { addTextFieldAfterwards } = getContext<FormContextValue>(ADD_TEXTFIELDS_AFTERWARDS)
 
-  let nodeList = $state(graph.nodes)
-  let edgeListFlat = $state(
-    graph.edges.flat().filter(graph.directed ? () => true : (e) => e.source < e.target),
-  )
+  let nodeList = $state(cloneNodesForState(graph.nodes))
+  let edgeListFlat = $state(buildEdgeListForState(graph))
   const nodeClickType = $derived(graph.nodeClickType)
   const edgeClickType = $derived(graph.edgeClickType)
 
@@ -76,11 +88,23 @@
   const edgeText = $derived(() => edgeField()?.text ?? "")
 
   $effect(() => {
-    saveNodeInput(nodeText(), nodeList, graph, lang)
+    const text = nodeText()
+    untrack(() => {
+      saveNodeInput(text, nodeList, graph, lang)
+    })
   })
 
   $effect(() => {
-    saveEdgeInput(edgeText(), edgeListFlat, graph, lang)
+    const text = edgeText()
+    untrack(() => {
+      saveEdgeInput(text, edgeListFlat, graph, lang)
+    })
+  })
+
+  $effect(() => {
+    const currentGraph = graph
+    nodeList = cloneNodesForState(currentGraph.nodes)
+    edgeListFlat = buildEdgeListForState(currentGraph)
   })
 
   let currentlyDragged = $state<null | number>(null)
@@ -232,7 +256,7 @@
     >
       <g>
         {#each edgeListFlat as e, i (i)}
-          <Edge
+          <EdgeComp
             u={nodePositions[e.source]}
             v={nodePositions[e.target]}
             weight={e.value}
@@ -251,7 +275,7 @@
       </g>
       <g>
         {#each nodeList as u, i (i)}
-          <Node
+          <NodeComp
             pos={nodePositions[i]}
             setDragged={graph.nodeDraggable ? () => handleSetDragged(i) : undefined}
             size={nodeScale}

@@ -150,7 +150,7 @@ export class Graph {
     const numEdges = parseInt(graphMetaData[2])
     const directed = graphMetaData[3] === "1"
     const weighted = graphMetaData[4] === "1"
-    const inputFields = parseInt(graphMetaData[5])
+    const inputFieldID = parseInt(graphMetaData[5])
     const nodeDraggable = graphMetaData[6] === "1"
     const clickTypeMapping: Record<string, ClickEventType> = {
       "0": "none",
@@ -217,12 +217,27 @@ export class Graph {
       edges,
       directed,
       weighted,
-      inputFields,
+      inputFieldID,
       nodeDraggable,
       nodeClick,
       edgeClick,
       nodeGroupMax,
       edgeGroupMax,
+    )
+  }
+
+  public clone(): Graph {
+    return new Graph(
+      [...this.nodes],
+      [...this.edges],
+      this.directed,
+      this.weighted,
+      this.inputFieldID,
+      this.nodeDraggable,
+      this.nodeClickType,
+      this.edgeClickType,
+      this.nodeGroupMax,
+      this.edgeGroupMax,
     )
   }
 

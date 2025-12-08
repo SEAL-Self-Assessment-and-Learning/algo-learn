@@ -28,7 +28,7 @@ const translations: Translations = {
     text:
       "Select all nodes that can be reached from node $ {{1}}$, including $ {{1}} $ itself. {{0}} " +
       "For testing purpose, some text to see how the pop up of the input field/s affects the text below.",
-    fdToFew: "You have selected to few nodes.",
+    fdTooFew: "You have selected too few nodes.",
     fdWrong: "You have selected wrong nodes.",
     fdParse: "Error parsing input.",
   },
@@ -36,7 +36,7 @@ const translations: Translations = {
     name: "Graph-Knoten-Eingabefrage",
     description: "Wähle bestimmte Knoten aus.",
     text: "Wähle alle Knoten aus, die von Knoten ${{1}}$ aus erreichbar sind, einschließlich $ {{1}} $ selbst. {{0}}",
-    fdToFew: "Du hast zu wenige Knoten ausgewählt.",
+    fdTooFew: "Du hast zu wenige Knoten ausgewählt.",
     fdWrong: "Du hast falsche Knoten ausgewählt.",
     fdParse: "Fehler beim Parsen der Eingabe.",
   },
@@ -116,25 +116,28 @@ function getCheckFormat(graph: Graph, lang: Language): MultiFreeTextFormatFuncti
 
 function getFeedback(nodeIDs: number[], graph: Graph, lang: Language): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
-    const nodeLabels: string[] = mapNumberToNodeLabel(nodeIDs)
-    for (const nodeID of nodeIDs) {
-      graph.setNodeGroup(nodeID, 1)
-    }
-    graph.nodeClickType = "selectupgrade"
     const nodeTextField = text[nodeInputFieldID(6)]
     const parsedNodeTextField = checkNodeInput(nodeTextField, graph, lang)
+
+    const newGraph = graph.clone()
+    const nodeLabels: string[] = mapNumberToNodeLabel(nodeIDs)
+    for (const nodeID of nodeIDs) {
+      newGraph.setNodeGroup(nodeID, 1)
+    }
+    newGraph.nodeClickType = "selectupgrade"
+
     if (!("selected" in parsedNodeTextField)) {
       return {
         correct: false,
         feedbackText: t(translations, lang, "fdParse"),
-        correctAnswer: graph.toMarkdown(),
+        correctAnswer: newGraph.toMarkdown(),
       }
     }
     if (parsedNodeTextField.selected.length !== nodeLabels.length) {
       return {
         correct: false,
-        feedbackText: t(translations, lang, "fdToFew"),
-        correctAnswer: graph.toMarkdown(),
+        feedbackText: t(translations, lang, "fdTooFew"),
+        correctAnswer: newGraph.toMarkdown(),
       }
     }
 
@@ -143,7 +146,7 @@ function getFeedback(nodeIDs: number[], graph: Graph, lang: Language): MultiFree
         return {
           correct: false,
           feedbackText: t(translations, lang, "fdWrong"),
-          correctAnswer: graph.toMarkdown(),
+          correctAnswer: newGraph.toMarkdown(),
         }
       }
     }
