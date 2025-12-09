@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "svelte-kit dev",
-    "build": "node ./scripts/build.mjs",
+    "build": "vite build",
     "preview": "svelte-kit preview",
     "prepare": "svelte-kit sync",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
