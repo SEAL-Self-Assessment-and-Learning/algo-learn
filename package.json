@@ -1,7 +1,6 @@
 {
   "name": "algo-learn-monorepo",
   "private": true,
-  "packageManager": "bun@1.3.4",
   "workspaces": [
     "packages/*"
   ],
