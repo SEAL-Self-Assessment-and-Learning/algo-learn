@@ -10,6 +10,7 @@ const executable = isWindows ? "svelte-kit.cmd" : "svelte-kit"
 const binLocations = [
   resolve(scriptDir, "../node_modules/.bin", executable),
   resolve(scriptDir, "../../node_modules/.bin", executable),
+  resolve(scriptDir, "../../../node_modules/.bin", executable),
 ]
 
 const svelteKitBin = binLocations.find((bin) => existsSync(bin))
