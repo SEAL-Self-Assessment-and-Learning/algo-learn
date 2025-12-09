@@ -6,16 +6,30 @@ import { fileURLToPath } from "node:url"
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 const isWindows = process.platform === "win32"
-const executable = isWindows ? "svelte-kit.cmd" : "svelte-kit"
-const binLocations = [
-  resolve(scriptDir, "../node_modules/.bin", executable),
-  resolve(scriptDir, "../../node_modules/.bin", executable),
-  resolve(scriptDir, "../../../node_modules/.bin", executable),
+const binRoots = [
+  resolve(scriptDir, "../node_modules/.bin"),
+  resolve(scriptDir, "../../node_modules/.bin"),
+  resolve(scriptDir, "../../../node_modules/.bin"),
 ]
 
-const svelteKitBin = binLocations.find((bin) => existsSync(bin))
+function findBinary(name) {
+  const executable = isWindows ? `${name}.cmd` : name
+  for (const root of binRoots) {
+    const candidate = resolve(root, executable)
+    if (existsSync(candidate)) return candidate
+  }
+  return null
+}
+
+const svelteKitBin = findBinary("svelte-kit")
 if (!svelteKitBin) {
   console.error("Unable to locate the svelte-kit executable. Did you install dependencies?")
+  process.exit(1)
+}
+
+const viteBin = findBinary("vite")
+if (!viteBin) {
+  console.error("Unable to locate the vite executable. Did you install dependencies?")
   process.exit(1)
 }
 
@@ -41,5 +55,5 @@ if (syncResult.status !== 0) {
   process.exit(syncResult.status ?? 1)
 }
 
-const buildResult = spawnSync(svelteKitBin, ["build", ...forwardedArgs], { stdio: "inherit" })
+const buildResult = spawnSync(viteBin, ["build", ...forwardedArgs], { stdio: "inherit" })
 process.exit(buildResult.status ?? 1)
