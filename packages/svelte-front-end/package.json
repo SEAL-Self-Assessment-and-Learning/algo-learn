@@ -35,7 +35,7 @@
     "svelte": "5.38.9",
     "svelte-check": "4.3.1",
     "tailwindcss": "4.1.13",
-    "vite": "7.1.9",
+    "vite": "7.1.11",
     "vite-plugin-devtools-json": "1.0.0"
   }
 }
