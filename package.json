@@ -1,5 +1,5 @@
 {
-  "name": "algo-learn",
+  "name": "seal",
   "private": true,
   "workspaces": [
     "packages/*"
