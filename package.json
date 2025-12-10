@@ -5,7 +5,33 @@
     "packages/*"
   ],
   "license": "MIT",
-  "author": "Holger Dell (https://holgerdell.com)",
+  "author": "SEAL <SEAL@ae.cs.uni-frankfurt.de>",
+  "description": "An interactive learning platform for typical undergraduate courses.",
+  "contributors": [
+    {
+      "name": "Holger Dell",
+      "url": "https://holgerdell.com"
+    },
+    {
+      "name": "Alex Schickedanz",
+      "url": "https://ae.cs.uni-frankfurt.de/staff/alex_schickedanz.html"
+    },
+    {
+      "name": "Janette Welker",
+      "url": "https://github.com/welkerje"
+    },
+    {
+      "name": "Fabian Stiewe",
+      "url": "https://github.com/Fabianstw"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SEAL-Self-Assessment-and-Learning/algo-learn"
+  },
+  "bugs": {
+    "url": "https://github.com/SEAL-Self-Assessment-and-Learning/algo-learn/issues"
+  },
   "scripts": {
     "dev": "cd packages/svelte-front-end; $npm_execpath run dev",
     "build": "cd packages/svelte-front-end; $npm_execpath run build",
