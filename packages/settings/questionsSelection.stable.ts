@@ -8,14 +8,14 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { DijkstraAlgorithm } from "@shared/question-generators/graph-algorithms/dijkstra"
+import { DijkstraTableGenerator } from "@shared/question-generators/graph-algorithms/dijkstraTable"
 import { FindMinimalMST } from "@shared/question-generators/graph-algorithms/spanningtree/findMinimalMST.ts"
 import { KruskalCycle } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalGen.ts"
 import { MSTGraphGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTGraph.ts"
 import { MSTWeightGen } from "@shared/question-generators/graph-algorithms/spanningtree/MSTWeight.ts"
 import { PrimOrder } from "@shared/question-generators/graph-algorithms/spanningtree/primGen.ts"
 import { UniqueMSTGen } from "@shared/question-generators/graph-algorithms/spanningtree/uniqueMST.ts"
-import { DijkstraAlgorithm } from "@shared/question-generators/graph-algorithms/dijkstra"
-import { DijkstraTableGenerator } from "@shared/question-generators/graph-algorithms/dijkstraTable"
 import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
 import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighbours.ts"
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
@@ -119,7 +119,7 @@ export const collection: QuestionCollection = [
   {
     slug: "spanning-trees",
     name: { de: "MST", en: "MST" },
-    topics: [],
+    topics: ["graph", "algorithms"],
     contents: [MSTWeightGen, MSTGraphGen, KruskalCycle, PrimOrder, UniqueMSTGen, FindMinimalMST],
   },
 ]

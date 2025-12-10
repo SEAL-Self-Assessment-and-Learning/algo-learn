@@ -80,7 +80,7 @@ export const KruskalCycle: QuestionGenerator = {
       kruskalResult = kruskalAlgorithm(G)
     } while (kruskalResult.cycle.length < 2)
 
-    G.inputFields = 1
+    G.inputFieldID = 1
     G.edgeGroupMax = 2
     G.edgeClickType = "select"
     G.nodeDraggable = false
@@ -107,7 +107,6 @@ export const KruskalCycle: QuestionGenerator = {
 function getFeedback(G: Graph, cycleEdges: Edge[], lang: Language): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
     setEdgesGroup(G, cycleEdges, 1)
-    G.inputFields = 0
     const edgeInput = checkEdgeInput(text[edgeInputFieldID(1)], G, lang)
     if (!edgeInput.parsed || !("selected" in edgeInput)) {
       return {

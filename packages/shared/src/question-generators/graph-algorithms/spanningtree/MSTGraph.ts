@@ -85,7 +85,7 @@ export const MSTGraphGen: QuestionGenerator = {
     G.edgeClickType = "select"
     G.edgeGroupMax = 2
     G.nodeDraggable = false
-    G.inputFields = 1
+    G.inputFieldID = 1
 
     const question: MultiFreeTextQuestion = {
       type: "MultiFreeTextQuestion",
@@ -113,7 +113,6 @@ function getFeedback(graph: Graph, random: Random, lang: Language): MultiFreeTex
       random.bool() ? kruskalAlgorithm(graph) : computeAllMST(graph, random.choice(graph.nodes))[0]
     ).mst
     setEdgesGroup(graph, MST, 1)
-    graph.inputFields = 0
 
     const edgeInput = checkEdgeInput(text[edgeInputFieldID(1)], graph, lang)
     if (!edgeInput.parsed || !("selected" in edgeInput)) {
