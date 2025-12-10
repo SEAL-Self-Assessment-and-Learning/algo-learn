@@ -25,7 +25,6 @@
     graph: Graph
   }
   const { maxWidth, maxHeight, graph }: Props = $props()
-  console.log(graph.nodes)
   const lang = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
 
@@ -49,27 +48,30 @@
       .map((edge) => ({ ...edge }))
   }
 
-  const { addTextFieldAfterwards } = getContext<FormContextValue>(ADD_TEXTFIELDS_AFTERWARDS)
-
   let nodeList = $state(cloneNodesForState(graph.nodes))
   let edgeListFlat = $state(buildEdgeListForState(graph))
   const nodeClickType = $derived(graph.nodeClickType)
   const edgeClickType = $derived(graph.edgeClickType)
 
   let fieldOpen = $derived(false)
-  const nodeId = nodeInputFieldID(graph.inputFieldID)
-  const edgeId = edgeInputFieldID(graph.inputFieldID)
-  const nodeInputFieldMd = `${nodeId}#TL###`
-  const edgeInputFieldMd = `${edgeId}#TL###`
+  const inputFieldBase = graph.inputFieldID ?? null
+  const hasInputFieldId = inputFieldBase !== null
+  const nodeId = hasInputFieldId ? nodeInputFieldID(inputFieldBase) : null
+  const edgeId = hasInputFieldId ? edgeInputFieldID(inputFieldBase) : null
+  const nodeInputFieldMd = nodeId ? `${nodeId}#TL###` : null
+  const edgeInputFieldMd = edgeId ? `${edgeId}#TL###` : null
 
   // register fields first so parent/provider can add them
-  if (graph.inputFieldID) {
-    if (graph.nodeClickType !== "none") {
-      addTextFieldAfterwards(nodeInputFieldMd)
-    }
-    if (graph.edgeClickType !== "none") {
-      addTextFieldAfterwards(edgeInputFieldMd)
-    }
+  let addTextFieldAfterwards = undefined
+  if (hasInputFieldId) {
+    const { addTextFieldAfterwards: atfa } = getContext<FormContextValue>(ADD_TEXTFIELDS_AFTERWARDS)
+    addTextFieldAfterwards = atfa
+  }
+  if (hasInputFieldId && graph.nodeClickType !== "none") {
+    addTextFieldAfterwards!(nodeInputFieldMd!)
+  }
+  if (hasInputFieldId && graph.edgeClickType !== "none") {
+    addTextFieldAfterwards!(edgeInputFieldMd!)
   }
 
   // get context (the provider should keep this object reactive)
@@ -77,17 +79,18 @@
 
   // derive the live field objects from the context (no one-time copies)
   // this reads the context object each time it changes
-  const nodeField = $derived(() => context.textFieldStateValues?.[nodeId])
-  const edgeField = $derived(() => context.textFieldStateValues?.[edgeId])
+  const nodeField = $derived(() => (nodeId ? context.textFieldStateValues?.[nodeId] : undefined))
+  const edgeField = $derived(() => (edgeId ? context.textFieldStateValues?.[edgeId] : undefined))
 
   const nodeDisabled = $derived(() => nodeField()?.disabled ?? false)
   const edgeDisabled = $derived(() => edgeField()?.disabled ?? false)
 
   // derive the text string reactively from nodeField
-  const nodeText = $derived(() => nodeField()?.text ?? "")
-  const edgeText = $derived(() => edgeField()?.text ?? "")
+  const nodeText = $derived(() => (nodeId ? nodeField()?.text ?? "" : ""))
+  const edgeText = $derived(() => (edgeId ? edgeField()?.text ?? "" : ""))
 
   $effect(() => {
+    if (!nodeId) return
     const text = nodeText()
     untrack(() => {
       saveNodeInput(text, nodeList, graph, lang)
@@ -95,6 +98,7 @@
   })
 
   $effect(() => {
+    if (!edgeId) return
     const text = edgeText()
     untrack(() => {
       saveEdgeInput(text, edgeListFlat, graph, lang)
@@ -296,7 +300,7 @@
     <div
       class="absolute right-28 -bottom-6 flex flex-row items-center space-x-1 rounded-lg dark:border-gray-700 dark:bg-gray-800"
     >
-      {#if nodeClickType === "select" || nodeClickType === "group" || edgeClickType === "select" || edgeClickType === "group"}
+      {#if hasInputFieldId && (nodeClickType === "select" || nodeClickType === "group" || edgeClickType === "select" || edgeClickType === "group")}
         <Toggle
           class="hover:cursor-pointer"
           size="sm"
@@ -311,19 +315,19 @@
       {/if}
     </div>
   </div>
-  {#if (nodeClickType === "select" || nodeClickType === "group") && fieldOpen}
+  {#if hasInputFieldId && (nodeClickType === "select" || nodeClickType === "group") && fieldOpen}
     <div class="mt-4">
       <div class="mb-1">
         <b>{t("nodeSelection")}</b>
       </div>
       <div class="flex w-full flex-row items-center justify-center space-x-1">
         <div class="mr-0.5 flex-grow">
-          <Markdown md={`{{${nodeInputFieldMd}}}`} />
+          <Markdown md={`{{${nodeInputFieldMd ?? ""}}}`} />
         </div>
       </div>
     </div>
   {/if}
-  {#if (edgeClickType === "select" || edgeClickType === "group") && fieldOpen}
+  {#if hasInputFieldId && (edgeClickType === "select" || edgeClickType === "group") && fieldOpen}
     <div class="mt-1">
       <div class="mb-1">
         <b>{t("edgeSelection")}</b>
@@ -336,3 +340,4 @@
     </div>
   {/if}
 </div>
+

@@ -27,6 +27,16 @@ test("parse", () => {
   expect(graph.isStronglyConnected()).toBeTruthy()
 })
 
+test("parse inputFieldID variants", () => {
+  const base = '3 2 0 0 null 0 0 0 1 1\n0 0 - ""\n1 1 - ""\n2 2 - ""\n0 1 -\n1 2 -\n'
+  const parsedNull = Graph.parse(base)
+  expect(parsedNull.inputFieldID).toBeNull()
+
+  const withId = base.replace('null', '42')
+  const parsedNumeric = Graph.parse(withId)
+  expect(parsedNumeric.inputFieldID).toEqual(42)
+})
+
 describe("graph generation", () => {
   function getGraph({
     seed = "test",

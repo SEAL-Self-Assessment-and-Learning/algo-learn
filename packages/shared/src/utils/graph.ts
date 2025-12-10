@@ -49,7 +49,7 @@ export class Graph {
   edges: EdgeList
   weighted: boolean
   directed: boolean
-  public inputFieldID: number
+  public inputFieldID: number | null
   public nodeDraggable: boolean
   public nodeClickType: ClickEventType
   public edgeClickType: ClickEventType
@@ -62,7 +62,7 @@ export class Graph {
     edges: EdgeList,
     directed: boolean,
     weighted: boolean,
-    inputFieldID: number = 0,
+    inputFieldID: number | null = null,
     nodeDraggable: boolean = false,
     nodeClick: ClickEventType = "none",
     edgeClick: ClickEventType = "none",
@@ -142,7 +142,7 @@ export class Graph {
   public static parse(graphStr: string): Graph {
     const lines = graphStr.split("\n")
     const graphMetaData = lines[0].match(
-      /^(\d+) (\d+) ([01]) ([01]) ([\d+]) ([01]) ([01234]) ([01234]) (\d+) (\d+)$/,
+      /^(\d+) (\d+) ([01]) ([01]) (null|\d+) ([01]) ([01234]) ([01234]) (\d+) (\d+)$/,
     )
 
     if (graphMetaData === null) throw Error(`Input error: graph data has invalid meta data: ${lines[0]}`)
@@ -150,7 +150,10 @@ export class Graph {
     const numEdges = parseInt(graphMetaData[2])
     const directed = graphMetaData[3] === "1"
     const weighted = graphMetaData[4] === "1"
-    const inputFieldID = parseInt(graphMetaData[5])
+    const inputFieldID = graphMetaData[5] === "null" ? null : parseInt(graphMetaData[5])
+    if (inputFieldID === null && graphMetaData[5] !== "null") {
+      throw Error("Input error: invalid input field identifier")
+    }
     const nodeDraggable = graphMetaData[6] === "1"
     const clickTypeMapping: Record<string, ClickEventType> = {
       "0": "none",
