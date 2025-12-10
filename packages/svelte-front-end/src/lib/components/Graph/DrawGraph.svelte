@@ -131,7 +131,7 @@
   const edgeStates = $derived<GraphElementStateType[]>(
     edgeListFlat.map((e) => ({
       selected: edgeClickType === "select" || edgeClickType === "selectupgrade" ? !!e.group : false,
-      group: edgeClickType === "group" || edgeClickType === "selectupgrade" ? (e.group ?? null) : null,
+      group: edgeClickType === "group" || edgeClickType === "groupupgrade" ? (e.group ?? null) : null,
     })),
   )
 

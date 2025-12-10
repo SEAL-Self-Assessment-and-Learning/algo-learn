@@ -71,6 +71,7 @@ export const FindMinimalMST: QuestionGenerator = {
       )
       G.edgeGroupMax = 2
       G.nodeDraggable = false
+      G.edgeClickType = "selectupgrade"
 
       graphs.push(G)
     }
