@@ -10,7 +10,7 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "format": "prettier --write .",
-    "lint": "bun run check && prettier --check . && eslint ."
+    "lint": "$npm_execpath run check && prettier --check . && eslint ."
   },
   "dependencies": {
     "@dnd-kit-svelte/core": "0.0.11",
