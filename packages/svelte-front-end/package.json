@@ -1,0 +1,25 @@
+{
+  "name": "svelte-front-end",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "prepare": "svelte-kit sync || echo ''",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "format": "prettier --write .",
+    "lint": "$npm_execpath run check && prettier --check . && eslint ."
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "@dnd-kit-svelte/core": "^0.0.11",
+    "@dnd-kit-svelte/sortable": "^0.0.11",
+    "@icons-pack/svelte-simple-icons": "^6.4.0",
+    "@dnd-kit-svelte/utilities": "^0.0.11",
+    "@tailwindcss/typography": "^0.5.16",
+    "bits-ui": "^2.9.6",
+    "katex": "^0.16.22"
+  }
+}

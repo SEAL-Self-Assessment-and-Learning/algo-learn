@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="%lang%">
+  <head>
+    <title>SEAL - Self Assessment and Learning</title>
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="%sveltekit.assets%/favicon/favicon-32x32.png"
+      sizes="96x96"
+    />
+    <meta name="apple-mobile-web-app-title" content="SEAL" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      const x = localStorage.getItem("theme")
+      if (x === "dark" || (x !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark")
+        document.documentElement.style.colorScheme = "dark"
+      }
+    </script>
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
