@@ -86,8 +86,8 @@
   const edgeDisabled = $derived(() => edgeField()?.disabled ?? false)
 
   // derive the text string reactively from nodeField
-  const nodeText = $derived(() => (nodeId ? nodeField()?.text ?? "" : ""))
-  const edgeText = $derived(() => (edgeId ? edgeField()?.text ?? "" : ""))
+  const nodeText = $derived(() => (nodeId ? (nodeField()?.text ?? "") : ""))
+  const edgeText = $derived(() => (edgeId ? (edgeField()?.text ?? "") : ""))
 
   $effect(() => {
     if (!nodeId) return
@@ -340,4 +340,3 @@
     </div>
   {/if}
 </div>
-

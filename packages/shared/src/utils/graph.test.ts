@@ -32,7 +32,7 @@ test("parse inputFieldID variants", () => {
   const parsedNull = Graph.parse(base)
   expect(parsedNull.inputFieldID).toBeNull()
 
-  const withId = base.replace('null', '42')
+  const withId = base.replace("null", "42")
   const parsedNumeric = Graph.parse(withId)
   expect(parsedNumeric.inputFieldID).toEqual(42)
 })
