@@ -1,5 +1,5 @@
 {
-  "name": "algo-learn-monorepo",
+  "name": "algo-learn",
   "private": true,
   "workspaces": [
     "packages/*"
