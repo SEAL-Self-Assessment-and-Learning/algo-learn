@@ -1,6 +1,5 @@
 import { spanningTreeBaseChecks } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalAlgo.ts"
-import { isSameEdge } from "@shared/question-generators/graph-algorithms/spanningtree/utils.ts"
-import type { Edge, Graph, Node } from "@shared/utils/graph.ts"
+import { isSameEdge, type Edge, type Graph, type Node } from "@shared/utils/graph.ts"
 
 export function getNumOfAllMST(graph: Graph) {
   return getAllMST(graph).length

@@ -1055,3 +1055,14 @@ export class CycleGraph {
     return new Graph(nodes, edges, directed, !!weights)
   }
 }
+
+/**
+ * Checks if two edges are the same (ignoring direction)
+ * @param a
+ * @param b
+ */
+export function isSameEdge(a: Edge, b: Edge): boolean {
+  return (
+    (a.source === b.source && a.target === b.target) || (a.source === b.target && a.target === b.source)
+  )
+}

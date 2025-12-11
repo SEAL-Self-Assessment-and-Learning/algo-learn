@@ -7,7 +7,6 @@ import type {
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { kruskalAlgorithm } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalAlgo.ts"
-import { setEdgesGroup } from "@shared/question-generators/graph-algorithms/spanningtree/utils.ts"
 import {
   edgeInputFieldID,
   getNodeLabel,
@@ -15,7 +14,7 @@ import {
   type Edge,
   type Graph,
 } from "@shared/utils/graph.ts"
-import { checkEdgeInput } from "@shared/utils/graphInput.ts"
+import { checkEdgeInput, setEdgesGroup } from "@shared/utils/graphInput.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 

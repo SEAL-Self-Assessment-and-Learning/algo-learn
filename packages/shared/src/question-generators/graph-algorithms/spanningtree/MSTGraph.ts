@@ -7,10 +7,7 @@ import type {
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { kruskalAlgorithm } from "@shared/question-generators/graph-algorithms/spanningtree/kruskalAlgo.ts"
 import { computeAllMST } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
-import {
-  isSpanningTree,
-  setEdgesGroup,
-} from "@shared/question-generators/graph-algorithms/spanningtree/utils.ts"
+import { isSpanningTree } from "@shared/question-generators/graph-algorithms/spanningtree/utils.ts"
 import {
   edgeInputFieldID,
   getNodeLabel,
@@ -18,7 +15,7 @@ import {
   type Edge,
   type Graph,
 } from "@shared/utils/graph.ts"
-import { checkEdgeInput } from "@shared/utils/graphInput.ts"
+import { checkEdgeInput, setEdgesGroup } from "@shared/utils/graphInput.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 

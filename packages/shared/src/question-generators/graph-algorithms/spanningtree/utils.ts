@@ -1,30 +1,5 @@
 import { QuickFind } from "@shared/question-generators/unionFind/quickFind/quickFindAlgorithm.ts"
-import type { Edge, Graph } from "@shared/utils/graph.ts"
-
-/**
- * Highlight the edges in the graph
- * In place operation
- * @param graph
- * @param edges
- * @param group
- */
-export function setEdgesGroup(graph: Graph, edges: Edge[], group: number) {
-  for (const edge of edges) {
-    edge.group = group
-    graph.setEdgeGroup(edge.source, edge.target, edge.group)
-  }
-}
-
-/**
- * Checks if two edges are the same (ignoring direction)
- * @param a
- * @param b
- */
-export function isSameEdge(a: Edge, b: Edge): boolean {
-  return (
-    (a.source === b.source && a.target === b.target) || (a.source === b.target && a.target === b.source)
-  )
-}
+import type { Edge } from "@shared/utils/graph.ts"
 
 /**
  * Checks if a given list of edges forms a spanning tree

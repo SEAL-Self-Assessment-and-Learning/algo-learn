@@ -339,3 +339,17 @@ export function parseNodeText(nodeStates: GraphElementStateType[]) {
     .filter((x) => x !== "")
     .join(";")
 }
+
+/**
+ * Highlight the edges in the graph
+ * In place operation
+ * @param graph
+ * @param edges
+ * @param group
+ */
+export function setEdgesGroup(graph: Graph, edges: Edge[], group: number) {
+  for (const edge of edges) {
+    edge.group = group
+    graph.setEdgeGroup(edge.source, edge.target, edge.group)
+  }
+}
