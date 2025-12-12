@@ -339,9 +339,3 @@
     {/each}
   </div>
 {/if}
-
-<style>
-  .matching-board {
-    align-items: flex-start;
-  }
-</style>
