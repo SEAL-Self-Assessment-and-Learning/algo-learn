@@ -118,7 +118,7 @@ export const collection: QuestionCollection = [
   },
   {
     slug: "spanning-trees",
-    name: { de: "MST", en: "MST" },
+    name: { de: "Spannbäume", en: "Spanning Trees" },
     topics: ["graph", "algorithms"],
     contents: [MSTWeightGen, MSTGraphGen, KruskalCycle, PrimOrder, UniqueMSTGen, FindMinimalMST],
   },

@@ -6,7 +6,7 @@ import type {
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
 import { computeAllMST } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
-import { RandomGraph } from "@shared/utils/graph.ts"
+import { RandomGraph, type Edge, type Graph } from "@shared/utils/graph.ts"
 import Random from "@shared/utils/random.ts"
 import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
@@ -14,19 +14,20 @@ const translations: Translations = {
   en: {
     name: "Minimum Spanning Tree (Weight)",
     description: "Compute the weight of a minimum spanning tree",
-    task: "Given the graph $G$: {{0}} Compute the weight of the minimum spanning tree.",
+    task: "Given the graph $G$: {{0}} Compute the weight of a minimum spanning tree.",
     fdParse: "Your response could not be converted into an integer.",
-    param_size: "Size of the graph",
   },
   de: {
     name: "Minimaler Spannbaum (Gewicht)",
     description: "Berechne das Gewicht eines minimalen Spannbaums",
-    task: "Gegeben ist der Graph $G$: {{0}} Berechne das Gewicht des minimalen Spannbaums.",
+    task: "Gegeben ist der Graph $G$: {{0}} Berechne das Gewicht eines minimalen Spannbaums.",
     fdParse: "Deine Antwort konnte nicht in eine ganze Zahl umgewandelt werden.",
-    param_size: "Größe des Graphen",
   },
 }
 
+/**
+ * Generates a question asking for the weight of a minimum spanning tree
+ */
 export const MSTWeightGen: QuestionGenerator = {
   id: "mstweight",
   name: tFunctional(translations, "name"),
@@ -37,7 +38,6 @@ export const MSTWeightGen: QuestionGenerator = {
   expectedParameters: [
     {
       name: "size",
-      description: tFunctional(translations, "param_size"),
       type: "integer",
       min: 2,
       max: 4,
@@ -67,14 +67,14 @@ export const MSTWeightGen: QuestionGenerator = {
     G.nodeDraggable = false
     const startNode = random.choice(G.nodes)
     const MST = computeAllMST(G, startNode)[0].mst
-    const mstWeight = MST.reduce((acc, x) => acc + (x.value ?? 1), 0)
+    const mstWeight = MST.reduce((acc, x) => acc + x.value!, 0)
 
     const question: FreeTextQuestion = {
       type: "FreeTextQuestion",
       name: MSTWeightGen.name(lang),
       path: permaLink,
       text: t(translations, lang, "task", [G.toMarkdown()]),
-      feedback: getFeedback(mstWeight, lang),
+      feedback: getFeedback(mstWeight, G, MST, lang),
     }
     return { question }
   },
@@ -83,12 +83,29 @@ export const MSTWeightGen: QuestionGenerator = {
 /**
  * Feedback function parsing the user input and checking for correctness
  * @param mstWeight
+ * @param graph
+ * @param mst
  * @param lang
  */
-function getFeedback(mstWeight: number, lang: Language): FreeTextFeedbackFunction {
+function getFeedback(
+  mstWeight: number,
+  graph: Graph,
+  mst: Edge[],
+  lang: Language,
+): FreeTextFeedbackFunction {
   return ({ text }) => {
+    graph.edgeClickType = "selectupgrade"
+    graph.nodeClickType = "none"
+    // first remove all highlighting
+    for (const edge of graph.edges.flat()) {
+      graph.setEdgeGroup(edge.source, edge.target, null)
+    }
+    // add the correct mst highlighting
+    for (let i = 0; i < mst.length; i++) {
+      graph.setEdgeGroup(mst[i].source, mst[i].target, 1)
+    }
     if (text.trim() === "") {
-      return { correct: false, correctAnswer: mstWeight.toString() }
+      return { correct: false, correctAnswer: mstWeight.toString() + graph.toMarkdown() }
     }
     const answer = text.replaceAll(" ", "")
     const answerValue = Number.parseInt(answer, 10)
@@ -96,12 +113,12 @@ function getFeedback(mstWeight: number, lang: Language): FreeTextFeedbackFunctio
     if (Number.isNaN(answerValue)) {
       return {
         correct: false,
-        correctAnswer: mstWeight.toString(),
+        correctAnswer: mstWeight.toString() + graph.toMarkdown(),
         feedbackText: t(translations, lang, "fdParse"),
       }
     }
     if (answerValue !== mstWeight) {
-      return { correct: false, correctAnswer: mstWeight.toString() }
+      return { correct: false, correctAnswer: mstWeight.toString() + graph.toMarkdown() }
     }
 
     return {
