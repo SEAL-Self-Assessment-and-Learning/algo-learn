@@ -64,37 +64,48 @@
   function onChange(slots: (SlotItem | null)[]) {
     questionState.choice = slots.map((s) => (s ? Number(s.id) : -1))
   }
+
+  function onKeyDown(e: Event) {
+    if (!(e instanceof KeyboardEvent)) return
+    if (e.ctrlKey || e.metaKey || e.altKey) return
+    if (e.key === "Enter") {
+      e.preventDefault()
+      handleClick(false)
+    }
+  }
 </script>
 
-<InteractWithQuestion
-  {permalink}
-  name={question.name}
-  {regenerate}
-  footerMode={questionState.mode}
-  footerMessage={footerMsg}
-  handleFooterClick={handleClick}
->
-  <Markdown md={question.text ?? ""} />
+<div on:keydown={onKeyDown} tabindex="0" class="focus:outline-none">
+  <InteractWithQuestion
+    {permalink}
+    name={question.name}
+    {regenerate}
+    footerMode={questionState.mode}
+    footerMessage={footerMsg}
+    handleFooterClick={handleClick}
+  >
+    <Markdown md={question.text ?? ""} />
 
-  <div class="my-5">
-    <MatchingExercise
-      pairs={(question.fixedItems ?? []).map((f, i) => ({
-        id: `${i}`,
-        fixed: f,
-        answerId: questionState.choice[i] >= 0 ? `${questionState.choice[i]}` : null,
-        correctness: questionState.feedbackObject?.rowCorrectness?.[i] ?? null,
-      }))}
-      answers={question.answers.map((a, i) => ({
-        id: `${i}`,
-        content: a,
-      }))}
-      {disabled}
-      {onChange}
-      {onModeChange}
-      columns={question.columns}
-    />
-  </div>
-</InteractWithQuestion>
+    <div class="my-5">
+      <MatchingExercise
+        pairs={(question.fixedItems ?? []).map((f, i) => ({
+          id: `${i}`,
+          fixed: f,
+          answerId: questionState.choice[i] >= 0 ? `${questionState.choice[i]}` : null,
+          correctness: questionState.feedbackObject?.rowCorrectness?.[i] ?? null,
+        }))}
+        answers={question.answers.map((a, i) => ({
+          id: `${i}`,
+          content: a,
+        }))}
+        {disabled}
+        {onChange}
+        {onModeChange}
+        columns={question.columns}
+      />
+    </div>
+  </InteractWithQuestion>
+</div>
 
 {#snippet footerMsg()}
   <div class="flex-col">
