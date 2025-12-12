@@ -101,7 +101,7 @@ export const collection: QuestionCollection = [
   },
   {
     slug: "setbuilder",
-    name: { en: "Set Builder Notation", de: "Mengenschreibweise" },
+    name: { en: "Sets", de: "Mengen" },
     contents: [SetBuilderQuestion],
     topics: ["math"],
   },
