@@ -18,7 +18,6 @@ import { templates } from "./templates"
 import { translations } from "./translations"
 
 const maxMatchSize = 8
-const maxAttempts = 100
 
 export const SetBuilderQuestion: QuestionGenerator = {
   id: "setbuild",
@@ -98,10 +97,8 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
   const fixed: string[] = []
   const movable: string[] = []
 
-  let attempts = 0
-  while (fixed.length < nSets && attempts < maxAttempts) {
-    attempts++
-
+  // retry until enough valid sets are generated
+  while (fixed.length < nSets) {
     const template = random.choice(templates)
     const domain: Domain = random.choice(["N", "Z"])
     const param = template.paramRange(random)
@@ -126,10 +123,6 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
 
     fixed.push(label)
     movable.push(explicit)
-  }
-
-  if (fixed.length < nSets) {
-    throw new Error("Could not generate enough small sets for matching")
   }
 
   // shuffle correct answers
