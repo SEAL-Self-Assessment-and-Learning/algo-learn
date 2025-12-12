@@ -210,14 +210,17 @@ function generateFreeTextVariant(lang: Language, path: string, random: Random) {
   // also accept negative integers
   const checkFormat = (a: FreeTextAnswer) => {
     const input = a.text.trim()
+    if (input === "") return { valid: false }
     const isValid = /^\{\s*(-?\d+(\s*,\s*-?\d+)*)?\s*\}$/.test(input)
-    return isValid ? { valid: true } : { valid: false, message: t(translations, lang, "checkFormat") }
+    return isValid
+      ? { valid: true }
+      : { valid: false, message: t(translations, lang, "checkFormat") }
   }
 
   const feedback = (a: FreeTextAnswer): FreeTextFeedback => {
     const trimmed = a.text.trim()
     if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
-      return { correct: false, correctAnswer: `\\{ ${sorted.join(", ")} \\}` }
+      return { correct: false, correctAnswer: `$\\{ ${sorted.join(", ")} \\}$` }
     }
     const inside = trimmed.slice(1, -1).trim()
     if (inside === "") {
@@ -230,7 +233,7 @@ function generateFreeTextVariant(lang: Language, path: string, random: Random) {
       .filter((x) => !isNaN(x))
 
     const correct = user.length === correctSet.size && [...correctSet].every((x) => user.includes(x))
-    return { correct, correctAnswer: `\\{ ${sorted.join(", ")} \\}` }
+    return { correct, correctAnswer: `$\\{ ${sorted.join(", ")} \\}$` }
   }
 
   const question: FreeTextQuestion = {
@@ -238,6 +241,7 @@ function generateFreeTextVariant(lang: Language, path: string, random: Random) {
     name: t(translations, lang, "name"),
     path,
     text: `${t(translations, lang, "free")}\\[${expression}\\]`,
+    prompt: "",
     checkFormat,
     feedback,
     typingAid: [
@@ -245,6 +249,7 @@ function generateFreeTextVariant(lang: Language, path: string, random: Random) {
       { text: "}", input: "}", label: "}" },
       { text: ",", input: ",", label: "," },
     ],
+    bottomText: t(translations, lang, "typingAidExplanation"),
   }
 
   return { question }
