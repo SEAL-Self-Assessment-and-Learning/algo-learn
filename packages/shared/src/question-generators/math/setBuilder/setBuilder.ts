@@ -212,9 +212,7 @@ function generateFreeTextVariant(lang: Language, path: string, random: Random) {
     const input = a.text.trim()
     if (input === "") return { valid: false }
     const isValid = /^\{\s*(-?\d+(\s*,\s*-?\d+)*)?\s*\}$/.test(input)
-    return isValid
-      ? { valid: true }
-      : { valid: false, message: t(translations, lang, "checkFormat") }
+    return isValid ? { valid: true } : { valid: false, message: t(translations, lang, "checkFormat") }
   }
 
   const feedback = (a: FreeTextAnswer): FreeTextFeedback => {

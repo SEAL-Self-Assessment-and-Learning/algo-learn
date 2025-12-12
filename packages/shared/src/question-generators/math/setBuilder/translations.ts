@@ -19,7 +19,8 @@ export const translations: Translations = {
     match:
       "Ordne jeder in Mengenschreibweise gegebenen Menge ihre explizite Aufzählung der Elemente zu:",
     free: "Schreibe alle Elemente der folgenden Menge explizit auf:",
-    checkFormat: "Die Antwort konnte nicht als Menge erkannt werden. Eine gültige Menge sieht so aus: {a, b, c}.",
+    checkFormat:
+      "Die Antwort konnte nicht als Menge erkannt werden. Eine gültige Menge sieht so aus: {a, b, c}.",
     even: "gerade",
     odd: "ungerade",
     prime: "prim",
