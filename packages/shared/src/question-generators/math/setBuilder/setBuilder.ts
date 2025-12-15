@@ -4,10 +4,10 @@ import {
   type FreeTextAnswer,
   type FreeTextFeedback,
   type FreeTextQuestion,
+  type MatchingFeedback,
+  type MatchingFeedbackFunction,
+  type MatchingQuestion,
   type MultipleChoiceAnswer,
-  type MultipleChoiceFeedback,
-  type MultipleChoiceFeedbackFunction,
-  type MultipleChoiceQuestion,
   type QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
@@ -84,8 +84,8 @@ function buildMismatchTable(
   ].join("\n")
 }
 
-function matchingRowFeedback(correctMapping: number[], base: MultipleChoiceFeedbackFunction) {
-  return async (answer: MultipleChoiceAnswer): Promise<MultipleChoiceFeedback> => {
+function matchingRowFeedback(correctMapping: number[], base: MatchingFeedbackFunction) {
+  return async (answer: MultipleChoiceAnswer): Promise<MatchingFeedback> => {
     const result = await Promise.resolve(base(answer))
     const rowCorrectness = correctMapping.map((c, i) => answer.choice[i] === c)
     return { ...result, rowCorrectness }
@@ -156,7 +156,7 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     sorting: true,
   })
 
-  const feedback: MultipleChoiceFeedbackFunction = async (answer) => {
+  const feedback: MatchingFeedbackFunction = async (answer) => {
     const base = await matchingRowFeedback(solution, baseFeedback)(answer)
 
     const table = buildMismatchTable(lang, fixed, movableShuffled, answer.choice, solution)
@@ -167,12 +167,10 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     }
   }
 
-  const question: MultipleChoiceQuestion = {
-    type: "MultipleChoiceQuestion",
+  const question: MatchingQuestion = {
+    type: "MatchingQuestion",
     name: SetBuilderQuestion.name(lang),
     path,
-    sorting: true,
-    matching: true,
     text: t(translations, lang, "match"),
     fixedItems: fixed,
     answers: movableShuffled,

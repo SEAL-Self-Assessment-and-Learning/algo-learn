@@ -14,7 +14,7 @@
   const { question, onResult, regenerate }: Props = $props()
 </script>
 
-{#if question.type === "MultipleChoiceQuestion" && question.matching}
+{#if question.type === "MatchingQuestion"}
   <ExerciseMatching {question} permalink={question.path} {onResult} {regenerate} />
 {:else if question.type === "MultipleChoiceQuestion"}
   <ExerciseMultipleChoice {question} permalink={question.path} {onResult} {regenerate} />

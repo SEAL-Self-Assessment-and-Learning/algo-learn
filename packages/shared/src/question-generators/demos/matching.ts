@@ -1,8 +1,9 @@
 import {
   minimalMultipleChoiceFeedback,
+  type MatchingFeedback,
+  type MatchingFeedbackFunction,
+  type MatchingQuestion,
   type MultipleChoiceAnswer,
-  type MultipleChoiceFeedback,
-  type MultipleChoiceQuestion,
   type QuestionGenerator,
 } from "@shared/api/QuestionGenerator"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
@@ -82,14 +83,16 @@ export const DemoMatching: QuestionGenerator = {
       sorting: true,
     })
 
-    const feedback = async (answer: MultipleChoiceAnswer): Promise<MultipleChoiceFeedback> => {
+    const feedback: MatchingFeedbackFunction = async (
+      answer: MultipleChoiceAnswer,
+    ): Promise<MatchingFeedback> => {
       const result = await baseFeedback(answer)
       const rowCorrectness = solution.map((c, i) => answer.choice[i] === c)
       return { ...result, rowCorrectness }
     }
 
-    const question: MultipleChoiceQuestion = {
-      type: "MultipleChoiceQuestion",
+    const question: MatchingQuestion = {
+      type: "MatchingQuestion",
       name: DemoMatching.name(lang),
       path: serializeGeneratorCall({
         generator: DemoMatching,
@@ -97,13 +100,12 @@ export const DemoMatching: QuestionGenerator = {
         parameters,
         seed,
       }),
-      sorting: true,
-      matching: true,
       text: t(translations, lang, "text"),
       fixedItems: fixed,
       answers: movableShuffled,
       feedback,
       columns: 5,
+      fillOutAll: true,
     }
 
     return { question }

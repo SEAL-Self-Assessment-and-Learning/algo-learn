@@ -8,14 +8,14 @@
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte"
   import type { Language } from "@shared/api/Language"
-  import type { MultipleChoiceFeedback, MultipleChoiceQuestion } from "@shared/api/QuestionGenerator.ts"
+  import type { MatchingFeedback, MatchingQuestion } from "@shared/api/QuestionGenerator.ts"
   import { tFunction } from "@shared/utils/translations"
 
   const lang: Language = $derived(getLanguage())
   const { t } = $derived(tFunction([globalTranslations], lang))
 
   interface Props {
-    question: MultipleChoiceQuestion
+    question: MatchingQuestion
     permalink?: string
     onResult?: (result: Result, finished: boolean) => void
     regenerate?: () => void
@@ -26,7 +26,7 @@
   const questionState: {
     mode: MODE
     choice: number[]
-    feedbackObject?: MultipleChoiceFeedback
+    feedbackObject?: MatchingFeedback
   } = $state({
     mode: question.fillOutAll ? "invalid" : "draft",
     choice: Array(question.answers.length).fill(-1),
