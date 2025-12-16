@@ -110,6 +110,7 @@ function getFeedback(graph: Graph, random: Random, lang: Language): MultiFreeTex
       random.bool() ? kruskalAlgorithm(graph) : computeAllMST(graph, random.choice(graph.nodes))[0]
     ).mst
     setEdgesGroup(graph, MST, 1)
+    graph.edgeClickType = "selectupgrade"
 
     const edgeInput = checkEdgeInput(text[edgeInputFieldID(1)], graph, lang)
     if (!edgeInput.parsed || !("selected" in edgeInput)) {

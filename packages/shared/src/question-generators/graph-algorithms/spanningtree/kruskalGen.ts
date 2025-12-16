@@ -72,7 +72,7 @@ export const KruskalCycle: QuestionGenerator = {
         [size, size],
         1,
         random.choice(["square", "square-width-diagonals", "triangle"]),
-        "random",
+        "unique", // otherwise kruskal sorts them differently than the user
         false,
         random.bool(),
       )
@@ -106,6 +106,7 @@ export const KruskalCycle: QuestionGenerator = {
 function getFeedback(G: Graph, cycleEdges: Edge[], lang: Language): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
     setEdgesGroup(G, cycleEdges, 1)
+    G.edgeClickType = "selectupgrade"
     const edgeInput = checkEdgeInput(text[edgeInputFieldID(1)], G, lang)
     if (!edgeInput.parsed || !("selected" in edgeInput)) {
       return {
@@ -120,7 +121,7 @@ function getFeedback(G: Graph, cycleEdges: Edge[], lang: Language): MultiFreeTex
       return {
         correct: false,
         correctAnswer: G.toMarkdown(),
-        feedbackText: t(translations, lang, "fdEdgeAmount", [
+        feedbackText: t(translations, lang, "fdAmount", [
           selectedEdges.length.toString(),
           cycleEdges.length.toString(),
         ]),

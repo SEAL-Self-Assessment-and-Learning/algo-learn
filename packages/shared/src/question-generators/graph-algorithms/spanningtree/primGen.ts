@@ -77,6 +77,7 @@ export const PrimOrder: QuestionGenerator = {
       type: "MultiFreeTextQuestion",
       name: PrimOrder.name(lang),
       path: permaLink,
+      fillOutAll: true,
       text: t(translations, lang, "task", [G.toMarkdown(), startNode.label!]),
       checkFormat: getCheckFormat(G, lang),
       feedback: getFeedback(primResult.nodes, G, lang),
@@ -111,8 +112,8 @@ function getCheckFormat(G: Graph, lang: Language): MultiFreeTextFormatFunction {
     return {
       valid: missingNodes,
       message:
-        "$" +
-        nodeCheck.selected.join("$-$") +
+        "$ " +
+        nodeCheck.selected.join("$,$") +
         "$ " +
         (missingNodes
           ? ""

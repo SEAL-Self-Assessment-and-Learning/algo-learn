@@ -1,14 +1,16 @@
-import type { Language } from "@shared/api/Language.ts"
+import type { Language } from "@shared/api/Language.ts";
 import type {
   FreeTextFeedbackFunction,
+  FreeTextFormatFunction,
   FreeTextQuestion,
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { getNumOfAllMST } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
-import { RandomGraph, type Graph } from "@shared/utils/graph.ts"
-import Random from "@shared/utils/random.ts"
-import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
+import { getNumOfAllMST } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts";
+import { RandomGraph, type Graph } from "@shared/utils/graph.ts";
+import Random from "@shared/utils/random.ts";
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts";
+
 
 const translations: Translations = {
   en: {
@@ -16,6 +18,7 @@ const translations: Translations = {
     description: "Compute the number of unique minimum spanning trees",
     task: "Given the graph $G$: {{0}} Compute the number of unique minimum spanning trees.",
     fdParse: "Your response could not be converted into an integer.",
+    cfParse: "Only positive integers are allowed.",
     param_size: "Size of the graph",
   },
   de: {
@@ -23,6 +26,7 @@ const translations: Translations = {
     description: "Berechne die Anzahl der eindeutigen minimalen Spannbäume",
     task: "Gegeben ist der Graph $G$: {{0}} Berechne die Anzahl der eindeutigen minimalen Spannbäume.",
     fdParse: "Deine Antwort konnte nicht in eine ganze Zahl umgewandelt werden.",
+    cfParse: "Es sind nur positive ganze Zahlen erlaubt.",
     param_size: "Größe des Graphen",
   },
 }
@@ -82,6 +86,7 @@ export const UniqueMSTGen: QuestionGenerator = {
       path: permaLink,
       text: t(translations, lang, "task", [G.toMarkdown()]),
       feedback: getFeedback(numUniqueMST, lang),
+      checkFormat: getCheckFormat(lang),
     }
     return { question }
   },
@@ -113,6 +118,25 @@ function getFeedback(numUniqueMST: number, lang: Language): FreeTextFeedbackFunc
 
     return {
       correct: true,
+    }
+  }
+}
+
+function getCheckFormat(lang: Language): FreeTextFormatFunction {
+  return ({ text }) => {
+    const answer = text.replaceAll(" ", "")
+    const answerValue = Number.parseInt(answer, 10)
+
+    if (Number.isNaN(answerValue) || answerValue < 1) {
+      return {
+        valid: false,
+        message: t(translations, lang, "cfParse"),
+      }
+    }
+
+    return {
+      valid: true,
+      message: answerValue.toString()
     }
   }
 }
