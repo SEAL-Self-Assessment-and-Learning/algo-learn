@@ -1,4 +1,4 @@
-import type { Language } from "@shared/api/Language.ts";
+import type { Language } from "@shared/api/Language.ts"
 import type {
   FreeTextFeedbackFunction,
   FreeTextFormatFunction,
@@ -6,11 +6,10 @@ import type {
   QuestionGenerator,
 } from "@shared/api/QuestionGenerator.ts"
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter.ts"
-import { getNumOfAllMST } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts";
-import { RandomGraph, type Graph } from "@shared/utils/graph.ts";
-import Random from "@shared/utils/random.ts";
-import { t, tFunctional, type Translations } from "@shared/utils/translations.ts";
-
+import { getNumOfAllMST } from "@shared/question-generators/graph-algorithms/spanningtree/primAlgo.ts"
+import { RandomGraph, type Graph } from "@shared/utils/graph.ts"
+import Random from "@shared/utils/random.ts"
+import { t, tFunctional, type Translations } from "@shared/utils/translations.ts"
 
 const translations: Translations = {
   en: {
@@ -136,7 +135,7 @@ function getCheckFormat(lang: Language): FreeTextFormatFunction {
 
     return {
       valid: true,
-      message: answerValue.toString()
+      message: answerValue.toString(),
     }
   }
 }
