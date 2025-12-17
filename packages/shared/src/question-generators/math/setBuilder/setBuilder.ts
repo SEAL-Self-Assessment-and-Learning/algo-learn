@@ -143,7 +143,8 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     const result = generateConfounder(nums, base.template, random)
     if (!result) continue
 
-    const { strategy, values } = result
+    //const { strategy, values } = result
+    const { values } = result
     const unique = Array.from(new Set(values)).sort((a, b) => a - b)
 
     if (unique.length === 0) continue
@@ -153,11 +154,11 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     if (movable.some((m) => m.latex === fakeLatex)) continue
     if (confounders.some((c) => c.latex === fakeLatex)) continue
 
-    console.debug("[setbuilder confounder]", {
-      strategy,
-      base: base.latex,
-      generated: fakeLatex,
-    })
+    // console.debug("[setbuilder confounder]", {
+    //   strategy,
+    //   base: base.latex,
+    //   generated: fakeLatex,
+    // })
 
     confounders.push({ latex: fakeLatex, template: base.template })
   }
