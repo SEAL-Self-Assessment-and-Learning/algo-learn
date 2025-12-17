@@ -156,6 +156,7 @@ export const templates: SetTemplate[] = [
       return start <= end ? rangeArray(start, end).filter(isPrime) : []
     },
     paramRange: (random) => random.int(20, 50),
+    confounderStrategies: ["random", "dropAny", "resample"],
   },
 
   // multiples of m in N or Z
@@ -243,6 +244,7 @@ export const templates: SetTemplate[] = [
     },
     build: (_dom, _n, cfg) => rangeArray(cfg.includeStart, cfg.includeEnd).filter(isSquare),
     paramRange: (random) => random.int(30, 80),
+    confounderStrategies: ["random", "dropEdge", "extend", "resample"],
   },
 
   // congruence in N or Z
@@ -294,5 +296,6 @@ export const templates: SetTemplate[] = [
       return arr
     },
     paramRange: (random) => random.int(4, 12),
+    confounderStrategies: ["random", "dropEdge", "extend", "resample"],
   },
 ]

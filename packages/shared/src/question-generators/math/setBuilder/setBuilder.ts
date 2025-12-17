@@ -13,7 +13,7 @@ import {
 import { serializeGeneratorCall } from "@shared/api/QuestionRouter"
 import Random from "@shared/utils/random"
 import { t, tFunctional } from "@shared/utils/translations"
-import type { Domain } from "./helpers"
+import { generateConfounder, parseLatexSet, type Domain, type SetTemplate } from "./helpers"
 import { templates } from "./templates"
 import { translations } from "./translations"
 
@@ -95,7 +95,7 @@ function matchingRowFeedback(correctMapping: number[], base: MatchingFeedbackFun
 function generateMatchVariant(lang: Language, path: string, random: Random) {
   const nSets = random.int(4, 5)
   const fixed: string[] = []
-  const movable: string[] = []
+  const movable: { latex: string; template: SetTemplate }[] = []
 
   // retry until enough valid sets are generated
   while (fixed.length < nSets) {
@@ -116,13 +116,13 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     if (elementsSorted.length > maxMatchSize) continue
 
     const explicit = `$\\{ ${elementsSorted.join(", ")} \\}$`
-    if (movable.includes(explicit)) continue
+    if (movable.some((m) => m.latex === explicit)) continue
 
     const variants = template.labels(lang, domain, param, cfg)
     const label = `\\[${random.choice(variants)}\\]`
 
     fixed.push(label)
-    movable.push(explicit)
+    movable.push({ latex: explicit, template })
   }
 
   // shuffle correct answers
@@ -130,26 +130,41 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
 
   // add confounders (0–2 wrong answers)
   const nConfounders = random.int(0, 2)
-  const confounders: string[] = []
+  const confounders: { latex: string; template: SetTemplate }[] = []
 
-  for (let k = 0; k < nConfounders; k++) {
-    let fake: string
-    let tries = 0
+  let tries = 0
+  while (confounders.length < nConfounders && tries < 50) {
+    tries++
 
-    do {
-      tries++
-      const nums = Array.from({ length: random.int(1, 5) }, () => random.int(-10, 20)).sort(
-        (a, b) => a - b,
-      )
+    const base = random.choice(movable)
+    const nums = parseLatexSet(base.latex)
+    if (nums.length < 2) continue
 
-      fake = `$\\{ ${nums.join(", ")} \\}$`
-    } while ((movable.includes(fake) || confounders.includes(fake)) && tries < 30)
+    const result = generateConfounder(nums, base.template, random)
+    if (!result) continue
 
-    confounders.push(fake)
+    const { strategy, values } = result
+    const unique = Array.from(new Set(values)).sort((a, b) => a - b)
+
+    if (unique.length === 0) continue
+
+    const fakeLatex = `$\\{ ${unique.join(", ")} \\}$`
+
+    if (movable.some((m) => m.latex === fakeLatex)) continue
+    if (confounders.some((c) => c.latex === fakeLatex)) continue
+
+    console.debug("[setbuilder confounder]", {
+      strategy,
+      base: base.latex,
+      generated: fakeLatex,
+    })
+
+    confounders.push({ latex: fakeLatex, template: base.template })
   }
 
   movableShuffled = [...movableShuffled, ...confounders]
-  const solution = movable.map((exp) => movableShuffled.indexOf(exp))
+
+  const solution = movable.map((m) => movableShuffled.findIndex((x) => x.latex === m.latex))
 
   const baseFeedback = minimalMultipleChoiceFeedback({
     correctAnswerIndex: solution,
@@ -158,8 +173,13 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
 
   const feedback: MatchingFeedbackFunction = async (answer) => {
     const base = await matchingRowFeedback(solution, baseFeedback)(answer)
-
-    const table = buildMismatchTable(lang, fixed, movableShuffled, answer.choice, solution)
+    const table = buildMismatchTable(
+      lang,
+      fixed,
+      movableShuffled.map((m) => m.latex),
+      answer.choice,
+      solution,
+    )
 
     return {
       ...base,
@@ -173,7 +193,7 @@ function generateMatchVariant(lang: Language, path: string, random: Random) {
     path,
     text: t(translations, lang, "match"),
     fixedItems: fixed,
-    answers: movableShuffled,
+    answers: movableShuffled.map((m) => m.latex),
     feedback,
     columns: 2,
     fillOutAll: true,

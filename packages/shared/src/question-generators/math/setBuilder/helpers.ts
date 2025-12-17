@@ -168,4 +168,114 @@ export type SetTemplate = {
   labels: (lang: Language, dom: Domain, param: number, cfg: TemplateConfig) => string[]
   build: (dom: Domain, param: number, cfg: TemplateConfig) => number[]
   paramRange: (random: Random) => number
+  confounderStrategies?: readonly ConfounderStrategy[]
+}
+
+export type ConfounderStrategy = "random" | "dropEdge" | "dropAny" | "extend" | "resample"
+
+export type ConfounderResult = {
+  strategy: ConfounderStrategy
+  values: number[]
+}
+
+export function generateConfounder(
+  base: number[],
+  template: SetTemplate,
+  random: Random,
+): ConfounderResult | null {
+  const strategies = template.confounderStrategies ?? ["random", "dropEdge", "extend", "resample"]
+
+  const strategy = random.choice(strategies)
+
+  switch (strategy) {
+    case "random": {
+      const v = randomConfounder(random)
+      return { strategy, values: v }
+    }
+    case "dropEdge": {
+      const v = dropEdge(base, random)
+      return v ? { strategy, values: v } : null
+    }
+
+    case "dropAny": {
+      const v = dropAny(base, random)
+      return v ? { strategy, values: v } : null
+    }
+
+    case "extend": {
+      const v = extendByGap(base, random)
+      return v ? { strategy, values: v } : null
+    }
+
+    case "resample": {
+      const v = resampleWithinBounds(base, random)
+      return v ? { strategy, values: v } : null
+    }
+  }
+}
+
+export function randomConfounder(random: Random): number[] {
+  return Array.from({ length: random.int(1, 5) }, () => random.int(-10, 20)).sort((a, b) => a - b)
+}
+export function dropEdge(base: number[], random: Random): number[] | null {
+  if (base.length <= 2) return null
+  return random.choice([true, false]) ? base.slice(1) : base.slice(0, -1)
+}
+
+export function dropAny(base: number[], random: Random): number[] | null {
+  if (base.length <= 2) return null
+  const i = random.int(0, base.length - 1)
+  return base.filter((_, idx) => idx !== i)
+}
+
+export function averageGap(arr: number[]): number {
+  if (arr.length < 2) return 1
+  let sum = 0
+  for (let i = 1; i < arr.length; i++) {
+    sum += arr[i] - arr[i - 1]
+  }
+  return Math.max(1, Math.round(sum / (arr.length - 1)))
+}
+
+export function extendByGap(base: number[], random: Random): number[] | null {
+  if (base.length < 2) return null
+  const gap = averageGap(base)
+  return random.choice([true, false]) ? [...base, base[base.length - 1] + gap] : [base[0] - gap, ...base]
+}
+
+export function resampleWithinBounds(base: number[], random: Random, maxSize = 10): number[] | null {
+  if (base.length < 3) return null
+
+  const low = base[0]
+  const high = base[base.length - 1]
+  const width = high - low
+  if (width < 2) return null
+
+  const avg = averageGap(base)
+
+  const possibleSteps: number[] = []
+  for (let d = 1; d <= width; d++) {
+    if (width % d === 0 && d !== avg) possibleSteps.push(d)
+  }
+
+  if (possibleSteps.length === 0) return null
+
+  const step = random.choice(possibleSteps)
+  const result: number[] = []
+
+  for (let x = low; x <= high; x += step) {
+    result.push(x)
+    if (result.length > maxSize) return null
+  }
+
+  if (result.length < 2) return null
+  return result
+}
+
+export function parseLatexSet(latex: string): number[] {
+  return latex
+    .replace(/[{}$\\]/g, "")
+    .split(",")
+    .map((s) => parseInt(s.trim(), 10))
+    .filter((n) => !isNaN(n))
 }
