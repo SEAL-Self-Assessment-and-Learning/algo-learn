@@ -290,7 +290,7 @@ export const templates: SetTemplate[] = [
       const start = dom === "N" ? Math.max(1, cfg.includeStart) : cfg.includeStart
       const rVal = cfg.residue ?? 0
       const arr: number[] = []
-      for (let x = start; x <= cfg.includeEnd; x++) if (x % m === rVal) arr.push(x)
+      for (let x = start; x <= cfg.includeEnd; x++) if ((x - rVal) % m === 0) arr.push(x)
       return arr
     },
     paramRange: (random) => random.int(4, 12),
