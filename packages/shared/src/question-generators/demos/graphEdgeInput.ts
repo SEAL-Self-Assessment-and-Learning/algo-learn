@@ -20,7 +20,7 @@ const translations: Translations = {
     name: "Graph Edge Input Question",
     description: "Select all edges of a path.",
     text: "Select all edges on a simple path starting from node $ {{1}}$ reaching node $ {{2}}$. {{0}}",
-    fdParse: "The has been an error parsing your input.",
+    fdParse: "There has been an error parsing your input.",
     fdPath: "Your answer is not a simple path or does not lead to the desired end-node.",
   },
   de: {
