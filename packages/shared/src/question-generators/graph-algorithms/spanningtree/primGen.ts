@@ -15,7 +15,7 @@ import { t, tFunctional, type Translations } from "@shared/utils/translations.ts
 const translations: Translations = {
   en: {
     name: "Prims Algorithm",
-    description: "Correctly execute the Kruskal algorithm",
+    description: "Correctly execute the Prims algorithm",
     task: `Given the graph $G$: {{0}} 
     Provide the order in which Prims algorithm visits the nodes, starting at node $ {{1}} $:
     {{primorder#NL###below}}`,
@@ -71,7 +71,7 @@ export const PrimOrder: QuestionGenerator = {
     G.edgeClickType = "select"
     G.nodeClickType = "select"
     const startNode = random.choice(G.nodes)
-    const primResult = computeAllMST(G, startNode)[0]
+    const primResult = computeAllMST(G, startNode)
 
     const question: MultiFreeTextQuestion = {
       type: "MultiFreeTextQuestion",
@@ -80,7 +80,11 @@ export const PrimOrder: QuestionGenerator = {
       fillOutAll: true,
       text: t(translations, lang, "task", [G.toMarkdown(), startNode.label!]),
       checkFormat: getCheckFormat(G, lang),
-      feedback: getFeedback(primResult.nodes, G, lang),
+      feedback: getFeedback(
+        primResult.map((x) => x.nodes),
+        G,
+        lang,
+      ),
     }
 
     return { question }
@@ -122,18 +126,36 @@ function getCheckFormat(G: Graph, lang: Language): MultiFreeTextFormatFunction {
   }
 }
 
-function getFeedback(nodeOrder: Node[], G: Graph, lang: Language): MultiFreeTextFeedbackFunction {
+function getFeedback(allNodeOrder: Node[][], G: Graph, lang: Language): MultiFreeTextFeedbackFunction {
   return ({ text }) => {
     const nodeCheck = inputTextNodeCheck(text, G, lang)
     if (!("selected" in nodeCheck)) {
       return { correct: false }
     }
     if (!nodeCheck.parsed) {
-      return { correct: false, correctAnswer: "$" + nodeOrder.map((n) => n.label).join("$-$") + "$" }
+      return {
+        correct: false,
+        correctAnswer: "$" + allNodeOrder[0].map((n) => n.label).join("$-$") + "$",
+      }
     }
-    for (const [i, node] of nodeOrder.entries()) {
-      if (node.label !== nodeCheck.selected[i]) {
-        return { correct: false, correctAnswer: "$" + nodeOrder.map((n) => n.label).join("$-$") + "$" }
+    let foundCorrectOrder = false
+    for (const nodeOrder of allNodeOrder) {
+      let isCorrect = true
+      for (const [i, node] of nodeOrder.entries()) {
+        if (node.label !== nodeCheck.selected[i]) {
+          isCorrect = false
+          break
+        }
+      }
+      if (isCorrect) {
+        foundCorrectOrder = true
+        break
+      }
+    }
+    if (!foundCorrectOrder) {
+      return {
+        correct: false,
+        correctAnswer: "$" + allNodeOrder[0].map((n) => n.label).join("$-$") + "$",
       }
     }
     return {
