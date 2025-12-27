@@ -75,37 +75,35 @@
   }
 </script>
 
-<div on:keydown={onKeyDown} tabindex="0" class="focus:outline-none">
-  <InteractWithQuestion
-    {permalink}
-    name={question.name}
-    {regenerate}
-    footerMode={questionState.mode}
-    footerMessage={footerMsg}
-    handleFooterClick={handleClick}
-  >
-    <Markdown md={question.text ?? ""} />
+<InteractWithQuestion
+  {permalink}
+  name={question.name}
+  {regenerate}
+  footerMode={questionState.mode}
+  footerMessage={footerMsg}
+  handleFooterClick={handleClick}
+>
+  <Markdown md={question.text ?? ""} />
 
-    <div class="my-5">
-      <MatchingExercise
-        pairs={(question.fixedItems ?? []).map((f, i) => ({
-          id: `${i}`,
-          fixed: f,
-          answerId: questionState.choice[i] >= 0 ? `${questionState.choice[i]}` : null,
-          correctness: questionState.feedbackObject?.rowCorrectness?.[i] ?? null,
-        }))}
-        answers={question.answers.map((a, i) => ({
-          id: `${i}`,
-          content: a,
-        }))}
-        {disabled}
-        {onChange}
-        {onModeChange}
-        columns={question.columns}
-      />
-    </div>
-  </InteractWithQuestion>
-</div>
+  <div class="my-5">
+    <MatchingExercise
+      pairs={(question.fixedItems ?? []).map((f, i) => ({
+        id: `${i}`,
+        fixed: f,
+        answerId: questionState.choice[i] >= 0 ? `${questionState.choice[i]}` : null,
+        correctness: questionState.feedbackObject?.rowCorrectness?.[i] ?? null,
+      }))}
+      answers={question.answers.map((a, i) => ({
+        id: `${i}`,
+        content: a,
+      }))}
+      {disabled}
+      {onChange}
+      {onModeChange}
+      columns={question.columns}
+    />
+  </div>
+</InteractWithQuestion>
 
 {#snippet footerMsg()}
   <div class="flex-col">
@@ -136,3 +134,5 @@
   <br />
   <Markdown md={questionState.feedbackObject?.correctAnswer ?? ""} />
 {/snippet}
+
+<svelte:window on:keydown={onKeyDown} />
