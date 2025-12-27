@@ -1,6 +1,6 @@
 <script lang="ts">
   import Markdown from "$lib/components/markdown/markdown.svelte"
-  import type { TextFieldState } from "$lib/components/types.ts"
+  import { ADD_TEXTFIELDS_AFTERWARDS, type FormContextValue } from "$lib/components/types.ts"
   import { inputClass } from "$lib/components/ui/MultiInput/cnInput.ts"
   import FeedbackComp from "$lib/components/ui/MultiInput/FeedbackComp.svelte"
   import { cn } from "$lib/utils.ts"
@@ -11,10 +11,7 @@
     id: string
   }
   const { id }: Props = $props()
-
-  const textFieldStateValues: () => { [p: string]: TextFieldState } = $derived(
-    getContext("textFieldStateValues"),
-  )
+  const { textFieldStateValues } = $derived(getContext<FormContextValue>(ADD_TEXTFIELDS_AFTERWARDS))
   const {
     feedbackVariation,
     focus,
@@ -26,7 +23,7 @@
     disabled,
     setText,
     text,
-  } = $derived(textFieldStateValues()[id])
+  } = $derived(textFieldStateValues[id])
 
   let firstInputRef: HTMLInputElement | null = $state(null)
   $effect(() => {
