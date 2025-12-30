@@ -103,7 +103,6 @@
   })
 
   const accuracy = $derived(counts.total ? Math.round((counts.correct / counts.total) * 100) : 0)
-  const clampedAccuracy = $derived(Math.min(100, Math.max(0, accuracy)))
   function accuracyToneClass(value: number) {
     if (value >= 90)
       return "border-2 border-emerald-500/70 bg-emerald-50/70 text-emerald-900 dark:border-emerald-400/70 dark:bg-emerald-900/25 dark:text-emerald-50"
@@ -113,7 +112,7 @@
       return "border-2 border-amber-500/70 bg-amber-50/70 text-amber-900 dark:border-amber-400/70 dark:bg-amber-900/25 dark:text-amber-50"
     return "border-2 border-red-500/70 bg-red-50/70 text-red-900 dark:border-red-400/70 dark:bg-red-900/25 dark:text-red-50"
   }
-  const accuracyClasses = $derived(accuracyToneClass(clampedAccuracy))
+  const accuracyClasses = $derived(accuracyToneClass(accuracy))
 
   const baseCountdownMs = 5000
   let countdownMs = $state(baseCountdownMs)
