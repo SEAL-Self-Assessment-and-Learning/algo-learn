@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from "$app/navigation"
   import { resolve } from "$app/paths"
   import { page } from "$app/state"
   import type { Result } from "$lib/components/types.ts"
@@ -155,7 +156,7 @@
   })
 
   const handleContinue = () => {
-    window.location.href = resolve(`/${getLanguage()}`)
+    goto(resolve(`/${getLanguage()}`))
   }
 
   const handleResult = (result: Result, finished: boolean) => {
