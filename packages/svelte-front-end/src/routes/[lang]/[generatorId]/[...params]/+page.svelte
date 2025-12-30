@@ -14,17 +14,6 @@
   import { tFunction, type Translations } from "@shared/utils/translations.ts"
   import CenteredDivs from "@/lib/components/centeredDivs.svelte"
 
-  const path =
-    page.params.lang +
-    "/" +
-    page.params.generatorId +
-    (page.params.params ? "/" + page.params.params : "")
-  const deserializedPath = deserializePath({
-    collection,
-    path,
-    expectLang: true,
-  })
-
   const localTranslations: Translations = {
     en: {
       completeHeading: "Session summary",
@@ -46,9 +35,17 @@
   const { t: tGlobal } = $derived(tFunction([globalTranslations], lang))
   const { t: tLocal } = $derived(tFunction([localTranslations], lang))
 
-  // Note: This sometimes throws an error, but still loads everything correctly?
-  // What is producing the error, and what is the error?
-  // But, I think the error only occurs when on the start page.
+  const path =
+    page.params.lang +
+    "/" +
+    page.params.generatorId +
+    (page.params.params ? "/" + page.params.params : "")
+  const deserializedPath = deserializePath({
+    collection,
+    path,
+    expectLang: true,
+  })
+
   if (!deserializedPath) throw new Error("Parsing the url went wrong!")
 
   const generator = deserializedPath.generator
@@ -72,8 +69,8 @@
     sessionSeed = deserializedPath!.seed ? deserializedPath!.seed : sampleRandomSeed()
   }
   const currSeed = $derived(deserializedPath.seed ? deserializedPath.seed : sessionSeed)
-  let status: "running" | "finished" | "aborted" = $state("running")
 
+  let status: "running" | "finished" | "aborted" = $state("running")
   function updateStatus(finished: boolean) {
     status = questionState.aborted ? "aborted" : finished ? "finished" : "running"
   }
@@ -107,12 +104,16 @@
 
   const accuracy = $derived(counts.total ? Math.round((counts.correct / counts.total) * 100) : 0)
   const clampedAccuracy = $derived(Math.min(100, Math.max(0, accuracy)))
-  const accuracyHue = $derived((clampedAccuracy / 100) * 120) // 0=red, 120=green
-  const accuracyBgColor = $derived(`hsla(${accuracyHue}, 70%, 55%, 0.15)`) // lighter fill for text legibility
-  const accuracyBorderColor = $derived(`hsl(${accuracyHue}, 80%, 35%)`) // more defined hue-driven border
-  const accuracyStyle = $derived(
-    `background:${accuracyBgColor}; border:2px solid ${accuracyBorderColor};`,
-  )
+  function accuracyToneClass(value: number) {
+    if (value >= 90)
+      return "border-2 border-emerald-500/70 bg-emerald-50/70 text-emerald-900 dark:border-emerald-400/70 dark:bg-emerald-900/25 dark:text-emerald-50"
+    if (value >= 70)
+      return "border-2 border-lime-500/70 bg-lime-50/70 text-lime-900 dark:border-lime-400/70 dark:bg-lime-900/25 dark:text-lime-50"
+    if (value >= 40)
+      return "border-2 border-amber-500/70 bg-amber-50/70 text-amber-900 dark:border-amber-400/70 dark:bg-amber-900/25 dark:text-amber-50"
+    return "border-2 border-red-500/70 bg-red-50/70 text-red-900 dark:border-red-400/70 dark:bg-red-900/25 dark:text-red-50"
+  }
+  const accuracyClasses = $derived(accuracyToneClass(clampedAccuracy))
 
   const baseCountdownMs = 5000
   let countdownMs = $state(baseCountdownMs)
@@ -207,8 +208,7 @@
             {tLocal("completeHeading")}
           </div>
           <div
-            class="flex items-center gap-2 rounded-full bg-gray-100/80 px-3 py-1 text-sm font-semibold text-gray-900 ring-1 ring-black/10 dark:bg-gray-800/60 dark:text-white dark:ring-white/10"
-            style={accuracyStyle}
+            class={`flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ring-1 ring-black/10 transition-colors dark:ring-white/10 ${accuracyClasses}`}
           >
             <span>{tLocal("accuracyLabel")}</span>
             <span>{accuracy}%</span>
