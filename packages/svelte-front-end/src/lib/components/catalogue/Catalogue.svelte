@@ -59,7 +59,9 @@
 
   if (browser) {
     const stored = sessionStorage.getItem(storageKey)
-    if (stored) selectedGroup = stored
+    if (stored && collection.some((group) => group.slug === stored)) {
+      selectedGroup = stored
+    }
   }
 
   $effect(() => {
