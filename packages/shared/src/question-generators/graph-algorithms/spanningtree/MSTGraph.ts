@@ -29,6 +29,7 @@ const translations: Translations = {
     fdEdgeAmount: `You have selected $ {{0}} $ edges, but the minimum spanning tree includes exactly $ {{1}} $ edges.`,
     fdNotSpanningTree: "The selected edges do not form a spanning tree.",
     fdWeight: "The weight of the selected edges is higher than the weight of the minimum spanning tree.",
+    param_size: "Size of the graph.",
   },
   de: {
     name: "Minimaler Spannbaum (Graph)",
@@ -39,6 +40,7 @@ const translations: Translations = {
     fdEdgeAmount: `Du hast $ {{0}} $ Kanten ausgewählt, aber der minimale Spannbaum enthält genau $ {{1}} $ Kanten.`,
     fdNotSpanningTree: "Die ausgewählten Kanten bilden keinen Spannbaum.",
     fdWeight: "Das Gewicht der ausgewählten Kanten ist höher als das Gewicht des minimalen Spannbaums.",
+    param_size: "Größe des Graphen.",
   },
 }
 
@@ -69,7 +71,7 @@ export const MSTGraphGen: QuestionGenerator = {
     const random = new Random(seed)
     const size = parameters.size as number
 
-    // Todo: Change this graph something more random
+    // Todo: Future: Change this graph something more random
     const G = RandomGraph.grid(
       random,
       [size, size],
@@ -117,7 +119,7 @@ function getFeedback(graph: Graph, random: Random, lang: Language): MultiFreeTex
       return {
         correct: false,
         correctAnswer: graph.toMarkdown(),
-        feedbackText: t(translations, lang, "fdEdgeAmount"),
+        feedbackText: t(translations, lang, "fdParse"),
       }
     }
 

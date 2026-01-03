@@ -53,7 +53,7 @@
   const nodeClickType = $derived(graph.nodeClickType)
   const edgeClickType = $derived(graph.edgeClickType)
 
-  let fieldOpen = $derived(false)
+  let fieldOpen = $state(false)
   const inputFieldBase = graph.inputFieldID ?? null
   const hasInputFieldId = inputFieldBase !== null
   const nodeId = hasInputFieldId ? nodeInputFieldID(inputFieldBase) : null

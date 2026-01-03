@@ -26,6 +26,7 @@ const translations: Translations = {
     fdParse: "Your response could not be parsed into a list of edges.",
     fdAmount: "You have selected $ {{0}} $ edges, but should have selected $ {{1}} $ edges.",
     fdWrong: "The selected edges are not the correct ones.",
+    param_size: "Size of the graph.",
   },
   de: {
     name: "Kruskal-Algorithmus",
@@ -34,6 +35,7 @@ const translations: Translations = {
     fdParse: "Deine Antwort konnte nicht als Liste von Kanten interpretiert werden.",
     fdAmount: "Du hast $ {{0}} $ Kanten ausgewählt, aber es sollten $ {{1}} $ sein.",
     fdWrong: "Die ausgewählten Kanten sind nicht korrekt.",
+    param_size: "Größe des Graphen.",
   },
 }
 

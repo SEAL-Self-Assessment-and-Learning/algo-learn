@@ -60,7 +60,7 @@ export const DemoGraphNodeInput: QuestionGenerator = {
    * @param lang The language of the question
    * @param parameters The parameters for the question. In this case none are used.
    * @param seed The seed for the random number generator
-   * @returns A new MultipleChoiceQuestion question
+   * @returns A new MultiFreeText question
    */
   generate: (lang = "en", parameters, seed) => {
     const permaLink = serializeGeneratorCall({
@@ -165,7 +165,6 @@ export function mapNumberToNodeLabel(elements: number[]): string[] {
   return nodeLabels
 }
 
-// Todo: Remove this function and use the one from graph.ts
 function reachableNodes(graph: Graph, startNode: Node): number[] {
   const startIndex = graph.nodes.findIndex((node) => node.label === startNode.label)
   if (startIndex === -1) throw new Error("Start node not found in graph")

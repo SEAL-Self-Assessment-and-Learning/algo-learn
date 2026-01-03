@@ -43,7 +43,7 @@ describe("Prim Order (Unique MST)", () => {
   })
 })
 
-describe("Prim Order (Unique MST)", () => {
+describe("getAllMST (Number of Unique MSTs)", () => {
   test("3", () => {
     const g3 = getGraph3()
     const primResult = getAllMST(g3)

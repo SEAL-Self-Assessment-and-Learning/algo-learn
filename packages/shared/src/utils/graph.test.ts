@@ -2,7 +2,11 @@ import { describe, expect, test } from "vitest"
 import Random, { sampleRandomSeed } from "@shared/utils/random.ts"
 import { Graph, RandomGraph, RootedTree, type Edge } from "./graph.ts"
 
-// Todo: More parsing tests
+// TODO: Additional parsing test coverage:
+// - malformed or inconsistent headers (e.g. wrong node/edge counts, non-numeric fields)
+// - graphs with no edges or with isolated nodes
+// - labels containing escaped quotes, spaces, or newline characters
+// - optional / missing / invalid fields (e.g. group, inputFieldID)
 test("parse", () => {
   const graphStr = '3 3 1 1 1 0 0 0 6 4\n1 0 3 "A"\n0 1 4 "B"\n1 1 5 "C"\n0 1 1 1\n1 2 2 2\n2 0 3 3\n'
   const graph = Graph.parse(graphStr)

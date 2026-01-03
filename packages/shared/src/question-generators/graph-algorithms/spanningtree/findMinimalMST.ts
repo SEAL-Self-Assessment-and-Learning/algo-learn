@@ -16,11 +16,13 @@ const translations: Translations = {
     name: "Identify Minimal Spanning Trees",
     description: "Decide which spanning trees are minimal.",
     task: "Select all graphs in which the highlighted spanning tree is a minimal spanning tree.",
+    param_size: "The size of the graph",
   },
   de: {
     name: "Minimale Spannbäume erkennen",
     description: "Entscheiden Sie, welche Spannbäume minimal sind.",
     task: "Wählen Sie alle Graphen aus, in denen der hervorgehobene Spannbaum ein minimaler Spannbaum ist.",
+    param_size: "Die Größe des Graphen",
   },
 }
 

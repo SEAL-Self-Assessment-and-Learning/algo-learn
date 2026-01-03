@@ -198,7 +198,8 @@ function checkNodeInputGroup(nodes: string[], graph: Graph, lang: Language): Nod
     }
 
     const group = parseInt(match[2])
-    if (group > graph.nodeGroupMax || group < 1) {
+    const groupIndex = group - 1
+    if (groupIndex > graph.nodeGroupMax || groupIndex < 1) {
       parsed = false
       messages.push(t(parseFdTranslations, lang, "validGroup", [group.toString()]))
     }
@@ -294,7 +295,7 @@ function checkEdgeInputGroup(edges: string[], graph: Graph, lang: Language): Edg
   for (const edge of edges) {
     const cleanEdge = edge.replace(/\s/g, "")
     if (!cleanEdge) continue
-    const regexEdge = new RegExp(`^\\(([A-Z]+),([A-Z]+),([1-9])\\)$`)
+    const regexEdge = new RegExp(`^\\(([A-Z]+),([A-Z]+),(\\d|[0-9])\\)$`)
     const match = cleanEdge.match(regexEdge)
     const edgeCorrectness = checkEdgeCorrectness(match, cleanEdge, graph, lang)
     if (!edgeCorrectness.parsed) {
@@ -303,13 +304,14 @@ function checkEdgeInputGroup(edges: string[], graph: Graph, lang: Language): Edg
       continue
     }
     const group = parseInt(match![3])
-    if (group > graph.edgeGroupMax || group < 1) {
+    const groupIndex = group - 1
+    if (groupIndex > graph.edgeGroupMax || groupIndex < 0) {
       parsed = false
       messages.push(t(parseFdTranslations, lang, "validGroup", [group.toString()]))
       continue
     }
-    groups[group] = groups[group] || []
-    groups[group].push([match![1], match![2]])
+    groups[groupIndex] = groups[groupIndex] || []
+    groups[groupIndex].push([match![1], match![2]])
   }
   return { parsed, messages, groups }
 }

@@ -20,6 +20,7 @@ const translations: Translations = {
     Provide the order in which Prims algorithm visits the nodes, starting at node $ {{1}} $:
     {{primorder#NL###below}}`,
     missing: "*({{0}} nodes missing)*",
+    param_size: "Size of the graph.",
   },
   de: {
     name: "Prims Algorithmus",
@@ -28,6 +29,7 @@ const translations: Translations = {
     Bestimme die Reihenfolge, in der der Prims-Algorithmus die Knoten besucht, beginnend bei Knoten $ {{1}} $:
     {{primorder#NL###below}}`,
     missing: "*({{0}} Knoten fehlen)*",
+    param_size: "Größe des Graphen.",
   },
 }
 

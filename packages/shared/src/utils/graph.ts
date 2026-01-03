@@ -179,7 +179,7 @@ export class Graph {
       if (nodeData === null) throw Error("Input error: invalid node data: " + lines[i])
       if (
         !(nodeData[3] === "-") &&
-        (parseInt(nodeData[3]) > nodeGroupMax || parseInt(nodeData[3]) < 0)
+        (parseInt(nodeData[3]) > nodeGroupMax - 1 || parseInt(nodeData[3]) < 0)
       ) {
         throw Error("Input error: node group too large: " + lines[i])
       }
@@ -201,7 +201,7 @@ export class Graph {
       if (edgeData === null) throw Error("Input error: invalid edge data: " + lines[i])
       if (
         !(edgeData[3] === "-") &&
-        (parseInt(edgeData[3]) > edgeGroupMax || parseInt(edgeData[3]) < 0)
+        (parseInt(edgeData[3]) > edgeGroupMax - 1 || parseInt(edgeData[3]) < 0)
       ) {
         throw Error("Input error: edge group too large: " + lines[i])
       }
