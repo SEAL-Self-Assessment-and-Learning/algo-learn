@@ -15,10 +15,14 @@ import { HeapNeighbours } from "@shared/question-generators/heap/generatorNeighb
 import { HeapOperations } from "@shared/question-generators/heap/generatorOperations.ts"
 import { HeapVerifying } from "@shared/question-generators/heap/generatorVerify.ts"
 import { huffmanCoding } from "@shared/question-generators/huffman-coding/huffmanCoding"
+import { ReverseHuffmanCoding } from "@shared/question-generators/huffman-coding/reverseHuffmanCoding.ts"
+import { AxbGenerator } from "@shared/question-generators/math/linearAlgebra/axb/axbGen.ts"
+import { Determinant } from "@shared/question-generators/math/linearAlgebra/determinant/det.ts"
 import { CRT } from "@shared/question-generators/math/modularArithmetic/crt.ts"
 import { ExtendedEuclideanAlgorithm } from "@shared/question-generators/math/modularArithmetic/eea.ts"
 import { modFactor } from "@shared/question-generators/math/modularArithmetic/modFactorization.ts"
 import { ModTricks } from "@shared/question-generators/math/modularArithmetic/modTricks.ts"
+import { SetBuilderQuestion } from "@shared/question-generators/math/setBuilder/setBuilder.ts"
 import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
 import { ReadingSyntaxTrees } from "@shared/question-generators/propositional-logic/readingSyntaxTrees.ts"
@@ -41,6 +45,7 @@ export const collection: QuestionCollection = [
   {
     slug: "propositional-logic",
     name: { de: "Aussagenlogik", en: "Propositional Logic" },
+    topics: ["logic", "math"],
     contents: [
       Satisfiability,
       NormalForms,
@@ -55,39 +60,40 @@ export const collection: QuestionCollection = [
   {
     slug: "modular-arithmetic",
     name: { de: "Modulare Arithmetik", en: "Modular Arithmetic" },
+    topics: ["math"],
     contents: [ModTricks, CRT, modFactor, ExtendedEuclideanAlgorithm],
   },
   {
     slug: "asymptotics",
-    name: { de: "Asymptotik", en: "Asymptotics" },
-    contents: [AsymptoticsPreciseLanguage, SortTerms, LandauNotation, SimplifySum, Between],
-    // image: new URL("../front-end/assets/images/skill-asymptotics.jpg", import.meta.url),
-  },
-  {
-    slug: "recursion",
-    name: { de: "Rekursion", en: "Recursion" },
-    contents: [RecursionFormula, RecurrenceMaster],
-    // image: new URL("../front-end/assets/images/skill-recursion.jpg", import.meta.url),
-  },
-  {
-    slug: "time",
-    name: { de: "Laufzeit", en: "Time" },
-    contents: [Loops],
-    // image: new URL("../front-end/assets/images/skill-time.jpg", import.meta.url),
+    name: { de: "Asymptotische Notation und Laufzeiten", en: "Asymptotic Notation and Runtimes" },
+    topics: ["math", "recursion", "pseudocode"],
+    contents: [
+      AsymptoticsPreciseLanguage,
+      LandauNotation,
+      SortTerms,
+      SimplifySum,
+      Between,
+      RecursionFormula,
+      RecurrenceMaster,
+      Loops,
+    ],
   },
   {
     slug: "stack",
     name: { de: "Stacks und Queues", en: "Stacks and Queues" },
+    topics: ["algorithms", "data-structures"],
     contents: [stackQuestion, queueQuestion],
   },
   {
     slug: "heap",
     name: { de: "Heaps", en: "Heaps" },
+    topics: ["algorithms", "data-structures"],
     contents: [HeapOperations, HeapVerifying, HeapNeighbours],
   },
   {
     slug: "union-find",
     name: { de: "Union-Find", en: "Union-Find" },
+    topics: ["algorithms", "data-structures"],
     contents: [
       QuickFindGenerator,
       QuickUnionGenerator,
@@ -98,17 +104,26 @@ export const collection: QuestionCollection = [
   {
     slug: "huffmancoding",
     name: { de: "Huffman-Codierung", en: "Huffman-Coding" },
-    contents: [huffmanCoding],
+    contents: [huffmanCoding, ReverseHuffmanCoding],
+    topics: ["algorithms"],
+  },
+  {
+    slug: "setbuilder",
+    name: { en: "Sets", de: "Mengen" },
+    contents: [SetBuilderQuestion],
+    topics: ["math"],
   },
   {
     slug: "graphs",
-    name: { de: "Graphen", en: "Graphs" },
-    contents: [TreeTraversal],
+    name: { de: "Graphalgorithmen", en: "Graph Algorithms" },
+    topics: ["algorithms", "data-structures", "graph"],
+    contents: [TreeTraversal, DijkstraAlgorithm, DijkstraTableGenerator],
   },
   {
-    slug: "dijkstra",
-    name: { de: "Dijkstra", en: "Dijkstra" },
-    contents: [DijkstraAlgorithm, DijkstraTableGenerator],
+    slug: "linear-algebra",
+    name: { de: "Lineare Algebra", en: "Linear Algebra" },
+    topics: ["math"],
+    contents: [Determinant, AxbGenerator],
   },
 ]
 

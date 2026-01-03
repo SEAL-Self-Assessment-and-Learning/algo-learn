@@ -20,7 +20,7 @@ const translations: Translations = {
     prompt: "What is a possible Huffman-Coding?",
     textTable: `Suppose we have the following table, which represents how often each character appears in a given string:
 {{0}}
-What could be a correct **Huffman-Coding** for each letter?`,
+What could be a correct **Huffman-Coding** for each character?`,
     feedbackInvalid: "Can only contain 1 and 0",
     multiInputText: `Suppose we have the following table, which represents how often each character appears in a given string:
 {{0}}
@@ -35,7 +35,7 @@ Construct a correct **Huffman-Code** for the given string.
     prompt: "Was ist eine mögliche Huffman-Kodierung?",
     textTable: `Angenommen wir habe die folgende Tabelle, welche angibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:
 {{0}}
-        Was wäre eine korrekte **Huffman-Codierung** für jeden Buchstaben?`,
+        Was wäre eine korrekte **Huffman-Codierung** für jedes Zeichen?`,
     feedbackInvalid: "Darf nur 1 und 0 enthalten",
     multiInputText: `Betrachte die folgende Tabelle, welche angebibt, wie oft jeder Buchstabe in einem gegebenen String vorkommt:
 {{0}}

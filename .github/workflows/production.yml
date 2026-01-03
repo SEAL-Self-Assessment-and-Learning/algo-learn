@@ -60,7 +60,7 @@ jobs:
         with:
           options: ""
           ssh_options: ""
-          src: "front-end/dist/"
+          src: "packages/svelte-front-end/build/"
           dest: "dell-from-github@tcs.uni-frankfurt.de:/var/www/html/algo-learn/"
 
       - name: Display status from deploy

@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@commander-js/extra-typings": "^13.0.0",
-    "fuse.js": "^7.0.0",
+    "@commander-js/extra-typings": "^13.1.0",
+    "commander": "^13.1.0",
+    "fuse.js": "^7.1.0",
     "settings": "workspace:*",
     "shared": "workspace:*"
   }
