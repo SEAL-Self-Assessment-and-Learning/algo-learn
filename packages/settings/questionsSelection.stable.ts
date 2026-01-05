@@ -37,6 +37,11 @@ import { RecurrenceMaster } from "@shared/question-generators/recursion/recurren
 import { stackQuestion } from "@shared/question-generators/Stack/StackGenerator.ts"
 import { Loops } from "@shared/question-generators/time/loops"
 import { QuickFindGenerator } from "@shared/question-generators/unionFind/quickFind/generatorQF.ts"
+import { AutomatonWordQuestion } from "@shared/question-generators/automaton/automatonWordProblem"
+import { MinimalDFAStateCount } from "@shared/question-generators/automaton/stateCount"
+import { Congruence } from "@shared/question-generators/automaton/congruence"
+import { DFAMinimizationTable } from "@shared/question-generators/automaton/minimization"
+
 
 export const collection: QuestionCollection = [
   {
@@ -117,6 +122,17 @@ export const collection: QuestionCollection = [
     topics: ["math"],
     contents: [Determinant, AxbGenerator],
   },
+  {
+  slug: "automata",
+  name: { de: "Endliche Automaten", en: "Finite Automata" },
+  topics: ["algorithms", "graph"],
+  contents: [
+    AutomatonWordQuestion,
+    MinimalDFAStateCount,
+    Congruence,
+    DFAMinimizationTable,
+  ],
+}
 ]
 
 export const oldPathToGenerator = {
