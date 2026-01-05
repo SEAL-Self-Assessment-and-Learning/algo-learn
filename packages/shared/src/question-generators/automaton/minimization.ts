@@ -143,7 +143,7 @@ function findMinimalDistinguishingSuffix(
 }
 
 export const DFAMinimizationTable: QuestionGenerator = {
-  id: "dfa_min_table",
+  id: "dfamintab",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   license: "MIT",
