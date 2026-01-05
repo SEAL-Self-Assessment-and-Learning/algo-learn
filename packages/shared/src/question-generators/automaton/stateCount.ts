@@ -21,7 +21,7 @@ const translations: Translations = {
 }
 
 export const MinimalDFAStateCount: QuestionGenerator = {
-  id: "dfamincount",
+  id: "famincount",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   license: "MIT",
