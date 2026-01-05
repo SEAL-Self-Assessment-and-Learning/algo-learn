@@ -50,7 +50,7 @@ const Node = ({
 const EdgeWeight = ({ weight, x, y }: { weight: number; x: number; y: number }) => {
   return (
     <text
-      className="select-none fill-primary"
+      className="fill-primary select-none"
       textAnchor="middle"
       dominantBaseline="central"
       x={x}
@@ -313,7 +313,7 @@ export function DrawGraph({
           : maxWidth * viewBoxAspectRatio
       }
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-      className="mx-auto h-auto max-w-full rounded-2xl bg-secondary"
+      className="bg-secondary mx-auto h-auto max-w-full rounded-2xl"
       onMouseMove={(e) => {
         if (currentlyDragged === null || svgRef.current === null) return
 
