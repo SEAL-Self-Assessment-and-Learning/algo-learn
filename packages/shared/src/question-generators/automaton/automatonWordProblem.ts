@@ -34,7 +34,7 @@ const translations: Translations = {
 }
 
 export const AutomatonWordQuestion: QuestionGenerator = {
-  id: "automatonaccept",
+  id: "autaccept",
   name: tFunctional(translations, "name"),
   description: tFunctional(translations, "description"),
   tags: ["automaton", "word recognition"],
