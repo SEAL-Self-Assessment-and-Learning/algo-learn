@@ -258,7 +258,7 @@ function getCongruenceFeedbackFunction(
              sind sie **nicht Myhill-Nerode-äquivalent**.`
             : `Since the words behave differently from the start state in the minimal DFA 
              ($\\hat{\\delta}'(${start}, ${word1}) = ${simulateFrom(dfa, start, word1) ?? "∅"}$, but 
-             $\\hat{\\delta}'(${start}, ${word2}) = ${simulateFrom(dfa, start, word2) ?? "∅"}), 
+             $\\hat{\\delta}'(${start}, ${word2}) = ${simulateFrom(dfa, start, word2) ?? "∅"}$), 
              they are **not Myhill-Nerode equivalent**.`
           : lang === "de"
             ? `Da sich die Wörter von mindestens einem Zustand
