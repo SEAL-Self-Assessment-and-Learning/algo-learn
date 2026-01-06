@@ -165,7 +165,7 @@ export class Graph {
     }
 
     const edgeEnd = nodesEnd + numEdges
-    const edgeRegex = weighted ? /^(\d+) (\d+) (-|\d+) (\d+)$/ : /^(\d+) (\d+) (-|\d+)$/
+    const edgeRegex = weighted ? /^(\d+) (\d+) (-|\d+) (-?\d+)$/ : /^(\d+) (\d+) (-|\d+)$/
 
     const edges: EdgeList = Array.from(Array(numNodes), () => [])
 

@@ -14,6 +14,8 @@ import {
   isWordAccepted,
   writeAutomatonDefinition,
 } from "@shared/question-generators/automaton/generate/automatonUtil"
+import { autToGraph } from "@shared/question-generators/automaton/generate/automatonToGraph"
+import { Graph } from "@shared/utils/graph"
 import Random from "@shared/utils/random"
 import { t, tFunctional, type Translations } from "@shared/utils/translations"
 
@@ -49,22 +51,35 @@ export const AutomatonWordQuestion: QuestionGenerator = {
       max: 6,
     },
     {
-      name: "type",
-      description: (lang) =>
-        lang === "en" ? "Type of automaton (NFA or DFA)." : "Typ des Automaten (NFA oder DFA).",
+      name: "automatonType",
       type: "string",
       allowedValues: ["NFA", "DFA"],
+      description: (lang) =>
+        lang === "en"
+          ? "Type of automaton (NFA or DFA)."
+          : "Typ des Automaten (NFA oder DFA).",
+    },
+    {
+      name: "display",
+      type: "string",
+      allowedValues: ["text", "display"],
+      description: (lang) =>
+        lang === "en"
+          ? "Whether the automaton is displayed as text or graph."
+          : "Ob der Automat als Text oder graphisch dargestellt wird.",
     },
   ],
 
-  generate: (lang: "en" | "de", parameters, seed) => {
+  generate(lang: "en" | "de", parameters, seed) {
     const random = new Random(seed)
     const size = parameters.size as number
-    const type = parameters.type as "NFA" | "DFA"
+    const automatonType = parameters.automatonType as "NFA" | "DFA"
+    const display = parameters.display as "text" | "display"
+
     const alphabet = ["0", "1"]
 
     const automaton: Automaton =
-      type === "NFA"
+      automatonType === "NFA"
         ? generateNFA(random, size, alphabet, 0.5, 0.2, 0.1, 0.3, true)
         : generateDFA(random, size, alphabet, 0.2, true)
 
@@ -84,24 +99,44 @@ export const AutomatonWordQuestion: QuestionGenerator = {
       correct: acceptedWords.length === 0,
     })
 
-    const question: MultipleChoiceQuestion = {
-      type: "MultipleChoiceQuestion",
-      name: AutomatonWordQuestion.name(lang),
-      path: serializeGeneratorCall({ generator: AutomatonWordQuestion, lang, parameters, seed }),
-      allowMultiple: true,
-      text: [
-        writeAutomatonDefinition(lang, automaton, alphabet),
-        "",
-        t(translations, lang, "prompt"),
-      ].join(" $\\\\$ "),
-      answers: answers.map(({ element }) => element),
-      feedback: minimalMultipleChoiceFeedback({
-        correctAnswerIndex: answers
-          .map((answer, index) => (answer.correct ? index : -1))
-          .filter((index) => index !== -1),
-      }),
-    }
+const automatonDefinition = writeAutomatonDefinition(lang, automaton, alphabet)
 
+const automatonGraph =
+  display === "display"
+    ? (() => {
+        const { nodes, edges } = autToGraph(automaton)
+
+        const graph = new Graph(nodes, edges, true, true)
+        graph.nodeGroupMax = 3
+        graph.setDraggable(true)
+
+        return graph.toMarkdown()
+      })()
+    : null
+
+    const question: MultipleChoiceQuestion = {
+  type: "MultipleChoiceQuestion",
+  name: AutomatonWordQuestion.name(lang),
+  path: serializeGeneratorCall({
+    generator: AutomatonWordQuestion,
+    lang,
+    parameters,
+    seed,
+  }),
+  allowMultiple: true,
+  text: [
+    automatonDefinition,
+    ...(automatonGraph ? ["", automatonGraph] : []),
+    "",
+    t(translations, lang, "prompt"),
+  ].join(" $\\\\$ "),
+  answers: answers.map((a) => a.element),
+  feedback: minimalMultipleChoiceFeedback({
+    correctAnswerIndex: answers
+      .map((a, i) => (a.correct ? i : -1))
+      .filter((i) => i !== -1),
+  }),
+}
     return { question }
   },
 }
