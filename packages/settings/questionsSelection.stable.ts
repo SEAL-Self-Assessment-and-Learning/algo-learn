@@ -24,7 +24,6 @@ import { modFactor } from "@shared/question-generators/math/modularArithmetic/mo
 import { ModTricks } from "@shared/question-generators/math/modularArithmetic/modTricks.ts"
 import { AnyBaseToAny } from "@shared/question-generators/math/number-systems/anyBaseToAny.ts"
 import { BaseToDecimal } from "@shared/question-generators/math/number-systems/baseToDecimal.ts"
-import { BinaryHexMatching } from "@shared/question-generators/math/number-systems/binaryHexMatching.ts"
 import { DecimalToBase } from "@shared/question-generators/math/number-systems/decimalToBase.ts"
 import { SetBuilderQuestion } from "@shared/question-generators/math/setBuilder/setBuilder.ts"
 import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
@@ -68,7 +67,7 @@ export const collection: QuestionCollection = [
     slug: "number-systems",
     name: { de: "Zahlensysteme", en: "Number Systems" },
     topics: ["math"],
-    contents: [DecimalToBase, BaseToDecimal, BinaryHexMatching, AnyBaseToAny],
+    contents: [DecimalToBase, BaseToDecimal, AnyBaseToAny],
   },
   {
     slug: "asymptotics",

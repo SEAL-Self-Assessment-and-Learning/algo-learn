@@ -54,6 +54,9 @@ export const BaseToDecimal: QuestionGenerator = {
       },
       checkFormat: ({ text }) => {
         const normalized = text.trim()
+        if (normalized.length === 0) {
+          return { valid: false }
+        }
         const valid = /^\d+$/.test(normalized)
         const hint = translations[lang]?.formatHint ?? ""
         return { valid, message: valid ? undefined : hint }

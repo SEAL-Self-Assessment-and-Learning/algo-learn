@@ -36,11 +36,11 @@ export const DecimalToBase: QuestionGenerator = {
   license: "MIT",
   expectedParameters: [],
   generate: (lang = "en", parameters, seed) => {
+    const path = serializeGeneratorCall({ generator: DecimalToBase, lang, parameters, seed })
     const random = new Random(seed)
     const targetBase: TargetBase = random.choice(targetBases)
     const decimalValue = random.int(targetBase === 2 ? 10 : 30, targetBase === 2 ? 255 : 4095)
     const correctRepresentation = toBaseString(decimalValue, targetBase)
-    const path = serializeGeneratorCall({ generator: DecimalToBase, lang, parameters, seed })
 
     const question: FreeTextQuestion = {
       type: "FreeTextQuestion",
@@ -59,6 +59,9 @@ export const DecimalToBase: QuestionGenerator = {
       },
       checkFormat: ({ text }) => {
         const normalized = normalizeBaseInput(text)
+        if (normalized.length === 0) {
+          return { valid: false }
+        }
         const valid = normalized.length > 0 && isValidBaseString(normalized, targetBase)
         return { valid, message: valid ? undefined : baseDigitHints[targetBase][lang] }
       },

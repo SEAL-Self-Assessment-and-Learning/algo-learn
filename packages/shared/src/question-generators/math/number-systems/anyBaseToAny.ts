@@ -72,6 +72,9 @@ export const AnyBaseToAny: QuestionGenerator = {
       },
       checkFormat: ({ text }) => {
         const normalized = normalizeBaseInput(text)
+        if (normalized.length === 0) {
+          return { valid: false }
+        }
         const valid = normalized.length > 0 && isValidBaseString(normalized, targetBase)
         return { valid, message: valid ? undefined : baseDigitHints[targetBase][lang] }
       },

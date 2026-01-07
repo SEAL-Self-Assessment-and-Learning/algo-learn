@@ -130,6 +130,7 @@
   footerMode={questionState.mode}
   footerMessage={messageList}
   handleFooterClick={handleClick}
+  disabled={questionState.mode === "correct" || questionState.mode === "incorrect"}
 >
   <Markdown md={question.text ?? ""} />
   <br />
