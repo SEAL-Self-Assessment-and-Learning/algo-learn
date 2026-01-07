@@ -133,6 +133,7 @@
     footerMode={questionState.mode}
     footerMessage={messageList}
     handleFooterClick={handleClick}
+    {disabled}
   >
     <Markdown md={question.text ?? ""} />
     <div class="flex flex-col flex-wrap gap-4 p-4">
@@ -169,6 +170,7 @@
     footerMode={questionState.mode}
     footerMessage={messageList}
     handleFooterClick={handleClick}
+    {disabled}
   >
     <Markdown md={question.text ?? ""} />
     <SortableList {initItems} {onChange} {disabled} />
