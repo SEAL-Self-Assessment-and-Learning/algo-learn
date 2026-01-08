@@ -5,6 +5,7 @@
 import type { QuestionCollection } from "@shared/api/QuestionRouter"
 import { Between } from "@shared/question-generators/asymptotics/between"
 import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
+import { AsymptoticLoops } from "@shared/question-generators/asymptotics/loops/asymptoticLoops"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
@@ -70,6 +71,7 @@ export const collection: QuestionCollection = [
       SortTerms,
       SimplifySum,
       Between,
+      AsymptoticLoops,
       RecursionFormula,
       RecurrenceMaster,
       Loops,
@@ -125,6 +127,7 @@ export const oldPathToGenerator = {
   "asymptotics/landau": LandauNotation,
   "asymptotics/sum": SimplifySum,
   "asymptotics/between": Between,
+  "asymptotics/loops": AsymptoticLoops,
   "recursion/formula": RecursionFormula,
   "recursion/master": RecurrenceMaster,
   "time/loops": Loops,
