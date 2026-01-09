@@ -68,8 +68,15 @@ export const AutomatonWordQuestion: QuestionGenerator = {
         ? generateNFA(random, size, alphabet, 0.5, 0.2, 0.1, 0.3, true)
         : generateDFA(random, size, alphabet, 0.2, true)
 
-    const words = generateWords(random, 6, 2, 6, alphabet)
-    const acceptedWords = words.filter((word) => isWordAccepted(automaton, word))
+    let words: string[] = []
+    let acceptedWords: string[] = []
+
+    const maxTries = 10
+    for (let attempt = 0; attempt < maxTries; attempt++) {
+      words = generateWords(random, 6, 2, 6, alphabet)
+      acceptedWords = words.filter((word) => isWordAccepted(automaton, word))
+      if (acceptedWords.length > 0) break
+    }
 
     const answers = words.map((word) => ({
       key: word,
