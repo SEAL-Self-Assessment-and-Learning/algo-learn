@@ -21,7 +21,7 @@ const translations: Translations = {
       ' - Mark all pairs $(q_i, q_j)\\in Q\\times Q$ where $q_i \\in F \\Leftrightarrow q_j \\notin F$, with an "x". \n' +
       " - Pairs $(q_i, q_j)$ distinguishable by some input $w \\in \\Sigma^*$ such that $\\delta(q_i, w) \\in F \\Leftrightarrow \\delta(q_j, w) \\notin F$, should be marked by the lexicographically shortest such distinguishing suffix $w$. \n" +
       " - Should no such $w$ exists, leave the field blank.",
-    invalid: "x, $w\\in\\Sigma^*$ or blank",
+    invalid: '"x", $w\\in\\Sigma^*$ or blank',
   },
   de: {
     description:
@@ -31,7 +31,7 @@ const translations: Translations = {
       ' - Markiere alle Paare $(q_i, q_j)\\in Q\\times Q$ mit $q_i \\in F \\Leftrightarrow q_j \\notin F$, mit einem "x". \n' +
       " - Paare, die durch ein Wort $w \\in \\Sigma^*$ unterscheidbar sind, sodass $\\delta(q_i, w) \\in F \\Leftrightarrow \\delta(q_j, w) \\notin F$, sollten durch das lexikografisch kürzeste solche Suffix $w$ markiert werden.\n" +
       " - Gibt es kein solches $w$, lasse das Feld leer.",
-    invalid: "x, $w\\in\\Sigma^*$ oder leer",
+    invalid: '"x", $w\\in\\Sigma^*$ oder leer',
   },
 }
 
