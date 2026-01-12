@@ -16,7 +16,7 @@
 </script>
 
 <div class={`${isMobileOrTablet ? "overflow-x-scroll" : ""}`}>
-  <table class="my-5 w-auto border-collapse">
+  <table class="text-foreground bg-background my-5 w-auto border-collapse rounded-sm">
     {#if headerRow}
       <thead
         class="[&_tr:first-child_>_th:first-child]:rounded-tl-sm [&_tr:first-child_>_th:last-child]:rounded-tr-sm"
@@ -36,10 +36,7 @@
       </thead>
     {/if}
     <tbody
-      class={cn(
-        hasZebra &&
-          "[&>tr:nth-child(even)>td]:bg-muted [&>tr:nth-child(even)>td:first-child]:rounded-l-sm [&>tr:nth-child(even)>td:last-child]:rounded-r-sm",
-      )}
+      class={cn(hasZebra && "[&>tr:nth-child(even)>td]:bg-muted [&>tr:nth-child(odd)>td]:bg-background")}
     >
       {#each bodyRows as row, i (i)}
         <tr>
