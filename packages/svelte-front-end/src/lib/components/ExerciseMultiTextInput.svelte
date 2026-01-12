@@ -1,12 +1,18 @@
 <script lang="ts">
   import InteractWithQuestion from "$lib/components/InteractWithQuestion.svelte"
   import Markdown from "$lib/components/markdown/markdown.svelte"
-  import type { MODE, Result, TextFieldState } from "$lib/components/types.ts"
+  import {
+    ADD_TEXTFIELDS_AFTERWARDS,
+    type FormContextValue,
+    type MODE,
+    type Result,
+    type TextFieldState,
+  } from "$lib/components/types.ts"
   import { playSound } from "$lib/sound.svelte.ts"
   import { globalTranslations } from "$lib/translation.ts"
   import { isMobileOrTablet } from "$lib/utils/deviceInformation"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
-  import { getInputFields } from "$lib/utils/MultiTextInput.ts"
+  import { getInputFields, getInputFieldValues } from "$lib/utils/MultiTextInput.ts"
   import { setContext } from "svelte"
   import type { Language } from "@shared/api/Language.ts"
   import type { FreeTextFeedback, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
@@ -39,7 +45,10 @@
     if (!question.fillOutAll) return "draft"
     // if every mode in modeID is draft, the overall mode is draft too
     for (const value of Object.values(currentModeIDs)) {
-      if (value === "invalid" || value === "initial") {
+      if (value === "invalid") {
+        return "invalid"
+      }
+      if (value === "initial" && question.fillOutAll) {
         return "invalid"
       }
     }
@@ -115,7 +124,7 @@
     }
   }
 
-  const textFieldStateValues: { [p: string]: TextFieldState } = $derived(
+  let textFieldStateValues: { [p: string]: TextFieldState } = $derived(
     fieldValues.inputIds.reduce<{ [key: string]: TextFieldState }>((acc, id, i) => {
       acc[id] = {
         text: questionState.text[id],
@@ -133,7 +142,40 @@
     }, {}),
   )
 
-  setContext("textFieldStateValues", () => textFieldStateValues)
+  function addTextFieldAfterwards(inputField: string) {
+    const singleFieldValues = getInputFieldValues([inputField])
+    fieldValues.inputIds.push(singleFieldValues.inputIds[0])
+    fieldValues.inputTypes.push(singleFieldValues.inputTypes[0])
+    fieldValues.inputPrompts.push(singleFieldValues.inputPrompts[0])
+    fieldValues.inputFeedbackVariations.push(singleFieldValues.inputFeedbackVariations[0])
+    fieldValues.inputPlaceholders.push(singleFieldValues.inputPlaceholders[0])
+    const newId = singleFieldValues.inputIds[0]
+    const idx = fieldValues.inputIds.length - 1
+
+    textFieldStateValues[newId] = {
+      text: questionState.text[newId],
+      type: fieldValues.inputTypes[idx],
+      prompt: fieldValues.inputPrompts[idx],
+      feedbackVariation: fieldValues.inputFeedbackVariations[idx],
+      setText: (text: string) => setText(newId, text),
+      placeholder: fieldValues.inputPlaceholders[idx],
+      invalid: questionState.modeID[newId] === "invalid",
+      disabled: questionState.mode === "correct" || questionState.mode === "incorrect",
+      feedback: questionState.formatFeedback[newId],
+      focus: !isMobileOrTablet,
+    }
+
+    // make reactive in Svelte
+    textFieldStateValues = { ...textFieldStateValues }
+  }
+
+  // Provide both
+  setContext<FormContextValue>(ADD_TEXTFIELDS_AFTERWARDS, {
+    get textFieldStateValues() {
+      return textFieldStateValues
+    },
+    addTextFieldAfterwards,
+  })
 </script>
 
 <InteractWithQuestion
