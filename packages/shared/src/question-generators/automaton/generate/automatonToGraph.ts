@@ -1,5 +1,5 @@
-import type { Automaton } from "./automaton"
 import type { Edge as GraphEdge, Node as GraphNode } from "@shared/utils/graph"
+import type { Automaton } from "./automaton"
 
 export interface GraphNodeWithGroup extends GraphNode {
   group: number | null
@@ -9,12 +9,11 @@ export interface GraphNodeWithGroup extends GraphNode {
  * Converts an Automaton into graph suitable for rendering.
  *
  * \epsilon is encoded as value === -1
- * start and accepting states are colored via groups
- *   - start       group 0 green
- *   - end         group 1 red
- *   - start + end group 2 blue
- * self-loops are rewritten using helper nodes
- * i.e. q -1-> q is rendered as q -1-> q' --> q
+ * start and accepting states are tagged via groups (used for rendering on the client)
+ *   - start + end group 0
+ *   - end         group 1
+ *   - start       group 2
+ * self-loops are kept as explicit edges (no helper nodes)
  */
 export function autToGraph(automaton: Automaton): {
   nodes: GraphNodeWithGroup[]
@@ -28,12 +27,10 @@ export function autToGraph(automaton: Automaton): {
     nodes.push({
       label: n.label,
       coords: n.coords,
-      group: n.isStart && n.isEnd ? 0 : n.isStart ? 2 : n.isEnd ? 1 : null
+      group: n.isStart && n.isEnd ? 0 : n.isStart ? 2 : n.isEnd ? 1 : null,
     })
     edges.push([])
   })
-
-  let helperCounter = 0
 
   // edges
   automaton.edges.forEach((outgoing, u) => {
@@ -41,39 +38,11 @@ export function autToGraph(automaton: Automaton): {
       const v = e.target
       const value = e.value ?? -1
 
-      // rewrite self-loops
-      if (u === v) {
-        const helperIndex = nodes.length
-        const base = nodes[u]
-
-        nodes.push({
-          label: `${base.label}_loop_${helperCounter++}`,
-          coords: {
-            x: base.coords.x + 0.6,
-            y: base.coords.y + 0.6,
-          },
-          group: null,
-        })
-        edges.push([])
-
-        edges[u].push({
-          source: u,
-          target: helperIndex,
-          value,
-        })
-
-        edges[helperIndex].push({
-          source: helperIndex,
-          target: u,
-          value: -1,
-        })
-      } else {
-        edges[u].push({
-          source: u,
-          target: v,
-          value,
-        })
-      }
+      edges[u].push({
+        source: u,
+        target: v,
+        value,
+      })
     })
   })
 
