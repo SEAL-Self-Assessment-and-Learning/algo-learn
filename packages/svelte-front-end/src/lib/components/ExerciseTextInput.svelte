@@ -121,6 +121,18 @@
       ? "text-green-600 dark:text-green-400"
       : "text-red-600 dark:text-red-400",
   )
+
+  $effect(() => {
+    void lang
+    if (question.feedback === undefined) return
+    if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
+    const textSnapshot = questionState.text
+    void Promise.resolve(question.feedback({ text: textSnapshot })).then((feedbackObject) => {
+      if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
+      if (questionState.text !== textSnapshot) return
+      questionState.feedbackObject = feedbackObject
+    })
+  })
 </script>
 
 <InteractWithQuestion

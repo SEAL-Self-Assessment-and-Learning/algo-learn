@@ -134,6 +134,17 @@
   )
 
   setContext("textFieldStateValues", () => textFieldStateValues)
+
+  $effect(() => {
+    void lang
+    if (question.feedback === undefined) return
+    if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
+    const textSnapshot = { ...questionState.text }
+    void Promise.resolve(question.feedback({ text: textSnapshot })).then((feedbackObject) => {
+      if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
+      questionState.feedbackObject = feedbackObject
+    })
+  })
 </script>
 
 <InteractWithQuestion
