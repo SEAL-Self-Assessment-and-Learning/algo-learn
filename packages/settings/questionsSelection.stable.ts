@@ -8,6 +8,10 @@ import { LandauNotation } from "@shared/question-generators/asymptotics/landau"
 import { AsymptoticsPreciseLanguage } from "@shared/question-generators/asymptotics/preciseLanguage"
 import { SortTerms } from "@shared/question-generators/asymptotics/sort"
 import { SimplifySum } from "@shared/question-generators/asymptotics/sum"
+import { AutomatonWordQuestion } from "@shared/question-generators/automaton/automatonWordProblem"
+import { Congruence } from "@shared/question-generators/automaton/congruence"
+import { DFAMinimizationTable } from "@shared/question-generators/automaton/minimization"
+import { MinimalDFAStateCount } from "@shared/question-generators/automaton/stateCount"
 import { DijkstraAlgorithm } from "@shared/question-generators/graph-algorithms/dijkstra"
 import { DijkstraTableGenerator } from "@shared/question-generators/graph-algorithms/dijkstraTable"
 import { TreeTraversal } from "@shared/question-generators/graph-algorithms/treeTraversal.ts"
@@ -22,6 +26,7 @@ import { CRT } from "@shared/question-generators/math/modularArithmetic/crt.ts"
 import { ExtendedEuclideanAlgorithm } from "@shared/question-generators/math/modularArithmetic/eea.ts"
 import { modFactor } from "@shared/question-generators/math/modularArithmetic/modFactorization.ts"
 import { ModTricks } from "@shared/question-generators/math/modularArithmetic/modTricks.ts"
+import { SetBuilderQuestion } from "@shared/question-generators/math/setBuilder/setBuilder.ts"
 import { MinimizePropositionalLogic } from "@shared/question-generators/propositional-logic/minimize.ts"
 import { NormalForms } from "@shared/question-generators/propositional-logic/normalForms"
 import { ReadingSyntaxTrees } from "@shared/question-generators/propositional-logic/readingSyntaxTrees.ts"
@@ -99,6 +104,12 @@ export const collection: QuestionCollection = [
     topics: ["algorithms"],
   },
   {
+    slug: "setbuilder",
+    name: { en: "Sets", de: "Mengen" },
+    contents: [SetBuilderQuestion],
+    topics: ["math"],
+  },
+  {
     slug: "graphs",
     name: { de: "Graphalgorithmen", en: "Graph Algorithms" },
     topics: ["algorithms", "data-structures", "graph"],
@@ -109,6 +120,12 @@ export const collection: QuestionCollection = [
     name: { de: "Lineare Algebra", en: "Linear Algebra" },
     topics: ["math"],
     contents: [Determinant, AxbGenerator],
+  },
+  {
+    slug: "automata",
+    name: { de: "Endliche Automaten", en: "Finite Automata" },
+    topics: ["algorithms", "graph"],
+    contents: [AutomatonWordQuestion, MinimalDFAStateCount, Congruence, DFAMinimizationTable],
   },
 ]
 
