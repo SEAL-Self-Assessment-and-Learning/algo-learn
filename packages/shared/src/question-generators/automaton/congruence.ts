@@ -18,8 +18,8 @@ import {
 const translations: Translations = {
   en: {
     name: "Congruence of Words",
-    description: "Determine if two words are congruent with respect to L(A).",
-    sizeautomaton: "Size of automaton",
+    description: "Determine if two words are congruent with respect to $L(A)$.",
+    sizeautomaton: "Size of the automaton",
     viewpoint: "Viewpoint for equivalence",
     prompt: "Are the following words {{variantLabel}}",
     yesMyhill: "Yes, ${{word1}} \\mathrel{R_{L(A)}} {{word2}}$",
@@ -65,21 +65,21 @@ const translations: Translations = {
     variantMonoid:
       "syntaktisch kongruent bzgl. $L(\\mathcal{A})$? $\\\\$" +
       "(d.h. $\\forall x,y \\in \\Sigma^*: x{{word1}}y \\in L(A) \\Leftrightarrow x{{word2}}y \\in L(A)$)",
-    fddeflet: `Sei $\\mathcal{A}' = (Q', \\Sigma, \\delta', {{0}}, F')$ der minimierte DEA mit $\\\\$`,
+    fddeflet: `Sei $\\mathcal{A}' = (Q', \\Sigma, \\delta', {{0}}, F')$ der minimierte DFA mit $\\\\$`,
     fddedelta: "und $\\delta$ ist über die folgende Übergangstabelle definiert:",
     traceMyhill: `Anwendung von $ {{0}}$ und $ {{1}}$ auf den Startzustand $ {{2}}$:`,
     traceMonoid: `Anwendung von $ {{0}}$ und $ {{1}}$ auf alle Zustände:`,
     allSameMyhill1:
-      "Da sich beide Wörter vom Startzustand aus im minimalen DEA gleich verhalten, sind sie **Myhill-Nerode-äquivalent**.",
-    allSameMyhill2: `Da sich die Wörter vom Startzustand aus im minimalen DEA unterschiedlich verhalten 
+      "Da sich beide Wörter vom Startzustand aus im minimalen DFA gleich verhalten, sind sie **Myhill-Nerode-äquivalent**.",
+    allSameMyhill2: `Da sich die Wörter vom Startzustand aus im minimalen DFA unterschiedlich verhalten 
              ($\\hat{\\delta}'({{0}}, {{1}}) = {{2}}$, aber 
              $\\hat{\\delta}'({{0}}, {{3}}) = {{4}}$), 
              sind sie **nicht Myhill-Nerode-äquivalent**.`,
     allSameMonoid1:
-      "Da sich beide Wörter von allen Zuständen aus im minimalen DEA gleich verhalten, sind sie **syntaktisch kongruent**.",
+      "Da sich beide Wörter von allen Zuständen aus im minimalen DFA gleich verhalten, sind sie **syntaktisch kongruent**.",
     allSameMonoid2: `Da sich die Wörter von mindestens einem Zustand
-          (z.B. $\\hat{\\delta}'({{0}}, {{1}}) = {{2}}$, aber 
-             $\\hat{\\delta}'({{0}}, {{3}}) = {{4}}$) im minimalen DEA unterschiedlich verhalten, 
+          (e.g. $\\hat{\\delta}'({{0}}, {{1}}) = {{2}}$, aber 
+             $\\hat{\\delta}'({{0}}, {{3}}) = {{4}}$) im minimalen DFA unterschiedlich verhalten, 
              sind sie **nicht syntaktisch kongruent**.`,
   },
 }

@@ -12,7 +12,7 @@ const translations: Translations = {
     prompt: "Number of states:",
     Question: "How many states does the minimal DFA equivalent to $\\mathcal{A}$ have?",
     typeautomaton: "Type of automaton",
-    sizeautomaton: "Size of automaton",
+    sizeautomaton: "Size of the automaton",
   },
   de: {
     name: "Minimale DFA Zustandsanzahl",
