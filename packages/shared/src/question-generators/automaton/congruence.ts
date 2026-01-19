@@ -19,6 +19,8 @@ const translations: Translations = {
   en: {
     name: "Congruence of Words",
     description: "Determine if two words are congruent with respect to L(A).",
+    sizeautomaton: "Size of automaton",
+    viewpoint: "Viewpoint for equivalence",
     prompt: "Are the following words {{variantLabel}}",
     yesMyhill: "Yes, ${{word1}} \\mathrel{R_{L(A)}} {{word2}}$",
     noMyhill: "No, ${{word1}} \\not\\mathrel{R_{L(A)}} {{word2}}$",
@@ -30,10 +32,28 @@ const translations: Translations = {
     variantMonoid:
       "syntactically congruent with respect to $L(\\mathcal{A})$? $\\\\$" +
       "(i.e., $\\forall x,y \\in \\Sigma^*: x{{word1}}y \\in L(A) \\Leftrightarrow x{{word2}}y \\in L(A)$)",
+    fddeflet: `Let $\\mathcal{A}' = (Q', \\Sigma, \\delta', {{0}}, F')$ be the minimized DFA with $\\\\$`,
+    fddedelta: "and $\\delta$ is defined by the following transition table:",
+    traceMyhill: `Trace of $ {{0}}$ and $ {{1}}$ from the start state $ {{2}}$:`,
+    traceMonoid: `Trace of $ {{0}}$ and $ {{1}}$ from all states:`,
+    allSameMyhill1:
+      "Since both words behave the same from the start state in the minimal DFA, they are **Myhill-Nerode equivalent**.",
+    allSameMyhill2: `Since the words behave differently from the start state in the minimal DFA 
+             ($\\hat{\\delta}'({{0}}, {{1}}) = {{2}}$, but 
+             $\\hat{\\delta}'({{0}}, {{3}}) = {{4}}$), 
+             they are **not Myhill-Nerode equivalent**.`,
+    allSameMonoid1:
+      "Since both words behave the same from all states in the minimal DFA, they are **syntactically congruent**.",
+    allSameMonoid2: `Since the words behave differently from at least one state 
+          (z.B. $\\hat{\\delta}'({{0}}, {{1}}) = {{2}}$, but 
+             $\\hat{\\delta}'({{0}}, {{3}}) = {{4}}$) in the minimal DFA, 
+             they are **not syntactically congruent**.`,
   },
   de: {
     name: "Kongruenz von Wörtern",
     description: "Bestimme, ob zwei Wörter bzgl. L(A) kongruent sind.",
+    sizeautomaton: "Größe des Automaten",
+    viewpoint: "Perspektive der Äquivalenz",
     prompt: "Sind diese Wörter {{variantLabel}}",
     yesMyhill: "Ja, ${{word1}} \\mathrel{R_{L(A)}} {{word2}}$",
     noMyhill: "Nein, ${{word1}} \\not\\mathrel{R_{L(A)}} {{word2}}$",
@@ -45,6 +65,22 @@ const translations: Translations = {
     variantMonoid:
       "syntaktisch kongruent bzgl. $L(\\mathcal{A})$? $\\\\$" +
       "(d.h. $\\forall x,y \\in \\Sigma^*: x{{word1}}y \\in L(A) \\Leftrightarrow x{{word2}}y \\in L(A)$)",
+    fddeflet: `Sei $\\mathcal{A}' = (Q', \\Sigma, \\delta', {{0}}, F')$ der minimierte DEA mit $\\\\$`,
+    fddedelta: "und $\\delta$ ist über die folgende Übergangstabelle definiert:",
+    traceMyhill: `Anwendung von $ {{0}}$ und $ {{1}}$ auf den Startzustand $ {{2}}$:`,
+    traceMonoid: `Anwendung von $ {{0}}$ und $ {{1}}$ auf alle Zustände:`,
+    allSameMyhill1:
+      "Da sich beide Wörter vom Startzustand aus im minimalen DEA gleich verhalten, sind sie **Myhill-Nerode-äquivalent**.",
+    allSameMyhill2: `Da sich die Wörter vom Startzustand aus im minimalen DEA unterschiedlich verhalten 
+             ($\\hat{\\delta}'({{0}}, {{1}}) = {{2}}$, aber 
+             $\\hat{\\delta}'({{0}}, {{3}}) = {{4}}$), 
+             sind sie **nicht Myhill-Nerode-äquivalent**.`,
+    allSameMonoid1:
+      "Da sich beide Wörter von allen Zuständen aus im minimalen DEA gleich verhalten, sind sie **syntaktisch kongruent**.",
+    allSameMonoid2: `Da sich die Wörter von mindestens einem Zustand
+          (z.B. $\\hat{\\delta}'({{0}}, {{1}}) = {{2}}$, aber 
+             $\\hat{\\delta}'({{0}}, {{3}}) = {{4}}$) im minimalen DEA unterschiedlich verhalten, 
+             sind sie **nicht syntaktisch kongruent**.`,
   },
 }
 
@@ -79,14 +115,13 @@ export const Congruence: QuestionGenerator = {
       type: "integer",
       min: 3,
       max: 6,
-      description: (lang) => t(translations, lang, "description"),
+      description: tFunctional(translations, "sizeautomaton"),
     },
     {
       name: "variant",
       type: "string",
       allowedValues: ["myhill-nerode", "syntactic-monoid"],
-      description: (lang) =>
-        lang === "en" ? "Viewpoint for equivalence" : "Perspektive der Äquivalenz",
+      description: tFunctional(translations, "viewpoint"),
     },
   ],
 
@@ -183,21 +218,17 @@ function getCongruenceFeedbackFunction(
     const states = dfa.nodes.map((n) => `${n.label}`).join(", ")
 
     const definition = [
-      lang === "de"
-        ? `Sei $\\mathcal{A}' = (Q', \\Sigma, \\delta', ${start}, F')$ der minimierte DEA mit $\\\\$`
-        : `Let $\\mathcal{A}' = (Q', \\Sigma, \\delta', ${start}, F')$ be the minimized DFA, where $\\\\$`,
+      t(translations, lang, "fddeflet", [start]),
       `$Q' = \\{ ${states} \\}$, $\\\\$`,
       `$F' = \\{ ${accepting} \\}$,$\\\\$`,
-      lang === "de"
-        ? "und $\\delta$ ist über die folgende Übergangstabelle definiert:"
-        : "and $\\delta$ is defined by the following transition table:",
+      t(translations, lang, "fddedelta"),
       `| $q \\in Q'$ | ${alphabet.map((a) => `$${a}$`).join(" | ")} |`,
       `|------------|${alphabet.map(() => "------").join("|")}|`,
       ...dfa.nodes.map((node) => {
         const row = [node.label!]
         for (const a of alphabet) {
           const edge = dfa.getOutgoingEdges(node).find((e) => e.value?.toString() === a)
-          const target = edge ? `${dfa.nodes[edge.target]?.label ?? "∅"}` : "∅"
+          const target = edge ? `${dfa.nodes[edge.target]?.label ?? "$\\emptyset$"}` : "$\\emptyset$"
           row.push(target)
         }
         return `| $${row.join("$ | $")}$ |`
@@ -217,8 +248,8 @@ function getCongruenceFeedbackFunction(
         : dfa.nodes.map((n) => n.label!)
 
     for (const from of statesToTrace) {
-      const trace1 = simulateFrom(dfa, from, word1) ?? "∅"
-      const trace2 = simulateFrom(dfa, from, word2) ?? "∅"
+      const trace1 = simulateFrom(dfa, from, word1) ?? "$\\emptyset$"
+      const trace2 = simulateFrom(dfa, from, word2) ?? "$\\emptyset$"
       if (trace1 !== trace2) {
         allSame = false
         if (!firstDifference) {
@@ -230,12 +261,8 @@ function getCongruenceFeedbackFunction(
 
     const traceBlock = [
       variant === "myhill-nerode"
-        ? lang === "de"
-          ? `Anwendung von $${word1}$ und $${word2}$ auf den Startzustand $${start}$:`
-          : `Trace of $${word1}$ and $${word2}$ from the start state $${start}$:`
-        : lang === "de"
-          ? `Anwendung von $${word1}$ und $${word2}$ auf alle Zustände:`
-          : `Trace of $${word1}$ and $${word2}$ from all states:`,
+        ? t(translations, lang, "traceMyhill", [word1, word2, start])
+        : t(translations, lang, "traceMonoid", [word1, word2]),
 
       `| $q \\in Q'$ | $\\delta'(q, ${word1})$ | $\\delta'(q, ${word2})$ |`,
       "|------------|----------------------|----------------------|",
@@ -244,31 +271,23 @@ function getCongruenceFeedbackFunction(
 
       allSame
         ? variant === "myhill-nerode"
-          ? lang === "de"
-            ? "Da sich beide Wörter vom Startzustand aus im minimalen DEA gleich verhalten, sind sie **Myhill-Nerode-äquivalent**."
-            : "Since both words behave the same from the start state in the minimal DFA, they are **Myhill-Nerode equivalent**."
-          : lang === "de"
-            ? "Da sich beide Wörter von allen Zuständen aus im minimalen DEA gleich verhalten, sind sie **syntaktisch kongruent**."
-            : "Since both words behave the same from all states in the minimal DFA, they are **syntactically congruent**."
+          ? t(translations, lang, "allSameMyhill1")
+          : t(translations, lang, "allSameMonoid1")
         : variant === "myhill-nerode"
-          ? lang === "de"
-            ? `Da sich die Wörter vom Startzustand aus im minimalen DEA unterschiedlich verhalten 
-             ($\\hat{\\delta}'(${start}, ${word1}) = ${simulateFrom(dfa, start, word1) ?? "∅"}$, aber 
-             $\\hat{\\delta}'(${start}, ${word2}) = ${simulateFrom(dfa, start, word2) ?? "∅"}$), 
-             sind sie **nicht Myhill-Nerode-äquivalent**.`
-            : `Since the words behave differently from the start state in the minimal DFA 
-             ($\\hat{\\delta}'(${start}, ${word1}) = ${simulateFrom(dfa, start, word1) ?? "∅"}$, but 
-             $\\hat{\\delta}'(${start}, ${word2}) = ${simulateFrom(dfa, start, word2) ?? "∅"}$), 
-             they are **not Myhill-Nerode equivalent**.`
-          : lang === "de"
-            ? `Da sich die Wörter von mindestens einem Zustand
-          (z.B. $\\hat{\\delta}'(${firstDifference?.state}, ${word1}) = ${firstDifference?.w1}$, aber 
-             $\\hat{\\delta}'(${firstDifference?.state}, ${word2}) = ${firstDifference?.w2}$) im minimalen DEA unterschiedlich verhalten, 
-             sind sie **nicht syntaktisch kongruent**.`
-            : `Since the words behave differently from at least one state 
-          (e.g. $\\hat{\\delta}'(${firstDifference?.state}, ${word1}) = ${firstDifference?.w1}$, but 
-             $\\hat{\\delta}'(${firstDifference?.state}, ${word2}) = ${firstDifference?.w2}$) in the minimal DFA, 
-             they are **not syntactically congruent**.`,
+          ? t(translations, lang, "allSameMyhill2", [
+              start,
+              word1,
+              simulateFrom(dfa, start, word1) ?? "\\emptyset",
+              word2,
+              simulateFrom(dfa, start, word2) ?? "\\emptyset",
+            ])
+          : t(translations, lang, "allSameMonoid2", [
+              firstDifference?.state ?? "",
+              word1,
+              firstDifference?.w1 ?? "\\emptyset",
+              word2,
+              firstDifference?.w2 ?? "\\emptyset",
+            ]),
     ]
 
     return {

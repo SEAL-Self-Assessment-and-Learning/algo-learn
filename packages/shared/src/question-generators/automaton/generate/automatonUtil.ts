@@ -1,5 +1,7 @@
 import type { Language } from "@shared/api/Language"
+import { adt } from "@shared/question-generators/automaton/generate/automatonDefinitionTranslation.ts"
 import type Random from "@shared/utils/random"
+import { t } from "@shared/utils/translations"
 import { Automaton, type AutomatonNode } from "./automaton"
 
 /**
@@ -99,8 +101,7 @@ export function minimizeDFA(dfa: Automaton, alphabet: string[]): Automaton {
         const signature = alphabet
           .map((symbol) => {
             const target = getTargetState(dfa, state, symbol)
-            const index = partitions.findIndex((p) => p.has(target ?? ""))
-            return index
+            return partitions.findIndex((p) => p.has(target ?? ""))
           })
           .join(",")
 
@@ -221,36 +222,17 @@ export function writeAutomatonDefinition(
 
   if (isDFA) {
     const startState = startNodes[0] ?? "q_0"
-    intro =
-      lang === "de"
-        ? `Sei $\\mathcal{A}=(Q,\\Sigma,${startState},F,\\delta)$ ein DEA, wobei $\\\\$`
-        : `Let $\\mathcal{A}=(Q,\\Sigma,${startState},F,\\delta)$ be a DFA, where $\\\\$`
+    intro = t(adt, lang, "introDFA", [startState])
   } else {
-    intro =
-      lang === "de"
-        ? `Sei $\\mathcal{A}=(Q,\\Sigma,S,F,\\delta)$ ein NEA, wobei $\\\\$`
-        : `Let $\\mathcal{A}=(Q,\\Sigma,S,F,\\delta)$ be a NFA, where $\\\\$`
-
-    sLine =
-      lang === "de"
-        ? `$S = \\{${startNodes.join(", ")}\\}$ ist die Menge der Startzustände`
-        : `$S = \\{${startNodes.join(", ")}\\}$ is the set of start states`
+    intro = t(adt, lang, "introNFA")
+    sLine = t(adt, lang, "startsNFA", [startNodes.join(", ")])
   }
 
-  const qLine =
-    lang === "de"
-      ? `$Q = \\{${states}\\}$ ist die Zustandsmenge`
-      : `$Q = \\{${states}\\}$ is the set of states`
+  const qLine = t(adt, lang, "states", [states])
 
-  const sigmaLine =
-    lang === "de"
-      ? `$\\Sigma = \\{${alphabet.join(", ")}\\}$ ist das Eingabealphabet`
-      : `$\\Sigma = \\{${alphabet.join(", ")}\\}$ is the input alphabet`
+  const sigmaLine = t(adt, lang, "sigma", [alphabet.join(", ")])
 
-  const fLine =
-    lang === "de"
-      ? `$F = \\{${endStates}\\}$ ist die Menge der akzeptierenden Zustände`
-      : `$F = \\{${endStates}\\}$ is the set of accepting states`
+  const fLine = t(adt, lang, "final", [endStates])
 
   let deltaLine: string
 
@@ -258,15 +240,13 @@ export function writeAutomatonDefinition(
     const tableRows = automaton.nodes.map((node) => {
       const cells = alphabet.map((symbol) => {
         const edge = automaton.getOutgoingEdges(node).find((e) => e.value?.toString() === symbol)
-        return edge ? `$${automaton.nodes[edge.target]?.label ?? "∅"}$` : "$∅$"
+        return edge ? `$${automaton.nodes[edge.target]?.label ?? "$\\emptyset$"}$` : "$\\emptyset$"
       })
       return `| $${node.label}$ | ${cells.join(" | ")} |`
     })
 
     deltaLine = [
-      lang === "de"
-        ? "und $\\delta$ ist über die folgende Übergangstabelle definiert:"
-        : "and $\\delta$ is defined by the following transition table:",
+      t(adt, lang, "deltaTable"),
       `| $q$ | ${alphabet.map((a) => `$${a}$`).join(" | ")} |`,
       `|${Array(alphabet.length + 1)
         .fill("---")
@@ -286,10 +266,7 @@ export function writeAutomatonDefinition(
       .map((t) => `$${t}$`)
       .join(", $\\\\$ ")
 
-    deltaLine =
-      lang === "de"
-        ? `und $\\delta$ ist gegeben durch: $\\\\$ ${transitions}`
-        : `and $\\delta$ is given as: $\\\\$ ${transitions}`
+    deltaLine = t(adt, lang, "deltaDefinition") + transitions
   }
 
   return [intro, qLine, sigmaLine, fLine, ...(sLine ? [sLine] : []), deltaLine].join(" $\\\\$ ")

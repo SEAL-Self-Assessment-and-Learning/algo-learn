@@ -11,12 +11,16 @@ const translations: Translations = {
     description: "Determine how many states the minimal DFA has.",
     prompt: "Number of states:",
     Question: "How many states does the minimal DFA equivalent to $\\mathcal{A}$ have?",
+    typeautomaton: "Type of automaton",
+    sizeautomaton: "Size of automaton",
   },
   de: {
     name: "Minimale DFA Zustandsanzahl",
     description: "Bestimme wie viele Zustände der minimale DFA hat.",
     prompt: "Anzahl Zustände:",
     Question: "Wie viele Zustände hat der zu $\\mathcal{A}$ äquivalente minimale DFA?",
+    typeautomaton: "Typ des Automaten",
+    sizeautomaton: "Größe des Automaten",
   },
 }
 
@@ -32,14 +36,14 @@ export const MinimalDFAStateCount: QuestionGenerator = {
       name: "type",
       type: "string",
       allowedValues: ["NFA", "DFA"],
-      description: (lang) => (lang === "en" ? "Type of automaton" : "Typ des Automaten"),
+      description: tFunctional(translations, "typeautomaton"),
     },
     {
       name: "size",
       type: "integer",
       min: 3,
       max: 6,
-      description: (lang) => t(translations, lang, "description"),
+      description: tFunctional(translations, "sizeautomaton"),
     },
   ],
 

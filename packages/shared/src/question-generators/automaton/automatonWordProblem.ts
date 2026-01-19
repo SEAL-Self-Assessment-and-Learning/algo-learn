@@ -23,6 +23,8 @@ const translations: Translations = {
     description: "Determine which words are accepted by the automaton.",
     prompt: "Which of the following words are accepted by $\\mathcal{A}$? Select all that apply.",
     none: "None of the above",
+    size: "Size of the automaton",
+    type: "Type of automaton (NFA or DFA).",
   },
   de: {
     name: "Wortproblem in endlichen Automaten",
@@ -30,6 +32,8 @@ const translations: Translations = {
     prompt:
       "Welche der folgenden Wörter werden von $\\mathcal{A}$ akzeptiert? Wähle alle korrekten Möglichkeiten aus.",
     none: "Keine der genannten Optionen",
+    size: "Größe des Automaten",
+    type: "Typ des Automaten (NFA oder DFA).",
   },
 }
 
@@ -43,15 +47,14 @@ export const AutomatonWordQuestion: QuestionGenerator = {
   expectedParameters: [
     {
       name: "size",
-      description: (lang) => t(translations, lang, "description"),
+      description: tFunctional(translations, "size"),
       type: "integer",
       min: 3,
       max: 6,
     },
     {
       name: "type",
-      description: (lang) =>
-        lang === "en" ? "Type of automaton (NFA or DFA)." : "Typ des Automaten (NFA oder DFA).",
+      description: tFunctional(translations, "type"),
       type: "string",
       allowedValues: ["NFA", "DFA"],
     },
