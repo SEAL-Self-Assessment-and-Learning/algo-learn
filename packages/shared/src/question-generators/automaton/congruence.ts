@@ -18,7 +18,8 @@ import {
 const translations: Translations = {
   en: {
     name: "Congruence of Words",
-    description: "Determine if two words are congruent with respect to $L(A)$.",
+    description:
+      "Determine if two words are congruent with respect to the language induced by finite automata.",
     sizeautomaton: "Size of the automaton",
     viewpoint: "Viewpoint for equivalence",
     prompt: "Are the following words {{variantLabel}}",
@@ -51,7 +52,8 @@ const translations: Translations = {
   },
   de: {
     name: "Kongruenz von Wörtern",
-    description: "Bestimme, ob zwei Wörter bzgl. L(A) kongruent sind.",
+    description:
+      "Bestimme, ob zwei Wörter bzgl. der von endlichen Automaten induzierten Sprache kongruent sind.",
     sizeautomaton: "Größe des Automaten",
     viewpoint: "Perspektive der Äquivalenz",
     prompt: "Sind diese Wörter {{variantLabel}}",
