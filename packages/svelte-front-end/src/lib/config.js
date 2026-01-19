@@ -2,7 +2,7 @@
 
 // The base URL of the application. Useful if project is deployed to a subdirectory.
 // prettier-ignore
-export const BASENAME = "" // Note: This is set in the CI pipeline!
+export const BASENAME = process.env.PUBLIC_BASE_PATH // Note: This is set in the CI pipeline!
 
 // The version of the application.
 // prettier-ignore
