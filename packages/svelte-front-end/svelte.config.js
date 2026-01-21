@@ -7,7 +7,7 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     prerender: {
-      entries: ["*", "/en/about", "/en/legal", "/de/about", "/de/legal"],
+      entries: ["*"],
       handleHttpError: ({ path, referrer, message }) => {
         void referrer
         // Ignore favicon errors during prerender - they're handled by hooks
