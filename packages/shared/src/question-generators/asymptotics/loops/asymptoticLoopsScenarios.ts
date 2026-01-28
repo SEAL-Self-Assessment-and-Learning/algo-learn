@@ -609,7 +609,14 @@ const sqrtForLogScenario: ScenarioFactory = (random) => {
   const functionName = random.choice(scenarioFunctionNames)
   const loopVar = random.choice(outerLoopVariables)
   const tempVar = "m"
-  const limit: PseudoCodeString = ["\\lfloor ", { variable: nVar }, "^{0.5} \\rfloor"]
+  const exponentOptions = [
+    { value: 0.5, tex: "1/2" },
+    { value: 1 / 3, tex: "1/3" },
+    { value: 2 / 3, tex: "2/3" },
+    { value: 3 / 2, tex: "3/2" },
+  ]
+  const exponent = random.choice(exponentOptions)
+  const limit: PseudoCodeString = ["\\lfloor ", { variable: nVar }, "^{", exponent.tex, "} \\rfloor"]
 
   const logWhile: PseudoCodeWhile = {
     while: {
@@ -642,9 +649,534 @@ const sqrtForLogScenario: ScenarioFactory = (random) => {
     },
   ]
 
-  const complexity = new SimpleAsymptoticTerm({ variable: nVar, polyexponent: 0.5, logexponent: 1 })
+  const complexity = new SimpleAsymptoticTerm({
+    variable: nVar,
+    polyexponent: exponent.value,
+    logexponent: 1,
+  })
 
   return { id: "sqrt-for-log", code, complexity, functionName, variable: nVar }
+}
+
+const fractionalPowerForScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const loopVar = random.choice(outerLoopVariables)
+  const exponentOptions = [
+    { value: 0.5, tex: "1/2", label: "half" },
+    { value: 1 / 3, tex: "1/3", label: "third" },
+    { value: 2 / 3, tex: "2/3", label: "two-thirds" },
+    { value: 3 / 2, tex: "3/2", label: "three-halves" },
+    { value: 5 / 2, tex: "5/2", label: "five-halves" },
+    { value: 7 / 3, tex: "7/3", label: "seven-thirds" },
+  ]
+  const exponent = random.choice(exponentOptions)
+
+  const limit: PseudoCodeString = ["\\lfloor ", { variable: nVar }, "^{", exponent.tex, "} \\rfloor"]
+
+  const forLoop: PseudoCodeFor = {
+    for: {
+      variable: loopVar,
+      from: [random.choice(["1", "2", "3", "1000"])],
+      to: limit,
+      do: { block: [incrementState("w", random.int(1, 5))] },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [assignmentState("w", ["0"]), forLoop, returnState("w")],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({ variable: nVar, polyexponent: exponent.value })
+
+  return { id: `fractional-power-${exponent.label}`, code, complexity, functionName, variable: nVar }
+}
+
+const exponentialSumScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const outerVar = random.choice(outerLoopVariables)
+  let innerVar = random.choice(innerLoopVariables)
+  while (innerVar === outerVar) {
+    innerVar = random.choice(innerLoopVariables)
+  }
+  const base = random.choice([2, 3, 4])
+  const limit: PseudoCodeString = [base.toString(), "^{", { variable: outerVar }, "}"]
+
+  const innerFor: PseudoCodeFor = {
+    for: {
+      variable: innerVar,
+      from: ["1"],
+      to: limit,
+      do: { block: [incrementState("w")] },
+    },
+  }
+
+  const outerFor: PseudoCodeFor = {
+    for: {
+      variable: outerVar,
+      from: ["1"],
+      to: asArray(nVar),
+      do: { block: [innerFor] },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [assignmentState("w", ["0"]), outerFor, returnState("w")],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({ variable: nVar, exponentialBase: base })
+
+  return { id: `exp-sum-${base}`, code, complexity, functionName, variable: nVar }
+}
+
+const exponentialDirectScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const loopVar = random.choice(outerLoopVariables)
+  const base = random.choice([2, 3, 5])
+  const limit: PseudoCodeString = [base.toString(), "^{", { variable: nVar }, "}"]
+
+  const forLoop: PseudoCodeFor = {
+    for: {
+      variable: loopVar,
+      from: [random.choice(["1", "2", "3", "10"])],
+      to: limit,
+      do: { block: [incrementState("w", random.int(1, 4))] },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [assignmentState("w", ["0"]), forLoop, returnState("w")],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({ variable: nVar, exponentialBase: base })
+
+  return { id: `exp-direct-${base}`, code, complexity, functionName, variable: nVar }
+}
+
+const logLogForScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const loopVar = random.choice(outerLoopVariables)
+  const limit: PseudoCodeString = ["\\lfloor ", "\\log(\\log ", { variable: nVar }, ") \\rfloor"]
+
+  const forLoop: PseudoCodeFor = {
+    for: {
+      variable: loopVar,
+      from: ["1"],
+      to: limit,
+      do: { block: [incrementState("w")] },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [assignmentState("w", ["0"]), forLoop, returnState("w")],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({ variable: nVar, loglogexponent: 1 })
+
+  return { id: "loglog-for", code, complexity, functionName, variable: nVar }
+}
+
+const sqrtWhileLogLogScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const tempVar = "m"
+  const exponentOptions = [
+    { value: 0.5, tex: "1/2" },
+    { value: 1 / 3, tex: "1/3" },
+    { value: 2 / 3, tex: "2/3" },
+  ]
+  const exponent = random.choice(exponentOptions)
+
+  const whileLoop: PseudoCodeWhile = {
+    while: {
+      condition: [{ variable: tempVar }, " > ", "2"],
+      do: {
+        block: [
+          incrementState("w"),
+          assignmentState(tempVar, [
+            "\\lfloor ",
+            { variable: tempVar },
+            "^{",
+            exponent.tex,
+            "} \\rfloor",
+          ]),
+        ],
+      },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [
+          assignmentState("w", ["0"]),
+          assignmentState(tempVar, asArray(nVar)),
+          whileLoop,
+          returnState("w"),
+        ],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({ variable: nVar, loglogexponent: 1 })
+
+  return { id: "sqrt-while-loglog", code, complexity, functionName, variable: nVar }
+}
+
+const sqrtByStepScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const loopVar = random.choice(outerLoopVariables)
+  const pairOptions = [
+    { limit: 2, limitTex: "2", step: 1.5, stepTex: "3/2", label: "2-3half" },
+    { limit: 3, limitTex: "3", step: 2.5, stepTex: "5/2", label: "3-5half" },
+    { limit: 7 / 3, limitTex: "7/3", step: 11 / 6, stepTex: "11/6", label: "7thirds-11sixths" },
+  ]
+  const pair = random.choice(pairOptions)
+
+  const limit: PseudoCodeString = ["\\lfloor ", { variable: nVar }, "^{", pair.limitTex, "} \\rfloor"]
+  const step: PseudoCodeString = ["\\lfloor ", { variable: nVar }, "^{", pair.stepTex, "} \\rfloor"]
+
+  const whileLoop: PseudoCodeWhile = {
+    while: {
+      condition: [{ variable: loopVar }, " <= ", ...limit],
+      do: {
+        block: [incrementState("w"), assignmentState(loopVar, [{ variable: loopVar }, " + ", ...step])],
+      },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [
+          assignmentState("w", ["0"]),
+          assignmentState(loopVar, ["1"]),
+          whileLoop,
+          returnState("w"),
+        ],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({ variable: nVar, polyexponent: pair.limit - pair.step })
+
+  return { id: `sqrt-by-step-${pair.label}`, code, complexity, functionName, variable: nVar }
+}
+
+const exponentialLogScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const outerVar = random.choice(outerLoopVariables)
+  let innerVar = random.choice(innerLoopVariables)
+  while (innerVar === outerVar) {
+    innerVar = random.choice(innerLoopVariables)
+  }
+  const tempVar = "m"
+  const base = random.choice([2, 3])
+
+  const logWhile: PseudoCodeWhile = {
+    while: {
+      condition: [{ variable: tempVar }, " > ", "1"],
+      do: {
+        block: [
+          incrementState("w"),
+          assignmentState(tempVar, ["\\lfloor ", { variable: tempVar }, " / 2 \\rfloor"]),
+        ],
+      },
+    },
+  }
+
+  const innerFor: PseudoCodeFor = {
+    for: {
+      variable: innerVar,
+      from: ["1"],
+      to: [base.toString(), "^{", { variable: outerVar }, "}"],
+      do: { block: [assignmentState(tempVar, asArray(nVar)), logWhile] },
+    },
+  }
+
+  const outerFor: PseudoCodeFor = {
+    for: {
+      variable: outerVar,
+      from: ["1"],
+      to: asArray(nVar),
+      do: { block: [innerFor] },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [assignmentState("w", ["0"]), outerFor, returnState("w")],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({
+    variable: nVar,
+    exponentialBase: base,
+    logexponent: 1,
+  })
+
+  return { id: `exp-log-${base}`, code, complexity, functionName, variable: nVar }
+}
+
+const exponentialLogLogScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const loopVar = random.choice(outerLoopVariables)
+  const tempVar = "m"
+  const base = random.choice([2, 3])
+
+  const logLogWhile: PseudoCodeWhile = {
+    while: {
+      condition: [{ variable: tempVar }, " > ", "2"],
+      do: {
+        block: [
+          incrementState("w"),
+          assignmentState(tempVar, ["\\lfloor ", { variable: tempVar }, "^{1/2} \\rfloor"]),
+        ],
+      },
+    },
+  }
+
+  const forLoop: PseudoCodeFor = {
+    for: {
+      variable: loopVar,
+      from: ["1"],
+      to: [base.toString(), "^{", { variable: nVar }, "}"],
+      do: { block: [assignmentState(tempVar, asArray(nVar)), logLogWhile] },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [assignmentState("w", ["0"]), forLoop, returnState("w")],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({
+    variable: nVar,
+    exponentialBase: base,
+    loglogexponent: 1,
+  })
+
+  return { id: `exp-loglog-${base}`, code, complexity, functionName, variable: nVar }
+}
+
+const factorialForScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const loopVar = random.choice(outerLoopVariables)
+  const exponent = random.choice([1, 2])
+  const limit: PseudoCodeString =
+    exponent === 1 ? [{ variable: nVar }, "!"] : ["(", { variable: nVar }, "!)^", exponent.toString()]
+
+  const forLoop: PseudoCodeFor = {
+    for: {
+      variable: loopVar,
+      from: ["1"],
+      to: limit,
+      do: { block: [incrementState("w")] },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [assignmentState("w", ["0"]), forLoop, returnState("w")],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({ variable: nVar, factorialExponent: exponent })
+
+  return { id: `factorial-for-${exponent}`, code, complexity, functionName, variable: nVar }
+}
+
+const factorialLogScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const loopVar = random.choice(outerLoopVariables)
+  const tempVar = "m"
+  const exponent = random.choice([1, 2])
+  const limit: PseudoCodeString =
+    exponent === 1 ? [{ variable: nVar }, "!"] : ["(", { variable: nVar }, "!)^", exponent.toString()]
+
+  const logWhile: PseudoCodeWhile = {
+    while: {
+      condition: [{ variable: tempVar }, " > ", "1"],
+      do: {
+        block: [
+          incrementState("w"),
+          assignmentState(tempVar, ["\\lfloor ", { variable: tempVar }, " / 2 \\rfloor"]),
+        ],
+      },
+    },
+  }
+
+  const forLoop: PseudoCodeFor = {
+    for: {
+      variable: loopVar,
+      from: ["1"],
+      to: limit,
+      do: { block: [assignmentState(tempVar, asArray(nVar)), logWhile] },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [assignmentState("w", ["0"]), forLoop, returnState("w")],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({
+    variable: nVar,
+    factorialExponent: exponent,
+    logexponent: 1,
+  })
+
+  return { id: `factorial-log-${exponent}`, code, complexity, functionName, variable: nVar }
+}
+
+const factorialLogLogScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const loopVar = random.choice(outerLoopVariables)
+  const tempVar = "m"
+  const exponent = random.choice([1, 2])
+  const limit: PseudoCodeString =
+    exponent === 1 ? [{ variable: nVar }, "!"] : ["(", { variable: nVar }, "!)^", exponent.toString()]
+
+  const logLogWhile: PseudoCodeWhile = {
+    while: {
+      condition: [{ variable: tempVar }, " > ", "2"],
+      do: {
+        block: [
+          incrementState("w"),
+          assignmentState(tempVar, ["\\lfloor ", { variable: tempVar }, "^{1/2} \\rfloor"]),
+        ],
+      },
+    },
+  }
+
+  const forLoop: PseudoCodeFor = {
+    for: {
+      variable: loopVar,
+      from: ["1"],
+      to: limit,
+      do: { block: [assignmentState(tempVar, asArray(nVar)), logLogWhile] },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [assignmentState("w", ["0"]), forLoop, returnState("w")],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({
+    variable: nVar,
+    factorialExponent: exponent,
+    loglogexponent: 1,
+  })
+
+  return { id: `factorial-loglog-${exponent}`, code, complexity, functionName, variable: nVar }
+}
+
+const factorialNestedScenario: ScenarioFactory = (random) => {
+  const nVar = "n"
+  const functionName = random.choice(scenarioFunctionNames)
+  const outerVar = random.choice(outerLoopVariables)
+  let innerVar = random.choice(innerLoopVariables)
+  while (innerVar === outerVar) {
+    innerVar = random.choice(innerLoopVariables)
+  }
+  const exponent = random.choice([1, 2])
+  const limit: PseudoCodeString =
+    exponent === 1
+      ? [{ variable: outerVar }, "!"]
+      : ["(", { variable: outerVar }, "!)^", exponent.toString()]
+
+  const innerFor: PseudoCodeFor = {
+    for: {
+      variable: innerVar,
+      from: ["1"],
+      to: limit,
+      do: { block: [incrementState("w")] },
+    },
+  }
+
+  const outerFor: PseudoCodeFor = {
+    for: {
+      variable: outerVar,
+      from: ["1"],
+      to: asArray(nVar),
+      do: { block: [innerFor] },
+    },
+  }
+
+  const code: PseudoCode = [
+    {
+      name: functionName,
+      args: [nVar],
+      body: {
+        block: [assignmentState("w", ["0"]), outerFor, returnState("w")],
+      },
+    },
+  ]
+
+  const complexity = new SimpleAsymptoticTerm({ variable: nVar, factorialExponent: exponent })
+
+  return { id: `factorial-nested-${exponent}`, code, complexity, functionName, variable: nVar }
 }
 
 const geometricGrowthScenario: ScenarioFactory = (random) => {
@@ -880,6 +1412,18 @@ const buildScenarioPool = (difficulty: number): ScenarioFactory[] => {
     { factory: quadraticLogScenario, weight: difficulty >= 4 ? 2 : 0 },
     { factory: tripleNestedForScenario, weight: difficulty >= 5 ? 2 : 0 },
     { factory: sqrtForLogScenario, weight: difficulty >= 4 ? 2 : 0 },
+    { factory: fractionalPowerForScenario, weight: difficulty >= 3 ? 3 : 1 },
+    { factory: exponentialSumScenario, weight: difficulty >= 5 ? 2 : 0 },
+    { factory: exponentialDirectScenario, weight: difficulty >= 5 ? 2 : 0 },
+    { factory: exponentialLogScenario, weight: difficulty >= 6 ? 2 : 0 },
+    { factory: exponentialLogLogScenario, weight: difficulty >= 6 ? 2 : 0 },
+    { factory: logLogForScenario, weight: difficulty >= 4 ? 2 : 0 },
+    { factory: sqrtWhileLogLogScenario, weight: difficulty >= 5 ? 2 : 0 },
+    { factory: sqrtByStepScenario, weight: difficulty >= 5 ? 2 : 0 },
+    { factory: factorialForScenario, weight: difficulty >= 6 ? 2 : 0 },
+    { factory: factorialLogScenario, weight: difficulty >= 6 ? 2 : 0 },
+    { factory: factorialLogLogScenario, weight: difficulty >= 6 ? 2 : 0 },
+    { factory: factorialNestedScenario, weight: difficulty >= 6 ? 2 : 0 },
     { factory: earlyBreakScenario, weight: difficulty <= 4 ? 2 : 0 },
     { factory: fixedIterationsScenario, weight: difficulty <= 3 ? 1 : 0 },
   ]
@@ -894,7 +1438,8 @@ const buildScenarioPool = (difficulty: number): ScenarioFactory[] => {
     }
   }
 
-  return pool.length > 0 ? pool : [simpleForScenario]
+  // return pool.length > 0 ? pool : [simpleForScenario]
+  return [exponentialLogLogScenario]
 }
 
 export { buildScenarioPool }

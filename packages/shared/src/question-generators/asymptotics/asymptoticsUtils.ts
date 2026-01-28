@@ -26,6 +26,8 @@ export type Unbounded = "infty" | "-infty"
 export class ProductTerm {
   /** The coefficient of the term. */
   coefficient: Fraction
+  /** The exponent of the factorial term (n!)^e. */
+  factorialExponent: Fraction
   /**
    * A map from the number of times the logarithm function is iterated to the
    * exponent of the term. For example, if the term is c * n^2 * log(n)^3 *
@@ -50,14 +52,17 @@ export class ProductTerm {
    */
   constructor({
     coefficient = 1,
+    factorialExponent = 0,
     logarithmExponents = new IteratedLogarithms(),
     exponentialBase = 1,
   }: {
     coefficient?: number | Fraction
+    factorialExponent?: number | Fraction
     logarithmExponents?: IteratedLogarithms
     exponentialBase?: number | Fraction
   } = {}) {
     this.coefficient = new Fraction(coefficient)
+    this.factorialExponent = new Fraction(factorialExponent)
     this.logarithmExponents = logarithmExponents
     this.exponentialBase = new Fraction(exponentialBase)
   }
@@ -74,6 +79,10 @@ export class ProductTerm {
     const factors = []
     if (this.coefficient.compare(1) !== 0) {
       factors.push(this.coefficient.toFraction())
+    }
+    if (!this.factorialExponent.equals(0)) {
+      const out = `${vartex}!${exponentToText(this.factorialExponent)}`
+      factors.push(out)
     }
     for (const i of Array.from(this.logarithmExponents.keys()).sort()) {
       const e = this.logarithmExponents.get(i)
@@ -129,6 +138,16 @@ export class ProductTerm {
     if (this.coefficient.compare(1) !== 0) {
       numerator.push(this.coefficient.toLatex())
     }
+    if (!this.factorialExponent.equals(0)) {
+      let out = `${variable}!`
+      if (this.factorialExponent.compare(0) > 0) {
+        out += exponentToLatex(this.factorialExponent)
+        numerator.push(out)
+      } else {
+        out += exponentToLatex(this.factorialExponent.neg())
+        denominator.push(out)
+      }
+    }
     for (const i of Array.from(this.logarithmExponents.keys()).sort()) {
       const e = this.logarithmExponents.get(i)
       if (e === undefined) throw new Error("impossible")
@@ -181,6 +200,7 @@ export class ProductTerm {
    */
   isConstant(): boolean {
     if (this.coefficient.equals(0)) return true
+    if (!this.factorialExponent.equals(0)) return false
     if (!this.exponentialBase.equals(1)) return false
     for (const [, e] of this.logarithmExponents) {
       if (!e.equals(0)) return false
@@ -194,6 +214,8 @@ export class ProductTerm {
    * @returns - True if the product term is unbounded, false otherwise.
    */
   isUnbounded(): boolean {
+    if (this.factorialExponent.compare(0) > 0) return true
+    if (this.factorialExponent.compare(0) < 0) return false
     if (this.exponentialBase.compare(1) > 0) return true
     if (this.exponentialBase.compare(1) < 0) return false
     for (const [, e] of this.logarithmExponents) {
@@ -225,6 +247,7 @@ export class ProductTerm {
   abs(): ProductTerm {
     return new ProductTerm({
       coefficient: this.coefficient.abs(),
+      factorialExponent: this.factorialExponent,
       logarithmExponents: this.logarithmExponents,
       exponentialBase: this.exponentialBase,
     })
@@ -238,6 +261,7 @@ export class ProductTerm {
   neg(): ProductTerm {
     return new ProductTerm({
       coefficient: this.coefficient.neg(),
+      factorialExponent: this.factorialExponent,
       logarithmExponents: this.logarithmExponents,
       exponentialBase: this.exponentialBase,
     })
@@ -251,6 +275,7 @@ export class ProductTerm {
   inv(): ProductTerm {
     return new ProductTerm({
       coefficient: this.coefficient.inverse(),
+      factorialExponent: this.factorialExponent.neg(),
       logarithmExponents: new IteratedLogarithms(
         usedIterationNumbers([this]).map((i) => [i, this.logarithmExponents.get(i).neg()]),
       ),
@@ -271,6 +296,7 @@ export class ProductTerm {
     }
     return new ProductTerm({
       coefficient: this.coefficient.add(t.coefficient),
+      factorialExponent: this.factorialExponent,
       logarithmExponents: this.logarithmExponents,
       exponentialBase: this.exponentialBase,
     })
@@ -296,6 +322,7 @@ export class ProductTerm {
   mul(t: ProductTerm): ProductTerm {
     return new ProductTerm({
       coefficient: this.coefficient.mul(t.coefficient),
+      factorialExponent: this.factorialExponent.add(t.factorialExponent),
       logarithmExponents: new IteratedLogarithms(
         usedIterationNumbers([this, t]).map((i) => [
           i,
@@ -378,6 +405,7 @@ export class ProductTerm {
    */
   isLogarithmic(): boolean {
     if (this.coefficient.equals(0)) return true
+    if (!this.factorialExponent.equals(0)) return false
     if (this.exponentialBase.compare(1) !== 0) return false
     for (const [i, e] of this.logarithmExponents) {
       if (!(i === 1 && e.equals(1))) return false
@@ -392,6 +420,7 @@ export class ProductTerm {
    */
   isLinear(): boolean {
     if (this.coefficient.equals(0)) return true
+    if (!this.factorialExponent.equals(0)) return false
     if (this.exponentialBase.compare(1) !== 0) return false
     for (const [i, e] of this.logarithmExponents) {
       if (!(i === 0 && e.equals(1))) return false
@@ -411,6 +440,7 @@ export class ProductTerm {
     if (exponent.isConstant()) {
       return new ProductTerm({
         coefficient: b.pow(e),
+        factorialExponent: this.factorialExponent.mul(e),
         logarithmExponents: new IteratedLogarithms(
           usedIterationNumbers([this]).map((i) => [i, this.logarithmExponents.get(i).mul(e)]),
         ),
@@ -441,6 +471,9 @@ export class ProductTerm {
    * @returns The logarithm of t in base base, or undefined if t <= 0
    */
   log(base = 2): SumProductTerm {
+    if (!this.factorialExponent.equals(0)) {
+      throw new TooComplex(this, "Taking the logarithm of factorial terms is not supported")
+    }
     if (this.coefficient.compare(0) <= 0) throw new Error("logarithm is only defined for positive terms")
     const newTerms: ProductTerm[] = []
 
@@ -480,13 +513,17 @@ export class ProductTerm {
 
 export function createProductTerm({
   coefficient = 1,
+  factorialExponent = 0,
   polyexponent,
   logexponent,
+  loglogexponent,
   exponentialBase = 1,
 }: {
   coefficient?: number | Fraction
+  factorialExponent?: number | Fraction
   polyexponent?: number | Fraction
   logexponent?: number | Fraction
+  loglogexponent?: number | Fraction
   exponentialBase?: number | Fraction
 } = {}): ProductTerm {
   const logarithmExponents = new IteratedLogarithms()
@@ -496,8 +533,12 @@ export function createProductTerm({
   if (logexponent !== undefined) {
     logarithmExponents.set(1, new Fraction(logexponent))
   }
+  if (loglogexponent !== undefined) {
+    logarithmExponents.set(2, new Fraction(loglogexponent))
+  }
   return new ProductTerm({
     coefficient: new Fraction(coefficient),
+    factorialExponent: new Fraction(factorialExponent),
     logarithmExponents: logarithmExponents,
     exponentialBase: new Fraction(exponentialBase),
   })
@@ -789,9 +830,32 @@ export function mathNodeToSumProductTerm(node: math.MathNode): SumProductTerm {
       const base = mathNodeToSumProductTerm(n.args[0])
       const exponent = mathNodeToSumProductTerm(n.args[1])
       return base.pow(exponent)
+    } else if (n.op === "!") {
+      if (n.args.length !== 1) throw new Error("Invalid number of arguments for factorial")
+      const arg = mathNodeToSumProductTerm(n.args[0])
+      if (!arg.isLinear()) {
+        throw new TooComplex(n, "Factorial only supported for linear arguments")
+      }
+      const term = arg.getOnlyTerm()
+      if (!term.coefficient.equals(1) || !term.logarithmExponents.get(0).equals(1)) {
+        throw new TooComplex(n, "Factorial only supported for n")
+      }
+      return new SumProductTerm(createProductTerm({ factorialExponent: 1 }))
     }
   } else if (node.type === "FunctionNode") {
     const n = node as math.FunctionNode
+    if (n.fn.name === "factorial") {
+      if (n.args.length !== 1) throw new Error("Invalid number of arguments for factorial")
+      const arg = mathNodeToSumProductTerm(n.args[0])
+      if (!arg.isLinear()) {
+        throw new TooComplex(n, "Factorial only supported for linear arguments")
+      }
+      const term = arg.getOnlyTerm()
+      if (!term.coefficient.equals(1) || !term.logarithmExponents.get(0).equals(1)) {
+        throw new TooComplex(n, "Factorial only supported for n")
+      }
+      return new SumProductTerm(createProductTerm({ factorialExponent: 1 }))
+    }
     const base = baseOfLog(n.fn.name)
     const arg = mathNodeToSumProductTerm(n.args[0])
     if (base) {
@@ -845,6 +909,29 @@ function logToLatex(
   latex += `\\log${basis}{${vartex}}`
   if (exponentToLatex(logexponent) !== "") {
     latex += ")" + exponentToLatex(logexponent)
+  }
+  return latex
+}
+
+/**
+ * Output a log(log(x)) term as a LaTeX string.
+ */
+function logLogToLatex(
+  vartex: string,
+  logexponent: Fraction,
+  logbasis: Fraction,
+  omitLogBasis: boolean = false,
+  verboseStyle: boolean = true,
+): string {
+  if (logexponent.equals(0)) return "1"
+  const basis = omitLogBasis ? "" : `_{${logbasis.toString()}}`
+  const inner = `\\log${basis}({${vartex}})`
+  let latex = `\\log(${inner})`
+  if (!verboseStyle) {
+    return `\\log${exponentToLatex(logexponent)}(${inner})`
+  }
+  if (exponentToLatex(logexponent) !== "") {
+    latex = `(${latex})${exponentToLatex(logexponent)}`
   }
   return latex
 }
@@ -1164,30 +1251,38 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
   coefficient: Fraction
   polyexponent: Fraction
   logexponent: Fraction
+  loglogexponent: Fraction
   logbasis: Fraction
   exponentialBase: Fraction
+  factorialExponent: Fraction
   variable: string
 
   constructor({
     coefficient = 1,
     logexponent = 0,
+    loglogexponent = 0,
     logbasis = 2,
     exponentialBase = 1,
     polyexponent = 0,
+    factorialExponent = 0,
     variable,
   }: {
     coefficient?: number | Fraction
     logexponent?: number | Fraction
+    loglogexponent?: number | Fraction
     logbasis?: number | Fraction
     exponentialBase?: number | Fraction
     polyexponent?: number | Fraction
+    factorialExponent?: number | Fraction
     variable: string
   }) {
     this.coefficient = new Fraction(coefficient)
     this.polyexponent = new Fraction(polyexponent)
     this.logexponent = new Fraction(logexponent)
+    this.loglogexponent = new Fraction(loglogexponent)
     this.logbasis = new Fraction(logbasis)
     this.exponentialBase = new Fraction(exponentialBase)
+    this.factorialExponent = new Fraction(factorialExponent)
     this.variable = variable
   }
 
@@ -1196,8 +1291,10 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
     return new SumProductTerm(
       createProductTerm({
         coefficient: this.coefficient,
+        factorialExponent: this.factorialExponent,
         polyexponent: this.polyexponent,
         logexponent: this.logexponent,
+        loglogexponent: this.loglogexponent,
         exponentialBase: this.exponentialBase,
       }),
     )
@@ -1229,6 +1326,8 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
     } else if (
       this.polyexponent.compare(0) <= 0 &&
       this.logexponent.compare(0) <= 0 &&
+      this.loglogexponent.compare(0) <= 0 &&
+      this.factorialExponent.compare(0) <= 0 &&
       this.exponentialBase.compare(1) <= 0
     ) {
       latex += "1"
@@ -1239,12 +1338,20 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
     if (this.logexponent.compare(0) > 0) {
       latex += logToLatex(variable, this.logexponent, this.logbasis, omitLogBasis)
     }
+    if (this.loglogexponent.compare(0) > 0) {
+      latex += logLogToLatex(variable, this.loglogexponent, this.logbasis, omitLogBasis)
+    }
+    if (this.factorialExponent.compare(0) > 0) {
+      latex += `${variable}!${exponentToLatex(this.factorialExponent)}`
+    }
     if (this.exponentialBase.compare(1) > 0) {
       latex += `${this.exponentialBase.toLatex()}^{${this.variable}}`
     }
     const numNegativeTerms =
       (this.polyexponent.compare(0) < 0 ? 1 : 0) +
       (this.logexponent.compare(0) < 0 ? 1 : 0) +
+      (this.loglogexponent.compare(0) < 0 ? 1 : 0) +
+      (this.factorialExponent.compare(0) < 0 ? 1 : 0) +
       (this.exponentialBase.compare(1) < 0 ? 1 : 0)
 
     if (numNegativeTerms > 0) {
@@ -1258,6 +1365,12 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
     }
     if (this.logexponent.compare(0) < 0) {
       latex += logToLatex(variable, this.logexponent.neg(), this.logbasis, omitLogBasis)
+    }
+    if (this.loglogexponent.compare(0) < 0) {
+      latex += logLogToLatex(variable, this.loglogexponent.neg(), this.logbasis, omitLogBasis)
+    }
+    if (this.factorialExponent.compare(0) < 0) {
+      latex += `${variable}!${exponentToLatex(this.factorialExponent.neg())}`
     }
     if (this.exponentialBase.compare(1) < 0) {
       latex += `${this.exponentialBase.inverse().toLatex()}^${variable}`
@@ -1277,7 +1390,7 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
    */
   toString(variable: string = "x"): string {
     variable = variable.length === 1 ? variable : `(${variable})`
-    return `${this.coefficient.toFraction()} * ${variable}^(${this.polyexponent.toFraction()}) * (log(${variable}))^(${this.logexponent.toFraction()}) * (${this.exponentialBase.toFraction()})^${variable}`
+    return `${this.coefficient.toFraction()} * ${variable}^(${this.polyexponent.toFraction()}) * (log(${variable}))^(${this.logexponent.toFraction()}) * (log(log(${variable})))^(${this.loglogexponent.toFraction()}) * (${variable}!)^(${this.factorialExponent.toFraction()}) * (${this.exponentialBase.toFraction()})^${variable}`
   }
 
   compare(t: SimpleAsymptoticTerm): number {

@@ -117,8 +117,10 @@ const makeDistractors = (correct: SimpleAsymptoticTerm, random: Random): SimpleA
   candidates.push(
     new SimpleAsymptoticTerm({
       variable,
+      factorialExponent: correct.factorialExponent,
       polyexponent: correct.polyexponent.add(1),
       logexponent: correct.logexponent,
+      loglogexponent: correct.loglogexponent,
     }),
   )
 
@@ -126,8 +128,10 @@ const makeDistractors = (correct: SimpleAsymptoticTerm, random: Random): SimpleA
     candidates.push(
       new SimpleAsymptoticTerm({
         variable,
+        factorialExponent: correct.factorialExponent,
         polyexponent: correct.polyexponent.sub(1),
         logexponent: correct.logexponent,
+        loglogexponent: correct.loglogexponent,
       }),
     )
   }
@@ -136,23 +140,29 @@ const makeDistractors = (correct: SimpleAsymptoticTerm, random: Random): SimpleA
     candidates.push(
       new SimpleAsymptoticTerm({
         variable,
+        factorialExponent: correct.factorialExponent,
         polyexponent: correct.polyexponent,
         logexponent: correct.logexponent.add(1),
+        loglogexponent: correct.loglogexponent,
       }),
     )
     candidates.push(
       new SimpleAsymptoticTerm({
         variable,
+        factorialExponent: correct.factorialExponent,
         polyexponent: correct.polyexponent,
         logexponent: 0,
+        loglogexponent: correct.loglogexponent,
       }),
     )
   } else {
     candidates.push(
       new SimpleAsymptoticTerm({
         variable,
+        factorialExponent: correct.factorialExponent,
         polyexponent: correct.polyexponent,
         logexponent: 1,
+        loglogexponent: correct.loglogexponent,
       }),
     )
   }
