@@ -123,6 +123,17 @@
     }),
   )
   const onChange = (newItems: Array<Item>) => setChoice(newItems.map((item) => item.position))
+
+  $effect(() => {
+    void lang
+    if (question.feedback === undefined) return
+    if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
+    const choiceSnapshot = questionState.choice.slice()
+    void Promise.resolve(question.feedback({ choice: choiceSnapshot })).then((feedbackObject) => {
+      if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
+      questionState.feedbackObject = feedbackObject
+    })
+  })
 </script>
 
 {#if !question.sorting}

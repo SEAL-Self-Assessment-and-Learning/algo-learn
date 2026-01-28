@@ -73,6 +73,17 @@
       handleClick(false)
     }
   }
+
+  $effect(() => {
+    void lang
+    if (question.feedback === undefined) return
+    if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
+    const choiceSnapshot = questionState.choice.slice()
+    void Promise.resolve(question.feedback({ choice: choiceSnapshot })).then((feedbackObject) => {
+      if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
+      questionState.feedbackObject = feedbackObject
+    })
+  })
 </script>
 
 <InteractWithQuestion
