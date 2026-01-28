@@ -21,6 +21,6 @@ export const adt: Translations = {
     final: `$F = \\{{{0}}\\}$ ist die Menge der akzeptierenden Zustände`,
     deltaTable: "and $\\delta$ ist über die folgende Übergangstabelle definiert:",
     deltaDefinition: "und $\\delta$ ist gegeben durch: $\\\\$",
-    deltaEmpty: "und es gibt keine Übergänge, d.h. ist $\\delta$ eine leere Funktion.",
+    deltaEmpty: "und es gibt keine Übergänge, d.h. $\\delta$ ist eine leere Funktion.",
   },
 }
