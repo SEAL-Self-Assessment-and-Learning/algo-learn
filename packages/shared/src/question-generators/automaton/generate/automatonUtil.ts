@@ -236,37 +236,41 @@ export function writeAutomatonDefinition(
 
   let deltaLine: string
 
-  if (asTable) {
-    const tableRows = automaton.nodes.map((node) => {
-      const cells = alphabet.map((symbol) => {
-        const edge = automaton.getOutgoingEdges(node).find((e) => e.value?.toString() === symbol)
-        return edge ? `$${automaton.nodes[edge.target]?.label ?? "$\\emptyset$"}$` : "$\\emptyset$"
+  if (automaton.edges.flatMap((e) => e).length) {
+    if (asTable) {
+      const tableRows = automaton.nodes.map((node) => {
+        const cells = alphabet.map((symbol) => {
+          const edge = automaton.getOutgoingEdges(node).find((e) => e.value?.toString() === symbol)
+          return edge ? `$${automaton.nodes[edge.target]?.label ?? "$\\emptyset$"}$` : "$\\emptyset$"
+        })
+        return `| $${node.label}$ | ${cells.join(" | ")} |`
       })
-      return `| $${node.label}$ | ${cells.join(" | ")} |`
-    })
 
-    deltaLine = [
-      t(adt, lang, "deltaTable"),
-      `| $q$ | ${alphabet.map((a) => `$${a}$`).join(" | ")} |`,
-      `|${Array(alphabet.length + 1)
-        .fill("---")
-        .join("|")}|`,
-      ...tableRows,
-    ].join("\n")
+      deltaLine = [
+        t(adt, lang, "deltaTable"),
+        `| $q$ | ${alphabet.map((a) => `$${a}$`).join(" | ")} |`,
+        `|${Array(alphabet.length + 1)
+          .fill("---")
+          .join("|")}|`,
+        ...tableRows,
+      ].join("\n")
+    } else {
+      const transitions = automaton.nodes
+        .flatMap((fromNode, i) =>
+          (automaton.edges[i] ?? []).map((edge) => {
+            const symbol = edge.value === undefined ? "\\varepsilon" : edge.value.toString()
+            const from = fromNode.label ?? `q_${i}`
+            const to = automaton.nodes[edge.target]?.label ?? `q_${edge.target}`
+            return `\\delta(${from}, ${symbol}) = ${to}`
+          }),
+        )
+        .map((t) => `$${t}$`)
+        .join(", $\\\\$ ")
+
+      deltaLine = t(adt, lang, "deltaDefinition") + transitions
+    }
   } else {
-    const transitions = automaton.nodes
-      .flatMap((fromNode, i) =>
-        (automaton.edges[i] ?? []).map((edge) => {
-          const symbol = edge.value === undefined ? "\\varepsilon" : edge.value.toString()
-          const from = fromNode.label ?? `q_${i}`
-          const to = automaton.nodes[edge.target]?.label ?? `q_${edge.target}`
-          return `\\delta(${from}, ${symbol}) = ${to}`
-        }),
-      )
-      .map((t) => `$${t}$`)
-      .join(", $\\\\$ ")
-
-    deltaLine = t(adt, lang, "deltaDefinition") + transitions
+    deltaLine = t(adt, lang, "deltaEmpty")
   }
 
   return [intro, qLine, sigmaLine, fLine, ...(sLine ? [sLine] : []), deltaLine].join(" $\\\\$ ")
