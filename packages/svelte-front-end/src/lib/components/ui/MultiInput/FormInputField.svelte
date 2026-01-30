@@ -3,7 +3,6 @@
   import type { TextFieldState } from "$lib/components/types.ts"
   import { inputClass } from "$lib/components/ui/MultiInput/cnInput.ts"
   import FeedbackComp from "$lib/components/ui/MultiInput/FeedbackComp.svelte"
-
   import { getTextFieldStateValues } from "$lib/context/textFieldStateValues.ts"
   import { cn } from "$lib/utils.ts"
   import { getExtraStyles } from "$lib/utils/MultiTextInput.ts"
@@ -80,7 +79,7 @@
           <input
             class={`${cn(inputClass, inputBorderColor, additionalClassnames)}`}
             bind:this={firstInputRef}
-            id={id}
+            {id}
             name={id}
             {disabled}
             value={text}
@@ -107,7 +106,7 @@
         <input
           class={`${cn(inputClass, inputBorderColor, additionalClassnames)}`}
           bind:this={firstInputRef}
-          id={id}
+          {id}
           name={id}
           {disabled}
           value={text}
