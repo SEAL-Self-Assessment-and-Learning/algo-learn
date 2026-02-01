@@ -31,13 +31,14 @@
     feedbackObject?: FreeTextFeedback
     formatFeedback: { [key: string]: string }
   } = $state({
-    mode: !question.fillOutAll ? "draft" : "invalid",
+    mode: "invalid",
     modeID: {},
     text: {},
     formatFeedback: {},
   })
 
   $effect(() => {
+    questionState.mode = !question.fillOutAll ? "draft" : "invalid"
     for (const id of fieldValues.inputIds) {
       if (!questionState.text[id]) {
         questionState.text[id] = ""

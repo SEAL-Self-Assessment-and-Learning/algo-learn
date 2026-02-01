@@ -26,7 +26,9 @@
   const { pairs, answers, disabled = false, onChange, onModeChange, columns = 2 }: Props = $props()
 
   // pool uses the supplied items (cloned so we don't mutate caller's array)
+  // svelte-ignore state_referenced_locally
   let pool = $state<SlotItem[]>(structuredClone(answers))
+  // svelte-ignore state_referenced_locally
   let slots = $state<(SlotItem | null)[]>(Array(pairs.length).fill(null))
   let activeItem = $state<SlotItem | null>(null)
 

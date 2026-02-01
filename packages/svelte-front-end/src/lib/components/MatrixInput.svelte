@@ -9,12 +9,12 @@
   }
   const { x }: Props = $props()
 
-  const parsedMatrixObject = JSON.parse(x) as MatrixInputProps
-  const rows = parsedMatrixObject.rows
-  const cols = parsedMatrixObject.cols
+  const parsedMatrixObject = $derived(JSON.parse(x) as MatrixInputProps)
+  const rows = $derived(parsedMatrixObject.rows)
+  const cols = $derived(parsedMatrixObject.cols)
 
   const theme = getTheme()
-  const svgColor = theme === "dark" ? "white" : "black"
+  const svgColor = $derived(theme === "dark" ? "white" : "black")
 </script>
 
 <div class="flex items-center justify-center">

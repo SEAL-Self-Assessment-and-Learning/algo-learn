@@ -17,7 +17,9 @@
 
   const { id, item, onRemove, disabled = false, correctness = null }: Props = $props()
 
+  // svelte-ignore state_referenced_locally
   const drop = useDroppable({ id })
+  // svelte-ignore state_referenced_locally
   const drag = useDraggable({ id: `${id}-drag` })
 
   const dragStyle = $derived(

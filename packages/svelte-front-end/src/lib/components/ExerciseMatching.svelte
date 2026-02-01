@@ -28,8 +28,14 @@
     choice: number[]
     feedbackObject?: MatchingFeedback
   } = $state({
-    mode: question.fillOutAll ? "invalid" : "draft",
-    choice: Array(question.answers.length).fill(-1),
+    mode: "invalid",
+    choice: [],
+  })
+
+  $effect(() => {
+    questionState.mode = question.fillOutAll ? "invalid" : "draft"
+    questionState.choice = Array(question.answers.length).fill(-1)
+    questionState.feedbackObject = undefined
   })
 
   const disabled = $derived(questionState.mode === "correct" || questionState.mode === "incorrect")

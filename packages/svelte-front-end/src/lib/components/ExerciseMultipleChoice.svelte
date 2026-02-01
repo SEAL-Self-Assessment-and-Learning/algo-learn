@@ -30,12 +30,18 @@
     choice: Array<number>
     feedbackObject?: MultipleChoiceFeedback
   } = $state({
-    mode: question.sorting ? "draft" : "invalid",
-    choice: question.sorting ? [...Array(question.answers.length).keys()] : [],
+    mode: "invalid",
+    choice: [],
   })
   const disabled: boolean = $derived(
     questionState.mode === "correct" || questionState.mode === "incorrect",
   )
+
+  $effect(() => {
+    questionState.mode = question.sorting ? "draft" : "invalid"
+    questionState.choice = question.sorting ? [...Array(question.answers.length).keys()] : []
+    questionState.feedbackObject = undefined
+  })
 
   /**
    * SetChoice sets the entire choice array.

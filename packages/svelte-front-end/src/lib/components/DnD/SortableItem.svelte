@@ -12,6 +12,7 @@
 
   let { task, disabled }: { task: Item; disabled?: boolean } = $props()
 
+  // svelte-ignore state_referenced_locally
   const { attributes, listeners, node, transform, transition, isDragging, isSorting } = useSortable({
     id: task.id,
   })
