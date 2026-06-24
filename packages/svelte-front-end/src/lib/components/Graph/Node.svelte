@@ -22,7 +22,10 @@
   )
   let hoverFillClass = $derived(clickable ? "" : "group-hover:fill-goethe")
 
-  const dragAreaSize = $derived(size * 2)
+  const dragAreaSize = $derived.by(() => {
+    // Explicitly reference size to ensure reactivity
+    return size * 2
+  })
 
   let startX = 0
   let startY = 0

@@ -18,11 +18,13 @@
   // svelte-ignore state_referenced_locally
   const drag = useDraggable({ id })
 
-  const dragStyle = $derived(
-    drag.transform.current
+  const dragStyle = $derived.by(() => {
+    // Explicitly reference id to ensure reactivity
+    void id
+    return drag.transform.current
       ? `transform: translate(${drag.transform.current.x}px, ${drag.transform.current.y}px)`
-      : "",
-  )
+      : ""
+  })
 </script>
 
 <div

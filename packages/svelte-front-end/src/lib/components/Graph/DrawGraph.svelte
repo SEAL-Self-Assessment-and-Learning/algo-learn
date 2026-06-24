@@ -17,37 +17,41 @@
   // limited by the number of colors we have. See tailwind --color-group-0,...,--color-group-7.
   const maxGroups = 8
 
-  const edgeListFlat = $derived(
-    graph.edges.flat().filter(graph.directed ? () => true : (e) => e.source < e.target),
-  )
+  const edgeListFlat = $derived.by(() => {
+    // Explicitly reference graph to ensure reactivity
+    return graph.edges.flat().filter(graph.directed ? () => true : (e) => e.source < e.target)
+  })
 
   let currentlyDragged = $state<null | number>(null)
 
-  let nodePositions = $derived(
-    graph.nodes.map((u) => {
+  let nodePositions = $derived.by(() => {
+    // Explicitly reference graph and coordinateScale to ensure reactivity
+    return graph.nodes.map((u) => {
       return {
         x: u.coords.x * coordinateScale,
         y: u.coords.y * coordinateScale,
       }
-    }),
-  )
-  let nodeStates = $derived<GraphElementStateType[]>(
-    graph.nodes.map((u) => {
+    })
+  })
+  let nodeStates = $derived.by<GraphElementStateType[]>(() => {
+    // Explicitly reference graph to ensure reactivity
+    return graph.nodes.map((u) => {
       return {
         selected: false,
         group: u.group ?? null,
       }
-    }),
-  )
+    })
+  })
 
-  let edgeStates = $derived<GraphElementStateType[]>(
-    edgeListFlat.map((e) => {
+  let edgeStates = $derived.by<GraphElementStateType[]>(() => {
+    // Explicitly reference edgeListFlat to ensure reactivity
+    return edgeListFlat.map((e) => {
       return {
         selected: false,
         group: e.group ?? null,
       }
-    }),
-  )
+    })
+  })
 
   function handleSetDragged(i: number) {
     if (currentlyDragged === null) {
@@ -93,7 +97,10 @@
     return vb
   })
 
-  const viewBoxAspectRatio = $derived(Math.min(maxHeight / maxWidth, viewBox.height / viewBox.width))
+  const viewBoxAspectRatio = $derived.by(() => {
+    // Explicitly reference maxHeight and maxWidth to ensure reactivity
+    return Math.min(maxHeight / maxWidth, viewBox.height / viewBox.width)
+  })
 
   function updateDraggedNode(clientX: number, clientY: number) {
     if (currentlyDragged === null || !svgRef) return

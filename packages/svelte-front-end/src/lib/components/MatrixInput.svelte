@@ -9,7 +9,10 @@
   }
   const { x }: Props = $props()
 
-  const parsedMatrixObject = $derived(JSON.parse(x) as MatrixInputProps)
+  const parsedMatrixObject = $derived.by(() => {
+    // Explicitly reference x to ensure reactivity
+    return JSON.parse(x) as MatrixInputProps
+  })
   const rows = $derived(parsedMatrixObject.rows)
   const cols = $derived(parsedMatrixObject.cols)
 

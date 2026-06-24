@@ -33,6 +33,7 @@
   })
 
   $effect(() => {
+    // Explicitly reference question to ensure reactivity
     questionState.mode = question.fillOutAll ? "invalid" : "draft"
     questionState.choice = Array(question.answers.length).fill(-1)
     questionState.feedbackObject = undefined
@@ -81,7 +82,9 @@
   }
 
   $effect(() => {
+    // Explicitly reference lang and question to ensure reactivity
     void lang
+    void question
     if (question.feedback === undefined) return
     if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
     const choiceSnapshot = questionState.choice.slice()

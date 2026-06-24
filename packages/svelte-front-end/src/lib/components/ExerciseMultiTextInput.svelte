@@ -38,6 +38,7 @@
   })
 
   $effect(() => {
+    // Explicitly reference question to ensure reactivity
     questionState.mode = !question.fillOutAll ? "draft" : "invalid"
     for (const id of fieldValues.inputIds) {
       if (!questionState.text[id]) {
@@ -139,7 +140,9 @@
   }
 
   $effect(() => {
+    // Explicitly reference lang and question to ensure reactivity
     void lang
+    void question
     if (question.feedback === undefined) return
     if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
     const textSnapshot = { ...questionState.text }
