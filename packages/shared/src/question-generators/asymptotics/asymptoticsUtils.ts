@@ -1,6 +1,7 @@
-import Fraction from "fraction.js"
-import math, { baseOfLog, exponentToLatex, exponentToText, log2Fraction } from "../../utils/math.ts"
-import type Random from "../../utils/random.ts"
+import Fraction from "fraction.js";
+import math, { baseOfLog, exponentToLatex, exponentToText, log2Fraction } from "../../utils/math.ts";
+import type Random from "../../utils/random.ts";
+
 
 /**
  * Represents an iterated logarithm term, such as (log(log(n)))^3. It is
@@ -1319,66 +1320,79 @@ export class SimpleAsymptoticTerm implements GeneratedAsymptoticTerm {
    */
   toLatex(variable?: string, omitCoefficient: boolean = false, omitLogBasis: boolean = false): string {
     variable = variable || this.variable
-    variable = variable.length === 1 ? variable : `(${variable})`
-    let latex = ""
-    if (!omitCoefficient && !this.coefficient.equals(1)) {
-      latex += this.coefficient.toLatex()
-    } else if (
-      this.polyexponent.compare(0) <= 0 &&
-      this.logexponent.compare(0) <= 0 &&
-      this.loglogexponent.compare(0) <= 0 &&
-      this.factorialExponent.compare(0) <= 0 &&
-      this.exponentialBase.compare(1) <= 0
-    ) {
-      latex += "1"
-    }
-    if (this.polyexponent.compare(0) == 1) {
-      latex += `${variable}${exponentToLatex(this.polyexponent)}`
-    }
-    if (this.logexponent.compare(0) > 0) {
-      latex += logToLatex(variable, this.logexponent, this.logbasis, omitLogBasis)
-    }
-    if (this.loglogexponent.compare(0) > 0) {
-      latex += logLogToLatex(variable, this.loglogexponent, this.logbasis, omitLogBasis)
-    }
-    if (this.factorialExponent.compare(0) > 0) {
-      latex += `${variable}!${exponentToLatex(this.factorialExponent)}`
-    }
-    if (this.exponentialBase.compare(1) > 0) {
-      latex += `${this.exponentialBase.toLatex()}^{${this.variable}}`
-    }
-    const numNegativeTerms =
-      (this.polyexponent.compare(0) < 0 ? 1 : 0) +
-      (this.logexponent.compare(0) < 0 ? 1 : 0) +
-      (this.loglogexponent.compare(0) < 0 ? 1 : 0) +
-      (this.factorialExponent.compare(0) < 0 ? 1 : 0) +
-      (this.exponentialBase.compare(1) < 0 ? 1 : 0)
+    const varLatex = variable.length === 1 ? variable : `(${variable})`
 
-    if (numNegativeTerms > 0) {
-      latex += " / "
+    // Collect numerator/denominator factors, then join with a visible separator.
+    const num: string[] = []
+    const den: string[] = []
+
+    // Coefficient (only if it isn't 1, unless everything else is 1)
+    const hasAnyNontrivial =
+      this.polyexponent.compare(0) !== 0 ||
+      this.logexponent.compare(0) !== 0 ||
+      this.loglogexponent.compare(0) !== 0 ||
+      this.factorialExponent.compare(0) !== 0 ||
+      this.exponentialBase.compare(1) !== 0
+
+    if (!omitCoefficient && !this.coefficient.equals(1)) {
+      num.push(this.coefficient.toLatex())
+    } else if (!hasAnyNontrivial) {
+      return "1"
     }
-    if (numNegativeTerms > 1) {
-      latex += "("
+
+    // Helper to add to numerator/denominator depending on sign
+    const addPowerFactor = (latex: string, expSign: number) => {
+      if (expSign >= 0) num.push(latex)
+      else den.push(latex)
     }
-    if (this.polyexponent.compare(0) < 0) {
-      latex += `${variable}${exponentToLatex(this.polyexponent.neg())}`
+
+    // Polynomial n^k
+    if (this.polyexponent.compare(0) !== 0) {
+      const e = this.polyexponent
+      const factor = `${varLatex}${exponentToLatex(e.abs())}`
+      addPowerFactor(factor, e.compare(0))
     }
-    if (this.logexponent.compare(0) < 0) {
-      latex += logToLatex(variable, this.logexponent.neg(), this.logbasis, omitLogBasis)
+
+    // log^k n
+    if (this.logexponent.compare(0) !== 0) {
+      const e = this.logexponent
+      const factor = logToLatex(varLatex, e.abs(), this.logbasis, omitLogBasis)
+      addPowerFactor(factor, e.compare(0))
     }
-    if (this.loglogexponent.compare(0) < 0) {
-      latex += logLogToLatex(variable, this.loglogexponent.neg(), this.logbasis, omitLogBasis)
+
+    // loglog^k n
+    if (this.loglogexponent.compare(0) !== 0) {
+      const e = this.loglogexponent
+      const factor = logLogToLatex(varLatex, e.abs(), this.logbasis, omitLogBasis)
+      addPowerFactor(factor, e.compare(0))
     }
-    if (this.factorialExponent.compare(0) < 0) {
-      latex += `${variable}!${exponentToLatex(this.factorialExponent.neg())}`
+
+    // n!^k
+    if (this.factorialExponent.compare(0) !== 0) {
+      const e = this.factorialExponent
+      const factor = `${varLatex}!${exponentToLatex(e.abs())}`
+      addPowerFactor(factor, e.compare(0))
     }
-    if (this.exponentialBase.compare(1) < 0) {
-      latex += `${this.exponentialBase.inverse().toLatex()}^${variable}`
+
+    // Exponential: b^n
+    if (this.exponentialBase.compare(1) !== 0) {
+      const b = this.exponentialBase
+      if (b.compare(1) > 0) {
+        num.push(`${b.toLatex()}^{${varLatex}}`)
+      } else {
+        // If you ever represent bases < 1, show it as (1/b)^n in denominator
+        den.push(`${b.inverse().toLatex()}^{${varLatex}}`)
+      }
     }
-    if (numNegativeTerms > 1) {
-      latex += ")"
-    }
-    return latex
+
+    // Join factors with thin spaces so terms don't visually merge.
+    const joinMul = (parts: string[]) => parts.filter(Boolean).join(`\\,`)
+
+    const numerator = joinMul(num)
+    if (den.length === 0) return numerator
+
+    const denominator = joinMul(den)
+    return `${numerator} / (${denominator})`
   }
 
   /**

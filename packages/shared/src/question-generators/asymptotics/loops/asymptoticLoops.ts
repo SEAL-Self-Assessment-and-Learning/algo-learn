@@ -22,21 +22,25 @@ const translations: Translations = {
     description: "Analyze loop-based pseudocode and find its growth rate",
     intro:
       "Consider the following pseudocode for the function `{{0}}(n)`. Assume the primitive statements take constant time.",
-    question:
+    questionFreeText:
       "What is the tight asymptotic running time of this function? Enter the dominant term (e.g., $n^2$ or $n \\log n$).",
+    questionMC:
+      "What is the tight asymptotic running time of this function? Choose the correct dominant term from the options below.",
   },
   de: {
     name: "Asymptotische Schleifen",
     description: "Analysiere Schleifen-Pseudocode und bestimme die Wachstumsrate",
     intro:
       "Betrachte den folgenden Pseudocode der Funktion `{{0}}(n)`. Primitive Anweisungen haben konstante Laufzeit.",
-    question:
+    questionFreeText:
       "Wie lautet die asymptotische Laufzeit dieser Funktion? Gib den dominanten Term an (z. B. $n^2$ oder $n \\log n$).",
+    questionMC:
+      "Wie lautet die asymptotische Laufzeit dieser Funktion? Wähle den korrekten dominanten Term aus den untenstehenden Optionen aus.",
   },
 }
 
 // Display logs without bases (log_b n ~ log n asymptotically)
-const thetaText = (term: SimpleAsymptoticTerm) => `$\\Theta(${term.toLatex(undefined, false, true)})$`
+const thetaText = (term: SimpleAsymptoticTerm) => `$\\Theta(${term.toLatex(undefined, true, true)})$`
 
 function buildFreeTextQuestion({
   scenario,
@@ -89,7 +93,7 @@ function buildFreeTextQuestion({
     const correct = correctTerm.bigTheta(userTerm)
     return {
       correct,
-      correctAnswer: `$\\Theta(${scenario.complexity.toLatex(undefined, false, true)})$`,
+      correctAnswer: `$\\Theta(${scenario.complexity.toLatex(undefined, true, true)})$`,
     }
   }
 
@@ -102,7 +106,7 @@ function buildFreeTextQuestion({
       parameters,
       seed,
     }),
-    text: `${t("intro", [scenario.functionName])}\n\n${stringifyPseudoCode(scenario.code)}\n\n${t("question")}`,
+    text: `${t("intro", [scenario.functionName])}\n\n${stringifyPseudoCode(scenario.code)}\n\n${t("questionFreeText")}`,
     prompt,
     placeholder: "n log n",
     feedback,
@@ -174,6 +178,7 @@ const makeDistractors = (correct: SimpleAsymptoticTerm, random: Random): SimpleA
     }
   }
 
+  // TODO, this may introduce O(26 log n) candidates. Not tight, needs a better approach.
   while (unique.length < 3) {
     const fallback = sampleTerm(variable, random.choice(["pure", "polylog"]), random)
     if (fallback.compare(correct) !== 0 && !unique.some((u) => u.compare(fallback) === 0)) {
@@ -213,11 +218,6 @@ export const AsymptoticLoops: QuestionGenerator = {
       const question = buildFreeTextQuestion({ scenario, lang, parameters: safeParameters, seed })
       return {
         question,
-        testing: {
-          scenario: scenario.id,
-          complexity: scenario.complexity.toLatex(),
-          mode: "free",
-        },
       }
     }
 
@@ -234,7 +234,7 @@ export const AsymptoticLoops: QuestionGenerator = {
       .map((answer) => answer.index)
 
     const { t } = tFunction(translations, lang)
-    const text = `${t("intro", [scenario.functionName])}\n\n${stringifyPseudoCode(scenario.code)}\n\n${t("question")}`
+    const text = `${t("intro", [scenario.functionName])}\n\n${stringifyPseudoCode(scenario.code)}\n\n${t("questionMC")}`
 
     const question: MultipleChoiceQuestion = {
       type: "MultipleChoiceQuestion",
@@ -252,11 +252,6 @@ export const AsymptoticLoops: QuestionGenerator = {
 
     return {
       question,
-      testing: {
-        scenario: scenario.id,
-        complexity: scenario.complexity.toLatex(),
-        mode: "mc",
-      },
     }
   },
 }

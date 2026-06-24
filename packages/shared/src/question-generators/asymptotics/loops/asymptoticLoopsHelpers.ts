@@ -14,12 +14,13 @@ export type ScenarioFactory = (random: Random, difficulty: number) => LoopScenar
 
 export type AdditiveStep = { kind: "add"; step: number; label: string; weight: number }
 export type MultiplicativeStep = { kind: "mul"; factor: number; label: string; weight: number }
-export type StepVariant = AdditiveStep | MultiplicativeStep
+export type DivisionStep = { kind: "div"; factor: number; label: string; weight: number }
+export type StepVariant = AdditiveStep | MultiplicativeStep | DivisionStep
 
 export const asArray = (v: string): PseudoCodeString => [{ variable: v }]
 
-export const powerString = (variable: string, exponent: number): PseudoCodeString =>
-  exponent === 1 ? asArray(variable) : [{ variable }, "^", exponent.toString()]
+export const powerString = (variable: string, exponent: number | string): PseudoCodeString =>
+  exponent === 1 ? asArray(variable) : [{ variable }, "^{", exponent.toString(), "}"]
 
 export const assignmentState = (assignment: string, value: PseudoCodeString): PseudoCodeState => ({
   state: { assignment, value },

@@ -6,6 +6,48 @@ import type {
 } from "../api/QuestionGenerator.ts"
 import { parseMarkdown, type ParseTree, type ParseTreeNode } from "./parseMarkdown.ts"
 
+export function toFraction(value: number): string {
+  if (!Number.isFinite(value)) return String(value)
+  if (Number.isInteger(value)) return String(value)
+  const sign = value < 0 ? -1 : 1
+  const x = Math.abs(value)
+  const eps = 1e-12
+  const maxDen = 1000000
+
+  let a = Math.floor(x)
+  let h1 = 1, k1 = 0
+  let h = a, k = 1
+  let x1 = x
+
+  while (Math.abs(x - h / k) > eps && k <= maxDen) {
+    x1 = 1 / (x1 - a)
+    a = Math.floor(x1)
+    const h2 = a * h + h1
+    const k2 = a * k + k1
+    h1 = h; k1 = k
+    h = h2; k = k2
+  }
+
+  // if denominator grew too large, fallback to previous convergent
+  if (k > maxDen) {
+    h = h1
+    k = k1
+  }
+
+  // reduce fraction
+  const gcd = (a: number, b: number): number => {
+    a = Math.abs(a); b = Math.abs(b)
+    while (b) { const t = a % b; a = b; b = t }
+    return a
+  }
+  let num = sign * h
+  let den = k
+  const g = gcd(num, den)
+  num /= g; den /= g
+
+  return den === 1 ? String(num) : `\\frac{${num}}{${den}}`
+}
+
 /**
  * Function to render a given markdown-like string in LaTeX
  *
