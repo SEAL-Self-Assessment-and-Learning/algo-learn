@@ -99,6 +99,13 @@
       correctness: questionState.feedbackObject?.rowCorrectness?.[i] ?? null,
     })),
   )
+
+  const answers = $derived(
+    question.answers.map((a, i) => ({
+      id: `${i}`,
+      content: a,
+    })),
+  )
 </script>
 
 <InteractWithQuestion
@@ -114,10 +121,7 @@
   <div class="my-5">
     <MatchingExercise
       {pairs}
-      answers={question.answers.map((a, i) => ({
-        id: `${i}`,
-        content: a,
-      }))}
+      {answers}
       {disabled}
       {onChange}
       {onModeChange}
