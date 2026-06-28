@@ -8,6 +8,7 @@
   import { isMobileOrTablet } from "$lib/utils/deviceInformation"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { getInputFields } from "$lib/utils/MultiTextInput.ts"
+  import { untrack } from "svelte"
   import type { Language } from "@shared/api/Language.ts"
   import type { FreeTextFeedback, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
   import { tFunction } from "@shared/utils/translations.ts"
@@ -38,7 +39,6 @@
   })
 
   $effect(() => {
-    // Explicitly reference question to ensure reactivity
     questionState.mode = !question.fillOutAll ? "draft" : "invalid"
     for (const id of fieldValues.inputIds) {
       if (!questionState.text[id]) {
@@ -49,7 +49,7 @@
     }
   })
 
-  const textFieldStateValues: { [p: string]: TextFieldState } = $derived.by(() =>
+  const textFieldStateValues: { [p: string]: TextFieldState } = untrack(() =>
     fieldValues.inputIds.reduce<{ [key: string]: TextFieldState }>((acc, id, i) => {
       acc[id] = {
         text: questionState.text[id],
@@ -140,9 +140,6 @@
   }
 
   $effect(() => {
-    // Explicitly reference lang and question to ensure reactivity
-    void lang
-    void question
     if (question.feedback === undefined) return
     if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
     const textSnapshot = { ...questionState.text }
