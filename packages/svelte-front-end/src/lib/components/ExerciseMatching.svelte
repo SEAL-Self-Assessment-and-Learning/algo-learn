@@ -4,7 +4,6 @@
   import InteractWithQuestion from "$lib/components/InteractWithQuestion.svelte"
   import Markdown from "$lib/components/markdown/markdown.svelte"
   import type { MODE, Result } from "$lib/components/types.ts"
-  import { playSound } from "$lib/sound.svelte.ts"
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte"
   import type { Language } from "@shared/api/Language"
@@ -56,7 +55,6 @@
       void Promise.resolve(question.feedback({ choice: questionState.choice })).then(
         (feedbackObject) => {
           const mode: MODE = feedbackObject.correct ? "correct" : "incorrect"
-          playSound(mode === "correct" ? "pass" : "fail")
           questionState.feedbackObject = feedbackObject
           questionState.mode = mode
         },

@@ -5,7 +5,6 @@
   import type { MODE, Result } from "$lib/components/types.ts"
   import { Button } from "$lib/components/ui/button"
   import { inputClass } from "$lib/components/ui/MultiInput/cnInput.ts"
-  import { playSound } from "$lib/sound.svelte.ts"
   import { globalTranslations } from "$lib/translation.ts"
   import { isMobileOrTablet } from "$lib/utils/deviceInformation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
@@ -90,10 +89,8 @@
         void Promise.resolve(question.feedback({ text: questionState.text })).then((feedbackObject) => {
           let mode: MODE = "draft"
           if (feedbackObject.correct === true) {
-            playSound("pass")
             mode = "correct"
           } else if (feedbackObject.correct === false) {
-            playSound("fail")
             mode = "incorrect"
           }
           questionState.mode = mode

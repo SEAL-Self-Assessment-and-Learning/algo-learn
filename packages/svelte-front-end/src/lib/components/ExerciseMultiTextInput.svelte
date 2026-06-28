@@ -3,7 +3,6 @@
   import Markdown from "$lib/components/markdown/markdown.svelte"
   import type { MODE, Result, TextFieldState } from "$lib/components/types.ts"
   import { setTextFieldStateValues } from "$lib/context/textFieldStateValues.ts"
-  import { playSound } from "$lib/sound.svelte.ts"
   import { globalTranslations } from "$lib/translation.ts"
   import { isMobileOrTablet } from "$lib/utils/deviceInformation"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
@@ -113,10 +112,8 @@
         void Promise.resolve(question.feedback({ text: questionState.text })).then((feedbackObject) => {
           let mode: MODE = "draft"
           if (feedbackObject.correct === true) {
-            playSound("pass")
             mode = "correct"
           } else if (feedbackObject.correct === false) {
-            playSound("fail")
             mode = "incorrect"
           }
           questionState.mode = mode

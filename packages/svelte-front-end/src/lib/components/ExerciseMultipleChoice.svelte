@@ -5,7 +5,6 @@
   import type { MODE, Result } from "$lib/components/types.ts"
   import { Checkbox } from "$lib/components/ui/checkbox"
   import { Label } from "$lib/components/ui/label"
-  import { playSound } from "$lib/sound.svelte.ts"
   import { globalTranslations } from "$lib/translation.ts"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { Tooltip } from "bits-ui"
@@ -75,10 +74,8 @@
           (feedbackObject) => {
             let mode: MODE = "draft"
             if (feedbackObject.correct === true) {
-              playSound("pass")
               mode = "correct"
             } else if (feedbackObject.correct === false) {
-              playSound("fail")
               mode = "incorrect"
             }
             questionState.mode = mode
