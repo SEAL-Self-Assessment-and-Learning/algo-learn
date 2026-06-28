@@ -1,5 +1,6 @@
 <script lang="ts">
   import Markdown from "$lib/components/markdown/markdown.svelte"
+  import { untrack } from "svelte"
   import type { UniqueIdentifier } from "@dnd-kit-svelte/core"
   import { useSortable } from "@dnd-kit-svelte/sortable"
   import { CSS, styleObjectToString } from "@dnd-kit-svelte/utilities"
@@ -12,10 +13,11 @@
 
   let { task, disabled }: { task: Item; disabled?: boolean } = $props()
 
-  // svelte-ignore state_referenced_locally
-  const { attributes, listeners, node, transform, transition, isDragging, isSorting } = useSortable({
-    id: task.id,
-  })
+  const { attributes, listeners, node, transform, transition, isDragging, isSorting } = untrack(() =>
+    useSortable({
+      id: task.id,
+    }),
+  )
 
   const style = $derived(
     styleObjectToString({

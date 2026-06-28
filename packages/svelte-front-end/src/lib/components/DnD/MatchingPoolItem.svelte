@@ -1,5 +1,6 @@
 <script lang="ts">
   import Markdown from "$lib/components/markdown/markdown.svelte"
+  import { untrack } from "svelte"
   import { useDraggable } from "@dnd-kit-svelte/core"
 
   export interface SlotItem {
@@ -14,9 +15,7 @@
   }
 
   const { id, item, disabled = false }: Props = $props()
-
-  // svelte-ignore state_referenced_locally
-  const drag = useDraggable({ id })
+  const drag = untrack(() => useDraggable({ id }))
 
   const dragStyle = $derived(
     drag.transform.current
