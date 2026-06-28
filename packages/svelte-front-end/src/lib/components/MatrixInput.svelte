@@ -1,8 +1,8 @@
 <script lang="ts">
   import Markdown from "$lib/components/markdown/markdown.svelte"
-  import Parenthesis from "./ui/Parenthesis.svelte"
-  import {DARK, derivedTheme} from "$lib/theme.svelte.ts"
+  import { DARK, derivedTheme } from "$lib/theme.svelte.ts"
   import type { MatrixInputProps } from "@shared/utils/matrixInput.ts"
+  import Parenthesis from "./ui/Parenthesis.svelte"
 
   interface Props {
     x: string
