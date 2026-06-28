@@ -38,7 +38,6 @@
   )
 
   $effect(() => {
-    // Explicitly reference question to ensure reactivity
     questionState.mode = question.sorting ? "draft" : "invalid"
     questionState.choice = question.sorting ? [...Array(question.answers.length).keys()] : []
     questionState.feedbackObject = undefined
