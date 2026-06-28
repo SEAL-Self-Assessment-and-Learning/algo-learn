@@ -25,10 +25,6 @@
 
   const { pairs, answers, disabled = false, onChange, onModeChange, columns = 2 }: Props = $props()
 
-  $effect(() => {
-    console.log("pairs", pairs)
-  })
-
   // pool uses the supplied items (cloned so we don't mutate caller's array)
   let pool = $state<SlotItem[]>([])
   let slots = $state<(SlotItem | null)[]>([])

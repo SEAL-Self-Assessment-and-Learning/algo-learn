@@ -69,7 +69,6 @@
         const next = s.group === max ? null : s.group === null ? 0 : s.group + 1
         return { ...s, group: next }
       })
-      console.log(nodeStates[i])
     }
   }
 
