@@ -19,10 +19,7 @@
   }
   const { displayCode }: Props = $props()
 
-  const pseudoCodeStringParse: PseudoCode = $derived.by(() => {
-    // Explicitly reference displayCode to ensure reactivity
-    return JSON.parse(displayCode) as PseudoCode
-  })
+  const pseudoCodeStringParse: PseudoCode = $derived(JSON.parse(displayCode) as PseudoCode)
 
   const { pseudoCodeString, pseudoCodeStringColor, pseudoCodeStringLatex } = $derived(
     pseudoCodeToString(pseudoCodeStringParse),
