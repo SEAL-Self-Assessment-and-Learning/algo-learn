@@ -48,7 +48,7 @@
     }
   })
 
-  const textFieldStateValues: { [p: string]: TextFieldState } = untrack(() =>
+  const textFieldStateValues: { [p: string]: TextFieldState } = $derived(
     fieldValues.inputIds.reduce<{ [key: string]: TextFieldState }>((acc, id, i) => {
       acc[id] = {
         text: questionState.text[id],
@@ -63,7 +63,7 @@
         focus: i === 0 && !isMobileOrTablet,
       }
       return acc
-    }, {}),
+    }, {})
   )
 
   setTextFieldStateValues(() => textFieldStateValues)
