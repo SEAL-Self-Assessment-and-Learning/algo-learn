@@ -7,7 +7,6 @@
   import { isMobileOrTablet } from "$lib/utils/deviceInformation"
   import { getLanguage } from "$lib/utils/langState.svelte.ts"
   import { getInputFields } from "$lib/utils/MultiTextInput.ts"
-  import { untrack } from "svelte"
   import type { Language } from "@shared/api/Language.ts"
   import type { FreeTextFeedback, MultiFreeTextQuestion } from "@shared/api/QuestionGenerator.ts"
   import { tFunction } from "@shared/utils/translations.ts"
