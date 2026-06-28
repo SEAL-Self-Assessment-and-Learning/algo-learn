@@ -63,7 +63,7 @@
         focus: i === 0 && !isMobileOrTablet,
       }
       return acc
-    }, {})
+    }, {}),
   )
 
   setTextFieldStateValues(() => textFieldStateValues)
