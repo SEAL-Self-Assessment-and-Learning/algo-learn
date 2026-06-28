@@ -25,18 +25,20 @@
 
   const { pairs, answers, disabled = false, onChange, onModeChange, columns = 2 }: Props = $props()
 
+  $effect(() => {
+    console.log("pairs", pairs)
+  })
+
   // pool uses the supplied items (cloned so we don't mutate caller's array)
   // svelte-ignore state_referenced_locally
   let pool = $state<SlotItem[]>(structuredClone(answers))
-  $effect(() => {
-    void answers
-    pool = structuredClone(answers)
-  })
   // svelte-ignore state_referenced_locally
   let slots = $state<(SlotItem | null)[]>(Array(pairs.length).fill(null))
   $effect(() => {
-    void pairs
-    slots = Array(pairs.length).fill(null)
+    if (pairs.length !== slots.length) {
+      slots = Array(pairs.length).fill(null)
+      pool = structuredClone(answers)
+    }
   })
   let activeItem = $state<SlotItem | null>(null)
 

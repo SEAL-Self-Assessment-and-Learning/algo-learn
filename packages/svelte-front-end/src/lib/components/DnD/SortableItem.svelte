@@ -17,15 +17,13 @@
     id: task.id,
   })
 
-  const style = $derived.by(() => {
-    // Explicitly reference task to ensure reactivity
-    void task
-    return styleObjectToString({
+  const style = $derived(
+    styleObjectToString({
       transform: CSS.Transform.toString(transform.current),
       transition: isSorting.current ? transition.current : undefined,
       zIndex: isDragging.current ? 1 : undefined,
-    })
-  })
+    }),
+  )
 </script>
 
 <div

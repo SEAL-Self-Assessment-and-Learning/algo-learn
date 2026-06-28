@@ -33,7 +33,6 @@
   })
 
   $effect(() => {
-    // Explicitly reference question to ensure reactivity
     questionState.mode = question.fillOutAll ? "invalid" : "draft"
     questionState.choice = Array(question.answers.length).fill(-1)
     questionState.feedbackObject = undefined
@@ -82,9 +81,7 @@
   }
 
   $effect(() => {
-    // Explicitly reference lang and question to ensure reactivity
     void lang
-    void question
     if (question.feedback === undefined) return
     if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
     const choiceSnapshot = questionState.choice.slice()
@@ -93,6 +90,15 @@
       questionState.feedbackObject = feedbackObject
     })
   })
+
+  const pairs = $derived(
+    (question.fixedItems ?? []).map((f, i) => ({
+      id: `${i}`,
+      fixed: f,
+      answerId: questionState.choice[i] >= 0 ? `${questionState.choice[i]}` : null,
+      correctness: questionState.feedbackObject?.rowCorrectness?.[i] ?? null,
+    })),
+  )
 </script>
 
 <InteractWithQuestion
@@ -107,12 +113,7 @@
 
   <div class="my-5">
     <MatchingExercise
-      pairs={(question.fixedItems ?? []).map((f, i) => ({
-        id: `${i}`,
-        fixed: f,
-        answerId: questionState.choice[i] >= 0 ? `${questionState.choice[i]}` : null,
-        correctness: questionState.feedbackObject?.rowCorrectness?.[i] ?? null,
-      }))}
+      {pairs}
       answers={question.answers.map((a, i) => ({
         id: `${i}`,
         content: a,
