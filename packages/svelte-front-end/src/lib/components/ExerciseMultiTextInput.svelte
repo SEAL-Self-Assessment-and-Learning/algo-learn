@@ -136,6 +136,7 @@
   }
 
   $effect(() => {
+    void lang
     if (question.feedback === undefined) return
     if (questionState.mode !== "correct" && questionState.mode !== "incorrect") return
     const textSnapshot = { ...questionState.text }
