@@ -1,5 +1,5 @@
 import type {
-  MultiFreeTextFeedbackFunction,
+  MultiFreeTextFeedbackFunction, MultiFreeTextFormatFunction,
   MultiFreeTextQuestion,
 } from "@shared/api/QuestionGenerator.ts"
 import { AxbGenerator } from "@shared/question-generators/math/linearAlgebra/axb/axbGen"
@@ -10,6 +10,8 @@ import math from "@shared/utils/math.ts"
 import { createMatrixInput } from "@shared/utils/matrixInput.ts"
 import type Random from "@shared/utils/random.ts"
 import { t, type Translations } from "@shared/utils/translations.ts"
+
+
 
 /**
  * This function generates a question for the start variant of the Ax=b question
@@ -26,6 +28,14 @@ export function generateVariantStartAxb(
   lang: "de" | "en",
   permalink: string,
 ) {
+  const checkFormat: MultiFreeTextFormatFunction = ({ text }, fieldID) => {
+    // check if is a number
+    if (!/^\d+$/.test(text[fieldID])) {
+      return { valid: false, message: t(translations, lang, "validationOnlyNumbers") }
+    }
+    return { valid: true, message: "" }
+  }
+
   const feedback: MultiFreeTextFeedbackFunction = ({ text }) => {
     // rebuild an x vector from the input fields
     const userX: number[] = []
@@ -74,6 +84,7 @@ export function generateVariantStartAxb(
     path: permalink,
     fillOutAll: true,
     text: t(translations, lang, "text", [matrixToTex(A, "r"), vectorToTex(b), matrixInput.matrixInput]),
+    checkFormat,
     feedback,
   }
 

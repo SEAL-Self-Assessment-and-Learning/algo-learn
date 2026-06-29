@@ -99,6 +99,7 @@
         })
       })
     } else {
+      // todo here is missing something. without a check function the check button does not activate
       const valid = value.trim().length > 0 || !question.fillOutAll
       questionState.text[fieldID] = value
       questionState.mode = valid ? "draft" : "invalid"
