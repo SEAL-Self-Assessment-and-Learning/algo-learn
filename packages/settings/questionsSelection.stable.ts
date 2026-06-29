@@ -66,7 +66,7 @@ export const collection: QuestionCollection = [
   },
   {
     slug: "asymptotics",
-    name: { de: "Asymptotische Notation und Laufzeiten", en: "Asymptotic Notation and Runtimes" },
+    name: { de: "Asymptotische Notation und Laufzeiten", en: "Asymptotic Notation and Running Times" },
     topics: ["math", "recursion", "pseudocode"],
     contents: [
       AsymptoticsPreciseLanguage,

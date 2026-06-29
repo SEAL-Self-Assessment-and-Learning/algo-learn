@@ -14,7 +14,7 @@ export const adt: Translations = {
   },
   de: {
     introDFA: `Sei $\\mathcal{A}=(Q,\\Sigma,{{0}},F,\\delta)$ ein DFA wobei $\\\\$`,
-    introNFA: `Sei $\\mathcal{A}=(Q,\\Sigma,S,F,\\delta)$ ein NEA wobei $\\\\$`,
+    introNFA: `Sei $\\mathcal{A}=(Q,\\Sigma,S,F,\\delta)$ ein NFA wobei $\\\\$`,
     startsNFA: `$S = \\{{{0}}\\}$ ist die Menge der Startzustände`,
     states: `$Q = \\{{{0}}\\}$ ist die Zustandsmenge`,
     sigma: `$\\Sigma = \\{{{0}}\\}$ ist das Eingabealphabet`,
