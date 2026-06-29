@@ -78,27 +78,30 @@
     return "draft"
   }
 
+  function applyValidation(fieldID: string, value: string, valid: boolean) {
+    questionState.text[fieldID] = value
+    questionState.modeID[fieldID] = valid ? "draft" : value === "" ? "initial" : "invalid"
+    questionState.mode = checkOverallMode({
+      ...questionState.modeID,
+    })
+  }
+
   function setText(fieldID: string, value: string) {
     questionState.text[fieldID] = value
     if (question.checkFormat) {
       void Promise.resolve(
         question.checkFormat({ text: { ...questionState.text, [fieldID]: value } }, fieldID),
       ).then(({ valid, message }) => {
-        questionState.text[fieldID] = value
-        questionState.modeID[fieldID] = valid ? "draft" : value === "" ? "initial" : "invalid"
-        questionState.formatFeedback[fieldID] = !valid
-            ? (message ?? "")
-            : ""
-        questionState.mode = checkOverallMode({
-          ...questionState.modeID,
-          [fieldID]: valid ? "draft" : "invalid",
-        })
+        applyValidation(fieldID, value, valid)
+        questionState.formatFeedback[fieldID] = !valid ? (message ?? "") : ""
       })
     } else {
-      // todo here is missing something. without a check function the check button does not activate
       const valid = value.trim().length > 0 || !question.fillOutAll
-      questionState.text[fieldID] = value
-      questionState.mode = valid ? "draft" : "invalid"
+      // todo this Promise makes the check button update correctly but it seems to be a workaround
+      //  for a structural issue.
+      void Promise.resolve().then(() => {
+        applyValidation(fieldID, value, valid)
+      })
     }
   }
 

@@ -12,7 +12,7 @@ const translations: Translations = {
     \\[ A={{0}} \\quad b={{1}}\\]
     Provide a possible solution for $x$.
     {{2}}`,
-    validationOnlyNumbers: "Please enter just numerals."
+    validationOnlyNumbers: "Please enter just numerals.",
   },
   de: {
     name: "Lineares Gleichungssystem",
@@ -21,7 +21,7 @@ const translations: Translations = {
     \\[ A={{0}} \\quad b={{1}} \\]
     Gib eine mögliche Lösung für $x$ an.
     {{2}}`,
-    validationOnlyNumbers: "Bitte gib nur Zahlen ein."
+    validationOnlyNumbers: "Bitte gib nur Zahlen ein.",
   },
 }
 
