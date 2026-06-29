@@ -60,7 +60,7 @@ export function getInputFieldValues(inputFields: string[]): {
     inputTypes.push(inputFieldSplit[1])
     inputPrompts.push(inputFieldSplit[2])
     inputPlaceholders.push(inputFieldSplit[3])
-    inputFeedbackVariations.push(inputFieldSplit[4] === "overlay" ? "overlay" : "below")
+    inputFeedbackVariations.push("overlay") // todo remove inputFeedbackVariation
   }
 
   return { inputIds, inputTypes, inputPrompts, inputPlaceholders, inputFeedbackVariations }

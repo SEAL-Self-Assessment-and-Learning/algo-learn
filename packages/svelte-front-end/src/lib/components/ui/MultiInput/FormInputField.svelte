@@ -19,7 +19,7 @@
       text: id,
       type: "",
       prompt: "",
-      feedbackVariation: "below",
+      feedbackVariation: "overlay",
       feedback: JSON.stringify(textFieldStateValues()),
       placeholder: "",
       invalid: false,
