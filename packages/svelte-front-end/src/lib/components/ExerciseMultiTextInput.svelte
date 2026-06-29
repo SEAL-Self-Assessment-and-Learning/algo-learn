@@ -87,11 +87,7 @@
         questionState.text[fieldID] = value
         questionState.modeID[fieldID] = valid ? "draft" : value === "" ? "initial" : "invalid"
         questionState.formatFeedback[fieldID] = !valid
-          ? message
-            ? message
-            : ""
-          : message
-            ? message
+            ? (message ?? "")
             : ""
         questionState.mode = checkOverallMode({
           ...questionState.modeID,
